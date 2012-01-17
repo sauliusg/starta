@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test file printf and scanf operators for floating point types.
+#
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var pi : float = 3.1415926;
+var f : file;
+
+. pi;
+
+f = fopen( "outputs/data.txt", "w" );
+
+<f> << pi << "\n";
+
+fclose( f );
+
+f = fopen( "outputs/data.txt", "r" );
+
+<f> >> pi;
+. pi;
+
+fclose( f );

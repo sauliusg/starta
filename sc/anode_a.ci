@@ -1,0 +1,50 @@
+/*--*-C-*--------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+/* private allocator for dnodes */
+
+#include <stdlib.h>
+#include <cexceptions.h>
+#include <allocx.h>
+
+#if 0
+#define USE_FIXED_NODE_ARRAY
+#endif
+
+#ifdef USE_FIXED_NODE_ARRAY
+
+#define MAX_ANODES 100000
+
+static ANODE anodes[MAX_ANODES];
+static long last_anode;
+
+static ANODE *alloc_anode( cexception_t *ex )
+{
+    assert( last_anode < MAX_ANODES );
+    return &anodes[last_anode++];
+}
+
+static void free_anode( ANODE *anode )
+{
+    assert( anode->rcount == 0 );
+    anode->rcount--;
+}
+
+#else
+
+static ANODE *alloc_anode( cexception_t *ex )
+{
+    return callocx( sizeof(ANODE), 1, ex );
+}
+
+static void free_anode( ANODE *anode )
+{
+    assert( anode->rcount == 0 );
+    freex( anode );
+}
+
+#endif

@@ -1,0 +1,13 @@
+#
+# Snail language compiler tests
+#
+# Test "debug" trap statement.
+#
+
+include "inputs/stdtypes.slib"
+
+. "Before \"debug\"";
+
+debug;
+
+. "After \"debug\"";

@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+# Test module diagnostics
+#
+
+package Types
+
+type PackageType = struct {
+    size = 8
+}
+
+procedure f()
+{
+    type LocalType = struct {
+        size = 4
+    }
+
+    var l : LocalType;
+}
+
+end package Types;
+
+program Tester();
+
+var xx : Types::LocalType;
+var yy : Types::PackageType;

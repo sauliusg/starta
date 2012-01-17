@@ -1,0 +1,35 @@
+#
+# Snail compiler tests
+#
+#
+# String processing functions: concatenation, conversion.
+#
+
+include "inputs/stdtypes.slib"
+
+inline bytecode function toString( i : int ) : string
+begin
+    SLDC "%d" SWAP ISPRINTF
+end;
+
+inline bytecode function strcat( s1, s2 : string ) : string
+begin
+    STRCAT
+end
+
+var i : int;
+var s : string;
+
+i = 1024;
+
+s = toString( i );
+
+. s;
+. strcat( "The number is ", s );
+. strcat( "Another number is ", toString( 1000 ));
+. strcat( strcat( "Number ", toString( 123 )), " converted to string" );
+
+s = strcat( strcat( "Another number ", toString( 33 )),
+	" converted to string" );
+
+. s;

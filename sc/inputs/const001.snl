@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Constant tests
+#
+
+include "inputs/stdtypes.slib"
+
+const N = 11;
+const M = N + 9;
+
+. const N;
+. const M;
+. const N * const M;
+. const (N * M);

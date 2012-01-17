@@ -1,0 +1,4 @@
+p() returns FALSE for a and m
+p() returns TRUE for a and m[2]
+0
+1

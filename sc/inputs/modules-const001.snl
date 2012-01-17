@@ -1,0 +1,40 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+package M;
+
+use std;
+
+const C = 10;
+const D = C + 1;
+
+var i : int = const D;
+
+end package M;
+
+use std;
+
+const C = 100;
+
+. M::i;
+
+var int j;
+
+j = const(M::D);
+. j;
+
+j = const M::D;
+. j;
+
+. const(C * M::C);
+
+. const C * const M::C;
+
+const X = M::C + M::D;
+
+. const X;
+. const(X);

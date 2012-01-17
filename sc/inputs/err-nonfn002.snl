@@ -1,0 +1,10 @@
+#
+# Snail compiler tests
+#
+#
+# Test diagnostics of non-function calls.
+#
+
+use M;
+
+M::i();

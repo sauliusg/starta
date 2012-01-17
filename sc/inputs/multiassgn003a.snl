@@ -1,0 +1,100 @@
+#
+# Snail language compiler tests
+#
+# Test of the multiple assignment
+#
+
+type int = {
+    size = 4; kind = integer;
+    bytecode inline operator "+" ( x : int; y : int ) : int
+        { bytecode{ ADD }};
+    bytecode inline operator "-" ( x : int; y : int ) : int
+        { bytecode{ SUB }};
+    bytecode inline operator "*" ( x : int; y : int ) : int
+        { bytecode{ MUL }};
+    bytecode inline operator "/" ( x : int; y : int ) : int
+        { bytecode{ DIV }};
+    bytecode inline operator "%" ( x : int; y : int ) : int
+        { bytecode{ MOD }};
+    bytecode inline operator "<" ( i : int )
+        { IPRINT };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    bytecode inline operator ">" ( x, y : int ) : int
+        { GT };
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    inline bytecode operator "loop" ( counter : addressof; range : int )
+        { LOOP };
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_nref };
+};
+
+type S = struct { x : int; y : int };
+
+var a, b, c : int;
+
+a = 11;
+b = 12;
+c = 13;
+
+bytecode function space()
+{
+    bytecode { SPACE }
+};
+
+bytecode function newline()
+{
+    bytecode { NEWLINE }
+};
+
+function add_and_sub( x, y : int ) : int, int
+{
+    return  x + y, x - y;
+};
+
+function all_actions( x, y : int ) : int, int, int, int
+{
+    return  x + y, x - y, x * y, x / ( y - 5 );
+};
+
+var p, q : int;
+var m : array of int;
+var s : S;
+var i, j : int;
+var dummy : int;
+
+i = 7;
+m = new int[20];
+s = new S;
+
+p, q = add_and_sub( a, b );
+
+< p; space(); < q; newline();
+
+p, q, dummy, dummy = all_actions( a, b );
+
+< p; space(); < q; newline();
+
+p, m[i], q, s.y = all_actions( a, b );
+
+< p; space(); < q; space();
+
+for j = 1 to 10 do < m[j]; space(); enddo;
+newline();
+
+m[i], q, s.x, p = all_actions( a, b );
+
+< p; space(); < q; space();
+
+for j = 1 to 10 do < m[j]; space(); enddo;
+newline();
+
+m[i-1], m[i], s.x, m[i+1] = all_actions( a, b );
+
+< p; space(); < q; space();
+
+for j = 1 to 10 do < m[j]; space(); enddo;
+newline();

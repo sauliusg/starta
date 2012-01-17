@@ -1,0 +1,35 @@
+#
+# Snail compiler tests
+#
+#
+# Test how the SL compiler deals with the immutable values when
+# compiling the ':=' assignemtn.
+#
+
+use std;
+
+readonly m  = [ 1, 2, 3 ];
+readonly mm = [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]; // OK
+readonly mmm = [ [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ],
+                 [ [ 10, 20 ], [ 30, 40 ] ] 
+               ]; // OK
+
+var n = new int [3];
+var nn = new int[3][3];
+var nnn = new int[3][3][3];
+
+n := m; // OK
+
+m := n; // ERROR;
+
+nn := mm; // ERROR, 'nn' would give a r/w access to the r/o components of 'mm'
+
+nn[0] = mm[0]; // ERROR: can not assign a readonly content
+
+nn[0] := mm[0]; // OK
+
+nnn[0] := mmm[0]; // ERROR
+
+mm[0] := nn[0]; // ERROR, readonly content may not be modified.
+
+nnn[0] := mmm[0]; // ERROR

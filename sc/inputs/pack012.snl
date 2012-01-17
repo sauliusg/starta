@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+procedure print_array( float m[] )
+{
+    for var int i = 0 to last( m ) {
+        < m[i]; < " ";
+    }
+    < "\n";
+}
+
+procedure print_matrix( float m[][] )
+{
+    for var i = 0 to last( m ) do
+         print_array( m[i] );
+    enddo
+    < "\n"
+}
+
+var b = new blob(200);
+
+pack b, 0, "F4", [ [ 1.0, 2.0, 3.0 ], [ 4.0, 5.0, 6.0 ] ];
+
+var m = unpack (array of float)( b, 0, "F4x10" );
+print_array( m );
+
+. "-----------";
+
+var mm = unpack float[3][]( b, 0, "F4x2" );
+print_matrix( mm );

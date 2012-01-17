@@ -1,0 +1,29 @@
+#
+# Snail language compiler tests
+#
+#
+# Function declaration and call tests
+#
+
+#
+# Since functions can be declared anywhere in the main program text,
+# Snail must generate a code that jumps over function declarations:
+#
+
+# a jump must be generated over function ff()
+
+type int = {
+    size = 4;
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+function ff( a : int )
+{
+};
+
+bytecode {
+    SLDC "After jump over function f()"
+    SPRINT
+    NEWLINE
+}

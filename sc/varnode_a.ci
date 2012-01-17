@@ -1,0 +1,51 @@
+/*--*-C-*--------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+/* private allocator for vartab nodes */
+
+#include <stdlib.h>
+#include <cexceptions.h>
+#include <allocx.h>
+#include <stdio.h>
+
+#ifdef USE_FIXED_NODE_ARRAY
+
+#define MAX_VAR_NODES 10000
+
+static VAR_NODE var_nodes[MAX_VAR_NODES];
+static long last_var_node;
+
+static VAR_NODE *alloc_var_node( cexception_t *ex )
+{
+    /* return callocx( sizeof(VAR_NODE), 1, ex ); */
+    assert( last_var_node < MAX_VAR_NODES );
+    /* printf( "allocating var node %ld\n", last_var_node ); */
+    return &var_nodes[last_var_node++];
+}
+
+static void free_var_node( VAR_NODE *var_node )
+{
+    /* freex( var_node ); */
+    /* printf( "deleting var node %d\n", (var_node-var_nodes) ); */
+    assert( var_node->rcount == 0 );
+    var_node->rcount--;
+}
+
+#else
+
+static VAR_NODE *alloc_var_node( cexception_t *ex )
+{
+    return callocx( sizeof(VAR_NODE), 1, ex );
+}
+
+static void free_var_node( VAR_NODE *var_node )
+{
+    assert( var_node->rcount == 0 );
+    freex( var_node );
+}
+
+#endif

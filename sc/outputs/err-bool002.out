@@ -1,0 +1,23 @@
+./sl: inputs/err-bool002.snl(134,10): ERROR, type 'int' has no unary operator named 'jz'
+if a > b then
+         ^
+./sl: inputs/err-bool002.snl(141,10): ERROR, type 'int' has no unary operator named 'jz'
+if a > b && f < g then
+         ^
+./sl: inputs/err-bool002.snl(141,19): ERROR, incompatible types for binary operator 'and'
+if a > b && f < g then
+                  ^
+./sl: inputs/err-bool002.snl(141,19): ERROR, type 'int' has no unary operator named 'jz'
+if a > b && f < g then
+                  ^
+./sl: inputs/err-bool002.snl(153,11): ERROR, type 'long' has no unary operator named 'jnz'
+if g == h || c == d then
+          ^
+./sl: inputs/err-bool002.snl(153,21): ERROR, incompatible types for binary operator 'or'
+if g == h || c == d then
+                    ^
+./sl: inputs/err-bool002.snl(153,21): ERROR, type 'long' has no unary operator named 'jz'
+if g == h || c == d then
+                    ^
+./sl: 7 error(s) detected
+

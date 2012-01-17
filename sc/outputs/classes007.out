@@ -1,0 +1,12 @@
+B.ii.offset = 0
+B.xx.offset = 1
+B.a.offset  = 4
+B.nn.offset = 2
+B.nm.offset = 3
+B.name.offset = 2
+class A
+class B
+====
+class B
+21
+class AA

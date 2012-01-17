@@ -1,0 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test structures...
+#
+
+use std;
+
+class C {
+        xxx : int;
+	method setx( xx : int ) { self.xxx = xx }
+        method getx() : int { return self.xxx }
+}
+
+type A = struct {
+    c : class { 
+        x : int;
+	method setx( xx : int ) { self.x = xx }
+        method getx() : int { return self.x }
+    };
+    a : string;
+    b : int;
+    d : double;
+}
+
+var a = new A;
+a.c = new C;
+
+a.c->setx( 11 );
+. a.c->getx();
+
+a->setx( 20 );
+. a->getx();
+
+var c = new C;
+
+c->setx( 10 );
+. c->getx();

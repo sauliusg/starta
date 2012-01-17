@@ -1,0 +1,11 @@
+
+use std;
+
+var int[] m;
+var file f;
+
+for var i = 1 to last(m) do
+    while( fff( f )) {
+    }
+enddo;
+

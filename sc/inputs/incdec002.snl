@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+
+type int = {
+    size = 4; kind = integer;
+    inline bytecode operator "+" ( i : int; j : int ) : int
+        { ADD };
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+    inline bytecode operator "--" ( i : int ) : int
+        { DEC };
+    inline bytecode operator "incvar" ()
+        { INCVAR };
+    inline bytecode operator "decvar" ()
+        { DECVAR };
+    inline bytecode operator "." ( i : int )
+        { IPRINT };
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+var i : int;
+
+i = 11;
+
+i++;
+. i;
+
+i--;
+. i;

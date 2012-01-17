@@ -1,0 +1,25 @@
+#
+# Snail compiler tests
+#
+#
+# Test class method syntax
+#
+
+use std;
+
+struct S {
+    int i;
+    string name;
+    g : function (int i) -> (int);
+    function (int i) -> (int) ff;
+
+    inline bytecode operator "+"(S a, b) : S { };
+    inline bytecode operator "-"(S a, b) : S { }
+
+    method f(int i) : int { return i }
+    ro method g(int i) : int { return i }
+    readonly method h(int i) : int { return i }
+
+    inline bytecode operator "*"(S a, b) : S { return null }
+
+};

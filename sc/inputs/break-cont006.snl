@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test loop 'break' and 'continue' statements.
+#
+
+use std;
+
+var int m[][][] = new int [30][20][10];
+
+var int i, j, k;
+
+l1: for i = 0 to last(m) do
+    l2: for j = 0 to last(m[i]) do
+    	l3: for k = 0 to last(m[i][j]) do
+	    if( i > j ) then
+	    	continue l2;
+	    endif
+	    m[i][j][k] = i * j * k;
+	enddo
+    enddo
+enddo
+
+l1: for i = 0 to last(m) do
+    l2: for j = 0 to last(m[i]) do
+    	l3: for k = 0 to last(m[i][j]) do
+	    < m[i][j][k]; < " ";
+	enddo
+        . "";
+    enddo
+    . "";
+enddo;
+
+bytecode { ESPRINT };
+

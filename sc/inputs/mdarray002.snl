@@ -1,0 +1,40 @@
+#
+# Snail compiler tests
+#
+
+include "inputs/stdtypes.slib"
+
+inline bytecode function write( i : int )
+begin
+    IPRINT
+end
+
+inline bytecode function writeln()
+begin
+    NEWLINE
+end
+
+var m : array [][][] of int;
+
+m = new int [3][10][20];
+
+var i, j, k : int;
+
+for i = 0 to last(m) do
+    for j = 0 to last(m[i]) do
+        for k = 0 to last(m[i][j]) do
+            m[i][j][k] = i * j * k;
+        enddo
+    enddo
+enddo
+
+for i = 0 to last(m) do
+    for j = 0 to last(m[i]) do
+        for k = 0 to last(m[i][j]) do
+            write( m[i][j][k] );
+            bytecode { SPACE }
+        enddo
+        writeln();
+    enddo
+    writeln();
+enddo

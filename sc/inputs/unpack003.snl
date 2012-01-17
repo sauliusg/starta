@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+var b = new blob(100);
+
+pack b,  0, "i4", 123;
+pack b,  4, "i4", 45;
+pack b,  8, "i4", 6;
+pack b, 16, "i4", 7;
+
+pack b, 24, "i1", 10;
+pack b, 25, "i1",  1;
+
+var m = unpack int[]( b, 0, "i4x8" );
+
+. length( m );
+
+for var int i = 0 to last( m ) {
+    . m[i];
+}

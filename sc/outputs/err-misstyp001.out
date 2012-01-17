@@ -1,0 +1,9 @@
+./sl: inputs/err-misstyp001.snl(8,18): ERROR, type 'missing' is not declared in the current scope
+type T = missing {
+                 ^
+./sl: inputs/err-misstyp001.snl(8,18): ERROR, incorrect syntax
+type T = missing {
+                 ^
+./sl: compiler could not recover from errors, quitting now
+2 error(s) detected
+

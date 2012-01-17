@@ -1,0 +1,11 @@
+
+package testmath;
+
+use std;
+
+function sqr( float x ) : float
+begin
+    return x * x
+end
+
+end package testmath

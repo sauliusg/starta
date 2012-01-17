@@ -1,0 +1,5 @@
+./sl: inputs/err-over001.snl(33,13): ERROR, incompatible type of argument 2 for operator 'over'
+b = m[2] = c;
+            ^
+./sl: 1 error(s) detected
+

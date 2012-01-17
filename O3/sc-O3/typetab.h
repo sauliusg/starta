@@ -1,0 +1,1 @@
+../../sc/typetab.h

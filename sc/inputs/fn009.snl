@@ -1,0 +1,27 @@
+#
+# Snail language compiler tests
+#
+#
+# Function declaration and call tests
+#
+
+# Check whether pre-declared functions are called correctly
+
+type int = {
+    size = 4;
+    bytecode inline operator "+" ( x : int; y : int ) : int
+        { bytecode{ ADD }};
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+var i : int;
+
+i = 30;
+
+function writeln( x : int )
+{
+    bytecode { LD %x IPRINT NEWLINE }
+};
+
+writeln( i + 10 );

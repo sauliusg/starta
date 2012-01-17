@@ -1,0 +1,90 @@
+#
+# Snail language compiler tests
+#
+#
+# 'IF' and shortcut boolean expressions
+#
+
+type char = {
+    size = 1;
+}
+
+type int = {
+    size = 4; kind = integer;
+
+    bytecode inline operator "<" ( x, y : int ) : int
+        { LT };
+    bytecode inline operator ">" ( x, y : int ) : int
+        { GT };
+    bytecode inline operator "<=" ( x, y : int ) : int
+        { LE };
+    bytecode inline operator ">=" ( x, y : int ) : int
+        { GE };
+    bytecode inline operator "==" ( x, y : int ) : int
+        { EQ };
+    bytecode inline operator "!=" ( x, y : int ) : int
+        { NE };
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+}
+
+type long = {
+    size = 8; kind = integer; suffix = "L";
+
+    bytecode inline operator "<" ( x, y : long ) : long
+        { LLT };
+    bytecode inline operator ">" ( x, y : long ) : long
+        { LGT };
+    bytecode inline operator "<=" ( x, y : long ) : long
+        { LLE };
+    bytecode inline operator ">=" ( x, y : long ) : long
+        { LGE };
+    bytecode inline operator "==" ( x, y : long ) : long
+        { LEQ };
+    bytecode inline operator "!=" ( x, y : long ) : long
+        { LNE };
+    bytecode inline operator "jnz" ( x : long )
+        { JNZ };
+    bytecode inline operator "jz" ( x : long )
+        { JZ };
+}
+
+type string = {
+    size = 4;
+    kind = string;
+    reference;
+    suffix = "";
+
+    inline bytecode operator "." ( s : string )
+        { SPRINT NEWLINE };
+
+    inline bytecode operator "ldc" () : string
+        { SLDC };
+}
+
+function writeln( s : string )
+begin
+    bytecode { LD %s SPRINT NEWLINE }
+end
+
+function write( s : string )
+begin
+    bytecode { LD %s SPRINT }
+end
+
+var a, b, c, d : int;
+var e, f, g, h : long;
+
+if a > b || e < f then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+if a > b && e < f then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;

@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Test diagnostics of the unknown type kinds.
+#
+
+type eint = {
+    size = sizeof native "int";
+    kind = impossibleTypeKind;
+
+    inline bytecode operator "." ( i : eint )
+        { IPRINT NEWLINE };
+
+    inline bytecode operator "ldc" () : eint
+        { LDCS };
+
+}

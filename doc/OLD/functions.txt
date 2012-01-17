@@ -1,0 +1,27 @@
+
+When generating expression evaluation code from the expression parse tree,
+it was assumed that every temporary value can be stored in one stackcell.
+Also, it was assumed that there are lvalues and rvalues, and rvalues will
+never be used in indexing or field access operations.
+
+This was true, since all bytecode commands operate on the single stackcells,
+and only references can be used for indirectly accessing fields. STSO
+commands were supposed to be used only with "officially" declared local
+variables (and not with temporary values).
+
+Function calls make the situation more complicated, since a function can
+return compound value (table or strucure), and this may be a temporary value
+for field access or indexing operators.
+
+The following situations are possible:
+
+a) function returns r-value, caller needs r-value:
+
+   move or pop the returned function value to the destination, if 
+   MOVE   %dst %src
+   POP    %dst
+   MEMOVE %dst %src result_size
+   
+b) function returns lvalue, caller needs rvalue:
+
+   dereference and move

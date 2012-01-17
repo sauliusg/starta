@@ -1,0 +1,78 @@
+#
+# Snail language compiler tests
+#
+# Test of simple arithmetics.
+#
+
+type int = {
+    size = sizeof native "int";
+    kind = integer;
+    inline bytecode operator "+" ( x : int; y : int ) : int
+        { bytecode{ ADD }};
+    inline bytecode operator "-" ( x : int; y : int ) : int
+        { bytecode{ SUB }};
+    inline bytecode operator "*" ( x : int; y : int ) : int
+        { bytecode{ MUL }};
+    inline bytecode operator "/" ( x : int; y : int ) : int
+        { bytecode{ DIV }};
+    inline bytecode operator "%" ( x : int; y : int ) : int
+        { bytecode{ MOD }};
+    inline bytecode operator ">" ( x : int; y : int ) : int
+        { bytecode{ GT }};
+    inline bytecode operator "ld" () : int
+	{ ILD };
+    inline bytecode operator "st" ( i : int )
+	{ IST };
+    inline bytecode operator "ldi" ( a : addressof ) : int
+	{ ILDI };
+    inline bytecode operator "sti" ( a : addressof; i : int )
+	{ ISTI };
+    inline bytecode operator "ldc" () : int
+	{ LDCS };
+    inline bytecode operator "jnz" ( i : int )
+	{ JNZ };
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_nref };
+    inline bytecode operator "new[][]" ( i : int ) : array
+        { MDALLOCC %%element_nref %%level };
+    inline bytecode operator "loop" ( c : addressof; i : int )
+        { LOOP };
+};
+
+var i, j, k : int;
+
+type matrix = array of array of int;
+
+var m, n, p : matrix;
+
+var N : int;
+
+N = 400;
+
+m = new int [N][N];
+n = new int [N][N];
+p = new int [N][N];
+
+for i = 0 to N - 1 do
+    for j = 0 to N - 1 do
+    	p[i][j] = 0;
+        for k = 0 to N - 1 do
+	    /* p[i][j] += m[i][k] * n[k][j]; */
+            bytecode {
+                PLDXVAR2 -6 -1 (* p, i *)
+                INDEXVAR -2 (* j *)
+                DUP
+                ILDI
+                PLDXVAR2 -4 -1 (* m, i *)
+                ILDXVAR -3 (* k *)
+                PLDXVAR2 -5 -3 (* n, k *)
+                ILDXVAR -2 (* j *)
+                MUL
+                ADD
+                ISTI
+            }
+        enddo;
+    enddo;
+enddo;

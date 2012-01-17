@@ -1,0 +1,8 @@
+./sl: inputs/err-break-cont002.snl(23,7): ERROR, 'break' and 'continue' statements can be used only in loops
+break xxx;
+      ^
+./sl: inputs/err-break-cont002.snl(37,10): ERROR, 'break' and 'continue' statements can be used only in loops
+continue yyy;
+         ^
+./sl: 2 error(s) detected
+

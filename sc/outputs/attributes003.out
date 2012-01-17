@@ -1,0 +1,14 @@
+./sl: inputs/attributes003.snl(21,15): ERROR, neither type nor variable 'x' can be found to provide attribute 'size'
+. const(x.size);
+              ^
+./sl: inputs/attributes003.snl(22,12): ERROR, neither type nor variable 'x' can be found when searching for field 'y'
+. const(x.y.size);
+           ^
+./sl: inputs/attributes003.snl(23,12): ERROR, variable 't' does not have member 'y'
+. const(t.y.size);
+           ^
+./sl: inputs/attributes003.snl(27,12): ERROR, type 'T' does not have member 'y'
+. const(T.y.size);
+           ^
+./sl: 4 error(s) detected
+

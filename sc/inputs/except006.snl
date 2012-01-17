@@ -1,0 +1,42 @@
+#
+# Snail compiler tests
+#
+#
+# Test exception handling in SL compiler.
+#
+
+include "inputs/stdtypes.slib"
+
+procedure f( i : int ) : int
+{
+    try {
+        try {
+            return i + 1;
+        }
+    }
+}
+
+procedure g( i : int ) : int
+{
+    try {
+        try {
+            return 2 * f( i );
+        }
+    }
+}
+
+. "Before try\n";
+
+try {
+    . "Within TRY block, before g() call";
+    . g( 1 );
+    . "Within TRY block, after g() call\n";
+}
+
+catch( var x : int; var m : string ) {
+    . "exception:";
+    . x;
+    . m;
+}
+
+. "After try";

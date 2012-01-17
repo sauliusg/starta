@@ -1,0 +1,5 @@
+./sl: inputs/err-kind001.snl(10,12): ERROR, type kind 'impossibleTypeKind' is unknown
+    kind = impossibleTypeKind;
+           ^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,5 @@
+./sl: inputs/err-loadlib001.snl(8,6): ERROR, could not open shared library '/usr/lib/noexistent.so' - no such file or directory
+load "/usr/lib/noexistent.so";
+     ^
+./sl: 1 error(s) detected
+

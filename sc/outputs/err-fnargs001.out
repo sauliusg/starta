@@ -1,0 +1,14 @@
+./sl: inputs/err-fnargs001.snl(16,3): ERROR, parameter 'i' has no default value, please supply its value
+f();
+  ^
+./sl: inputs/err-fnargs001.snl(16,3): ERROR, too little arguments in call to function 'f'
+f();
+  ^
+./sl: inputs/err-fnargs001.snl(19,7): ERROR, parameter 'i' has no default value, please supply its value
+    f()
+      ^
+./sl: inputs/err-fnargs001.snl(19,7): ERROR, too little arguments in call to function 'f'
+    f()
+      ^
+./sl: 4 error(s) detected
+

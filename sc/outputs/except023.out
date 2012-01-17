@@ -1,0 +1,2 @@
+./sl: Unhandled exception 0 in the bytecode interpreter: The final message
+Caught exception XXX with error code 0 and message 'this is exception only with a message'

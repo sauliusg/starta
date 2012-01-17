@@ -1,0 +1,64 @@
+
+* Modules
+
+** Functions of modules in high-level languages.
+
+Modules in high level languages have surprisingly many roles:
+
+1. Modules can designate namespaces.
+2. Modules are units of distribution and deployment.
+3. Modules are units of abstraction (like classes).
+4. Modules are units of separate compilation.
+5. Modules are units of analysis.
+6. Modules are units of reuse.
+7. Modules are units of encapsulation (only module's functions can
+access internal module's variables).
+
+** Modules in HLC
+
+HLC choices for modules are:
+
+1. +   Modules can designate namespaces.
+2. +/- Modules are units of distribution and deployment.
+3. +   Modules are units of abstraction (like classes).
+4. -   Modules are units of separate compilation.
+5. +   Modules are units of analysis.
+6. +   Modules are units of reuse.
+7. +   Modules are units of encapsulation.
+
+Modules are namespaces. HLC module is not a unit of compilation --
+file is a unit of compilation. A HLC file can contain several
+modules. Also, a module can be spread through several files, either
+compiled consequtively or included into each other through 'include
+statements'.
+
+Of cource, you can put just one module into one file, and HLC compiler
+can help you to enforce this. However, HLC doesn not enforce any
+strict correspondence between files and modules.
+
+Because a file can contain multiple modules, modules are not
+necessarily a unit of deployment. You deploy files, and these can
+contain many modules. But then again, this is your choice, and you can
+put strictly one module into one file. This is probably wise to do.
+
+HLC modules are primarily namespaces. This diminishes namespace
+polution and name clashes dramatically.
+
+Thus, declaring a module will create a namespace.
+
+Exported functions will be declared with a fully qualified names, with
+names prefixed by the module name. Functions without such
+qualification will be internal to a module.
+
+Within the module, the declared names can be used unqualified within
+the module.
+
+module Numbers
+
+type Numbers.integer = int;
+
+function Numbers.add( x, y : integer ) : integer
+begin
+    return x + y;
+end;
+

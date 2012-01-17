@@ -1,0 +1,106 @@
+package Math;
+
+use std;
+
+load "libraries/math/libmath.so.0.01";
+
+inline bytecode operator "**" ( i : float; j : float ) : float
+{ libmath::FPOW }
+
+inline bytecode operator "**" ( i : double; j : double ) : double
+{ libmath::DPOW }
+
+inline bytecode operator "**" ( i : ldouble; j : ldouble ) : ldouble
+{ libmath::LDPOW }
+
+inline bytecode function iroundf( float x ) : long
+{
+    FLDC 0.5 FADD libmath::LFLOOR
+}
+
+inline bytecode function ifloorf( float x ) : long
+{
+    libmath::LFLOOR
+}
+
+inline bytecode function iround( double x ) : long
+{
+    DLDC 0.5 DADD libmath::LFLOORD
+}
+
+inline bytecode function ifloor( double x ) : long
+{
+    libmath::LFLOORD
+}
+
+inline bytecode function iroundl( ldouble x ) : llong
+{
+    LDLDC 0.5 LDADD libmath::LLFLOORLD
+}
+
+inline bytecode function ifloorl( ldouble x ) : llong
+{
+    libmath::LLFLOORLD
+}
+
+inline bytecode function sinf( float x ) : float
+{
+    libmath::FCALL libmath::sinf
+}
+
+inline bytecode function sinl( ldouble x ) : ldouble
+{
+    libmath::LDCALL libmath::sinl
+}
+
+inline bytecode function sin( double x ) : double
+{
+    libmath::DCALL libmath::sin
+}
+
+inline bytecode function cosf( float x ) : float
+{
+    libmath::FCALL libmath::cosf
+}
+
+inline bytecode function cosl( ldouble x ) : ldouble
+{
+    libmath::LDCALL libmath::cosl
+}
+
+inline bytecode function cos( double x ) : double
+{
+    libmath::DCALL libmath::cos
+}
+
+inline bytecode function atan2( double x, y ) : double
+{
+    libmath::DCALL2 libmath::atan2
+}
+
+inline bytecode function atan2f( float x, y ) : float
+{
+    libmath::FCALL2 libmath::atan2f
+}
+
+inline bytecode function atan2l( ldouble x, y ) : ldouble
+{
+    libmath::LDCALL2 libmath::atan2l
+}
+
+inline bytecode function sqrtf( float x ) : float
+{
+    libmath::FCALL libmath::sqrtf
+}
+
+inline bytecode function sqrtl( ldouble x ) : ldouble
+{
+    libmath::LDCALL libmath::sqrtl
+}
+
+inline bytecode function sqrt( double x ) : double
+{
+    libmath::DCALL libmath::sqrt
+}
+
+end package Math;

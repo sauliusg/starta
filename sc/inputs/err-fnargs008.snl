@@ -1,0 +1,19 @@
+#
+# Snail compiler tests
+#
+#
+# Test readonlyness of function parameters.
+#
+
+use std;
+
+procedure g( int i; array of int m )
+{
+    m[0] = i;
+}
+
+readonly a : array of int = new int[20];
+
+g( 7, a ); // ERROR, readonly value passed as a r/w procedure parameter
+
+. a[0];

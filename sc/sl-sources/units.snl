@@ -1,0 +1,11 @@
+
+
+
+var x : float units: cm;
+var y : float units: cm;
+
+var a : float units: cm**2;
+
+a = x * y;
+
+x = x * y;

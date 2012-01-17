@@ -1,0 +1,23 @@
+#
+# Snail compiler tests
+#
+#
+# Test array allocators using more Pascal-like syntax:
+#
+
+use std;
+
+var a = new array [22] of int;
+
+. length(a);
+
+var b = new array[33][44] of float;
+
+. length(b);
+. length(b[0]);
+
+var c = new array[3][4][5] of float;
+
+. length(c);
+. length(c[1]);
+. length(c[1][1]);

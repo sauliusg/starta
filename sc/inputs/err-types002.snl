@@ -1,0 +1,10 @@
+#
+# Snail compiler tests
+#
+#
+# Test size diagnostics for primitive types.
+#
+
+type T = {
+    nref = 4;
+};

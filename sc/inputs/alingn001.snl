@@ -1,0 +1,80 @@
+#
+# Snail compiler tests
+#
+#
+# Test alignment of fields in arrays and structures.
+#
+
+include "inputs/stdtypes.slib"
+
+type boolval = enum byte ( false, true ) ;
+
+var True : boolval = true boolval;
+var False : boolval = false boolval;
+
+struct A {
+    name : string;
+    flag : boolval;
+}
+
+type R = struct {
+    name : array [] of char;
+    flag : boolval;
+}
+
+type B = array [] of R;
+
+var a : A = new A;
+var b : B = new R[10];
+
+a.name = "This is node 'a'";
+a.flag = True;
+
+. a.name;
+. a.flag;
+
+// function min( i, j : int ) : int { return i < j ? i : j }
+
+procedure copy_name( r : array of R; i : int; name : string )
+{
+    if !r then return endif
+
+    for var int j = 0 to last(name) do
+        r[i].name[j] = name[j];
+    enddo
+}
+
+procedure print_array_of_char( m : array of char )
+{
+    if !m || length(m) == 0 || m[0] == '\0' c
+    then 
+        . "(null)";
+        return
+    endif;
+
+    for var i = 0 to last( m ) do
+        if( m[i] == '\0' char ) then break endif
+        < m[i]
+    enddo
+    < "\n";
+}
+
+var i : int;
+
+for i = 0 to last( b ) do
+    b[i] = new R;
+    b[i].name = new char[130];
+enddo
+
+copy_name( b, 1, a.name[] );
+b[1].flag = a.flag;
+
+var line : string = "===================";
+
+. line;
+
+for i = 0 to last( b ) do
+    print_array_of_char( b[i].name[] );
+    . b[i].flag;
+    . line;
+enddo;

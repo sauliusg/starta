@@ -1,0 +1,42 @@
+#
+# Snail compiler tests
+#
+#
+# Testing synonims of types that have references:
+#
+
+use std;
+
+struct S {
+    name : string;
+    value : float;
+}
+
+type R = S;
+
+var r1, r2 : R;
+
+r1 = new R;
+r1.name =  "'%s'" %% "name of record 1";
+
+. "++" + "--------------------------" + "++";
+
+r2 = new R;
+r2.name =  "'%s'" %% "name of record 2";
+
+. "++" + "--------------------------" + "++";
+
+. r1.name;
+. r2.name;
+
+. "++" + "--------------------------" + "++";
+
+r1 = new R;
+r1.name =  "'%s'" %% "NAME OF RECORD 3";
+
+. "++" + "--------------------------" + "++";
+
+. r1.name;
+. r2.name;
+
+. "++" + "--------------------------" + "++";

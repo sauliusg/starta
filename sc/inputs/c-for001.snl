@@ -1,0 +1,42 @@
+#
+# Snail language compiler tests
+#
+# Loop test
+#
+
+#
+# See if the C-style 'for ...' loop works
+#
+
+type int = {
+    size = 4;
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+function writeln( x : int )
+{
+    bytecode { LD %x IPRINT NEWLINE }
+};
+
+function lt( x, y : int ) : int
+{
+    bytecode { LD %x LD %y LT }
+};
+
+function add( x, y : int ) : int
+{
+    bytecode { LD %x LD %y ADD }
+};
+
+var i : int;
+
+for( i = 0; lt( i, 10 ); i = add( i, 1 ) ) do
+    writeln( i );
+enddo

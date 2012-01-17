@@ -1,0 +1,47 @@
+#
+# Snail compiler tests
+#
+#
+# Test exception handling in SL compiler.
+#
+
+type ref = { kind = ref; reference; size = sizeof native "void*" };
+
+type int = {
+    kind = integer;
+    size = sizeof native "int";
+
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    inline bytecode operator "exceptionval" ( p : ref ) : int
+        { ERRORCODE };
+};
+
+type string = {
+    reference;
+    kind = string;
+    size = sizeof native "void*";
+
+    inline bytecode operator "ldc" () : string
+        { SLDC };
+    inline bytecode operator "." ( s : string )
+        { SPRINT };
+};
+
+inline bytecode function raise_exception( code : int; msg : string )
+{
+    RAISEX
+}
+
+. "Before try";
+
+try {
+    . "Within TRY block, before raise";
+    raise_exception( 10, "Exception No. 10" );
+    . "Within TRY block, AFTER raise";
+}
+catch( var i : int ) {
+    . "Catching exception";
+}
+
+. "After try";

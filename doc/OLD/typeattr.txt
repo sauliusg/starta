@@ -1,0 +1,17 @@
+
+type int = {
+     ## allign: 1;
+     ## registers: ax, bx, cx, dx;
+     size: 4;
+     +   : ADD;
+     -   : SUB;
+     /   : DIV;
+     %   : MOD;
+     and : AND;
+     or  : OR;
+     not : NOT;
+     xor : XOR;
+
+     ::short : EXTEND;
+     ::byte  : BYTE EXTEND EXTEND;
+}

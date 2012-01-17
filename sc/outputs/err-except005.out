@@ -1,0 +1,8 @@
+./sl: inputs/err-except005.snl(28,50): ERROR, The first expression in 'raise' operator must be of integer type
+        raise ZeroDivision( "divison by 0 in g()", 12 )
+                                                 ^
+./sl: inputs/err-except005.snl(28,55): ERROR, The second expression in 'raise' operator must be of string type
+        raise ZeroDivision( "divison by 0 in g()", 12 )
+                                                      ^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,11 @@
+#
+# Snail compiler tests
+#
+#
+# Test unimplemented function call diagnostics.
+#
+
+include "inputs/stdtypes.slib"
+
+f(2);
+g();

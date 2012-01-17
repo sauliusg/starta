@@ -1,0 +1,30 @@
+#
+# Snail language compiler tests
+#
+# Test structures and field access.
+#
+
+include "inputs/stdtypes.slib"
+
+type R = struct { x, y, w, h : int };
+
+type S = struct {
+            n, m : int;
+	    rr   : R;
+            a, b : int;
+	    x, y : float;
+         };
+
+var s : S;
+var r : R;
+
+s = new S;
+s.rr = new R;
+
+s.rr.h = 34;
+
+. s.rr.h;
+
+r = s.rr;
+
+. r.h;

@@ -1,0 +1,22 @@
+#
+# Snail compiler tests
+#
+#
+# Test array indexing with chars.
+#
+
+use std;
+
+var s : string = "some string";
+
+var counts = new int[256];
+
+for var i = 0 to last(s) do
+    counts[s[i]] ++;
+enddo
+
+for var i = 0 to last(counts) do
+    if counts[i] != 0 then
+        . "%3d" %% i, (i > 0 ? "%c" %% i : " "), counts[i]
+    endif
+enddo

@@ -1,0 +1,5 @@
+./sl: inputs/err-except001.snl(43,26): ERROR, only one variable may be declared in the 'catch' clause
+catch( var i, j : string ) {
+                         ^
+./sl: 1 error(s) detected
+

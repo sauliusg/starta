@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test global variables
+#
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var int g = 10;
+
+. g;
+
+procedure p()
+{
+    . g;
+}
+
+procedure q( int i )
+{
+    g = i;
+}
+
+p();
+q( 11 );
+p();
+. g;

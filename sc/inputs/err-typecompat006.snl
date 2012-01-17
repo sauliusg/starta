@@ -1,0 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test compatibility of synonims and of synonim arrays.
+#
+
+use std;
+
+type inches = float;
+type cm = float;
+
+type landmarks = array [][] of cm;
+type matrix = array [][] of float;
+type imperial = array [][] of inches;
+
+var m : matrix = new float[10][20]; // OK
+var a : landmarks = [ [10.0, 10.0], [20.0, 30.0, 40.0] ]; // incompatible
+var b : landmarks = new float[10][20]; // incompatible
+var z : imperial;
+
+b = new float[10][20]; // incompatible
+a = new float[10][20]; // incompatible
+z = new inches[10][20]; // OK
+z = new inches[20]; // incompatible
+z = new cm[2][2]; // incompatible
+
+m = z; // incompatible
+
+var mm : array [][] of cm;
+var nn : array [][] of inches;
+
+nn = mm; // incompatible;
+
+nn = z; // OK
+mm = a; // OK
+
+z = nn; // OK
+a = mm; // OK

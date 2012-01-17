@@ -1,0 +1,12 @@
+
+package M1
+
+use std;
+
+procedure p1()
+begin
+    debug;
+    . "I am procedure p1 from the package M1";
+end;
+
+end package M1;

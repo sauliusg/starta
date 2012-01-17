@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+struct A {
+    int ii;
+    float xx;
+    string nn;
+    string nm;
+}
+
+struct C : A {
+    int a;
+    string name;
+}
+
+. "C.ii.offset =", const(C.ii.offset/.stackcellsize);
+. "C.xx.offset =", const(C.xx.offset/.stackcellsize);
+. "C.a.offset  =", const(C.a.offset/.stackcellsize);
+. "C.nn.offset =", const(C.nn.offset/.stackcellsize);
+. "C.nm.offset =", const(C.nm.offset/.stackcellsize);
+. "C.name.offset =", const(C.name.offset/.stackcellsize);

@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test FOR loops with locally declared loop counters
+#
+
+use std;
+
+var nn = [ "name1", "name2", "name3", "name4" ];
+
+for var i = 0 to last(nn) do
+    . nn[i];
+enddo;
+
+. "----------";
+
+for var int i = 0 to last(nn) do
+    . nn[i];
+enddo;
+
+. "----------";
+
+for var i : int = 0 to last(nn) do
+    . nn[i];
+enddo;
+
+. "----------";

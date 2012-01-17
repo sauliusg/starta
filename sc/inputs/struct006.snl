@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test the "stringification" operators.
+#
+
+use std;
+
+struct S {
+   char c[];
+   int  i;
+   long l;
+   float f;
+};
+
+var s = struct S { i : 10, l : 20, f : 33.44, c : new char[20] };
+
+s.c[0] = '\0101'c;
+s.c[1] = '\0102'c;
+s.c[2] = '\0103'c;
+s.c[3] = '\0104'c;
+
+. s.c[0];
+. s.c[1];
+. s.c[2];
+. s.c[3];
+. s.i;
+. s.l;
+. s.f;
+

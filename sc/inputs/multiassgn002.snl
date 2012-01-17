@@ -1,0 +1,59 @@
+#
+# Snail language compiler tests
+#
+# Test of the multiple assignment
+#
+
+type int = {
+    size = 4;
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+var a, b, c : int;
+
+a = 11;
+b = 12;
+c = 13;
+
+bytecode function writeln( i : int )
+{
+    bytecode { IPRINT NEWLINE }
+};
+
+bytecode function newline()
+{
+    bytecode { NEWLINE }
+};
+
+bytecode function write( i : int )
+{
+    bytecode { IPRINT NEWLINE }
+};
+
+writeln( a );
+writeln( b );
+writeln( c );
+newline();
+
+bytecode function add( x, y : int ) : int
+{
+    bytecode { ADD }
+};
+
+bytecode function sub( x, y : int ) : int
+{
+    bytecode { SUB }
+};
+
+function add_and_sub( x, y : int ) : int, int
+{
+    return add( x, y ), sub( x, y );
+};
+
+var p, m : int;
+
+(p, m) = add_and_sub( a, b );
+
+writeln( p );
+writeln( m );

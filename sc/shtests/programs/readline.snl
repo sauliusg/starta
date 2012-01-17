@@ -1,0 +1,49 @@
+
+use std;
+
+program ( args : array of string );
+
+var s : string;
+var f : file;
+
+inline bytecode function readline( f : file ) : string
+{
+    BLDC 10 SFILEREADLN SWAP DROP
+}
+
+inline bytecode function readword( f : file ) : string
+{
+    SFILESCAN SWAP DROP
+}
+
+inline bytecode function strindex( string s1, s2 ) : int
+{
+    STRINDEX
+}
+
+function strcontains( string haystack; string needle ) : bool
+{
+    if strindex( haystack, needle ) >= 0  then
+        return true
+    else
+        return false
+    endif
+}
+
+for var i = 1 int to last(args) do
+    . args[i];
+
+    f = fopen( args[i], "r" string );
+
+    if( strcontains( args[0], "readword" )) {
+        while( (s = readword(f)) != null ) {
+            . ">>>", s, "<<<";
+        }
+    } else {
+        while( (s = readline(f)) != null ) {
+            . ">>>", s, "<<<";
+        }
+    }
+
+    fclose( f );
+enddo;

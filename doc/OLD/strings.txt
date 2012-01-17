@@ -1,0 +1,28 @@
+
+String constants:
+
+"abc def" -- allocates string on the heap.
+'abc def' -- allocates string on the static memory.
+
+'A' -- character constant. How doe we distinguish it from a string?
+
+Or like this:
+
+"abc def" -- string on the static memory. Type is 'ref const string'.
+To get allocate string, use one of the following:
+
+var s : ref string;
+var c : ref const string;
+var s1 : string[100];
+
+s :- "abc def".clone();
+s := "abc def";
+c :- "abc def";
+s :- s.clone();
+s1 := s;
+s1 := "abc def";
+
+s :- "abc def"; # This is an error, since "abc def" is 'ref const string',
+                # and s is 'ref string'. If such assignments were allowed,
+s[3] := 'A'     # one could afterwards write smomething like "s[3] := 'A'"
+		# and in this way change the string constant.

@@ -1,0 +1,10 @@
+
+length
+
+amount of elemnts in an array, or amount of sumbols in a string
+(without terminating '\0' character).
+
+size
+
+amount of memory in bytes required for a data structure, including
+pads for allignment.

@@ -1,0 +1,21 @@
+#
+# Snail language compiler tests
+#
+#
+# Check diagnosticts of undeclared type.
+#
+
+include "inputs/stdtypes.slib"
+
+var a : int;
+var b : nonexistent;
+
+function f1() : int
+{
+    return 10;
+}
+
+b = f1();
+
+. a;
+. b;

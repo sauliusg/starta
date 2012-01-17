@@ -1,0 +1,21 @@
+#
+# Snail compiler tests
+#
+#
+# Test Math library.
+#
+
+use std;
+use Math;
+
+readonly Pi = 3.14159265358979;
+readonly PI = 3.14159265358979D;
+
+. sinf( 30.0 * Pi/180.0 );
+. sin( 30.0D * PI/180.0D );
+. sinl( 30.0D * PI/180.0D );
+. "";
+
+. cosf( 60.0 * Pi/180.0 );
+. cos( 60.0D * PI/180.0D );
+. cosl( 60.0D * PI/180.0D );

@@ -1,0 +1,115 @@
+#
+# Yes, it is Life!
+#
+# Worlds arguably most famous cellular automaton now implemented
+# in HLC!
+#
+# Saulius Grazulis, Byjsk,    2003.10.17
+# Saulius Grazulis, Kaunas,   2003.10.26
+# Saulius Grazulis, Orenburg, 2006.08.18
+#
+
+use std;
+
+type Cell = int;
+
+inline bytecode procedure writestr( s : string )
+{
+    SPRINT
+}
+
+procedure generation( newfield, field : array [][] of Cell )
+begin
+    var i, j : int;
+    var sum : Cell;
+    var max_i : int = last( field );
+    var max_j : int = last( field[0] );
+    var i1, i2 : int;
+    var j1, j2 : int;
+
+    for i = 0 to last( field ) do
+        for j = 0 to last( field[i] ) do
+
+	    i1 = i > 0 ? i - 1 : max_i;
+	    i2 = i < max_i ? i + 1 : 0;
+	    j1 = j > 0 ? j - 1 : max_j;
+	    j2 = j < max_j ? j + 1 : 0;
+
+            sum = field[i1][j1] + field[i1][j] +  field[i1][j2] +
+                  field[i][j1]  + field[i][j2] +
+                  field[i2][j1] + field[i2][j] +  field[i2][j2];
+
+	    if( sum < 2 Cell or sum > 3 Cell ) then
+                newfield[i][j] = 0 Cell
+            else
+                if( sum == 3 Cell ) then
+                    newfield[i][j] = 1 Cell
+                else
+                    newfield[i][j] = field[i][j];
+                endif
+            endif
+
+        enddo
+    enddo
+end
+
+procedure printfield( f : array [][] of Cell )
+{
+    var i, j : int;
+
+    for i = 0 to last(f) {
+        for j = 0 to last(f[i]) {
+            writestr( f[i][j] == 0 Cell ? "." : "o" );
+        }
+        . "";
+    }
+    . "";
+}
+
+function loadfield( filename : string )
+{
+    var file in = fopen( filename, "r" );
+
+    var line : string;
+
+    <in> >> line;
+    while( line != null ) {
+        . line;
+        <in> >> line;
+    }
+
+    fclose( in );
+}
+
+loadfield( "in.txt" );
+
+procedure sleep( length : long )
+{
+    var i : long;
+    for( i = 0L; i < length; i++ ) { }   
+}
+
+var field : array [][] of Cell = new Cell[20][70];
+var newfield : array [][] of Cell = new Cell[length(field)][length(field[0])];
+
+## field[10][10] = 1 Cell;
+## field[11][10] = 1 Cell;
+## field[12][10] = 1 Cell;
+## field[12][11] = 1 Cell;
+## field[11][12] = 1 Cell;
+## 
+## printfield( field );
+## 
+## var gen : int = 1;
+## 
+## //writestr( "\033[H\033[2J" );
+## while( false && gen < 1000 ) {
+##     generation( newfield, field );
+##     field, newfield = newfield, field;
+##     writestr( "\033[H" );
+##     writestr( "Generation " );
+##     . gen;
+##     printfield( field );
+##     //sleep( 800000 );
+##     gen ++;
+## }

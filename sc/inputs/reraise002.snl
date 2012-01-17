@@ -1,0 +1,29 @@
+#
+# Snail compiler tests
+#
+#
+# Test reraise statement
+#
+
+use std;
+
+exception TestException1;
+
+try{
+    try {
+        raise TestException1( 1, "TestException1 risen" );
+    }
+
+    catch( var i : int; var msg : string )  {
+        . msg;
+        . i;
+        reraise;
+    }
+}
+
+catch( var i : int; var msg : string ) {
+        . "";
+        . "Catching exception once more:";
+        . msg;
+        . i;
+}

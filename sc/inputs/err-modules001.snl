@@ -1,0 +1,7 @@
+#
+# Snail compiler tests
+#
+# Test module disgnostics
+#
+
+use Mbad;

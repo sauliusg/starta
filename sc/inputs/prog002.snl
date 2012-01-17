@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test 'program' statement and program arguments.
+#
+
+include "inputs/stdtypes.slib"
+
+inline bytecode function filename( f : file ) : string
+begin
+    bytecode{ FNAME }
+end;
+
+program test( args : array of string;
+              stdio : array of file );
+
+var i : int;
+
+for i = 0 to last( args ) do
+    . args[i];
+enddo;
+
+. "";
+
+for i = 0 to last( stdio ) do
+    . filename(stdio[i]);
+enddo;

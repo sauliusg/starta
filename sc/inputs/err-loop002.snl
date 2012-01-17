@@ -1,0 +1,39 @@
+#
+# Snail language compiler tests
+#
+# Loop test
+#
+
+#
+# See if the Pascal-style 'for ... to' loop works
+#
+
+type long;
+
+type int = {
+    size = 4;
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    inline bytecode operator ">" ( a, b : int ) : int
+        { GT };
+    inline bytecode operator "jnz" ( a : int )
+        { JNZ };
+    inline bytecode operator "loop" ( counter : int; range : int )
+        { LOOP };
+};
+
+function writeln( x : int )
+{
+    bytecode { LD %x IPRINT NEWLINE }
+};
+
+function lt( x, y : int )
+{
+    bytecode { LD %x LD %y LT }
+};
+
+var i : int;
+
+for i = 1 to 10 do
+    writeln( i );
+enddo

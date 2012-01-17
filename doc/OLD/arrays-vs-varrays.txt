@@ -1,0 +1,404 @@
+
+Two different array type systems.
+
+1. C/Pascal style arrays (aka tables in the very early HLC).
+============================================================
+
+Array is implemented as a continuous chunk of memory, with elements ordered
+sequentially. This implementation is the same as in C or Pascal.
+
+To declare a variable of array type, the size of it must be known at compile
+time. However, types, references and function arguments can be declared to
+be of "open" array type, i.e. of array type with unspecified size. Array of
+any size will be compatible with such open array, provided that component
+types are compatible.
+
+References (and also var/const args of functions) to open arrays must be
+then implemented as two-field structures, containing a pointer to the actual
+data and the length of the array. When such references are assigned, both
+fields are copied, thus the length field gets correctly propagated. When a
+fixed-array reference (that has no length field, just a data pointer) is
+assigned to an open array reference, the pointer gets copied, and the size
+field must be initialised by the compiler. This can be done, since size of
+the fixed array is know at compile time; thus, compiler mus just load this
+size (a compiletime constant) into the 'length' field of the open array
+reference.
+
+Examples:
+
+/* all of the following statements are OK, and all declared variables are
+compatible with each other: */
+
+var a, b : array [10] of int;
+const N = 10;
+var m : array [N] of int;
+
+type T = array [N] of int;
+var n, p : T;
+
+type ref_T = ref array [10] of int;
+var x : ref_T :- new array [10] of int;
+
+type TT = array of int;
+
+/* the following declarations are forbidden: */
+
+var w : array of int; # WRONG -- size unknown at compile time
+var w : TT; # WRONG -- size unknown at compile time
+
+var w : ref array [11] of int :- new T; # WRONG -- array sizes differ
+
+/* with open arrays we can work like this: */
+
+var r : ref array of int;
+var q : TT;
+
+r :- q;
+r :- x; # OK -- open arrays are compatible with any fixed-sized arrays.
+
+x :- r; # either forbidden or throws exception if the array sizes are
+        # different at run-time
+
+procedure pp( var a : array of int );
+
+pp( b ); # OK, size known at run time
+pp( x ); # OK, size contained in the 'length' field of x
+
+With such arrays, strings can be implemented as 'array of char'. The actual
+string length must be then indicated by terminating '\0' character, as in C.
+
+Hashes can be also implemented as continuous arrays. Such implementation
+limits the possible conflict resolution mechanisms -- since we are not
+allowed to use pointers to resolve it, we must use linear search in the same
+table or secondary hash function.
+
+Multidimensional arrays will be implemented as in C as arrays of arrays.
+Only the first (coarsest) dimension of such arrays can be made open. Thus,
+
+type Image = array [][3] of int; 
+
+is allowed, while 
+
+type Image = array [3][] of int; # WRONG!
+
+is forbidden, since the size of one 'Image' elemnent is unknow at run time,
+and compiler will not be able to generate correct code for indexing
+expressions.
+
+This is not a big handicap, since genuine multidimensional arrays, as in C,
+can be implemented as arrays of the refs to arrays:
+
+type Matrix = array of ref array of int;
+
+Just one needs to remember initialising variables of type 'ref Matrix':
+
+var mm : ref Matrix :- new array [20] of ref array;
+
+var int i;
+for i := 0; i < mm.length(); i++ do
+    mm[i] :- new array [30] of int;
+endfor
+
+Benefits of having C/Pascal style arrays
+----------------------------------------
+
+1. We ensure that variable of any type is a continuous chunk of memory, and
+its size is known at compile time. To assign variable of any type, one can
+just memmove its contents to a new location.
+
+At the same time, we can work with arrays whose size are unknown in advance
+by using references. Lengths of arrays are remembered automatically, thus
+making programs much safer than in C, and taking away this tedious
+responsibility from the programmer.
+
+2. Strings are synonimous to arrays of char, thus no special processing for
+strings is necessary.
+
+Features 1 and 2 would simplify the compiler quite a bit.
+
+3. No allocations are happenning "behind the scenes". Only explicite calls
+to 'new' operator. You always see what is happening, the compiler will
+never try to outsmart you.
+
+4. One can start thinking about generic procedures that get variables of yet
+unspecified type. Since only the size of the concrete type is required, such
+procedure should be easy to parametrise without making them actually macros.
+
+5. Arrays of such style map directly to C/Pascal arrays, thus making
+interface of HLC with such languages easier.
+
+Disadvantages of having C/Pascal style arrays
+---------------------------------------------
+
+1. Pushing of a new element on such arrays is dangerous.
+
+Obviously, a new element can only by pused onto the allocated open array,
+which can anly be accessed over 'ref array' variable. Now consider the
+following code:
+
+var r1, r2 : ref array of int;
+
+r1 :- r2 :- new int[100]; # r1 and r2 now point to the same chunk of memory
+
+push( r1 ); # r1 == r2 or r1 =/= r2 ? you never know..
+
+During the push() operation, r1 sometimes will be reallocated and moved to a
+new place, and sometimes will stay at the old place. Thus, r2 will become
+independent from r1 (i.e. pointing to a different array) at unpredictable
+times, which is a bug.
+
+Forbiding pushes onto the open arrays, however, would render language
+completely unusable. Java suffers heavily from such caviat.
+
+2. Since arrays and strings are allocated on the stack, this will put a
+heavy burden onto the stack if not used carefully.
+
+3. It will not be possible to write structures that are copied as values and
+contain arrays with variable sizes:
+
+1) either we must write:
+
+struct S1 {
+    x, y : int;
+    m : array [3] of int;
+}
+
+var s1, s2 : S1;
+
+s1 := s2; # OK, values of structures are copied, but the size of 'm' field
+          # must be fixed at compile-time.
+
+2) or we write this way:
+
+struct S2 {
+    x, y : int;
+    m : ref array of int;
+}
+
+var s1, s2 : S2;
+
+s1 := s2; # field 'm' can have any size, but this assignment will copy
+          # anly a reference. Thus, s1 and s2 will contain reference to
+	  # the same physical array, which is substantially different from
+	  # the situation 1).
+
+There is no way to declare a structure that contains an open array field and
+is deep-copied by the assignment (i.e. so that an assigned structure, s1 in
+the above examples, would get a new independent copy of the array data).
+
+
+Remedies against disadvantages of plain arrays
+----------------------------------------------
+
+1. Pushing is safe on 'ref ref array' variables. Consider:
+
+var a, b : ref ref array of int;
+
+a and b would be implemented as follows:
+
+                anonymous
+stack:          reference       array data
+                on the heap:
++----------+    +----------+    +------------------------------+
+| a  ref o-+--->|  ref   o-+--->| elem0 | elem1 | .... | elemN |
++----------+    +----------+    +------------------------------+
+                | length=N |
+		+----------+
+
+Pushing a would change only the intermediate anonymous pointer, and since
+b also points to it, it will see the change.
+
+One can allow pushes onto the internal variables of the procedures:
+
+procedure reader( file f ) : ref array of int;
+begin
+    var a : ref array of int;
+    var i : int;
+
+    while not f.eof() do
+        i << f;
+        push( a, i );
+    enddo
+    return a;
+end
+
+Since a is an internal variable of the 'reader', we can be sure that nobody
+else has references to it, so the conflict will not arise. The possible
+conflicts are not always easy to detect automatically, but in many cases
+compiler would be able to issue warnings. The technique might therefore be
+quite safe; anyway, it is much safer than realloc() in C.
+
+2. One must not forget that large arrays on the stack can easily overload
+compiler and/or runtime envionment, and instead put large arrays and strings
+on heap:
+
+const N : int := 100000;
+var a : array [N] of float; # may cause stack overflow at run time or
+                            # the compiler may run out of stackcells.
+
+Better is:
+
+
+const N : int := 100000;
+var a : ref array [N] of float :- new float[N];
+    # absolutely no problem
+
+
+Since in HLC 'ref array' variable can be used anywhere where the 'array'
+type variable can be used, this should put nearly no burden on a programmer.
+
+3. The transparent deep copy of structures and objects will only be possible
+by overloading assignment operator ':='. The above example would be
+implemented as this:
+
+struct S2 {
+    x, y : int;
+    m : ref array of int;
+    
+    operator := ( const s1, s2 : S2 ) : S2;
+}
+
+operator S2.:= ( const s1, s2 : S2 ) : S2
+begin
+    s1 := s2;                         # bit-wise copy
+    s1.m :- new int[ s2.m.length() ]; # allocate new memory
+    s1.m := s2.m;                     # copy the data
+end
+
+var s1, s2 : S2;
+
+s1 := s2; # field 'm' can have any size, and will be correctly duplicated
+          # by the custom assigment operator of the S2 structure.
+
+
+One just must be careful, after adding more references to S2 in future, not
+to forget to patch the S2.:= operator.
+
+Since the overloading of the operators is necessary anyway, the above
+construct will probably be quite nice.
+
+
+2. Perl style arrays -- varrays (aka arrays in the very early HLC, before
+   2002.06.20).
+==========================================================================
+
+The more complicated arrays I will call varrays here to avoid confusion with
+simple arrays discussed above. Varray means "variable array", and reflects
+the fact the size of such array is variable at run-time and can be adjusted
+safely at any time (i.e. varrays have a safe push opration). To ensure that
+every variable correctly sees changes in varray after push, 'ref varray'
+must be implemented as double reference, and consequently, 'varray' itself
+must be internally represented as a reference. Since any varray can be
+pushed at any moment, this reference must point to memory allocated on a
+heap.
+
+But if we have two varrays, m1 and m2, declared as
+
+var m1, m2 : varray of int;
+
+then 
+
+m1 := m2;
+
+must make a new copy of the varray data. Therefore the assign operator of
+varrays must not only copy the pointers but also allocate a new chunk of
+memory. Also, declaration
+
+var m : varray [20] of float;
+
+must allocate array of floats on the heap.
+
+To make the matters more complicated, if varray is a field in a stucture or
+an alement of the array or varray, it must also be copied as a value. Thus,
+a compiler must in this case examine the type of every structure field, or
+the array/varray base type, and if these are varrays, or types that
+internally contain varrays, their memory must be correctly duplicated. We
+can say that such types must be subjected to "deep copy".
+
+The deep copy must also happen of a parameter is passed to a procedure by
+value.
+
+Benefits of having Perl style arrays
+----------------------------------------
+
+1. Any varray can be pushed at will, and any assignments will correctly
+duplicate the array values. There is no need to overload the assignemnt
+operator, the compiler should take care about the copying automatically.
+
+2. Type system becomes very consistent, in that the operator
+
+a := b;
+
+always copies value of b to a, and the two values are separate and
+independent (that is, any modification of a will not modify b and vice
+versa).
+
+3. Declaring multidimensional arrays becomes very simple:
+
+procedure make_image( w, h : int ) : varray [,] of short
+begin
+    var image : varray [w,h] of short;
+    return image;
+end
+
+Basically, the procedure make_image is obsolete; the 'image' variable can be
+declared anywhere the rectangular array is necessary, and used immediately.
+The memory is automatically allocated by the compiler.
+
+The same procedure with arrays would look like this:
+
+procedure make_image( w, h : int ) : ref array of ref array of short
+begin
+    var image : ref short[][];
+    # let's consider 'short[][]' as a shortcut to
+    # 'array of ref array of short'
+
+    image :- new array [w] of ref short[];
+    var int i;
+    for i := 0 to w-1 do
+        image[i] :- new short[h];
+    enddo
+    return image;
+end
+
+Most probably we will need an to hide 'image' variable in an object to
+handle its structure consistently in a large program.
+
+For different images, with different base types (say, 'byte' instead of
+'short' in the above example), we will have to write 'make_image' functions
+of wrapper objects manually. To avoid this manual work, we need to be able
+to write generic (i.e. parametrised with a type) procedures or objects,
+which I do not know how to make simply and efficiently.
+
+If we use varrays, however, compiler takes care of everything:
+
+var w, h : long; # only known at run-time!
+
+var byte_image : array [w,h] of byte;
+var word_image : array [w,h] of short;
+var float_image : array [w,h] of float;
+
+# for every *_image, memory allocated and ready-for-use.
+
+4. The straightforward use of varrays does not stress the run-time stack at
+all (only pointer and maybe size information is put on the stack; all data
+go to the heap-allocated memory).
+
+
+Disadvantages of having Perl style arrays
+-----------------------------------------
+
+1. Compiler becomes much more complex, since it must generate code for deep
+copy of the variables. Adding new types of such deep-copy types will
+increase the complexity. It is very easy to overlook a situation where the
+deep copy is necessary and make a buggy compiler.
+
+2. Simple variable declaration, assignemnt or parameter passing can allocate
+large amounts of memory.
+
+3. The internal struture of varray is non-trivial, and its invariants can be
+fairly complex and still worse, depend on the implementation of the HLC
+compiler. Thus, its transfer to C routines might be prohibitevely complex
+and unmaintainable.
+
+

@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+var a = new blob(100);
+
+pack a, 0, "F4", 12.34;
+. unpack float( a, 0, "F4" );
+
+pack a, 0, "f4", 12.34;
+. unpack float( a, 0, "f4" );

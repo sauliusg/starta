@@ -1,0 +1,5 @@
+./sl: inputs/err-new001.snl(12,12): ERROR, only reference-implemented types can be used in new operator
+i = new int;
+           ^
+./sl: 1 error(s) detected
+

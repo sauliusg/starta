@@ -1,0 +1,24 @@
+#
+# Snail compiler tests
+#
+
+include "inputs/stdtypes.slib"
+
+var x : float;
+var l : long;
+var i : int;
+
+function three_values( x : int ) : float, long, int
+{
+    return x @ float, x @ long, x;
+};
+
+( x, l, i ) = three_values( 23 );
+. x;
+. l;
+. i;
+
+x = three_values( 17 );
+. x;
+. l;
+. i;

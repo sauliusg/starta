@@ -1,0 +1,121 @@
+#
+# Standard file management functions for SL
+#
+
+inline bytecode function fopen( name : string; mode : string ) : file
+{
+    FOPEN
+}
+
+inline bytecode function fclose( f : file )
+{
+    FCLOSE
+}
+
+inline bytecode function filename( f : file ) : string
+{
+    FNAME
+}
+
+inline bytecode function fread( f : file; m : blob ) : int
+{
+    FREAD
+}
+
+inline bytecode function fwrite( f : file; m : blob ) : int
+{
+    FWRITE
+}
+
+const SEEK_SET = 0;
+const SEEK_CUR = 1;
+const SEEK_END = 2;
+
+inline bytecode function fseek( f : file; offset : long; whence : int = 0 )
+{
+    FSEEK
+}
+
+inline bytecode function ftell( f : file ) : long
+{
+    FTELL
+}
+
+inline bytecode function feof( f : file ) : bool
+{
+    FEOF
+}
+
+inline bytecode function arguments() :  array of string
+{
+    ALLOCARGV
+}
+
+inline bytecode function environment() :  array of string
+{
+    ALLOCENV
+}
+
+inline bytecode function STDIO() :  array of file
+{
+    ALLOCSTDIO
+}
+
+inline bytecode function STDIN() :  file
+{
+    FDFILE 0
+}
+
+inline bytecode function STDOUT() :  file
+{
+    FDFILE 1
+}
+
+inline bytecode function STDERR() :  file
+{
+    FDFILE 2
+}
+
+exception FLOAD_EXCEPTION;
+
+procedure fload( filename : string; 
+                 f : file = null;
+                 buffer : blob = null;
+                 bytes : long = -1
+               ) : blob, long
+{
+    var inp_file : file;
+    var long bytes_read;
+
+    if( !f ) {
+        if( !filename ) {
+            raise FLOAD_EXCEPTION( -1, "Can not open file without a filename" );
+        }
+        f = fopen( filename, "r" );
+        inp_file = f;
+    }
+
+    if( !buffer ) {
+        if( bytes >= 0L ) {
+            buffer = new blob(bytes);
+        } else {
+            var pos = ftell( f );
+            fseek( f, 0, const(SEEK_END) );
+            bytes = ftell( f ) - pos;
+            fseek( f, pos );
+            buffer = new blob( bytes );
+        }
+    } else {
+        if( bytes < 0L ) {
+            bytes = length( buffer );
+        }
+    }
+    
+    bytes_read = fread( f, buffer );
+    
+    if( inp_file ) {
+        fclose( inp_file );
+    }
+
+    return buffer, bytes_read;
+}

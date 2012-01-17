@@ -1,0 +1,185 @@
+
+There are three kinds of arrays.
+
+1. Tables. Correspond to the standard Pascal/C arrays.
+   Properties:
+	1) Size is known at a compile-time.
+	2) It is possible to create a table on the stack (as auto
+	   variable), and to pass it by value.
+	3) No push/pop operations.
+	4) Simple indexinng.
+
+   Implementation: tables are implemented as a simple slice of memory
+without extra control information.
+
+Necessary butecode support:
+INDEX, ALLOC, LDX, STX, LDIX, STIX
+
+2. Vectors. Correspond to arrays in Java, vectorised arrays in Fortran
+and arrays in Perl. Substantioally one dimanetional, but maulti
+dimentional behaviour can be emulated by creating vetors of references
+to vectors.
+   Properties:
+	1) One-dimentional implementation.
+	2) Size is know only at run time.
+	3) Stack contains only references to vectors.
+	4) Push/pop operators on vectors may be not safe; use ref
+	   vector for safe push'es and pop's.
+	5) Indexing with one extra indirection.
+
+   Implementation: vectors can be implemented as allocated arrays with
+a fixed size header (but be aware of the possible alignmnent problems
+after the header), or as more genral arrays (see below).
+
+   stack
+<--void*--->        <------size_t------>
++----------+        +------------------+
+|     o----|------->| vector size      |
++----------+        +------------------+
+                    | element size (?) |
+                    +------------------+
+                    |///align. pad/////|
+                    +------------------+
+                    |  data[0]     |
+                    |  ...         |
+                    +--------------+
+                    |  data[N]     |
+                    |              |
+                    +--------------+
+
+Necessary bytecode support:
+VINDEX, STOX, LDOX
+
+3. Genaral arrays, or simply arrays. Do not have any correspondence in
+currenly "living" languages, but are similar to array implementations
+in Mesa [?], and have nearly the full semantics of arrays in Algol
+(except of slices?).
+   Properties:
+	1) Size is known at run-time, dimentionality is known at
+	   compile time.
+	2) Stack contains only references to arrays.
+	3) Push/pop operators should always be safe (But only if
+           implemented with separate header, see below).
+	4) Indexing rather complex, with two extra indirections or one
+	   extra indirection and one calculation of the header size,
+	   and a necessity to compute section sizes at run-time.
+   Implementation:
+	1) Arrays with variable size header 
+	   Drawbacks:
+		a) Necessity to calcuate header size for every indexing
+		   operation -- might be inherently slow.
+		b) Possible alignment problems with variable size
+		   header, aligmnent pad must be calculated at
+		   run-time.
+		c) Such implementation does not make push/pop
+                   operations safe.
+	2) Structure with header information that contains a pointer
+	   to actual data.
+	   Drawbacks:
+		a) Must allocate two separate chunks for each array.
+
+Implementation with separatly header on the stack
+
+Ndim is a number of array dimensions.
+dim0 is a size of the whole array. (in this example Ndim == 3 )
+dim1 is a size of dimension 1 (slowest), in bytes (i.e. size of a section).
+dim2 size of dimension 2 (medium), in bytes (i.e. size of a row).
+dim3 size of dimension 3 (fastest), in bytes.
+
+       stack:
+ <---void*/size_t--->     <--data size->
+ +------------------+     +------------+
+ | data ptr    o----|---->|  data[0]   |
+ +------------------+     |            |
+ | Ndim             |     +------------+
+ +------------------+     |  data[1]   |
+ | dim0 (array size)|     |            |
+ +------------------+     +------------+
+ | dim1             |     |            |
+ +------------------+     |    ...     |
+ | dim2             |     +------------+
+ +------------------+     |  data[NN]  |
+ | dim3 (element sz)|     |            |
+ +------------------+     +------------+
+
+Thus, address of the element m[i][j][k] (in case Ndim = 3)
+
+         data_ptr + dim1 * i + dim2 * j + dim3 * k
+
+Necessary bytecode support:
+AINDEX, AALLOC, STIX, LDIX
+
+Implementation with separatly allocated header
+
+Ndim is a number of array dimensions.
+dim0 is a size of the whole array. (in this example Ndim == 3 )
+dim1 is a size of dimension 1 (slowest), in bytes (i.e. size of a section).
+dim2 size of dimension 2 (medium), in bytes (i.e. size of a row).
+dim3 size of dimension 3 (fastest), in bytes.
+
+   stack
+<--void*--->        <---void*/size_t--->     <--data size->
++----------+        +------------------+     +------------+
+|     o----|------->| data ptr    o----|---->|  data[0]   |
++----------+        +------------------+     |            |
+                    | Ndim             |     +------------+
+                    +------------------+     |  data[1]   |
+                    | dim0 (array sz)  |     |            |
+                    +------------------+     +------------+
+                    | dim1             |     |            |
+                    +------------------+     |    ...     |
+                    | dim2             |     +------------+
+                    +------------------+     |  data[NN]  |
+                    | dim3 (element sz)|     |            |
+                    +------------------+     +------------+
+
+Thus, address of the element m[i][j][k] (in case Ndim = 3)
+
+         data_ptr + dim1 * i + dim2 * j + dim3 * k
+
+Necessary bytecode support:
+AINDEX, AALLOC, STIX, LDIX
+
+Implementation with variable length header:
+
+<---- size_t ---->
++----------------+ ^
+|     Ndim       | |                Number of array dimensions
++----------------+ |                (in this example Ndim == 3 )
+|     dim1       | |                size of dimension 1 (slowest), in bytes
++----------------+ | h e a d e r    (i.e. size of a section)
+|     dim2       | |                size of dimension 2 (medium), in bytes
++----------------+ |                (i.e. size of a row)
+|     dim3       | |                size of dimension 3 (fastest), in bytes
++================+ v                (size of a single array element)
+| maybe some pad |
+| for alignemnt  |
++-------------+--+
+|             | ^                             ^
++-------------+ |			      |
+|             | | this is one row;	      |
++-------------+ | its size is dim2 bytes      |
+|             | |			      | this is one section;
++=============+ v			      | its size is dim1 bytes
+|   element   | <-- this is one element;      |
++-------------+     its size is dim3 bytes    |
+|             |				      |
+   ........				      |
+|             |				      |
++=============+				      |
+|             |				      |
++-------------+				      |
+|             |				      |
++-------------+				      |
+|             |				      |
++=============+                               v
+|             |
+    .....
+
+Thus, address of the element m[i][j][k] is
+
+         m + header_size + dim1 * i + dim2 * j + dim3 * k
+
+Necessary bytecode support:
+INDEXN, ALLOCN
+

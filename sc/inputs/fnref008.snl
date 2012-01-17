@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test function and procedure references
+#
+
+use std;
+
+procedure g( x : int ) : int
+{
+    return 2 * x;
+}
+
+type F = procedure ( i : int ) -> ( int );
+
+var m : array of F = [ null, g, null ];
+
+for var i = 0 to last( m ) do
+    < i; < "\t";
+    if( m[i] == null ) {
+    	. "null"
+    } else {
+        . m[i](i);
+    }
+enddo

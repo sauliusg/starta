@@ -1,0 +1,25 @@
+#
+# Snail language compiler tests
+#
+#
+# Check variable initialisation statements.
+#
+
+include "inputs/stdtypes.slib"
+
+var a : int = 1;
+var b, c : int = 2;
+
+. a;
+. b;
+. c;
+
+var m, n : array of int = new int[11];
+
+m[2] = 5;
+. n[2];
+
+var r, s : array of string = new string[10];
+
+r[1] = "First";
+. s[1];

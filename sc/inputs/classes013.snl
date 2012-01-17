@@ -1,0 +1,17 @@
+#
+# Snail compiler tests
+#
+#
+# Test structures...
+#
+
+use std;
+
+type A = class {
+    c : class { size = 4 };
+    a : string;
+    b : int;
+    d : double;
+}
+
+. const(A.size/.stackcellsize);

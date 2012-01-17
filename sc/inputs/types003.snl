@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test compatibility of synonims with overriden operators.
+#
+
+use std;
+
+type cm = like float {
+    inline bytecode operator "/" ( c1, c2 : cm ) : float
+        {
+          SLDC "This is the cm \"/\" operator\n"
+          SPRINT
+          FDIV
+        }
+};
+
+var c1, c2 : cm;
+
+c1 = 5 cm;
+c2 = 2 cm;
+
+var float x = c1/c2;
+. x;
+

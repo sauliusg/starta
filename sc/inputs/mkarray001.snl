@@ -1,0 +1,20 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use std;
+
+var m : array of int;
+
+m = [ 1, 2, 3 ];
+
+. length( m );
+. "";
+
+var int i;
+for i = 0 to last(m) do
+    . m[i]
+enddo

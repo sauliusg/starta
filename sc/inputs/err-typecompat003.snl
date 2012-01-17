@@ -1,0 +1,46 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use std;
+
+type A = array of bool;
+type GR = ref;
+
+function p( m, n : array ) : array
+{
+    return new bool[length(m) + length(n)]; // OK
+}
+
+function p1( m, n : array ) : A
+{
+    return m; // ERROR
+}
+
+function p2( m, n : array ) : array
+{
+    return n; // OK
+}
+
+function p3( m, n : array ) : GR
+{
+    return m; // ERROR?
+}
+
+function q1( m, n : ref ) : A
+{
+    return m; // ERROR
+}
+
+function q2( m, n : ref ) : array
+{
+    return m; // ERROR
+}
+
+function q3( m, n : ref ) : GR
+{
+    return m; // ERROR
+}

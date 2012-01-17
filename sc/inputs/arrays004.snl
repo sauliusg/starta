@@ -1,0 +1,74 @@
+#
+# Snail compiler tests
+#
+#
+# Testing cloning of arrays.
+#
+
+use std;
+
+procedure print_array( int[] m )
+{
+    < "[ ";
+    for var i = 0 to last(m) do
+        do < ", " if i > 0;
+        < m[i]
+    enddo
+    < " ]\n";
+}
+
+procedure inc_array( int[] m ) : array of int
+{
+    for var i = 0 to last(m) do
+        m[i] ++
+    enddo
+    return m;
+}
+
+var m : array of int;
+var n : array of int = new int[3];
+
+m = [ 10, 20, 30, 40 ];
+
+print_array( m );
+
+n[0] = n[1] = n[2] = 22;
+
+print_array( n[] );
+
+m = n[];
+
+print_array( m );
+print_array( m[] );
+
+inc_array( m );
+print_array( m );
+
+. "";
+
+const N = 10;
+
+struct S {
+    string name;
+    int[] vals;
+}
+
+var s = new S;
+
+s.vals = new int[const(N)];
+s.name = "s";
+
+for var i = 0 to const(N-1) do
+    s.vals[i] = (i+1)*(i+1);
+enddo
+
+print_array( s.vals[] );
+
+m = s.vals[];
+print_array( inc_array( m[] ));
+print_array( m );
+
+. "";
+
+. "n length =", length( n[] );
+. "s.vals length =", length( s.vals[] );

@@ -1,0 +1,8 @@
+./sl: inputs/err-fnpointers001.snl(15,4): ERROR, function 'f' is not declared in the current scope
+. f()
+   ^
+./sl: inputs/err-fnpointers001.snl(16,3): ERROR, this type has no field named 'ff'
+. ff( 2 );
+  ^
+./sl: 2 error(s) detected
+

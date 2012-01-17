@@ -1,0 +1,99 @@
+#
+# Snail compiler tests
+#
+#
+# Check bitwise logic operators.
+#
+
+use std;
+
+var b : byte = 1B;
+var s : short = 2S;
+var i : int = 2;
+var l : long = 2;
+var L : llong = 2;
+
+. "bytes:";
+
+. b;
+. b << 2B;
+. 4B >> b;
+. b shl 2B;
+. 4B shr b;
+
+. "-----";
+
+. 3B & 2B;
+. 3B | 1B;
+. 3B | 4B;
+. 3B ^ 7B;
+
+. "-----\n";
+
+. "shorts:";
+
+. s;
+. s << 2S;
+. 4S >> s;
+. s shl 2S;
+. 4S shr s;
+
+. "-----";
+
+. 3S & 2S;
+. 3S | 1S;
+. 3S | 4S;
+. 3S ^ 7S;
+
+. "-----\n";
+
+. "integers:";
+
+. i;
+. i << 2;
+. 4 >> i;
+. i shl 2;
+. 4 shr i;
+
+. "-----";
+
+. 3 & 2;
+. 3 | 1;
+. 3 | 4;
+. 3 ^ 7;
+
+. "-----\n";
+
+. "longs:";
+
+. l;
+. l << 2L;
+. 4L >> l;
+. l shl 2L;
+. 4L shr l;
+
+. "-----";
+
+. 3L & 2L;
+. 3L | 1L;
+. 3L | 4L;
+. 3L ^ 7L;
+
+. "-----\n";
+
+. "long longs:";
+
+. L;
+. L << 2LL;
+. 4LL >> L;
+. L shl 2LL;
+. 4LL shr L;
+
+. "-----";
+
+. 3LL & 2LL;
+. 3LL | 1LL;
+. 3LL | 4LL;
+. 3LL ^ 7LL;
+
+. "-----";

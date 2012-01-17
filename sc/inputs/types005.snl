@@ -1,0 +1,10 @@
+#
+# Snail compiler tests
+#
+#
+# Test size diagnostics for primitive types.
+#
+
+type T = {
+    size = 40;
+};

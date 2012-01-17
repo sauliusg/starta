@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Test named function arguments
+#
+
+use std;
+
+function ff( x : int = 0; y : float = 1 ) : float
+{
+    return <float>x * y / ( <float>x + y );
+}
+
+. f()
+. ff( 2 );

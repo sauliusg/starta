@@ -1,0 +1,5 @@
+./sl: inputs/err-typesfx001.snl(17,6): ERROR, integer type with empty suffix is already defined in the current scope
+     };
+     ^
+./sl: 1 error(s) detected
+

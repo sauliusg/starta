@@ -1,0 +1,30 @@
+#
+# Snail compiler tests
+#
+#
+# Test C- and Pascal-style if-then-else operator
+#
+
+include "inputs/stdtypes.slib"
+
+var a : int = 1;
+var b : int = 0;
+
+if a == 0 then
+   . "a is zero"
+else
+   . "a is non-zero"
+endif
+
+if( b == 0 )
+{
+   . "b is zero"
+}
+
+b = 10;
+
+if( b == 0 ) {
+   . "b is now zero";
+} else {
+   . "b is now non-zero";
+}

@@ -1,0 +1,26 @@
+
+use std;
+
+type R = struct {
+    string s1, s2, s2;
+};
+
+var m : array of R;
+
+m = new R[0];
+
+m = null;
+
+. "--" _ "We are here" _ "--";
+
+m = new R[0];
+
+. "--" _ "We are here" _ "--";
+
+m = new R[0];
+
+. "--" _ "We are here" _ "--";
+
+m = new R[0];
+
+. "--" _ "We are here" _ "--";

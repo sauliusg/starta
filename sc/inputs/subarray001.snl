@@ -1,0 +1,16 @@
+#
+# Snail language compiler tests
+#
+# Test subarrays
+#
+
+use std;
+
+var m = [ 1, 2, 3, 4, 5, 6 ];
+
+var n = m[2..4];
+
+for var i = 0 to last(n) do
+    < n[i], " ";
+enddo
+. "";

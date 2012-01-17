@@ -1,0 +1,19 @@
+#
+# Snail compiler tests
+#
+#
+# Testing expressions.
+#
+
+use std;
+
+. 1;
+. (1);
+. +1;
+. (+1);
+. -1;
+. (-1);
+. 1+1;
+. (1+1);
+. -1+1;
+. (-1+1);

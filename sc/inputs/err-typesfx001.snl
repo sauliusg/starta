@@ -1,0 +1,53 @@
+#
+# Test printing of different types
+#
+
+type int = {
+         size = 4;
+         kind = integer;
+	 bytecode inline operator "."( i : int ) { IPRINT };
+	 bytecode inline operator "ldc" () : int { LDCS }
+     };
+
+type long = {
+         size = 8;
+         kind = integer;
+	 bytecode inline operator "."( i : long ) { LPRINT };
+	 bytecode inline operator "ldc" () : long { LLDCS }
+     };
+
+type float = {
+         size = 4;
+         kind = real;
+	 bytecode inline operator "."( x: float ) { FPRINT };
+	 bytecode inline operator "+"( x: float; y: float ) : float { ADD };
+	 bytecode inline operator "@float" ( i : int ) : float { I2F };
+	 bytecode inline operator "ldc" () : float { FLDCS };
+     };
+
+type string = {
+    size = 4;
+    kind = string;
+    bytecode inline operator "." ( s : string ) { SPRINT };
+    bytecode inline operator "ldc" () : string { SLDC };
+};
+
+var x : float;
+var i : int;
+
+i = 20;
+. i;
+. "\n";
+
+x = 0.75;
+. x;
+. "\n";
+
+## x = 21;
+. x;
+. "\n";
+
+x = i@float;
+
+. x;
+. "\n";

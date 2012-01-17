@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Generic array and ref argument tests.
+#
+
+include "inputs/stdtypes.slib"
+
+inline bytecode function ldnull() : ref
+{ PLDZ }
+
+procedure f( r : ref )
+{
+    . "f() : I have received generic ref argument r,";
+    . "that argument is ";
+    if r == ldnull() then
+        . "null"
+    else
+        . "not null"
+    endif
+}
+
+f( null );
+f( new struct{ i : int} );
+f( new int[10] );

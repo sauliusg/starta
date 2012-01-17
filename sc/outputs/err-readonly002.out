@@ -1,0 +1,8 @@
+./sl: inputs/err-readonly002.snl(13,16): ERROR, can not assign to the readonly variable 'm'
+m = new int [7]; // ERROR: assignment to readonly variable
+               ^
+./sl: inputs/err-readonly002.snl(14,9): ERROR, can not assign to a readonly component
+m[0] = 5; // ERROR: component of readonly variable may not be modified
+        ^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,15 @@
+#
+# Snail compiler tests
+#
+#
+# Test file printf and scanf operators for integer types.
+#
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var b = fload( "outputs/data.txt" );
+
+. length(b);
+
+. unpack string( b, 0, "s" );

@@ -1,0 +1,5 @@
+./sl: inputs/err-undeffn003.snl(13,16): ERROR, functions called in exressions must return at least one value
+    if( fff( f )) {
+               ^
+./sl: 1 error(s) detected
+

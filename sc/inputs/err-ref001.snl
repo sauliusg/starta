@@ -1,0 +1,46 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use std;
+
+type A = array of float;
+type M = array [][] of int;
+
+type S = struct { a, b : float };
+
+
+
+var s : S = new S;
+
+function p( m, n : array ) : bool
+{
+    return (m == null) or (n == null);
+}
+
+procedure q( m, n : ref ) : bool
+{
+    m[0] = m[1];
+    return (m == null) or (n == null);
+}
+
+var m : M = new (array of int)[10];
+var a : A = new float[20];
+
+if p( a, m ) {
+    . "p() returns TRUE for a and m"
+} else {
+    . "p() returns FALSE for a and m"
+}
+
+if p( a, m[2] ) {
+    . "p() returns TRUE for a and m[2]"
+} else {
+    . "p() returns FALSE for a and m[2]"
+}
+
+. ( q( a, s ) ? 1 : 0 );
+. ( q( m[0], s ) ? 1 : 0 );

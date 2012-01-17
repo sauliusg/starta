@@ -1,0 +1,21 @@
+#
+# Snail compiler tests
+#
+#
+# Testing reading into structures with references.
+#
+
+use std;
+
+type S = struct {
+    string name;
+    int val;
+}
+
+var s = new S;
+
+var f = fopen( "inputs/text.dat", "r" );
+
+fread( s, f );
+
+.s.val;

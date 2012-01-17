@@ -1,0 +1,6 @@
+./sl: inputs/err-while001.snl(26,23): ERROR, incorrect syntax
+while( (p = p.next) ) {
+                      ^
+./sl: compiler could not recover from errors, quitting now
+1 error(s) detected
+

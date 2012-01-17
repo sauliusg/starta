@@ -1,0 +1,5 @@
+#!/usr/bin/awk -f
+/^\%token/ { 
+	if( match( $2, "^_[A-Z][a-zA-Z]*$" ))
+		print tolower(substr($2,2)), "     \t{ MARK; return " $2 "; }" 
+}

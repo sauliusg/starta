@@ -1,0 +1,66 @@
+#
+# Snail language compiler tests
+#
+#
+# Recursive function tests
+#
+
+#
+# Calculate factorial using recursuve funtion calls.
+#
+
+type int = {
+    size = 4; kind = integer;
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    bytecode inline operator ">" ( x, y : int ) : int
+        { GT };
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+    inline bytecode operator "loop" ( counter : addressof; range : int )
+        { LOOP };
+};
+
+type short = { size = 2; kind = integer; suffix = S };
+
+forward function writeln( i : int );
+forward function mul( i, j : int ) : int;
+forward function dec( i : int ) : int;
+forward function le( i, j : int ) : int;
+
+function factorial( n : int ) : int
+{
+    if le( n, 1 ) then
+        return 1;
+    else
+        return mul( n, factorial( dec(n) ));
+    endif
+}
+
+var i : int;
+
+for i = 0 to 10 do
+    writeln( factorial(i) );
+enddo
+
+bytecode function writeln( i : int )
+{
+    IPRINT NEWLINE
+}
+
+bytecode function mul( a, b : int ) : int
+{
+    MUL
+}
+
+bytecode function dec( i : int ) : int
+{
+    bytecode { DEC }
+}
+
+bytecode function le( i, j : int ) : int
+{
+    bytecode { LE }
+}

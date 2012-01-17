@@ -1,0 +1,6 @@
+C.ii.offset = 0
+C.xx.offset = 1
+C.a.offset  = 4
+C.nn.offset = 2
+C.nm.offset = 3
+C.name.offset = 5

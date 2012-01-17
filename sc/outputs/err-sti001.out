@@ -1,0 +1,8 @@
+./sl: inputs/err-sti001.snl(49,11): ERROR, incompatible type of argument 2 for operator 'sti'
+a[2] = 123;
+          ^
+./sl: inputs/err-sti001.snl(54,12): ERROR, incompatible type of argument 2 for operator 'sti'
+b[2] = a[2];
+           ^
+./sl: 2 error(s) detected
+

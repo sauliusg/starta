@@ -1,0 +1,52 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+type P = class {
+// class P {
+     float x;
+     int i;
+
+     method g() : int
+     begin
+	 . "This is method g() of class P object with x =", self.x,
+	   "and i =", self.i;
+	 return 1;
+     end;
+}
+
+class S : P {
+    int i;
+    string name;
+    P next;
+
+    method g() : int
+    begin
+	. "This is method g() of class S object with x =", self.x,
+	  ", name =", '"' _ self.name _ '"', "and i =", self.i;
+        return 2;
+    end;
+};
+
+var p = new P;
+var s = new S;
+
+p.i = 4;
+p.x = 3.1;
+
+s.i = 6;
+s.x = 2.3;
+s.name = "class S";
+
+// bytecode { PLD %s DUMPVMT }
+
+s->g();
+
+// bytecode { PLD %p DUMPVMT }
+
+p->g();

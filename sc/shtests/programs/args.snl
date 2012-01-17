@@ -1,0 +1,15 @@
+#
+# args.snl
+#
+# Print out command line arguments
+#
+
+include "inputs/stdtypes.slib"
+
+program args( argv : array of string );
+
+var i : int;
+
+for i = 0 to last(argv) do
+    . argv[i];
+enddo;

@@ -1,0 +1,54 @@
+/*--*-C-*--------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+/* private allocator for tnodes */
+
+#include <stdlib.h>
+#include <cexceptions.h>
+#include <allocx.h>
+
+#if 1
+#define USE_FIXED_NODE_ARRAY
+#endif
+
+#ifdef USE_FIXED_NODE_ARRAY
+
+#define MAX_TNODES 100000
+
+static TNODE tnodes[MAX_TNODES];
+static long last_tnode;
+
+static TNODE *alloc_tnode( cexception_t *ex )
+{
+    /* return callocx( sizeof(TNODE), 1, ex ); */
+    assert( last_tnode < MAX_TNODES );
+    /* printf( "allocating tnode %ld\n", last_tnode ); */
+    return &tnodes[last_tnode++];
+}
+
+static void free_tnode( TNODE *tnode )
+{
+    /* freex( tnode ); return; */
+    /* printf( "deleting tnode %d\n", (tnode-tnodes) ); */
+    assert( tnode->rcount == 0 );
+    tnode->rcount--;
+}
+
+#else
+
+static TNODE *alloc_tnode( cexception_t *ex )
+{
+    return callocx( sizeof(TNODE), 1, ex );
+}
+
+static void free_tnode( TNODE *tnode )
+{
+    assert( tnode->rcount == 0 );
+    freex( tnode );
+}
+
+#endif

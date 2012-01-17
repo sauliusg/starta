@@ -1,0 +1,47 @@
+./sl: inputs/err-namedargs002.snl(17,13): ERROR, parameter 'z' has no default value, please supply its value
+. g( y => 2 ); // ERR
+            ^
+./sl: inputs/err-namedargs002.snl(17,13): ERROR, parameter 't' has no default value, please supply its value
+. g( y => 2 ); // ERR
+            ^
+./sl: inputs/err-namedargs002.snl(17,13): ERROR, incompatible types for function 'g' argument nr. 4
+. g( y => 2 ); // ERR
+            ^
+./sl: inputs/err-namedargs002.snl(17,13): ERROR, incompatible types for function 'g' argument nr. 3
+. g( y => 2 ); // ERR
+            ^
+./sl: inputs/err-namedargs002.snl(17,13): ERROR, too little arguments in call to function 'g'
+. g( y => 2 ); // ERR
+            ^
+./sl: inputs/err-namedargs002.snl(18,14): ERROR, parameter 't' has no default value, please supply its value
+. g( 3, 2, 2 ); // ERR
+             ^
+./sl: inputs/err-namedargs002.snl(18,14): ERROR, incompatible types for function 'g' argument nr. 3
+. g( 3, 2, 2 ); // ERR
+             ^
+./sl: inputs/err-namedargs002.snl(18,14): ERROR, too little arguments in call to function 'g'
+. g( 3, 2, 2 ); // ERR
+             ^
+./sl: inputs/err-namedargs002.snl(20,19): ERROR, parameter 't' has no default value, please supply its value
+. g( 3, 2, z => 4 ); // ERR
+                  ^
+./sl: inputs/err-namedargs002.snl(20,19): ERROR, incompatible types for function 'g' argument nr. 3
+. g( 3, 2, z => 4 ); // ERR
+                  ^
+./sl: inputs/err-namedargs002.snl(20,19): ERROR, too little arguments in call to function 'g'
+. g( 3, 2, z => 4 ); // ERR
+                  ^
+./sl: inputs/err-namedargs002.snl(22,14): ERROR, parameter 'z' has no default value, please supply its value before 't'
+. g( 3, 2, t => 4, z => 12 ); // ERR
+             ^
+./sl: inputs/err-namedargs002.snl(22,22): ERROR, function 'g' has no argument 'z' to emit
+. g( 3, 2, t => 4, z => 12 ); // ERR
+                     ^
+./sl: inputs/err-namedargs002.snl(22,28): ERROR, incompatible types for function 'g' argument nr. 5
+. g( 3, 2, t => 4, z => 12 ); // ERR
+                           ^
+./sl: inputs/err-namedargs002.snl(22,28): ERROR, incompatible types for function 'g' argument nr. 4
+. g( 3, 2, t => 4, z => 12 ); // ERR
+                           ^
+./sl: 15 error(s) detected
+

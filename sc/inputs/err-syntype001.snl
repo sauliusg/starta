@@ -1,0 +1,24 @@
+#
+# Snail language compiler tests
+#
+#
+# Type synonimity.
+#
+
+include "inputs/stdtypes.slib"
+
+type cell  = float;
+type voxel = float;
+
+var c : cell;
+var v : voxel;
+var f : float;
+
+c = f;
+f = c;
+
+v = f;
+f = v;
+
+v = c;
+c = v;

@@ -1,0 +1,33 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+var a = new blob(100);
+
+pack a, 10, "i4x2,X4x2,u4", [ 1, 20, 30, 400, 530 ];
+
+var m = unpack (array of int)(a, 14, "i4x2,x4x1,u4x3");
+
+. unpack float( a, 10, "i4" );
+
+. length(m);
+
+procedure print_array( int m[] );
+
+print_array( m );
+
+//------------------
+
+procedure print_array( int m[] )
+{
+    for var int i = 0 to last( m ) {
+        < m[i]; < " ";
+    }
+    < "\n";
+}
+

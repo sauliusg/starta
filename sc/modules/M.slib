@@ -1,0 +1,30 @@
+#
+# Test SL packages.
+#
+
+package M;
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+const C = 10;
+const D = C + 1;
+
+var i : int = const D;
+
+function f( int i ) : int
+{
+    return i * i;
+}
+
+function get_i() : int
+{
+    return i;
+}
+
+procedure set_i( int i )
+{
+    M::i = i;
+}
+
+end package M;
