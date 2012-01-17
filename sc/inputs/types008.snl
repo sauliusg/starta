@@ -1,0 +1,14 @@
+#
+# Snail compiler tests
+#
+#
+# Test undelimited type descriptions
+#
+
+use std;
+
+type S = (struct { a, b : int; x, y : float })
+
+var a : struct { a, b : int; x, y : float };
+
+var i : int

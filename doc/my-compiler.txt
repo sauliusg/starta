@@ -1,0 +1,50 @@
+A few statements about the programming language I would like to have:
+
+A. Keep it as simple as possible!
+B. Everything what can be checked at compile time, should not be
+   postponed until run-time
+C. Everything, what is obviously wrong during execution time, should
+   be checked. (But allowing to strip off checks easilly in end-version of
+   the compiled program)
+
+1.  Constructors/destructors
+    To keep trak of captured resources, not only memory
+2.  Garbage collection (that is lacking in C++)
+    To make sure that there is no "memory leakage"
+3.  What about "Resource collection" ?
+    To handle resources other than memory in the same way as heap.
+4.  Exception mechanism
+    To provide secure and flexible handling of errors and non-std. situations
+5.  Const (?)
+    To increase compile-time checking and code efficiency
+6.  Strict type checking
+    To allow maximum error detection at run time.
+    Yet it should not interfer with safe convertions, such as int to long.
+6a. However, it would be necessary to have possibility of converting
+    one type to anothter in some safe manner. (and/or in low-level modules)
+7.  Good modularity
+    To make programs more readable, and to make project maintainance easier.
+8.  Low level programming possibility
+    To allow low level computations ("bit shuffling"), speed optimisation
+    and hardware programing within the same language, yet strictly controled
+    and separated from the high level code. ( Low-level modules )
+9.  Operation and procedure(?) overloading
+    To allow true user defined types, and to reduce the number of names.
+10. Allow abstraction of iterators(?)
+    To support reusable code.
+11. RTTI
+    To make safe type convertions up the class hierarchy (with run time check,
+    of course)
+12. Safe operations with pointers.
+13. Generic classes?
+13a.Generic procedures?
+14. Get warnings on all dangerous constructs; there should be a
+    possibility to get these warnings (with some compiler option) even
+    if they are explicitely suppressed.
+15. Would be nice to have pre/post conditions checked at run time
+
+OOP capabilities:
+1. Classes
+2. Inheritance - single
+3. Inheritance - multiple?
+4. private / protected / public

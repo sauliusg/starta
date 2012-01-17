@@ -1,0 +1,651 @@
+
+   Description of the HLC, High(er) Level C, language and compiler.
+   
+*Overview
+
+**Why HLC?
+
+HLC is a high level, strictly statically typed language combining those
+features of C, Pascal and Perl which I liked most. I attemted to implement
+consistent and highly orthogonal type system that would be convenient to
+write decent and maintainable programs, at the expence of compiler
+simplicity and theoretical cleanliness.
+
+Most of the features HLC has can be found scattered over many languages; C,
+C++, Java, Pascal, Perl, Python, Slang, Lisp, Ada, Mesa, Algol*, Turing,
+Oberon, Modula* to mention just a few. Yet none of the languages contain
+them all. Most often, the richness of the language is sacrifieced to
+facilitate ease of implementation. In my view, however, the collection of
+facilities I decided to build into HLC are necessary for comportable
+programming. Surely, they must be implemented correctly and efficiently. HLC
+is an attemt to prove that such implementation is possible.
+
+Below, you will find the description of the HLC features and facilities, as
+I would like to see them. Whether their implementation is or will be
+successful is another story...
+
+*Lexics and syntax
+
+**Lexics
+
+At the moment, HLC is case sensitive.
+
+Rationale: although it is of course a bad practice to have identifiers that
+differ only in case, like 'count' and 'COUNT', there might be useful to
+maintain such distinctions between some broad classes of identifiers. Say,
+type names might be always capitalsed. Also, all keywords will be definitely
+all-lowecase in HLC, so if you include capital letters into your
+identifiers, you can be sure that you will never clash with some reserved
+word, even in future.
+
+Case-insensitivity does not add any functionality, and requires extra work
+-- so wy should we bother to implement it? Case insenitive languages were
+probably useful as a transition from all-uppercase encodings of the very old
+computers to a mixed case alphabets of the more recent ones. Nowadays, one
+can take for granted that at least in latin alphabet both lower-case and
+upper-case letters are present.
+
+I must aggree, though, that there is some charm in the Pascal's (or
+Fortrans, for that matter) possibility to freely highlit the text with
+capitals without affecting the translation of the program. The same is true
+also for human languages. Thus, there might be some sence in case
+insensitivity, and the question should be regarded as 'under discussion'.
+
+Adding case-insensitivity to HLC is trivial, and might be done even as a
+compiler option.
+
+*Identifiers
+
+As in all usual programming languages, identifiers in HLC start with a
+letter and may contain digits or letters. Underscore (character '_') is
+considered to be a letter, so also may be used.
+
+Any identifier can start with a dollar sign (character '$'). Rationale: to
+make variables visually distinct from keywords, and to ensure that no
+variable clashes with some new keyword in a future version of HLC (like in
+Perl). However, with dollar-preficed names complex math expressions seem
+overcrowded with dollars and difficult to read for my taste. Thus, a usual
+c-pascal-algol-... identifier construction is also supported.
+
+*Numbers
+
+Numbers always start with a digit. Rationale: this makes recognising a
+number easy, both for a human and for a compiler's lexical analyser. By
+default, numbers are in decimal system.
+
+Numbers with bases other than decimal are denoted by prefixes:
+
+   12345  -- decimal
+  012345  -- also decimal (not octal, like in C!)
+             Rationale: in normal human language(s), leading 0s are not
+             significant.
+ 0x1234F  -- hexadecimal
+ 0o12345  -- octal
+             0o1234 seems much more consistent notation for octals than
+	     01234, since it resembles 0xFFFF notation for hexadecimals.
+	     Most importantly, it does not cause confusion, like 01234 does.
+ 0b11010  -- binary
+
+*Strings
+
+String constants are denoted by sequence of characters in double quotes (").
+Usual C-style escapes are recognised: \n (new line), \r (carridge return),
+\a (alarm or bell). For full list, please consult common/common.c functions
+process_escapes() and translate_escape(). '\\' means litrally a single
+backslash; in general, any non-alphanumeric character preceeded by a
+backslash should denote that character itself.
+
+Examples:
+
+"This is a string"
+
+"Some special characters: \004\007"
+
+"String with new line\n";
+
+The strings may contain 8-bit characters from the upper part of the ISO
+encoding table. Which exactely coding table should be used will be
+controlled by 'pragma encoding' (*not yet implemented*), e.g.:
+
+pragma encoding koi-8;
+pragma encoding latin-13;
+pragma encoding utf-8;
+
+The pragma states how the 8-bit values should be interpreted; it does not
+specify any conversions.
+
+*Keywords
+
+Keywords are all lowercase in a case-sensitive variant of the language.
+
+A keyword cannot be used as a user defined identifier; if it does, HLC
+compiler will report a syntax error.
+
+A problem (still unsolved) is that a new keyword in a future version of the
+language may clash with some identifier in old programs, thus causing much
+headache for programmers and users. The Perl's method to start all
+identifiers with a '$' (dollar) sign seems to be too restrictive. As
+mentioned before, in complex arithmetic expressions with short variable
+names dollar characters tend to obscure the expression itself.
+
+The final solution of the problem is left up to the programmer. One can
+prepend all variable names with dollars, thus making a text look like Perl
+programm, and ensureing that no future keyword comes in conflict with your
+variable. Or one can chose variable name like in Pascal, hoping that they
+are easier to read.
+
+To minimise the keyword-idetifier clash problems, it seems reasonamble to
+promse that:
+
+a) there will be no one letter keywords,
+b) keywords will always contain only lowercase letters
+
+Thus, if you start your identifiers with capitals, or with a dollar sign,a
+there should not be problems in future versions of HLC with them. Single
+letter identifiers like 'i', 'x', 'y' or 'z' should also be safe.
+
+Keywords 'begin' and 'end' have short-hand equivalents '{' and '}'. Thus,
+program text can be written in C/Perl-like or Pascal-like manner:
+
+if( i < 0 ) {
+    a = 2;
+}
+
+or
+
+if i < 0 begin
+    a = 2;
+endif;
+
+*Syntax
+
+HLC features a free mix of pascal-like, C-like and Perl-like syntax as long
+as the resulting grammar of the language can be made unambiguous. For many
+constructs, one can choose a concise (C-like) or more explicit (and
+hopefully more readable) Pascal-like form.
+
+HLC program is a sequence of statements. Each statement can be an operator
+(say, assignment or loop), variable declaration, type declaration, or
+procedure declaration/definition. There is no strict order prescribed for
+the operators, but every name must be declared before usage. For recursive
+type definitions and recursive procedure calls, forward declarations are
+supported.
+
+*Variable declarations
+
+A variable declaration can be used anywhere where the statement is permited.
+To distinguish it from other statements, it is always started with a 'var'
+keyword.
+
+Examples:
+
+var int x, y;   # C-like declaration
+var a, b : int; # P-like declaration
+
+*Types of the variables
+
+Every variable must be declared before usage, and must have a type. For
+example, both declarations
+
+var int i, j;
+
+and 
+
+var i, j : int;
+
+declare two integer variables 'i' and 'j', while
+
+var float x, y;
+
+and 
+
+var x, y : float;
+
+declare two floating-point variables 'x' and 'y'. In the expressions,
+assignements and procedure calls, types of the variables are checked during
+compilation and any mismatches are reported as compilation errors. This
+allows catching early all kinds of nasty errors and more efficient code
+generation.
+
+*Untyped variables (*not yet implemented*)
+
+A variable can be declared with now type:
+
+var a, b, c;
+
+Such variables are type-checked during run-time and can contain values of
+any type. A typeof() function returns a code for a value type currently
+stored in such variable, and can be used to implement safe conversions:
+
+var float d;
+var int i;
+switch typeof(a) {
+    int:   i := int::a + 2;
+    float: f := float::a / 2.0;
+};
+
+*References and implicit dereferencing
+
+For any type T, a variable contaning reference to that type can be declared
+in one of the following (synonimous) ways:
+
+var r : ref T; # Pascal-style declaration
+var ref T r;   # C-style declaration
+ref T r;       # further abbreviation of the C-style declaration
+
+Such variable 'r' is said to be of type 'ref T' and will contain the address
+of a location where value of type T can be stored. For example, if we declare
+
+var fp : ref float;
+
+then fp can contain address of one float value.
+
+Unlike C pointers which can contain addresses of anything you want, hlc
+insists that references point only to values that are allocated on the heap.
+This is done to facilitate garbage collection. HLC has no explicit 'address
+of' operator; all references get their values from the assignment of 'new'
+operator, or from the assignment of other references.
+
+One important idea about references is that they behave like normal
+variables everywhere where their reference-nature is irrelevant. Consider
+two declarations:
+
+var m : array [10] of int;
+
+and 
+
+var mm : ref array [10] of int;
+
+For variable m, indexing operator can be applied:
+
+m[0] := 20;
+
+For mm, we would have to dereference it before use in Pascal or Perl. The
+Pascal syntax would be
+
+mm^[0] := 20;
+
+HLC accepts such explicitly dereferenced variables, but it does not require
+explicit dereferencing, and one can write instead:
+
+mm[0] := 20;
+
+C does the same for arrays, but not for structures:
+assume C declarations
+
+typedef struct { int x, y } S;
+S s, *ps;
+
+Now, to access field 'x' of s we use dot:
+
+s.x = 5;
+
+but for ps dot as a field access operator will not compile -- we must
+explicitely dereference in one of the following ways:
+
+ps->x = 5;
+(*ps).x = 5;
+
+This is not really necessary -- and indeed, Ada would not require you to
+dereference a pointer to structure when acessing a field. HLC does not
+require dereferencing as well:
+
+type S = struct { int x, y };
+var s : S; var ps : ref S;
+
+s.x := ps.x := 20; # ps and s are interchangeable.
+
+Ada, however, needs dereferencing when copying the value of the structure --
+a copy assignement would look like:
+
+s.all := ps.all;
+
+In HLC, I have decided to make automatic dereferencing in all cases. Thus,
+to copy a value from one structure to anoter one would write:
+
+s := ps;
+
+just as if both s and ps were structures, not refs. The same for two refs:
+
+ref S s1, s2;
+
+s1 := s2; # Copies the value referenced to by s2 into the location referenced
+          # to by s1. If s1 and s2 were pointing to the different memory
+          # locations before this assignment, they will continue to do so 
+	  # after the assignment as well.
+
+*Principle of semantic invariance
+
+The above behaviour can be summarised in a rule:
+
+"anywhere in the program where variable of type T can be used, a correctly
+initialised 'ref T' variable (i.e. not null) can also be used and should
+produce exactely the same result".
+
+We notice that now we can derive the meaning of HLC operators without much
+caring about whether we work with references or simple variables. So,
+
+a := b;
+
+will always copy a _value_ of b into a, making a trully independent copy of
+b, in the sence that modifying b afterwords will not affect a, no matter
+whether and and/or be are references or not. Also, any of the expressions
+would be permissible:
+
+a += b;
+a = b * c;
+a[i]++;
+
+can contain references to some types supporting operators '+', '*', '[]'
+(indexing) and '++' (incement), or can contain variables of such type.
+
+We can generalise the rule in the beginning of the section and promiss that:
+
+       "Everything that looks the same should behave the same"
+
+I call this pompously "A Principle of Semantic Invariance" :-). Note that it
+is somewhat complementary to Perls principle that "everything that is
+different should look different".
+
+*Assignment statements
+** := and :- assignments
+
+Since for references p1 and p2 the assignment 'p1 := p2' copies a value from
+one location to another, the question arises how do we make both references
+to point to the same thing? (Obviously, references would be useles and the
+language would be deeply deficient if we could not do this!). My solution
+(taken from Simula) is to have different assignment operator for copying
+references:
+
+ref p1, p2 : T;
+
+p1 :- p2; # p1 and p2 now point to the same piece of memory.
+
+Similarily, null constant and the result of 'new' operator must be assigned
+with the help of ':-':
+
+p2 :- null;
+p1 :- new T;
+
+Note that 'p := new T' would allocate new memory for the variable of type T,
+initialise it with 0 (since all variables are initialised with 0's) and then
+copy data from this new piece of memory to the location pointed by p, which
+is not what expected! Be careful. This behaviour is unfortunately
+unavoidable if we want to be consistent about automatic dereferencing and
+semantic invariance. The compiler, however, might give warnings for such
+weird expressions.
+
+Comparison of pointers must be also done with special operators:
+
+p === q  # true when p and q point to the same memory
+p =/= q  # true when p and q point to different memory locations
+
+Mykolas suggested that the need of special operators would go away if we
+specify in some way when the reference must _not_ be dereferenced. Say, one
+could write
+
+ref(p) := ref(q)      instead of     p :- q
+
+and
+
+ref(p) == ref(q)      instead of     p === q
+
+Currently, this is not implemented; in future, I plan to implement these
+forms as synonims.
+
+*Variable initialisation
+
+Variables can be initialised immediatly at the place of declaration:
+
+var int x = 1, y = 12;
+var a, b : int := x * sin(y);
+
+Initialisations are general expressions, computed at run-time. They must not
+be constants, and there are no other limitations. Variable initialisation
+has sematics of the assignment, i.e. the memory for variable is allocated on
+the stack, initialisation statement evaluated and the resulting value copied
+(assigned) to the variable.
+
+The second form of initialisation (var a, b : integer := x * sin(y))
+initialises both variables a and b (i.e. the whole list of variables is
+initialised with the same value). The value, however, is computed only once.
+In paticular, any memory allocations that might take place are executed only
+once, and all variables in the list will end up pointing to the same piece
+of memory.
+
+For example, after the statement
+
+var a, b : ref array of int :- new int[20];
+
+we get two variables a and b both pointing to the same allocated memory.
+
+All variables that do not have explicit initialisation are automatically
+initialised with 0 (pointers, or references are initialised with 'null').
+
+As a simplification, colon in simple assignment ':=' can be omited, and
+assignment can be written in a C-like fashion:
+
+a = b;   instead of     a := b;
+
+*Expressions and arithmetics
+
+All operators as in C are supported. For exact list and precedence please
+look into hlc.y and hlc.flex at the moment. C-style logic operators '&&',
+'||' and '~' have Pascal-style synonims 'and', 'or' and 'not'. Operator '^'
+is used only for dereferecing, and not for 'xor' (an attempt to use it for
+'xor' introduces loads of conflicts). Thus, 'xor' operator must always be
+spelled out as in Pascal.
+
+All boolean evaluations ar short-cut (that is, the evaleation of a boolean
+expression stops as soon as the result becomes clear, and the rest of the
+expression is not evaluated). This is faster and allows to write expressions
+that would otherwice not work:
+
+if( i < m.length() and m[i] > 0 ) then ...
+
+Note that preceedence of the logical 'and' is like in C, not like in Pascal;
+thus, the above example functions as expected, while in Pascal extra braces
+would be obligatory:
+
+if( (i < m.length()) and (m[i] > 0) ) then ... # Brrr....
+
+If there would ever be a necessity to have full boolean evaluation, one
+should use operators 'and also' and 'or also':
+
+if p(x) and also q(y) ... # both p() and q() will be called, no matter
+                          # what the result of p(x) is
+
+if p(x) or also q(y)  ... # both p() and q() will be called, no matter
+                          # what the result of p(x) is
+
+Such operators are clearly inspired by Ada's 'and then'/'or else'; just the
+default is made more reasonable. Could anybody suggest a practical situation
+where full evaluation af booleans would be necessary? :-)
+
+*Control statements
+
+*'if' and 'unless' statements
+
+Control statements behave the same way as in "normal" languages, just the
+syntax is a bit different:
+
+#
+# basic form of 'if'
+#
+if a < b then
+   print(a);
+else
+   print(b);
+endif
+
+if( a < b ) then # braces around the condition are not necessary, but
+                 # since any expression can be surrouonded by braces, these
+		 # do not harm...
+   print(a);
+else
+   print(b);
+   print(b)    # semicolon here can be used or can be omited, as you want
+endif; # semicolon is not obligatory after 'end', 'endif' and the like,
+       # but can be used as you like
+
+if( a < b ) { # a completely C-like...
+    print(a);
+} else {
+    print(b)
+}
+
+Since '{' is exactely the same as 'begin', and '}' is the same as 'end', one
+can write:
+
+if a < b   # note that 'then' is not used here!
+    begin
+       print(a)
+    end
+else
+    begin
+       print(b)
+    end
+
+'if' can be replaced by 'unless', and inverse-conditioned statements are
+supported. Note, however, that only a simple statement is allowed before the
+condition, and semicolon at the end is obligatory:
+
+print(a) unless is_printed(a);
+
+a++ if a < 100;
+
+would more than one statement be needed before the condition, a 'do{}'
+construct must be used ('do' keyword converts a compound statement,
+delimited by 'begin'...'end', into a simple statement):
+
+do { print(a); a++ } unless a >= 100;
+
+*loop statements
+
+HLC features a rich set of loop constructs: 'while', 'until' and 'for' loops
+are supported:
+
+while( i > 0 ) {
+    do_something(i);
+    i--;
+}
+
+while( i > 0 ) begin
+    do_something(i);
+    i--;
+end
+
+while( i > 0 ) do
+    do_something(i);
+    i--;
+enddo;
+
+while i > 0 do
+    do_something(i);
+    i--;
+enddo
+
+'for' loops:
+
+for i = 0; i < N; i++ do
+    process( i );
+enddo
+
+for( i = 0; i < N; i++ ) {
+    process( i );
+};
+
+for i = 0; i < N; i++ begin
+    process( i );
+end;
+
+(*not yet implemented*)
+
+Fast 'for' loop:
+
+for i := first() to last() do
+    print( i );
+enddo
+
+for i := first() to last() step 2 {
+    print( i );
+}
+
+In such 'for', loop start and end expressions (in the above examples,
+first() and last() function calls) are evaluated only once, before the
+beginning of the loop. The number of cycles is then calculated, and the loop
+is executed required last()-first()+1 times. If last() < first(), loop is
+not executed at all. Such loops are faster than generic C-style loops:
+
+for i = first(); i <= last(); i++ do print(i) enddo;
+
+since a) in C-style loop, last() would be called in each cycle b) a special
+looping command LOOP of the bytecode can be used (many processors also have
+similar commands in their instruction set), and this is faster than
+increment/conditional-jump.
+
+*'switch' statement
+
+(*not yet implemented*) Will be similar to Pascal's 'case'.
+
+
+*HLC type system
+
+**Type declarations
+
+**Type equivlence
+
+*builtin, simple and composite types
+
+*existing builtin types in HLC
+
+*Deep-copy assignment of composite types
+
+*possible implementations of arrays in HLC and different array types
+
+
+*Functions and procedures
+
+*Nested procedures
+
+*External language procedures
+
+*Scope rules of the HLC
+
+*Memory allocation and garbage collection
+
+
+*Object model of the HLC
+
+I did not think much about this, but basically I suggest taking Java's
+objrct model, with 'interface' replaced by 'abstract class'. This would
+allow that _some_ methods in the interface are implemented in the parent.
+
+Another thoughts:
+
+1) should all methods be virtual?
+
+2) there should be a dynamic messaging mechanism like in smalltalk.
+
+*Modules and program composition in HLC
+
+*Versions of modules and maintaining compatibility
+
+
+*Target languages of the compiler
+
+*Bytecode interpreter
+
+**possible implementations of the bytecode
+
+**pseudo-registers
+
+**prefixes
+
+*Other target languages
+
+**C as a target language
+
+**Compiling to native code
+
+**Compiling to a gcc intermediate representation

@@ -1,0 +1,5 @@
+./sl: inputs/err-novalue002.snl(10,10): ERROR, functions called in exressions must return at least one value
+s = ggg(1);
+         ^
+./sl: 1 error(s) detected
+

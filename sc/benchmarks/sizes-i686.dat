@@ -1,0 +1,14 @@
+Fri Nov 11 19:49:00 EET 2011
+Linux 2.6.29-1-netbook i686
+gcc (Ubuntu 4.3.3-5ubuntu4) 4.3.3
+fn001-loop.snl         86
+fn001.snl              91
+l-slow.snl            100
+l-slower.snl          102
+l.snl                  56
+mat001.snl            180
+mat001asm.snl         166
+mat002.snl            186
+pl-slow.snl            80
+pl-slower.snl          80
+pl.snl                 51

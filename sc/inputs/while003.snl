@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use std;
+
+type node = struct {
+    i : int;
+    next : node;
+}
+
+var node p;
+
+p = new node;
+p.next = new node;
+p.next.next = new node;
+
+p.i = 1;
+p.next.i = 2;
+p.next.next.i = 3;
+
+while( p ) {
+    . p.i;
+    p = p.next;
+}

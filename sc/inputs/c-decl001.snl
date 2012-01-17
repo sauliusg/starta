@@ -1,0 +1,49 @@
+#
+# Snail compiler tests
+#
+#
+# Test C-style variable declarators
+#
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var int i = 9, m[][], n[][] = new int[10L][20L];
+
+var int[] p, q, r;
+
+var p1, q1, r1 : array of int;
+
+p = q1;
+
+m = n;
+
+m = new (array of int)[10];
+
+m[0] = n[1];
+
+m[0][1] = i;
+
+. n[1][1];
+
+p = new int[2];
+
+program ( args : array of string; files : array of file );
+
+for p[0] = 0 to last(m) {
+    for p[1] = 0 to last(m[p[0]]) {
+        <files[1]> << m[p[0]][p[1]];
+	<files[1]> << " ";
+    }
+    <files[1]> << "\n";
+}
+
+. "";
+
+for p[0] = 0 to last(n) {
+    for p[1] = 0 to last(n[p[0]]) {
+        <files[1]> << n[p[0]][p[1]];
+	<files[1]> << " ";
+    }
+    <files[1]> << "\n";
+}

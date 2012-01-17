@@ -1,0 +1,5 @@
+# factor primary term term_conjunction simple_expression expression 
+awk '/^factor *$/,/;/' $1 
+awk '/^array_constructor *$/,/;/' $1 
+awk '/^record_constructor *$/,/;/' $1 
+awk '/^set_constructor *$/,/;/' $1 

@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Check ref and synonim compatibility:
+#
+
+use std;
+
+inline function abs( float x ) : float
+{
+    return x > 0.0 ? x : -x;
+}
+
+. abs( 23 );
+. abs( -1.1 );

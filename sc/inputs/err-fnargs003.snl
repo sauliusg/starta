@@ -1,0 +1,19 @@
+#
+# SL compiler tests.
+#
+# Check diagnostics of wrong number of arguments in function calls.
+#
+
+include "inputs/stdtypes.slib"
+
+procedure f( i, j : int )
+begin
+    bytecode { LD %i LD %j ADD IPRINT NEWLINE }
+end
+
+f( 1 );
+f( 3, 4 );
+
+try {
+    f( 3, 4 )
+}

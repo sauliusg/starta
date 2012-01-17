@@ -1,0 +1,8 @@
+for variable 't':
+t.offset =	 0
+t.nref =	 1
+t.size =	 2
+
+for type 'T':
+T.nref =	 1
+T.size =	 2

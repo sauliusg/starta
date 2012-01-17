@@ -1,0 +1,44 @@
+./sl: inputs/err-syntype002.snl(20,6): ERROR, incompatible types for assignment to variable 'c'
+c = f;
+     ^
+./sl: inputs/err-syntype002.snl(21,6): ERROR, incompatible types for assignment to variable 'f'
+f = c;
+     ^
+./sl: inputs/err-syntype002.snl(23,6): ERROR, incompatible types for assignment to variable 'v'
+v = f;
+     ^
+./sl: inputs/err-syntype002.snl(24,6): ERROR, incompatible types for assignment to variable 'f'
+f = v;
+     ^
+./sl: inputs/err-syntype002.snl(27,14): ERROR, incompatible types for binary operator '+'
+c = a + b + f;
+             ^
+./sl: inputs/err-syntype002.snl(27,14): ERROR, incompatible types for assignment to variable 'c'
+c = a + b + f;
+             ^
+./sl: inputs/err-syntype002.snl(30,10): ERROR, incompatible types for binary operator '+'
+v = u + g;
+         ^
+./sl: inputs/err-syntype002.snl(30,10): ERROR, incompatible types for assignment to variable 'v'
+v = u + g;
+         ^
+./sl: inputs/err-syntype002.snl(31,11): ERROR, incompatible types for binary operator '+'
+v = u + f + c;
+          ^
+./sl: inputs/err-syntype002.snl(31,14): ERROR, incompatible types for binary operator '+'
+v = u + f + c;
+             ^
+./sl: inputs/err-syntype002.snl(31,14): ERROR, incompatible types for assignment to variable 'v'
+v = u + f + c;
+             ^
+./sl: inputs/err-syntype002.snl(33,10): ERROR, incompatible types for binary operator '+'
+c = a + v;
+         ^
+./sl: inputs/err-syntype002.snl(33,10): ERROR, incompatible types for assignment to variable 'c'
+c = a + v;
+         ^
+./sl: inputs/err-syntype002.snl(34,10): ERROR, incompatible types for binary operator '+'
+v = b + w;
+         ^
+./sl: 14 error(s) detected
+

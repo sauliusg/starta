@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+type collection of T = {
+    reference;
+    size = sizeof native "void*";
+
+    inline bytecode operator "new[char]" ( i : char ) : collection of T
+    {
+      BAALLOC %%element_nref
+      SLDC "This is 'collection of T' new[char]" SPRINT NEWLINE
+    };
+
+    inline bytecode operator "[char]" ( a : collection of T; i : char ) : 
+        addressof
+    {
+	BINDEX
+    };
+}
+
+var c : collection of ldouble;
+var d : collection of long;
+
+c = new collection [200 char] of ldouble;
+
+c['1'c] = 2.2LD;
+
+. c['1'c];
+
+. "done";

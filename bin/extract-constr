@@ -1,0 +1,2 @@
+
+getrule $1 factor array_constructor record_constructor set_constructor

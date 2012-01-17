@@ -1,0 +1,54 @@
+#
+# Snail compiler tests
+#
+#
+# Test 'new' operator and memory allocation.
+#
+
+type long;
+
+type int = {
+    size = sizeof native "int"; kind = integer;
+    bytecode inline operator "." ( i : int )
+        { IPRINT };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    inline bytecode operator ">" ( a, b : int ) : int
+        { GT };
+    inline bytecode operator "jnz" ( a : int )
+        { JNZ };
+    inline bytecode operator "loop" ( counter : addressof; range : int )
+        { LOOP };
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+    inline bytecode operator "new[]" ( i : long ) : array
+        { AALLOC %%element_nref };
+    inline bytecode operator "new[][]" ( i : long ) : array
+        { MDALLOCC };
+};
+
+var i, j : int;
+var m : array of array of int;
+
+function mul( i, j : int ) : int;
+
+m = new int[10][20];
+
+for i = 0 to 9 do
+    for j = 0 to 19 do
+    	m[i][j] = mul( i, j );
+    enddo;
+enddo;
+
+for i = 0 to 9 do
+    for j = 0 to 19 do
+        . m[i][j];
+    	bytecode { SPACE };
+    enddo;
+    bytecode { NEWLINE };
+enddo;
+
+bytecode function mul( i, j : int ) : int
+begin
+   bytecode { MUL }
+end;

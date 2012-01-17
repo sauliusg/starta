@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+package M;
+
+use std;
+
+type E = enum int ( nulis, vienas, du, trys );
+
+var e : E = du E;
+
+end package M;
+
+. M::e;
+
+var M::E f = trys M::E;
+var g : M::E;
+
+g = vienas M::E;
+
+. f;
+. g;

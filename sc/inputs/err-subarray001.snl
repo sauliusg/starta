@@ -1,0 +1,47 @@
+#
+# Snail language compiler tests
+#
+# Test subarrays
+#
+
+use std;
+
+var m = [ 1, 2, 3, 4, 5, 6 ];
+var n = m;
+
+try {
+    n = m[3..10]
+}
+catch ( var msg : string ) {
+    . msg
+}
+
+try {
+    n = m[-30..3]
+}
+catch ( var msg : string ) {
+    . msg
+}
+
+try {
+    n = m[0..-33]
+}
+catch ( var msg : string ) {
+    . msg
+}
+
+try {
+    n = m[-30..-33]
+}
+catch ( var msg : string ) {
+    . msg
+}
+
+try {
+    n = m[30..3]
+}
+catch ( var msg : string ) {
+    . msg
+}
+
+n = m[30..-30]

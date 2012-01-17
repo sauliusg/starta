@@ -1,0 +1,12 @@
+#!/bin/bash
+
+FILE=$1
+shift
+echo ----------------------------------
+while [ "$1" != "" ]
+do
+   PATTERN="/^$1 *\$/,/;/"
+   awk  "$PATTERN" $FILE 
+   echo ----------------------------------
+   shift
+done

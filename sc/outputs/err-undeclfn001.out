@@ -1,0 +1,8 @@
+./sl: inputs/err-undeclfn001.snl(10,2): ERROR, function 'f' is not declared in the current scope
+f(2);
+ ^
+./sl: inputs/err-undeclfn001.snl(11,2): ERROR, function 'g' is not declared in the current scope
+g();
+ ^
+./sl: 2 error(s) detected
+

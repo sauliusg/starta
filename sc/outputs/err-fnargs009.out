@@ -1,0 +1,20 @@
+./sl: inputs/err-fnargs009.snl(17,33): ERROR, default value is not compatible with the function argument 'y' of type 'long'
+function f( int x; long y = 1.1 ) : long
+                                ^
+./sl: inputs/err-fnargs009.snl(24,34): ERROR, default value is not compatible with the function argument 'y' of type 'byte'
+function g( int x; byte y = null ) : int
+                                 ^
+./sl: inputs/err-fnargs009.snl(29,8): ERROR, incompatible types for function 'g' argument nr. 2
+. g( 2 );
+       ^
+./sl: inputs/err-fnargs009.snl(38,40): ERROR, default value is not compatible with the function argument 's' of type 'string'
+function errquote( string s = 100 + 10 ) : string
+                                       ^
+./sl: inputs/err-fnargs009.snl(45,31): ERROR, default value is not compatible with the function argument 's' of type 'int'
+function i( int s = "mistake" ) : int
+                              ^
+./sl: inputs/err-fnargs009.snl(52,22): ERROR, incompatible types for assignment to variable 's'
+var int s = "mistake";
+                     ^
+./sl: 6 error(s) detected
+

@@ -1,0 +1,28 @@
+#
+# Snail language compiler tests
+#
+#
+# Function declaration and call tests
+#
+
+# This example will not function correctly if the ENTER operator
+# is not emitted in the beginning of the global code and each function,
+# or if ENTER operator works incorrectly.
+
+type int = {
+    size = 4;
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+function writeln( x : int )
+{
+    bytecode { LD %x IPRINT NEWLINE }
+};
+
+var a : int;
+
+a = 10;
+
+writeln( a );
+writeln( a );

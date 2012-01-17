@@ -1,0 +1,121 @@
+#
+# Snail compiler tests
+#
+#
+# Test variable type inference
+#
+
+use std;
+
+var xx = 2.34;
+var bb = 127B;
+var mmm = new float[10][20];
+
+. bb;
+
+mmm[1][1] = xx;
+
+. mmm[1][1];
+. "";
+
+type inches = float;
+type cm = float;
+
+var i = 10 inches;
+
+< "i is ";
+< i;
+< " inches";
+. "";
+
+var l = 0;
+
+bytecode function cm_from_inches( inches i ) : cm
+{
+    FLDC 2.54
+    FMUL
+}
+
+var c = cm_from_inches( i );
+
+< "c is ";
+< c;
+< " cm\n";
+
+c = c + 1 cm;
+
+< "c is ";
+< c;
+< " cm\n";
+
+type landmarks = array [][] of cm;
+type matrix = array [][] of float;
+type imperial = array [][] of inches;
+
+var m = new float[10][20];
+var a = [ [10.0cm, 10.0cm], [20.0 cm, 30.0 cm, c - 5cm] ];
+var b = new cm[10][20];
+var z : imperial;
+var p : array [][] of float;
+var q : array [][] of cm;
+var r : array [][] of inches;
+
+p = m;
+m = p;
+
+q = a;
+b = q;
+
+r = z;
+z = r;
+
+function print_value( v : float )
+{
+    . v;
+}
+
+function print_inch_value( v : inches )
+{
+    < v; . " inches";
+}
+
+print_inch_value( i );
+
+print_value( bytecode : float {FLD %i} );
+
+// m = a;
+// m = z;
+// a = z;
+
+var int ii, jj;
+
+for ii = 0 to last(a) {
+    for jj = 0 to last(a[ii]) {
+        < a[ii][jj]; < " ";
+    }
+    . "";
+}
+
+// b = new float[10][20]; // incompatible
+// a = new float[10][20]; // incompatible
+z = new inches[10][20];
+
+var mm = [[100cm]];
+var nn = [[20.0]];
+
+// nn = mm; // incompatible;
+
+procedure print( x : array [][] of float )
+{
+    . x[0][0];
+}
+
+procedure print_cm( x : array [][] of cm )
+{
+    < x[0][0]; . " cm";
+}
+
+print(m);
+
+print_cm(mm);
+print(nn);

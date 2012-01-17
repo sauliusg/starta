@@ -1,0 +1,20 @@
+./sl: inputs/err-enum005.snl(36,1): ERROR, one can only extend previously defined enumeration types
+);
+^
+./sl: inputs/err-enum005.snl(41,11): ERROR, type 'E' has no operator named 'ldc'
+e1 = six E;
+          ^
+./sl: inputs/err-enum005.snl(42,5): ERROR, type 'E' has no unary operator named '.'
+. e1;
+    ^
+./sl: inputs/err-enum005.snl(44,11): ERROR, type 'E' has no operator named 'ldc'
+e3 = two E;
+          ^
+./sl: inputs/err-enum005.snl(44,11): ERROR, enumeration type 'E' does not have value 'two'
+e3 = two E;
+          ^
+./sl: inputs/err-enum005.snl(48,5): ERROR, type 'E' has no unary operator named '.'
+. e3;
+    ^
+./sl: 6 error(s) detected
+

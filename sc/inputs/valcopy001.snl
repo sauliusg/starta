@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test value-copy-assignment
+#
+
+use std;
+
+var a : array of int = [ 1, 2, 3 ];
+var b : array of int = [ 4, 5, 6 ];
+
+a := b;
+
+b[0] = 11;
+b[1] = 12;
+b[2] = 13;
+
+.a[0];
+.a[1];
+.a[2];
+
+var float m[][] = [ [1.0, 2.0], [3.0, 4.0] ];
+var float n[][] = [ [0.0, 0.0], [0.0, 0.0] ];
+
+n[0] := m[1];
+
+m[1] = new float[3];
+
+. n[0][0];
+. n[0][1];

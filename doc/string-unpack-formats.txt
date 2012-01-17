@@ -1,0 +1,24 @@
+
+* Blob pack/unpack formats for string types
+
+Blobs can contain the fllowing strings:
+
+- 0-terminated strings (length is dynamic and determined during run
+  time). Next string starts immediately after the 0-character.
+
+- Fixed-length characters strings (character arrays) -- length is
+  determined statically. 0-character terminator is ignored and
+  processed in the same manner as any other symbol.
+
+'s' -- 1-byte character strings; locale/encoding unspecified.
+
+'w' -- 2-byte character strings, chars little-endian; locale/encoding unspecified.
+'W' -- 2-byte character strings, chars big-endian; locale/encoding unspecified.
+'l' -- 4-byte character strings, chars little-endian; locale/encoding unspecified.
+'L' -- 4-byte character strings, chars big-endian; locale/encoding unspecified.
+
+'u' -- UTF8
+'c' -- UCS16, chars little-endian;
+'C' -- UCS16, chars big-endian;
+'n' -- UCS32, chars little-endian;
+'N' -- UCS32, chars big-endian;

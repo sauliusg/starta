@@ -1,0 +1,5 @@
+./sl: inputs/err-bytecode001.snl(17,10): ERROR, type attribute '%%element_size' is not available here (are you compiling a function or operator?)
+    LD %%element_size
+         ^
+./sl: 1 error(s) detected
+

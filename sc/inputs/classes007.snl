@@ -1,0 +1,69 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+class A {
+    int ii;
+    float xx;
+    string nn;
+    string nm;
+    method ff() : string { return self.nm }
+    method name() : string { return "class A" }
+}
+
+class AA {
+    int ii;
+    float xx;
+    string nm;
+    method name() : string { return "class AA" }
+}
+
+class B : A {
+    int a;
+    string instance_name;
+    ccc : class : AA { 
+              int x;
+              method set_x( int x ) { self.x = x }
+              method get_x() : int { return self.x }
+          } 
+    method name() : string { return "class B" }
+}
+
+. "B.ii.offset =", const(B.ii.offset/.stackcellsize);
+. "B.xx.offset =", const(B.xx.offset/.stackcellsize);
+. "B.a.offset  =", const(B.a.offset/.stackcellsize);
+. "B.nn.offset =", const(B.nn.offset/.stackcellsize);
+. "B.nm.offset =", const(B.nm.offset/.stackcellsize);
+. "B.name.offset =", const(B.name.offset);
+
+var a = new A;
+
+. a->name();
+
+a = new B;
+
+. a->name();
+
+. "====";
+
+var b : B = new B;
+
+b.ccc = new class : AA { 
+              int x;
+              method set_x( int x ) { self.x = x }
+              method get_x() : int { return self.x }
+          };
+
+. b->name();
+
+var cc = b.ccc;
+
+cc->set_x( 21 );
+
+. b.ccc.x;
+. cc->name();

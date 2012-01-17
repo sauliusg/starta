@@ -1,0 +1,39 @@
+#
+# Snail language compiler tests
+#
+# Test structures and field access.
+#
+
+type int = {
+    size = 4; kind = integer;
+    bytecode inline operator "." ( i : int )
+        { IPRINT };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+};
+
+type long  = {
+    size = 8; kind = integer; suffix = L;
+};
+
+type float = {
+    size = 4; kind = real;
+};
+
+type R = struct { x, y, w, h : int };
+
+type S = struct {
+            n, m : int;
+	    rr   : R;
+            a, b : int;
+	    x, y : float;
+         };
+
+var s : S;
+
+s = new S;
+s.rr = new R;
+
+s.rr.h = 34;
+
+. s.rr.h;

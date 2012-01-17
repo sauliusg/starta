@@ -1,0 +1,40 @@
+'MTZ '
+15300
+1 VERS MTZ:V1.1                                                                   
+2 TITLE truncate                                                                  
+3 NCOL       11         1389        0                                             
+4 CELL     8.1255   13.1601   21.2737   90.0000   90.0000   90.0000               
+5 SORT    1   2   3   0   0                                                       
+6 SYMINF   4  4 P    19           'P 21 21 21' PG222                              
+7 SYMM X,  Y,  Z                                                                  
+8 SYMM -X+1/2,  -Y,  Z+1/2                                                        
+9 SYMM X+1/2,  -Y+1/2,  -Z                                                        
+10 SYMM -X,  Y+1/2,  -Z+1/2                                                        
+11 RESO 0.028788             0.999801                                              
+12 VALM NAN                                                                        
+13 COLUMN H                              H            0.0000            8.0000    0
+14 COLUMN K                              H            0.0000           13.0000    0
+15 COLUMN L                              H            0.0000           21.0000    0
+16 COLUMN TEST                           I            0.0000            9.0000    0
+17 COLUMN F                              F            1.8420          459.4221    1
+18 COLUMN SIGF                           Q            0.8983           32.6416    1
+19 COLUMN DANO                           D         -135.9600          147.1590    1
+20 COLUMN SIGDANO                        Q            0.0000           32.1703    1
+21 COLUMN IMEAN                          J           -2.2882         2176.4465    1
+22 COLUMN SIGIMEAN                       Q            0.0858          275.4604    1
+23 COLUMN ISYM                           Y            0.0000            2.0000    1
+24 NDIF        2                                                                   
+25 PROJECT       0 HKL_base                                                        
+26 CRYSTAL       0 HKL_base                                                        
+27 DATASET       0 HKL_base                                                        
+28 DCELL         0     8.1255   13.1601   21.2737   90.0000   90.0000   90.0000    
+29 DWAVEL        0    0.00000                                                      
+30 PROJECT       1 VD20                                                            
+31 CRYSTAL       1 2007.12.17                                                      
+32 DATASET       1 2007.12.17                                                      
+33 DCELL         1     8.1255   13.1601   21.2737   90.0000   90.0000   90.0000    
+34 DWAVEL        1    0.84230                                                      
+35 END                                                                             
+36 MTZHIST   1                                                                     
+37 data from CAD on 17/12/07                                                       
+38 MTZENDOFHEADERS                                                                 

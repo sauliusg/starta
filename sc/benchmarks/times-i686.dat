@@ -1,0 +1,15 @@
+Fri Nov 11 19:45:27 EET 2011
+Linux 2.6.29-1-netbook i686
+Intel(R) Celeron(R) M processor          900MHz
+gcc (Ubuntu 4.3.3-5ubuntu4) 4.3.3
+fn001-loop.snl       real 0m0.119s
+fn001.snl            real 0m0.767s
+l-slow.snl           real 0m1.197s
+l-slower.snl         real 0m4.216s
+l.snl                real 0m1.760s
+mat001.snl           real 2m4.512s
+mat001asm.snl        real 1m11.116s
+mat002.snl           real 0m2.403s
+pl-slow.snl          real 0m0.604s
+pl-slower.snl        real 0m2.232s
+pl.snl               real 0m0.869s

@@ -1,0 +1,5 @@
+./sl: inputs/err-valcopy004.snl(14,9): ERROR, can not copy readonly value in the value-copy assignment ':='
+s1 := s2;
+        ^
+./sl: 1 error(s) detected
+

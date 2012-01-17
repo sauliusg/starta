@@ -1,0 +1,24 @@
+#
+# Snail compiler tests
+#
+#
+# Test pointer-not operator for arrays
+#
+
+include "inputs/stdtypes.slib"
+
+type M = array of int;
+
+var m : M;
+
+m = new int[20];
+
+if( m ) {
+    . "m is not null"
+}
+
+m = null;
+
+if( !m ) {
+    . "m is null"
+}

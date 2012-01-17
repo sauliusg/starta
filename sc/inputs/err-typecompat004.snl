@@ -1,0 +1,60 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use std;
+
+inline bytecode function my_length( m : array ) : int
+{
+    LENGTH
+}
+
+type A = array of int;
+
+function p( m : array of int ) : int
+{
+    return my_length(m);
+}
+
+function p1( m : array ) : int
+{
+    return my_length(m);
+}
+
+function p2( m : A ) : int
+{
+    return my_length(m);
+}
+
+function p3( m : ref ) : int
+{
+    return my_length(m); // ERROR
+}
+
+var a : A;
+var m : array of int;
+var x : array;
+var r : ref;
+
+. p( a ); // OK
+. p( m ); // OK
+. p( x ); // ERROR
+. p( r ); // ERROR
+
+. p1( a ); // OK
+. p1( m ); // OK
+. p1( x ); // OK
+. p1( r ); // ERROR
+
+. p2( a ); // OK
+. p2( m ); // OK?
+. p2( x ); // ERROR
+. p2( r ); // ERROR
+
+. p3( a ); // OK
+. p3( m ); // OK
+. p3( x ); // OK
+. p3( r ); // OK

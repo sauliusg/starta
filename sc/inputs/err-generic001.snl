@@ -1,0 +1,20 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+procedure g( type T a; b : type T ) : int
+begin
+    var n : type T;
+    n = a;
+    return 1;
+end
+
+g( 1, 2 );
+g( 1.0, 2.0 );
+g( "a", "c" );
+g( "a", 2 );

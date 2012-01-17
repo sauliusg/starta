@@ -1,0 +1,5 @@
+./sl: inputs/err-fnargs008.snl(17,9): ERROR, can not pass readonly value for r/w parameter 'm'
+g( 7, a ); // ERROR, readonly value passed as a r/w procedure parameter
+        ^
+./sl: 1 error(s) detected
+

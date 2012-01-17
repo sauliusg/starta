@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test readonly variables.
+#
+
+use std;
+
+readonly var int x = 12; // OK;
+readonly string s = "something"; // OK, immutable ref.
+readonly m : array of int = [10, 20, 30]; // OK, mutable initialisation
+readonly n : array of int = m; // OK, initialisation of the immutable;
+
+var int y;
+var a : array of int;
+
+.y;
+y = x;
+.y;
+
+.s;
+."";
+
+.m[0]; .m[1]; .m[2];
+."";
+
+.n[0]; .n[1]; .n[2];

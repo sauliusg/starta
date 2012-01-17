@@ -1,0 +1,103 @@
+#
+# Snail compiler tests
+#
+#
+# Manually created lists.
+#
+
+use std;
+
+type list_of_string = struct {
+    next : list_of_string;
+    value : string;
+}
+
+operator "<" ( l : list_of_string )
+{
+    if( l ) {
+        < l.value;
+    } else {
+        < "((null))" 
+    }
+}
+
+operator "." ( l : list_of_string )
+{
+    < "(";
+    if( l ) {
+        < l.value;
+        var p = l.next;
+        while( p ) {
+            < ", ";
+            < p.value;
+            p = p.next
+        }
+    } else {
+        < "(null)"
+    }
+    < ")"
+}
+
+operator "+" ( l1, l2 : list_of_string ) : list_of_string
+{
+    if( l1 && l2 ) {
+        var r = struct list_of_string { value: l1.value };
+        var q = r;
+        var p = l1.next;
+        while( p != null ) {
+	    q.next = struct list_of_string { value : p.value };
+            q = q.next;
+            p = p.next
+        }
+        q.next = l2;
+	return r
+    } else {
+        if( l1 ) {
+            return l1
+        } else {
+            return l2
+        }
+    }
+}
+
+procedure cons( s : string; l : list_of_string = null ) : list_of_string
+{
+    return struct list_of_string{ value => s, next => l };
+}
+
+procedure head( l : list_of_string ) : string
+{
+    if( l ) {
+        return l.value
+    } else {
+        return null;
+    }
+}
+
+procedure tail( l : list_of_string ) : list_of_string
+{
+    if( l ) {
+        return l.next
+    } else {
+        return null;
+    }
+}
+
+var l : list_of_string;
+var s = cons( "one" );
+
+. l;
+. s;
+. s + cons( "two" );
+. cons( "alpha", cons( "beta", cons( "gamma" )));
+. "---";
+. s;
+
+. "---";
+l = cons( "1", cons( "2" )) + cons( "three", cons( "four" ));
+. l;
+. tail( l );
+. head( l );
+. head( tail( l ));
+. tail( l ) + s;
+. s + tail( l );

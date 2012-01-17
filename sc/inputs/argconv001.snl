@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test enumerator types (enum).
+#
+
+include "inputs/stdtypes.slib"
+
+procedure writelong( l : long )
+{
+    . l;
+}
+
+procedure writeint( i : long )
+{
+    . i;
+}
+
+procedure writefloat( f : float )
+{
+    . f;
+}
+
+var a : int = 4;
+var b : long = 70L;
+
+writeint( a );
+writelong( a );
+writelong( b );
+writefloat( a );

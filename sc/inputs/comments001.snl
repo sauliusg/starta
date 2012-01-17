@@ -1,0 +1,27 @@
+
+(* Modula-2/Pascal style comments *)
+
+(*
+   Multi-line comments are OK.
+*)
+
+/* C-style comments */
+
+/*
+   Multi-line comments in C-style are also OK.
+*/
+
+// C++ style comments
+
+# shell/Perl/UNIX style comments
+
+(* different styles of comments /* can */ be #nested# *)
+
+/** **/
+(*****)
+
+/**+******+**/
+(* ******** *)
+
+// Single line comments can include (* bracketed ones *)
+## Single line comments can include /* bracketed ones */

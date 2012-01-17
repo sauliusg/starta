@@ -1,0 +1,73 @@
+#
+# Snail language compiler tests
+#
+# Test of simple arithmetics.
+#
+
+type int;
+
+type long = {
+    size = 8; kind = integer; suffix = L;
+    bytecode inline operator "+" ( x : long; y : long ) : long
+        { bytecode{ LADD }};
+    bytecode inline operator "-" ( x : long; y : long ) : long
+        { bytecode{ LSUB }};
+    bytecode inline operator "*" ( x : long; y : long ) : long
+        { bytecode{ LMUL }};
+    bytecode inline operator "/" ( x : long; y : long ) : long
+        { bytecode{ LDIV }};
+    bytecode inline operator "%" ( x : long; y : long ) : long
+        { bytecode{ LMOD }};
+    inline bytecode operator "@long" ( x : int ) : long
+        { EXTEND };
+    inline bytecode operator "ldc" () : long
+        { LLDCS };
+};
+
+type int  = {
+    size = 4; kind = integer;
+    /*inline*/ bytecode operator "+" ( x : int; y : int ) : int
+        { ADD };
+    bytecode inline operator "-" ( x : int; y : int ) : int
+        { bytecode{ SUB }};
+    bytecode inline operator "*" ( x : int; y : int ) : int
+        { bytecode{ MUL }};
+    bytecode inline operator "/" ( x : int; y : int ) : int
+        { bytecode{ DIV }};
+    bytecode inline operator "%" ( x : int; y : int ) : int
+        { bytecode{ MOD }};
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+};
+
+var a, b : int;
+var c, d : long;
+
+a = 11;
+b = 35;
+c = 21L;
+
+bytecode function writeln( i : int )
+{
+    bytecode { IPRINT NEWLINE }
+};
+
+bytecode function lwriteln( i : long )
+{
+    bytecode { LPRINT NEWLINE }
+};
+
+bytecode function write( i : int )
+{
+    bytecode { IPRINT }
+};
+
+d = ( a + b )@long / ( a@long - c );
+
+lwriteln( a@long );
+writeln( a );
+lwriteln( d );
+
+c = b@long - d * c + a@long;
+
+lwriteln( c );

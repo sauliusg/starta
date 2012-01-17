@@ -1,0 +1,34 @@
+#
+# Snail compiler tests
+#
+#
+# Test global variables
+#
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var int g1 = 10, g2 = 11, g3 = 12;
+
+. g1;
+. g2;
+. g3;
+. "";
+
+procedure p()
+{
+    var l : int;
+    . l;
+    bytecode {
+	LDG %g2
+	ST  %l
+    }
+    . l;
+}
+
+p();
+
+. "";
+. g1;
+. g2;
+. g3;

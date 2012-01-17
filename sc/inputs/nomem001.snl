@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Test "out of memory" diagnostics
+#
+
+include "inputs/stdtypes.slib"
+
+var l : long = 1;
+var i : long;
+var m : array of long;
+
+for i = 1 to 1000000L do
+    m = new long[l];
+    // . l;
+    l *= 2L;
+enddo;

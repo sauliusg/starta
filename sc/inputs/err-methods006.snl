@@ -1,0 +1,17 @@
+#
+# Snail compiler tests
+#
+#
+# Test 'blob' types
+#
+
+use std;
+
+struct A {
+    a : int;
+    b : string;
+};
+
+var a = new A;
+
+a->m( 20 );

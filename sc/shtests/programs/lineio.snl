@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test line-wise file reading.
+#
+
+use std;
+
+program lines( string args[] );
+
+for var i = 1 to last(args) do
+    . args[i];
+
+    var file in = fopen( args[i], "r" );
+    
+    var int n = 1;
+    var line : string;
+    
+    while( !feof( in )) {
+        <in> >> line;
+        do break if line == null;
+        . n, "\t", ">>>", line, "<<<";
+    	n++;
+    }
+    
+    fclose( in );
+enddo;

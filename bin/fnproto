@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my $memory_class = '(static|inline)\s+';
+my $type = '(long|short)?\w+(?:\s+|\s*\*+\s*)';
+my $name = '\w+\s*';
+
+my $function_declaration =
+    "$memory_class $type $name \\( |".
+    "$memory_class $name \\( |".
+    "$type $name \\( |".
+    "$name \\( ";
+
+sub opening_braces { local $_ = shift; s/[^{]//g; length }
+sub closing_braces { local $_ = shift; s/[^}]//g; length }
+
+my $context_depth = 0;
+while(<>) {
+
+    $context_depth += opening_braces( $_ ) if /\{/;
+    $context_depth -= closing_braces( $_ ) if /\}/;
+
+    if( /^\s* ($function_declaration) /x .. /\)/ and $context_depth == 0 ) {
+	s/ \) (\s* [^;] | \s* $) /\);$1/x ;
+	print;
+    }
+}

@@ -1,0 +1,30 @@
+
+// include "inputs/stdtypes.slib"
+
+type int = {
+    size = 4; kind = integer;
+
+    bytecode inline operator "<" ( x, y : int ) : int
+        { LT };
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+
+    inline bytecode operator "." ( i : int )
+        { IPRINT };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+}
+
+var i : int;
+
+i = 0;
+
+while( i < 10 ) {
+    i++;
+    . i
+}

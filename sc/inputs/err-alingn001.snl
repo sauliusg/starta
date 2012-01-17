@@ -1,0 +1,57 @@
+#
+# Snail compiler tests
+#
+#
+# Test alignemnt of fields in arrays and structures.
+#
+
+include "inputs/stdtypes.slib"
+
+type boolval = enum byte ( false, true ) ;
+
+var True : boolval = true boolval;
+var False : boolval = false boolval;
+
+struct A {
+    name : string;
+    flag : boolval;
+}
+
+type R = struct {
+    ival : int;
+    flag : boolval;
+}
+
+const N = 10;
+
+type B = struct {
+    m : array [N] of R;
+};
+
+var a : A = new A;
+var b : B = new B;
+
+a.name = "This is node 'a'";
+a.flag = True;
+
+. a.name;
+. a.flag;
+
+var i : int;
+
+for i = 0 to const(N-1) do
+    b.m[i] = new R;
+enddo
+
+b.m[1].ival = 1 * 10;
+b.m[1].flag = a.flag;
+
+var line : string = "===================";
+
+. line;
+
+for i = 0 to const(N-1) do
+    . b.m[i].ival;
+    . b.m[i].flag;
+    . line;
+enddo;

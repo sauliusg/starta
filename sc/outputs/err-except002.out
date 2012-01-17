@@ -1,0 +1,5 @@
+./sl: inputs/err-except002.snl(39,20): ERROR, type of variable declared in a 'catch' clause must have unary 'exceptionval' operator
+catch( var i : int ) {
+                   ^
+./sl: 1 error(s) detected
+

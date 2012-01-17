@@ -1,0 +1,12 @@
+#
+# Compiler tests
+#
+# Check indexing operator (regression test of segfault when indexing
+# variable is undefined).
+#
+
+use std;
+
+var b = new int[10];
+
+. b[i];

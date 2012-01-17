@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Test readonly variables.
+#
+
+use std;
+
+struct S {
+    var i, j : int;
+    var name : string
+};
+
+readonly s : S = new S;
+
+s.i = 10;
+s.name = "new";

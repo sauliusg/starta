@@ -1,0 +1,54 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic types
+#
+
+use std;
+
+procedure g( type T a; b : type T ) : int
+begin
+    var n : type T;
+
+    n = a;
+
+    return 1;
+end
+
+procedure max( a, b : type T; 
+               gt : function( x, y : type T ) -> (bool) ) : type T
+begin
+    if( gt( a, b )) {
+        return a
+    } else {
+        return b
+    }
+end
+
+function gt_int( i, j : int ) : bool
+begin
+    return i > j ? true : false;
+end
+
+function gt_float( i, j : float ) : bool
+begin
+    return i > j ? true : false;
+end
+
+inline bytecode function gt_string( i, j : string ) : bool
+begin
+    STRGT
+end
+
+inline bytecode function le_string( i, j : string ) : bool
+begin
+    STRLE
+end
+
+. max( 7, 8, gt_int );
+. max( 7.1, 5.5, gt_float );
+. max( "more", "less", gt_string );
+. max( "less", "more", gt_string );
+. max( "more", "less", le_string );
+. max( "less", "more", le_string );

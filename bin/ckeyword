@@ -1,0 +1,25 @@
+#!/usr/bin/awk -f
+BEGIN {
+	print "#include \"global.h\""
+	print ""
+	print "#ifdef _PCYACC_"
+	print "#include \"pascal.h\""
+	print "#else"
+	print "#include \"y.tab.h\""
+	print "#endif"
+	print ""
+	print "TNameList names[] ="
+	print "\{"		
+}
+
+/^\%token/ { 
+	if( match( $2, "^_[A-Z]*$" ))
+		print "\"" tolower(substr($2,2)) "\", \t" $2 ","
+}
+
+END {
+	print "/* end marker : */"		
+	print "		\"\$eot\$\",	__IDENTIFIER"
+	print "\};"
+}
+

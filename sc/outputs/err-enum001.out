@@ -1,0 +1,5 @@
+./sl: inputs/err-enum001.snl(30,8): ERROR, enumerator value 'two' already defined in the current type
+    two,
+       ^
+./sl: 1 error(s) detected
+

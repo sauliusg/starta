@@ -1,0 +1,37 @@
+#
+# Snail compiler tests
+#
+#
+# Test 'new' operator and memory allocation.
+#
+
+type int = {
+    size = 4; kind = integer;
+    bytecode inline operator "." ( i : int )
+        { IPRINT };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_nref };
+};
+
+var i : array of int;
+var m : array of int;
+
+var a : int;
+
+a = 233;
+. a;
+
+i = new int[1];
+m = new int[20];
+
+i[0] = 121;
+
+. i[0];
+
+m[1] = i[0];
+
+. m[1];

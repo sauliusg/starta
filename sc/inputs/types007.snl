@@ -1,0 +1,24 @@
+#
+# Snail compiler tests
+#
+#
+# Test size diagnostics for primitive types.
+#
+
+use std;
+
+type T = {
+    reference;
+    size = 16;
+    s : string;
+    x : int;
+};
+
+var t = new T;
+
+t.s = "%s" %% "something"; // force string allocation on heap
+t.x = 1234;
+
+. "\"" + ("%s" %% t.s) + "\"";
+. "\"" + ("%s" %% t.s) + "\"";
+. "\"" + ("%s" %% t.s) + "\"";

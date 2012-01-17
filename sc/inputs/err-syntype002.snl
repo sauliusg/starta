@@ -1,0 +1,37 @@
+#
+# Snail language compiler tests
+#
+#
+# Type synonimity.
+#
+
+include "inputs/stdtypes.slib"
+
+type cell  = float;
+type voxel = float;
+
+var a, b, c : cell;
+var u, v, w : voxel;
+var f, g, h : float;
+
+# All assignments that are not marked as OK produce type
+# incompatibility errors during compilation.
+
+c = f;
+f = c;
+
+v = f;
+f = v;
+
+c = a + b; # OK
+c = a + b + f;
+
+v = u + w; # OK
+v = u + g;
+v = u + f + c;
+
+c = a + v;
+v = b + w;
+
+## v = c;
+## c = v;

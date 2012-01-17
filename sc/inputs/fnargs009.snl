@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Test the use of negative default values for function arguments
+#
+
+use std;
+
+function f( parameter : int = -2 ) : int
+{
+    return parameter;
+}
+
+. f();
+. f(33);

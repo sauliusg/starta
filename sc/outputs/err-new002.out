@@ -1,0 +1,5 @@
+./sl: inputs/err-new002.snl(16,28): ERROR, arrays should be allocated with array-new operator (e.g. 'a = new int[20]')
+a = new (array [][] of int);
+                           ^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,8 @@
+
+type float = { size = 4 };
+type int   = { size = 4 };
+
+type S = struct {
+    i : int;
+    i : float;
+};

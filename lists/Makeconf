@@ -1,0 +1,7 @@
+
+OTHER_DIRS = 
+LIB_DIRS   = ../cexceptions
+
+EXT = .hlc
+TEST_OPTIONS =
+SIZE_OPTIONS = -c -d dump

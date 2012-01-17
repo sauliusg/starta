@@ -1,0 +1,9 @@
+Before try
+
+Within TRY block, before g() call
+1
+2
+about to raise exception in g()
+Cought exception 12, and reraising...
+*** second catch: exception twelve
+After catch

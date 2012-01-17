@@ -1,0 +1,31 @@
+#
+# Snail language compiler tests
+#
+# Test of boolean constants.
+#
+
+use std;
+
+if 0B then
+    . "This is TRUE branch";
+else
+    . "This is FALSE branch";
+endif
+
+if 1B {
+    . "This is TRUE branch";
+} else {
+    . "This is FALSE branch";
+}
+
+if( false ) then
+    . "This is TRUE branch";
+else
+    . "This is FALSE branch";
+endif
+
+if( true ) {
+    . "This is TRUE branch";
+} else {
+    . "This is FALSE branch";
+}

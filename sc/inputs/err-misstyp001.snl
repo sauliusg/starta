@@ -1,0 +1,14 @@
+#
+# Snail language compiler tests
+#
+#
+# Non-existent type tests.
+#
+
+type T = missing {
+    suffix = T;
+    size = sizeof native "int";
+    function f()
+    {
+    }    
+}

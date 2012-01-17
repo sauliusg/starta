@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test named function arguments
+#
+
+use std;
+
+function ff( x : int = 100; y : long = 200 ) : long
+{
+    return <long>x * y / ( <long>x + y );
+}
+
+. ff( 300 );
+
+. ff( 200, 200 );
+
+. ff();
+
+. ff( 100, 200 );
+
+. ff( y => 100 );
+
+. ff( x => 200 );
+
+. ff( x => 300, y => 300 );

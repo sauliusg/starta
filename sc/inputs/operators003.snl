@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test sring concatenation and float power raising operators.
+#
+
+use std;
+
+load "libraries/math/libmath.so.0.01";
+
+inline bytecode operator "**" ( i : float; j : float ) : float
+{ libmath::FPOW }
+
+inline bytecode operator "**" ( i : double; j : double ) : double
+{ libmath::DPOW }
+
+inline bytecode operator "**" ( i : ldouble; j : ldouble ) : ldouble
+{ libmath::LDPOW }
+
+. 2.0**5.0;
+. "alpha"_" "_"beta";
+
+var float x = 2, y = 5;
+
+x **= y;
+. x;
+

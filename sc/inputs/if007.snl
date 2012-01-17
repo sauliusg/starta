@@ -1,0 +1,60 @@
+#
+# Snail language compiler tests
+#
+#
+# Check diagnostics of incompatible operands for shorcut boolean operators.
+#
+
+
+include "inputs/stdtypes.slib"
+
+function writeln( s : string )
+begin
+    bytecode { LD %s SPRINT NEWLINE }
+end
+
+function write( s : string )
+begin
+    bytecode { LD %s SPRINT }
+end
+
+writeln( "So, let's see how it works:" );
+
+var a, b, c, d : int;
+var e, f, g, h : long;
+
+a = 1;
+b = 2;
+c = 3;
+d = 4;
+
+write( "First if: " );
+if a > b then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+write( "Second if: " );
+if a > b && f < g then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+write( "Third if: " );
+
+forward function incn( x : int; n : int ) : int;
+
+a = incn( a, 1 );
+
+if a == b || c == d then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+function incn( x : int; n : int ) : int
+{
+    bytecode { LD %x LD %n ADD }
+}

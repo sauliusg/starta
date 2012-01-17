@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test function and procedure references
+#
+
+use std;
+
+procedure g( x : int ) : int
+{
+    return 2 * x;
+}
+
+type F = procedure ( i : int ) -> ( int );
+
+type S = struct {
+    string name;
+    F f;
+    array of F functions;
+};
+
+var p  = struct S { name: "first", functions: [ g ], f: g };
+
+. p.functions[0]( 2 );
+. p.f( 7 );

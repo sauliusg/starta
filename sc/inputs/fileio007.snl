@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test file printf and scanf operators for integer types.
+#
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var p : int = 31415926;
+var f : file;
+
+. p;
+
+f = fopen( "outputs/data.txt", "w" );
+
+<f> << p << "\n";
+
+fclose( f );
+
+f = fopen( "outputs/data.txt", "r" );
+
+<f> >> p;
+. p;
+
+fclose( f );

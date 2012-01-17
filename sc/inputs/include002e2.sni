@@ -1,0 +1,6 @@
+
+. "This is 'include002e2.sni'";
+
+2 +;
+
+. "After the syntax error";

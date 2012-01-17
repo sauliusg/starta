@@ -1,0 +1,42 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+package M;
+
+include "inputs/stdtypes.slib"
+include "inputs/stdio.slib"
+
+var i : int;
+
+i = 111;
+
+procedure set_i( int val )
+{
+    i = val;
+}
+
+function get_i() : int
+{
+    return i;
+}
+
+end package M;
+
+//import M;
+
+. M::get_i();
+
+. M::i;
+
+M::i = 222 M::int;
+
+. M::i;
+
+M::set_i( 333 M::int );
+
+. M::get_i();
+. M::i;

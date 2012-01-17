@@ -1,0 +1,41 @@
+#
+# Snail compiler tests
+#
+#
+# Array reference comparison tests.
+#
+
+include "inputs/stdtypes.slib"
+
+type S = array of float; 
+
+var s : S;
+var p : S;
+
+if s == p then
+    . "s is same as p";
+else
+    . "s is NOT same as p";
+endif
+
+
+procedure compare_struct( s1, s2 : S )
+begin
+    if s1 == s2 then
+        . "s is same as p";
+    else
+        . "s is NOT same as p";
+    endif
+end
+
+s = new float[20];
+
+compare_struct( s, p );
+
+p = new float[30];
+
+compare_struct( p, s );
+
+p = s;
+
+compare_struct( p, s );

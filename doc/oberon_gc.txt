@@ -1,0 +1,48 @@
+ptr = pointer to node;
+node = record
+   m : integer;
+   l, r : ptr;
+end;
+
+procedure Traverse( root : ptr )
+   var p, q, r : ptr;
+begin
+   p := root; q := root;
+   repeat { q != nil }
+      m++; (* mark *)
+      if p.l != nil then
+         r := p.l; p.l := p.r; p.r := q;
+         q := p; p := r;
+      else
+         p.l := p.r; p.r := q; q := nil;
+      end if;
+   until p = q;
+end;
+
+node = record
+   m, n : integer;
+   dsc : array n of ptr;
+end;
+
+p.dsc[0], ..., p.dsc[n-1]
+
+procedure Traverse( root : ptr )
+   var k : integer; p, q, r : ptr;
+begin
+   p := q := root;
+   loop { p != nil }
+      k := p.m; p.m++; (* mark *)
+      if k < p.n then
+         r := p.dsc[k];
+         if r != nil then
+            p.dsc[k] := q; q := p; p := r;
+         end if
+      elsif p = q then
+         exit
+      else
+         k := q.m - 1;
+         r := q.dsc[k]; q.dsc[k] := p;
+         p := q; q := r;
+      end if
+   end loop
+end

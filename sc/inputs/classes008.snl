@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+type A = class {
+     method name() : string
+     begin
+         return "class A"
+     end;
+}
+
+class B {
+     A a;
+     method name() : string { return "class B" }
+};
+
+var b = new B;
+b.a = new A;
+
+. b->name();
+. b.a->name();

@@ -1,0 +1,53 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+var b = new blob(4000);
+var mm : array [][] of int;
+
+pack b, 0, "I2", [ [ -2, -1, 0 ], [1, 2, 3 ] ];
+
+mm = unpack int[3][]( b, 0, "I2x2" );
+for var i = 0 to last(mm) do
+    for var j = 0 to last(mm[i]) do
+        < mm[i][j]; < " "
+    enddo
+    . "";
+enddo
+
+. "----------------";
+
+mm = unpack int[3][]( b, 0, "U2x2" );
+for var i = 0 to last(mm) do
+    for var j = 0 to last(mm[i]) do
+        < mm[i][j]; < " ";
+    enddo
+    . "";
+enddo
+
+. "=================";
+
+pack b, 0, "I4", [ [ -2, -1, 0 ], [ 1, 2, 3 ] ];
+
+mm = unpack int[3][]( b, 0, "I4x2" );
+for var i = 0 to last(mm) do
+    for var j = 0 to last(mm[i]) do
+        < mm[i][j]; < " "
+    enddo
+    . ""
+enddo
+
+. "----------------";
+
+mm = unpack int[3][]( b, 0, "U4x2" );
+for var i = 0 to last(mm) do
+    for var j = 0 to last(mm[i]) do
+        < mm[i][j]; < " ";
+    enddo
+    . "";
+enddo

@@ -1,0 +1,8 @@
+./sl: inputs/err-bool001.snl(80,19): ERROR, incompatible types for binary operator 'or'
+if a > b || e < f then
+                  ^
+./sl: inputs/err-bool001.snl(86,19): ERROR, incompatible types for binary operator 'and'
+if a > b && e < f then
+                  ^
+./sl: 2 error(s) detected
+

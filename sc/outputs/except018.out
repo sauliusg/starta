@@ -1,0 +1,8 @@
+./sl: Unhandled exception 1 in the bytecode interpreter: test exception
+Cought exception testerr
+11
+Cought TestException:
+message:
+test exception
+error code:
+1

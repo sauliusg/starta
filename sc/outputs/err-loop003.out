@@ -1,0 +1,11 @@
+./sl: inputs/err-loop003.snl(33,17): ERROR, type 'int' has no binary operator named '>'
+for i = 1 to 10 do
+                ^
+./sl: inputs/err-loop003.snl(33,17): ERROR, type 'int' has no unary operator named 'jnz'
+for i = 1 to 10 do
+                ^
+./sl: inputs/err-loop003.snl(35,1): ERROR, incompatible type of argument 2 for operator 'loop'
+enddo
+^
+./sl: 3 error(s) detected
+

@@ -1,0 +1,6 @@
+Before try
+
+Within TRY block, before g() call
+1
+Cought one of YetAnotherError, TestException exceptions
+After catch

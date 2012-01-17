@@ -1,0 +1,25 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use std;
+
+var b = new blob(20);
+var s = "string 1";
+
+pack b, 0, "s", s;
+
+var a = unpack string( b, 0, "s" );
+
+. a;
+
+s = "str2";
+
+pack b, 0, "s", s;
+
+a = unpack string( b, 0, "s" );
+
+. a;

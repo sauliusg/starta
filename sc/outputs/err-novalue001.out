@@ -1,0 +1,8 @@
+./sl: inputs/err-novalue001.snl(10,10): ERROR, functions called in exressions must return at least one value
+s = ggg(1);
+         ^
+./sl: inputs/err-novalue001.snl(10,11): ERROR, incompatible types for assignment to variable 's'
+s = ggg(1);
+          ^
+./sl: 2 error(s) detected
+

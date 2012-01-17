@@ -1,0 +1,41 @@
+
+use std;
+
+inline bytecode operator "~" ( i : int ) : int
+{
+    NOT
+}
+
+inline bytecode operator "~" ( i : long ) : long
+{
+    LNOT
+}
+
+inline bytecode operator "~" ( i : llong ) : llong
+{
+    LLNOT
+}
+
+ro maxint = ~(1 shl const(int.size * 8 - 1));
+ro maxlong = ~(1L shl const(long.size * 8 - 1) long);
+ro maxllong = ~(1LL shl const(llong.size * 8 - 1) llong);
+
+ro minint = 1 shl const(int.size * 8 - 1);
+ro minlong = 1L shl const(long.size * 8 - 1) long;
+ro minllong = 1LL shl const(llong.size * 8 - 1) llong;
+
+. maxint;
+. minint;
+. -(minint + 1);
+. "";
+
+. maxlong;
+. minlong;
+. "";
+
+. maxllong;
+. minllong;
+. "";
+
+. "%llX" %% maxllong;
+. "%llX" %% minllong;

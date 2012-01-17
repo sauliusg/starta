@@ -1,0 +1,23 @@
+#
+# Snail language compiler tests
+#
+# Test of user-defined "dup" operator.
+#
+
+type duplicator = {
+    size = 4; kind = integer;
+
+    inline bytecode operator "ldc" () : duplicator
+        { LDCS };
+
+    inline bytecode operator "dup" ( i : duplicator ) : duplicator
+        {
+          SLDC "This is user-defined \"dup\" operator\n"
+          SPRINT
+          DUP
+        };
+}
+
+var a, b, c : duplicator;
+
+a = b = c = 1;

@@ -1,0 +1,71 @@
+
+Semantics of the CALL instruction and function calls.
+
+Before the function call, a caller should push onto the stack:
+
+    a) addresses of the returned values of the function. If the return value
+       is to be ignored, a fake temporary cell on the stack should be
+       allocated and its address passed to the function.
+       
+    b) actual parameters (arguments) are pushed onto the stack. Last
+       argument is pushed first (language C calling order).
+
+After the function returns, the RET command removes local variables
+arguments from the stack (Pascal calling convetion).
+
+Values on the stack immediately after the execution of the CALL command.
+
+^ 0xFF                  offset
+|			from FP:
+          +----------+
+	  | retval   |  4         return value of the function
+          +----------+
+          | arg1     |  3         first function argument, if any
+          +----------+
+          | old SP   |  2         old stack pointer
+          +----------+
+          | old FP   |  1         old frame pointer          
+          +----------+
+FP, SP -> | ret addr |  0         return address
+          +----------+
+
+|
+v 00 (stack grows downwards)
+
+Values on the stack after the execution of the ENTER command
+
+
+^ 0xFF                  offset
+|			from FP:
+          +----------+
+	  | retval   |  4         return value of the function
+          +----------+
+          | arg1     |  3         first function argument, if any
+          +----------+
+          | old SP   |  2         old stack pointer
+          +----------+
+          | old FP   |  1         old frame pointer
+          +----------+
+FP ->     | ret addr |  0         return address
+          +----------+
+          | loc1     | -1         first local variable
+	  +----------+
+          | loc2     | -2         second local variable
+	  +----------+
+SP ->     | tmp1     | -3         first temporary cell
+	  +----------+
+|
+v 00 (stack grows downwards)
+
+
+The cell 'retval' of the function contains an _ADDRESS_ of the return value.
+
+At the return statement, a function executes the following assignment:
+
+             :=
+	    /  \
+	   /    \
+	 ref    return expression
+	 /
+        /
+      var, offset = retval offset

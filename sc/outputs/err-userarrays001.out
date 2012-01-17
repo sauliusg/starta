@@ -1,0 +1,5 @@
+./sl: inputs/err-userarrays001.snl(16,7): ERROR, incompatible type of argument 1 for operator '[]'
+. c[1];
+      ^
+./sl: 1 error(s) detected
+

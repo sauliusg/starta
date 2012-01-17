@@ -1,0 +1,5 @@
+./sl: inputs/err-mass001.snl(55,32): ERROR, incompatible types for assignment to variable 'i'
+( i, n[3], n[9] ) = l, m, l - m;
+                               ^
+./sl: 1 error(s) detected
+

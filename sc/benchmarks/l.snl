@@ -1,0 +1,29 @@
+
+type int = {
+    size = sizeof native "int";
+    inline bytecode operator "+" ( x : int; y : int ) : int
+        { bytecode{ ADD }};
+    inline bytecode operator "%" ( x : int; y : int ) : int
+        { bytecode{ MOD }};
+    inline bytecode operator "<=" ( x : int; y : int ) : int
+        { LE };
+    inline bytecode operator "==" ( x : int; y : int ) : int
+        { EQ };
+    inline bytecode operator "ldc" () : int
+	{ LDCS };
+    inline bytecode operator "jz" ( i : int )
+	{ JZ };
+    inline bytecode operator "jnz" ( i : int )
+	{ JNZ };
+};
+
+var i : int;
+
+bytecode function writeln( i : int )
+begin
+    bytecode { IPRINT NEWLINE };
+end;
+
+for( i = 1; i <= 1000000; i = i + 1 ) do
+    if i % 100000 == 0 then writeln( i ); endif;
+enddo;

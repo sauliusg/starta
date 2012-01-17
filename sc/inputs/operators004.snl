@@ -1,0 +1,32 @@
+#
+# Snail compiler tests
+#
+#
+# Check operators declared outside of the types
+#
+
+use std;
+
+type list_of_string = struct {
+    next : list_of_string;
+    value : string;
+
+}
+
+operator "." ( l : list_of_string )
+{ 
+    if( l ) {
+        < l.value;
+    } else {
+        < "((null))"
+    }
+}
+
+procedure cons( s : string; l : list_of_string = null ) : list_of_string
+{
+    return struct list_of_string{ value => s, next => l };
+}
+
+var  s = cons( "one" );
+
+. s;

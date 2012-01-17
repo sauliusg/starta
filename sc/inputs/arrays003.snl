@@ -1,0 +1,44 @@
+#
+# Snail compiler tests
+#
+#
+# Testing cloning of dynamic arrays.
+#
+
+use std;
+
+procedure print_array( int[] m )
+{
+    < "[ ";
+    for var i = 0 to last(m) do
+        do < ", " if i > 0;
+        < m[i]
+    enddo
+    < " ]\n";
+}
+
+procedure inc_array( int[] m )
+{
+    for var i = 0 to last(m) do
+         m[i] ++
+    enddo
+}
+
+var m, n : array of int;
+
+m = [ 10, 20, 30, 40 ];
+
+print_array( m );
+
+n = m;
+
+inc_array( m );
+
+print_array( n );
+
+n = m[];
+
+inc_array( m );
+
+print_array( m );
+print_array( n );

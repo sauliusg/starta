@@ -1,0 +1,6 @@
+./sl: inputs/err-classes002.snl(13,12): ERROR, incorrect syntax
+    char s[20];
+           ^
+./sl: compiler could not recover from errors, quitting now
+1 error(s) detected
+

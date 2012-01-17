@@ -1,0 +1,32 @@
+./sl: inputs/err-argcompat001.snl(17,9): ERROR, type 'int' has no conversion from type 'string'
+. f( "1", 2, 3, 4 ); // ERROR
+        ^
+./sl: inputs/err-argcompat001.snl(18,12): ERROR, type 'int' has no conversion from type 'string'
+. f( 1, "2", 3, 4 ); // ERROR
+           ^
+./sl: inputs/err-argcompat001.snl(19,15): ERROR, type 'long' has no conversion from type 'string'
+. f( 1, 2, "3", 4 ); // ERROR
+              ^
+./sl: inputs/err-argcompat001.snl(20,19): ERROR, type 'long' has no conversion from type 'string'
+. f( 1, 2, 3, "4" ); // ERROR
+                  ^
+./sl: inputs/err-argcompat001.snl(22,14): ERROR, parameter 't' has no default value, please supply its value
+. f( 1, 2, 3 ); // ERROR
+             ^
+./sl: inputs/err-argcompat001.snl(22,14): ERROR, incompatible types for function 'f' argument nr. 3
+. f( 1, 2, 3 ); // ERROR
+             ^
+./sl: inputs/err-argcompat001.snl(22,14): ERROR, too little arguments in call to function 'f'
+. f( 1, 2, 3 ); // ERROR
+             ^
+./sl: inputs/err-argcompat001.snl(23,20): ERROR, incompatible types for function 'f' argument nr. 4
+. f( 1, 2, 3, 4, 5 ); // ERROR
+                   ^
+./sl: inputs/err-argcompat001.snl(23,20): ERROR, incompatible types for function 'f' argument nr. 2
+. f( 1, 2, 3, 4, 5 ); // ERROR
+                   ^
+./sl: inputs/err-argcompat001.snl(23,20): ERROR, too many arguments in call to function 'f'
+. f( 1, 2, 3, 4, 5 ); // ERROR
+                   ^
+./sl: 10 error(s) detected
+

@@ -1,0 +1,2 @@
+# factor primary term term_conjunction simple_expression expression 
+getrule $1 factor primary term term_conjunction simple_expression expression 

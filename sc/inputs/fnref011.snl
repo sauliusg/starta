@@ -1,0 +1,41 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+struct S {
+    int x;
+    int y;
+}
+
+procedure f( int a; int b ): S
+begin
+    var s = new struct{ int a; int b };
+    s.a = a;
+    s.b = b;
+    return s;
+end
+
+procedure g( int a; int b ): (struct { int x; int y })
+begin
+    var s = new struct{ int a; int b };
+    s.a = a + b;
+    s.b = a - b;
+    return s;
+end
+
+type p = procedure ( int i; int j ) -> (S);
+
+var pp : p;
+
+pp = f;
+
+. pp(10,2).x;
+
+pp = g;
+
+. pp(10,2).x;

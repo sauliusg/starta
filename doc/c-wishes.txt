@@ -1,0 +1,12 @@
+
+What I would like to have in C
+
+1. Garbage collections
+2. Exception handling -- can be implemented without changing the language
+3. Arrays that remember their size
+4. Safe realloc()
+5. Modules (namespaces)
+6. Objects -- can be implemented as opaque pointers
+7. Inheritance of interface
+8. Inheritance of implementation (?)
+9. Type-generic functions

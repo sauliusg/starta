@@ -1,0 +1,11 @@
+./sl: inputs/err-index001.snl(16,9): ERROR, type 'float' has no binary operator named '[]'
+. s[1.1];
+        ^
+./sl: inputs/err-index001.snl(17,12): ERROR, type 'double' has no binary operator named '[]'
+. counts[x];
+           ^
+./sl: inputs/err-index001.snl(19,12): ERROR, lvalue is needed for assignment
+s[0] = 'A'c;
+           ^
+./sl: 3 error(s) detected
+

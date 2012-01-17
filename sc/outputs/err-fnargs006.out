@@ -1,0 +1,14 @@
+./sl: inputs/err-fnargs006.snl(12,34): ERROR, can not assign to a readonly component
+    if last(m) > 0 then m[0] = 1 endif
+                                 ^
+./sl: inputs/err-fnargs006.snl(19,20): ERROR, can not assign to the readonly variable 'm'
+    m = new int[10];
+                   ^
+./sl: inputs/err-fnargs006.snl(26,22): ERROR, incompatible types for assignment to variable 'm'
+    m = new float[10];
+                     ^
+./sl: inputs/err-fnargs006.snl(33,29): ERROR, can not assign readonly content to variable 'n'
+    var n : array of int = m;
+                            ^
+./sl: 4 error(s) detected
+

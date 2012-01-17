@@ -1,0 +1,4 @@
+>>string 1<<
+>>str 2<<
+exception -1 : attempting to unpack values past the end of a blob
+exception -1 : attempting to unpack values past the end of a blob

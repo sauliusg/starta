@@ -1,0 +1,44 @@
+#
+# Snail language compiler tests
+#
+#
+# Test of DROP, DROPN, PDROP and PDROPN bytecode operators.
+#
+
+include "inputs/stdtypes.slib"
+
+type S = struct {
+    name : string;
+    count : int;
+}
+
+type M = array of int;
+
+function f1() : S
+{
+    return new S;
+}
+
+function f2() : S, M
+{
+    return new S, new int[10];
+}
+
+var i : int;
+
+. "Before function calls.";
+
+f1();
+f2();
+
+f1();
+f2();
+
+. "Before loop.";
+
+for i = 1 to 10 do
+    f1();
+    f2();
+enddo;
+
+. "The end";

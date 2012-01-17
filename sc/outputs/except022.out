@@ -1,0 +1,8 @@
+./sl: inputs/except022.snl(21,14): ERROR, there are more variables than values to asign
+a, b, c = f();
+             ^
+./sl: inputs/except022.snl(21,14): ERROR, not enough values on the stack for assignment to variable 'a'
+a, b, c = f();
+             ^
+./sl: 2 error(s) detected
+

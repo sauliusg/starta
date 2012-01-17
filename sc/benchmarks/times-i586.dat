@@ -1,0 +1,6 @@
+Mon Oct 14 18:34:34 EET 2002
+Linux 2.4.19-gentoo-r5 i586
+l-opt.snl            real 0m3.601s
+l.snl                real 0m10.076s
+pl-opt.snl           real 0m1.736s
+pl.snl               real 0m5.235s

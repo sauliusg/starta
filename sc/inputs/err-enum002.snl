@@ -1,0 +1,42 @@
+#
+# Snail compiler tests
+#
+#
+# Test enumerator types (enum).
+#
+
+type eint = {
+    size = sizeof native "int";
+
+    inline bytecode operator "." ( i : eint )
+        { IPRINT NEWLINE };
+
+    inline bytecode operator "ldc" () : eint
+        { LDCS };
+
+}
+
+type E = enum eint (
+    one,
+    two,
+    three,
+    ...
+);
+
+type E = enum eint (
+    four,
+    five,
+    six,
+    ...
+);
+
+var e1 : E;
+var e2, e3 : E;
+
+e1 = three E;
+. e1;
+
+e2 = 11 E;
+e3 = one E;
+
+. e2;

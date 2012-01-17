@@ -1,0 +1,35 @@
+#
+# Snail compiler tests
+#
+#
+# Test loop 'break' and 'continue' statements.
+#
+
+use std;
+
+const N = 10;
+
+var int i;
+
+i = 0;
+loop1: for i = 0 to const(N) {
+     if( i == const(N/2) ) {
+     	 break loop1
+     }
+     . i;
+}
+
+. "Out of the first loop.";
+
+i = 0;
+loop2: for i = 0 to const(N) {
+     if( i == const(N/2) ) {
+     	 continue loop2
+     }
+     . i;
+}
+
+. "Finished.";
+
+bytecode { ESPRINT };
+

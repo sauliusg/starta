@@ -1,0 +1,6 @@
+./sl: Unhandled exception -1 in the bytecode interpreter: upper bound '-30' is out of range 0..5 in subarray
+upper bound '10' is out of range 0..5 in subarray
+lower bound '-30' is out of range 0..5 in subarray
+upper bound '-33' is out of range 0..5 in subarray
+upper bound '-33' is out of range 0..5 in subarray
+lower bound '30' is out of range 0..5 in subarray

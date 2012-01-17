@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function, type, and variable access.
+#
+
+import M1;
+import M2;
+
+package M3
+
+const X = 2000;
+
+import std;
+
+var Y : std::int = const(X+1) std::int;
+
+end package M3;
+
+M1::p1();
+M2::p2();
+
+//use std;
+import std;
+
+. const(M3::X) std::int;
+. M3::Y;

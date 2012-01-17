@@ -1,0 +1,26 @@
+./sl: inputs/err-typecompat001.snl(24,10): ERROR, incompatible types for assignment to variable 'x'
+    x = n; // ERROR
+         ^
+./sl: inputs/err-typecompat001.snl(38,10): ERROR, incompatible types for assignment to variable 'x'
+    x = n; // ERROR
+         ^
+./sl: inputs/err-typecompat001.snl(39,10): ERROR, incompatible types for assignment to variable 's'
+    s = m; // ERROR
+         ^
+./sl: inputs/err-typecompat001.snl(55,6): ERROR, incompatible types for assignment to variable 'g'
+g = r; // ERROR
+     ^
+./sl: inputs/err-typecompat001.snl(57,6): ERROR, incompatible types for assignment to variable 'm'
+m = g; // ERROR
+     ^
+./sl: inputs/err-typecompat001.snl(59,6): ERROR, incompatible types for assignment to variable 'a'
+a = g; // ERROR
+     ^
+./sl: inputs/err-typecompat001.snl(61,6): ERROR, incompatible types for assignment to variable 'm'
+m = r; // ERROR
+     ^
+./sl: inputs/err-typecompat001.snl(63,6): ERROR, incompatible types for assignment to variable 'm'
+m = g; // ERROR
+     ^
+./sl: 8 error(s) detected
+

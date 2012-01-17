@@ -1,0 +1,26 @@
+#
+# SL language compiler tests
+#
+# Test implementation of subscopes.
+#
+
+include "inputs/stdtypes.slib"
+
+var x : int = 202;
+var i : int;
+
+for i = 1 to 10 do
+    var y : int;
+
+    . y;
+    . x;
+    . i;
+
+    y = 2 * i;
+
+    . y;
+    . ""
+enddo
+
+var y : int = 112;
+. y

@@ -1,0 +1,18 @@
+#
+# Check whether exception can be raised only with a message, without
+# an error code:
+#
+
+use std;
+
+exception XXX;
+
+try {
+    raise XXX( "this is exception only with a message" );
+}
+catch XXX( var errcode : int; var message : string ) {
+    . "Caught exception XXX with error code", errcode,
+        "and message '" _ message _ "'";
+}
+
+raise XXX( "The final message" );

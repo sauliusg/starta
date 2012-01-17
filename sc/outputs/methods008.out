@@ -1,0 +1,4 @@
+S.f.offset (new)        = 3
+S.h.offset (overloaded) = 2
+S.g.offset (inherited)  = 1
+S.k.offset (new)        = 4

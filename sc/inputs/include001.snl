@@ -1,0 +1,14 @@
+
+type str = {
+    size = 4; kind = string;
+    bytecode inline operator "." ( s : str ) { SPRINT };
+    bytecode inline operator "ldc" () : str { SLDC };
+};
+
+. "Before including first file";
+
+include "inputs/include001a.sni";
+
+. "Before including second file";
+
+include "inputs/include001b.sni";

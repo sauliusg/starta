@@ -1,0 +1,11 @@
+./sl: inputs/err-mass002.snl(55,32): ERROR, incompatible types for binary operator '-'
+( i, n[3], n[9] ) = l, m, l - m;
+                               ^
+./sl: inputs/err-mass002.snl(55,32): ERROR, incompatible types for assignment
+( i, n[3], n[9] ) = l, m, l - m;
+                               ^
+./sl: inputs/err-mass002.snl(55,32): ERROR, incompatible types for assignment
+( i, n[3], n[9] ) = l, m, l - m;
+                               ^
+./sl: 3 error(s) detected
+

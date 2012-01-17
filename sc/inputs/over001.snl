@@ -1,0 +1,38 @@
+#
+# Snail language compiler tests
+#
+#
+# Test user-defined "over" operator.
+#
+
+
+include "inputs/stdtypes.slib"
+
+type overer = {
+    size = 4; kind = integer; suffix = overer;
+
+    inline bytecode operator "ldc" () : overer
+        { LDCS };
+
+    inline bytecode operator "." ( i : overer )
+        { IPRINT };
+
+    inline bytecode operator "over" ( n : overer; a /* ignored */ ) : overer
+    {
+        SLDC "Calling redefined operator \"over\"\n"
+        SPRINT
+        OVER
+    }
+}
+
+var a, b, c : overer;
+var m : array of overer;
+
+c = 137 overer;
+m = new overer[21];
+
+b = m[2] = c;
+
+. a;
+. b;
+. c;

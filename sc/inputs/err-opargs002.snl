@@ -1,0 +1,22 @@
+#
+# Snail language compiler tests
+#
+#
+# Check of operator argument compatibility.
+#
+
+type int = {
+    size = sizeof native "int";
+}
+
+type long = {
+    size = sizeof native "long";
+    suffix = L;
+
+    inline bytecode operator "+" ( x : int; y : long ) : long
+	{ LADD };
+}
+
+var a, b, c : long;
+
+a = b + c;

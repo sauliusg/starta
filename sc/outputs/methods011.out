@@ -1,0 +1,13 @@
+S.f.offset (new)        = 4
+S.h.offset (overloaded) = 2
+S.g.offset (inherited)  = 1
+S.k.offset (new)        = 5
+S.t.offset (inherited)  = 3
+-------------
+s.name offset = 3
+s.next offset = 4
+s.i    offset = 2
+-------------
+-------------
+30
+41

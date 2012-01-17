@@ -1,0 +1,5 @@
+./sl: inputs/err-fileio001.snl(19,13): ERROR, incompatible types for function 'fread' argument nr. 2
+fread( f, s );
+            ^
+./sl: 1 error(s) detected
+

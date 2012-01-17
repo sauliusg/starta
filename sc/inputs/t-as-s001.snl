@@ -1,0 +1,12 @@
+#
+# Snail compiler tests
+#
+#
+# Test pointer-not operator for arrays
+#
+
+include "inputs/stdtypes.slib"
+
+var i : int = 34 int;
+
+. i;

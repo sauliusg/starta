@@ -1,0 +1,23 @@
+#
+# Snail compiler tests
+#
+#
+# Check that LENGTH works on null arrays
+#
+
+include "inputs/stdtypes.slib"
+
+var a : array of int;
+
+. length(a);
+. last(a);
+
+. "Before loop";
+
+var i : int;
+for i = 0 to last(a) do
+    . a[i];
+    a[i] = i;
+enddo;
+
+. "After loop";

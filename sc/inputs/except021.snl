@@ -1,0 +1,72 @@
+#
+# Snail compiler tests
+#
+#
+# Test exception handling in SL compiler.
+#
+
+include "inputs/stdtypes.slib"
+
+procedure f( i : int ) : int
+{
+    return i + 1;
+}
+
+exception MathError;
+exception AnotherError;
+exception ZeroDivision;
+exception YetAnotherError;
+
+procedure g( i : int ) : int
+{
+    if( i != 0 ) then
+        return f( i ) / i
+    else
+        . "about to raise exception in g()";
+        raise ZeroDivision( 11, "divison by 0 in g()" )
+    endif
+}
+
+. "Before try\n";
+
+inline bytecode procedure iwrite( i : int )
+{
+    IPRINT
+}
+
+inline bytecode procedure swrite( s : string )
+{
+    SPRINT
+}
+
+inline bytecode procedure nl()
+{
+    NEWLINE
+}
+
+try {
+    . "Within TRY block, before g() call";
+    . g( 2 );
+    bytecode { RAISE_TEST }
+    . g( 1 );
+    . g( 0 );
+    . "Within TRY block, after g() call\n";
+}
+
+catch MathError, ZeroDivision, AnotherError {
+    swrite( "Cought one of MathError, ZeroDivision, or AnotherError ");
+    swrite( "exceptions\n" );
+}
+
+catch YetAnotherError, TestException {
+    swrite( "Cought one of YetAnotherError, TestException exceptions\n" );
+}
+
+catch( var msg : string ) {
+    swrite( "*** catch-all: exception " );
+    swrite( msg );
+    nl();
+}
+
+
+. "After catch";

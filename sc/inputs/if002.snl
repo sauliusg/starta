@@ -1,0 +1,76 @@
+#
+# Snail language compiler tests
+#
+#
+# 'IF' conditional operator test
+#
+
+#
+# See if the 'if ... then ... else ... endif' operator works
+#
+
+type int = {
+    size = 4; kind = integer;
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+type string = {
+    size = 4; kind = string;
+    inline bytecode operator "ldc" () : string
+        { SLDC };
+};
+
+function writeln( s : string )
+begin
+    bytecode { LD %s SPRINT NEWLINE }
+end;
+
+function write( s : string )
+begin
+    bytecode { LD %s SPRINT }
+end;
+
+writeln( "So, let's see how it works:" );
+
+var a : int;
+
+a = 1;
+
+write( "First if: " );
+if a then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+a = 0;
+
+write( "Second if: " );
+if a then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+write( "Third if: " );
+
+forward function incn( x : int; n : int ) : int;
+a = incn( a, 3 );
+
+if a then
+    writeln( "TRUE" );
+else
+    writeln( "FALSE" );
+endif;
+
+function incn( x : int; n : int ) : int
+{
+    bytecode { LD %x LD %n ADD }
+};

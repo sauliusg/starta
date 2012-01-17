@@ -1,0 +1,28 @@
+#
+# Snail language compiler tests
+#
+#
+# Check diagnostics of missing "jnz" and "jz" operators, and of the
+# incompatible shortcut boolean operands.
+#
+
+
+include "inputs/stdtypes.slib"
+
+var a, b, c : int;
+var m : array of int;
+
+c = 137;
+m = new int[21];
+
+a = m[2] = b = c;
+
+. a;
+. b;
+. c;
+
+bytecode { NEWLINE }
+
+. m[1];
+. m[2];
+. m[3];
