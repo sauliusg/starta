@@ -257,7 +257,7 @@ int LLFLOORLD( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-    istate.ep[0].num.l = (long)floor( istate.ep[0].num.ld );
+    istate.ep[0].num.ll = (long)floor( istate.ep[0].num.ld );
 
     return 1;
 }
