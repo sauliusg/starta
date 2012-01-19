@@ -1,6 +1,5 @@
 
-FIRST = bytecode/ hlc/ stackcode/ s-hlc/ w-interpret/ \
-        snail/ sl/ tcode/ bcode/ wcode/ risc/
+FIRST = 
 
 DIRS  = ${FIRST} ${filter-out ${FIRST}, ${dir ${wildcard */Makefile}}}
 
