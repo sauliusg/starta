@@ -3537,6 +3537,35 @@ int STRLE( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * STRLEN  Length of the string a-la C
+ *
+ * bytecode:
+ * STRLEN
+ *
+ * stack:
+ * ..., str -> ..., ssize_t
+ */
+
+int STRLEN( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *block = istate.ep[0].PTR;
+    ssize_t size = block[-1].size;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    if( !str ) {
+	istate.ep[0].num.ssize = 0;
+    } else {
+        istate.ep[0].num.ssize = strnlen( str, size );
+    }
+
+    return 1;
+}
+
+/*
  * STRINDEX  Does one string contain another?
  *
  * bytecode:

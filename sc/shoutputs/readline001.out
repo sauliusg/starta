@@ -17,14 +17,14 @@ shtests/programs/readline.snl
 >>>     SFILESCAN SWAP DROP <<<
 >>> } <<<
 >>>  <<<
->>> inline bytecode function strindex( string s1, s2 ) : int <<<
+>>> inline bytecode function stridx( string s1, s2 ) : int <<<
 >>> { <<<
 >>>     STRINDEX <<<
 >>> } <<<
 >>>  <<<
 >>> function strcontains( string haystack; string needle ) : bool <<<
 >>> { <<<
->>>     if strindex( haystack, needle ) >= 0  then <<<
+>>>     if stridx( haystack, needle ) >= 0  then <<<
 >>>         return true <<<
 >>>     else <<<
 >>>         return false <<<
