@@ -207,6 +207,7 @@ continue   { MARK; return _CONTINUE; }
 debug      { MARK; return _DEBUG; }
 do         { MARK; return _DO; }
 else       { MARK; return _ELSE; }
+elsif      { MARK; return _ELSIF; }
 end        { MARK; return '}'; }
 enddo      { MARK; return _ENDDO; }
 endif      { MARK; return _ENDIF; }

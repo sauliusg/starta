@@ -5047,6 +5047,7 @@ static cexception_t *px; /* parser exception */
 %token _DEBUG
 %token _DO
 %token _ELSE
+%token _ELSIF
 %token _ENDDO
 %token _ENDIF
 %token _ENUM
@@ -5900,6 +5901,47 @@ for_variable_declaration
       }
   ;
 
+elsif_condition
+  : _ELSIF /* expression */ condition
+      {
+        snail_push_relative_fixup( snail_cc, px );
+	snail_compile_jz( snail_cc, 0, px );
+      }
+  ;
+
+elsif_statement
+  : elsif_condition _THEN statement_list _ENDIF
+    {
+        snail_fixup_here( snail_cc );
+    }
+
+  | elsif_condition _THEN statement_list
+    {
+	ssize_t zero = 0;
+        snail_push_relative_fixup( snail_cc, px );
+        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+        snail_swap_fixups( snail_cc );
+        snail_fixup_here( snail_cc );
+    }
+    elsif_statement
+    {
+        snail_fixup_here( snail_cc );
+    }
+
+  | elsif_condition _THEN statement_list
+    {
+	ssize_t zero = 0;
+        snail_push_relative_fixup( snail_cc, px );
+        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+        snail_swap_fixups( snail_cc );
+        snail_fixup_here( snail_cc );
+    }
+    _ELSE statement_list _ENDIF
+    {
+        snail_fixup_here( snail_cc );
+    }
+;
+
 control_statement
   : if_condition _THEN statement_list _ENDIF
       {
@@ -5915,6 +5957,19 @@ control_statement
         snail_fixup_here( snail_cc );
       }
     _ELSE statement_list _ENDIF
+      {
+        snail_fixup_here( snail_cc );
+      }
+
+  | if_condition _THEN statement_list
+      {
+	ssize_t zero = 0;
+        snail_push_relative_fixup( snail_cc, px );
+        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+        snail_swap_fixups( snail_cc );
+        snail_fixup_here( snail_cc );
+      }
+    elsif_statement
       {
         snail_fixup_here( snail_cc );
       }
