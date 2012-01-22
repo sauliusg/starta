@@ -52,7 +52,7 @@ shtests/programs/readword.snl
 >>> inline <<<
 >>> bytecode <<<
 >>> function <<<
->>> strindex( <<<
+>>> stridx( <<<
 >>> string <<<
 >>> s1, <<<
 >>> s2 <<<
@@ -73,7 +73,7 @@ shtests/programs/readword.snl
 >>> bool <<<
 >>> { <<<
 >>> if <<<
->>> strindex( <<<
+>>> stridx( <<<
 >>> haystack, <<<
 >>> needle <<<
 >>> ) <<<

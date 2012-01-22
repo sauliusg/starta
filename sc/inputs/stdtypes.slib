@@ -1086,6 +1086,16 @@ inline bytecode function strend( suffix, str : string ) : bool
     STREND
 }
 
+inline bytecode function strlen( str : string ) : long
+{
+    STRLEN
+}
+
+inline bytecode function strindex( haystack, needle : string ) : long
+{
+    STRINDEX
+}
+
 #
 # Type conversion funcitons: rounding
 #

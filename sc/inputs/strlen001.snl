@@ -1,0 +1,14 @@
+#
+# Snail compiler tests
+#
+#
+# Test strlen() function
+#
+
+use std;
+
+. strlen( "" );
+. strlen( "o" );
+. strlen( "on" );
+. strlen( "one" );
+. strlen( "many" );

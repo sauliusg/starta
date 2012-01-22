@@ -1,0 +1,13 @@
+#
+# Snail compiler tests
+#
+#
+# Test strindex() function
+#
+
+use std;
+
+. strindex( "haystack", "needle" );
+. strindex( "haystack", "hay" );
+. strindex( "haystack", "stack" );
+. strindex( "need", "needle" );
