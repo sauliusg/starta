@@ -37,7 +37,7 @@ type list of T = {
 
 procedure cons( s : T; l : list of T = null ) : list of T
 {
-    return struct list of T { value => s, next => l };
+    return type list of T { value => s, next => l };
 }
 
 exception NullPointerException;

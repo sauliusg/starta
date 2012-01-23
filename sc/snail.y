@@ -7750,7 +7750,7 @@ struct_expression
      }
     '{' field_initialiser_list opt_comma '}'
 
-  | _STRUCT type_identifier _OF delimited_type_description
+  | _TYPE type_identifier _OF delimited_type_description
      {
 	 TNODE *composite = new_tnode_synonim( $2, px );
 	 tnode_set_kind( composite, TK_COMPOSITE );
