@@ -1,0 +1,6 @@
+.*.d
+*.tab.*
+*.lex.*
+*.a
+*.output
+sl
