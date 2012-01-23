@@ -68,7 +68,10 @@ void bctraverse( void *root )
 	p[-1].rcount ++;
 	if( k < p[-1].nref ) {
 	    r = s->ptr;
-	    if( r != NULL && (r[-1].flags & AF_USED) == 0 ) {
+	    if( r != NULL && 
+                ( (char*)r <  (char*)istate.code ||
+		  (char*)r >= (char*)(istate.code + istate.code_length) ) &&
+                (r[-1].flags & AF_USED) == 0 ) {
 		s->ptr = q;
 		q = p;
 		p = r;
