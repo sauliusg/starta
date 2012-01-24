@@ -1,0 +1,26 @@
+#
+# Snail language compiler tests
+#
+#
+# 'ELSIF' conditional operator test
+#
+
+use std;
+
+var i : int;
+
+i = -1;
+while( i < 3 ) {
+    . i;
+    if i < 0 then
+        . "i is NEGATIVE" 
+    elsif i == 0 then
+        . "i is ZERO"
+    elsif i > 1 then
+        . "i is NON-ZERO POSITIVE"
+    else
+        . "i is POSITIVE"
+    endif
+
+    i ++;
+}
