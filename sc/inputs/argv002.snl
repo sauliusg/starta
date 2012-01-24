@@ -1,0 +1,10 @@
+#
+# Snail compiler tests
+#
+#
+# Test functions to access program arguments
+#
+
+use std
+
+. argument(0);

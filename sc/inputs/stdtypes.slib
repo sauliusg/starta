@@ -1114,3 +1114,12 @@ inline bytecode function ldfloat( x : ldouble ) : float
 {
     LDDOUBLE DFLOAT
 }
+
+#
+# The libc exit() function:
+#
+
+inline bytecode function exit( int exit_code )
+{
+    EXIT
+}
