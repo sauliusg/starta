@@ -3720,7 +3720,7 @@ static void snail_compile_indexing( SNAIL_COMPILER *cc,
     } else if( expr_count == -1 ) {
 	assert( 0 );
     } else if( expr_count == 2 ) {
-	assert( array_is_reference );
+	// assert( array_is_reference );
         snail_compile_subarray( cc, ex );
     } else {
 	assert( 0 );
