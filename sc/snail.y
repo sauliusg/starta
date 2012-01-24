@@ -3899,7 +3899,8 @@ static void snail_emit_catch_comparison( SNAIL_COMPILER *cc,
 					 char *exception_name,
 					 cexception_t *ex )
 {
-    DNODE *exception = vartab_lookup( cc->vartab, exception_name );
+    DNODE *exception =
+        snail_lookup_dnode( cc, module_name, exception_name, "exception" );
     ssize_t zero = 0;
     ssize_t exception_val;
     ssize_t try_var_offset = cc->try_variable_stack ?
@@ -3914,9 +3915,11 @@ static void snail_emit_catch_comparison( SNAIL_COMPILER *cc,
 	snail_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
 	snail_emit( cc, ex, "\n\tc\n", EXCEPTIONMODULE );
 	snail_emit( cc, ex, "\tce\n", SLDC, &module_name );
-	snail_emit( cc, ex, "\tc\n", EQBOOL );
+	snail_emit( cc, ex, "\tc\n", PEQBOOL );
+	snail_emit( cc, ex, "\tc\n", DUP );
 	snail_push_relative_fixup( cc, ex );
 	snail_emit( cc, ex, "\tce\n", BJNZ, &zero );
+	snail_emit( cc, ex, "\tc\n", DROP );
     }
 
     snail_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
