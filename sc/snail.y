@@ -3906,11 +3906,6 @@ static void snail_emit_catch_comparison( SNAIL_COMPILER *cc,
     ssize_t try_var_offset = cc->try_variable_stack ?
 	cc->try_variable_stack[cc->try_block_level-1] : 0;
 
-    if( !exception ) {
-	yyerrorf( "exception '%s' is not defined at the current point",
-		  exception_name );
-    }
-
     if( module_name ) {
 	snail_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
 	snail_emit( cc, ex, "\n\tc\n", EXCEPTIONMODULE );
