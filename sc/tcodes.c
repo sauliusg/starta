@@ -581,6 +581,25 @@ int STI( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+/*
+ * EXIT Call libc exit() to exit the program.
+ * 
+ * bytecode:
+ * EXIT
+ * 
+ * stack:
+ * int_exit_code --> ...
+ * 
+ */
+
+int EXIT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    exit( istate.ep[0].num.i );
+
+    return 1;
+}
 
 /*
  * NEWLINE (print a newline character)
