@@ -1,0 +1,18 @@
+#
+# Snail language compiler tests
+#
+# Test exceptions with package names.
+#
+
+use std;
+
+package Ex
+
+use std;
+
+exception Ex1;
+exception Ex2;
+
+end package Ex;
+
+raise Ex2( "raising exception from a package" );

@@ -1,0 +1,40 @@
+#
+# Snail language compiler tests
+#
+# Test exceptions with package names.
+#
+
+use std;
+
+package Ex
+
+use std;
+
+exception Ex1;
+exception Ex2;
+
+end package Ex;
+
+try {
+    raise Ex::Ex1( "raising exception from a package" )
+}
+catch Ex::Ex1( var code : int; var message : string ) {
+    . "Cought exception Ex::Ex1 with error code %d" %% code,
+      "and error message '%s'" %% message
+}
+catch Ex::Ex2( var code : int; var message : string ) {
+    . "Cought exception Ex::Ex2 with error code %d" %% code,
+      "and error message '%s'" %% message
+}
+
+try {
+    raise Ex::Ex2( "raising exception from a package" )
+}
+catch Ex::Ex1( var code : int; var message : string ) {
+    . "Cought exception Ex::Ex1 with error code %d" %% code,
+      "and error message '%s'" %% message
+}
+catch Ex::Ex2( var code : int; var message : string ) {
+    . "Cought exception Ex::Ex2 with error code %d" %% code,
+      "and error message '%s'" %% message
+}
