@@ -814,6 +814,10 @@ static void snail_compile_exception( SNAIL_COMPILER *c,
 
 	dnode_set_ssize_value( exception, exception_nr );
 	vartab_insert_named( c->vartab, exception, &inner );
+        if( c->current_package && dnode_scope( exception ) == 0 ) {
+            dnode_vartab_insert_named_vars( c->current_package,
+                                            share_dnode( exception ), ex );
+        }
     }
     cexception_catch {
 	delete_dnode( exception );
@@ -4162,13 +4166,7 @@ static void compiler_check_raise_expression( SNAIL_COMPILER *c,
 					     char *exception_name,
 					     cexception_t *ex )
 {
-    DNODE *exception = vartab_lookup( c->vartab, exception_name );
     TNODE *top_type = NULL;
-
-    if( !exception ) {
-	yyerrorf( "Exception '%s' is not defined at this point",
-		  exception_name );
-    }
 
     if( !c->e_stack ) {
 	yyerrorf( "Not enough values on the stack for raising exception?" );
@@ -5142,6 +5140,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
 %type <dnode> package_name
+%type <dnode> raised_exception_identifier;
 %type <dnode> retval_description_list
 %type <i>     size_constant
 %type <tnode> struct_description
@@ -5393,6 +5392,17 @@ delimited_control_statement
 
   ;
 
+raised_exception_identifier
+  : __IDENTIFIER
+      {
+          $$ = vartab_lookup( snail_cc->vartab, $1 );
+      }
+  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+      {
+          $$ = snail_lookup_dnode( snail_cc, $1, $3, "exception" );
+      }
+  ;
+
 raise_statement
   : _RAISE
     {
@@ -5403,28 +5413,32 @@ raise_statement
 	snail_emit( snail_cc, px, "\tcee\n", RAISE, &zero, &zero );
     }
 
-  | _RAISE __IDENTIFIER
+  | _RAISE raised_exception_identifier
     {
 	ssize_t zero = 0;
 	ssize_t minus_one = -1;
-	DNODE *exception = vartab_lookup( snail_cc->vartab, $2 );
+	DNODE *exception = $2;
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
-	if( !exception ) {
-	    yyerrorf( "Exception '%s' is not defined at this point", $2 );
-	}
+        if( exception ) {
+            compiler_check_raise_expression( snail_cc, dnode_name( exception ),
+                                             px );
+        }
 
 	snail_emit( snail_cc, px, "\tce\n", LDC, &minus_one );
 	snail_emit( snail_cc, px, "\tc\n", PLDZ );
 	snail_emit( snail_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
     }
-  | _RAISE __IDENTIFIER '(' expression ')'
+  | _RAISE raised_exception_identifier '(' expression ')'
     {
 	ssize_t zero = 0;
-	DNODE *exception = vartab_lookup( snail_cc->vartab, $2 );
+	DNODE *exception = $2;
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
-	compiler_check_raise_expression( snail_cc, $2, px );
+        if( exception ) {
+            compiler_check_raise_expression( snail_cc, dnode_name(exception),
+                                             px );
+        }
 
         if( tnode_is_reference( enode_type( snail_cc->e_stack ))) {
             snail_emit( snail_cc, px, "\tce\n", LLDC, &zero );
@@ -5437,9 +5451,14 @@ raise_statement
 	compiler_drop_top_expression( snail_cc );
     }
 
-  | _RAISE __IDENTIFIER '(' expression ','
+  | _RAISE raised_exception_identifier '(' expression ','
     {
-	compiler_check_raise_expression( snail_cc, $2, px );
+        DNODE *exception = $2;
+
+        if( exception ) {
+            compiler_check_raise_expression( snail_cc, dnode_name(exception),
+                                             px );
+        }
 	if( !snail_stack_top_is_integer( snail_cc )) {
 	    yyerrorf( "The first expression in 'raise' operator "
 		      "must be of integer type" );
@@ -5448,10 +5467,9 @@ raise_statement
     expression ')'
     {
 	ssize_t zero = 0;
-	DNODE *exception = vartab_lookup( snail_cc->vartab, $2 );
+	DNODE *exception = $2;
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
-	compiler_check_raise_expression( snail_cc, $2, px );
 	if( !snail_stack_top_is_reference( snail_cc )) {
 	    yyerrorf( "The second expression in 'raise' operator "
 		      "must be of string type" );
