@@ -1,0 +1,8 @@
+package Ex
+
+use std;
+
+exception Ex1;
+exception Ex2;
+
+end package Ex;
