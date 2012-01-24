@@ -1554,7 +1554,6 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS )
     } else {
 	istate.ep[0].ptr = NULL;
     }
-    STACKCELL_ZERO_PTR( istate.ep[0] );
     return 1;
 }
 
