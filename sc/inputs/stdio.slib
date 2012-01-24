@@ -56,6 +56,11 @@ inline bytecode function argument( int i ) :  string
     ALLOCARGV SWAP INDEX PLDI
 }
 
+inline bytecode function narguments() :  int
+{
+    ALLOCARGV LENGTH
+}
+
 inline bytecode function environment() :  array of string
 {
     ALLOCENV
