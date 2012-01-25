@@ -1096,6 +1096,16 @@ inline bytecode function strindex( haystack, needle : string ) : long
     STRINDEX
 }
 
+inline bytecode function strchr( haystack: string; needle: char  ) : long
+{
+    STRCHR
+}
+
+inline bytecode function strrchr( haystack: string; needle: char ) : long
+{
+    STRRCHR
+}
+
 #
 # Type conversion funcitons: rounding
 #
