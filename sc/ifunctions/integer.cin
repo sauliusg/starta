@@ -672,6 +672,45 @@ int ATO@PREFIX@( INSTRUCTION_FN_ARGS )
 #undef atob
 #undef atos
 
+/*
+ * STRTOI Convert an ASCII string to number in the machine's
+ *        representation, using the specified base.
+ *
+ * bytecode:
+ * STRTOI
+ *
+ * stack:
+ * ..., str, base -> ..., integer
+ */
+
+#define strtoi strtol
+#define strtos strtol
+#define strtob strtol
+
+int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[1] );
+    int base = istate.ep[0].num.i;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+
+    istate.ep ++;
+
+    if( !str ) {
+	istate.ep[0].I = 0;
+    } else {
+        istate.ep[0].I = strto@field@( str, NULL, base );
+    }
+
+    return 1;
+}
+
+#undef strtoi
+#undef strtos
+#undef strtob
+
 /*---------------------------------------------------------------------------*/
 
 static int

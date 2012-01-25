@@ -1,0 +1,13 @@
+#
+# Snail compiler tests
+#
+#
+# Test strto*() functions
+#
+
+use std;
+
+. strtoi( "AB", 16 );
+. strtoll( "010" );
+. strtob( "010", 10 );
+. strtoh( "0xFF" );

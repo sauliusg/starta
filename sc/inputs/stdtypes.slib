@@ -1135,6 +1135,31 @@ inline bytecode function atoll( s: string ): llong
     ATOLL
 }
 
+inline bytecode function strtob( s: string; base: int = 0 ): byte
+{
+    STRTOB
+}
+
+inline bytecode function strtoh( s: string; base: int = 0 ): short
+{
+    STRTOH
+}
+
+inline bytecode function strtoi( s: string; base: int = 0 ): int
+{
+    STRTOI
+}
+
+inline bytecode function strtol( s: string; base: int = 0 ): long
+{
+    STRTOL
+}
+
+inline bytecode function strtoll( s: string; base: int = 0 ): llong
+{
+    STRTOLL
+}
+
 #
 # Type conversion functions: rounding
 #
