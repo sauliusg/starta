@@ -1176,9 +1176,19 @@ inline bytecode function strtold( s: string ): ldouble, long
 }
 
 #
-# Narrowing of integers -- throu exceptions if the numbers do
+# Narrowing of integers -- raise exceptions if the numbers do
 # not fit into destinations:
 #
+
+inline bytecode function lowbyte( short s ) : byte
+{
+    LOWBYTE
+}
+
+inline bytecode function lowshort( int i ) : short
+{
+    LOWSHORT
+}
 
 inline bytecode function lowint( long l ) : int
 {

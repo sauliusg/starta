@@ -2144,6 +2144,76 @@ int LEXTEND( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * LOWBYTE take low byte of a short number and present them as a byte;
+ *         raise exception if the result does not fit into the result.
+ * 
+ * bytecode:
+ * LOWBYTE
+ * 
+ * stack:
+ * short -> byte
+ * 
+ */
+
+int LOWBYTE( INSTRUCTION_FN_ARGS )
+{
+    byte b;
+
+    TRACE_FUNCTION();
+
+    b = istate.ep[0].num.s;
+    if( istate.ep[0].num.s == b ) {
+        istate.ep[0].num.b = b;
+    } else {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "short integer value does not fit into a byte on conversion",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+	      EXCEPTION );
+	return 0;
+    }
+
+    return 1;
+}
+
+/*
+ * LOWSHORT take low bytes of an int number and present them as short;
+ *          raise exception if the result does not fit into the result.
+ * 
+ * bytecode:
+ * LOWSHORT
+ * 
+ * stack:
+ * int -> short
+ * 
+ */
+
+int LOWSHORT( INSTRUCTION_FN_ARGS )
+{
+    short s;
+
+    TRACE_FUNCTION();
+
+    s = istate.ep[0].num.i;
+    if( istate.ep[0].num.i == s ) {
+        istate.ep[0].num.s = s;
+    } else {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -2,
+	      /* message = */
+	      "integer value does not fit into short int on conversion",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+	      EXCEPTION );
+	return 0;
+    }
+
+    return 1;
+}
+
+/*
  * LOWINT take low bytes of a long number and present them as int;
  *        raise exception if the result does not fit into the integer.
  * 
@@ -2166,7 +2236,7 @@ int LOWINT( INSTRUCTION_FN_ARGS )
         istate.ep[0].num.i = i;
     } else {
 	interpret_raise_exception_with_bcalloc_message
-	    ( /* err_code = */ -1,
+	    ( /* err_code = */ -3,
 	      /* message = */
 	      "long value does not fit into integer on conversion",
 	      /* module_id = */ 0,
@@ -2180,7 +2250,7 @@ int LOWINT( INSTRUCTION_FN_ARGS )
 
 /*
  * LOWLONG take low bytes of a long number and present them as int;
- *         raise exception if the result does not fit into the integer.
+ *         raise exception if the result does not fit into the result.
  * 
  * bytecode:
  * LOWLONG
@@ -2201,7 +2271,7 @@ int LOWLONG( INSTRUCTION_FN_ARGS )
         istate.ep[0].num.l = l;
     } else {
 	interpret_raise_exception_with_bcalloc_message
-	    ( /* err_code = */ -2,
+	    ( /* err_code = */ -4,
 	      /* message = */
 	      "llong value does not fit into long on conversion",
 	      /* module_id = */ 0,
