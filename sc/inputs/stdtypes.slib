@@ -583,6 +583,9 @@ type long = {
     inline bytecode operator "[]" ( a : array; i : long ) : addressof
         { LINDEX };
 
+    inline bytecode operator "[..]" ( a : array; lower, upper : long ) : array
+        { LSUBARRAY };
+
     inline bytecode operator "new[]" ( i : long ) : array
         { LAALLOC %%element_nref };
 
@@ -1015,6 +1018,9 @@ type string = {
 
     inline bytecode operator "[int..int]" ( s : string; ifrom, ito : int ) : string
         { SUBSTR 1 };
+
+    inline bytecode operator "[long..long]" ( s : string; ifrom, ito : long ) : string
+        { LSUBSTR 1 };
 
     bytecode inline operator "==" ( x, y : string ) : bool
         { STREQ };
