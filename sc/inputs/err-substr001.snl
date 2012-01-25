@@ -13,7 +13,7 @@ var s = "Something";
 try { . s[-10..0] }
 catch ( var m : string) { . m }
 
-try { . s[9..0] }
+try { . s[10..0] }
 catch ( var m : string) { . m }
 
 try { . s[0..20] }

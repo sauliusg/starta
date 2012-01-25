@@ -580,7 +580,7 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
                 lower_bound += length;
             }
         }
-        if( upper_bound < 0 || upper_bound >= length ) {
+        if( upper_bound < 0 || upper_bound > length ) {
             interpret_raise_exception_with_bcalloc_message
                 ( /* err_code = */ -1,
                   /* message = */
@@ -599,7 +599,7 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
                   EXCEPTION );
             return 0;
         }
-        if( lower_bound < 0 || lower_bound >= length ) {
+        if( lower_bound < 0 || lower_bound > length ) {
             interpret_raise_exception_with_bcalloc_message
                 ( /* err_code = */ -2,
                   /* message = */
@@ -607,19 +607,19 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
                   (char*)cxprintf( "lower bound %lld"
                                    " is out of range 0..%lld in substring",
                                    (llong)lower_bound,
-                                   (llong)(length-1)) :
+                                   (llong)(length)) :
                   (char*)cxprintf( "lower bound %lld (originally %lld)"
                                    " is out of range 0..%lld in substring",
                                    (llong)lower_bound,
                                    (llong)original_lower_bound,
-                                   (llong)(length-1)),
+                                   (llong)(length)),
                   /* module_id = */ 0,
                   /* exception_id = */ SL_EXCEPTION_BOUND_ERROR,
                   EXCEPTION );
             return 0;
         }
 
-        if( upper_bound < lower_bound ) {
+        if( upper_bound < lower_bound - 1 ) {
             STACKCELL_ZERO_PTR( istate.ep[2] );
         } else {
             length = upper_bound - lower_bound + 1;
