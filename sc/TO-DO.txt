@@ -5,12 +5,12 @@ xx Change i/o operators from << and >> to <- and ->.
 ?? The same for end_{sub}scope() functions
 ?? Implement exception types (classes?).
 +- Implement subarrays and substrings.
--- Try to implement formatted prints a-la Pascal's write( x:8:3 )
--- Implement 'strstart()', 'strend()' and similar string comparison functions
+xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
+++ Implement 'strstart()', 'strend()' and similar string comparison functions
 -- Think/implement generic 'copy()' and 'clone()' functions, instead of or in addition to the '[]' and ':=' operators.
--- Change names of STDIN()/STDOUT()/STDERR() standard functions to lowercase.
--- Make it possible to use 'float[]' as type designators of return values.
--- Implement functions 'argument(i)' and 'argumentnr()'
+++ Change names of STDIN()/STDOUT()/STDERR() standard functions to lowercase.
+?? Make it possible to use 'float[]' as type designators of return values.
+++ Implement functions 'argument(i)' and 'argumentnr()'
 -- Implement run-time null-pointer and array bound checks
 -- Implement pragma to skip included files from '--debug code' listing.
 -- describe all options in --help (also all --debug arguments).
