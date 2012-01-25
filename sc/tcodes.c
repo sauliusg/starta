@@ -5,6 +5,11 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
+/* special uses: */
+#define _ISOC99_SOURCE 1
+#include <stdlib.h> /* with _ISOC99_SOURCE true, provides strtof() and
+                       strtold() */
+
 /* exports: */
 #include <tcodes.h>
 

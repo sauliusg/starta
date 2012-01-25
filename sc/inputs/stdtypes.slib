@@ -1160,6 +1160,21 @@ inline bytecode function strtoll( s: string; base: int = 0 ): llong, long
     STRTOLL
 }
 
+inline bytecode function strtof( s: string ): float, long
+{
+    STRTOF
+}
+
+inline bytecode function strtod( s: string ): double, long
+{
+    STRTOD
+}
+
+inline bytecode function strtold( s: string ): ldouble, long
+{
+    STRTOLD
+}
+
 #
 # Type conversion functions: rounding
 #

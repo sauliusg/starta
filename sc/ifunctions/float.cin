@@ -137,6 +137,51 @@ int @PREFIX1@FILEPRINT( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+/*
+ * STRTOF Convert an ASCII string to floating-point number in the machine's
+ *        representation.
+ *
+ * bytecode:
+ * STRTOF
+ *
+ * stack:
+ * ..., str -> ..., integer, size
+ */
+
+#if !_ISOC99_SOURCE
+#define strtof  strtod
+#define strtold strtod
+#endif
+
+int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[0] );
+    char *endptr = NULL;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep --;
+
+    if( !str ) {
+	istate.ep[1].I = 0;
+        istate.ep[0].num.ssize = -1;
+    } else {
+        istate.ep[1].I = strto@field@( str, &endptr );
+        istate.ep[0].num.ssize = endptr - str;
+    }
+
+    return 1;
+}
+
+#if !_ISOC99_SOURCE
+#undef strtof
+#undef strtold
+#endif
+
+/*---------------------------------------------------------------------------*/
+
 static int
 pack_@field@( stackcell_t *stackcell, char typechar, ssize_t size,
 	      ssize_t *offset, byte *blob )
