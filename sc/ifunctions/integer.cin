@@ -639,6 +639,41 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
     return 2;
 }
 
+/*
+ * ATOI  Convert an ASCII string to number in the machine's representation
+ *
+ * bytecode:
+ * ATOI
+ *
+ * stack:
+ * ..., str -> ..., integer
+ */
+
+#define atob atoi
+#define atos atoi
+
+int ATO@PREFIX@( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[0] );
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    if( !str ) {
+	istate.ep[0].I = 0;
+    } else {
+        istate.ep[0].I = ato@field@( str );
+    }
+
+    return 1;
+}
+
+#undef atob
+#undef atos
+
+/*---------------------------------------------------------------------------*/
+
 static int
 pack_@field@( stackcell_t *stackcell, char typechar, ssize_t size,
               ssize_t *offset, byte *blob )

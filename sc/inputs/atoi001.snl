@@ -1,0 +1,13 @@
+#
+# Snail compiler tests
+#
+#
+# Test ato*() functions
+#
+
+use std;
+
+. atoi( "123" );
+. atoll( "12345678901234" );
+. atob( "127" );
+. atoh( "256" );
