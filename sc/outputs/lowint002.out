@@ -1,3 +1,3 @@
 1000
 10000000000
-inputs/lowint002.snl : Exception 'TruncatedInteger' caught (error code -2) -- llong value does not fit into long on conversion
+10000000000

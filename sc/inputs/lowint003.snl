@@ -7,23 +7,23 @@
 
 use std;
 
-var l : long = 1000;
-var i : int;
+var i : int = 1000;
+var s : short;
 
-i = lowint( l );
+s = lowshort( i );
+. s;
+
+i = 10000000;
 . i;
-
-l = 1000000000L;
-. l;
 
 // Either the conversion is exact, or the correct value is printed out
 // by an exception handler. Unfortunately, the exception branch can 
 // not be tested on architecures that have both types of the same size:
 
 try {
-    i = lowint( l );
+    s = lowshort( i );
     . i;
 }
-catch{
-    . "1000000000";
+catch TruncatedInteger {
+    . "10000000";
 }
