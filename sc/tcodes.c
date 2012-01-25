@@ -2144,6 +2144,76 @@ int LEXTEND( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * LOWINT take low bytes of a long number and present them as int;
+ *        raise exception if the result does not fit into the integer.
+ * 
+ * bytecode:
+ * LOWINT
+ * 
+ * stack:
+ * long -> int
+ * 
+ */
+
+int LOWINT( INSTRUCTION_FN_ARGS )
+{
+    int i;
+
+    TRACE_FUNCTION();
+
+    i = istate.ep[0].num.l;
+    if( istate.ep[0].num.l == i ) {
+        istate.ep[0].num.i = i;
+    } else {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "long value does not fit into integer on conversion",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+	      EXCEPTION );
+	return 0;
+    }
+
+    return 1;
+}
+
+/*
+ * LOWLONG take low bytes of a long number and present them as int;
+ *         raise exception if the result does not fit into the integer.
+ * 
+ * bytecode:
+ * LOWLONG
+ * 
+ * stack:
+ * llong -> long
+ * 
+ */
+
+int LOWLONG( INSTRUCTION_FN_ARGS )
+{
+    long l;
+
+    TRACE_FUNCTION();
+
+    l = istate.ep[0].num.ll;
+    if( istate.ep[0].num.ll == l ) {
+        istate.ep[0].num.l = l;
+    } else {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -2,
+	      /* message = */
+	      "llong value does not fit into long on conversion",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+	      EXCEPTION );
+	return 0;
+    }
+
+    return 1;
+}
+
+/*
  * I2F converts integer value on the top of the stack to a floating point 
  * 
  * bytecode:
