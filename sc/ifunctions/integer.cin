@@ -680,7 +680,7 @@ int ATO@PREFIX@( INSTRUCTION_FN_ARGS )
  * STRTOI
  *
  * stack:
- * ..., str, base -> ..., integer
+ * ..., str, base -> ..., integer, ssize
  */
 
 #define strtoi strtol
@@ -691,17 +691,18 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 {
     char *str = STACKCELL_PTR( istate.ep[1] );
     int base = istate.ep[0].num.i;
+    char *endptr = NULL;
 
     TRACE_FUNCTION();
 
     STACKCELL_ZERO_PTR( istate.ep[1] );
 
-    istate.ep ++;
-
     if( !str ) {
-	istate.ep[0].I = 0;
+	istate.ep[1].I = 0;
+        istate.ep[0].num.ssize = -1;
     } else {
-        istate.ep[0].I = strto@field@( str, NULL, base );
+        istate.ep[1].I = strto@field@( str, &endptr, base );
+        istate.ep[0].num.ssize = endptr - str;
     }
 
     return 1;
