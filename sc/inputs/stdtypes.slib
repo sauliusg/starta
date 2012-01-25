@@ -1135,27 +1135,27 @@ inline bytecode function atoll( s: string ): llong
     ATOLL
 }
 
-inline bytecode function strtob( s: string; base: int = 0 ): byte
+inline bytecode function strtob( s: string; base: int = 0 ): byte, long
 {
     STRTOB
 }
 
-inline bytecode function strtoh( s: string; base: int = 0 ): short
+inline bytecode function strtoh( s: string; base: int = 0 ): short, long
 {
     STRTOH
 }
 
-inline bytecode function strtoi( s: string; base: int = 0 ): int
+inline bytecode function strtoi( s: string; base: int = 0 ): int, long
 {
     STRTOI
 }
 
-inline bytecode function strtol( s: string; base: int = 0 ): long
+inline bytecode function strtol( s: string; base: int = 0 ): long, long
 {
     STRTOL
 }
 
-inline bytecode function strtoll( s: string; base: int = 0 ): llong
+inline bytecode function strtoll( s: string; base: int = 0 ): llong, long
 {
     STRTOLL
 }
