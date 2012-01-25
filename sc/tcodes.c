@@ -3620,6 +3620,81 @@ int STRINDEX( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+
+/*
+ * STRCHR  Does a string contain a character?
+ *
+ * bytecode:
+ * STRCHR
+ *
+ * stack:
+ * ..., str, chr -> ..., ssize_t
+ */
+
+int STRCHR( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[1] );
+    char chr = istate.ep[0].num.c;
+    char *idx;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+
+    istate.ep++;
+
+    if( !str ) {
+	istate.ep[0].num.ssize = -1;
+    } else {
+	idx = strchr( str, chr );
+	if( !idx ) {
+	    istate.ep[0].num.ssize = -1;
+	} else {
+	    istate.ep[0].num.ssize = idx - str;
+	}
+    }
+
+    return 1;
+}
+
+/*
+ * STRRCHR  Does a string contain a character? Finds the last occurence.
+ *
+ * bytecode:
+ * STRRCHR
+ *
+ * stack:
+ * ..., str, chr -> ..., ssize_t
+ */
+
+int STRRCHR( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[1] );
+    char chr = istate.ep[0].num.c;
+    char *idx;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+
+    istate.ep++;
+
+    if( !str ) {
+	istate.ep[0].num.ssize = -1;
+    } else {
+	idx = strrchr( str, chr );
+	if( !idx ) {
+	    istate.ep[0].num.ssize = -1;
+	} else {
+	    istate.ep[0].num.ssize = idx - str;
+	}
+    }
+
+    return 1;
+}
+
 /*
 Perl hashing function, from http://www.perl.com/lpt/a/679 :
 
