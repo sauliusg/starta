@@ -1107,7 +1107,36 @@ inline bytecode function strrchr( haystack: string; needle: char ) : long
 }
 
 #
-# Type conversion funcitons: rounding
+# String conversions:
+#
+
+inline bytecode function atob( s: string ): byte
+{
+    ATOB
+}
+
+inline bytecode function atoh( s: string ): short
+{
+    ATOH
+}
+
+inline bytecode function atoi( s: string ): int
+{
+    ATOI
+}
+
+inline bytecode function atol( s: string ): long
+{
+    ATOL
+}
+
+inline bytecode function atoll( s: string ): llong
+{
+    ATOLL
+}
+
+#
+# Type conversion functions: rounding
 #
 
 inline bytecode function lddouble( x : ldouble ) : double

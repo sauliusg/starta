@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Test ato*() functions
+#
+
+use std;
+
+var i : int   = atoi( "123" );
+var l : llong = atoll( "12345678901234" );
+var b : byte  = atob( "127" );
+var s : short =  atoh( "256" );
+
+.i;
+.l;
+.b;
+.s;
