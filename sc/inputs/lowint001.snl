@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test truncation of integers to narrowe values.
+#
+
+use std;
+
+var l : long = 1000;
+var i : int;
+
+i = lowint( l );
+. i;
+
+l = 1000000000L;
+. l;
+
+try {
+    i = lowint( l );
+    . i;
+}
+catch TruncatedInteger( var err : int; var msg : string ) {
+    . argument(0), ":", "Exception 'TruncatedInteger' caught",
+    "(error code %d)"%%err, "--", msg;
+}

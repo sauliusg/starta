@@ -61,6 +61,7 @@ typedef enum {
   SL_EXCEPTION_BLOB_OVERFLOW,
   SL_EXCEPTION_BLOB_BAD_DESCR, /* unsuitable "unpack" or "pack" description */
   SL_EXCEPTION_ARRAY_OVERFLOW,
+  SL_EXCEPTION_TRUNCATED_INTEGER,
 
   last_SL_EXCEPTION
 } sl_exception_t;

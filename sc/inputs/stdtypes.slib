@@ -1176,6 +1176,21 @@ inline bytecode function strtold( s: string ): ldouble, long
 }
 
 #
+# Narrowing of integers -- throu exceptions if the numbers do
+# not fit into destinations:
+#
+
+inline bytecode function lowint( long l ) : int
+{
+    LOWINT
+}
+
+inline bytecode function lowlong( llong l ) : long
+{
+    LOWLONG
+}
+
+#
 # Type conversion functions: rounding
 #
 
