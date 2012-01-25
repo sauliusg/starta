@@ -66,22 +66,22 @@ inline bytecode function environment() :  array of string
     ALLOCENV
 }
 
-inline bytecode function STDIO() :  array of file
+inline bytecode function stdfiles() :  array of file
 {
     ALLOCSTDIO
 }
 
-inline bytecode function STDIN() :  file
+inline bytecode function stdinput() :  file
 {
     FDFILE 0
 }
 
-inline bytecode function STDOUT() :  file
+inline bytecode function stdoutput() :  file
 {
     FDFILE 1
 }
 
-inline bytecode function STDERR() :  file
+inline bytecode function stderrors() :  file
 {
     FDFILE 2
 }
