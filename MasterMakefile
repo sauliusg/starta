@@ -267,21 +267,25 @@ ${DIFF_FILES}: ${TARGET}
 
 ${OUTPUT_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
+	unset SL_INCLUDE_PATHS; \
 	./$^ ${TEST_OPTIONS} 2>&1 | diff ${OUTPUT_DIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 ${OUTPUT_DIR}/%.out: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@test -f $@ || echo "$@:"
-	-@test -f $@ || ./$^ ${TEST_OPTIONS} 2>&1 | tee $@
+	-@unset SL_INCLUDE_PATHS; \
+	test -f $@ || ./$^ ${TEST_OPTIONS} 2>&1 | tee $@
 	-@touch $@
 
 ${TST_OUT_DIR}/%.out: ${TST_EXE_DIR}/%
 	-@test -f $@ || echo "$@:"
-	-@test -f $@ || $< 2>&1 | tee $@
+	-@unset SL_INCLUDE_PATHS; \
+	test -f $@ || $< 2>&1 | tee $@
 	-@touch $@
 
 ${TST_OUT_DIR}/%.diff: ${TST_EXE_DIR}/%
 	-@printf "%-30s " "$*:" ; \
+	unset SL_INCLUDE_PATHS; \
 	./$< 2>&1 | diff ${TST_OUT_DIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
