@@ -129,3 +129,13 @@ procedure fload( filename : string;
 
     return buffer, bytes_read;
 }
+
+#
+# Line reader:
+#
+
+inline bytecode function readln( inp : file;
+       eolchar: char = '\n' ): string
+{
+    SFILEREADLN SWAP DROP
+}
