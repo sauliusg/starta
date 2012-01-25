@@ -10,7 +10,7 @@ OPTFLAGS = -O3 \
     -foptimize-register-move 
 
 EXT = .snl
-TEST_OPTIONS = -I inputs -I modules -G
+TEST_OPTIONS = -I inputs -I modules -I . -G
 SIZE_OPTIONS = -c -d dump
 
 .PHONY: libraries
