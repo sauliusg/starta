@@ -972,7 +972,14 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
 
     if( !tnode ) return empty_list;
 
-    list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
+    /* For placeholders, we just in case allocate arrays thay say they
+       contain references. This is necessary so that GC does not
+       collect allocated elements in case the generic type is indeed a
+       reference, and we assign them as elements to an allocated array
+       of generic type: */
+
+    list[0].val = tnode_is_reference( tnode ) ? 1 : 
+        (tnode_kind(tnode) == TK_PLACEHOLDER ? 1 : 0);
 
     return list;
 }
