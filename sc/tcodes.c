@@ -359,6 +359,9 @@ int COPY( INSTRUCTION_FN_ARGS )
 	memcpy( ptr1, ptr0, size );
     }
 
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+
     istate.ep += 2;
 
     return 1;
