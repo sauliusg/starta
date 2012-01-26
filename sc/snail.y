@@ -853,7 +853,7 @@ static void snail_push_array_of_type( SNAIL_COMPILER *c, TNODE *tnode,
 
 static void compiler_drop_top_expression( SNAIL_COMPILER *cc )
 {
-    /* assert( cc->e_stack ); */
+    assert( cc->e_stack );
     enode_list_drop( &cc->e_stack );
 }
 
@@ -1823,8 +1823,8 @@ static void snail_compile_variable_assignment_or_init(
 	    snail_emit_st( cc, expr_type, var_name, var_offset,
 			   var_scope, ex );
 	}
+        compiler_drop_top_expression( cc );
     }
-    compiler_drop_top_expression( cc );
 }
 
 static void snail_compile_variable_assignment( SNAIL_COMPILER *cc,
