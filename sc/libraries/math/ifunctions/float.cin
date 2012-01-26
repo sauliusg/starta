@@ -20,3 +20,29 @@ int @PREFIX@POW( INSTRUCTION_FN_ARGS )
 
     return 1;
 }
+
+/*
+ * FABS   Compute an absolute value.
+ * 
+ * bytecode:
+ * FABS
+ * 
+ * stack:
+ * float -> abs(float)
+ * 
+ */
+
+#define fabsd fabs
+#define fabsld fabsl
+
+int @PREFIX@ABS( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].I = fabs@field@( istate.ep[0].I );
+
+    return 1;
+}
+
+#undef fabsd
+#undef fabsld
