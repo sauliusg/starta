@@ -1073,9 +1073,19 @@ inline bytecode function length( m : ref ) : int
     LENGTH
 }
 
+inline bytecode function llength( m : ref ) : long
+{
+    LLENGTH
+}
+
 inline bytecode function last( m : ref ) : int
 {
     LENGTH LDC 1 SUB
+}
+
+inline bytecode function llast( m : ref ) : long
+{
+    LLENGTH LLDC 1 LSUB
 }
 
 #
