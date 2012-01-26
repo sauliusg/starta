@@ -853,6 +853,7 @@ static void snail_push_array_of_type( SNAIL_COMPILER *c, TNODE *tnode,
 
 static void compiler_drop_top_expression( SNAIL_COMPILER *cc )
 {
+    /* assert( cc->e_stack ); */
     enode_list_drop( &cc->e_stack );
 }
 
@@ -7408,6 +7409,10 @@ multivalue_function_call
 
 	  snail_cc->current_arg = fn_tnode ?
 	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
+
+          if( fn_tnode && tnode_kind( fn_tnode ) == TK_FUNCTION_REF ) {
+              snail_push_type( snail_cc, share_tnode(fn_tnode), px );
+          }
 
 	  snail_push_guarding_arg( snail_cc, px );
 	}
