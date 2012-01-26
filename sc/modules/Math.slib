@@ -103,4 +103,19 @@ inline bytecode function sqrt( double x ) : double
     libmath::DCALL libmath::sqrt
 }
 
+inline bytecode function fabs( float x ) : float
+{
+    libmath::FABS
+}
+
+inline bytecode function dabs( double x ) : double
+{
+    libmath::DABS
+}
+
+inline bytecode function ldabs( ldouble x ) : ldouble
+{
+    libmath::LDABS
+}
+
 end package Math;
