@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Testing llength() and llast() functions
+#
+
+use std;
+
+var m = new int[1000];
+
+var l : long = llength( m );
+
+. l;
+
+l = llast( m );
+
+. l;
