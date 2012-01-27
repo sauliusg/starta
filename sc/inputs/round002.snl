@@ -17,24 +17,24 @@ var f : float = 4.0 * atan2f( 1, 1 );
 
 . "";
 
-. iroundl( ld );
-. iround( d );
-. iroundf( f );
+. lroundl( ld );
+. lround( d );
+. lroundf( f );
 
 . "";
 
-. ifloorl( ld );
-. ifloor( d );
-. ifloorf( f );
+. lfloorl( ld );
+. lfloor( d );
+. lfloorf( f );
 
 . "";
 
-. iroundl( ld + 0.5LD );
-. iround( d + 0.5D );
-. iroundf( f + 0.5 );
+. lroundl( ld + 0.5LD );
+. lround( d + 0.5D );
+. lroundf( f + 0.5 );
 
 . "";
 
-. ifloorl( ld + 0.5LD );
-. ifloor( d + 0.5D );
-. ifloorf( f + 0.5 );
+. lfloorl( ld + 0.5LD );
+. lfloor( d + 0.5D );
+. lfloorf( f + 0.5 );
