@@ -13,34 +13,64 @@ inline bytecode operator "**" ( i : double; j : double ) : double
 inline bytecode operator "**" ( i : ldouble; j : ldouble ) : ldouble
 { libmath::LDPOW }
 
-inline bytecode function iroundf( float x ) : long
+inline bytecode function lroundf( float x ) : long
 {
     FLDC 0.5 FADD libmath::LFLOOR
 }
 
-inline bytecode function ifloorf( float x ) : long
+inline bytecode function roundf( float x ) : int
+{
+    FLDC 0.5 FADD libmath::LFLOOR LOWINT
+}
+
+inline bytecode function lfloorf( float x ) : long
 {
     libmath::LFLOOR
 }
 
-inline bytecode function iround( double x ) : long
+inline bytecode function floorf( float x ) : int
+{
+    libmath::LFLOOR LOWINT
+}
+
+inline bytecode function lround( double x ) : long
 {
     DLDC 0.5 DADD libmath::LFLOORD
 }
 
-inline bytecode function ifloor( double x ) : long
+inline bytecode function lfloor( double x ) : long
 {
     libmath::LFLOORD
 }
 
-inline bytecode function iroundl( ldouble x ) : llong
+inline bytecode function round( double x ) : int
+{
+    DLDC 0.5 DADD libmath::LFLOORD LOWINT
+}
+
+inline bytecode function floor( double x ) : int
+{
+    libmath::LFLOORD LOWINT
+}
+
+inline bytecode function llroundl( ldouble x ) : llong
 {
     LDLDC 0.5 LDADD libmath::LLFLOORLD
 }
 
-inline bytecode function ifloorl( ldouble x ) : llong
+inline bytecode function llfloorl( ldouble x ) : llong
 {
     libmath::LLFLOORLD
+}
+
+inline bytecode function lroundl( ldouble x ) : long
+{
+    LDLDC 0.5 LDADD libmath::LLFLOORLD LOWLONG
+}
+
+inline bytecode function lfloorl( ldouble x ) : long
+{
+    libmath::LLFLOORLD LOWLONG
 }
 
 inline bytecode function sinf( float x ) : float
