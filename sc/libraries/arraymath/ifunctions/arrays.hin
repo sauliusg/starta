@@ -5,5 +5,4 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
-int @PREFIX@POW( INSTRUCTION_FN_ARGS );
-int @PREFIX@ABS( INSTRUCTION_FN_ARGS );
+int @PREFIX@SUM( INSTRUCTION_FN_ARGS );

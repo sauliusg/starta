@@ -37,8 +37,7 @@ int @PREFIX@SUM( INSTRUCTION_FN_ARGS )
             sum += array[i].I;
         }
     }
-
-    STACKELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep[0].I = sum;
 
     return 1;
