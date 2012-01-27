@@ -1,0 +1,45 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author: saulius $
+**$Date: 2009-01-12 16:00:09 +0200 (Mon, 12 Jan 2009) $ 
+**$Revision: 1335 $
+**$URL: svn+ssh2225://vartai.ibt.lt/home/saulius/svn-repositories/compilers/sl/ifunctions/float.cin $
+\*---------------------------------------------------------------------------*/
+
+#ifdef I
+#undef I
+#endif
+
+#define I num.@field@
+
+/*
+ * FSUM   Sum all values in an array
+ * 
+ * bytecode:
+ * FSUM
+ * 
+ * stack:
+ * array of float -> float
+ * 
+ */
+
+int @PREFIX@SUM( INSTRUCTION_FN_ARGS )
+{
+    ssize_t i, length;
+    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t* hdr = (alloccell_t*)array;
+    double sum = 0.0;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        length = hdr[-1].length;
+        for( i = 0; i < length; i++ ) {
+            sum += array[i].I;
+        }
+    }
+
+    STACKELL_ZERO_PTR( istate.ep[0] );
+    istate.ep[0].I = sum;
+
+    return 1;
+}
