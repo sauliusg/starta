@@ -1,0 +1,2 @@
+CFLAGS = -I. -I../.. -I../../../cexceptions
+LIBFLAGS = -lm
