@@ -6,7 +6,7 @@
 #
 
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 function writeln( s : string )
 begin

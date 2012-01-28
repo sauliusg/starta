@@ -5,8 +5,8 @@
 # Test C-style function parameter declarators
 #
 
-include "inputs/stdtypes.slib"
-include "inputs/stdio.slib"
+include "stdtypes.slib"
+include "stdio.slib"
 
 function array_length( array a ) : int
 {

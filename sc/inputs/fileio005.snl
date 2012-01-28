@@ -5,8 +5,8 @@
 # Test different exceptional conditions in file read and write.
 #
 
-include "inputs/stdtypes.slib"
-include "inputs/stdio.slib"
+include "stdtypes.slib"
+include "stdio.slib"
 
 inline bytecode function asstring( s : blob ): string {};
 

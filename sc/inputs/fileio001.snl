@@ -5,7 +5,7 @@
 # Test file open/read/write/close
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 program ( argv : array of string );
 

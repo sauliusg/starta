@@ -9,7 +9,7 @@
 # Saulius Grazulis, Orenburg, 2006.08.18
 #
 
-## include "inputs/stdtypes.slib"
+## include "stdtypes.slib"
 
 use std;
 

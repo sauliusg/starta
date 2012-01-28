@@ -4,7 +4,7 @@
 # Check diagnostics of wrong number of arguments in function calls.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 procedure f( i : int )
 begin

@@ -5,7 +5,7 @@
 # Recursive struct declaration tests.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 struct A;
 struct B;

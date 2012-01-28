@@ -1,5 +1,5 @@
 
-// include "inputs/stdtypes.slib"
+// include "stdtypes.slib"
 
 type bool;
 

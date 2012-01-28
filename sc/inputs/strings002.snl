@@ -5,7 +5,7 @@
 # String processing functions: concatenation, conversion.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 inline bytecode function toString( i : int ) : string
 begin

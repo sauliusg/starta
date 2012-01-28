@@ -2,7 +2,7 @@
 # Snail compiler tests
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 inline bytecode function write( i : int )
 begin

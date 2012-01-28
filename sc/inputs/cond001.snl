@@ -5,7 +5,7 @@
 # Test conditional operator.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 var a : int = 0;
 var b : int = 2;

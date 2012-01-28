@@ -5,7 +5,7 @@
 # Test enumerator types (enum).
 #
 
-include "inputs/stdtypes.slib";
+include "stdtypes.slib";
 load "libraries/math/libmath.so.0.01";
 
 inline bytecode function

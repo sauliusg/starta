@@ -5,7 +5,7 @@
 # Test enumerator types (enum).
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 function f( x : int ) : int;
 function g( x : float ) : float;
