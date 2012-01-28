@@ -23,6 +23,12 @@ ${GEN_DIR}/%_intvect.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intvect.hin
 ${GEN_DIR}/%_intvect.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intvect.cin
 	sed -f $^ > $@
 
+${GEN_DIR}/%_floatvect.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/floatvect.hin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_floatvect.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/floatvect.cin
+	sed -f $^ > $@
+
 #-----------------------------------------------------------------------------
 
 cleanlocal:
