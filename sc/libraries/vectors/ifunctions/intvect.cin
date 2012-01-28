@@ -46,7 +46,7 @@ int @PREFIX1@MKVECTOR( INSTRUCTION_FN_ARGS )
  * SUMINT
  * 
  * stack:
- * array of float -> float
+ * float_vector -> float
  * 
  */
 
