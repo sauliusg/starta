@@ -24,6 +24,10 @@ char *OPCODES[] = {
 #include "locally-generated/long_intvect.tab.c"
 #include "locally-generated/llong_intvect.tab.c"
 
+#include "locally-generated/float_floatvect.tab.c"
+#include "locally-generated/double_floatvect.tab.c"
+#include "locally-generated/ldouble_floatvect.tab.c"
+
     NULL
 };
 
@@ -100,3 +104,7 @@ int trace_on( int trace_flag )
 #include <locally-generated/int_intvect.c>
 #include <locally-generated/long_intvect.c>
 #include <locally-generated/llong_intvect.c>
+
+#include <locally-generated/float_floatvect.c>
+#include <locally-generated/double_floatvect.c>
+#include <locally-generated/ldouble_floatvect.c>

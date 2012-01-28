@@ -5,9 +5,4 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
-#ifdef I
-#undef I
-#endif
-
-#define I num.@field@
-
+int @PREFIX@SUM( INSTRUCTION_FN_ARGS );
