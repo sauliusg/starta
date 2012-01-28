@@ -53,6 +53,6 @@ include ${DEPEND_FILES}
 clean:
 	rm -f ${OFILES}
 
-distclean cleanAll: clean
+distclean cleanAll: clean ${LOCAL_CLEAN_TARGETS}
 	rm -f ${LIBFILES}
 	rm -f ${DEPEND_FILES}
