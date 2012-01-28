@@ -7,9 +7,9 @@
 
 char *OPCODES[] = {
 
-#include "locally-generated/float_arrays.tab.c"
-#include "locally-generated/double_arrays.tab.c"
-#include "locally-generated/ldouble_arrays.tab.c"
+#include "locally-generated/float_vectors.tab.c"
+#include "locally-generated/double_vectors.tab.c"
+#include "locally-generated/ldouble_vectors.tab.c"
 
     NULL
 };
@@ -64,6 +64,6 @@ int trace_on( int trace_flag )
     return old_trace_flag;
 }
 
-#include <locally-generated/float_arrays.c>
-#include <locally-generated/double_arrays.c>
-#include <locally-generated/ldouble_arrays.c>
+#include <locally-generated/float_vectors.c>
+#include <locally-generated/double_vectors.c>
+#include <locally-generated/ldouble_vectors.c>
