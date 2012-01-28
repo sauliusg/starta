@@ -1,0 +1,40 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+#ifdef I
+#undef I
+#endif
+
+#define I num.@field@
+
+/*
+ * MKVECTOR Make (allocate) a vector -- a "packed array" of elements
+ * that do not contain references, and leave the allocated reference
+ * on the top of the stack. 
+ * 
+ * bytecode:
+ * MKVECTOR element_size
+ * 
+ * stack:
+ * length -> vector
+ * 
+ */
+
+int @PREFIX1@MKVECTOR( INSTRUCTION_FN_ARGS )
+{
+    ssize_t element_size = istate.code[istate.ip+1].ssizeval;
+    @type@ length = istate.ep[0].I;
+    @type@ *ptr;
+
+    TRACE_FUNCTION();
+
+    ptr = bcalloc( element_size, length, /* nref */ 0 );
+    BC_CHECK_PTR( ptr );
+    STACKCELL_SET_ADDR( istate.ep[0], ptr );
+
+    return 2;
+}
