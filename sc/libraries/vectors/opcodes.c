@@ -3,13 +3,26 @@
 #include <math.h>
 #include <stackcell.h>
 #include <alloccell.h>
+#include <bcalloc.h>
 #include <run.h>
 
 char *OPCODES[] = {
 
+#include "locally-generated/byte_vectors.tab.c"
+#include "locally-generated/short_vectors.tab.c"
+#include "locally-generated/int_vectors.tab.c"
+#include "locally-generated/long_vectors.tab.c"
+#include "locally-generated/llong_vectors.tab.c"
+
 #include "locally-generated/float_vectors.tab.c"
 #include "locally-generated/double_vectors.tab.c"
 #include "locally-generated/ldouble_vectors.tab.c"
+
+#include "locally-generated/byte_intvect.tab.c"
+#include "locally-generated/short_intvect.tab.c"
+#include "locally-generated/int_intvect.tab.c"
+#include "locally-generated/long_intvect.tab.c"
+#include "locally-generated/llong_intvect.tab.c"
 
     NULL
 };
@@ -51,6 +64,12 @@ static istate_t *istate_ptr;
 #define TRACE_FUNCTION()
 #endif
 
+#define BC_CHECK_PTR( ptr ) \
+    if( !(ptr) ) { \
+        bc_merror( EXCEPTION ); \
+        return 0; \
+    }
+
 int init( istate_t *global_istate )
 {
     istate_ptr = global_istate;
@@ -64,6 +83,20 @@ int trace_on( int trace_flag )
     return old_trace_flag;
 }
 
+
+
+#include <locally-generated/byte_vectors.c>
+#include <locally-generated/short_vectors.c>
+#include <locally-generated/int_vectors.c>
+#include <locally-generated/long_vectors.c>
+#include <locally-generated/llong_vectors.c>
+
 #include <locally-generated/float_vectors.c>
 #include <locally-generated/double_vectors.c>
 #include <locally-generated/ldouble_vectors.c>
+
+#include <locally-generated/byte_intvect.c>
+#include <locally-generated/short_intvect.c>
+#include <locally-generated/int_intvect.c>
+#include <locally-generated/long_intvect.c>
+#include <locally-generated/llong_intvect.c>
