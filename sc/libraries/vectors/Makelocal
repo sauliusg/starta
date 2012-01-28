@@ -11,10 +11,10 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 
 #-----------------------------------------------------------------------------
 
-${GEN_DIR}/%_arrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.hin
+${GEN_DIR}/%_vectors.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/vectors.hin
 	sed -f $^ > $@
 
-${GEN_DIR}/%_arrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.cin
+${GEN_DIR}/%_vectors.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/vectors.cin
 	sed -f $^ > $@
 
 #-----------------------------------------------------------------------------
