@@ -11,3 +11,82 @@
 
 #define I num.@field@
 
+/*
+ * VADD Add two vectors, yielding a third one. The third vector is
+ * used if provided, otherwise a new vector is allocated. The provided
+ * result vector may coinside with one of the source vectors, in which
+ * case the source vector will be overwritten during the oprtaion.
+ * 
+ * bytecode:
+ * VADD
+ * 
+ * stack:
+ * v1, v2, vsum -> vsum'
+ * 
+ */
+
+int @PREFIX1@VADD( INSTRUCTION_FN_ARGS )
+{
+    ssize_t i, length;
+    @type@ *v1 = STACKCELL_PTR( istate.ep[2] );
+    @type@ *v2 = STACKCELL_PTR( istate.ep[1] );
+    @type@ *vres = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t* hdr1 = (alloccell_t*)v1;
+    alloccell_t* hdr2 = (alloccell_t*)v2;
+    alloccell_t* hdr3 = (alloccell_t*)vres;
+    llong sum = 0;
+
+    TRACE_FUNCTION();
+
+    if( !v1 || !v2 ) {
+	STACKCELL_ZERO_PTR( istate.ep[2] );
+	STACKCELL_ZERO_PTR( istate.ep[0] );
+	istate.ep += 2;
+	return 1;
+    }
+
+    length = hdr1[-1].length;
+
+    if( hdr2[-1].length != length ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */ (char*)
+	      cxprintf( "adding vectors of different lengths %ld and %ld",
+			length, hdr2[-1].length ),
+	      /* module_id = */ module_id,
+	      /* exception_id = */ VX_VECTOR_LENGTH_ERROR,
+	      EXCEPTION );
+	    return 0;
+    }
+
+    if( !vres ) {
+	vres = bcalloc( sizeof(@type@), length, /* nref = */ 0 );
+	BC_CHECK_PTR( vres );
+	STACKCELL_SET_ADDR( istate.ep[0], vres );
+    } else {
+	if( hdr3[-1].length != length ) {
+	    interpret_raise_exception_with_bcalloc_message
+		( /* err_code = */ -1,
+		  /* message = */ (char*)
+		  cxprintf( "result vector is of different length than the "
+			    "operands: operands %ld, result %ld",
+			    length, hdr3[-1].length ),
+		  /* module_id = */ module_id,
+		  /* exception_id = */ VX_VECTOR_LENGTH_ERROR,
+		  EXCEPTION );
+	    return 0;
+	}
+    }
+
+    for( i = 0; i < length; i++ ) {
+	vres[i] = v1[i] + v2[i];
+    }
+
+    STACKCELL_SET_ADDR( istate.ep[2], vres );
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
+
+    return 1;
+}

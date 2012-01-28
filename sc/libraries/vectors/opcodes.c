@@ -5,6 +5,17 @@
 #include <alloccell.h>
 #include <bcalloc.h>
 #include <run.h>
+#include <cxprintf.h>
+
+void *module_id = &module_id;
+
+typedef enum {
+    VX_VECTOR_NULL = 0,
+
+    VX_VECTOR_LENGTH_ERROR,
+
+    last_VX_VECTOR_ERROR
+} vector_error_t;
 
 char *OPCODES[] = {
 
