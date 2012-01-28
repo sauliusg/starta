@@ -5,8 +5,8 @@
 # Test pointer-not operator for files.
 #
 
-include "inputs/stdtypes.slib"
-include "inputs/stdio.slib"
+include "stdtypes.slib"
+include "stdio.slib"
 
 var f : file;
 

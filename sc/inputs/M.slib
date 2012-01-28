@@ -4,8 +4,8 @@
 
 package M;
 
-include "inputs/stdtypes.slib"
-include "inputs/stdio.slib"
+include "stdtypes.slib"
+include "stdio.slib"
 
 const C = 10;
 const D = C + 1;

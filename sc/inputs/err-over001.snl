@@ -5,7 +5,7 @@
 # Test user-defined "over" operator.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 type overer = {
     size = 4; kind = integer; suffix = overer;

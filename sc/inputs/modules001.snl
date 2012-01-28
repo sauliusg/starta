@@ -7,8 +7,8 @@
 
 package M;
 
-include "inputs/stdtypes.slib"
-include "inputs/stdio.slib"
+include "stdtypes.slib"
+include "stdio.slib"
 
 var i : int;
 

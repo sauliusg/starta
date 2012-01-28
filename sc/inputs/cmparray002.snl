@@ -5,7 +5,7 @@
 # Test pointer-not operator for arrays
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 type M = array of int;
 

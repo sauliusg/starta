@@ -5,7 +5,7 @@
 # Records, structures and fixed arrays.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 type S = struct { i : int; f : float };
 

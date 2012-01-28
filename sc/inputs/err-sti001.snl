@@ -6,7 +6,7 @@
 # operator.
 #
 
-// include "inputs/stdtypes.slib"
+// include "stdtypes.slib"
 
 type another;
 

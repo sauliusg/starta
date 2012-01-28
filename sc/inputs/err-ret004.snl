@@ -2,5 +2,5 @@
 # Check diagnostics of the returen statament from the main script 
 #
 
-include "inputs/stdtypes.slib";
+include "stdtypes.slib";
 return;

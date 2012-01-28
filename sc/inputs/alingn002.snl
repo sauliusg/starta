@@ -5,7 +5,7 @@
 # Test alignemnt of fields in arrays and structures.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 type boolval = enum byte ( false, true ) ;
 

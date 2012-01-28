@@ -5,7 +5,7 @@
 # Test exceptions.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 exception ioerr;
 exception rderr;

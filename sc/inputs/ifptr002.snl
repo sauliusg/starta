@@ -5,7 +5,7 @@
 # Test pointer-not operator for strcutures
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 type S = struct { x : int };
 

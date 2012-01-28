@@ -5,7 +5,7 @@
 # Test of user-defined ldi and sti operators.
 #
 
-// include "inputs/stdtypes.slib"
+// include "stdtypes.slib"
 
 type loader = {
     size = 4;

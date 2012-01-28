@@ -6,7 +6,7 @@
 # garbage collector deals with it properly.
 #
 
-include "inputs/stdtypes.slib";
+include "stdtypes.slib";
 
 type Node = struct {
     head : Node;

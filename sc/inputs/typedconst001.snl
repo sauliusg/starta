@@ -5,7 +5,7 @@
 # Test modules, module function and variable access.
 #
 
-include "inputs/stdtypes.slib"
+include "stdtypes.slib"
 
 var int i;
 
