@@ -1,0 +1,11 @@
+./sl: inputs/err-multinit005.snl(16,24): ERROR, need more than one expression to initialise 2 variables
+var x2, y2 : double = 1;
+                       ^
+./sl: inputs/err-multinit005.snl(18,31): ERROR, number of expressions (2) is less the number of variables (3)
+var x3, y3, z3 : double = 1, 3;
+                              ^
+./sl: inputs/err-multinit005.snl(20,36): ERROR, not enough values on the stack for assignment to variable 'x4'
+var x4, y4, z4, t4 = multitype( 4 );
+                                   ^
+./sl: 3 error(s) detected
+

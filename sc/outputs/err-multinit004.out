@@ -1,0 +1,5 @@
+./sl: inputs/err-multinit004.snl(41,31): ERROR, number of expressions (2) is less the number of variables (3)
+var x3, y3, z3 : double = 1, 3;
+                              ^
+./sl: 1 error(s) detected
+
