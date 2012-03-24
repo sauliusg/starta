@@ -5128,7 +5128,6 @@ static cexception_t *px; /* parser exception */
 %type <dnode> method_header
 %type <dnode> method_definition
 %type <i>     multivalue_function_call
-%type <i>     multivalue_expression
 %type <i>     multivalue_expression_list
 %type <s>     import_statement
 %type <s>     include_statement
@@ -5806,6 +5805,11 @@ variable_declaration
 	 DNODE *var;
 	 DNODE *lst = $2;
 	 int len = dnode_list_length( lst );         
+
+         if( expr_nr < len ) {
+             yyerrorf( "number of expressions (%d) is less "
+                       "the number of variables (%d)", expr_nr, len );
+         }
          
          if( expr_nr > 1 ) {
              foreach_dnode( var, lst ) {
@@ -5820,6 +5824,18 @@ variable_declaration
              snail_compile_initialise_variable( snail_cc, var, px );
          }
      }
+    }
+
+  | variable_declaration_keyword variable_identifier ','
+    variable_identifier_list ':' var_type_description '=' simple_expression
+    {
+        yyerrorf( "need more than one expression to initialise %d variables",
+                  dnode_list_length( $4 ) + 1 );
+
+        $2 = dnode_list_invert( dnode_append( $2, $4 ));
+        dnode_list_append_type( $2, $6 );
+        dnode_list_assign_offsets( $2, &snail_cc->local_offset );
+        snail_vartab_insert_named_vars( snail_cc, $2, px );
     }
 
   | variable_declaration_keyword var_type_description variable_declarator_list
@@ -7706,10 +7722,10 @@ condition
   ;
 
 multivalue_expression_list
-  : multivalue_expression
+  : multivalue_function_call
       { $$ = $1; }
-  | multivalue_expression_list ',' multivalue_expression
-      { $$ = $1 + $3; }
+  | expression ',' expression_list
+      { $$ = $3 + 1; }
   ;
 
 expression
@@ -7719,19 +7735,6 @@ expression
   | boolean_expression
   | assignment_expression
   | null_expression
-  ;
-
-multivalue_expression
-  : multivalue_function_call
-      { $$ = $1; }
-  | simple_expression
-      { $$ = 1; }
-  | arithmetic_expression
-      { $$ = 1; }
-  | boolean_expression
-      { $$ = 1; }
-  | assignment_expression
-      { $$ = 1; }
   ;
 
 null_expression

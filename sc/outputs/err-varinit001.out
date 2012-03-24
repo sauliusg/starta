@@ -1,0 +1,11 @@
+./sl: inputs/err-varinit001.snl(11,19): ERROR, need more than one expression to initialise 2 variables
+var b, c : int = 2;
+                  ^
+./sl: inputs/err-varinit001.snl(17,38): ERROR, need more than one expression to initialise 2 variables
+var m, n : array of int = new int[11];
+                                     ^
+./sl: inputs/err-varinit001.snl(22,44): ERROR, need more than one expression to initialise 2 variables
+var r, s : array of string = new string[10];
+                                           ^
+./sl: 3 error(s) detected
+
