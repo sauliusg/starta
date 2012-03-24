@@ -1,0 +1,13 @@
+#
+# Snail language compiler tests
+#
+# Test multiple variable initialisation.
+#
+
+use std;
+
+var x, y, z : double = 1, 2.0, 3.0D;
+
+. x;
+. y;
+. z;
