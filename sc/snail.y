@@ -5734,7 +5734,7 @@ variable_declaration_keyword
   ;
 
 variable_declaration
-  : variable_declaration_keyword variable_identifier_list ':' var_type_description
+  : variable_declaration_keyword variable_identifier ':' var_type_description
     {
      int readonly = $1;
 
@@ -5748,8 +5748,24 @@ variable_declaration
 	 snail_compile_zero_out_stackcells( snail_cc, $2, px );
      }
     }
+  | variable_declaration_keyword 
+    variable_identifier ',' variable_identifier_list ':' var_type_description
+    {
+     int readonly = $1;
+
+     $2 = dnode_append( $2, $4 );
+     dnode_list_append_type( $2, $6 );
+     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
+     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     if( readonly ) {
+	 dnode_list_set_flags( $2, DF_IS_READONLY );
+     }
+     if( snail_cc->loops ) {
+	 snail_compile_zero_out_stackcells( snail_cc, $2, px );
+     }
+    }
   | variable_declaration_keyword
-    variable_identifier_list ':' var_type_description initialiser
+    variable_identifier ':' var_type_description initialiser
     {
      int readonly = $1;
 
@@ -5770,6 +5786,39 @@ variable_declaration
 	     snail_compile_initialise_variable( snail_cc, var, px );
 	 }
 	 snail_compile_initialise_variable( snail_cc, var, px );
+     }
+    }
+
+  | variable_declaration_keyword variable_identifier ','
+    variable_identifier_list ':' var_type_description '=' multivalue_expression_list
+    {
+     int readonly = $1;
+     int expr_nr = $8;
+
+     $2 = dnode_list_invert( dnode_append( $2, $4 ));
+     dnode_list_append_type( $2, $6 );
+     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
+     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     if( readonly ) {
+	 dnode_list_set_flags( $2, DF_IS_READONLY );
+     }
+     {
+	 DNODE *var;
+	 DNODE *lst = $2;
+	 int len = dnode_list_length( lst );         
+         
+         if( expr_nr > 1 ) {
+             foreach_dnode( var, lst ) {
+                 snail_compile_initialise_variable( snail_cc, var, px );
+             }
+         } else {
+             foreach_dnode( var, lst ) {
+                 if( --len <= 0 ) break;
+                 snail_compile_dup( snail_cc, px );
+                 snail_compile_initialise_variable( snail_cc, var, px );
+             }
+             snail_compile_initialise_variable( snail_cc, var, px );
+         }
      }
     }
 
@@ -5807,8 +5856,7 @@ variable_declaration
 	snail_compile_variable_initialisations( snail_cc, $4, px );
       }
 
-  | variable_declaration_keyword
-    variable_identifier_list initialiser
+  | variable_declaration_keyword variable_identifier initialiser
     {
      TNODE *expr_type = snail_cc->e_stack ?
 	 share_tnode( enode_type( snail_cc->e_stack )) : NULL;
@@ -5833,6 +5881,30 @@ variable_declaration
 	 snail_compile_initialise_variable( snail_cc, var, px );
      }
     }
+  | variable_declaration_keyword variable_identifier ','
+    variable_identifier_list '=' multivalue_expression_list
+    {
+     int readonly = $1;
+
+     $2 = dnode_list_invert( dnode_append( $2, $4 ));
+     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
+     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     if( readonly ) {
+	 dnode_list_set_flags( $2, DF_IS_READONLY );
+     }
+     {
+	 DNODE *var;
+	 DNODE *lst = $2;
+
+	 foreach_dnode( var, lst ) {
+             TNODE *expr_type = snail_cc->e_stack ?
+                 share_tnode( enode_type( snail_cc->e_stack )) : NULL;
+             dnode_append_type( var, expr_type );
+	     snail_compile_initialise_variable( snail_cc, var, px );
+	 }
+     }
+    }
+
   ;
 
 variable_declarator_list
