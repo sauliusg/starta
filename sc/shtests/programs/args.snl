@@ -4,7 +4,7 @@
 # Print out command line arguments
 #
 
-include "inputs/stdtypes.slib"
+include "modules/stdtypes.slib"
 
 program args( argv : array of string );
 
