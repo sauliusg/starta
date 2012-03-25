@@ -1485,8 +1485,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 	    dnode_set_offset( current, tnode->size );
 	    tnode->size += STRUCT_FIELD_SIZE;
             tnode_set_flags( tnode, TF_IS_REF );
-	    if( tnode_is_reference( field_type ) ||
-		field_type->kind == TK_PLACEHOLDER ) {
+	    if( field_type && ( tnode_is_reference( field_type ) ||
+                                field_type->kind == TK_PLACEHOLDER )) {
 		tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
 	    }
 	}
