@@ -8161,6 +8161,11 @@ variable
 	  TNODE *variable_type = variable ? dnode_type( variable ) : NULL; 
 
 	  if( variable_type && tnode_kind( variable_type ) == TK_FUNCTION ) {
+              if( variable && dnode_offset( variable ) == 0 ) {
+                  thrcode_push_forward_function
+                      ( snail_cc->thrcode, dnode_name( variable ),
+                        thrcode_length( snail_cc->thrcode ) + 1, px );
+              }
 	      snail_compile_load_function_address( snail_cc, variable, px );
 	  } else {
 	      snail_compile_load_variable_value( snail_cc, variable, px );
