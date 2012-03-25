@@ -2,11 +2,19 @@
 # Snail compiler tests
 #
 #
-# Regression test: segfault when 'std' is not used: 
+# Regression test: stack overflow after taking forward function
+# pointers.
 #
 
-// use std;
+use std;
 
-struct CCP4MapHeader {
-    int   columnNr;
+function f() : string;
+
+var phi : function() -> (string) = f;
+
+function f() : string
+{
+    return "I am here!";
 }
+
+. phi();
