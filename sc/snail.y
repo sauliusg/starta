@@ -1142,7 +1142,9 @@ static void snail_compile_return( SNAIL_COMPILER *cc,
 
 	/* if( !tnode_types_are_identical( returned_type, available_type )) { */
 	if( !tnode_types_are_assignment_compatible( returned_type,
-						    available_type )) {
+						    available_type,
+                                                    NULL /* generic type table */,
+                                                    ex )) {
 	    yyerrorf( "incompatible types of returned value %d "
 		      "of function '%s'",
 		      nretvals - i, dnode_name( cc->current_function ));
@@ -1456,7 +1458,8 @@ static int snail_test_top_types_are_assignment_compatible(
 	TNODE *type1 = enode_type( expr1 );
 	TNODE *type2 = enode_type( expr2 );
 
-	if( !tnode_types_are_assignment_compatible( type1, type2 )) {
+	if( !tnode_types_are_assignment_compatible
+            ( type1, type2, NULL /* generic type table */, ex )) {
 	    return 0;
 	} else {
 	    return 1;
@@ -1790,7 +1793,11 @@ static void snail_compile_variable_assignment_or_init(
 	int var_scope = variable ? dnode_scope( variable ) : -1;
 
 	/* if( !tnode_types_are_identical( var_type, expr_type )) { */
-	if( !tnode_types_are_assignment_compatible( var_type, expr_type )) {
+	/* if( !tnode_types_are_assignment_compatible( var_type, expr_type )) { */
+
+        TYPETAB *generic_types = new_typetab( ex );
+        if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
+                                                    generic_types, ex )) {
 	    char *src_name = expr_type ? tnode_name( expr_type ) : NULL;
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( src_name && dst_name &&
@@ -1830,6 +1837,7 @@ static void snail_compile_variable_assignment_or_init(
 	    snail_emit_st( cc, expr_type, var_name, var_offset,
 			   var_scope, ex );
 	}
+        delete_typetab( generic_types );
         compiler_drop_top_expression( cc );
     }
 }
@@ -1974,8 +1982,8 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 	    if( element_type && expr_type ) {
 		/* if( !tnode_types_are_identical( element_type, expr_type )) {
 		 */
-		if( !tnode_types_are_assignment_compatible( element_type,
-							    expr_type )) {
+		if( !tnode_types_are_assignment_compatible
+                    ( element_type, expr_type, NULL /* generic_typ_table*/, ex )) {
 		    char *src_name = tnode_name( expr_type );
 		    char *dst_name = tnode_name( element_type );
 		    if( src_name && dst_name &&

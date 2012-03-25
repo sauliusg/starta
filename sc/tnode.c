@@ -959,6 +959,7 @@ const char *tnode_kind_name( TNODE *tnode )
       case TK_ARRAY:         return "array";
       case TK_FUNCTION:      return "function";
       case TK_SYNONIM:       return "synonim";
+      case TK_PLACEHOLDER:   return "placeholder";
       default: return "<unknown kind>";
   }
   assert( 0 ); /* should never reach this point */
@@ -1110,7 +1111,9 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
 			   t2->kind == TK_PLACEHOLDER )) {
         if( t2->kind == TK_PLACEHOLDER ) {
-            return tnode_types_are_assignment_compatible( t1, t2->base_type );
+            /* placeholder is already implemented: */
+            return tnode_types_are_assignment_compatible
+                ( t1, t2->base_type, generic_types, ex );
         } else {
             TNODE *volatile placeholder_implementation =
                 typetab_lookup( generic_types, t1->name );
@@ -1185,12 +1188,12 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
     return tnode_types_are_identical( t1, t2, generic_types, ex );
 }
 
-int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2 )
+int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
+                                           TYPETAB *generic_types,
+                                           cexception_t *ex )
 {
     return
-        tnode_arguments_are_compatible( t1, t2,
-                                        NULL, /* TYPETAB *generic_types */
-                                        NULL  /* cexception_t *ex */ );
+        tnode_arguments_are_compatible( t1, t2, generic_types, ex );
 }
 
 static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
@@ -1233,7 +1236,38 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
 			   t2->kind == TK_PLACEHOLDER )) {
         if( t2->kind == TK_PLACEHOLDER ) {
-            return tnode_types_are_assignment_compatible( t1, t2->base_type );
+            if( t2->base_type ) {
+                /* placeholder is already implemented: */
+                return tnode_types_are_assignment_compatible
+                    ( t1, t2->base_type, generic_types, ex );
+            } else {
+                /* create a new placeholder implementation: */
+                /* FIXME: the code below is essentially a dupivcation
+                   of the 'else' branche, needs to be refactored:*/
+                TNODE *volatile placeholder_implementation =
+                    typetab_lookup( generic_types, t2->name );
+
+                if( placeholder_implementation ) {
+                    return tnode_arguments_are_compatible
+                        ( t1, placeholder_implementation->base_type,
+                          generic_types, ex );
+                } else {
+                    cexception_t inner;
+                    cexception_guard( inner ) {
+                        placeholder_implementation =
+                            new_tnode_placeholder( t2->name, ex );
+                        tnode_insert_base_type( placeholder_implementation,
+                                                share_tnode( t1 ));
+                        typetab_insert( generic_types, t2->name, 
+                                        placeholder_implementation, &inner );
+                    }
+                    cexception_catch {
+                        delete_tnode( placeholder_implementation );
+                        cexception_reraise( inner, ex );
+                    }
+                    return 1;
+                }
+            }
         } else {
             TNODE *volatile placeholder_implementation =
                 typetab_lookup( generic_types, t1->name );
