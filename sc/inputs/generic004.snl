@@ -1,0 +1,43 @@
+#
+# Snail compiler tests
+#
+#
+# Testing cloning of arrays.
+#
+
+use std;
+
+var p = [ 12.0, 13.0, 14.0, 15.0, 16.0 ];
+
+procedure shift( p: float; float amount ): float
+{
+    return p + amount;
+}
+
+procedure print_array( p: array of float )
+{
+    for( var i = 0; i < length(p); i++ ) {
+        < p[i], " ";
+    }
+    . "";
+}
+
+procedure generic_shift( p : array of type T;
+                         shifter: procedure (p:T; amount:float)->(T)
+                       ): array of type T
+{
+    var new_p: array [] of T = new T[length(p)];
+
+    for( var i = 0; i < length(new_p); i++ ) {
+        new_p[i] = shifter( p[i], i );
+    }
+
+    return new_p;
+}
+
+print_array( p );
+. "";
+
+p = generic_shift( p, shift );
+
+print_array( p );
