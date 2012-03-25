@@ -177,7 +177,7 @@ for( var argnr = 1; argnr <= last(argv); argnr++ ) {
                 ry * <double>(ysize - 1),
                 rz * <double>(zsize - 1);
 
-            ix, iy, iz = iround( gx ), iround( gy ), iround( gz );
+            ix, iy, iz = round( gx ), round( gy ), round( gz );
 
             fx, fy, fz =
                 (gx + <double>xstart) / <double>(xintervals),

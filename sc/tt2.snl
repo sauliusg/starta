@@ -8,11 +8,13 @@
 
 use std;
 
+function f() : string;
+
+var phi = f;
+
 function f() : string
 {
     return "I am here!";
 }
-
-var phi = f;
 
 . phi();
