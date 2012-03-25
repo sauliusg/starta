@@ -16,3 +16,18 @@ function f() : string
 var phi = f;
 
 . phi();
+
+function g(): string
+{
+    return "This is function g()"
+}
+
+function h() -> (string)
+{
+    return "This is function h()"
+}
+
+var gg, hh = g, h;
+
+. gg();
+. hh();
