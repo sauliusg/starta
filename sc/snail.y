@@ -5878,6 +5878,20 @@ variable_declaration
 	 share_tnode( enode_type( snail_cc->e_stack )) : NULL;
      int readonly = $1;
 
+     type_kind_t expr_type_kind = expr_type ?
+         tnode_kind( expr_type ) : TK_NONE;
+
+     if( expr_type_kind == TK_FUNCTION ||
+         expr_type_kind == TK_OPERATOR ||
+         expr_type_kind == TK_METHOD ) {
+         TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+         expr_type = new_tnode_function_or_proc_ref
+             ( share_dnode( tnode_args( expr_type )),
+               share_dnode( tnode_retvals( expr_type )),
+               share_tnode( base_type ),
+               px );
+     }
+
      dnode_list_append_type( $2, expr_type );
      dnode_list_assign_offsets( $2, &snail_cc->local_offset );
      snail_vartab_insert_named_vars( snail_cc, $2, px );
@@ -5915,6 +5929,18 @@ variable_declaration
 	 foreach_dnode( var, lst ) {
              TNODE *expr_type = snail_cc->e_stack ?
                  share_tnode( enode_type( snail_cc->e_stack )) : NULL;
+             type_kind_t expr_type_kind = expr_type ?
+                 tnode_kind( expr_type ) : TK_NONE;
+             if( expr_type_kind == TK_FUNCTION ||
+                 expr_type_kind == TK_OPERATOR ||
+                 expr_type_kind == TK_METHOD ) {
+                 TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+                 expr_type = new_tnode_function_or_proc_ref
+                     ( share_dnode( tnode_args( expr_type )),
+                       share_dnode( tnode_retvals( expr_type )),
+                       share_tnode( base_type ),
+                       px );
+             }
              dnode_append_type( var, expr_type );
 	     snail_compile_initialise_variable( snail_cc, var, px );
 	 }
