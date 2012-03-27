@@ -2006,7 +2006,8 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 
 	    snail_init_operator_description( &od, expr_type, "sti", 2 );
 
-	    if( !addr_type || tnode_kind( addr_type ) != TK_ADDRESSOF ) {
+	    if( ( !addr_type || tnode_kind( addr_type ) != TK_ADDRESSOF ) &&
+                !enode_has_errors( lval )) {
 		yyerrorf( "lvalue is needed for assignment" );
 	    } else {
 		snail_check_operator_args( cc, &od, NULL /*generic_types*/,
@@ -2738,6 +2739,48 @@ static void snail_push_guarding_retval( SNAIL_COMPILER *cc, cexception_t *ex )
     enode_list_push( &cc->e_stack, arg );
 }
 
+static DNODE* snail_lookup_dnode_silently( SNAIL_COMPILER *cc,
+					   char *module_name,
+					   char *identifier )
+{
+    DNODE *module;
+
+    if( !module_name ) {
+	return vartab_lookup( cc->vartab, identifier );
+    } else {
+	module = vartab_lookup( cc->vartab, module_name );
+	if( !module ) {
+	    yyerrorf( "module '%s' is not available in the current scope",
+		      module_name  );
+	    return NULL;
+	} else {
+	    return dnode_vartab_lookup_var( module, identifier );
+	}
+    }
+}
+
+static DNODE* snail_lookup_dnode( SNAIL_COMPILER *cc,
+				  char *module_name,
+				  char *identifier,
+				  char *message )
+{
+    DNODE *varnode =
+	snail_lookup_dnode_silently( cc, module_name, identifier );
+
+    if( !varnode ) {
+	if( !message ) message = "name";
+	if( module_name ) {
+	    yyerrorf( "%s '%s::%s' is not declared in the "
+		      "current scope", message, module_name,
+		      identifier );
+	} else {
+	    yyerrorf( "%s '%s' is not declared in the "
+		      "current scope", message, identifier );
+	}
+    }
+    return varnode;
+}
+
 /*
   Function snail_push_varaddr_expr() pushes a fake expression with
   variable reference onto the stack. It is fake because no code is
@@ -2754,10 +2797,16 @@ static void snail_push_varaddr_expr( SNAIL_COMPILER *cc,
 				     char *variable_name,
 				     cexception_t *ex )
 {
-    DNODE *var_dnode = vartab_lookup( cc->vartab, variable_name );
-    ENODE *arg = new_enode_varaddr_expr( var_dnode, ex );
-    share_dnode( var_dnode );
-    enode_list_push( &cc->e_stack, arg );
+    DNODE *var_dnode = snail_lookup_dnode( cc, NULL /* module_name */,
+                                           variable_name, "variable" );
+    ENODE *arg = var_dnode ?
+        new_enode_varaddr_expr( var_dnode, ex ) : NULL;
+    if( arg ) {
+        share_dnode( var_dnode );
+        enode_list_push( &cc->e_stack, arg );
+    } else {
+        snail_push_error_type( cc, ex );
+    }
 }
 
 static type_kind_t snail_stack_top_type_kind( SNAIL_COMPILER *cc )
@@ -3219,48 +3268,6 @@ static void snail_compile_constant( SNAIL_COMPILER *cc,
 				   suffix, constant_kind_name );
 
     snail_compile_typed_constant( cc, const_type, value, ex );
-}
-
-static DNODE* snail_lookup_dnode_silently( SNAIL_COMPILER *cc,
-					   char *module_name,
-					   char *identifier )
-{
-    DNODE *module;
-
-    if( !module_name ) {
-	return vartab_lookup( cc->vartab, identifier );
-    } else {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    return NULL;
-	} else {
-	    return dnode_vartab_lookup_var( module, identifier );
-	}
-    }
-}
-
-static DNODE* snail_lookup_dnode( SNAIL_COMPILER *cc,
-				  char *module_name,
-				  char *identifier,
-				  char *message )
-{
-    DNODE *varnode =
-	snail_lookup_dnode_silently( cc, module_name, identifier );
-
-    if( !varnode ) {
-	if( !message ) message = "name";
-	if( module_name ) {
-	    yyerrorf( "%s '%s::%s' is not declared in the "
-		      "current scope", message, module_name,
-		      identifier );
-	} else {
-	    yyerrorf( "%s '%s' is not declared in the "
-		      "current scope", message, identifier );
-	}
-    }
-    return varnode;
 }
 
 static DNODE* snail_lookup_constant( SNAIL_COMPILER *cc,
