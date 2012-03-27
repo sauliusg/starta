@@ -1,0 +1,5 @@
+./sl: inputs/err-undeclvar001.snl(12,16): ERROR, variable 's4' is not declared in the current scope
+s1, s2, s3, s4 = "core", "ore", "", "eve";
+               ^
+./sl: 1 error(s) detected
+
