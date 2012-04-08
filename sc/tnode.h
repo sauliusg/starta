@@ -171,9 +171,9 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 				TYPETAB *generic_types,
 				cexception_t *ex );
 
-int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
-                                    TYPETAB *generic_types,
-                                    cexception_t *ex );
+int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
+                                           TYPETAB *generic_types,
+                                           cexception_t *ex );
 
 int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 			       TYPETAB *generic_types,

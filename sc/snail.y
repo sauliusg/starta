@@ -1141,10 +1141,9 @@ static void snail_compile_return( SNAIL_COMPILER *cc,
 	available_type = enode_type( expr );
 
 	/* if( !tnode_types_are_identical( returned_type, available_type )) { */
-	if( !tnode_arguments_are_compatible( returned_type,
-                                             available_type,
-                                             NULL /* generic type table */,
-                                             ex )) {
+	if( !tnode_types_are_assignment_compatible
+            ( returned_type, available_type, NULL /* generic type table */,
+              ex )) {
 	    yyerrorf( "incompatible types of returned value %d "
 		      "of function '%s'",
 		      nretvals - i, dnode_name( cc->current_function ));
@@ -1282,7 +1281,7 @@ static void snail_check_operator_args( SNAIL_COMPILER *cc,
 
             if( !tnode_types_are_compatible( argument_type, expr_type,
 					     generic_types, ex )) {
-	    // if( !tnode_arguments_are_compatible( argument_type, expr_type,
+	    // if( !tnode_types_are_assignment_compatible( argument_type, expr_type,
 	    //				 generic_types, ex )) {
 		yyerrorf( "incompatible type of argument %d for operator '%s'",
 			  nargs, dnode_name( od->operator ));
@@ -1458,7 +1457,7 @@ static int snail_test_top_types_are_assignment_compatible(
 	TNODE *type1 = enode_type( expr1 );
 	TNODE *type2 = enode_type( expr2 );
 
-	if( !tnode_arguments_are_compatible
+	if( !tnode_types_are_assignment_compatible
             ( type1, type2, NULL /* generic type table */, ex )) {
 	    return 0;
 	} else {
@@ -1793,11 +1792,11 @@ static void snail_compile_variable_assignment_or_init(
 	int var_scope = variable ? dnode_scope( variable ) : -1;
 
 	/* if( !tnode_types_are_identical( var_type, expr_type )) { */
-	/* if( !tnode_arguments_are_compatible( var_type, expr_type )) { */
+	/* if( !tnode_types_are_assignment_compatible( var_type, expr_type )) { */
 
         TYPETAB *generic_types = new_typetab( ex );
-        if( !tnode_arguments_are_compatible( var_type, expr_type, 
-                                             generic_types, ex )) {
+        if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
+                                                    generic_types, ex )) {
 	    char *src_name = expr_type ? tnode_name( expr_type ) : NULL;
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( src_name && dst_name &&
@@ -1982,7 +1981,7 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 	    if( element_type && expr_type ) {
 		/* if( !tnode_types_are_identical( element_type, expr_type )) {
 		 */
-		if( !tnode_arguments_are_compatible
+		if( !tnode_types_are_assignment_compatible
                     ( element_type, expr_type, NULL /* generic_typ_table*/, ex )) {
 		    char *src_name = tnode_name( expr_type );
 		    char *dst_name = tnode_name( element_type );
@@ -2898,8 +2897,8 @@ static void snail_check_and_drop_function_args( SNAIL_COMPILER *cc,
             formal_type = dnode_type( formal_arg );
             actual_type = enode_type( actual_arg );
             /* if( !tnode_types_are_identical( formal_type, actual_type )) { */
-            if( !tnode_arguments_are_compatible( formal_type, actual_type,
-                                                 generic_types, ex )) {
+            if( !tnode_types_are_assignment_compatible
+                ( formal_type, actual_type, generic_types, ex )) {
                 yyerrorf( "incompatible types for function '%s' argument "
                           "nr. %d"/* " (%s)" */, dnode_name( function ),
                           nargs - n, dnode_name( formal_arg ));

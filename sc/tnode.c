@@ -1112,16 +1112,16 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 			   t2->kind == TK_PLACEHOLDER )) {
         if( t2->kind == TK_PLACEHOLDER ) {
             /* placeholder is already implemented: */
-            return tnode_arguments_are_compatible
+            return tnode_types_are_assignment_compatible
                 ( t1, t2->base_type, generic_types, ex );
         } else {
             TNODE *volatile placeholder_implementation =
                 typetab_lookup( generic_types, t1->name );
 
             if( placeholder_implementation ) {
-                return tnode_arguments_are_compatible(
-                           placeholder_implementation->base_type,
-                           t2, generic_types, ex );
+                return tnode_types_are_assignment_compatible
+                    ( placeholder_implementation->base_type,
+                      t2, generic_types, ex );
             } else {
                 cexception_t inner;
                 cexception_guard( inner ) {
@@ -1193,9 +1193,9 @@ static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
                                                     char *msg, int msglen,
                                                     cexception_t *ex );
 
-int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
-                                    TYPETAB *generic_types,
-                                    cexception_t *ex )
+int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
+                                           TYPETAB *generic_types,
+                                           cexception_t *ex )
 {
     if( !t1 || !t2 ) return 0;
 
@@ -1221,8 +1221,8 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
         return (!t1->name && tnode_classes_are_compatible( t1, t2,
 							   generic_types,
 							   ex )) ||
-            tnode_arguments_are_compatible( t1, t2->base_type,
-                                            generic_types, ex );
+            tnode_types_are_assignment_compatible( t1, t2->base_type,
+                                                   generic_types, ex );
     }
 
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
@@ -1230,7 +1230,7 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
         if( t2->kind == TK_PLACEHOLDER ) {
             if( t2->base_type ) {
                 /* placeholder is already implemented: */
-                return tnode_arguments_are_compatible
+                return tnode_types_are_assignment_compatible
                     ( t1, t2->base_type, generic_types, ex );
             } else {
                 /* create a new placeholder implementation: */
@@ -1240,7 +1240,7 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
                     typetab_lookup( generic_types, t2->name );
 
                 if( placeholder_implementation ) {
-                    return tnode_arguments_are_compatible
+                    return tnode_types_are_assignment_compatible
                         ( t1, placeholder_implementation->base_type,
                           generic_types, ex );
                 } else {
@@ -1265,9 +1265,9 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
                 typetab_lookup( generic_types, t1->name );
 
             if( placeholder_implementation ) {
-                return tnode_arguments_are_compatible(
-                           placeholder_implementation->base_type,
-                           t2, generic_types, ex );
+                return tnode_types_are_assignment_compatible
+                    ( placeholder_implementation->base_type,
+                      t2, generic_types, ex );
             } else {
                 cexception_t inner;
                 cexception_guard( inner ) {
@@ -1295,8 +1295,8 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
 	} else {
 	    return (!t1->name || !t2->name || strcmp( t1->name, t2->name ) == 0) &&
 		/* tnode_types_are_identical( t1->element_type, t2->element_type ); */
-		tnode_arguments_are_compatible( t1->element_type, t2->element_type,
-						generic_types, ex );
+		tnode_types_are_assignment_compatible
+                ( t1->element_type, t2->element_type, generic_types, ex );
 	}
     }
 
@@ -1316,9 +1316,8 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
 	if( t1->element_type == NULL ) {
 	    return t2->kind == TK_ARRAY;
 	} else {
-	    return tnode_arguments_are_compatible( t1->element_type,
-                                                   t2->element_type,
-                                                   generic_types, ex );
+	    return tnode_types_are_assignment_compatible
+                ( t1->element_type, t2->element_type, generic_types, ex );
 	}
     }
 
