@@ -1111,9 +1111,38 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
 			   t2->kind == TK_PLACEHOLDER )) {
         if( t2->kind == TK_PLACEHOLDER ) {
-            /* placeholder is already implemented: */
-            return tnode_types_are_assignment_compatible
-                ( t1, t2->base_type, generic_types, ex );
+            if( t2->base_type ) {
+                /* placeholder is already implemented: */
+                return tnode_types_are_identical
+                    ( t1, t2->base_type, generic_types, ex );
+            } else {
+                /* create a new placeholder implementation: */
+                /* FIXME: the code below is essentially a dupivcation
+                   of the 'else' branche, needs to be refactored:*/
+                TNODE *volatile placeholder_implementation =
+                    typetab_lookup( generic_types, t2->name );
+
+                if( placeholder_implementation ) {
+                    return tnode_types_are_assignment_compatible
+                        ( t1, placeholder_implementation->base_type,
+                          generic_types, ex );
+                } else {
+                    cexception_t inner;
+                    cexception_guard( inner ) {
+                        placeholder_implementation =
+                            new_tnode_placeholder( t2->name, ex );
+                        tnode_insert_base_type( placeholder_implementation,
+                                                share_tnode( t1 ));
+                        typetab_insert( generic_types, t2->name, 
+                                        placeholder_implementation, &inner );
+                    }
+                    cexception_catch {
+                        delete_tnode( placeholder_implementation );
+                        cexception_reraise( inner, ex );
+                    }
+                    return 1;
+                }
+            }
         } else {
             TNODE *volatile placeholder_implementation =
                 typetab_lookup( generic_types, t1->name );
