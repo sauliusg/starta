@@ -1112,7 +1112,7 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 			   t2->kind == TK_PLACEHOLDER )) {
         if( t2->kind == TK_PLACEHOLDER ) {
             /* placeholder is already implemented: */
-            return tnode_types_are_assignment_compatible
+            return tnode_arguments_are_compatible
                 ( t1, t2->base_type, generic_types, ex );
         } else {
             TNODE *volatile placeholder_implementation =
@@ -1188,14 +1188,6 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
     return tnode_types_are_identical( t1, t2, generic_types, ex );
 }
 
-int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
-                                           TYPETAB *generic_types,
-                                           cexception_t *ex )
-{
-    return
-        tnode_arguments_are_compatible( t1, t2, generic_types, ex );
-}
-
 static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
                                                     TYPETAB *generic_types,
                                                     char *msg, int msglen,
@@ -1238,7 +1230,7 @@ int tnode_arguments_are_compatible( TNODE *t1, TNODE *t2,
         if( t2->kind == TK_PLACEHOLDER ) {
             if( t2->base_type ) {
                 /* placeholder is already implemented: */
-                return tnode_types_are_assignment_compatible
+                return tnode_arguments_are_compatible
                     ( t1, t2->base_type, generic_types, ex );
             } else {
                 /* create a new placeholder implementation: */
