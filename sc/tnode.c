@@ -1116,11 +1116,6 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
     if( t1 == t2 ) return 1;
-#if 0
-    if( t1->kind == TK_ANY || t2->kind == TK_ANY ) {
-	return 1;
-    }
-#endif
     if( t1->kind == TK_IGNORE || t2->kind == TK_IGNORE ) {
 	return 1;
     }
@@ -1234,21 +1229,16 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                            cexception_t *ex )
 {
     if( !t1 || !t2 ) return 0;
-
     if( t1 == t2 ) return 1;
-
     if( t1->kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
-
     if( t2->kind == TK_REF ) {
 	return t1->kind == TK_REF;
     }
-
     if( t1->kind == TK_BLOB && t2->kind == TK_BLOB ) {
 	return 1;
     }
-
     if( t2->kind == TK_NULLREF ) {
 	return tnode_is_reference( t1 );
     }
