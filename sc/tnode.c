@@ -1071,7 +1071,7 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                     typetab_lookup( generic_types, t2->name );
 
                 if( placeholder_implementation ) {
-                    return tnode_types_are_assignment_compatible
+                    return tnode_check_types
                         ( t1, placeholder_implementation->base_type,
                           generic_types, ex );
                 } else {
@@ -1096,7 +1096,7 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                 typetab_lookup( generic_types, t1->name );
 
             if( placeholder_implementation ) {
-                return tnode_types_are_assignment_compatible
+                return tnode_check_types
                     ( placeholder_implementation->base_type,
                       t2, generic_types, ex );
             } else {
