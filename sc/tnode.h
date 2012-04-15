@@ -28,6 +28,7 @@ typedef enum {
     TF_IS_FORWARD      = 0x08,
     TF_EXTENDABLE_ENUM = 0x10,
     TF_IS_IMMUTABLE    = 0x20,
+    TF_IS_UNALIASED    = 0x40,
     last_TYPE_FLAG
 } type_flag_t;
 
