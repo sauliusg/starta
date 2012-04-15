@@ -1048,13 +1048,13 @@ static int tnode_structures_are_identical( TNODE *t1, TNODE *t2,
 }
 
 static int
-tnode_check_placeholder_implementation( TNODE *t1, TNODE *t2,
-                                        TYPETAB *generic_types,
-                                        int (*tnode_check_types)
-                                            ( TNODE *t1, TNODE *t2,
-                                              TYPETAB *generic_types,
-                                              cexception_t *ex ),
-                                        cexception_t *ex)
+tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
+                                                   TYPETAB *generic_types,
+                                                   int (*tnode_check_types)
+                                                       ( TNODE *t1, TNODE *t2,
+                                                         TYPETAB *generic_types,
+                                                         cexception_t *ex ),
+                                                   cexception_t *ex)
 {
     TNODE *volatile placeholder_implementation =
         typetab_lookup( generic_types, t2->name );
@@ -1098,11 +1098,11 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                 return tnode_check_types
                     ( t1, t2->base_type, generic_types, ex );
             } else {
-                return tnode_check_placeholder_implementation
+                return tnode_create_and_check_placeholder_implementation
                     ( t1, t2, generic_types, tnode_check_types, ex );
             }
         } else {
-            return tnode_check_placeholder_implementation
+            return tnode_create_and_check_placeholder_implementation
                 ( t2, t1, generic_types, tnode_check_types, ex );
         }
     }
