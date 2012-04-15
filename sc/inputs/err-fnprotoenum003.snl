@@ -1,0 +1,19 @@
+#
+# Snail language compiler tests
+#
+# Test enum type identity in function prototypes.
+#
+
+use std;
+
+type A = enum int ( a, b, c );
+type B = enum int ( x, z, y );
+
+procedure p( B i ) : int;
+
+procedure p( A i ): int
+{
+    return 0
+}
+
+. p( x B );

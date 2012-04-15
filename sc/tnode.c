@@ -1146,25 +1146,6 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 					    t2->return_vals,
 					    generic_types, ex );
     }
-    if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
-	return tnode_types_are_identical( t1->base_type, t2,
-					  generic_types, ex );
-    }
-    if( t2->kind == TK_ENUM && t1->kind != TK_ENUM ) {
-	return tnode_types_are_identical( t1, t2->base_type,
-					  generic_types, ex );
-    }
-
-#if 0
-    if( t1->kind == TK_PLACEHOLDER ) {
-	return tnode_types_are_identical( t1->base_type, t2,
-					  generic_types, ex );
-    }
-    if( t2->kind == TK_PLACEHOLDER ) {
-	return tnode_types_are_identical( t1, t2->base_type,
-					  generic_types, ex );
-    }
-#endif
 
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
 			   t2->kind == TK_PLACEHOLDER )) {
@@ -1216,6 +1197,16 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 	return tnode_types_are_compatible( t1, t2->base_type,
 					   generic_types, ex );
     }
+
+    if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
+	return tnode_types_are_identical( t1->base_type, t2,
+					  generic_types, ex );
+    }
+    if( t2->kind == TK_ENUM && t1->kind != TK_ENUM ) {
+	return tnode_types_are_identical( t1, t2->base_type,
+					  generic_types, ex );
+    }
+
     return tnode_types_are_identical( t1, t2, generic_types, ex );
 }
 
