@@ -53,9 +53,6 @@ typedef enum {
     TK_REF,
     TK_FUNCTION_REF,
     TK_NULLREF,
-#if 0
-    TK_ANY,
-#endif
     TK_IGNORE, /* "type" of ignored arguments, e.g. for the "over" operator */
     TK_EXCEPTION,
     last_type_kind_t
