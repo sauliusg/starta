@@ -1,0 +1,5 @@
+./sl: inputs/err-fnprotoenum001.snl(15,1): ERROR, prototype of function p() does not match previous definition - old prototype argument 1 has type int, but new prototype has type B
+{
+^
+./sl: 1 error(s) detected
+
