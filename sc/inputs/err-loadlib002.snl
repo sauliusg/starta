@@ -5,4 +5,4 @@
 # Test dynamic library loading
 #
 
-load "/usr/lib/libm.so";
+load "libraries/just-so/libjust-so.so.0.01";

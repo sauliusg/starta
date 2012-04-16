@@ -1,5 +1,5 @@
-./sl: inputs/err-loadlib002.snl(8,6): ERROR, shared library '/usr/lib/libm.so' does not contain symbol OPCODES
-load "/usr/lib/libm.so";
+./sl: inputs/err-loadlib002.snl(8,6): ERROR, shared library 'libraries/just-so/libjust-so.so.0.01' does not contain symbol OPCODES
+load "libraries/just-so/libjust-so.so.0.01";
      ^
 ./sl: 1 error(s) detected
 
