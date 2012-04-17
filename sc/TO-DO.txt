@@ -15,9 +15,9 @@ xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 -- Implement pragma to skip included files from '--debug code' listing.
 -- describe all options in --help (also all --debug arguments).
 -- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
--- Implement 'unaliased' values
+xx Implement 'unaliased' values
 -- Implement checks of uncaught exceptions (exceptions cheched by module, not by function)!
--- Think about 'print/println/prints/printsln' operators
+xx Think about 'print/println/prints/printsln' operators
 -- Think about the transfer oprators to a common operator table, with the possibility to overload types.
 -- Implement possibility to define operators like 'operator "." ( array of int )'
 -- Implement possibility to use constants with type suffixes as default function parameter values.
