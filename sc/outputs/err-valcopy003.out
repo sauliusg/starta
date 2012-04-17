@@ -1,20 +1,11 @@
-./sl: inputs/err-valcopy003.snl(23,7): ERROR, can not copy readonly value in the value-copy assignment ':='
+./sl: inputs/err-valcopy003.snl(23,7): ERROR, can not copy into the readonly value in the value-copy assignment ':='
 m := n; // ERROR;
       ^
-./sl: inputs/err-valcopy003.snl(25,9): ERROR, can not copy readonly value in the value-copy assignment ':='
-nn := mm; // ERROR, 'nn' would give a r/w access to the r/o components of 'mm'
-        ^
 ./sl: inputs/err-valcopy003.snl(27,14): ERROR, can not assign readonly content
-nn[0] = mm[0]; // ERROR: can not assign a readonly content
+nn[0] = mm[0]; // OK
              ^
-./sl: inputs/err-valcopy003.snl(31,17): ERROR, can not copy readonly value in the value-copy assignment ':='
-nnn[0] := mmm[0]; // ERROR
-                ^
-./sl: inputs/err-valcopy003.snl(33,15): ERROR, can not copy readonly value in the value-copy assignment ':='
+./sl: inputs/err-valcopy003.snl(33,15): ERROR, can not copy into the readonly value in the value-copy assignment ':='
 mm[0] := nn[0]; // ERROR, readonly content may not be modified.
               ^
-./sl: inputs/err-valcopy003.snl(35,17): ERROR, can not copy readonly value in the value-copy assignment ':='
-nnn[0] := mmm[0]; // ERROR
-                ^
-./sl: 6 error(s) detected
+./sl: 3 error(s) detected
 

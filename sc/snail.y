@@ -1480,22 +1480,12 @@ static int snail_test_top_types_are_readonly_compatible_for_copy(
     if( !expr1 || !expr2 ) {
 	return 0;
     } else {
-	if( enode_has_flags( expr2, EF_IS_READONLY )) {
+        TNODE *tnode2 = enode_type( expr2 );
+	if( enode_has_flags( expr2, EF_IS_READONLY ) ||
+            ( tnode2 && tnode_is_immutable( tnode2 ))) {
 	    return 0;
 	} else {
-	    TNODE *tnode1 = enode_type( expr1 );
-	    TNODE *elem_type1 = tnode_element_type( tnode1 );
-
-	    if( !elem_type1 ) {
-		return 0;
-	    } else
-	    if( tnode_is_reference( elem_type1 ) &&
-		!tnode_is_immutable( elem_type1 ) &&
-		enode_has_flags( expr1, EF_IS_READONLY )) {
-		return 0;
-	    } else {
-		return 1;
-	    }
+            return 1;
 	}
     }
 }
@@ -7374,8 +7364,8 @@ assignment_statement
 	  if( !err &&
 	      !snail_test_top_types_are_readonly_compatible_for_copy(
 	           snail_cc, px )) {
-	      yyerrorf( "can not copy readonly value in the value-copy "
-			"assignment ':='" );
+	      yyerrorf( "can not copy into the readonly value "
+                        "in the value-copy assignment ':='" );
 	      err = 1;
 	  }
 	  compiler_drop_top_expression( snail_cc );
@@ -7406,8 +7396,8 @@ assignment_statement
 	  if( !err &&
 	      !snail_test_top_types_are_readonly_compatible_for_copy(
 	           snail_cc, px )) {
-	      yyerrorf( "can not copy readonly value in the value-copy "
-			"assignment ':='" );
+	      yyerrorf( "can not copy into the readonly value in "
+                        "the value-copy assignment ':='" );
 	      err = 1;
 	  }
 	  compiler_drop_top_expression( snail_cc );
