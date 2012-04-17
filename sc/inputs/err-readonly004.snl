@@ -20,7 +20,8 @@ y = x;
 
 a = new int [100]; // OK
 a[0] = n[0]; // OK
-a = n; // ERROR: n might be modified via a
+a = n; // OK: n might be modified via a, but
+       //     we give up hope to catch this consistently...
 
 readonly int mm[][] = new int[10][20];
 var int nn[][] = new int[10][20];

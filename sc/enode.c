@@ -220,9 +220,12 @@ int enode_is_readonly_compatible_with_var( ENODE *expr, DNODE *variable )
 {
     if( dnode_has_flags( variable, DF_IS_READONLY )) {
 	return 0;
-    } else if( enode_is_reference( expr ) && !enode_is_immutable( expr ) &&
+#if 0
+    }
+    else if( enode_is_reference( expr ) && !enode_is_immutable( expr ) &&
 	       enode_has_flags( expr, EF_IS_READONLY )) {
 	return 0;
+#endif
     } else {
 	return 1;
     }
@@ -230,6 +233,7 @@ int enode_is_readonly_compatible_with_var( ENODE *expr, DNODE *variable )
 
 int enode_is_readonly_compatible_for_init( ENODE *expr, DNODE *variable )
 {
+#if 0
     if( dnode_has_flags( variable, DF_IS_READONLY )) {
 	return 1;
     } else if( enode_is_reference( expr ) && !enode_is_immutable( expr ) &&
@@ -238,6 +242,9 @@ int enode_is_readonly_compatible_for_init( ENODE *expr, DNODE *variable )
     } else {
 	return 1;
     }
+#else
+    return 1;
+#endif
 }
 
 int enode_is_readonly_compatible_for_param( ENODE *expr, DNODE *variable )

@@ -1,5 +1,0 @@
-./sl: inputs/err-fnargs007.snl(15,37): ERROR, can not assign readonly content to variable 'mm'
-        var mm : array of int = m[i];
-                                    ^
-./sl: 1 error(s) detected
-

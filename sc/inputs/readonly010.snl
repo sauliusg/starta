@@ -1,0 +1,11 @@
+
+use std;
+
+var x = new int[10];
+var y: array of int;
+
+readonly z = x;
+
+y = z;
+
+var t = z;
