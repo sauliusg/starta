@@ -1781,9 +1781,6 @@ static void snail_compile_variable_assignment_or_init(
 	ssize_t var_offset = variable ? dnode_offset( variable ) : 0;
 	int var_scope = variable ? dnode_scope( variable ) : -1;
 
-	/* if( !tnode_types_are_identical( var_type, expr_type )) { */
-	/* if( !tnode_types_are_assignment_compatible( var_type, expr_type )) { */
-
         TYPETAB *generic_types = new_typetab( ex );
         if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
                                                     generic_types, ex )) {
