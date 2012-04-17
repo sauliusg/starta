@@ -4430,28 +4430,17 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
 					    cexception_t *ex )
 {
     ssize_t i;
-    int is_readonly = 0;
 
     if( nexpr > 0 ) {
 	ENODE *top = enode_list_pop( &cc->e_stack );
 	TNODE *top_type = enode_type( top );
 	ssize_t nrefs = tnode_is_reference( top_type ) ? 1 : 0;
 
-	if( enode_has_flags( top, EF_IS_READONLY ) &&
-	    tnode_is_reference( top_type ) &&
-	    !tnode_is_immutable( top_type )) {
-	    is_readonly = 1;
-	}
 	for( i = 1; i < nexpr; i++ ) {
 	    ENODE *curr = enode_list_pop( &cc->e_stack );
 	    TNODE *curr_type = enode_type( curr );
 	    if( !tnode_types_are_identical( top_type, curr_type, NULL, ex )) {
 		yyerrorf( "incompatible types of array components" );
-	    }
-	    if( enode_has_flags( curr, EF_IS_READONLY ) &&
-		tnode_is_reference( curr_type ) &&
-		!tnode_is_immutable( curr_type )) {
-		is_readonly = 1;
 	    }
 	    delete_enode( curr );
 	}
@@ -4461,9 +4450,6 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
 	    snail_emit( cc, ex, "\tcee\n", MKARRAY, &nrefs, &nexpr );
 	}
 	snail_push_array_of_type( cc, share_tnode( top_type ), ex );
-	if( is_readonly ) {
-	    enode_set_flags( cc->e_stack, EF_IS_READONLY );
-	}
 	delete_enode( top );
     }
 }

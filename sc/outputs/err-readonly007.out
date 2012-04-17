@@ -1,5 +1,0 @@
-./sl: inputs/err-readonly007.snl(13,71): ERROR, can not assign readonly content to variable 'nn'
-var nn = [ [ [0], [1], m ], [[1,2],[3,4]], [[1,2,3],[3,4,5],[6,7,8]] ]; // ERROR!
-                                                                      ^
-./sl: 1 error(s) detected
-
