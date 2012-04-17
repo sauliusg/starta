@@ -8798,6 +8798,7 @@ operator_header
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      $$ = funct;
+              snail_set_function_arguments_readonly( dnode_type( funct ));
 	  }
 	  cexception_catch {
 	      delete_dnode( $6 );

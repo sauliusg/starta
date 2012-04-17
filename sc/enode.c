@@ -208,9 +208,11 @@ int enode_is_readonly_compatible_with_expr( ENODE *expr, ENODE *target )
 {
     if( enode_has_flags( target, EF_IS_READONLY )) {
 	return 0;
+#if 0
     } else if( enode_is_reference( expr ) && !enode_is_immutable( expr ) &&
 	       enode_has_flags( expr, EF_IS_READONLY )) {
 	return 0;
+#endif
     } else {
 	return 1;
     }
