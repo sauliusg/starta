@@ -1,5 +1,0 @@
-./sl: inputs/err-readonly006.snl(14,21): ERROR, can not assign readonly content to variable 'mn'
-var mn = [ m, m, m ]; // ERROR!
-                    ^
-./sl: 1 error(s) detected
-

@@ -3,7 +3,7 @@
 #
 #
 # Test how the SL compiler deals with the immutable values when
-# compiling the ':=' assignemtn.
+# compiling array expressions.
 #
 
 use std;
@@ -11,4 +11,4 @@ use std;
 readonly m  = [ 1, 2, 3 ];
 readonly mm = [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]; // OK
 
-var mn = [ m, m, m ]; // ERROR!
+var mn = [ m, [1,1], [2,2] ]; // OK

@@ -11,4 +11,4 @@ use std;
 readonly m  = [ 1, 2, 3 ];
 readonly mm = [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]; // OK
 
-var mn = [ m, [1,1], [2,2] ]; // ERROR!
+var mn = [ [1,0], [2,1], m ]; // OK
