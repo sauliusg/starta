@@ -59,6 +59,8 @@ int enode_is_readonly_compatible_with_var( ENODE *expr, DNODE *variable );
 
 int enode_is_readonly_compatible_for_init( ENODE *expr, DNODE *variable );
 
+int enode_is_readonly_compatible_for_param( ENODE *expr, DNODE *variable );
+
 ENODE* enode_append( ENODE *head, ENODE *tail );
 
 ENODE *share_enode( ENODE *enode );

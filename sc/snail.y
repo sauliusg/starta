@@ -2890,8 +2890,8 @@ static void snail_check_and_drop_function_args( SNAIL_COMPILER *cc,
                           "nr. %d"/* " (%s)" */, dnode_name( function ),
                           nargs - n, dnode_name( formal_arg ));
             }
-            if( !enode_is_readonly_compatible_for_init( actual_arg,
-                                                        formal_arg )) {
+            if( !enode_is_readonly_compatible_for_param( actual_arg,
+                                                         formal_arg )) {
                 char *name = dnode_name( formal_arg );
                 yyerrorf( "can not pass readonly value for r/w parameter "
                           "'%s'", name );
