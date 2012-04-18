@@ -5057,6 +5057,7 @@ static cexception_t *px; /* parser exception */
 %token _MODULE
 %token _NATIVE
 %token _NEW
+%token _NOT
 %token _NULL
 %token _OF
 %token _OPERATOR
@@ -6505,6 +6506,11 @@ var_type_description
   | undelimited_or_structure_description
   | _ARRAY
     { $$ = new_tnode_array_snail( NULL, snail_cc->typetab, px ); }
+  | non_null_type_designator _ARRAY
+    { 
+        $$ = new_tnode_non_null
+            ( new_tnode_array_snail( NULL, snail_cc->typetab, px ), px );
+    }
   ;
 
 undelimited_or_structure_description
@@ -6525,10 +6531,20 @@ type_identifier
      }
   ;
 
+non_null_type_designator
+  : _NOT _NULL
+  | '*'
+  ; 
+
 delimited_type_description
   : type_identifier
     { 
        $$ = share_tnode( $1 );
+    }
+
+  | non_null_type_designator delimited_type_description
+    {
+	$$ = new_tnode_non_null( share_tnode( $2 ), px );
     }
 
   | _LIKE type_identifier struct_or_class_description_body
@@ -6630,6 +6646,11 @@ class_description
 undelimited_type_description
   : _ARRAY _OF undelimited_or_structure_description
     { $$ = new_tnode_array_snail( $3, snail_cc->typetab, px ); }
+
+  | non_null_type_designator undelimited_type_description
+    {
+	$$ = new_tnode_non_null( share_tnode( $2 ), px );
+    }
 
   | _ARRAY dimension_list _OF undelimited_or_structure_description
     { $$ = tnode_append_element_type( $2, $4 ); }

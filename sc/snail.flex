@@ -226,6 +226,7 @@ method     { MARK; return _METHOD; }
 module     { MARK; return _MODULE; }
 native     { MARK; return _NATIVE; }
 new        { MARK; return _NEW; }
+not        { MARK; return _NOT; }
 null       { MARK; return _NULL; }
 of         { MARK; return _OF; }
 operator   { MARK; return _OPERATOR; }
