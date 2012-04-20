@@ -319,14 +319,6 @@ TNODE *new_tnode_synonim( TNODE *base, cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_non_null( TNODE *base_type, cexception_t *ex )
-{
-    TNODE *node = new_tnode_synonim( base_type, ex );
-    node->kind = TK_NON_NULL;
-    node->flags |= TF_IS_REF;
-    return node;
-}
-
 TNODE *new_tnode_blob( TNODE *base_type,
                        cexception_t *ex )
 {
@@ -971,7 +963,6 @@ const char *tnode_kind_name( TNODE *tnode )
         case TK_DERIVED:       return "derived";
         case TK_PLACEHOLDER:   return "placeholder";
         case TK_REF:           return "ref";
-        case TK_NON_NULL:      return "non-null";
         default:
             snprintf( buffer, sizeof(buffer)-1, "type kind %d", tnode->kind );
             buffer[sizeof(buffer)-1] = '\0';
@@ -1140,10 +1131,6 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
     if( t2->kind == TK_REF ) {
 	return tnode_is_reference( t1 );
     }
-    if( t1->kind == TK_NON_NULL && t2->kind == TK_NON_NULL ) {
-	return tnode_types_are_identical( t1->base_type, t2->base_type,
-                                          generic_types, ex );
-    }
     if( t2->kind == TK_REF ) {
 	return tnode_is_reference( t1 );
     }
@@ -1220,17 +1207,6 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 					   generic_types, ex );
     }
 
-    if( t1->kind == TK_NON_NULL ) {
-	return 
-            t2->kind == TK_NON_NULL &&
-            tnode_types_are_compatible( t1->base_type, t2->base_type,
-                                        generic_types, ex );
-    }
-    if( t2->kind == TK_NON_NULL ) {
-	return tnode_types_are_compatible( t1, t2->base_type,
-                                           generic_types, ex );
-    }
-
     if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
 	return tnode_types_are_identical( t1->base_type, t2,
 					  generic_types, ex );
@@ -1254,17 +1230,6 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
     if( t1 == t2 ) return 1;
-
-    if( t1->kind == TK_NON_NULL ) {
-	return 
-            t2->kind == TK_NON_NULL &&
-            tnode_types_are_assignment_compatible( t1->base_type, t2->base_type,
-                                                   generic_types, ex );
-    }
-    if( t2->kind == TK_NON_NULL ) {
-	return tnode_types_are_assignment_compatible( t1, t2->base_type,
-                                                      generic_types, ex );
-    }
 
     if( t1->kind == TK_REF ) {
 	return tnode_is_reference( t2 );
@@ -1819,6 +1784,14 @@ int tnode_is_reference( TNODE *tnode )
 {
     if( tnode )
 	return ( tnode->flags & TF_IS_REF ) != 0;
+    else
+	return 0;
+}
+
+int tnode_is_non_null_reference( TNODE *tnode )
+{
+    if( tnode )
+	return ( tnode->flags & TF_NON_NULL ) != 0;
     else
 	return 0;
 }

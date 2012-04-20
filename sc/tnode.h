@@ -28,6 +28,7 @@ typedef enum {
     TF_IS_FORWARD      = 0x08,
     TF_EXTENDABLE_ENUM = 0x10,
     TF_IS_IMMUTABLE    = 0x20,
+    TF_NON_NULL        = 0x40,
     last_TYPE_FLAG
 } type_flag_t;
 
@@ -55,7 +56,6 @@ typedef enum {
     TK_NULLREF,
     TK_IGNORE, /* "type" of ignored arguments, e.g. for the "over" operator */
     TK_EXCEPTION,
-    TK_NON_NULL,
     last_type_kind_t
 } type_kind_t;
 
@@ -72,7 +72,6 @@ TNODE *new_tnode_any( cexception_t *ex );
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
 TNODE *new_tnode_synonim( TNODE *base, cexception_t *ex );
-TNODE *new_tnode_non_null( TNODE *base_type, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
 TNODE *tnode_set_nref( TNODE *tnode, ssize_t nref );
 
@@ -214,6 +213,7 @@ int tnode_has_references( TNODE *tnode );
 int tnode_has_numbers( TNODE *tnode );
 int tnode_is_addressof( TNODE *tnode );
 int tnode_is_reference( TNODE *tnode );
+int tnode_is_non_null_reference( TNODE *tnode );
 int tnode_is_integer( TNODE *tnode );
 int tnode_is_conversion( TNODE *tnode );
 int tnode_is_forward( TNODE *tnode );

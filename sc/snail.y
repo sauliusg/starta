@@ -5128,6 +5128,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
 %type <i>     function_or_procedure_type_keyword
+%type <i>     opt_null_type_designator
 %type <tnode> opt_base_type
 %type <i>     opt_function_attributes
 %type <s>     opt_label
@@ -6506,11 +6507,6 @@ var_type_description
   | undelimited_or_structure_description
   | _ARRAY
     { $$ = new_tnode_array_snail( NULL, snail_cc->typetab, px ); }
-  | non_null_type_designator _ARRAY
-    { 
-        $$ = new_tnode_non_null
-            ( new_tnode_array_snail( NULL, snail_cc->typetab, px ), px );
-    }
   ;
 
 undelimited_or_structure_description
@@ -6531,20 +6527,23 @@ type_identifier
      }
   ;
 
-non_null_type_designator
+opt_null_type_designator
   : _NOT _NULL
-  | '*'
+      { $$ = 1; }
+  | _NULL
+      { $$ = 0; }
+  | '*' /* synonim of 'not null' */
+      { $$ = 1; }
+  | '?' /* synonim of 'null' */
+      { $$ = 0; }
+  | /* default: not null: */
+      { $$ = 1; }
   ; 
 
 delimited_type_description
   : type_identifier
     { 
        $$ = share_tnode( $1 );
-    }
-
-  | non_null_type_designator delimited_type_description
-    {
-	$$ = new_tnode_non_null( share_tnode( $2 ), px );
     }
 
   | _LIKE type_identifier struct_or_class_description_body
@@ -6629,28 +6628,29 @@ opt_base_type
 ;
 
 struct_description
-  : _STRUCT struct_or_class_description_body
+  : opt_null_type_designator _STRUCT struct_or_class_description_body
     {
-      $$ = tnode_finish_struct( $2, px );
+        $$ = tnode_finish_struct( $3, px );
+        if( $1 ) {
+            tnode_set_flags( $$, TF_NON_NULL );
+        }
     }
 ;
 
 class_description
-  : _CLASS struct_or_class_description_body
+  : opt_null_type_designator _CLASS struct_or_class_description_body
     {
-      compiler_compile_virtual_method_table( snail_cc, $2, px );
-      $$ = tnode_finish_class( $2, px );
+        compiler_compile_virtual_method_table( snail_cc, $3, px );
+        $$ = tnode_finish_class( $3, px );
+        if( $1 ) {
+            tnode_set_flags( $$, TF_NON_NULL );
+        }
     }
 ;
 
 undelimited_type_description
   : _ARRAY _OF undelimited_or_structure_description
     { $$ = new_tnode_array_snail( $3, snail_cc->typetab, px ); }
-
-  | non_null_type_designator undelimited_type_description
-    {
-	$$ = new_tnode_non_null( share_tnode( $2 ), px );
-    }
 
   | _ARRAY dimension_list _OF undelimited_or_structure_description
     { $$ = tnode_append_element_type( $2, $4 ); }
@@ -7086,7 +7086,7 @@ struct_declaration
 	snail_typetab_insert( snail_cc, $4, px );
         snail_cc->current_type = NULL;
     }
-  | type_declaration_start '=' _STRUCT
+  | type_declaration_start '=' opt_null_type_designator _STRUCT
     {
 	assert( snail_cc->current_type );
 	tnode_set_flags( snail_cc->current_type, TF_IS_REF );
@@ -7094,24 +7094,30 @@ struct_declaration
     }
     struct_or_class_declaration_body
     {
-	tnode_finish_struct( $5, px );
+        if( $3 ) {
+            tnode_set_flags( $6, TF_NON_NULL );
+        }
+	tnode_finish_struct( $6, px );
 	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $5, px );
+	snail_compile_type_declaration( snail_cc, $6, px );
         snail_cc->current_type = NULL;
     }
-  | type_declaration_start '='
+  | type_declaration_start '=' opt_null_type_designator
     {
 	assert( snail_cc->current_type );
 	// tnode_set_flags( snail_cc->current_type, TF_IS_REF );
     }
     struct_or_class_declaration_body
     {
-	// tnode_finish_struct( $4, px );
+        if( $3 ) {
+            tnode_set_flags( $5, TF_NON_NULL );
+        }
+	// tnode_finish_struct( $5, px );
 	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $4, px );
+	snail_compile_type_declaration( snail_cc, $5, px );
         snail_cc->current_type = NULL;
     }
-  | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' _STRUCT 
+  | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
       {
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
@@ -7137,12 +7143,15 @@ struct_declaration
       }
       struct_or_class_declaration_body
       {
+        if( $6 ) {
+            tnode_set_flags( $9, TF_NON_NULL );
+        }
 	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $8, px );
+	snail_compile_type_declaration( snail_cc, $9, px );
 	snail_cc->current_type = NULL;
       }
 
-  | _TYPE __IDENTIFIER _OF __IDENTIFIER '='
+  | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator
       {
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
@@ -7168,8 +7177,11 @@ struct_declaration
       }
     struct_or_class_declaration_body
       {
+        if( $6 ) {
+            tnode_set_flags( $8, TF_NON_NULL );
+        }
 	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $7, px );
+	snail_compile_type_declaration( snail_cc, $8, px );
 	snail_cc->current_type = NULL;
       }
 
@@ -7882,9 +7894,9 @@ array_expression
   ;
 
 struct_expression
-  : _STRUCT type_identifier
+  : opt_null_type_designator _STRUCT type_identifier
      {
-	 snail_compile_alloc( snail_cc, share_tnode( $2 ), px );
+	 snail_compile_alloc( snail_cc, share_tnode( $3 ), px );
      }
     '{' field_initialiser_list opt_comma '}'
 
