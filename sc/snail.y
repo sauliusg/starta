@@ -666,7 +666,7 @@ static void snail_insert_tnode_into_suffix_list( SNAIL_COMPILER *cc,
 
     type_kind = tnode_kind( tnode );
 
-    if( type_kind == TK_SYNONIM &&
+    if( type_kind == TK_DERIVED &&
 	(base_type = tnode_base_type( tnode )) ) {
 	type_kind = tnode_kind( base_type );
     }
@@ -749,7 +749,7 @@ static void snail_insert_tnode_into_suffix_list( SNAIL_COMPILER *cc,
     case TK_ENUM:
     case TK_REF:
     case TK_FUNCTION_REF:
-    case TK_SYNONIM:
+    case TK_DERIVED:
 	break;
     default:
 	yyerrorf( "types of kind '%s' do not have suffix table",
@@ -1326,7 +1326,7 @@ static void snail_push_operator_retvals( SNAIL_COMPILER *cc,
     retval_type = od->retvals ? dnode_type( od->retvals ) : NULL;
 
     if( od->containing_type &&
-	    ( tnode_kind( od->containing_type ) == TK_SYNONIM ||
+	    ( tnode_kind( od->containing_type ) == TK_DERIVED ||
 	      tnode_kind( od->containing_type ) == TK_ENUM ) &&
 	    (od->flags & ODF_IS_INHERITED) != 0 ) {
 	TNODE *base_type = tnode_base_type( od->containing_type );

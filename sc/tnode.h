@@ -49,7 +49,7 @@ typedef enum {
     TK_METHOD, /* class (virtual) methods, or virtual functions */
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
-    TK_SYNONIM,
+    TK_DERIVED,
     TK_REF,
     TK_FUNCTION_REF,
     TK_NULLREF,
