@@ -290,9 +290,9 @@ TNODE *new_tnode_synonim( TNODE *base, cexception_t *ex )
 
     cexception_guard( inner ) {
 	/* node->kind = base->kind; */
-	node->kind = TK_SYNONIM;
+	node->kind = TK_DERIVED;
 	/* base->name is not copied */
-	while( base && base->kind == TK_SYNONIM )
+	while( base && base->kind == TK_DERIVED )
 	    base = base->base_type;
 	assert( node != base );
 	node->base_type = share_tnode( base );
@@ -860,7 +860,7 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, char *src_type_name )
 
 #if 0
     if( !conversion && tnode && tnode->base_type &&
-	( tnode->kind == TK_SYNONIM || tnode->kind == TK_ENUM )) {
+	( tnode->kind == TK_DERIVED || tnode->kind == TK_ENUM )) {
 	conversion = tnode_lookup_conversion( tnode->base_type, src_type_name );
     }
 #endif
@@ -968,7 +968,7 @@ const char *tnode_kind_name( TNODE *tnode )
         case TK_PRIMITIVE:     return "primitive";
         case TK_ARRAY:         return "array";
         case TK_FUNCTION:      return "function";
-        case TK_SYNONIM:       return "synonim";
+        case TK_DERIVED:       return "derived";
         case TK_PLACEHOLDER:   return "placeholder";
         case TK_REF:           return "ref";
         case TK_NON_NULL:      return "non-null";
@@ -1211,11 +1211,11 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
 
-    if( t1->kind == TK_SYNONIM && t2->kind != TK_SYNONIM ) {
+    if( t1->kind == TK_DERIVED && t2->kind != TK_DERIVED ) {
 	return tnode_types_are_compatible( t1->base_type, t2,
 					   generic_types, ex );
     }
-    if( t2->kind == TK_SYNONIM && t1->kind != TK_SYNONIM ) {
+    if( t2->kind == TK_DERIVED && t1->kind != TK_DERIVED ) {
 	return tnode_types_are_compatible( t1, t2->base_type,
 					   generic_types, ex );
     }

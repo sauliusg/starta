@@ -726,7 +726,7 @@ DNODE *dnode_append_type( DNODE *dnode, TNODE *tnode )
     assert( dnode );
 
 #if 0
-    if( tnode && tnode_kind( tnode ) == TK_SYNONIM ) {
+    if( tnode && tnode_kind( tnode ) == TK_DERIVED ) {
 	true_tnode = tnode_base_type( tnode );
     } else {
 	true_tnode = tnode;
