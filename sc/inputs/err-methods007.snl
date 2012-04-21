@@ -13,8 +13,8 @@ class C {
         method getx() : int { return self.xxx }
 }
 
-type A = struct {
-    c : class { 
+type A = null struct {
+    c : ?class { 
         x : int;
 	method setx( xx : int ) { self.x = xx }
         method getx() : int { return self.x }

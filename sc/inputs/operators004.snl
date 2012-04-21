@@ -7,7 +7,7 @@
 
 use std;
 
-type list_of_string = struct {
+type list_of_string = null struct {
     next : list_of_string;
     value : string;
 

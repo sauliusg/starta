@@ -7,7 +7,7 @@
 
 use std;
 
-type list of T = {
+type list of T = ?{
     next : list of T;
     value : T;
 
