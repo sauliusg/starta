@@ -1,0 +1,5 @@
+./sl: inputs/err-notnull002.snl(14,9): ERROR, incompatible types for assignment to variable 's'
+s = null; // ERROR
+        ^
+./sl: 1 error(s) detected
+
