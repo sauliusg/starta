@@ -6536,8 +6536,8 @@ opt_null_type_designator
       { $$ = 1; }
   | '?' /* synonim of 'null' */
       { $$ = 0; }
-  | /* default: not null: */
-      { $$ = 1; }
+  | /* default: null: */
+      { $$ = 0; }
   ; 
 
 delimited_type_description
