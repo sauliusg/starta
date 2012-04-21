@@ -100,7 +100,7 @@ type char = {
         { BUNPACKMDARRAY %%level };
 }
 
-type ref = {
+type ref = null {
     kind = ref;
     reference;
     bytecode inline operator "==" ( x, y : ref ) : bool
@@ -111,7 +111,7 @@ type ref = {
 	{ PZBOOL };
 };
 
-type blob = {
+type blob = null {
     kind = ref;
     reference;
     bytecode inline operator "==" ( x, y : ref ) : bool
@@ -157,7 +157,7 @@ type procedure = {
 		{ PZBOOL };
 }
 
-type file = {
+type file = ?{
     suffix = "file"; // just to avoid empty suffix conflicts with enum types...
     reference;
 
@@ -970,7 +970,7 @@ type ldouble = {
         { LDLDCS };
 }
 
-type string = {
+type string = ?{
     size = sizeof native "char*";
     kind = string;
     reference;

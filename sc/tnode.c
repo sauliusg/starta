@@ -957,11 +957,21 @@ const char *tnode_kind_name( TNODE *tnode )
 
     switch( tnode->kind ) {
         case TK_NONE:          return "<no kind>";
+        case TK_BOOL:          return "bool";
+        case TK_INTEGER:       return "integer";
+        case TK_REAL:          return "real";
+        case TK_STRING:        return "string";
         case TK_PRIMITIVE:     return "primitive";
+        case TK_ADDRESSOF:     return "addressof";
         case TK_ARRAY:         return "array";
+        case TK_ENUM:          return "enum";
+        case TK_STRUCT:        return "struct";
+        case TK_CLASS:         return "class";
+        case TK_BLOB:          return "blob";
         case TK_FUNCTION:      return "function";
-        case TK_DERIVED:       return "derived";
+
         case TK_PLACEHOLDER:   return "placeholder";
+        case TK_DERIVED:       return "derived";
         case TK_REF:           return "ref";
         default:
             snprintf( buffer, sizeof(buffer)-1, "type kind %d", tnode->kind );
@@ -1233,6 +1243,12 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( tnode_is_non_null_reference( t1 ) &&
         !tnode_is_non_null_reference( t2 )) {
+#if 0
+        printf( ">>> %s:%s(%d), %s:%s(%d)",
+                t1->name, tnode_kind_name(t1), ((t1->flags & TF_NON_NULL) != 0),
+                t2->name, tnode_kind_name(t2), ((t2->flags & TF_NON_NULL) != 0)
+                );
+#endif
         return 0;
     }
 
@@ -1795,7 +1811,7 @@ int tnode_is_reference( TNODE *tnode )
 
 int tnode_is_non_null_reference( TNODE *tnode )
 {
-    if( tnode )
+    if( tnode && tnode_is_reference( tnode ))
 	return ( tnode->flags & TF_NON_NULL ) != 0;
     else
 	return 0;

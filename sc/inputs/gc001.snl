@@ -8,7 +8,7 @@
 
 include "stdtypes.slib";
 
-type Node = struct {
+type Node = null struct {
     head : Node;
     up : Node;
     left, right : Node; 
