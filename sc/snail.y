@@ -1513,6 +1513,10 @@ static int compiler_check_top_2_expressions_are_identical( SNAIL_COMPILER *cc,
 	TNODE *type2 = enode_type( expr2 );
 
 	if( strcmp( binop_name, "%%" ) != 0 && 
+#if 0
+            strcmp( binop_name, "!=" ) != 0 &&
+            strcmp( binop_name, "==" ) != 0 &&
+#endif
 	    !tnode_types_are_identical( type1, type2, NULL, ex )) {
 	    yyerrorf( "incompatible types for binary operator '%s'",
 		      binop_name );
@@ -6539,7 +6543,7 @@ opt_null_type_designator
       { $$ = 1; }
   | '?' /* synonim of 'null' */
       { $$ = 0; }
-  | /* default: null: */
+  | /* default: 1 == not null, 0 == null */
       { $$ = 1; }
   ; 
 
