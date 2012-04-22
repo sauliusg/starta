@@ -1135,6 +1135,14 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
     if( t1->kind == TK_IGNORE || t2->kind == TK_IGNORE ) {
 	return 1;
     }
+
+#if 0
+    if( tnode_is_non_null_reference( t1 ) !=
+        tnode_is_non_null_reference( t2 )) {
+        return 0;
+    }
+#endif
+
     if( t1->kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
@@ -1207,6 +1215,13 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 				cexception_t *ex )
 {
     if( !t1 || !t2 ) return 0;
+
+#if 0
+    if( tnode_is_non_null_reference( t1 ) !=
+        tnode_is_non_null_reference( t2 )) {
+        return 0;
+    }
+#endif
 
     if( t1->kind == TK_DERIVED && t2->kind != TK_DERIVED ) {
 	return tnode_types_are_compatible( t1->base_type, t2,

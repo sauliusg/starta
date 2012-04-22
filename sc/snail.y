@@ -1279,10 +1279,13 @@ static void snail_check_operator_args( SNAIL_COMPILER *cc,
 	    argument_type = dnode_type( arg );
 	    expr_type = enode_type( expr );
 
+#if 1
             if( !tnode_types_are_compatible( argument_type, expr_type,
 					     generic_types, ex )) {
-	    // if( !tnode_types_are_assignment_compatible( argument_type, expr_type,
-	    //				 generic_types, ex )) {
+#else
+            if( !tnode_types_are_assignment_compatible( argument_type, expr_type,
+                                                        generic_types, ex )) {
+#endif
 		yyerrorf( "incompatible type of argument %d for operator '%s'",
 			  nargs, dnode_name( od->operator ));
 	    }
