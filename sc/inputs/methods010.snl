@@ -7,7 +7,7 @@
 
 use std;
 
-type P = class {
+type P = ?class {
 // class P {
      int x;
      int i;
@@ -17,7 +17,7 @@ type P = class {
      method t() : int;
 }
 
-class S : P {
+?class S : P {
     int i;
     string name;
     gg : function (int i) -> (int);
