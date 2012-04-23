@@ -7,7 +7,7 @@
 
 use std;
 
-class S {
+null class S {
     int i;
     string name;
     g : function (int i) -> (int);

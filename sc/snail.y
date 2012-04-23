@@ -3999,7 +3999,7 @@ static void snail_convert_function_argument( SNAIL_COMPILER *cc,
 
     if( arg_type && exp_type ) {
 	if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
-	    !tnode_types_are_identical( arg_type, exp_type, NULL, ex )) {
+	    !tnode_types_are_assignment_compatible( arg_type, exp_type, NULL, ex )) {
 	    char *arg_type_name = tnode_name( arg_type );
 	    if( arg_type_name ) {
 		snail_compile_type_conversion( cc, arg_type_name, ex );
@@ -7072,25 +7072,28 @@ undelimited_type_declaration
   ;
 
 struct_declaration
-  : _STRUCT __IDENTIFIER
+  : opt_null_type_designator _STRUCT __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $2 );
+	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_struct( $2, px );
+	    TNODE *tnode = new_tnode_forward_struct( $3, px );
+            if( $1 ) {
+                tnode_set_flags( tnode, TF_NON_NULL );
+            }
 	    snail_typetab_insert( snail_cc, tnode, px );
 	}
-	tnode = typetab_lookup( snail_cc->typetab, $2 );
+	tnode = typetab_lookup( snail_cc->typetab, $3 );
 	assert( !snail_cc->current_type );
 	snail_cc->current_type = tnode;
 	snail_begin_scope( snail_cc, px );
     }
     struct_or_class_declaration_body
     {
-	tnode_finish_struct( $4, px );
+	tnode_finish_struct( $5, px );
 	snail_end_scope( snail_cc, px );
-	snail_typetab_insert( snail_cc, $4, px );
+	snail_typetab_insert( snail_cc, $5, px );
         snail_cc->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _STRUCT
@@ -7195,29 +7198,32 @@ struct_declaration
 ;
 
 class_declaration
-  : _CLASS __IDENTIFIER
+  : opt_null_type_designator _CLASS __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $2 );
+	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_class( $2, px );
+	    TNODE *tnode = new_tnode_forward_class( $3, px );
+            if( $1 ) {
+                tnode_set_flags( tnode, TF_NON_NULL );
+            }
 	    snail_typetab_insert( snail_cc, tnode, px );
 	}
-	tnode = typetab_lookup( snail_cc->typetab, $2 );
+	tnode = typetab_lookup( snail_cc->typetab, $3 );
 	assert( !snail_cc->current_type );
 	snail_cc->current_type = tnode;
 	snail_begin_scope( snail_cc, px );
     }
     struct_or_class_declaration_body
     {
- 	tnode_finish_class( $4, px );
-	compiler_compile_virtual_method_table( snail_cc, $4, px );
+ 	tnode_finish_class( $5, px );
+	compiler_compile_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
-	snail_typetab_insert( snail_cc, $4, px );
+	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
     }
-  | type_declaration_start '=' _CLASS
+  | type_declaration_start '=' opt_null_type_designator _CLASS
     {
 	assert( snail_cc->current_type );
 	tnode_set_flags( snail_cc->current_type, TF_IS_REF );
@@ -7225,26 +7231,35 @@ class_declaration
     }
     struct_or_class_declaration_body
     {
- 	tnode_finish_class( $5, px );
-	compiler_compile_virtual_method_table( snail_cc, $5, px );
+        if( $3 ) {
+            tnode_set_flags( $6, TF_NON_NULL );
+        }
+ 	tnode_finish_class( $6, px );
+	compiler_compile_virtual_method_table( snail_cc, $6, px );
 	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $5, px );
+	snail_compile_type_declaration( snail_cc, $6, px );
 	snail_cc->current_type = NULL;
     }
 ;
 
 forward_struct_declaration
-  : _STRUCT __IDENTIFIER
+  : opt_null_type_designator _STRUCT __IDENTIFIER
       {
-	  TNODE *tnode = new_tnode_forward_struct( $2, px );
+	  TNODE *tnode = new_tnode_forward_struct( $3, px );
+          if( $1 ) {
+              tnode_set_flags( tnode, TF_NON_NULL );
+          }
 	  snail_typetab_insert( snail_cc, tnode, px );
       }
 ;
 
 forward_class_declaration
-  : _CLASS __IDENTIFIER
+  : opt_null_type_designator _CLASS __IDENTIFIER
       {
-	  TNODE *tnode = new_tnode_forward_class( $2, px );
+	  TNODE *tnode = new_tnode_forward_class( $3, px );
+          if( $1 ) {
+              tnode_set_flags( tnode, TF_NON_NULL );
+          }
 	  snail_typetab_insert( snail_cc, tnode, px );
       }
 ;

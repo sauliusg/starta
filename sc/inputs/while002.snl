@@ -7,7 +7,7 @@
 
 use std;
 
-type node = struct {
+type node = ? struct {
     i : int;
     next : node;
 }

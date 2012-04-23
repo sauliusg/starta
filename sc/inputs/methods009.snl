@@ -7,7 +7,7 @@
 
 use std;
 
-type P = class {
+type P = null class {
      int x;
      int i;
 
@@ -16,7 +16,7 @@ type P = class {
      method t() : int;
 }
 
-class S : P {
+null class S : P {
     int i;
     string name;
     gg : function (int i) -> (int);

@@ -10,10 +10,10 @@
 ./sl: inputs/err-typecompat004.snl(50,9): ERROR, incompatible types for function 'p1' argument nr. 1
 . p1( r ); // ERROR
         ^
-./sl: inputs/err-typecompat004.snl(54,9): ERROR, incompatible types for function 'p2' argument nr. 1
+./sl: inputs/err-typecompat004.snl(54,9): ERROR, type 'A' has no conversion from the given type
 . p2( x ); // ERROR
         ^
-./sl: inputs/err-typecompat004.snl(55,9): ERROR, incompatible types for function 'p2' argument nr. 1
+./sl: inputs/err-typecompat004.snl(55,9): ERROR, type 'A' has no conversion from type 'ref'
 . p2( r ); // ERROR
         ^
 ./sl: 6 error(s) detected

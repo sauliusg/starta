@@ -7,7 +7,7 @@
 
 use std;
 
-struct S {
+null struct S {
     name : string;
     value : int;
     next : S;

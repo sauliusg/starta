@@ -7,14 +7,14 @@
 
 use std;
 
-type P = class {
+type P = null class {
      int x;
      int i;
 
      method g() : int;
 }
 
-class S : P {
+null class S : P {
     int i;
     string name;
     g : function (int i) -> (int);
