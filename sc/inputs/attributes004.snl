@@ -7,7 +7,7 @@
 
 use std;
 
-type T = {
+type T = null {
     reference;
     size = 8;
     s : string;

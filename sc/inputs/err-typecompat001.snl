@@ -29,7 +29,7 @@ procedure p( m, n : array ) : bool
 procedure q( m, n : ref ) : bool
 {
     var x : array of bool = new bool[10];
-    var s : struct { n : string };
+    var s : null struct { n : string };
 
     m = n; // OK
     m = x; // OK

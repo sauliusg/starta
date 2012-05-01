@@ -15,7 +15,7 @@ bytecode {
     NEWLINE
 }
 
-type collection of T = {
+type collection of T = null {
     size = sizeof native "void*";
     inline bytecode operator "[]" ( a : collection of T; i : char ) : addressof
     {

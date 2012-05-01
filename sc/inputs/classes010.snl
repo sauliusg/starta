@@ -20,10 +20,7 @@ class A {
     }
 }
 
-var a, b : A;
-
-a = new A;
-b = new A;
+var a, b : A = new A, new A;
 
 a.x = 5;
 b.x = 8;

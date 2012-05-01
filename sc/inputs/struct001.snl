@@ -22,9 +22,7 @@ type S = struct {
 	    x, y : float;
          };
 
-var s : S;
-
-s = new S;
+var s = new S;
 
 s.m = 34;
 

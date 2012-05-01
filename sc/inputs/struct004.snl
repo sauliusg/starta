@@ -10,9 +10,7 @@ include "stdtypes.slib"
 type S = struct { i : int; f : float };
 
 var a : struct { i : int } = new struct { i : int };
-var s : S;
-
-s = new struct { i : int; f : float };
+var s : S = new struct { i : int; f : float };
 
 a.i = 10;
 s.i = a.i;

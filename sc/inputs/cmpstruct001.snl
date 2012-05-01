@@ -7,7 +7,7 @@
 
 include "stdtypes.slib"
 
-type S = struct { x, y : int; m : array of float }; 
+type S = null struct { x, y : int; m : array of float }; 
 
 var s : S;
 var p : S;

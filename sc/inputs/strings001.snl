@@ -62,7 +62,7 @@ type int = {
         { LOOP };
 }
 
-type string = {
+type string = ?{
     size = 4;
     kind = string;
     reference;

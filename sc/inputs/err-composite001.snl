@@ -15,7 +15,7 @@ bytecode {
     NEWLINE
 }
 
-type collection of T = {
+type collection of T = null {
     reference;
     size = sizeof native "void*";
 

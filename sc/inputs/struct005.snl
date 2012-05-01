@@ -7,19 +7,19 @@
 
 include "stdtypes.slib"
 
-struct A;
-struct B;
+null struct A;
+null struct B;
 
-struct A;
-struct B;
+null struct A;
+null struct B;
 
-struct A {
+null struct A {
     name : string;
     a : A;
     b : B;
 }
 
-struct B {
+null struct B {
     name : string;
     value : int;
     a : A;

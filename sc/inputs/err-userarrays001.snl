@@ -7,7 +7,7 @@
 
 use std;
 
-type collection of T = {
+type collection of T = null {
     size = sizeof native "void*";
 }
 

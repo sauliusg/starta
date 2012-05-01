@@ -32,7 +32,7 @@ type int = {
         { AALLOC %%element_nref };
 };
 
-type S = struct { x : int; y : int };
+type S = null struct { x : int; y : int };
 
 var a, b, c : int;
 

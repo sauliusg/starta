@@ -15,9 +15,7 @@ struct S {
     var int p[][], q[][];
 }
 
-var S s;
-
-s = new S;
+var s = new S;
 
 s.i = 20;
 

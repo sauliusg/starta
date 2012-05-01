@@ -6,7 +6,7 @@
 
 package Types
 
-type PackageType = struct {
+type PackageType = null struct {
     size = 8
 }
 
@@ -16,7 +16,7 @@ procedure f()
         size = 4
     }
 
-    var l : LocalType;
+    var l : LocalType = new LocalType;
 }
 
 end package Types;
