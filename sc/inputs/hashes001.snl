@@ -1,7 +1,7 @@
 
 use std;
 
-type hash of T = {
+type hash of T = ?{
     reference;
 
     inline bytecode operator "new[int]" ( i : int ) : hash of T
@@ -18,7 +18,7 @@ type hash of T = {
     { HASHPTR }
 };
 
-struct S {
+null struct S {
      name : string;
      dict : hash of string;
      idict : hash of int;

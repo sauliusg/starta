@@ -20,7 +20,7 @@ type int = {
         { LDCS };
 }
 
-type R = struct {
+type R = null struct {
     nr : int;
     next : R;
 };

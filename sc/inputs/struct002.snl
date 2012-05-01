@@ -20,7 +20,7 @@ type float = {
     size = 4; kind = real;
 };
 
-type R = struct { x, y, w, h : int };
+type R = ?struct { x, y, w, h : int };
 
 type S = struct {
             n, m : int;
@@ -29,9 +29,7 @@ type S = struct {
 	    x, y : float;
          };
 
-var s : S;
-
-s = new S;
+var s : S = new S;
 s.rr = new R;
 
 s.rr.h = 34;

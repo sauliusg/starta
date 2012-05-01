@@ -64,7 +64,7 @@ type int = {
         { LOOP };
 }
 
-type string = {
+type string = null {
     size = 4;
     kind = string;
     reference;
@@ -85,7 +85,7 @@ inline bytecode function last( a : array ) : int
     LENGTH LDC 1 SUB
 }
 
-type R = struct {
+type R = null struct {
     i : int;
     n : string;
     m : array [][] of int;

@@ -64,7 +64,7 @@ type int = {
         { LOOP };
 }
 
-type string = {
+type string = null {
     size = 4;
     kind = string;
     reference;
@@ -90,10 +90,7 @@ type R = struct {
     m : array [][] of int;
 };
 
-var p, q : R;
-
-p = new R;
-q = new R;
+var p, q = new R, new R;
 
 p.m = new int[10][5];
 q.m = new int[20][6];

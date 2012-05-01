@@ -6,9 +6,9 @@
 
 include "stdtypes.slib"
 
-type R = struct { x, y, w, h : int };
+type R = ?struct { x, y, w, h : int };
 
-type S = struct {
+type S = ?struct {
             n, m : int;
 	    rr   : R;
             a, b : int;

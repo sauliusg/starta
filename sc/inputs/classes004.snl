@@ -17,8 +17,7 @@ class S {
 
 type S2 = class : S {s : string; x, y : double};
 
-var s2 : S2;
-s2 = new S2;
+var s2 : S2 = new S2;
 
 var s1 = new S;
 

@@ -9,6 +9,6 @@ use std;
 
 type S = (struct { a, b : int; x, y : float })
 
-var a : struct { a, b : int; x, y : float };
+var a : null struct { a, b : int; x, y : float };
 
 var i : int

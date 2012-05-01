@@ -4263,6 +4263,24 @@ static void snail_compile_file_input_operator( SNAIL_COMPILER *cc,
     snail_compile_sti( cc, ex );
 }
 
+static void snail_check_non_null_variable( DNODE *dnode )
+{
+    TNODE *var_type = dnode_type( dnode );
+    if( tnode_is_non_null_reference( var_type )) {
+        yyerrorf( "'%s' was declared as non-null reference -- "
+                  "it must be initialised", dnode_name( dnode ) );
+    }
+}
+
+static void snail_check_non_null_variables( DNODE *dnode_list )
+{
+    DNODE *var_dnode;
+
+    foreach_dnode( var_dnode, dnode_list ) {
+        snail_check_non_null_variable( var_dnode );
+    }
+}
+
 static void snail_compile_variable_initialisations( SNAIL_COMPILER *cc,
 						    DNODE *lst,
 						    cexception_t *ex )
@@ -4272,7 +4290,9 @@ static void snail_compile_variable_initialisations( SNAIL_COMPILER *cc,
     foreach_dnode( var, lst ) {
 	if( dnode_has_flags( var, DF_HAS_INITIALISER )) {
 	    snail_compile_initialise_variable( cc, var, ex );
-	}
+	} else {
+            snail_check_non_null_variable( var );
+        }
     }
 }
 
@@ -5011,6 +5031,7 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
     }
 }
 
+
 static SNAIL_COMPILER * volatile snail_cc;
 
 static cexception_t *px; /* parser exception */
@@ -5742,6 +5763,7 @@ variable_declaration
      if( snail_cc->loops ) {
 	 snail_compile_zero_out_stackcells( snail_cc, $2, px );
      }
+     snail_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword 
     variable_identifier ',' variable_identifier_list ':' var_type_description
@@ -5758,6 +5780,7 @@ variable_declaration
      if( snail_cc->loops ) {
 	 snail_compile_zero_out_stackcells( snail_cc, $2, px );
      }
+     snail_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword
     variable_identifier ':' var_type_description initialiser
