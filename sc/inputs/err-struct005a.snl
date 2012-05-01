@@ -1,0 +1,53 @@
+#
+# Snail compiler tests
+#
+#
+# Recursive struct declaration tests.
+#
+
+include "stdtypes.slib"
+
+null struct A;
+null struct B;
+
+null struct A;
+null struct B;
+
+struct A {
+    name : string;
+    a : A;
+    b : B;
+}
+
+struct B {
+    name : string;
+    value : int;
+    a : A;
+    b1, b2 : B;
+}
+
+var alpha : A;
+var beta : B;
+
+alpha = new A;
+beta = new B;
+
+alpha.b = beta;
+beta.a = alpha;
+
+beta.b1 = new B;
+alpha.b.b2 = new B;
+
+beta.b1.value = 10;
+beta.b2.value = 11;
+
+beta.b1.name = "This is b1 of beta";
+beta.b2.name = "This is b2 of beta";
+
+. alpha.b.b1.name;
+. alpha.b.b1.value;
+. alpha.b.b2.name;
+. alpha.b.b2.value;
+
+. beta.a.b.b1.name;
+. beta.a.b.b2.name;

@@ -1,0 +1,12 @@
+
+use std;
+
+type S = struct { name : string; x, y: float };
+
+var x: S;
+
+var y, z: S;
+
+var S x1;
+
+var S y1, z1;
