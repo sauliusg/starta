@@ -7,7 +7,7 @@
 
 use std;
 
-type S = (struct { a, b : int; x, y : float })
+type S = struct { a, b : int; x, y : float }
 
 var a : null struct { a, b : int; x, y : float };
 

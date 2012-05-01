@@ -592,6 +592,11 @@ static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
 
     if( lookup_node != tnode ) {
 	if( tnode_is_forward( lookup_node )) {
+            if( tnode_is_non_null_reference( tnode ) !=
+                tnode_is_non_null_reference( lookup_node )) {
+                yyerrorf( "redeclaration of forward type '%s' changes "
+                          "non-null flag", tnode_name( lookup_node ) );
+            }
 	    tnode_shallow_copy( lookup_node, tnode );
 	    delete_tnode( tnode );
 	} 
@@ -7106,7 +7111,13 @@ struct_declaration
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
 	    snail_typetab_insert( snail_cc, tnode, px );
-	}
+	} else {
+            if( tnode_is_non_null_reference( old_tnode ) !=
+                ($1 ? 1 : 0 )) {
+                yyerrorf( "definition of forward structure '%s' "
+                          "has different non-null flag", $3 );
+            }
+        }
 	tnode = typetab_lookup( snail_cc->typetab, $3 );
 	assert( !snail_cc->current_type );
 	snail_cc->current_type = tnode;
