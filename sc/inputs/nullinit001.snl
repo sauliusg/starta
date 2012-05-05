@@ -7,13 +7,12 @@ type S = struct {
      float c;
 }
 
-type Collection of T = {
+type R = struct {
      string name;
      S a1, a2;
-     T value;
 }
 
-var r : Collection of int = type Collection of int {
+var r = struct R {
    name: "First",
    a1: new S,
    a2: struct S {
@@ -23,4 +22,9 @@ var r : Collection of int = type Collection of int {
    }
 };
 
+// No null checks are necessary:
+
+. r.a1.c;
 . r.a2.a;
+. r.a2.b;
+. r.a2.c;
