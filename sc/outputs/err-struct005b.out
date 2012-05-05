@@ -16,5 +16,17 @@ var alpha : A;
 ./sl: inputs/err-struct005b.snl(30,13): ERROR, 'beta' was declared as non-null reference -- it must be initialised
 var beta : B;
             ^
-./sl: 6 error(s) detected
+./sl: inputs/err-struct005b.snl(32,14): ERROR, type 'A' contains non-null fields -- please use struct expressions to initialise them
+alpha = new A;
+             ^
+./sl: inputs/err-struct005b.snl(33,13): ERROR, type 'B' contains non-null fields -- please use struct expressions to initialise them
+beta = new B;
+            ^
+./sl: inputs/err-struct005b.snl(38,16): ERROR, type 'B' contains non-null fields -- please use struct expressions to initialise them
+beta.b1 = new B;
+               ^
+./sl: inputs/err-struct005b.snl(39,19): ERROR, type 'B' contains non-null fields -- please use struct expressions to initialise them
+alpha.b.b2 = new B;
+                  ^
+./sl: 10 error(s) detected
 

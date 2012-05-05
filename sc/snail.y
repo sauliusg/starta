@@ -5036,6 +5036,36 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
     }
 }
 
+static void snail_check_array_component_is_not_null( TNODE *tnode )
+{
+    if( tnode_is_non_null_reference( tnode )) {
+        char *type_name = tnode_name( tnode );
+        if( type_name ) {
+            yyerrorf( "type '%s' is a non-null reference -- "
+                      "please use array expressions to initialise array elements",
+                      type_name );
+        } else {
+            yyerrorf( "array element is a non-null reference -- "
+                      "please use array expressions to initialise array elements" );
+        }
+    }
+}
+
+static void snail_check_type_contains_non_null_ref( TNODE *tnode )
+{
+    if( tnode_non_null_ref_field_count( tnode ) > 0 &&
+        tnode_kind( tnode ) != TK_CLASS ) {
+        char *type_name = tnode_name( tnode );
+        if( type_name ) {
+            yyerrorf( "type '%s' contains non-null fields -- "
+                      "please use struct expressions to initialise them",
+                      type_name );
+        } else {
+            yyerrorf( "structure contains non-null fields -- "
+                      "please use structure expressions to initialise them" );
+        }
+    }
+}
 
 static SNAIL_COMPILER * volatile snail_cc;
 
@@ -8212,27 +8242,33 @@ boolean_expression
 generator_new
   : _NEW compact_type_description
       {
-	snail_compile_alloc( snail_cc, $2, px );
+          snail_check_type_contains_non_null_ref( $2 );
+          snail_compile_alloc( snail_cc, $2, px );
       }
   | _NEW compact_type_description '[' expression ']'
       {
-	snail_compile_array_alloc( snail_cc, $2, px );
+          snail_check_array_component_is_not_null( $2 );
+          snail_compile_array_alloc( snail_cc, $2, px );
       }
   | _NEW compact_type_description md_array_allocator '[' expression ']'
       {
-	snail_compile_mdalloc( snail_cc, $2, $3, px );
+          snail_check_array_component_is_not_null( $2 );
+          snail_compile_mdalloc( snail_cc, $2, $3, px );
       }
   | _NEW _ARRAY '[' expression ']' _OF var_type_description
       {
-	snail_compile_array_alloc( snail_cc, $7, px );
+          snail_check_array_component_is_not_null( $7 );
+          snail_compile_array_alloc( snail_cc, $7, px );
       }
   | _NEW _ARRAY md_array_allocator '[' expression ']' _OF var_type_description
       {
-	snail_compile_mdalloc( snail_cc, $8, $3, px );
+          snail_check_array_component_is_not_null( $8 );
+          snail_compile_mdalloc( snail_cc, $8, $3, px );
       }
   | _NEW compact_type_description '[' expression ']' _OF var_type_description
       {
-	snail_compile_composite_alloc( snail_cc, $2, $7, px );
+          snail_check_array_component_is_not_null( $7 );
+          snail_compile_composite_alloc( snail_cc, $2, $7, px );
       }
   | _NEW _BLOB '(' expression ')'
       {

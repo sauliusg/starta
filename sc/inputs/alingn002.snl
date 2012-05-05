@@ -12,12 +12,12 @@ type boolval = enum byte ( false, true ) ;
 var True : boolval = true boolval;
 var False : boolval = false boolval;
 
-struct A {
+? struct A {
     name : string;
     flag : boolval;
 }
 
-type R = struct {
+type R = ? struct {
     ival : int;
     flag : boolval;
 }

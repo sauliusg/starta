@@ -7,9 +7,4 @@ type S = struct {
      float c;
 }
 
-type R = null struct {
-     string name;
-     S s1
-}
-
-var m = new R;
+var m = new S[100];
