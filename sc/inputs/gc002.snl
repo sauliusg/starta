@@ -1,7 +1,7 @@
 
 use std;
 
-type R = struct {
+type R = ?struct {
     string s1, s2, s2;
 };
 
