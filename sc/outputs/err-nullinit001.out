@@ -1,0 +1,5 @@
+./sl: inputs/err-nullinit001.snl(25,1): ERROR, 1 out of 2 non-null fields are left uninitialised
+}
+^
+./sl: 1 error(s) detected
+

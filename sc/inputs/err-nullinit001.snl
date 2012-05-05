@@ -7,20 +7,19 @@ type S = struct {
      float c;
 }
 
-type Collection of T = {
+type R = struct {
      string name;
      S a1, a2;
-     T value;
 }
 
-var r : Collection of int = type Collection of int {
+var r = struct R {
    name: "First",
    a1: new S,
+/*
    a2: struct S {
        a: "Pirmas",
        b: 10,
        c: 1.1,
    }
-};
-
-. r.a2.a;
+*/
+}
