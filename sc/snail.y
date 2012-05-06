@@ -5160,6 +5160,8 @@ static cexception_t *px; /* parser exception */
 
 %token <s> __ARITHM_ASSIGN  /* +=, -=, *=, etc. */
 
+%token __QQ /* ?? */
+
 %token <s> __IDENTIFIER
 %token <s> __INTEGER_CONST
 %token <s> __REAL_CONST
@@ -8177,6 +8179,22 @@ arithmetic_expression
 */
   | '(' arithmetic_expression ')'
   | '(' simple_expression ')'
+
+  | __QQ expression  %prec __UNARY
+  {
+      ENODE *top = snail_cc->e_stack;
+      TNODE *top_type = top ? enode_type( top ) : NULL;
+
+      if( top && top_type &&
+          tnode_is_reference( top_type ) &&
+          !tnode_is_non_null_reference( top_type )) {
+          TNODE *converted = copy_unnamed_tnode( top_type, px );
+          tnode_set_flags( converted, TF_NON_NULL );
+          enode_replace_type( top, converted );
+          /* top_type no longer valid here! */
+          snail_emit( snail_cc, px, "\tc\n", CHECKREF );
+      }
+  }
 
   ;
 

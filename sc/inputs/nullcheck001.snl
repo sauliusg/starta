@@ -7,13 +7,15 @@ type S = struct {
      float c;
 }
 
-var m : null struct {
+var m = new null struct {
      string a;
      int b;
      float c;
 };
 
 var s : S = new S;
+
+m.b = 111;
 
 s = ?? m; // OK
 
