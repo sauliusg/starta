@@ -183,6 +183,7 @@ static void storeCurrentLine( char *line, int length );
 ">>"                    { MARK; return __LEFT_TO_RIGHT; }
 "<<"                    { MARK; return __RIGHT_TO_LEFT; }
 "%%"                    { MARK; return __DOUBLE_PERCENT; }
+"??"                    { MARK; return __QQ; }
 "..."                   { MARK; return __THREE_DOTS; }
 ".."                    { MARK; return __DOT_DOT; }
 

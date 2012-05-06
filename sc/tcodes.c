@@ -4684,3 +4684,33 @@ int STRUNPACKMDARRAY( INSTRUCTION_FN_ARGS )
 
     return 2;
 }
+
+/*
+ * CHECKREF Check reference on the top of the stack and raise
+ * exception if it is null:
+ * 
+ * bytecode:
+ * CHECKREF
+ * 
+ * stack:
+ * ref -> same_ref
+ */
+
+int CHECKREF( INSTRUCTION_FN_ARGS )
+{
+    void *ref = STACKCELL_PTR( istate.ep[0] );
+
+    if( !ref ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -98,
+              /* message = */
+              "reference was checked for nullity and found null",
+              /* module_id = */ 0,
+              /* exception_id = */
+              SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+        
+    }
+
+    return 1;
+}

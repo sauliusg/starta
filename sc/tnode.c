@@ -338,6 +338,34 @@ TNODE *new_tnode_blob( TNODE *base_type,
     return node;
 }
 
+TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE *copy = new_tnode( ex );
+
+    cexception_guard( inner ) {
+	assert( tnode );
+        copy->kind = tnode->kind;
+	copy->flags = tnode->flags;
+        /* tnode->name is not copied */
+        copy->element_type = share_tnode( tnode->element_type );
+        copy->size = tnode->size;
+        copy->nrefs = tnode->nrefs;
+        /* tnode->rcount is skipped, of cource ;-) */
+        copy->fields = share_dnode( tnode->fields );
+        copy->flags = tnode->flags;
+        copy->operators = share_dnode( tnode->operators );
+        copy->conversions = share_dnode( tnode->conversions );
+        copy->args = share_dnode( tnode->args );
+        copy->return_vals = share_dnode( tnode->return_vals );
+    }
+    cexception_catch {
+	delete_tnode( copy );
+	cexception_reraise( inner, ex );
+    }
+    return copy;
+}
+
 TNODE * tnode_set_nref( TNODE *tnode, ssize_t nref )
 {
     assert( tnode );
