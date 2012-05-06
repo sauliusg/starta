@@ -228,32 +228,35 @@ ${TST_EXE_DIR}/%: ${TST_PRG_DIR}/%.c ${LINK_OBJ_FILES} \
 # differences will be recorded in ./outputs/*.diff #
 
 TEST_DIR = ./inputs
-OUTPUT_DIR = ./outputs
+OUTPUT_DIR = ./outputs/out
+DIFFIL_DIR = ./outputs/diff
 
 TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}}
 RES_FILES  = ${patsubst ${TEST_DIR}/%${EXT},${OUTPUT_DIR}/%.out,${TEST_FILES}}
-DIFF_FILES = ${patsubst ${TEST_DIR}/%${EXT},${OUTPUT_DIR}/%.diff,${TEST_FILES}}
+DIFF_FILES = ${patsubst ${TEST_DIR}/%${EXT},${DIFFIL_DIR}/%.diff,${TEST_FILES}}
 
 #
 # Outputs and diffs from the standalone test drivers
 #
 
-TST_OUT_DIR = ./testout
+TST_OUT_DIR = ./testout/out
+TST_DIF_DIR = ./testout/diff
 
 TST_OUTPUTS = ${addprefix ${TST_OUT_DIR}/, ${TST_BASENAMES:%.c=%.out}}
-TST_DIFFS   = ${addprefix ${TST_OUT_DIR}/, ${TST_BASENAMES:%.c=%.diff}}
+TST_DIFFS   = ${addprefix ${TST_DIF_DIR}/, ${TST_BASENAMES:%.c=%.diff}}
 
 #
 # Outputs and tests from the shell-driven tests
 #
 
 SHELL_TSTDIR = ./shtests
-SHELL_OUTDIR = ./shoutputs
+SHELL_OUTDIR = ./shoutputs/out
+SHELL_DIFDIR = ./shoutputs/diff
 
 SHELL_TESTS   = ${wildcard ${SHELL_TSTDIR}/*.sh}
 SHELL_BASES   = ${notdir ${SHELL_TESTS}}
 SHELL_OUTPUTS = ${addprefix ${SHELL_OUTDIR}/, ${SHELL_BASES:%.sh=%.out}}
-SHELL_DIFFS   = ${addprefix ${SHELL_OUTDIR}/, ${SHELL_BASES:%.sh=%.diff}}
+SHELL_DIFFS   = ${addprefix ${SHELL_DIFDIR}/, ${SHELL_BASES:%.sh=%.diff}}
 
 #------------------------------------------------------------------------------
 
@@ -265,7 +268,7 @@ test: ${DIFF_FILES} ${TST_DIFFS}
 
 ${DIFF_FILES}: ${TARGET}
 
-${OUTPUT_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
+${DIFFIL_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
 	./$^ ${TEST_OPTIONS} 2>&1 | diff ${OUTPUT_DIR}/$*.out - > $@ ; \
@@ -283,7 +286,7 @@ ${TST_OUT_DIR}/%.out: ${TST_EXE_DIR}/%
 	test -f $@ || $< 2>&1 | tee $@
 	-@touch $@
 
-${TST_OUT_DIR}/%.diff: ${TST_EXE_DIR}/%
+${TST_DIF_DIR}/%.diff: ${TST_EXE_DIR}/%
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
 	./$< 2>&1 | diff ${TST_OUT_DIR}/$*.out - > $@ ; \
@@ -300,7 +303,7 @@ ${SHELL_OUTDIR}/%.out: ${SHELL_TSTDIR}/%.sh ${TARGET}
 	-@test -f $@ || $< ./${TARGET} 2>&1 | tee $@
 	-@touch $@
 
-${SHELL_OUTDIR}/%.diff: ${SHELL_TSTDIR}/%.sh ${TARGET}
+${SHELL_DIFDIR}/%.diff: ${SHELL_TSTDIR}/%.sh ${TARGET}
 	-@printf "%-30s " "$*:" ; \
 	$< ./${TARGET} 2>&1 | diff ${SHELL_OUTDIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
@@ -312,14 +315,14 @@ tests alltests: test shtests
 .PHONY: listdiff
 
 listdiff: # test
-	@-( test -d ${OUTPUT_DIR} && \
-	    ls -l ${OUTPUT_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
+	@-( test -d ${DIFFIL_DIR} && \
+	    ls -l ${DIFFIL_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
 	    true
-	@-( test -d ${TST_OUT_DIR} && \
-	    ls -l ${TST_OUT_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
+	@-( test -d ${TST_DIF_DIR} && \
+	    ls -l ${TST_DIF_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
 	    true
-	@-( test -d ${SHELL_OUTDIR} && \
-	    ls -l ${SHELL_OUTDIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
+	@-( test -d ${SHELL_DIFDIR} && \
+	    ls -l ${SHELL_DIFDIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
 	    true
 
 #------------------------------------------------------------------------------
