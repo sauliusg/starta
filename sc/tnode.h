@@ -217,7 +217,7 @@ int tnode_has_numbers( TNODE *tnode );
 int tnode_is_addressof( TNODE *tnode );
 int tnode_is_reference( TNODE *tnode );
 int tnode_is_non_null_reference( TNODE *tnode );
-int tnode_non_null_ref_field_count( TNODE *tnode );
+int tnode_has_non_null_ref_field( TNODE *tnode );
 int tnode_is_integer( TNODE *tnode );
 int tnode_is_conversion( TNODE *tnode );
 int tnode_is_forward( TNODE *tnode );
