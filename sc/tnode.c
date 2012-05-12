@@ -806,6 +806,12 @@ TNODE *tnode_merge_field_lists( TNODE *dst, TNODE *src )
     return dst;
 }
 
+DNODE *tnode_fields( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->fields;
+}
+
 DNODE *tnode_lookup_field( TNODE *tnode, char *field_name )
 {
     DNODE *field;

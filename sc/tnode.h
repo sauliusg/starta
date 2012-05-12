@@ -125,6 +125,8 @@ TNODE *tnode_insert_operator( TNODE *tnode, DNODE *operator );
 
 TNODE *tnode_merge_field_lists( TNODE *dst, TNODE *src );
 
+DNODE *tnode_fields( TNODE *tnode );
+
 DNODE *tnode_lookup_field( TNODE *tnode, char *field_name );
 
 DNODE *tnode_lookup_method( TNODE *tnode, char *method_name );

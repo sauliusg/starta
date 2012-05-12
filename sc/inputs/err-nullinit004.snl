@@ -5,6 +5,10 @@ struct Q {
      string a;
      int b;
      float c;
+     s : not null struct {
+         int i, j;
+         float x, y, z;
+     }
 }
 
 type S = struct {
@@ -25,4 +29,13 @@ var s = struct S {
         a => "kva-kva",
         b => 2222
     }
+};
+
+var q = struct Q {
+    c => 12,
+};
+
+var qq = struct Q {
+    c => 12,
+    s => new struct { int i, j; float a, b, c; }
 };
