@@ -27,8 +27,8 @@ xx Think about 'print/println/prints/printsln' operators
 -- move COMPILER object and compiler_...() functions from 'snail.y' into a separate compiler.c file (and comiler.h header).
 -- implement stack reference types.
 ++ implement pointers to functions.
--- implement non-null reference types.
--- implement 'p = ? q' assignment for save conversion of regular references into non-null references (the assignment should raise a runtime exception if the reference to be converted is null).
+++ implement non-null reference types.
+++ implement 'p = ? q' assignment for save conversion of regular references into non-null references (the assignment should raise a runtime exception if the reference to be converted is null).
 -- implement 'foreach ... in'
 +- implement "clone" operator for reference types.
 xx implement convenient conversion of fixed arrays into regular, variable arrays and strings
