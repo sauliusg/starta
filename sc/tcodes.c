@@ -4751,3 +4751,55 @@ int FILLARRAY( INSTRUCTION_FN_ARGS )
 
     return 1;
 }
+
+/*
+ * FILLMDARRAY Fill multidimensional array with a specified value.
+ * 
+ * bytecode:
+ * FILLMDARRAY level
+ * 
+ * stack:
+ * value, array_ref ->
+ */
+
+static int
+fill_md_array( stackcell_t *array_ref, ssize_t level, stackcell_t *value )
+{
+    ssize_t length, i;
+    length = ((alloccell_t*)array_ref)[-1].length;
+
+    if( level == 0 ) {
+        for( i = 0; i < length; i++ ) {
+            array_ref[i] = *value;
+        }
+    } else {
+        for( i = 0; i < length; i++ ) {
+            fill_md_array( STACKCELL_PTR(array_ref[i]), level-1, value );
+        }
+    }
+
+    return 0;
+}
+
+int FILLMDARRAY( INSTRUCTION_FN_ARGS )
+{
+    stackcell_t *array_ref = STACKCELL_PTR( istate.ep[0] );
+    stackcell_t value = istate.ep[1];
+    int level = istate.code[istate.ip+1].ssizeval;
+
+    if( !array_ref ) {
+        STACKCELL_ZERO_PTR( istate.ep[0] );
+        STACKCELL_ZERO_PTR( istate.ep[1] );
+        istate.ep ++;
+        return 0;
+    }
+
+    fill_md_array( array_ref, level, &value );
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_SET_ADDR( istate.ep[1], array_ref );
+
+    istate.ep ++;
+
+    return 2;
+}
