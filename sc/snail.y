@@ -5088,7 +5088,7 @@ static void snail_check_array_component_is_not_null( TNODE *tnode )
 
 static void snail_check_type_contains_non_null_ref( TNODE *tnode )
 {
-    if( tnode_non_null_ref_field_count( tnode ) > 0 &&
+    if( tnode_has_non_null_ref_field( tnode ) &&
         tnode_kind( tnode ) != TK_CLASS ) {
         char *type_name = tnode_name( tnode );
         if( type_name ) {
@@ -5224,8 +5224,6 @@ static cexception_t *px; /* parser exception */
 %type <i>     md_array_allocator
 %type <dnode> operator_definition
 %type <dnode> operator_header
-%type <i>     field_initialiser
-%type <i>     field_initialiser_list
 %type <i>     function_attributes
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
@@ -8027,9 +8025,6 @@ struct_expression
     '{' field_initialiser_list opt_comma '}'
     {
         DNODE *field, *field_list;
-        int initialised_non_null_field_count = $6;
-        int total_non_null_field_count =
-            tnode_non_null_ref_field_count( $3 );
 
         field_list = tnode_fields( $3 );
         foreach_dnode( field, field_list ) {
@@ -8065,9 +8060,6 @@ struct_expression
     '{' field_initialiser_list opt_comma '}'
     {
         DNODE *field, *field_list;
-        int initialised_non_null_field_count = $7;
-        int total_non_null_field_count =
-            tnode_non_null_ref_field_count( $2 );
 
         field_list = tnode_fields( $2 );
         foreach_dnode( field, field_list ) {
@@ -8095,9 +8087,7 @@ struct_expression
 
 field_initialiser_list
   : field_initialiser
-   { $$ = $1; }
   | field_initialiser_list ',' field_initialiser
-   { $$ = $1 + $3; }
   ;
 
 field_initialiser_separator
@@ -8129,13 +8119,6 @@ field_initialiser
      }
     field_initialiser_separator expression
      {
-         TNODE *field_type =
-             snail_cc->e_stack ? enode_type( snail_cc->e_stack ) : NULL;
-         if( field_type && tnode_is_non_null_reference( field_type )) {
-             $$ = 1;
-         } else {
-             $$ = 0;
-         }
 	 snail_compile_sti( snail_cc, px );
      }
   ;

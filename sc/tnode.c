@@ -1894,9 +1894,8 @@ int tnode_is_non_null_reference( TNODE *tnode )
 	return 0;
 }
 
-int tnode_non_null_ref_field_count( TNODE *tnode )
+int tnode_has_non_null_ref_field( TNODE *tnode )
 {
-    int count = 0;
     DNODE *field;
 
     if( !tnode ) return 0;
@@ -1904,11 +1903,11 @@ int tnode_non_null_ref_field_count( TNODE *tnode )
     foreach_dnode( field, tnode->fields ) {
         TNODE *field_type = dnode_type( field );
         if( tnode_is_non_null_reference( field_type )) {
-            count ++;
+            return 1;
         }
     }
 
-    return count;
+    return 0;
 }
 
 int tnode_is_integer( TNODE *tnode )
