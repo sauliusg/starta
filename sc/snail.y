@@ -2651,6 +2651,7 @@ static void snail_compile_array_alloc_operator( SNAIL_COMPILER *cc,
 	   type 'array'. The caller of the current function will push
 	   a correct return value 'array of proper_element_type' */
 	compiler_drop_top_expression( cc );
+        snail_emit( cc, ex, "\n" );
     } else {
 	snail_check_and_remove_index_type( cc );
 	tnode_report_missing_operator( top_type, operator_name, arity );
@@ -8349,6 +8350,18 @@ generator_new
   | _NEW _BLOB '(' expression ')'
       {
 	snail_compile_blob_alloc( snail_cc, px );
+      }
+  | expression '*' _NEW '[' expression ']'
+      {
+          ENODE *top_expr = snail_cc->e_stack;
+          ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
+          TNODE *element_type =  next_expr ? enode_type( next_expr ) : NULL;
+          snail_compile_array_alloc( snail_cc, element_type, px );
+          snail_emit( snail_cc, px, "\tc\n", FILLARRAY );
+      }
+  | expression '*' _NEW md_array_allocator '[' expression ']'
+      {
+          /* snail_compile_mdalloc( snail_cc, $2, $3, px ); */
       }
   ;
 

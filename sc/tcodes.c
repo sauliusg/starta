@@ -4714,3 +4714,40 @@ int CHECKREF( INSTRUCTION_FN_ARGS )
 
     return 1;
 }
+
+/*
+ * FILLARRAY Fill array with a specified value.
+ * 
+ * bytecode:
+ * FILLARRAY
+ * 
+ * stack:
+ * value, array_ref ->
+ */
+
+int FILLARRAY( INSTRUCTION_FN_ARGS )
+{
+    stackcell_t *array_ref = STACKCELL_PTR( istate.ep[0] );
+    stackcell_t value = istate.ep[1];
+    ssize_t length, i;
+
+    if( !array_ref ) {
+        STACKCELL_ZERO_PTR( istate.ep[0] );
+        STACKCELL_ZERO_PTR( istate.ep[1] );
+        istate.ep ++;
+        return 0;
+    }
+
+    length = ((alloccell_t*)array_ref)[-1].length;
+
+    for( i = 0; i < length; i++ ) {
+        array_ref[i] = value;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_SET_ADDR( istate.ep[1], array_ref );
+
+    istate.ep ++;
+
+    return 1;
+}
