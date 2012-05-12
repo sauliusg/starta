@@ -8361,7 +8361,13 @@ generator_new
       }
   | expression '*' _NEW md_array_allocator '[' expression ']'
       {
-          /* snail_compile_mdalloc( snail_cc, $2, $3, px ); */
+          ssize_t level = $4;
+          ENODE *top_expr = snail_cc->e_stack;
+          ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
+          ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
+          TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
+          snail_compile_mdalloc( snail_cc, element_type, level, px );
+          snail_emit( snail_cc, px, "\tce\n", FILLMDARRAY, &level );
       }
   ;
 
