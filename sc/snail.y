@@ -184,6 +184,13 @@ typedef struct {
     DLIST *current_package_stack;
     DNODE *current_package; /* this field must not be deleted when deleting
 			       COMPILER */
+
+    /* track whhich structure non-null reference fields are
+       initialised: */
+
+    VARTAB *initialised_references;
+    STLIST *initialised_ref_symtab_stack;
+
 } SNAIL_COMPILER;
 
 static void compiler_drop_include_file( SNAIL_COMPILER *c );
@@ -232,6 +239,9 @@ static void delete_snail_compiler( SNAIL_COMPILER *c )
 #endif
 
 	delete_dlist( c->current_package_stack );
+
+        delete_vartab( c->initialised_references );
+	delete_stlist( c->initialised_ref_symtab_stack );
 
         freex( c );
     }
@@ -456,6 +466,31 @@ static void compiler_pop_symbol_tables( SNAIL_COMPILER *c )
 	obtain_tables_from_symtab( symtab, &c->vartab, &c->consts,
 				   &c->typetab );
 
+	delete_symtab( symtab );
+    }
+}
+
+static void compiler_push_initialised_ref_tables( SNAIL_COMPILER *c,
+                                                  cexception_t *ex )
+{
+    SYMTAB *symtab = new_symtab( c->initialised_references, NULL, NULL, ex );
+    stlist_push_symtab( &c->initialised_ref_symtab_stack, &symtab, ex );
+
+    c->initialised_references = new_vartab( ex );
+}
+
+static void compiler_pop_initialised_ref_tables( SNAIL_COMPILER *c )
+{
+    SYMTAB *symtab = stlist_pop_data( &c->initialised_ref_symtab_stack );
+    VARTAB *dummy_v = NULL;
+    TYPETAB *dummy_t = NULL;
+
+    delete_vartab( c->initialised_references );
+    c->initialised_references = NULL;
+
+    if( symtab ) {
+	obtain_tables_from_symtab( symtab, &c->initialised_references,
+                                   &dummy_v, &dummy_t );
 	delete_symtab( symtab );
     }
 }
@@ -7987,20 +8022,35 @@ struct_expression
   : opt_null_type_designator _STRUCT type_identifier
      {
 	 snail_compile_alloc( snail_cc, share_tnode( $3 ), px );
+         compiler_push_initialised_ref_tables( snail_cc, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
+        DNODE *field, *field_list;
         int initialised_non_null_field_count = $6;
         int total_non_null_field_count =
             tnode_non_null_ref_field_count( $3 );
 
-        if( initialised_non_null_field_count !=
-            total_non_null_field_count ) {
-            yyerrorf( "%d out of %d non-null fields are left uninitialised",
-                      total_non_null_field_count -
-                      initialised_non_null_field_count,
-                      total_non_null_field_count );
+        field_list = tnode_fields( $3 );
+        foreach_dnode( field, field_list ) {
+            TNODE *field_type = dnode_type( field );
+            char * field_name = dnode_name( field );
+            if( tnode_is_non_null_reference( field_type ) &&
+                !vartab_lookup( snail_cc->initialised_references,
+                                field_name )) {
+                char *field_type_name = $3 ? tnode_name( $3 ) : NULL;
+                if( field_type_name ) {
+                    yyerrorf( "non-null field '%s' of type '%s' "
+                              "is not initialised",
+                              field_name, field_type_name );
+                } else {
+                    yyerrorf( "non-null field '%s' is not initialised",
+                              field_name );
+                }
+            }
         }
+
+        compiler_pop_initialised_ref_tables( snail_cc );
     }
 
   | _TYPE type_identifier _OF delimited_type_description
@@ -8010,20 +8060,35 @@ struct_expression
 	 tnode_insert_element_type( composite, $4 );
 
 	 snail_compile_alloc( snail_cc, share_tnode( composite ), px );
+         compiler_push_initialised_ref_tables( snail_cc, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
+        DNODE *field, *field_list;
         int initialised_non_null_field_count = $7;
         int total_non_null_field_count =
             tnode_non_null_ref_field_count( $2 );
 
-        if( initialised_non_null_field_count !=
-            total_non_null_field_count ) {
-            yyerrorf( "%d out of %d non-null fields are left uninitialised",
-                      total_non_null_field_count -
-                      initialised_non_null_field_count,
-                      total_non_null_field_count );
+        field_list = tnode_fields( $2 );
+        foreach_dnode( field, field_list ) {
+            TNODE *field_type = dnode_type( field );
+            char * field_name = dnode_name( field );
+            if( tnode_is_non_null_reference( field_type ) &&
+                !vartab_lookup( snail_cc->initialised_references,
+                                field_name )) {
+                char *field_type_name = $2 ? tnode_name( $2 ) : NULL;
+                if( field_type_name ) {
+                    yyerrorf( "non-null field '%s' of type '%s' "
+                              "is not initialised",
+                              field_name, field_type_name );
+                } else {
+                    yyerrorf( "non-null field '%s' is not initialised",
+                              field_name );
+                }
+            }
         }
+
+        compiler_pop_initialised_ref_tables( snail_cc );
     }
 
   ;
@@ -8044,9 +8109,19 @@ field_initialiser
   : __IDENTIFIER
      {
 	 DNODE *field;
+         TNODE *field_type;
+
 	 snail_compile_dup( snail_cc, px );
 	 field = snail_make_stack_top_field_type( snail_cc, $1 );
+         field_type = field ? dnode_type( field ) : NULL;
 	 snail_make_stack_top_addressof( snail_cc, px );
+
+         if( !vartab_lookup( snail_cc->initialised_references, $1 ) &&
+             field_type && tnode_is_non_null_reference( field_type )) {
+             vartab_insert_named( snail_cc->initialised_references,
+                                  share_dnode( field ), px );
+         }
+
 	 if( field && dnode_offset( field ) != 0 ) {
 	     ssize_t field_offset = dnode_offset( field );
 	     snail_emit( snail_cc, px, "\tce\n", OFFSET, &field_offset );
