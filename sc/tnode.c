@@ -1250,18 +1250,11 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 	return 1;
     }
 
-#if 1
     if( tnode_is_non_null_reference( t1 ) !=
         tnode_is_non_null_reference( t2 )) {
-#if 0
-        printf( ">>> %s:%s(%d), %s:%s(%d)\n",
-                t1->name, tnode_kind_name(t1), ((t1->flags & TF_NON_NULL) != 0),
-                t2->name, tnode_kind_name(t2), ((t2->flags & TF_NON_NULL) != 0)
-               );
-#endif
         return 0;
     }
-#endif
+
     return tnode_check_type_identity( t1, t2, generic_types, ex );
 }
 
@@ -1271,19 +1264,11 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
 
-#if 1
     if( tnode_is_non_null_reference( t1 )) {
-#if 0
-        printf( ">>> %s:%s(%d), %s:%s(%d)\n",
-                t1->name, tnode_kind_name(t1), ((t1->flags & TF_NON_NULL) != 0),
-                t2->name, tnode_kind_name(t2), ((t2->flags & TF_NON_NULL) != 0)
-               );
-#endif
         if( !tnode_is_non_null_reference( t2 )) {
             return 0;
         }
     }
-#endif
 
     if( t1->kind == TK_DERIVED && t2->kind != TK_DERIVED ) {
 	return tnode_types_are_compatible( t1->base_type, t2,
@@ -1320,12 +1305,6 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( tnode_is_non_null_reference( t1 ) &&
         !tnode_is_non_null_reference( t2 )) {
-#if 0
-        printf( ">>> %s:%s(%d), %s:%s(%d)",
-                t1->name, tnode_kind_name(t1), ((t1->flags & TF_NON_NULL) != 0),
-                t2->name, tnode_kind_name(t2), ((t2->flags & TF_NON_NULL) != 0)
-                );
-#endif
         return 0;
     }
 
