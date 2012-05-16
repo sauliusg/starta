@@ -4,7 +4,7 @@ xx Change i/o operators from << and >> to <- and ->.
 ?? Write comments how begin_scope() and begin_subscope() are supposed to work
 ?? The same for end_{sub}scope() functions
 ?? Implement exception types (classes?).
-+- Implement subarrays and substrings.
+++ Implement subarrays and substrings.
 xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 ++ Implement 'strstart()', 'strend()' and similar string comparison functions
 -- Think/implement generic 'copy()' and 'clone()' functions, instead of or in addition to the '[]' and ':=' operators.
