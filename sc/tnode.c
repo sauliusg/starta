@@ -238,6 +238,24 @@ TNODE *new_tnode_forward_class( char *name, cexception_t *ex )
     return node;
 }
 
+TNODE *new_tnode_forward_interface( char *name, cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE * volatile node = new_tnode( ex );
+
+    assert( name );
+    cexception_guard( inner ) {
+	node->name = strdupx( name, &inner );
+	node->kind = TK_INTERFACE;
+	tnode_set_flags( node, TF_IS_REF );
+    }
+    cexception_catch {
+        delete_tnode( node );
+        cexception_reraise( inner, ex );
+    }
+    return node;
+}
+
 TNODE *new_tnode_ptr( cexception_t *ex )
 {
     TNODE * volatile node = new_tnode( ex );
@@ -764,6 +782,13 @@ TNODE *tnode_finish_class( TNODE * volatile node,
 {
     return 
         tnode_finish_struct_or_class( node, TK_CLASS, ex );
+}
+
+TNODE *tnode_finish_interface( TNODE * volatile node,
+			       cexception_t *ex )
+{
+    return 
+        tnode_finish_struct_or_class( node, TK_INTERFACE, ex );
 }
 
 TNODE *tnode_finish_enum( TNODE * volatile node,

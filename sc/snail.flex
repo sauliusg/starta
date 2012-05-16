@@ -221,6 +221,7 @@ if         { MARK; return _IF; }
 import     { MARK; return _IMPORT; }
 include    { MARK; return _INCLUDE; }
 inline     { MARK; return _INLINE; }
+interface  { MARK; return _INTERFACE; }
 like       { MARK; return _LIKE; }
 load       { MARK; return _LOAD; }
 method     { MARK; return _METHOD; }
