@@ -44,6 +44,7 @@ typedef enum {
     TK_ENUM,      /* Enumeration type a-la C or Pascal. */
     TK_STRUCT,
     TK_CLASS,
+    TK_INTERFACE,
     TK_BLOB,
     TK_FUNCTION,
     TK_OPERATOR,
@@ -64,6 +65,7 @@ TNODE *new_tnode( cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_struct( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_class( char *name, cexception_t *ex );
+TNODE *new_tnode_forward_interface( char *name, cexception_t *ex );
 TNODE *new_tnode_ptr( cexception_t *ex );
 TNODE *new_tnode_nullref( cexception_t *ex );
 #if 0
@@ -115,6 +117,9 @@ TNODE *tnode_finish_struct( TNODE * volatile node,
 
 TNODE *tnode_finish_class( TNODE * volatile node,
 			   cexception_t *ex );
+
+TNODE *tnode_finish_interface( TNODE * volatile node,
+			       cexception_t *ex );
 
 TNODE *tnode_finish_enum( TNODE * volatile node,
 			  char *name,

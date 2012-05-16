@@ -5150,6 +5150,7 @@ static cexception_t *px; /* parser exception */
 %token _IMPORT
 %token _INCLUDE
 %token _INLINE
+%token _INTERFACE
 %token _LIKE
 %token _LOAD
 %token _METHOD
@@ -5242,6 +5243,8 @@ static cexception_t *px; /* parser exception */
 %type <tnode> struct_description
 %type <tnode> struct_or_class_declaration_body
 %type <tnode> struct_or_class_description_body
+%type <tnode> interface_declaration_body
+%type <tnode> interface_type_placeholder
 %type <tnode> class_description
 %type <dnode> struct_field
 %type <tnode> struct_declaration_field_list
@@ -5250,6 +5253,8 @@ static cexception_t *px; /* parser exception */
 %type <tnode> struct_operator_list
 %type <dnode> struct_var_declaration
 %type <tnode> finish_fields
+%type <dnode> interface_operator
+%type <tnode> interface_operator_list
 %type <tnode> compact_type_description
 %type <s>     type_declaration_name
 %type <tnode> type_identifier
@@ -6974,6 +6979,50 @@ struct_operator
   : operator_definition
   | method_definition
   | method_header
+  { snail_compile_main_thrcode( snail_cc ); }
+  ;
+
+interface_type_placeholder
+  : /* empty */
+     {
+         assert( snail_cc->current_type );
+	 $$ = share_tnode( snail_cc->current_type );
+     }
+  ;
+
+interface_declaration_body
+  : opt_base_type '{'
+    interface_type_placeholder finish_fields
+    interface_operator_list '}'
+    { $$ = $3; }
+  | opt_base_type '{'
+    interface_type_placeholder finish_fields
+    interface_operator_list ';' '}'
+    { $$ = $3; }
+  ;
+
+interface_operator_list
+  : interface_operator
+    {
+	TNODE *struct_type = snail_cc->current_type;
+	tnode_insert_type_member( struct_type, $1 );
+	$$ = struct_type;
+    }
+  | interface_operator_list interface_operator
+    {
+	tnode_insert_type_member( $1, $2 );
+	$$ = $1;
+    }
+  | interface_operator_list ';' interface_operator
+    {
+	tnode_insert_type_member( $1, $3 );
+	$$ = $1;
+    }
+;
+
+interface_operator
+  : method_header
+  { snail_compile_main_thrcode( snail_cc ); }
   ;
 
 struct_var_declaration
@@ -7165,6 +7214,7 @@ undelimited_type_declaration
 
   | struct_declaration
   | class_declaration
+  | interface_declaration
   ;
 
 struct_declaration
@@ -7340,6 +7390,34 @@ class_declaration
 	compiler_compile_virtual_method_table( snail_cc, $6, px );
 	snail_end_scope( snail_cc, px );
 	snail_compile_type_declaration( snail_cc, $6, px );
+	snail_cc->current_type = NULL;
+    }
+;
+
+interface_declaration
+  : opt_null_type_designator _INTERFACE __IDENTIFIER
+    {
+	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $3 );
+	TNODE *tnode = NULL;
+
+	if( !old_tnode ) {
+	    TNODE *tnode = new_tnode_forward_interface( $3, px );
+            if( $1 ) {
+                tnode_set_flags( tnode, TF_NON_NULL );
+            }
+	    snail_typetab_insert( snail_cc, tnode, px );
+	}
+	tnode = typetab_lookup( snail_cc->typetab, $3 );
+	assert( !snail_cc->current_type );
+	snail_cc->current_type = tnode;
+	snail_begin_scope( snail_cc, px );
+    }
+    interface_declaration_body
+    {
+ 	tnode_finish_interface( $5, px );
+	compiler_compile_virtual_method_table( snail_cc, $5, px );
+	snail_end_scope( snail_cc, px );
+	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
     }
 ;
@@ -8996,7 +9074,7 @@ method_header
               self_dnode = new_dnode_name( "self", &inner );
 #if 0
               dnode_insert_type( self_dnode,
-                                 share_tnode( snail_cc->current_class ));
+                                 share_tnode( snail_cc->current_type ));
 #else
               dnode_insert_type( self_dnode,
                                  share_tnode( $<tnode>-1 ));
