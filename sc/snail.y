@@ -95,7 +95,9 @@ typedef struct {
     THRCODE *main_thrcode;
     THRCODE *function_thrcode;
 
-    THRLIST *thrstack;
+    THRLIST *thrstack; /* a stack to push generated thrcode bodies
+                          when generating nested control
+                          structures. */
 
     char *static_data;
     ssize_t static_data_size;
@@ -108,6 +110,8 @@ typedef struct {
     int local_offset;
     int *local_offset_stack;
     int local_offset_stack_size;
+
+    int last_interface_number;
 
     /* the addr_stack is an array-used-as-stack and holds entry
        addresses of the loops that are currently being compiled. */
@@ -7414,7 +7418,7 @@ interface_declaration
     }
     interface_declaration_body
     {
- 	tnode_finish_interface( $5, px );
+ 	tnode_finish_interface( $5, ++snail_cc->last_interface_number, px );
 	compiler_compile_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
 	snail_typetab_insert( snail_cc, $5, px );

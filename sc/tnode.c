@@ -42,6 +42,10 @@ struct TNODE {
 			     this type.*/
     ssize_t vmt_offset;   /* offset of the VMT in the static data area. */
 
+    int interface_nr;     /* number assigned to the interface;
+                             specifies also the interface offset in
+                             the virtual method table. */
+
     ssize_t attr_size;    /* attr_size is the size of the type set via
 			     'type attributes', i.e. specified as
 			     'size = 1234' statements in the type
@@ -785,8 +789,10 @@ TNODE *tnode_finish_class( TNODE * volatile node,
 }
 
 TNODE *tnode_finish_interface( TNODE * volatile node,
+                               ssize_t interface_nr,
 			       cexception_t *ex )
 {
+    node->interface_nr = interface_nr;
     return 
         tnode_finish_struct_or_class( node, TK_INTERFACE, ex );
 }
