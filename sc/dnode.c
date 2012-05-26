@@ -52,13 +52,13 @@ struct DNODE {
 			      current dnode represents one of such
 			      objects. */
     FIXUP *code_fixups;    /* Fixups that need to be applied to the
-			      code fragmen from the 'code' field,
+			      code fragment from the 'code' field,
 			      after it is emitted. May contain, e.g.,
 			      array element size or alignment values
 			      that were not known during compilation
-			      of the oprator body. */
+			      of the operator body. */
     ssize_t value;         /* value of a constant or enumerator type,
-			      or an offset into te code area
+			      or an offset into the code area
 			      (i.e. code address) of the virtual
 			      method implementation. */
     const_value_t cvalue;  /* computed value of constant expressions;
