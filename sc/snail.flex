@@ -218,6 +218,7 @@ for        { MARK; return _FOR; }
 forward    { MARK; return _FORWARD; }
 function   { MARK; return _FUNCTION; }
 if         { MARK; return _IF; }
+implements { MARK; return _IMPLEMENTS; }
 import     { MARK; return _IMPORT; }
 include    { MARK; return _INCLUDE; }
 inline     { MARK; return _INLINE; }

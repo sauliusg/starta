@@ -5151,6 +5151,7 @@ static cexception_t *px; /* parser exception */
 %token _FORWARD
 %token _FUNCTION
 %token _IF
+%token _IMPLEMENTS
 %token _IMPORT
 %token _INCLUDE
 %token _INLINE
@@ -6739,6 +6740,16 @@ opt_base_type
       { $$ = NULL; }
 ;
 
+opt_implemented_interfaces
+  : _IMPLEMENTS interface_identifier_list
+  | /* empty */
+  ;
+
+interface_identifier_list
+  : __IDENTIFIER
+  | interface_identifier_list ',' __IDENTIFIER
+  ;
+
 struct_description
   : opt_null_type_designator _STRUCT struct_or_class_description_body
     {
@@ -6837,22 +6848,25 @@ enum_member
   ;
 
 struct_or_class_declaration_body
-  : opt_base_type '{' struct_declaration_field_list finish_fields '}'
-    { $$ = $3; }
-  | opt_base_type '{' struct_declaration_field_list finish_fields 
+  : opt_base_type opt_implemented_interfaces
+    '{' struct_declaration_field_list finish_fields '}'
+    { $$ = $4; }
+  | opt_base_type opt_implemented_interfaces
+    '{' struct_declaration_field_list finish_fields 
     struct_operator_list '}'
-    { $$ = $3; }
-  | opt_base_type '{' struct_declaration_field_list finish_fields 
+    { $$ = $4; }
+  | opt_base_type opt_implemented_interfaces
+    '{' struct_declaration_field_list finish_fields 
     struct_operator_list ';' '}'
-    { $$ = $3; }
+    { $$ = $4; }
   ;
 
 finish_fields
   : 
   {
       TNODE *current_class = $<tnode>0;
-      TNODE *base_type = $<tnode>-2 ?
-          $<tnode>-2 : typetab_lookup( snail_cc->typetab, "struct" );
+      TNODE *base_type = $<tnode>-3 ?
+          $<tnode>-3 : typetab_lookup( snail_cc->typetab, "struct" );
 
       if( current_class != base_type ) {
 	  tnode_insert_base_type( current_class, share_tnode( base_type ));
@@ -6905,14 +6919,17 @@ struct_declaration_field_list
   ;
 
 struct_or_class_description_body
-  : opt_base_type '{' struct_description_field_list finish_fields '}'
-    { $$ = $3; }
-  | opt_base_type '{' struct_description_field_list finish_fields 
+  : opt_base_type opt_implemented_interfaces
+    '{' struct_description_field_list finish_fields '}'
+    { $$ = $4; }
+  | opt_base_type opt_implemented_interfaces
+    '{' struct_description_field_list finish_fields 
     struct_operator_list '}'
-    { $$ = $3; }
-  | opt_base_type '{' struct_description_field_list finish_fields
+    { $$ = $4; }
+  | opt_base_type opt_implemented_interfaces 
+    '{' struct_description_field_list finish_fields
     struct_operator_list ';' '}'
-    { $$ = $3; }
+    { $$ = $4; }
   ;
 
 struct_description_field_list
@@ -6995,14 +7012,14 @@ interface_type_placeholder
   ;
 
 interface_declaration_body
-  : opt_base_type '{'
+  : opt_base_type opt_implemented_interfaces '{'
     interface_type_placeholder finish_fields
     interface_operator_list '}'
-    { $$ = $3; }
-  | opt_base_type '{'
+    { $$ = $4; }
+  | opt_base_type opt_implemented_interfaces '{'
     interface_type_placeholder finish_fields
     interface_operator_list ';' '}'
-    { $$ = $3; }
+    { $$ = $4; }
   ;
 
 interface_operator_list
