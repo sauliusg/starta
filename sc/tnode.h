@@ -14,6 +14,7 @@ typedef struct TNODE TNODE;
 
 #include <stdlib.h>
 #include <typetab.h>
+#include <tlist.h>
 #include <dnode.h>
 #include <anode.h>
 #include <tcodes.h>
@@ -202,6 +203,7 @@ ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset );
 DNODE *tnode_methods( TNODE *tnode );
 TNODE *tnode_base_type( TNODE *tnode );
 TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type );
+TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces );
 TNODE *tnode_element_type( TNODE *tnode );
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type );
 TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type );

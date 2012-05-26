@@ -5120,6 +5120,7 @@ static cexception_t *px; /* parser exception */
   TNODE *tnode;
   DNODE *dnode;
   ENODE *enode;
+  TLIST *tlist;
   int token;           /* token value returned by lexer */
   int op;              /* type of the assign operator; for simple assignement
 			  operator, contains '='; for operators like '+=' and
@@ -5227,6 +5228,7 @@ static cexception_t *px; /* parser exception */
 %type <s>     import_statement
 %type <s>     include_statement
 %type <i>     index_expression
+%type <tlist> interface_identifier_list
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
 %type <dnode> operator_definition
@@ -5238,6 +5240,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     opt_null_type_designator
 %type <tnode> opt_base_type
 %type <i>     opt_function_attributes
+%type <tlist> opt_implemented_interfaces
 %type <s>     opt_label
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
@@ -6742,12 +6745,25 @@ opt_base_type
 
 opt_implemented_interfaces
   : _IMPLEMENTS interface_identifier_list
+  { $$ = $2; }
   | /* empty */
+  { $$ = NULL; }
   ;
 
 interface_identifier_list
-  : __IDENTIFIER
-  | interface_identifier_list ',' __IDENTIFIER
+  : type_identifier
+  {
+      TLIST *interfaces = NULL;
+      share_tnode( $1 );
+      tlist_push_tnode( &interfaces, &$1, px );
+      $$ = interfaces;
+  }
+  | interface_identifier_list ',' type_identifier
+  {
+      share_tnode( $3 );
+      tlist_push_tnode( &$1, &$3, px );
+      $$ = $1;
+  }
   ;
 
 struct_description
@@ -6865,11 +6881,13 @@ finish_fields
   : 
   {
       TNODE *current_class = $<tnode>0;
+      TLIST *interfaces = $<tlist>-2;
       TNODE *base_type = $<tnode>-3 ?
           $<tnode>-3 : typetab_lookup( snail_cc->typetab, "struct" );
 
       if( current_class != base_type ) {
 	  tnode_insert_base_type( current_class, share_tnode( base_type ));
+          tnode_insert_interfaces( current_class, interfaces );
       }
 
       $$ = current_class;

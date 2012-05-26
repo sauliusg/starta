@@ -8,9 +8,10 @@
 #ifndef __TLIST_H
 #define __TLIST_H
 
-#include <tnode.h>
-
 typedef struct TLIST TLIST;
+
+#include <tnode.h>
+#include <cexceptions.h>
 
 typedef void (*tnode_delete_function_t)( TNODE* );
 typedef void (*tnode_dispose_function_t)( TNODE* volatile * );
