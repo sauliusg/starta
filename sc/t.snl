@@ -9,4 +9,14 @@ null interface If {
 . "If.f.offset =", const(If.f.offset);
 . "If.s.offset =", const(If.s.offset);
 
+. "there";
+
+struct S {
+    int i;
+    float k;
+}
+
+. "S.size = ", const(S.size);
+
 . "here";
+

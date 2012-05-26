@@ -119,6 +119,7 @@ TNODE *tnode_finish_class( TNODE * volatile node,
 			   cexception_t *ex );
 
 TNODE *tnode_finish_interface( TNODE * volatile node,
+                               ssize_t interface_nr,
 			       cexception_t *ex );
 
 TNODE *tnode_finish_enum( TNODE * volatile node,
