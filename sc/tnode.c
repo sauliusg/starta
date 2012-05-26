@@ -16,6 +16,7 @@
 #include <string.h> /* for memset() */
 #include <alloccell.h>
 #include <tcodes.h>
+#include <tlist.h>
 #include <allocx.h>
 #include <stringx.h>
 #include <assert.h>
@@ -29,6 +30,8 @@ struct TNODE {
     TNODE *base_type;     /* base type of the current type, if any;
 			     for functions this is a type of the
 			     returned value */
+    TLIST *interfaces;    /* lists interfaces that this class must
+                             implement */
     TNODE *element_type;  /* for arrays, contains trype of the array
 			     element; for 'addressof' type, contains
 			     description of the addressed element. */
@@ -97,6 +100,7 @@ void delete_tnode( TNODE *tnode )
 	delete_dnode( tnode->return_vals );
 	delete_tnode( tnode->base_type );
 	delete_tnode( tnode->element_type );
+        delete_tlist( tnode->interfaces );
 	delete_tnode( tnode->next );
 	free_tnode( tnode );
     }
@@ -1791,6 +1795,14 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
 	}
     }
 
+    return tnode;
+}
+
+TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces )
+{
+    assert( tnode );
+    assert( !tnode->interfaces );
+    tnode->interfaces = interfaces;
     return tnode;
 }
 
