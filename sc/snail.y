@@ -9095,18 +9095,29 @@ function_header
 	}
   ;
 
+interface_list
+  : __IDENTIFIER __COLON_COLON
+  | interface_list __COLON_COLON __IDENTIFIER __COLON_COLON
+  ;
+
+opt_implements_method
+  : _IMPLEMENTS __IDENTIFIER
+  | _IMPLEMENTS interface_list __IDENTIFIER
+  | /* empty */
+  ;
+
 method_header
   : opt_function_attributes function_code_start _METHOD
         {
 	    //snail_begin_scope( snail_cc, px );
 	}
-             __IDENTIFIER '(' argument_list ')'
+             __IDENTIFIER opt_implements_method '(' argument_list ')'
             opt_retval_description_list
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
           DNODE *volatile self_dnode = NULL;
-          DNODE *parameter_list = $7;
+          DNODE *parameter_list = $8;
 	  int is_function = 0;
 
     	  cexception_guard( inner ) {
@@ -9121,9 +9132,9 @@ method_header
               parameter_list = dnode_append( parameter_list, self_dnode );
               self_dnode = NULL;
 
-	      $$ = funct = new_dnode_method( $5, parameter_list, $9, &inner );
-	      $7 = NULL;
-	      $9 = NULL;
+	      $$ = funct = new_dnode_method( $5, parameter_list, $10, &inner );
+	      $8 = NULL;
+	      $10 = NULL;
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( $1 & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
@@ -9138,8 +9149,8 @@ method_header
 	      }
 	  }
 	  cexception_catch {
-	      delete_dnode( $7 );
-	      delete_dnode( $9 );
+	      delete_dnode( $8 );
+	      delete_dnode( $10 );
 	      delete_dnode( funct );
               delete_dnode( self_dnode );
 	      $$ = NULL;
