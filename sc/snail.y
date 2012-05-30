@@ -5223,6 +5223,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> function_header
 %type <dnode> method_header
 %type <dnode> method_definition
+%type <s>     module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
 %type <s>     import_statement
@@ -5685,12 +5686,17 @@ program_statement
      }
   ;
 
+module_list
+: __IDENTIFIER
+| module_list __COLON_COLON __IDENTIFIER
+;
+
 variable_access_identifier
   : __IDENTIFIER
      {
 	 $$ = snail_lookup_dnode( snail_cc, NULL, $1, "variable" );
      }
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
      {
 	 $$ = snail_lookup_dnode( snail_cc, $1, $3, "variable" );
      }
@@ -7684,7 +7690,7 @@ bytecode_item
 opcode
   : __IDENTIFIER
       { snail_emit( snail_cc, px, "\tC\n", $1 ); }
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
       { snail_emit( snail_cc, px, "\tMC\n", $1, $3 ); }
   ;
 
@@ -7775,7 +7781,7 @@ function_identifier
 	{
 	    snail_check_and_push_function_name( snail_cc, NULL, $1, px );
 	}
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
 	{
 	    snail_check_and_push_function_name( snail_cc, $1, $3, px );
 	}
