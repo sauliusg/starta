@@ -32,13 +32,17 @@ class S implements If, Ig {
     {
         return "This is S implementtion of If::s()"
     }
-    method sg implements Ig::s() -> (string)
+    method sg implements Ig::yet::another::Module::s() -> (string)
     {
         return "This is S implementtion of Ig::s()"
     }
 }
 
 . "S.size = ", const(S.size);
+
+var s = new S;
+
+s->a(20);
 
 . "here";
 
