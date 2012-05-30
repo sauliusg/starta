@@ -5507,7 +5507,7 @@ raised_exception_identifier
       {
           $$ = vartab_lookup( snail_cc->vartab, $1 );
       }
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
       {
           $$ = snail_lookup_dnode( snail_cc, $1, $3, "exception" );
       }
@@ -6547,7 +6547,7 @@ exception_identifier_list
       snail_emit_catch_comparison( snail_cc, NULL, $1, px );
       $$ = 0;
     }
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
     {
       snail_emit_catch_comparison( snail_cc, $1, $3, px );
       $$ = 0;
@@ -6560,7 +6560,7 @@ exception_identifier_list
       snail_emit_catch_comparison( snail_cc, NULL, $3, px );
       $$ = $1 + 1;
     }
-  | exception_identifier_list ',' __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | exception_identifier_list ',' module_list __COLON_COLON __IDENTIFIER
     {
       ssize_t zero = 0;
       snail_push_relative_fixup( snail_cc, px );
@@ -6643,7 +6643,7 @@ type_identifier
      {
 	 $$ = snail_lookup_tnode( snail_cc, NULL, $1, "type" );
      }
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
      {
 	 $$ = snail_lookup_tnode( snail_cc, $1, $3, "type" );
      }
@@ -8715,7 +8715,7 @@ constant
        snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
 			       NULL, $2, "integer", $1, px );
       }
-  | __INTEGER_CONST __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | __INTEGER_CONST module_list __COLON_COLON __IDENTIFIER
       {
        snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
 			       $2, $4, "integer", $1, px );
@@ -8730,7 +8730,7 @@ constant
        snail_compile_constant( snail_cc, TS_FLOAT_SUFFIX,
 			       NULL, $2, "real", $1, px );
       }
-  | __REAL_CONST __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | __REAL_CONST module_list __COLON_COLON __IDENTIFIER
       {
        snail_compile_constant( snail_cc, TS_FLOAT_SUFFIX,
 			       $2, $4, "real", $1, px );
@@ -8745,7 +8745,7 @@ constant
        snail_compile_constant( snail_cc, TS_STRING_SUFFIX,
 			       NULL, $2, "string", $1, px );
       }
-  | __STRING_CONST __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | __STRING_CONST module_list __COLON_COLON __IDENTIFIER
       {
        snail_compile_constant( snail_cc, TS_STRING_SUFFIX,
 			       $2, $4, "string", $1, px );
@@ -8755,7 +8755,7 @@ constant
        snail_compile_enumeration_constant( snail_cc, NULL, $1, $2, px );
       }
 
-  | __IDENTIFIER  __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | __IDENTIFIER module_list __COLON_COLON __IDENTIFIER
       {
        snail_compile_enumeration_constant( snail_cc, $2, $1, $4, px );
       }
@@ -8774,7 +8774,7 @@ constant
 	}
       }
 
-  | _CONST __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | _CONST module_list __COLON_COLON __IDENTIFIER
       {
 	DNODE *const_dnode = snail_lookup_constant( snail_cc, $2, $4,
 						    "constant" );
@@ -8799,7 +8799,7 @@ constant
       }
 
   | _CONST '(' constant_expression ')'
-    __IDENTIFIER __COLON_COLON __IDENTIFIER
+    module_list __COLON_COLON __IDENTIFIER
       {
 	  snail_compile_multitype_const_value( snail_cc, &$3, $5, $7, px );
       }
@@ -9101,14 +9101,9 @@ function_header
 	}
   ;
 
-interface_list
-  : __IDENTIFIER __COLON_COLON
-  | interface_list __COLON_COLON __IDENTIFIER __COLON_COLON
-  ;
-
 opt_implements_method
   : _IMPLEMENTS __IDENTIFIER
-  | _IMPLEMENTS interface_list __IDENTIFIER
+  | _IMPLEMENTS module_list __COLON_COLON __IDENTIFIER
   | /* empty */
   ;
 
@@ -9234,7 +9229,7 @@ field_designator
     {
 	$$ = compiler_lookup_type_field( snail_cc, NULL, $1, $3 );
     }
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
 	$$ = compiler_lookup_type_field( snail_cc, $1, $3, $5 );
     }
@@ -9282,7 +9277,7 @@ constant_expression
 	}
       }
 
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER
       {
 	DNODE *const_dnode = snail_lookup_constant( snail_cc, $1, $3,
 						    "constant" );
@@ -9304,7 +9299,7 @@ constant_expression
 	  $$ = compiler_make_compile_time_value( snail_cc, NULL, $1, $3, px );
       }
 
-  | __IDENTIFIER __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
+  | module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
       {
 	  $$ = compiler_make_compile_time_value( snail_cc, $1, $3, $5, px );
       }
