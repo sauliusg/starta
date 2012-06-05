@@ -45,9 +45,13 @@ struct TNODE {
 			     this type.*/
     ssize_t vmt_offset;   /* offset of the VMT in the static data area. */
 
-    int interface_nr;     /* number assigned to the interface;
-                             specifies also the interface offset in
-                             the virtual method table. */
+    int interface_nr;     /* For interfaces, a number assigned to the
+                             interface; specifies also the interface
+                             offset in the virtual method table. For
+                             method types, specifies thye number of
+                             the interface that declared this method;
+                             it must be used when computing VMT offset
+                             to call this method. */
 
     ssize_t attr_size;    /* attr_size is the size of the type set via
 			     'type attributes', i.e. specified as
