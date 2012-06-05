@@ -1217,6 +1217,21 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
 }
 
 static int
+tnode_implements_interface( TNODE *class_tnode, TNODE *interface_tnode )
+{
+    TLIST *curr;
+
+    assert( class_tnode );
+    foreach_tlist( curr, class_tnode->interfaces ) {
+        TNODE *curr_tnode = tlist_data( curr );
+        if( curr_tnode == interface_tnode ) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int
 tnode_check_type_identity( TNODE *t1, TNODE *t2,
                            TYPETAB *generic_types,
                            cexception_t *ex )
@@ -1248,6 +1263,9 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
 	return tnode_types_are_identical( t1, t2->base_type,
 					  generic_types, ex );
+    }
+    if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
+	return tnode_implements_interface( t2, t1 );
     }
     if( t1->kind == TK_OPERATOR && t2->kind == TK_OPERATOR ) {
         return

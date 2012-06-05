@@ -1,0 +1,14 @@
+./sl: inputs/err-interfaces004.snl(24,5): ERROR, method g() does not match method g it should implement - new prototype has too little arguments
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(28,5): ERROR, method f() does not match method f it should implement - new prototype has too little return values
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(32,5): ERROR, method sf() does not match method s it should implement - old prototype return value has type string, but new prototype has type int
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(36,5): ERROR, method sg() does not match method s it should implement - new prototype has too many arguments
+    {
+    ^
+./sl: 4 error(s) detected
+

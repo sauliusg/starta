@@ -5234,7 +5234,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     md_array_allocator
 %type <dnode> operator_definition
 %type <dnode> operator_header
-%type <tnode> opt_implements_method
+%type <dnode> opt_implements_method
 %type <i>     function_attributes
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
@@ -9110,8 +9110,6 @@ opt_implements_method
       TNODE *interface_type = tnode_first_interface( containing_class_type );
       DNODE *method_dnode = interface_type ?
           tnode_lookup_method( interface_type, method_name ) : NULL;
-      TNODE *method_type = method_dnode ?
-          dnode_type( method_dnode ) : NULL;
 
       /* printf( ">>> '%s'\n", tnode_name(containing_class_type) ); */
       assert( containing_class_type );
@@ -9125,7 +9123,7 @@ opt_implements_method
               yyerrorf( "this class does not implement any interfaces" );
           }
       } else {
-          if( !method_type ) {
+          if( !method_dnode ) {
               char *interface_name = tnode_name( interface_type );
               if( interface_name ) {
                   yyerrorf( "interface '%s' does not implement method "
@@ -9136,7 +9134,7 @@ opt_implements_method
               }
           }
       }
-      $$ = method_type;
+      $$ = method_dnode;
   }
   | _IMPLEMENTS __IDENTIFIER '.' __IDENTIFIER
   {
@@ -9147,8 +9145,6 @@ opt_implements_method
           tnode_lookup_interface( containing_class_type, interface_name );
       DNODE *method_dnode = interface_type ?
           tnode_lookup_method( interface_type, method_name ) : NULL;
-      TNODE *method_type = method_dnode ?
-          dnode_type( method_dnode ) : NULL;
 
       /* printf( ">>> '%s'\n", tnode_name(containing_class_type) ); */
       assert( containing_class_type );
@@ -9163,12 +9159,12 @@ opt_implements_method
                         interface_name );
           }
       } else {
-          if( !method_type ) {
+          if( !method_dnode ) {
               yyerrorf( "interface '%s' does not declare method "
                         "'%s'", interface_name, method_name );
           }
       }
-      $$ = method_type;
+      $$ = method_dnode;
   }
   | _IMPLEMENTS module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
   {
@@ -9179,8 +9175,6 @@ opt_implements_method
           tnode_lookup_interface( containing_class_type, interface_name );
       DNODE *method_dnode = interface_type ?
           tnode_lookup_method( interface_type, method_name ) : NULL;
-      TNODE *method_type = method_dnode ?
-          dnode_type( method_dnode ) : NULL;
 
       /* printf( ">>> '%s'\n", tnode_name(containing_class_type) ); */
       assert( containing_class_type );
@@ -9195,12 +9189,12 @@ opt_implements_method
                         interface_name );
           }
       } else {
-          if( !method_type ) {
+          if( !method_dnode ) {
               yyerrorf( "interface '%s' does not declare method "
                         "'%s'", interface_name, method_name );
           }
       }
-      $$ = method_type;
+      $$ = method_dnode;
   }
   | /* empty */
   { $$ = NULL; }
@@ -9211,32 +9205,44 @@ method_header
         {
 	    //snail_begin_scope( snail_cc, px );
 	}
-             __IDENTIFIER opt_implements_method '(' argument_list ')'
+    __IDENTIFIER opt_implements_method '(' argument_list ')'
             opt_retval_description_list
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
           DNODE *volatile self_dnode = NULL;
           char *method_name = $5;
-          TNODE *implements_method = $6;
+          DNODE *implements_method = $6;
           DNODE *parameter_list = $8;
           DNODE *return_values = $10;
 	  int is_function = 0;
 
     	  cexception_guard( inner ) {
               self_dnode = new_dnode_name( "self", &inner );
-#if 0
-              dnode_insert_type( self_dnode,
-                                 share_tnode( snail_cc->current_type ));
-#else
-              dnode_insert_type( self_dnode,
-                                 share_tnode( $<tnode>-1 ));
-#endif
+
+              dnode_insert_type( self_dnode, share_tnode( $<tnode>-1 ));
+
               parameter_list = dnode_append( parameter_list, self_dnode );
               self_dnode = NULL;
 
 	      $$ = funct = new_dnode_method( method_name, parameter_list,
                                              return_values, &inner );
+
+              if( implements_method ) {
+                  TNODE *method_type = dnode_type( funct );
+                  TNODE *implements_type = dnode_type( implements_method );
+                  char msg[300];
+
+                  if( !tnode_function_prototypes_match_msg
+                      ( implements_type, method_type, msg, sizeof( msg ))) {
+                      yyerrorf( "method %s() does not match "
+                                "method %s it should implement"
+                                " - %s",
+                                method_name,
+                                dnode_name( implements_method ),
+                                msg );
+                  }
+              }
 
 	      $8 = NULL;
 	      $10 = NULL;
