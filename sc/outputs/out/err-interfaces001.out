@@ -1,0 +1,11 @@
+./sl: inputs/err-interfaces001.snl(27,27): ERROR, interface 'If' does not implement method 'ff'
+    method f implements ff( x : int ) : int
+                          ^
+./sl: inputs/err-interfaces001.snl(31,29): ERROR, interface 'If' does not declare method 'ss'
+    method sf implements If.ss() -> (string)
+                            ^
+./sl: inputs/err-interfaces001.snl(35,37): ERROR, interface 'Ig' does not declare method 'ss'
+    method sg implements Module::Ig.ss() -> (string)
+                                    ^
+./sl: 3 error(s) detected
+

@@ -47,4 +47,7 @@ TNODE* tlist_pop_data( TLIST * volatile *list );
 void tlist_drop( TLIST * volatile *list );
 void tlist_swap( TLIST * volatile *list );
 
+#define foreach_tlist( NODE, LIST ) \
+   for( NODE = LIST; NODE != NULL; NODE = tlist_next( NODE ))
+
 #endif

@@ -1,0 +1,12 @@
+
+use std;
+
+class S {
+    int i;
+    float k;
+
+    method f implements ff( x : int ) : int
+    {
+        return x + 4;
+    }
+}

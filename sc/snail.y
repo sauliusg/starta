@@ -5234,6 +5234,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     md_array_allocator
 %type <dnode> operator_definition
 %type <dnode> operator_header
+%type <tnode> opt_implements_method
 %type <i>     function_attributes
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
@@ -6764,11 +6765,11 @@ interface_identifier_list
       tlist_push_tnode( &interfaces, &$1, px );
       $$ = interfaces;
   }
-  | interface_identifier_list ',' type_identifier
+  |  type_identifier ',' interface_identifier_list
   {
-      share_tnode( $3 );
-      tlist_push_tnode( &$1, &$3, px );
-      $$ = $1;
+      share_tnode( $1 );
+      tlist_push_tnode( &$3, &$1, px );
+      $$ = $3;
   }
   ;
 
@@ -9103,8 +9104,106 @@ function_header
 
 opt_implements_method
   : _IMPLEMENTS __IDENTIFIER
-  | _IMPLEMENTS module_list __COLON_COLON __IDENTIFIER
+  {
+      char *method_name = $2;
+      TNODE *containing_class_type = $<tnode>-6;
+      TNODE *interface_type = tnode_first_interface( containing_class_type );
+      DNODE *method_dnode = interface_type ?
+          tnode_lookup_method( interface_type, method_name ) : NULL;
+      TNODE *method_type = method_dnode ?
+          dnode_type( method_dnode ) : NULL;
+
+      /* printf( ">>> '%s'\n", tnode_name(containing_class_type) ); */
+      assert( containing_class_type );
+      if( !interface_type ) {
+          char *containing_class_name = containing_class_type ?
+              tnode_name( containing_class_type ) : NULL;
+          if( containing_class_name ) {
+              yyerrorf( "class '%s' does not implement any interfaces",
+                        containing_class_name );
+          } else {
+              yyerrorf( "this class does not implement any interfaces" );
+          }
+      } else {
+          if( !method_type ) {
+              char *interface_name = tnode_name( interface_type );
+              if( interface_name ) {
+                  yyerrorf( "interface '%s' does not implement method "
+                            "'%s'", interface_name, method_name );
+              } else {
+                  yyerrorf( "this interface does not declare method "
+                            "'%s'", method_name );
+              }
+          }
+      }
+      $$ = method_type;
+  }
+  | _IMPLEMENTS __IDENTIFIER '.' __IDENTIFIER
+  {
+      char *interface_name = $2;
+      char *method_name = $4;
+      TNODE *containing_class_type = $<tnode>-6;
+      TNODE *interface_type =
+          tnode_lookup_interface( containing_class_type, interface_name );
+      DNODE *method_dnode = interface_type ?
+          tnode_lookup_method( interface_type, method_name ) : NULL;
+      TNODE *method_type = method_dnode ?
+          dnode_type( method_dnode ) : NULL;
+
+      /* printf( ">>> '%s'\n", tnode_name(containing_class_type) ); */
+      assert( containing_class_type );
+      if( !interface_type ) {
+          char *containing_class_name = containing_class_type ?
+              tnode_name( containing_class_type ) : NULL;
+          if( containing_class_name ) {
+              yyerrorf( "class '%s' does not implement interface '%s'",
+                        containing_class_name, interface_name );
+          } else {
+              yyerrorf( "this class does not implement interface '%s'",
+                        interface_name );
+          }
+      } else {
+          if( !method_type ) {
+              yyerrorf( "interface '%s' does not declare method "
+                        "'%s'", interface_name, method_name );
+          }
+      }
+      $$ = method_type;
+  }
+  | _IMPLEMENTS module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
+  {
+      char *interface_name = $4;
+      char *method_name = $6;
+      TNODE *containing_class_type = $<tnode>-6;
+      TNODE *interface_type =
+          tnode_lookup_interface( containing_class_type, interface_name );
+      DNODE *method_dnode = interface_type ?
+          tnode_lookup_method( interface_type, method_name ) : NULL;
+      TNODE *method_type = method_dnode ?
+          dnode_type( method_dnode ) : NULL;
+
+      /* printf( ">>> '%s'\n", tnode_name(containing_class_type) ); */
+      assert( containing_class_type );
+      if( !interface_type ) {
+          char *containing_class_name = containing_class_type ?
+              tnode_name( containing_class_type ) : NULL;
+          if( containing_class_name ) {
+              yyerrorf( "class '%s' does not implement interface '%s'",
+                        containing_class_name, interface_name );
+          } else {
+              yyerrorf( "this class does not implement interface '%s'",
+                        interface_name );
+          }
+      } else {
+          if( !method_type ) {
+              yyerrorf( "interface '%s' does not declare method "
+                        "'%s'", interface_name, method_name );
+          }
+      }
+      $$ = method_type;
+  }
   | /* empty */
+  { $$ = NULL; }
   ;
 
 method_header
@@ -9118,7 +9217,10 @@ method_header
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
           DNODE *volatile self_dnode = NULL;
+          char *method_name = $5;
+          TNODE *implements_method = $6;
           DNODE *parameter_list = $8;
+          DNODE *return_values = $10;
 	  int is_function = 0;
 
     	  cexception_guard( inner ) {
@@ -9133,7 +9235,9 @@ method_header
               parameter_list = dnode_append( parameter_list, self_dnode );
               self_dnode = NULL;
 
-	      $$ = funct = new_dnode_method( $5, parameter_list, $10, &inner );
+	      $$ = funct = new_dnode_method( method_name, parameter_list,
+                                             return_values, &inner );
+
 	      $8 = NULL;
 	      $10 = NULL;
 	      dnode_set_flags( funct, DF_FNPROTO );
