@@ -933,6 +933,21 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, char *src_type_name )
     return conversion;
 }
 
+TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name )
+{
+    TLIST *curr;
+
+    assert( class_tnode );
+    foreach_tlist( curr, class_tnode->interfaces ) {
+        TNODE *curr_tnode = tlist_data( curr );
+        char *curr_name = tnode_name( curr_tnode );
+        if( strcmp( name, curr_name ) == 0 ) {
+            return curr_tnode;
+        }
+    }
+    return NULL;
+}
+
 TNODE *tnode_set_name( TNODE* node, char *name, cexception_t *ex )
 {
     assert( node );
@@ -1808,6 +1823,17 @@ TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces )
     assert( !tnode->interfaces );
     tnode->interfaces = interfaces;
     return tnode;
+}
+
+TNODE *tnode_first_interface( TNODE *class_tnode )
+{
+    assert( class_tnode );
+
+    if( !class_tnode->interfaces ) {
+        return NULL;
+    } else {
+        return tlist_data( class_tnode->interfaces );
+    }
 }
 
 TNODE *tnode_element_type( TNODE *tnode )

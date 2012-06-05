@@ -144,6 +144,8 @@ DNODE *tnode_lookup_operator_nonrecursive( TNODE *tnode, char *operator_name, in
 
 DNODE *tnode_lookup_conversion( TNODE *tnode, char *src_type_name );
 
+TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name );
+
 TNODE *tnode_convert_to_element_type( TNODE *tnode );
 
 TNODE *share_tnode( TNODE* node );
@@ -204,6 +206,7 @@ DNODE *tnode_methods( TNODE *tnode );
 TNODE *tnode_base_type( TNODE *tnode );
 TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type );
 TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces );
+TNODE *tnode_first_interface( TNODE *class_tnode );
 TNODE *tnode_element_type( TNODE *tnode );
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type );
 TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type );

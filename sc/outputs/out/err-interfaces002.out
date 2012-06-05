@@ -1,0 +1,11 @@
+./sl: inputs/err-interfaces002.snl(23,29): ERROR, class 'S' does not implement interface 'Igg'
+    method g implements Igg.g( x :  int ) : int
+                            ^
+./sl: inputs/err-interfaces002.snl(31,30): ERROR, class 'S' does not implement interface 'Iff'
+    method sf implements Iff.ss() -> (string)
+                             ^
+./sl: inputs/err-interfaces002.snl(35,38): ERROR, class 'S' does not implement interface 'Igg'
+    method sg implements Module::Igg.ss() -> (string)
+                                     ^
+./sl: 3 error(s) detected
+
