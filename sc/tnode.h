@@ -154,10 +154,12 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src );
 
 TNODE *tnode_set_name( TNODE* node, char *name, cexception_t *ex );
 TNODE *tnode_set_suffix( TNODE* node, const char *suffix, cexception_t *ex );
+TNODE *tnode_set_interface_nr( TNODE* node, ssize_t nr );
 char *tnode_name( TNODE *tnode );
 char *tnode_suffix( TNODE *tnode );
 ssize_t tnode_size( TNODE *tnode );
 ssize_t tnode_number_of_references( TNODE *tnode );
+ssize_t tnode_interface_number( TNODE *tnode );
 
 const char * tnode_kind_name( TNODE * );
 

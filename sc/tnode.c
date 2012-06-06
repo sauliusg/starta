@@ -800,7 +800,15 @@ TNODE *tnode_finish_interface( TNODE * volatile node,
                                ssize_t interface_nr,
 			       cexception_t *ex )
 {
+    DNODE *curr_method;
+
     node->interface_nr = interface_nr;
+
+    foreach_dnode( curr_method, node->methods ) {
+        TNODE *curr_method_type = dnode_type( curr_method );
+        curr_method_type->interface_nr = interface_nr;
+    }
+
     return 
         tnode_finish_struct_or_class( node, TK_INTERFACE, ex );
 }
@@ -964,6 +972,14 @@ TNODE *tnode_set_suffix( TNODE* node, const char *suffix, cexception_t *ex )
     return node;
 }
 
+TNODE *tnode_set_interface_nr( TNODE* node, ssize_t nr )
+{
+    assert( node );
+    assert( node->interface_nr == 0 );
+    node->interface_nr = nr;
+    return node;
+}
+
 char *tnode_name( TNODE *tnode )
 {
     assert( tnode );
@@ -986,6 +1002,12 @@ ssize_t tnode_number_of_references( TNODE *tnode )
 {
     assert( tnode );
     return tnode->nrefs;
+}
+
+ssize_t tnode_interface_number( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->interface_nr;
 }
 
 type_kind_t tnode_kind( TNODE *tnode ) { assert( tnode ); return tnode->kind; }
