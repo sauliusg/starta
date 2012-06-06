@@ -9241,6 +9241,15 @@ method_header
                                 method_name,
                                 dnode_name( implements_method ),
                                 msg );
+                  } else {
+                      ssize_t method_offset = dnode_offset( implements_method );
+                      TNODE *interface_method_type = dnode_type( implements_method );
+                      TNODE *implemented_method_type = dnode_type( funct );
+                      ssize_t interface_nr = interface_method_type ?
+                          tnode_interface_number( interface_method_type ) : -1;
+
+                      dnode_set_offset( funct, method_offset );
+                      tnode_set_interface_nr( implemented_method_type, interface_nr );
                   }
               }
 
