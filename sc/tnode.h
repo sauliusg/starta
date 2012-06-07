@@ -160,6 +160,7 @@ char *tnode_suffix( TNODE *tnode );
 ssize_t tnode_size( TNODE *tnode );
 ssize_t tnode_number_of_references( TNODE *tnode );
 ssize_t tnode_interface_number( TNODE *tnode );
+ssize_t tnode_max_interface( TNODE *class_descr );
 
 const char * tnode_kind_name( TNODE * );
 

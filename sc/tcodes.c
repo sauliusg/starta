@@ -1092,9 +1092,12 @@ int DUMPVMT( INSTRUCTION_FN_ARGS )
 	    printf( "NUMBER OF INTERFCES = %d\n", itable[i] );
 	    continue;
 	}
+
+	printf( "INTERFACE[%d]: vmt offset = %d\n", i, itable[i] );
+        if( itable[i] == 0 ) continue;
+
 	vtable = (ssize_t*)(istate.static_data + itable[i]);
 	vm_nr = vtable[0];
-	printf( "INTERFACE[%d]: vmt offset = %d\n", i, itable[i] );
 	for( j = 0; j <= vm_nr; j++ ) {
 	    printf( "VMT[%d]: %d\n", j, vtable[j] );
 	}

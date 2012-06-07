@@ -1106,9 +1106,9 @@ static void snail_emit_function_call( SNAIL_COMPILER *cc,
 	} else if( fn_tnode && tnode_kind( fn_tnode ) == TK_METHOD ) {
 	    char *fn_name = dnode_name( function );
 	    ssize_t fn_address = dnode_offset( function );
-	    ssize_t zero = 0;
+	    ssize_t interface_nr = tnode_interface_number( fn_tnode );
 	    snail_emit( cc, ex, "\tceeN\n", VCALL,
-			&zero, &fn_address, fn_name );
+			&interface_nr, &fn_address, fn_name );
 	} else {
 	    char *fn_name = dnode_name( function );
 	    ssize_t fn_address = dnode_offset( function );
@@ -5016,62 +5016,161 @@ static ssize_t snail_compile_multivalue_function_call( SNAIL_COMPILER *cc,
     return rval_nr;
 }
 
+/*
+
+             <--- ssize_t --->
+             alloccell_t:
+             +...............+
+             |               |
+             | ...           |
+             +---------------+
+             | vmt_address   |>-\
+             +---------------+  |
+                                |
+VMT layout:                     |
+                                |
+itable[]:                       |
+---------                       |
+             +---------------+  |
+vmt_address: | n_interfaces  |<-/
+             +---------------+
+             |class VMT offs.|
+             +---------------+
+             |i-face 1 VMT o.|>-\
+             +---------------+  |
+             |i-face 2 VMT o.|  |
+             +---------------+  |
+             |               |  |
+             | ...           |  |
+             +---------------+  |
+             |i-face n VMT o.|  |
+             +---------------+  |
+                                |
+vtable[]:                       |
+---------                       |
+static data +                   |
+i-face 1 VMT offs.:             |
+             +---------------+  |
+             | nr of methods |<-/
+             +---------------+
+             | method 1 offs.|
+             +---------------+
+             |               |
+             | ...           |
+             +---------------+
+             | method k offs.| k = nr of methods 
+             +---------------+
+
+*/
+
 static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 						   TNODE *class_descr,
 						   cexception_t *ex )
 {
-    ssize_t vmt_address, vmt_start;
+    ssize_t vmt_address, vmt_start, i;
     ssize_t max_vmt_entry;
+    ssize_t interface_nr;
+    ssize_t *itable; /* interface VMT offset table */
+    ssize_t *vtable; /* a VMT table with method offsets*/
     DNODE *volatile method;
     TNODE *volatile base;
 
     assert( class_descr );
 
+    if( tnode_kind( class_descr ) == TK_INTERFACE ) {
+        return;
+    }
+
     max_vmt_entry = tnode_max_vmt_offset( class_descr );
+    interface_nr = tnode_max_interface( class_descr );
 
     compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t), ex );
 
-    vmt_address = compiler_assemble_static_ssize_t( cc, 1, ex );
+    vmt_address = compiler_assemble_static_ssize_t( cc, 1 + interface_nr, ex );
+
+    itable = (ssize_t*)(cc->static_data + vmt_address);
 
     tnode_set_vmt_offset( class_descr, vmt_address );
 
-    compiler_assemble_static_ssize_t( cc, vmt_address + 2*sizeof(ssize_t), ex );
+    compiler_assemble_static_ssize_t( cc, vmt_address +
+                                      (2+interface_nr) * sizeof(ssize_t), ex );
+
+    compiler_assemble_static_data( cc, NULL,
+				   interface_nr * sizeof(ssize_t), ex );
 
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
 
 #if 0
-	    printf( ">>> class '%s', interface table starts at %d, vmt[1] starts at %d\n",
-		    tnode_name( class_descr ),
-		    vmt_address, vmt_start );
+    printf( ">>> class '%s', interface table starts at %d, vmt[1] starts at %d\n",
+            tnode_name( class_descr ),
+            vmt_address, vmt_start );
 #endif
 
     compiler_assemble_static_data( cc, NULL,
-				   max_vmt_entry*sizeof(ssize_t), ex );
+				   max_vmt_entry * sizeof(ssize_t), ex );
+
+    /* Temporarily, let's store */
+    foreach_tnode_base_class( base, class_descr ) {
+	DNODE *methods = tnode_methods( base );
+	foreach_dnode( method, methods ) {
+            TNODE *method_type = dnode_type( method );
+	    ssize_t method_index = dnode_offset( method );
+            ssize_t method_interface = method_type ?
+                tnode_interface_number( method_type ) : 0;
+            if( method_interface > 0 &&
+                itable[method_interface+1] < method_index ) {
+                itable[method_interface+1] = method_index;
+            }
+        }
+    }
+
+    /* Now, let's allocate VMTs for methods and replace itable[]
+       entries with table offsets: */
+    for( i = 2; i <= interface_nr+1; i++ ) {
+        ssize_t method_count = itable[i];
+        itable[i] = compiler_assemble_static_data( cc, NULL,
+                                                   (method_count + 1) *
+                                                   sizeof(ssize_t), ex );
+        ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
+    } 
 
     foreach_tnode_base_class( base, class_descr ) {
 	DNODE *methods = tnode_methods( base );
 	foreach_dnode( method, methods ) {
 	    ssize_t method_index = dnode_offset( method );
 	    ssize_t method_address = dnode_ssize_value( method );
+            TNODE *method_type = dnode_type( method );
+            ssize_t method_interface = method_type ?
+                tnode_interface_number( method_type ) : -1;
 	    ssize_t compiled_addr;
 #if 0
-	    printf( ">>> class '%s', method '%s', offset %d, address %d\n",
-		    tnode_name( base ), dnode_name( method ),
+	    printf( ">>> class '%s', interface %d, method '%s', offset %d, address %d\n",
+		    tnode_name( base ), method_interface, dnode_name( method ),
 		    dnode_offset( method ), dnode_ssize_value( method ));
 #endif
-	    compiled_addr = 
-		*(ssize_t*)
-		(&cc->static_data[vmt_start + method_index * sizeof(ssize_t)]);
-	    if( method_index != 0 && method_address != 0 && compiled_addr == 0 ) {
-		compiler_patch_static_data( cc, /* void *data: */ &method_address,
-					    /* ssize_t data_size: */
-					    sizeof(method_address),
-					    /* ssize_t offset: */
-					    vmt_start +
-					    method_index * sizeof(ssize_t),
-					    ex );
-	    }
+
+            vtable = (ssize_t*)(cc->static_data + itable[method_interface+1]);
+            if( vtable[method_index] == 0 ) {
+                vtable[method_index] = method_address;
+            }
+
+#if 0
+            if( method_interface == 0 ) {
+                compiled_addr =
+                    *(ssize_t*)
+                    (&cc->static_data[vmt_start + method_index * sizeof(ssize_t)]);
+                if( method_index != 0 && method_address != 0 && compiled_addr == 0 ) {
+                    compiler_patch_static_data( cc, /* void *data: */ &method_address,
+                                                /* ssize_t data_size: */
+                                                sizeof(method_address),
+                                                /* ssize_t offset: */
+                                                vmt_start +
+                                                method_index * sizeof(ssize_t),
+                                                ex );
+                }
+            }
+#endif
 	}
     }
 }
@@ -9250,6 +9349,8 @@ method_header
 
                       dnode_set_offset( funct, method_offset );
                       tnode_set_interface_nr( implemented_method_type, interface_nr );
+                      /* printf( ">>> interface = %d, method = %d\n",
+                         interface_nr, method_offset ); */
                   }
               }
 
