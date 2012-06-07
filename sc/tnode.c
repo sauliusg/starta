@@ -1010,6 +1010,24 @@ ssize_t tnode_interface_number( TNODE *tnode )
     return tnode->interface_nr;
 }
 
+ssize_t tnode_max_interface( TNODE *class_descr )
+{
+    ssize_t max_interface = 0;
+    TLIST *curr;
+
+    assert( class_descr );
+
+    foreach_tlist( curr, class_descr->interfaces ) {
+        TNODE *curr_type = tlist_data( curr );
+        ssize_t interface_nr = tnode_interface_number( curr_type );
+        if( max_interface < interface_nr ) {
+            max_interface = interface_nr;
+        }
+    }
+
+    return max_interface;
+}
+
 type_kind_t tnode_kind( TNODE *tnode ) { assert( tnode ); return tnode->kind; }
 
 DNODE *tnode_args( TNODE* tnode )
@@ -1678,6 +1696,10 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
         tnode_check_method_does_not_exist( tnode, tnode->methods, method );
 
     if( !existing_method ) {
+        TNODE *method_type = method ? dnode_type( method ) : NULL;
+        ssize_t method_interface_nr = method_type ?
+            tnode_interface_number( method_type ) : 0;
+
 	inherited_method = tnode->base_type ? 
 	    tnode_lookup_method( tnode->base_type, method_name ) : NULL;
 
@@ -1688,16 +1710,19 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 			  "inherted definition:\n%s", dnode_name( method ),
 			  msg );
 	    }
-
 	    method_offset = dnode_offset( inherited_method );
 	} else {
-	    tnode->max_vmt_offset++;
-	    method_offset = tnode->max_vmt_offset;
+            if( method_interface_nr == 0 ) {
+                tnode->max_vmt_offset++;
+                method_offset = tnode->max_vmt_offset;
+            }
 	}
 
         tnode_set_flags( tnode, TF_IS_REF );
 	tnode->methods = dnode_append( method, tnode->methods );
-	dnode_set_offset( method, method_offset );
+        if( method_interface_nr == 0 ) {
+            dnode_set_offset( method, method_offset );
+        }
     } else {
  	if( !dnode_function_prototypes_match_msg( existing_method, method,
 						  msg, sizeof(msg))) {

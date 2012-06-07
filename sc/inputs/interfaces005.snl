@@ -11,20 +11,6 @@ interface Ig {
     method s() : string;
 }
 
-interface Iq {
-    method x();
-}
-
-interface Ir {
-    method y();
-    method t();
-}
-
-interface Is:Iq  {
-    method z();
-}
-
-
 class S implements If, Ig {
     int i;
     float k;
@@ -62,18 +48,11 @@ class S implements If, Ig {
     }
 }
 
-. "S.size = ", const(S.size)/const(.stackcellsize);
-
 var s = new S;
 
 . s->sf();
 . s->sg();
 . s->s();
-
-. const(S.sf.offset);
-. const(S.sg.offset);
-
-bytecode { LD %s DUMPVMT }
 
 . "here";
 
