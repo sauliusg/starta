@@ -5088,18 +5088,25 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 
     vmt_address = compiler_assemble_static_ssize_t( cc, 1 + interface_nr, ex );
 
-    itable = (ssize_t*)(cc->static_data + vmt_address);
-
     tnode_set_vmt_offset( class_descr, vmt_address );
 
+#if 1
     compiler_assemble_static_ssize_t( cc, vmt_address +
                                       (2+interface_nr) * sizeof(ssize_t), ex );
-
     compiler_assemble_static_data( cc, NULL,
 				   interface_nr * sizeof(ssize_t), ex );
+#else
+    compiler_assemble_static_data( cc, NULL,
+				   (1+interface_nr) * sizeof(ssize_t), ex );
+#endif
 
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
+
+    assert( vmt_start == vmt_address + (2+interface_nr) * sizeof(ssize_t) );
+
+    itable = (ssize_t*)(cc->static_data + vmt_address);
+    itable[1] = vmt_start;
 
 #if 0
     printf( ">>> class '%s', interface table starts at %d, vmt[1] starts at %d\n",
@@ -5111,6 +5118,7 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 				   max_vmt_entry * sizeof(ssize_t), ex );
 
     /* Temporarily, let's store */
+    itable = (ssize_t*)(cc->static_data + vmt_address);
     foreach_tnode_base_class( base, class_descr ) {
 	DNODE *methods = tnode_methods( base );
 	foreach_dnode( method, methods ) {
@@ -5132,9 +5140,11 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
         itable[i] = compiler_assemble_static_data( cc, NULL,
                                                    (method_count + 1) *
                                                    sizeof(ssize_t), ex );
+        itable = (ssize_t*)(cc->static_data + vmt_address);
         ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
     } 
 
+    itable = (ssize_t*)(cc->static_data + vmt_address);
     foreach_tnode_base_class( base, class_descr ) {
 	DNODE *methods = tnode_methods( base );
 	foreach_dnode( method, methods ) {
@@ -5150,10 +5160,12 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 		    dnode_offset( method ), dnode_ssize_value( method ));
 #endif
 
+#if 1
             vtable = (ssize_t*)(cc->static_data + itable[method_interface+1]);
             if( vtable[method_index] == 0 ) {
                 vtable[method_index] = method_address;
             }
+#endif
 
 #if 0
             if( method_interface == 0 ) {
