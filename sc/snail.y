@@ -5117,7 +5117,11 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
     compiler_assemble_static_data( cc, NULL,
 				   max_vmt_entry * sizeof(ssize_t), ex );
 
-    /* Temporarily, let's store */
+    /* Temporarily, let's store method counts instead of interface vmt
+       offsets in the first layer of the VMT (the itable). Later, we
+       will allocate VMT's for each interface, for exactely the stored
+       number of methods (plus one entry for the method count), and
+       replace the method counts here with the VMT offsets. */
     itable = (ssize_t*)(cc->static_data + vmt_address);
     foreach_tnode_base_class( base, class_descr ) {
 	DNODE *methods = tnode_methods( base );
