@@ -135,6 +135,8 @@ typedef struct {
 				compiled. NOTE! this field must not be
 				deleted in delete_compiler() */
 
+    DLIST *current_function_stack;
+
     TNODE *current_type;     /* Type declaration that is currently
 				being compiled. NOTE! this field must
 				not be deleted in delete_compiler() */
@@ -246,6 +248,8 @@ static void delete_snail_compiler( SNAIL_COMPILER *c )
 
         delete_vartab( c->initialised_references );
 	delete_stlist( c->initialised_ref_symtab_stack );
+
+        delete_dlist( c->current_function_stack );
 
         freex( c );
     }
@@ -9035,6 +9039,9 @@ function_or_operator_start
 	  TNODE *function_type = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
 
+          dlist_push_dnode( &snail_cc->current_function_stack, 
+                            &snail_cc->current_function, px );
+
 	  snail_cc->current_function = funct;
 
 	  dnode_reset_flags( funct, DF_FNPROTO );
@@ -9066,7 +9073,8 @@ function_or_operator_start
 	  }
 	  cexception_catch {
 	      delete_dnode( funct );
-	      snail_cc->current_function = NULL;
+	      snail_cc->current_function =
+                  dlist_pop_data( &snail_cc->current_function_stack );
 	      cexception_reraise( inner, px );
 	  }
 	  if( !is_bytecode ) {
@@ -9095,7 +9103,8 @@ function_or_operator_end
 	  snail_compile_main_thrcode( snail_cc );
 
 	  snail_end_scope( snail_cc, px );
-	  snail_cc->current_function = NULL;
+	  snail_cc->current_function = 
+              dlist_pop_data( &snail_cc->current_function_stack );
 	}
 ;
 
