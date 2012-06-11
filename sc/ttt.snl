@@ -1,0 +1,27 @@
+
+use std;
+
+interface UnDoable {
+    method undoable_do( x : int );
+    method undo() : int;
+}
+
+class S implements UnDoable {
+    int n;
+    int buffer[];
+
+    method name(): string
+    {
+        return "This is t() of S"
+    }
+
+    method undoable_do implements UnDoable.undoable_do( int x )
+    {
+        
+    }
+    method undo implements UnDoable.undo() : int
+    {
+        return self.n
+    }
+}
+
