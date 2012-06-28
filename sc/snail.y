@@ -267,9 +267,10 @@ static SNAIL_COMPILER *new_snail_compiler( char *filename,
         cc->main_thrcode = new_thrcode( &inner );
         cc->function_thrcode = new_thrcode( &inner );
 
-	cc->thrcode = cc->function_thrcode;
+	/* cc->thrcode = cc->function_thrcode; */
+	cc->thrcode = NULL;
 
-	thrcode_set_immediate_printout( cc->thrcode, 1 );
+	thrcode_set_immediate_printout( cc->function_thrcode, 1 );
 
 	cc->vartab = new_vartab( &inner );
 	cc->consts = new_vartab( &inner );
@@ -3487,12 +3488,14 @@ static void snail_fixup_function_calls( SNAIL_COMPILER *cc, DNODE *funct )
 static void snail_compile_function_thrcode( SNAIL_COMPILER *cc )
 {
     assert( cc );
+    assert( cc->thrcode != cc->function_thrcode );
     cc->thrcode = cc->function_thrcode;
 }
 
 static void snail_compile_main_thrcode( SNAIL_COMPILER *cc )
 {
     assert( cc );
+    assert( cc->thrcode != cc->main_thrcode );
     cc->thrcode = cc->main_thrcode;
 }
 
