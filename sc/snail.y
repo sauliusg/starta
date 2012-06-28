@@ -3063,20 +3063,6 @@ static ssize_t compiler_assemble_static_data( SNAIL_COMPILER *cc,
     return old_size;
 }
 
-static void compiler_patch_static_data( SNAIL_COMPILER *cc,
-					void *data,
-					ssize_t data_size,
-					ssize_t offset,
-					cexception_t *ex )
-{
-    assert( cc );
-    assert( offset > 0 );
-    assert( offset + data_size <= cc->static_data_size );
-    assert( data );
-
-    memcpy( cc->static_data + offset, data, data_size );
-}
-
 #define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((ssize_t)(N)) % (lim)) % (lim) )
 
 static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
@@ -5164,8 +5150,8 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
             TNODE *method_type = dnode_type( method );
             ssize_t method_interface = method_type ?
                 tnode_interface_number( method_type ) : -1;
-	    ssize_t compiled_addr;
 #if 0
+	    ssize_t compiled_addr;
 	    printf( ">>> class '%s', interface %d, method '%s', offset %d, address %d\n",
 		    tnode_name( base ), method_interface, dnode_name( method ),
 		    dnode_offset( method ), dnode_ssize_value( method ));
