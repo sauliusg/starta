@@ -1,0 +1,25 @@
+
+use std;
+
+function f( double x ) : double
+{
+    pragma double;
+    return 2 * x / 3;
+}
+
+function g( float x ) : float
+{
+    pragma float;
+    return 2 * x / 3;
+}
+
+function h( long x ) : long
+{
+    pragma long;
+    return 2 * x / 3;
+}
+
+. f(6);
+. g(6);
+. h(6);
+
