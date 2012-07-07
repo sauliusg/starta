@@ -6916,13 +6916,18 @@ struct_description
 ;
 
 class_description
-  : opt_null_type_designator _CLASS struct_or_class_description_body
+  : opt_null_type_designator _CLASS 
     {
-        compiler_compile_virtual_method_table( snail_cc, $3, px );
-        $$ = tnode_finish_class( $3, px );
+        snail_begin_subscope( snail_cc, px );
+    }
+    struct_or_class_description_body
+    {
+        compiler_compile_virtual_method_table( snail_cc, $4, px );
+        $$ = tnode_finish_class( $4, px );
         if( $1 ) {
             tnode_set_flags( $$, TF_NON_NULL );
         }
+        snail_end_subscope( snail_cc, px );
     }
 ;
 
