@@ -5282,6 +5282,7 @@ static cexception_t *px; /* parser exception */
 %token _OPERATOR
 %token _PACK
 %token _PACKAGE
+%token _PRAGMA
 %token _PROCEDURE
 %token _PROGRAM
 %token _RAISE
@@ -5545,6 +5546,7 @@ undelimited_simple_statement
   | use_statement
        { compiler_use_package( snail_cc, $1, px ); }
   | load_library_statement
+  | pragma_statement
   | bytecode_statement
   | function_definition
   | operator_definition
@@ -5775,6 +5777,23 @@ load_library_statement
 include_statement
    : _INCLUDE __STRING_CONST
        { $$ = $2; }
+   ;
+
+pragma_statement
+   : _PRAGMA type_identifier
+   {
+       TNODE *default_type = $2;
+
+       typetab_override_suffix( snail_cc->typetab, /*name*/ "",
+                                TS_INTEGER_SUFFIX,
+                                share_tnode( default_type ),
+                                px );
+
+       typetab_override_suffix( snail_cc->typetab, /*name*/ "",
+                                TS_FLOAT_SUFFIX, 
+                                share_tnode( default_type ),
+                                px );
+   }
    ;
 
 program_statement

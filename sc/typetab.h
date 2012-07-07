@@ -40,6 +40,10 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
 			      type_suffix_t suffix, TNODE *tnode,
 			      cexception_t *ex );
 
+TNODE *typetab_override_suffix( TYPETAB *table, const char *name,
+                                type_suffix_t suffix, TNODE *tnode,
+                                cexception_t *ex );
+
 TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
 			      type_suffix_t suffix );
 

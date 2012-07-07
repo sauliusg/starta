@@ -108,6 +108,34 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
     return ret;
 }
 
+TNODE *typetab_override_suffix( TYPETAB *table, const char *name,
+                                type_suffix_t suffix, TNODE *tnode,
+                                cexception_t *ex )
+{
+    cexception_t inner;
+    TYPE_NODE * volatile node = NULL;
+    TNODE *ret = NULL;
+
+    assert( table );
+    assert( name );
+
+    cexception_guard( inner ) {
+        node = new_type_node( ex );
+        node->tnode = tnode;
+        node->suffix = suffix;
+        node->scope = table->current_scope;
+        node->subscope = table->current_subscope;
+        node->name  = strdupx( (char*)name, &inner );
+        node->next  = table->node;
+        table->node = node;
+    }
+    cexception_catch {
+        delete_type_node( node );
+	cexception_reraise( inner, ex );
+    }
+    return ret;
+}
+
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
 {
     TYPE_NODE *curr;

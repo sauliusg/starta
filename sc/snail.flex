@@ -236,6 +236,7 @@ operator   { MARK; return _OPERATOR; }
 or         { MARK; return _OR; }
 pack       { MARK; return _PACK; }
 package    { MARK; return _PACKAGE; }
+pragma     { MARK; return _PRAGMA; }
 procedure  { MARK; return _PROCEDURE; }
 program    { MARK; return _PROGRAM; }
 raise      { MARK; return _RAISE; }
