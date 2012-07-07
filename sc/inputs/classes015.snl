@@ -53,4 +53,4 @@ var s = new S;
 
 s->tell_name();
 s->quack();
-// s->foo();
+s->foo();

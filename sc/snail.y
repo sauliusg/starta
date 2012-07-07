@@ -99,6 +99,10 @@ typedef struct {
                           when generating nested control
                           structures. */
 
+    int nested_function_level; /* Used to keep track of the nested
+                                  code, to generate the neccessary
+                                  jump-arounds. */
+
     char *static_data;
     ssize_t static_data_size;
     VARTAB *vartab;   /* declared variables, with scopes */
@@ -191,7 +195,7 @@ typedef struct {
     DNODE *current_package; /* this field must not be deleted when deleting
 			       COMPILER */
 
-    /* track whhich structure non-null reference fields are
+    /* track which structure non-null reference fields are
        initialised: */
 
     VARTAB *initialised_references;
@@ -5064,7 +5068,6 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
     ssize_t max_vmt_entry;
     ssize_t interface_nr;
     ssize_t *itable; /* interface VMT offset table */
-    ssize_t *vtable; /* a VMT table with method offsets*/
     DNODE *volatile method;
     TNODE *volatile base;
 
@@ -5140,6 +5143,19 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
         itable = (ssize_t*)(cc->static_data + vmt_address);
         ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
     } 
+}
+
+static void compiler_fill_virtual_method_table( SNAIL_COMPILER *cc,
+                                                TNODE *class_descr,
+                                                cexception_t *ex )
+{
+    ssize_t vmt_address; /* , vmt_start, i; */
+    ssize_t *itable; /* interface VMT offset table */
+    ssize_t *vtable; /* a VMT table with method offsets*/
+    DNODE *volatile method;
+    TNODE *volatile base;
+
+    vmt_address = tnode_vmt_offset( class_descr );
 
     itable = (ssize_t*)(cc->static_data + vmt_address);
     foreach_tnode_base_class( base, class_descr ) {
@@ -6895,6 +6911,7 @@ class_description
   : opt_null_type_designator _CLASS struct_or_class_description_body
     {
         compiler_compile_virtual_method_table( snail_cc, $3, px );
+        compiler_fill_virtual_method_table( snail_cc, $3, px );
         $$ = tnode_finish_class( $3, px );
         if( $1 ) {
             tnode_set_flags( $$, TF_NON_NULL );
@@ -7525,6 +7542,7 @@ class_declaration
     {
  	tnode_finish_class( $5, px );
 	compiler_compile_virtual_method_table( snail_cc, $5, px );
+	compiler_fill_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
 	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
@@ -7542,6 +7560,7 @@ class_declaration
         }
  	tnode_finish_class( $6, px );
 	compiler_compile_virtual_method_table( snail_cc, $6, px );
+	compiler_fill_virtual_method_table( snail_cc, $6, px );
 	snail_end_scope( snail_cc, px );
 	snail_compile_type_declaration( snail_cc, $6, px );
 	snail_cc->current_type = NULL;
@@ -7570,6 +7589,7 @@ interface_declaration
     {
  	tnode_finish_interface( $5, ++snail_cc->last_interface_number, px );
 	compiler_compile_virtual_method_table( snail_cc, $5, px );
+	compiler_fill_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
 	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
@@ -9095,30 +9115,14 @@ function_or_operator_end
 
           assert( snail_cc->thrcode != snail_cc->main_thrcode );
 
-          if( snail_cc->thrcode == snail_cc->function_thrcode ) {
+          if( snail_cc->nested_function_level == 0 ) {
               snail_fixup_function_calls( snail_cc, funct );
-
               snail_compile_main_thrcode( snail_cc );
               snail_fixup_function_calls( snail_cc, funct );
           } else {
-              snail_swap_thrcodes( snail_cc );
-              snail_merge_top_thrcodes( snail_cc, px );
-              /* So far, only methods are supposted to be in the
-                 nedsted functions, and methods are not called
-                 directoly but via the virtual methpd tables
-                 (VMT). Thus, function fixups for them should not be
-                 neccessary. Operators will be in-lined, again not
-                 necessitating the back-patches for the previous
-                 calls. The only problem might be pointer to
-                 operators, but these are not yet implemented
-                 anyway... */
-              {
-                  TNODE *fn_tnode = funct ? dnode_type( funct ) : NULL;
-                  type_kind_t fn_kind =
-                      fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
-                  assert( fn_kind == TK_METHOD || fn_kind == TK_OPERATOR );
-              }
-              /* snail_fixup_function_calls( snail_cc, funct ); */
+              snail_cc->nested_function_level --;
+              assert( snail_cc->thrcode == snail_cc->function_thrcode );
+              snail_fixup_here( snail_cc );
           }
 
 	  snail_end_scope( snail_cc, px );
@@ -9190,7 +9194,13 @@ function_code_start
       if( snail_cc->thrcode == snail_cc->main_thrcode ) {
           snail_compile_function_thrcode( snail_cc );
       } else {
-          snail_push_thrcode( snail_cc, px );
+          /* generate a jump-around for the code of the nested
+             function -- ugly but simple to implement, so we do it
+             like this for now:*/
+          ssize_t zero = 0;
+          snail_push_relative_fixup( snail_cc, px );
+          snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+          snail_cc->nested_function_level++;
       }
       if( thrcode_debug_is_on()) {
 	  const char *currentLine = snail_flex_current_line();
