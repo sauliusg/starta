@@ -9103,7 +9103,22 @@ function_or_operator_end
           } else {
               snail_swap_thrcodes( snail_cc );
               snail_merge_top_thrcodes( snail_cc, px );
-              snail_fixup_function_calls( snail_cc, funct );
+              /* So far, only methods are supposted to be in the
+                 nedsted functions, and methods are not called
+                 directoly but via the virtual methpd tables
+                 (VMT). Thus, function fixups for them should not be
+                 neccessary. Operators will be in-lined, again not
+                 necessitating the back-patches for the previous
+                 calls. The only problem might be pointer to
+                 operators, but these are not yet implemented
+                 anyway... */
+              {
+                  TNODE *fn_tnode = funct ? dnode_type( funct ) : NULL;
+                  type_kind_t fn_kind =
+                      fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
+                  assert( fn_kind == TK_METHOD || fn_kind == TK_OPERATOR );
+              }
+              /* snail_fixup_function_calls( snail_cc, funct ); */
           }
 
 	  snail_end_scope( snail_cc, px );
