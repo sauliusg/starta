@@ -9093,10 +9093,18 @@ function_or_operator_end
 	      snail_emit( snail_cc, px, "\tc\n", RET );
 	  }
 
-          snail_fixup_function_calls( snail_cc, funct );
+          assert( snail_cc->thrcode != snail_cc->main_thrcode );
 
-	  snail_compile_main_thrcode( snail_cc );
-          snail_fixup_function_calls( snail_cc, funct );
+          if( snail_cc->thrcode == snail_cc->function_thrcode ) {
+              snail_fixup_function_calls( snail_cc, funct );
+
+              snail_compile_main_thrcode( snail_cc );
+              snail_fixup_function_calls( snail_cc, funct );
+          } else {
+              snail_swap_thrcodes( snail_cc );
+              snail_merge_top_thrcodes( snail_cc, px );
+              snail_fixup_function_calls( snail_cc, funct );
+          }
 
 	  snail_end_scope( snail_cc, px );
 	  snail_cc->current_function = 
@@ -9164,7 +9172,11 @@ opt_function_attributes
 function_code_start
   :
     {
-      snail_compile_function_thrcode( snail_cc );
+      if( snail_cc->thrcode == snail_cc->main_thrcode ) {
+          snail_compile_function_thrcode( snail_cc );
+      } else {
+          snail_push_thrcode( snail_cc, px );
+      }
       if( thrcode_debug_is_on()) {
 	  const char *currentLine = snail_flex_current_line();
 	  const char *first_nonblank = currentLine;
