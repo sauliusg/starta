@@ -9039,16 +9039,20 @@ function_or_operator_start
 	      type_kind_t function_kind = function_type ?
 		  tnode_kind( function_type ) : TK_NONE;
 
+#if 1
 	      if( function_kind == TK_METHOD ) {
 		  dnode_set_ssize_value( funct, current_address );
 	      } else {
 		  dnode_set_offset( funct, current_address );
 	      }
+#endif
 
+#if 0
 	      snail_fixup_function_calls( snail_cc, funct );
 	      snail_compile_main_thrcode( snail_cc );
 	      snail_fixup_function_calls( snail_cc, funct );
 	      snail_compile_function_thrcode( snail_cc );
+#endif
 
 	      snail_push_current_address( snail_cc, px );
 
@@ -9089,7 +9093,10 @@ function_or_operator_end
 	      snail_emit( snail_cc, px, "\tc\n", RET );
 	  }
 
+          snail_fixup_function_calls( snail_cc, funct );
+
 	  snail_compile_main_thrcode( snail_cc );
+          snail_fixup_function_calls( snail_cc, funct );
 
 	  snail_end_scope( snail_cc, px );
 	  snail_cc->current_function = 
