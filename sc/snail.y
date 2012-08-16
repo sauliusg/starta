@@ -9060,6 +9060,8 @@ function_or_operator_start
           dlist_push_dnode( &snail_cc->current_function_stack, 
                             &snail_cc->current_function, px );
 
+          snail_push_current_address( snail_cc, px );
+
 	  snail_cc->current_function = funct;
 
 	  dnode_reset_flags( funct, DF_FNPROTO );
@@ -9068,10 +9070,11 @@ function_or_operator_start
 	      type_kind_t function_kind = function_type ?
 		  tnode_kind( function_type ) : TK_NONE;
 
-#if 1
 	      if( function_kind == TK_METHOD ) {
 		  dnode_set_ssize_value( funct, current_address );
-	      } else {
+	      }
+#if 0
+              else {
 		  dnode_set_offset( funct, current_address );
 	      }
 #endif
@@ -9109,13 +9112,18 @@ function_or_operator_end
   :
         {
 	  DNODE *funct = snail_cc->current_function;
+          TNODE *funct_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
+          ssize_t function_entry_address = snail_pop_address( snail_cc, px );
 
 	  if( !is_bytecode ) {
 	      /* patch ENTER command: */
 	      snail_fixup( snail_cc, -snail_cc->local_offset );
 	  }
-
+          
+          if( funct_tnode && tnode_kind( funct_tnode ) != TK_METHOD ) {
+              dnode_set_offset( funct, function_entry_address );
+          }
 	  snail_get_inline_code( snail_cc, funct, px );
 
 	  if( thrcode_last_opcode( snail_cc->thrcode ).fn != RET ) {
