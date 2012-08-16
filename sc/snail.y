@@ -99,10 +99,6 @@ typedef struct {
                           when generating nested control
                           structures. */
 
-    int nested_function_level; /* Used to keep track of the nested
-                                  code, to generate the neccessary
-                                  jump-arounds. */
-
     char *static_data;
     ssize_t static_data_size;
     VARTAB *vartab;   /* declared variables, with scopes */
@@ -3463,7 +3459,7 @@ static void snail_compile_load_variable_address( SNAIL_COMPILER *cc,
     snail_compile_ld( cc, varnode, "lda", LDA, new_tnode_addressof, ex );
 }
 
-static void snail_fixup_function_calls( SNAIL_COMPILER *cc, DNODE *funct )
+static void compiler_fixup_function_calls( THRCODE *tc, DNODE *funct )
 {
     char *name;
     int address;
@@ -3472,7 +3468,7 @@ static void snail_fixup_function_calls( SNAIL_COMPILER *cc, DNODE *funct )
     name = dnode_name( funct );
     address = dnode_offset( funct );
 
-    thrcode_fixup_function_calls( cc->thrcode, name, address );
+    thrcode_fixup_function_calls( tc, name, address );
 }
 
 static void snail_compile_function_thrcode( SNAIL_COMPILER *cc )
@@ -3530,6 +3526,26 @@ static void snail_merge_top_thrcodes( SNAIL_COMPILER *sc, cexception_t *ex )
     thrlist_drop( &sc->thrstack );
     sc->e_stack = 
 	enode_append( elist_pop_data( &sc->saved_estacks ), sc->e_stack );
+}
+
+static void snail_merge_functions_and_top( SNAIL_COMPILER *cc,
+                                           cexception_t *ex )
+{
+    assert( cc );
+    assert( cc->function_thrcode != cc->thrcode );
+    assert( cc->function_thrcode != cc->main_thrcode );
+
+    thrcode_merge( cc->function_thrcode, cc->thrcode, ex );
+
+    delete_thrcode( cc->thrcode );
+
+    cc->thrcode = thrlist_pop_data( &cc->thrstack );
+
+    /* Actually, after function compilation the e-stack of the
+       finished function should be empty, so in fact the following
+       code should instead be an assert()... S.G. */
+    cc->e_stack = 
+	enode_append( elist_pop_data( &cc->saved_estacks ), cc->e_stack );
 }
 
 static void snail_get_inline_code( SNAIL_COMPILER *cc,
@@ -7162,7 +7178,6 @@ struct_operator
   : operator_definition
   | method_definition
   | method_header
-  { snail_compile_main_thrcode( snail_cc ); }
   ;
 
 interface_type_placeholder
@@ -7205,7 +7220,6 @@ interface_operator_list
 
 interface_operator
   : method_header
-  { snail_compile_main_thrcode( snail_cc ); }
   ;
 
 struct_var_declaration
@@ -9054,38 +9068,17 @@ function_or_operator_start
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = $<dnode>0;
-	  TNODE *function_type = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
 
-          dlist_push_dnode( &snail_cc->current_function_stack, 
+          dlist_push_dnode( &snail_cc->current_function_stack,
                             &snail_cc->current_function, px );
 
-          snail_push_current_address( snail_cc, px );
-
 	  snail_cc->current_function = funct;
-
 	  dnode_reset_flags( funct, DF_FNPROTO );
+
+          snail_push_thrcode( snail_cc, px );
+
     	  cexception_guard( inner ) {
-	      ssize_t current_address = thrcode_length( snail_cc->thrcode );
-	      type_kind_t function_kind = function_type ?
-		  tnode_kind( function_type ) : TK_NONE;
-
-	      if( function_kind == TK_METHOD ) {
-		  dnode_set_ssize_value( funct, current_address );
-	      }
-#if 0
-              else {
-		  dnode_set_offset( funct, current_address );
-	      }
-#endif
-
-#if 0
-	      snail_fixup_function_calls( snail_cc, funct );
-	      snail_compile_main_thrcode( snail_cc );
-	      snail_fixup_function_calls( snail_cc, funct );
-	      snail_compile_function_thrcode( snail_cc );
-#endif
-
 	      snail_push_current_address( snail_cc, px );
 
 	      if( !is_bytecode ) {
@@ -9114,34 +9107,31 @@ function_or_operator_end
 	  DNODE *funct = snail_cc->current_function;
           TNODE *funct_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
-          ssize_t function_entry_address = snail_pop_address( snail_cc, px );
+          ssize_t function_entry_address = thrcode_length( snail_cc->function_thrcode );
 
 	  if( !is_bytecode ) {
 	      /* patch ENTER command: */
 	      snail_fixup( snail_cc, -snail_cc->local_offset );
 	  }
           
-          if( funct_tnode && tnode_kind( funct_tnode ) != TK_METHOD ) {
+          if( funct_tnode && tnode_kind( funct_tnode ) == TK_METHOD ) {
+              dnode_set_ssize_value( funct, function_entry_address );
+          } else {
               dnode_set_offset( funct, function_entry_address );
           }
+
 	  snail_get_inline_code( snail_cc, funct, px );
 
 	  if( thrcode_last_opcode( snail_cc->thrcode ).fn != RET ) {
 	      snail_emit( snail_cc, px, "\tc\n", RET );
 	  }
 
-          assert( snail_cc->thrcode != snail_cc->main_thrcode );
-
-          if( snail_cc->nested_function_level == 0 ) {
-              snail_fixup_function_calls( snail_cc, funct );
-              snail_compile_main_thrcode( snail_cc );
-              snail_fixup_function_calls( snail_cc, funct );
-          } else {
-              snail_cc->nested_function_level --;
-              assert( snail_cc->thrcode == snail_cc->function_thrcode );
-              snail_fixup_here( snail_cc );
+          snail_merge_functions_and_top( snail_cc, px );
+          if( !snail_cc->thrcode ) {
+              snail_cc->thrcode = snail_cc->main_thrcode;
           }
-
+          compiler_fixup_function_calls( snail_cc->function_thrcode, funct );
+          compiler_fixup_function_calls( snail_cc->main_thrcode, funct );
 	  snail_end_scope( snail_cc, px );
 	  snail_cc->current_function = 
               dlist_pop_data( &snail_cc->current_function_stack );
@@ -9208,17 +9198,6 @@ opt_function_attributes
 function_code_start
   :
     {
-      if( snail_cc->thrcode == snail_cc->main_thrcode ) {
-          snail_compile_function_thrcode( snail_cc );
-      } else {
-          /* generate a jump-around for the code of the nested
-             function -- ugly but simple to implement, so we do it
-             like this for now:*/
-          ssize_t zero = 0;
-          snail_push_relative_fixup( snail_cc, px );
-          snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-          snail_cc->nested_function_level++;
-      }
       if( thrcode_debug_is_on()) {
 	  const char *currentLine = snail_flex_current_line();
 	  const char *first_nonblank = currentLine;
@@ -9493,9 +9472,7 @@ operator_header
 
 function_prototype
   : function_header
-      { snail_compile_main_thrcode( snail_cc ); }
   | _FORWARD function_header
-      { snail_compile_main_thrcode( snail_cc ); }
   ;
 
 /*---------------------------------------------------------------------------*/
