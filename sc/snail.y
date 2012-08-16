@@ -9203,9 +9203,11 @@ function_code_start
 	  const char *first_nonblank = currentLine;
 	  while( isspace( *first_nonblank )) first_nonblank++;
 	  if( *first_nonblank == '#' ) {
-	      snail_printf( NULL, "%s\n", currentLine );
+              thrcode_printf( snail_cc->function_thrcode, px,
+                              "%s\n", currentLine );
 	  } else {
-	      snail_printf( NULL, "#\n# %s\n#\n", currentLine );
+              thrcode_printf( snail_cc->function_thrcode, px,
+                              "#\n# %s\n#\n", currentLine );
 	  }
       }
     }
