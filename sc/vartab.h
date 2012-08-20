@@ -35,6 +35,9 @@ void vartab_copy_table( VARTAB *dst, VARTAB *src, cexception_t *ex );
 
 DNODE *vartab_lookup( VARTAB *table, const char *name );
 
+DNODE *vartab_lookup_silently( VARTAB *table, const char *name, 
+                               int *count, int *is_imported );
+
 void vartab_begin_scope( VARTAB* table, cexception_t *ex );
 void vartab_end_scope( VARTAB* table, cexception_t *ex );
 
