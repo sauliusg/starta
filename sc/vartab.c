@@ -39,9 +39,30 @@ typedef struct VAR_NODE {
 
 #include <varnode_a.ci>
 
-static VAR_NODE *new_var_node( cexception_t *ex )
+static VAR_NODE *new_var_node_default( cexception_t *ex )
 {
     return alloc_var_node( ex );
+}
+
+static VAR_NODE *new_var_node( DNODE *dnode,
+                               const char* name,
+                               int current_scope,
+                               int current_subscope,
+                               int count,
+                               VAR_NODE *next_node,
+                               cexception_t *ex )
+{
+    VAR_NODE *node = new_var_node_default( ex );
+
+    node->dnode = dnode;
+    node->name  = strdupx( (char*)name, ex );
+    node->next  = next_node;
+    node->scope = current_scope;
+    node->count = count;
+    node->subscope = current_subscope;
+    dnode_set_scope( dnode, current_scope );
+
+    return node;
 }
 
 static VAR_NODE *new_var_node_linked( VAR_NODE *next, cexception_t *ex )
@@ -132,97 +153,73 @@ static VAR_NODE *vartab_lookup_varnode( VARTAB *table, const char *name );
 void vartab_insert( VARTAB *table, const char *name,
 		    DNODE *dnode, cexception_t *ex )
 {
-    cexception_t inner;
     VAR_NODE * volatile node = NULL;
-    VAR_NODE * volatile newnode = NULL;
     assert( table );
-    cexception_guard( inner ) {
-	if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
-	    if( node->scope == table->current_scope &&
-                (node->flags & VNF_IS_IMPORTED) == 0 ) {
-		yyerrorf( "symbol '%s' already declared in the current scope",
-			   name );
-		table->duplicates =
-		    new_var_node_linked( table->duplicates, &inner );
-		table->duplicates->dnode = dnode;
+
+    if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
+        if( node->scope == table->current_scope &&
+            (node->flags & VNF_IS_IMPORTED) == 0 ) {
+            yyerrorf( "symbol '%s' already declared in the current scope",
+                      name );
+            table->duplicates =
+                new_var_node_linked( table->duplicates, ex );
+            table->duplicates->dnode = dnode;
 #if 0
-	    } else {
-		fprintf( stderr, "name '%s' shadows previous declaration "
-			 "in scope %d (currently in scope %d)\n",
-			 name, node->scope, table->current_scope );
+        } else {
+            fprintf( stderr, "name '%s' shadows previous declaration "
+                     "in scope %d (currently in scope %d)\n",
+                     name, node->scope, table->current_scope );
 #endif
-	    }
-	}
-	if( !node || node->scope != table->current_scope ||
-            (node->flags & VNF_IS_IMPORTED) != 0 ) {
-	    newnode = new_var_node( ex );
-	    newnode->dnode = dnode;
-	    newnode->name  = strdupx( (char*)name, &inner );
-	    newnode->next  = table->node;
-	    newnode->scope = table->current_scope;
-            newnode->count = 1;
-	    newnode->subscope = table->current_subscope;
-	    table->node = newnode;
-	    dnode_set_scope( dnode, table->current_scope );
-	}
+        }
     }
-    cexception_catch {
-        delete_var_node( newnode );
-	cexception_reraise( inner, ex );
+    if( !node || node->scope != table->current_scope ||
+        (node->flags & VNF_IS_IMPORTED) != 0 ) {
+        table->node = new_var_node( dnode, name,
+                                    table->current_scope,
+                                    table->current_subscope,
+                                    /* count = */ 1,
+                                    table->node, ex );
     }
 }
 
 void vartab_insert_modules_name( VARTAB *table, const char *name,
                                  DNODE *dnode, cexception_t *ex )
 {
-    cexception_t inner;
     VAR_NODE * volatile node = NULL;
-    VAR_NODE * volatile newnode = NULL;
     assert( table );
-    cexception_guard( inner ) {
-	if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
-	    if( node->scope == table->current_scope ) {
-                if( (node->flags & VNF_IS_IMPORTED) == 0 ) {
-                    /* a non-imported name exists -- silently ignore
-                       the imported name:*/
-                    table->duplicates =
-                        new_var_node_linked( table->duplicates, &inner );
-                    table->duplicates->dnode = dnode;
-                } else {
-                    /* another imported name exists: add the new
-                       imported name, but mark that it is present
-                       multiple times: */
-                    newnode = new_var_node( ex );
-                    newnode->dnode = dnode;
-                    newnode->name  = strdupx( (char*)name, &inner );
-                    newnode->next  = table->node;
-                    newnode->scope = table->current_scope;
-                    newnode->count = node->count + 1;
-                    newnode->flags |= VNF_IS_IMPORTED;
-                    newnode->subscope = table->current_subscope;
-                    table->node = newnode;
-                    dnode_set_scope( dnode, table->current_scope );
-                }
+
+    if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
+        if( node->scope == table->current_scope ) {
+            if( (node->flags & VNF_IS_IMPORTED) == 0 ) {
+                /* a non-imported name exists -- silently ignore
+                   the imported name:*/
+                table->duplicates =
+                    new_var_node_linked( table->duplicates, ex );
+                table->duplicates->dnode = dnode;
+            } else {
+                /* another imported name exists: add the new
+                   imported name, but mark that it is present
+                   multiple times: */
+                table->node = new_var_node( dnode, name,
+                                            table->current_scope,
+                                            table->current_subscope,
+                                            node->count + 1,
+                                            table->node, ex );
+
+                table->node->flags |= VNF_IS_IMPORTED;
             }
-	}
-        /* No node with the same name is present in the current scope:
-           add it: */
-	if( !node || node->scope != table->current_scope ) {
-	    newnode = new_var_node( ex );
-	    newnode->dnode = dnode;
-	    newnode->name  = strdupx( (char*)name, &inner );
-	    newnode->next  = table->node;
-	    newnode->scope = table->current_scope;
-            newnode->count = 1;
-            newnode->flags |= VNF_IS_IMPORTED;
-	    newnode->subscope = table->current_subscope;
-	    table->node = newnode;
-	    dnode_set_scope( dnode, table->current_scope );
-	}
+        }
     }
-    cexception_catch {
-        delete_var_node( newnode );
-	cexception_reraise( inner, ex );
+    /* No node with the same name is present in the current scope:
+       add it: */
+    if( !node || node->scope != table->current_scope ) {
+        table->node = new_var_node( dnode, name, 
+                                    table->current_scope,
+                                    table->current_subscope,
+                                    /* count = */ 1,
+                                    table->node, ex );
+
+        table->node->flags |= VNF_IS_IMPORTED;
     }
 }
 
