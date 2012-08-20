@@ -2980,10 +2980,12 @@ static DNODE *snail_check_and_set_fn_proto( SNAIL_COMPILER *cc,
 {
     DNODE *fn_dnode = NULL;
     TNODE *fn_tnode = NULL;
+    int count = 0, is_imported = 0;
     char msg[100];
 
-    if( (fn_dnode = vartab_lookup( cc->vartab, dnode_name( fn_proto )))
-	    != NULL ) {
+    fn_dnode = vartab_lookup_silently( cc->vartab, dnode_name( fn_proto ),
+                                       &count, &is_imported );
+    if( fn_dnode && !is_imported ) {
 	fn_tnode = dnode_type( fn_dnode );
 	if( !dnode_is_function_prototype( fn_dnode )) {
 	    yyerrorf( "function '%s' is already declared in this scope",

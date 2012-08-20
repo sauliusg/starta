@@ -138,7 +138,8 @@ void vartab_insert( VARTAB *table, const char *name,
     assert( table );
     cexception_guard( inner ) {
 	if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
-	    if( node->scope == table->current_scope ) {
+	    if( node->scope == table->current_scope &&
+                (node->flags & VNF_IS_IMPORTED) == 0 ) {
 		yyerrorf( "symbol '%s' already declared in the current scope",
 			   name );
 		table->duplicates =
@@ -152,7 +153,8 @@ void vartab_insert( VARTAB *table, const char *name,
 #endif
 	    }
 	}
-	if( !node || node->scope != table->current_scope ) {
+	if( !node || node->scope != table->current_scope ||
+            (node->flags & VNF_IS_IMPORTED) != 0 ) {
 	    newnode = new_var_node( ex );
 	    newnode->dnode = dnode;
 	    newnode->name  = strdupx( (char*)name, &inner );
@@ -181,7 +183,7 @@ void vartab_insert_modules_name( VARTAB *table, const char *name,
 	if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
 	    if( node->scope == table->current_scope ) {
                 if( (node->flags & VNF_IS_IMPORTED) == 0 ) {
-                    /* a non-imported name exists -- silentntly ignore
+                    /* a non-imported name exists -- silently ignore
                        the imported name:*/
                     table->duplicates =
                         new_var_node_linked( table->duplicates, &inner );
@@ -244,6 +246,19 @@ DNODE *vartab_lookup( VARTAB *table, const char *name )
     if( node && node->count > 1 ) {
         yyerrorf( "name '%s' is imported more than once -- "
                   "please use explicit package name for disambiguation" );
+    }
+    return node ? node->dnode : NULL;
+}
+
+DNODE *vartab_lookup_silently( VARTAB *table, const char *name, 
+                               int *count, int *is_imported )
+{
+    VAR_NODE *node = vartab_lookup_varnode( table, name );
+    assert( count );
+    assert( is_imported );
+    if( node ) {
+        *count = node->count;
+        *is_imported = ((node->flags & VNF_IS_IMPORTED) != 0);
     }
     return node ? node->dnode : NULL;
 }
