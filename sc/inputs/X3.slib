@@ -6,7 +6,7 @@ use std;
 procedure p()
 begin
     debug;
-    . "I am procedure p from the package X2";
+    . "I am procedure p from the package X3";
 end;
 
 procedure p3()

@@ -1,0 +1,22 @@
+
+use std;
+
+use X1;
+use X2;
+
+procedure p()
+{
+    . "This is p() from main."
+}
+
+p();
+X1::p();
+X2::p();
+
+use X3;
+p();
+X3::p();
+
+p1();
+p2();
+p3();
