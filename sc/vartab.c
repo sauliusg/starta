@@ -27,7 +27,6 @@ typedef enum {
 
 typedef struct VAR_NODE {
     int flags;
-    int rcount;
     int count; /* counts how may times an object with this name was
                   imported from different modules. */
     int scope;
@@ -93,7 +92,6 @@ static void delete_var_node_list( VAR_NODE *node )
 }
 
 struct VARTAB {
-    int rcount;
     int current_scope;
     int current_subscope;
     VAR_NODE *duplicates;
