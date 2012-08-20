@@ -1,0 +1,18 @@
+
+package X1
+
+use std;
+
+procedure p()
+begin
+    debug;
+    . "I am procedure p from the package X1";
+end;
+
+procedure p1()
+begin
+    debug;
+    . "I am procedure p1 from the package X1";
+end;
+
+end package X1;

@@ -19,8 +19,17 @@
 #include <yy.h>
 #include <assert.h>
 
+typedef enum {
+    VNF_NONE = 0,
+    VNF_IS_IMPORTED /* identifies nodes imported from modules into
+                       other namespaces. */
+} var_node_flag_t;
+
 typedef struct VAR_NODE {
+    int flags;
     int rcount;
+    int count; /* counts how may times an object with this name was
+                  imported from different modules. */
     int scope;
     int subscope;
     char *name;
@@ -149,6 +158,61 @@ void vartab_insert( VARTAB *table, const char *name,
 	    newnode->name  = strdupx( (char*)name, &inner );
 	    newnode->next  = table->node;
 	    newnode->scope = table->current_scope;
+            newnode->count = 1;
+	    newnode->subscope = table->current_subscope;
+	    table->node = newnode;
+	    dnode_set_scope( dnode, table->current_scope );
+	}
+    }
+    cexception_catch {
+        delete_var_node( newnode );
+	cexception_reraise( inner, ex );
+    }
+}
+
+void vartab_insert_modules_name( VARTAB *table, const char *name,
+                                 DNODE *dnode, cexception_t *ex )
+{
+    cexception_t inner;
+    VAR_NODE * volatile node = NULL;
+    VAR_NODE * volatile newnode = NULL;
+    assert( table );
+    cexception_guard( inner ) {
+	if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
+	    if( node->scope == table->current_scope ) {
+                if( (node->flags & VNF_IS_IMPORTED) == 0 ) {
+                    /* a non-imported name exists -- silentntly ignore
+                       the imported name:*/
+                    table->duplicates =
+                        new_var_node_linked( table->duplicates, &inner );
+                    table->duplicates->dnode = dnode;
+                } else {
+                    /* another imported name exists: add the new
+                       imported name, but mark that it is present
+                       multiple times: */
+                    newnode = new_var_node( ex );
+                    newnode->dnode = dnode;
+                    newnode->name  = strdupx( (char*)name, &inner );
+                    newnode->next  = table->node;
+                    newnode->scope = table->current_scope;
+                    newnode->count = node->count + 1;
+                    newnode->flags |= VNF_IS_IMPORTED;
+                    newnode->subscope = table->current_subscope;
+                    table->node = newnode;
+                    dnode_set_scope( dnode, table->current_scope );
+                }
+            }
+	}
+        /* No node with the same name is present in the current scope:
+           add it: */
+	if( !node || node->scope != table->current_scope ) {
+	    newnode = new_var_node( ex );
+	    newnode->dnode = dnode;
+	    newnode->name  = strdupx( (char*)name, &inner );
+	    newnode->next  = table->node;
+	    newnode->scope = table->current_scope;
+            newnode->count = 1;
+            newnode->flags |= VNF_IS_IMPORTED;
 	    newnode->subscope = table->current_subscope;
 	    table->node = newnode;
 	    dnode_set_scope( dnode, table->current_scope );
@@ -170,7 +234,7 @@ void vartab_copy_table( VARTAB *dst, VARTAB *src, cexception_t *ex )
     for( curr = src->node; curr != NULL; curr = curr->next ) {
 	char *name = curr->name;
 	DNODE *dnode = curr->dnode;
-	vartab_insert( dst, name, share_dnode( dnode ), ex );
+	vartab_insert_modules_name( dst, name, share_dnode( dnode ), ex );
     }
 }
 
