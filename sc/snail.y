@@ -5754,14 +5754,16 @@ package_name
       }
   ;
 
+package_keyword : _PACKAGE | _MODULE;
+
 package_statement
-  : _PACKAGE package_name
+  : package_keyword package_name
       {
 	  vartab_insert_named( snail_cc->vartab, $2, px );
 	  compiler_begin_package( snail_cc, share_dnode( $2 ), px );
       }
     statement_list
-    '}' _PACKAGE __IDENTIFIER
+    '}' package_keyword __IDENTIFIER
       {
 	  char *name;
 	  if( snail_cc->current_package &&
