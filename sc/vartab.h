@@ -28,6 +28,9 @@ void vartab_insert_named( VARTAB *table, DNODE *dnode, cexception_t *ex );
 void vartab_insert( VARTAB *table, const char *name,
 		    DNODE *tnode, cexception_t *ex );
 
+void vartab_insert_modules_name( VARTAB *table, const char *name,
+                                 DNODE *dnode, cexception_t *ex );
+
 void vartab_copy_table( VARTAB *dst, VARTAB *src, cexception_t *ex );
 
 DNODE *vartab_lookup( VARTAB *table, const char *name );
