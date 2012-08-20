@@ -241,6 +241,10 @@ void vartab_copy_table( VARTAB *dst, VARTAB *src, cexception_t *ex )
 DNODE *vartab_lookup( VARTAB *table, const char *name )
 {
     VAR_NODE *node = vartab_lookup_varnode( table, name );
+    if( node && node->count > 1 ) {
+        yyerrorf( "name '%s' is imported more than once -- "
+                  "please use explicit package name for disambiguation" );
+    }
     return node ? node->dnode : NULL;
 }
 
