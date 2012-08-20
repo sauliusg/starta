@@ -31,8 +31,8 @@ static void free_vartab( VARTAB *vartab )
 {
     /* freex( vartab ); return; */
     /* printf( "deleting var table %d\n", (vartab-vartabs) ); */
-    assert( vartab->rcount == 0 );
-    vartab->rcount--;
+    /* assert( vartab->rcount == 0 ); */
+    /* vartab->rcount--; */
 }
 
 #else
@@ -44,7 +44,7 @@ static VARTAB *alloc_vartab( cexception_t *ex )
 
 static void free_vartab( VARTAB *vartab )
 {
-    assert( vartab->rcount == 0 );
+    /* assert( vartab->rcount == 0 ); */
     freex( vartab );
 }
 
