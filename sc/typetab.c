@@ -118,19 +118,16 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
     return ret;
 }
 
-TNODE *typetab_override_suffix( TYPETAB *table, const char *name,
-                                type_suffix_t suffix, TNODE *tnode,
-                                cexception_t *ex )
+void typetab_override_suffix( TYPETAB *table, const char *name,
+                              type_suffix_t suffix, TNODE *tnode,
+                              cexception_t *ex )
 {
     assert( table );
     assert( name );
-
     table->node = new_type_node( tnode, name, suffix,
                                  table->current_scope,
                                  table->current_subscope,
                                  /* next = */ table->node, ex );
-
-    return NULL;
 }
 
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
