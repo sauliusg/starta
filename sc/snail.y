@@ -6933,14 +6933,18 @@ interface_identifier_list
   : type_identifier
   {
       TLIST *interfaces = NULL;
-      share_tnode( $1 );
-      tlist_push_tnode( &interfaces, &$1, px );
+      if( $1 ) {
+          share_tnode( $1 );
+          tlist_push_tnode( &interfaces, &$1, px );
+      }
       $$ = interfaces;
   }
   |  type_identifier ',' interface_identifier_list
   {
-      share_tnode( $1 );
-      tlist_push_tnode( &$3, &$1, px );
+      if( $1 ) {
+          share_tnode( $1 );
+          tlist_push_tnode( &$3, &$1, px );
+      }
       $$ = $3;
   }
   ;

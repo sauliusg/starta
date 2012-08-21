@@ -1,0 +1,11 @@
+./sl: inputs/interfaces006.snl(9,27): ERROR, type 'Ig' is not declared in the current scope
+class S implements If, Ig {
+                          ^
+./sl: inputs/interfaces006.snl(28,28): ERROR, class 'S' does not implement interface 'Ig'
+    method g implements Ig.g( x, y, z :  int ) : int
+                           ^
+./sl: inputs/interfaces006.snl(40,37): ERROR, class 'S' does not implement interface 'Ig'
+    method sg implements Module::Ig.s() -> (string)
+                                    ^
+./sl: 3 error(s) detected
+
