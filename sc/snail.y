@@ -634,7 +634,7 @@ static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
     int is_imported = 0;
 
     lookup_node =
-	typetab_insert_suffix( cc->typetab, name, suffix_type, tnode, 
+	typetab_insert_suffix( cc->typetab, name, suffix_type, tnode,
                                &count, &is_imported, ex );
 
     if( lookup_node != tnode ) {
@@ -646,12 +646,13 @@ static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
             }
 	    tnode_shallow_copy( lookup_node, tnode );
 	    delete_tnode( tnode );
+            tnode = NULL;
 	} 
 	else if( tnode_is_extendable_enum( lookup_node )) {
 	    tnode_merge_field_lists( lookup_node, tnode );
 	    compiler_check_enum_basetypes( lookup_node, tnode );
 	    delete_tnode( tnode );
-	} else {
+	} else if( !is_imported ) {
 	    char *name = tnode_name( tnode );
 	    if( strstr( type_conflict_msg, "%s" ) != NULL ) {
 		yyerrorf( type_conflict_msg, name );
@@ -660,7 +661,11 @@ static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
 	    }
 	}
     }
-    return lookup_node;
+    if( tnode && lookup_node != tnode && is_imported ) {
+        return tnode;
+    } else {
+        return lookup_node;
+    }
 }
 
 static int snail_current_scope( SNAIL_COMPILER *cc )
@@ -3194,12 +3199,14 @@ static void snail_compile_enum_const_from_tnode( SNAIL_COMPILER *cc,
     snail_emit( cc, ex, "e\n", &string_offset );
 }
 
-static TNODE* snail_lookup_tnode_silently( SNAIL_COMPILER *cc,
-					   char *module_name,
-					   char *identifier )
+static TNODE* snail_lookup_tnode_with_function( SNAIL_COMPILER *cc,
+                                                char *module_name,
+                                                char *identifier,
+                                                TNODE* (*typetab_lookup_fn)
+                                                    (TYPETAB*,const char*))
 {
     if( !module_name ) {
-	return typetab_lookup( cc->typetab, identifier );
+	return (*typetab_lookup_fn)( cc->typetab, identifier );
     } else {
 	DNODE *module = vartab_lookup( cc->vartab, module_name );
 	if( !module ) {
@@ -3212,13 +3219,23 @@ static TNODE* snail_lookup_tnode_silently( SNAIL_COMPILER *cc,
     }
 }
 
+static TNODE* snail_lookup_tnode_silently( SNAIL_COMPILER *cc,
+					   char *module_name,
+					   char *identifier )
+{
+    return snail_lookup_tnode_with_function( cc, module_name,
+                                             identifier,
+                                             typetab_lookup_silently );
+}
+
 static TNODE* snail_lookup_tnode( SNAIL_COMPILER *cc,
 				  char *module_name,
 				  char *identifier,
 				  char *message )
 {
-    TNODE *typenode =
-	snail_lookup_tnode_silently( cc, module_name, identifier );
+    TNODE *typenode = snail_lookup_tnode_with_function( cc, module_name, 
+                                                        identifier, 
+                                                        typetab_lookup );
 
     if( !typenode ) {
 	if( !message ) message = "name";
@@ -3833,7 +3850,7 @@ static void snail_compile_type_declaration( SNAIL_COMPILER *cc,
 	    tnode = type_descr;
 	}
 	snail_typetab_insert( cc, tnode, &inner );
-	tnode = typetab_lookup( cc->typetab, type_name );
+	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
 	snail_insert_tnode_into_suffix_list( cc, tnode, &inner );
 	cc->current_type = NULL;
@@ -7335,14 +7352,14 @@ type_declaration_name
 type_declaration_start
   : _TYPE type_declaration_name
       {
-	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $2 );
+	TNODE *old_tnode = typetab_lookup_silently( snail_cc->typetab, $2 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
 	    TNODE *tnode = new_tnode_forward( $2, px );
 	    snail_typetab_insert( snail_cc, tnode, px );
 	}
-	tnode = typetab_lookup( snail_cc->typetab, $2 );
+	tnode = typetab_lookup_silently( snail_cc->typetab, $2 );
 	assert( !snail_cc->current_type );
 	snail_cc->current_type = tnode;
 	snail_begin_scope( snail_cc, px );

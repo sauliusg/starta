@@ -123,14 +123,27 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
 
     lookup_node = typetab_lookup_typenode( table, name, suffix );
 
-    if( lookup_node && 
-        lookup_node->scope == table->current_scope &&
+    if( lookup_node && lookup_node->scope == table->current_scope &&
         lookup_node->subscope == table->current_subscope ) {
         if( count )
             *count = lookup_node->count;
         if( is_imported ) 
             *is_imported = ((lookup_node->flags & TNF_IS_IMPORTED) != 0);
-        ret = lookup_node->tnode;
+        if( (lookup_node->flags & TNF_IS_IMPORTED) == 0 ) {
+            /* The node found is not imported -- it is a genuine
+               duplicate; we discard the submitted tnode and return
+               the found one: */
+            ret = lookup_node->tnode;
+        } else {
+            /* We mask the imported node and insert the newly created
+               one: */
+            table->node = new_type_node( tnode, name, suffix,
+                                         table->current_scope,
+                                         table->current_subscope,
+                                         /* count = */ 1,
+                                         /* next = */ table->node, ex );
+            ret = tnode;
+        }
     } else {
         if( count ) *count = 1;
         if( is_imported ) *is_imported = 0;
@@ -263,6 +276,24 @@ TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
     } else {
         return NULL;
     }
+}
+
+TNODE *typetab_lookup_suffix_silently( TYPETAB *table, const char *name,
+                                       type_suffix_t suffix )
+{
+    TYPE_NODE *node = typetab_lookup_typenode( table, name, suffix );
+
+    if( node ) {
+        assert( node->tnode );
+        return node->tnode;
+    } else {
+        return NULL;
+    }
+}
+
+TNODE *typetab_lookup_silently( TYPETAB *table, const char *name )
+{
+    return typetab_lookup_suffix_silently( table, name, TS_NOT_A_SUFFIX );
 }
 
 void typetab_begin_scope( TYPETAB* table, cexception_t *ex )

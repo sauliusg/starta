@@ -48,6 +48,11 @@ void typetab_override_suffix( TYPETAB *table, const char *name,
 TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
 			      type_suffix_t suffix );
 
+TNODE *typetab_lookup_suffix_silently( TYPETAB *table, const char *name,
+                                       type_suffix_t suffix );
+
+TNODE *typetab_lookup_silently( TYPETAB *table, const char *name );
+
 void typetab_begin_scope( TYPETAB* table, cexception_t *ex );
 void typetab_end_scope( TYPETAB* table, cexception_t *ex );
 
