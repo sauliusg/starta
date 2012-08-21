@@ -123,18 +123,77 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
 
     lookup_node = typetab_lookup_typenode( table, name, suffix );
 
-    if( lookup_node ) {
+    if( lookup_node && 
+        lookup_node->scope == table->current_scope &&
+        lookup_node->subscope == table->current_subscope ) {
         if( count )
             *count = lookup_node->count;
         if( is_imported ) 
             *is_imported = ((lookup_node->flags & TNF_IS_IMPORTED) != 0);
         ret = lookup_node->tnode;
     } else {
+        if( count ) *count = 1;
+        if( is_imported ) *is_imported = 0;
         table->node = new_type_node( tnode, name, suffix,
                                      table->current_scope,
                                      table->current_subscope,
                                      /* count = */ 1,
                                      /* next = */ table->node, ex );
+        ret = tnode;
+    }
+
+    return ret;
+}
+
+static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
+                                              type_suffix_t suffix, TNODE *tnode,
+                                              cexception_t *ex )
+{
+    TNODE *ret = NULL;
+    TYPE_NODE *lookup_node = NULL;
+
+    assert( table );
+    assert( name );
+
+    lookup_node = typetab_lookup_typenode( table, name, suffix );
+
+    if( lookup_node && lookup_node->scope == table->current_scope ) {
+        assert( lookup_node->tnode );
+        if( !tnode_is_forward( lookup_node->tnode )) {
+            if( (lookup_node->flags & TNF_IS_IMPORTED) == 0 ) {
+                /* a non-imported name exists in the same scope --
+                   silently ignore the imported name:*/
+                ret = lookup_node->tnode;
+                /* probably a duplicate list must be installed in the
+                   type tables (TYPETAB), to keep propert record of
+                   the inserted TNODE ownership and to free them after
+                   the compilation, like it is currently done in
+                   vartabs. */
+            } else {
+                /* another imported type name exists: add the new
+                   imported name, but mark that it is present
+                   multiple times: */
+                table->node = new_type_node( tnode, name, suffix,
+                                             table->current_scope,
+                                             table->current_subscope,
+                                             lookup_node->count + 1,
+                                             /* next = */ table->node,
+                                             ex );
+                table->node->flags |= TNF_IS_IMPORTED;
+            }
+        } else {
+            /* A forward declaration must be overriden: */
+            ret = lookup_node->tnode;
+        }
+    } else {
+        /* No node with the same name is present in the current scope:
+           add it: */
+        table->node = new_type_node( tnode, name, suffix,
+                                     table->current_scope,
+                                     table->current_subscope,
+                                     /* count = */ 1,
+                                     /* next = */ table->node, ex );
+        table->node->flags |= TNF_IS_IMPORTED;
         ret = tnode;
     }
 
@@ -165,10 +224,8 @@ void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
 	char *name = curr->name;
 	TNODE *tnode = curr->tnode;
 	type_suffix_t suffix_type = curr->suffix;
-	typetab_insert_suffix( dst, name, suffix_type, share_tnode( tnode ),
-                               /* count = */ NULL,
-                               /* is_imported = */ NULL,
-                               ex );
+	typetab_insert_imported_suffix( dst, name, suffix_type, 
+                                        share_tnode( tnode ), ex );
     }
 }
 
@@ -197,6 +254,10 @@ TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
     TYPE_NODE *node = typetab_lookup_typenode( table, name, suffix );
 
     if( node ) {
+        if( node && node->count > 1 ) {
+            yyerrorf( "type '%s' is imported more than once -- "
+                      "please use explicit package name for disambiguation" );
+        }
         assert( node->tnode );
         return node->tnode;
     } else {

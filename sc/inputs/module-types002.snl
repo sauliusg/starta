@@ -1,0 +1,8 @@
+
+use std;
+
+use Y1;
+use Y2;
+
+var a : T;
+. a;
