@@ -938,17 +938,6 @@ TNODE *dnode_typetab_lookup_type( DNODE *dnode, const char *name )
     return typetab_lookup( dnode->typetab, name );
 }
 
-void dnode_typetab_insert_suffix( DNODE *dnode, const char *name, 
-				  type_suffix_t suffix, TNODE *tnode,
-				  cexception_t *ex )
-{
-    assert( dnode->typetab );
-    typetab_insert_suffix( dnode->typetab, name, suffix, tnode,
-                           /* count = */ NULL,
-                           /* is_imported = */ NULL,
-                           ex );
-}
-
 TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 				    type_suffix_t suffix )
 {

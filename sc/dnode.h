@@ -215,10 +215,6 @@ void dnode_typetab_insert_named_tnode( DNODE *dnode, TNODE *tnode,
 
 TNODE *dnode_typetab_lookup_type( DNODE *dnode, const char *name );
 
-void dnode_typetab_insert_suffix( DNODE *dnode, const char *name, 
-				  type_suffix_t suffix, TNODE *tnode,
-				  cexception_t *ex );
-
 TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 				    type_suffix_t suffix );
 
