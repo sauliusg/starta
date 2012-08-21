@@ -26,7 +26,7 @@ typedef struct TYPE_NODE {
     struct TYPE_NODE *next;
 } TYPE_NODE;
 
-static TYPE_NODE *new_type_node( cexception_t *ex )
+static TYPE_NODE *new_type_node_default( cexception_t *ex )
 {
     return callocx( sizeof(TYPE_NODE), 1, ex );
 }
@@ -90,7 +90,7 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
         if( lookup_node ) {
 	    ret = lookup_node;
 	} else {
-	    node = new_type_node( ex );
+	    node = new_type_node_default( ex );
 	    node->tnode = tnode;
 	    node->suffix = suffix;
 	    node->scope = table->current_scope;
@@ -120,7 +120,7 @@ TNODE *typetab_override_suffix( TYPETAB *table, const char *name,
     assert( name );
 
     cexception_guard( inner ) {
-        node = new_type_node( ex );
+        node = new_type_node_default( ex );
         node->tnode = tnode;
         node->suffix = suffix;
         node->scope = table->current_scope;
