@@ -630,9 +630,12 @@ static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
 					cexception_t *ex )
 {
     TNODE *lookup_node;
+    int count = 0;
+    int is_imported = 0;
 
     lookup_node =
-	typetab_insert_suffix( cc->typetab, name, suffix_type, tnode, ex );
+	typetab_insert_suffix( cc->typetab, name, suffix_type, tnode, 
+                               &count, &is_imported, ex );
 
     if( lookup_node != tnode ) {
 	if( tnode_is_forward( lookup_node )) {
