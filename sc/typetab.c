@@ -17,7 +17,16 @@
 #include <assert.h>
 #include <yy.h>
 
+typedef enum {
+    TNF_NONE = 0,
+    TNF_IS_IMPORTED /* identifies nodes imported from modules into
+                       other namespaces. */
+} type_node_flag_t;
+
 typedef struct TYPE_NODE {
+    int flags;
+    int count; /* counts how may times a type node with this name was
+                  imported from different modules. */
     char *name;
     type_suffix_t suffix;
     TNODE *tnode;
@@ -35,6 +44,7 @@ static TYPE_NODE *new_type_node( TNODE *tnode, const char* name,
                                  type_suffix_t suffix,
                                  int current_scope,
                                  int current_subscope,
+                                 int count,
                                  TYPE_NODE *next_node,
                                  cexception_t *ex )
 {
@@ -45,6 +55,7 @@ static TYPE_NODE *new_type_node( TNODE *tnode, const char* name,
     node->suffix = suffix;
     node->scope = current_scope;
     node->subscope = current_subscope;
+    node->count = count;
     node->next  = next_node;
 
     return node;
@@ -111,6 +122,7 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
         table->node = new_type_node( tnode, name, suffix,
                                      table->current_scope,
                                      table->current_subscope,
+                                     /* count = */ 1,
                                      /* next = */ table->node, ex );
         ret = tnode;
     }
@@ -127,6 +139,7 @@ void typetab_override_suffix( TYPETAB *table, const char *name,
     table->node = new_type_node( tnode, name, suffix,
                                  table->current_scope,
                                  table->current_subscope,
+                                 /* count = */ 1,
                                  /* next = */ table->node, ex );
 }
 
