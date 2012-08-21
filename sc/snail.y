@@ -4479,7 +4479,12 @@ static void compiler_use_package( SNAIL_COMPILER *c,
     }
 
     if( package != NULL ) {
-	vartab_insert_named( c->vartab, share_dnode( package ), ex );
+        char *package_name = dnode_name( package );
+        DNODE *existing_package = package_name ?
+            vartab_lookup( c->vartab, package_name ) : NULL;
+        if( !existing_package || existing_package != package ) {
+            vartab_insert_named( c->vartab, share_dnode( package ), ex );
+        }
 	/* printf( "found compiled package '%s'\n", package_name ); */
 	compiler_use_exported_package_names( c, package, ex );
     } else {
