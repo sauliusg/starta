@@ -919,7 +919,10 @@ void dnode_typetab_insert_tnode_suffix( DNODE *dnode,
 					cexception_t *ex )
 {
     assert( dnode->typetab );
-    typetab_insert_suffix( dnode->typetab, suffix_name, suffix_type, tnode, ex );
+    typetab_insert_suffix( dnode->typetab, suffix_name, suffix_type, tnode,
+                           /* count = */ NULL,
+                           /* is_imported = */ NULL,
+                           ex );
 }
 
 void dnode_typetab_insert_named_tnode( DNODE *dnode, TNODE *tnode,
@@ -940,7 +943,10 @@ void dnode_typetab_insert_suffix( DNODE *dnode, const char *name,
 				  cexception_t *ex )
 {
     assert( dnode->typetab );
-    typetab_insert_suffix( dnode->typetab, name, suffix, tnode, ex );
+    typetab_insert_suffix( dnode->typetab, name, suffix, tnode,
+                           /* count = */ NULL,
+                           /* is_imported = */ NULL,
+                           ex );
 }
 
 TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,

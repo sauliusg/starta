@@ -101,23 +101,34 @@ void delete_typetab( TYPETAB *table )
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *tnode, cexception_t *ex )
 {
-    return typetab_insert_suffix( table, name, TS_NOT_A_SUFFIX, tnode, ex );
+    return typetab_insert_suffix( table, name, TS_NOT_A_SUFFIX, tnode, 
+                                  /* count = */ NULL,
+                                  /* is_imported = */ NULL,
+                                  ex );
 }
+
+static TYPE_NODE *typetab_lookup_typenode( TYPETAB *table, const char *name,
+                                           type_suffix_t suffix );
 
 TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
 			      type_suffix_t suffix, TNODE *tnode,
+                              int *count, int *is_imported,
 			      cexception_t *ex )
 {
     TNODE *ret = NULL;
-    TNODE *lookup_node = NULL;
+    TYPE_NODE *lookup_node = NULL;
 
     assert( table );
     assert( name );
 
-    lookup_node = typetab_lookup_suffix( table, name, suffix );
+    lookup_node = typetab_lookup_typenode( table, name, suffix );
 
     if( lookup_node ) {
-        ret = lookup_node;
+        if( count )
+            *count = lookup_node->count;
+        if( is_imported ) 
+            *is_imported = ((lookup_node->flags & TNF_IS_IMPORTED) != 0);
+        ret = lookup_node->tnode;
     } else {
         table->node = new_type_node( tnode, name, suffix,
                                      table->current_scope,
@@ -154,7 +165,10 @@ void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
 	char *name = curr->name;
 	TNODE *tnode = curr->tnode;
 	type_suffix_t suffix_type = curr->suffix;
-	typetab_insert_suffix( dst, name, suffix_type, share_tnode( tnode ), ex );
+	typetab_insert_suffix( dst, name, suffix_type, share_tnode( tnode ),
+                               /* count = */ NULL,
+                               /* is_imported = */ NULL,
+                               ex );
     }
 }
 
@@ -163,19 +177,31 @@ TNODE *typetab_lookup( TYPETAB *table, const char *name )
     return typetab_lookup_suffix( table, name, TS_NOT_A_SUFFIX );
 }
 
-TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
-			      type_suffix_t suffix )
+static TYPE_NODE *typetab_lookup_typenode( TYPETAB *table, const char *name,
+                                           type_suffix_t suffix )
 {
     TYPE_NODE *node;
     assert( table );
     assert( name );
     for( node = table->node; node != NULL; node = node->next ) {
         if( strcmp( name, node->name ) == 0 && suffix == node->suffix ) {
-	    assert( node->tnode );
-	    return node->tnode;
+	    return node;
 	}
     }
     return NULL;
+}
+
+TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
+			      type_suffix_t suffix )
+{
+    TYPE_NODE *node = typetab_lookup_typenode( table, name, suffix );
+
+    if( node ) {
+        assert( node->tnode );
+        return node->tnode;
+    } else {
+        return NULL;
+    }
 }
 
 void typetab_begin_scope( TYPETAB* table, cexception_t *ex )
