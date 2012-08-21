@@ -31,6 +31,25 @@ static TYPE_NODE *new_type_node_default( cexception_t *ex )
     return callocx( sizeof(TYPE_NODE), 1, ex );
 }
 
+static TYPE_NODE *new_type_node( TNODE *tnode, const char* name,
+                                 type_suffix_t suffix,
+                                 int current_scope,
+                                 int current_subscope,
+                                 TYPE_NODE *next_node,
+                                 cexception_t *ex )
+{
+    TYPE_NODE *node = new_type_node_default( ex );
+
+    node->tnode = tnode;
+    node->name  = strdupx( (char*)name, ex );
+    node->suffix = suffix;
+    node->scope = current_scope;
+    node->subscope = current_subscope;
+    node->next  = next_node;
+
+    return node;
+}
+
 static void delete_type_node( TYPE_NODE *node )
 {
     if( node ) {
@@ -78,33 +97,24 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
 			      type_suffix_t suffix, TNODE *tnode,
 			      cexception_t *ex )
 {
-    cexception_t inner;
-    TYPE_NODE * volatile node = NULL;
     TNODE *ret = NULL;
+    TNODE *lookup_node = NULL;
 
     assert( table );
     assert( name );
 
-    cexception_guard( inner ) {
-        TNODE *lookup_node = typetab_lookup_suffix( table, name, suffix );
-        if( lookup_node ) {
-	    ret = lookup_node;
-	} else {
-	    node = new_type_node_default( ex );
-	    node->tnode = tnode;
-	    node->suffix = suffix;
-	    node->scope = table->current_scope;
-	    node->subscope = table->current_subscope;
-	    node->name  = strdupx( (char*)name, &inner );
-	    node->next  = table->node;
-	    table->node = node;
-	    ret = tnode;
-	}
+    lookup_node = typetab_lookup_suffix( table, name, suffix );
+
+    if( lookup_node ) {
+        ret = lookup_node;
+    } else {
+        table->node = new_type_node( tnode, name, suffix,
+                                     table->current_scope,
+                                     table->current_subscope,
+                                     /* next = */ table->node, ex );
+        ret = tnode;
     }
-    cexception_catch {
-        delete_type_node( node );
-	cexception_reraise( inner, ex );
-    }
+
     return ret;
 }
 
