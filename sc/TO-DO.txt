@@ -1,3 +1,9 @@
+-- Implement constructors for classes.
+-- Add diagnostics of unimplemented class methods.
+-- Implement program() { ... } construct.
+-- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
+-- Implement run-time null-pointer and array bound checks
+-- implement 'foreach ... in'
 xx Think if there would be a benefit from BNZ operator that removes its value from the stack only on branch.
 xx Make sure that begin_scope() function calls begin_subscope()
 xx Change i/o operators from << and >> to <- and ->.
@@ -11,10 +17,8 @@ xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 ++ Change names of STDIN()/STDOUT()/STDERR() standard functions to lowercase.
 ?? Make it possible to use 'float[]' as type designators of return values.
 ++ Implement functions 'argument(i)' and 'argumentnr()'
--- Implement run-time null-pointer and array bound checks
 -- Implement pragma to skip included files from '--debug code' listing.
 -- describe all options in --help (also all --debug arguments).
--- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 xx Implement 'unaliased' values
 -- Implement checks of uncaught exceptions (exceptions cheched by module, not by function)!
 xx Think about 'print/println/prints/printsln' operators
@@ -29,7 +33,6 @@ xx Think about 'print/println/prints/printsln' operators
 ++ implement pointers to functions.
 ++ implement non-null reference types.
 ++ implement 'p = ? q' assignment for save conversion of regular references into non-null references (the assignment should raise a runtime exception if the reference to be converted is null).
--- implement 'foreach ... in'
 +- implement "clone" operator for reference types.
 xx implement convenient conversion of fixed arrays into regular, variable arrays and strings
 -- Implement '--use' and '--import' options to specify used/imported modules on the command line.
