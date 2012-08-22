@@ -20,6 +20,8 @@ end module F2C;
 // use std;
 use F2C;
 
+. C_from_F( -40 F );
+. C_from_F(   0 F );
 . C_from_F(  32 F );
 . C_from_F(  80 F );
 . C_from_F( 100 F );
