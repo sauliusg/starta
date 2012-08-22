@@ -11,8 +11,8 @@ type P = ?class {
      int x;
      int i;
 
-     method g() : int;
-     method h( int a ) : int;
+     method g() : int { return self.i };
+     method h( int a ) : int { return self.i * a };
 }
 
 null class S : P {

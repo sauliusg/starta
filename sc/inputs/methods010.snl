@@ -12,9 +12,9 @@ type P = ?class {
      int x;
      int i;
 
-     method g() : int;
-     method h( int a ) : int;
-     method t() : int;
+     method g() : int { return self.x };
+     method h( int a ) : int { return self.i = a };
+     method t() : int { return self.i };
 }
 
 ?class S : P {

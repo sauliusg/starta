@@ -1,5 +1,9 @@
 ./sl: inputs/err-methods001.snl(21,27): ERROR, prototype of function h() does not match previous definition - old prototype argument 2 has type int, but new prototype has type long
     method h(long i) : int;
                           ^
-./sl: 1 error(s) detected
+./sl: inputs/err-methods001.snl(25,1): ERROR, class 'S', interface 0, method 'h' is declared but not implemented
+
+};
+^
+./sl: 2 error(s) detected
 

@@ -5233,6 +5233,26 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 #endif
 	}
     }
+
+    /* check whether all methods are implemented: */
+
+    {
+        DNODE *methods = tnode_methods( class_descr );
+        char *class_name = class_descr ? tnode_name( class_descr ) : "???";
+	foreach_dnode( method, methods ) {
+	    /* ssize_t method_index = dnode_offset( method ); */
+	    ssize_t method_address = dnode_ssize_value( method );
+            TNODE *method_type = dnode_type( method );
+            ssize_t method_interface = method_type ?
+                tnode_interface_number( method_type ) : -1;
+            if( method_address == 0 ) {
+                yyerrorf( "class '%s', interface %d, method '%s' is declared "
+                          "but not implemented\n",
+                          class_name, method_interface, 
+                          method ? dnode_name( method ) : "???" );
+            }
+        }
+    }
 }
 
 static void snail_check_array_component_is_not_null( TNODE *tnode )

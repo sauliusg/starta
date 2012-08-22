@@ -11,9 +11,9 @@ type P = null class {
      int x;
      int i;
 
-     method g() : int;
-     method h( int a ) : int;
-     method t() : int;
+     method g() : int { return self.i };
+     method h( int a ) : int { return self.x = a };
+     method t() : int { return self.i * self.x };
 }
 
 null class S : P {
