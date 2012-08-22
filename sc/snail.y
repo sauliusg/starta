@@ -3832,7 +3832,10 @@ static void snail_compile_type_declaration( SNAIL_COMPILER *cc,
     TNODE *tnode = NULL;
     char * volatile type_name = NULL;
 
-    if( !type_descr ) return;
+    if( !type_descr ) {
+	cc->current_type = NULL;
+        return;
+    }
 
     type_name = strdupx( tnode_name( cc->current_type ), ex );
 
@@ -5829,15 +5832,17 @@ pragma_statement
    {
        TNODE *default_type = $2;
 
-       typetab_override_suffix( snail_cc->typetab, /*name*/ "",
-                                TS_INTEGER_SUFFIX,
-                                share_tnode( default_type ),
-                                px );
+       if( default_type ) {
+           typetab_override_suffix( snail_cc->typetab, /*name*/ "",
+                                    TS_INTEGER_SUFFIX,
+                                    share_tnode( default_type ),
+                                    px );
 
-       typetab_override_suffix( snail_cc->typetab, /*name*/ "",
-                                TS_FLOAT_SUFFIX, 
-                                share_tnode( default_type ),
-                                px );
+           typetab_override_suffix( snail_cc->typetab, /*name*/ "",
+                                    TS_FLOAT_SUFFIX, 
+                                    share_tnode( default_type ),
+                                    px );
+       }
    }
    ;
 
