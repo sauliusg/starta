@@ -18,7 +18,7 @@ null class S {
 
     method f(int i) : int { return i * i }
     method h(int i) : int
-    // method h(int i) : int { return i*i + i }
+    method h(int i) : int { return i*i + i }
 
     inline bytecode operator "*"(S a, b) : S { return null };
 

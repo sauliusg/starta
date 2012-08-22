@@ -12,9 +12,9 @@ type P = null class {
      int x;
      int i;
 
-     method g() : int;
-     method h( int a ) : int;
-     method t() : int;
+     method g() : int { return 0; }
+     method h( int a ) : int { var old_x = self.x; self.x = a; return old_x }
+     method t() : int { return self.x / self.i }
 }
 
 null class S : P {

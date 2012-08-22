@@ -1,6 +1,14 @@
+./sl: inputs/err-methods003.snl(16,1): ERROR, class 'P', interface 0, method 'h' is declared but not implemented
+
+}
+^
+./sl: inputs/err-methods003.snl(16,1): ERROR, class 'P', interface 0, method 'g' is declared but not implemented
+
+}
+^
 ./sl: inputs/err-methods003.snl(27,26): ERROR, Prototype of method h() does not match inherted definition:
 new prototype has too many arguments
     method h(int x) : int; // ERROR: method prototype does not match the 
                          ^
-./sl: 1 error(s) detected
+./sl: 3 error(s) detected
 
