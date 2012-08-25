@@ -1,27 +1,13 @@
 
-module F2C;
-
 use std;
 
-type F = float;
-type C = float;
+class C {
+    int i;
 
-inline bytecode function F_as_float( t : F ): float {};
-inline bytecode function float_as_C( x : float ): C {};
-
-procedure C_from_F( t : F ): C
-{
-    pragma float;
-    return float_as_C((F_as_float(t) - 32) * 5/9);
+    constructor C( int x )
+    {
+        self.i = x;
+    }
 }
 
-end module F2C;
-
-// use std;
-use F2C;
-
-. C_from_F( -40 F );
-. C_from_F(   0 F );
-. C_from_F(  32 F );
-. C_from_F(  80 F );
-. C_from_F( 100 F );
+var c = new C( 5 );
