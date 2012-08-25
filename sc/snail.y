@@ -8684,12 +8684,15 @@ generator_new
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
 
-          snail_cc->current_call = constructor_dnode;
+          snail_cc->current_call = share_dnode( constructor_dnode );
           
-	  snail_cc->current_arg = constructor_tnode ?
-	      dnode_list_last( tnode_args( constructor_tnode )) : NULL;
+          snail_cc->current_arg = constructor_tnode ?
+              dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+              NULL;
 
+          snail_compile_dup( snail_cc, px );
 	  snail_push_guarding_arg( snail_cc, px );
+          compiler_swap_top_expressions( snail_cc );
 	}
     '(' opt_actual_argument_list ')'
         {
@@ -8702,8 +8705,8 @@ generator_new
 
 	    nretvals = snail_compile_multivalue_function_call( snail_cc, px );
 
-            if( nretvals > 1 ) {
-                yyerrorf( "constructor '%s()' must return one value",
+            if( nretvals > 0 ) {
+                yyerrorf( "constructor '%s()' should not return a value",
                           constructor_name ? constructor_name : "???" );
             }
 	}
@@ -9568,7 +9571,7 @@ constructor_header
           int function_attributes = $1;
           char *constructor_name = $5;
           DNODE *parameter_list = $7;
-          DNODE *return_dnode = NULL;
+          // DNODE *return_dnode = NULL;
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = $<tnode>-1;
@@ -9579,14 +9582,15 @@ constructor_header
               parameter_list = dnode_append( parameter_list, self_dnode );
               self_dnode = NULL;
 
-              return_dnode = new_dnode( px );
-              dnode_insert_type( return_dnode, share_tnode( class_tnode ));
+              // return_dnode = new_dnode( px );
+              // dnode_insert_type( return_dnode, share_tnode( class_tnode ));
 
 	      $$ = funct = new_dnode_constructor( constructor_name,
                                                   parameter_list,
-                                                  return_dnode, &inner );
+                                                  /* return_dnode = */ NULL,
+                                                  &inner );
 	      parameter_list = NULL;
-	      return_dnode = NULL;
+	      // return_dnode = NULL;
               
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
@@ -9602,7 +9606,7 @@ constructor_header
 	  }
 	  cexception_catch {
 	      delete_dnode( parameter_list );
-	      delete_dnode( return_dnode );
+	      // delete_dnode( return_dnode );
 	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );

@@ -13,17 +13,8 @@ class C {
     {
         . self.i
     }
-
-    method get_i(): int
-    {
-        return self.i
-    }
 }
 
 var c = new C( 5 );
 
-. c.i;
-
-c->print_i();
-
-. c->get_i();
+c->i();
