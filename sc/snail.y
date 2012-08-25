@@ -9582,7 +9582,8 @@ constructor_header
               return_dnode = new_dnode( px );
               dnode_insert_type( return_dnode, share_tnode( class_tnode ));
 
-	      $$ = funct = new_dnode_constructor( constructor_name, parameter_list,
+	      $$ = funct = new_dnode_constructor( constructor_name,
+                                                  parameter_list,
                                                   return_dnode, &inner );
 	      parameter_list = NULL;
 	      return_dnode = NULL;
@@ -9594,6 +9595,7 @@ constructor_header
 	          dnode_set_flags( funct, DF_INLINE );
 	      funct = $$ =
 		  snail_check_and_set_fn_proto( snail_cc, funct, px );
+              share_dnode( funct );
 
               /* Constructors are always functions (?): */
               /* snail_set_function_arguments_readonly( dnode_type( funct )); */

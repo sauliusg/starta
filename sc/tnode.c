@@ -531,6 +531,11 @@ TNODE *new_tnode_operator( char *name,
 					   TK_OPERATOR, ex );
 }
 
+static int tnode_is_constructor( TNODE *tnode )
+{
+    return tnode && tnode->kind == TK_CONSTRUCTOR;
+}
+
 static int tnode_is_method( TNODE *tnode )
 {
     return tnode && tnode->kind == TK_METHOD;
@@ -1694,6 +1699,30 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
     return tnode;
 }
 
+TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
+{
+    char msg[100];
+
+    assert( tnode );
+    assert( constructor );
+
+    if( !tnode->constructor ) {
+        tnode->constructor = constructor;
+    } else {
+        if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,
+                                                  msg, sizeof(msg))) {
+            yyerrorf( "Prototype of method %s() does not match "
+                      "inherted definition:\n%s", dnode_name( constructor ),
+                      msg );
+            delete_dnode( constructor );
+        } else {
+            delete_dnode( tnode->constructor );
+            tnode->constructor = constructor;
+        }
+    }
+    return tnode;
+}
+
 TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 {
     DNODE *existing_method;
@@ -1780,6 +1809,9 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member )
         } else
 	if( tnode_is_method( member_type )) {
 	    tnode_insert_single_method( tnode, member );
+        } else
+	if( tnode_is_constructor( member_type )) {
+	    tnode_insert_constructor( tnode, member );
 	} else {
 	    tnode_insert_fields( tnode, member );
 	}
