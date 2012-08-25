@@ -50,6 +50,7 @@ typedef enum {
     TK_FUNCTION,
     TK_OPERATOR,
     TK_METHOD, /* class (virtual) methods, or virtual functions */
+    TK_CONSTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
     TK_DERIVED,
@@ -92,6 +93,11 @@ TNODE *new_tnode_function_or_proc_ref( DNODE *parameters,
 
 TNODE *new_tnode_function( char *name, DNODE *parameters, DNODE *return_dnodes,
 			   cexception_t *ex );
+
+TNODE *new_tnode_constructor( char *name,
+                              DNODE *parameters,
+                              DNODE *return_dnodes,
+                              cexception_t *ex );
 
 TNODE *new_tnode_method( char *name, DNODE *parameters, DNODE *return_dnodes,
                          cexception_t *ex );
@@ -252,6 +258,8 @@ TNODE *tnode_set_integer_attribute( TNODE *tnode, const char *attr_name,
 
 TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 				   const char *attr_value, cexception_t *ex );
+
+DNODE *tnode_constructor( TNODE *tnode );
 
 TNODE *tnode_next( TNODE* list );
 

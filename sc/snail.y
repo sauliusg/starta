@@ -5318,6 +5318,7 @@ static cexception_t *px; /* parser exception */
 %token _CATCH
 %token _CLASS
 %token _CONST
+%token _CONSTRUCTOR
 %token _CONTINUE
 %token _DEBUG
 %token _DO
@@ -5395,6 +5396,8 @@ static cexception_t *px; /* parser exception */
 %type <dnode> argument_identifier_list
 %type <c>     constant_expression
 %type <i>     constant_integer_expression
+%type <dnode> constructor_header
+%type <dnode> constructor_definition
 %type <tnode> dimension_list
 %type <dnode> enum_member
 %type <tnode> enum_member_list
@@ -7236,6 +7239,8 @@ struct_operator
   : operator_definition
   | method_definition
   | method_header
+  | constructor_definition
+  | constructor_header
   ;
 
 interface_type_placeholder
@@ -8655,6 +8660,54 @@ generator_new
           snail_check_type_contains_non_null_ref( $2 );
           snail_compile_alloc( snail_cc, $2, px );
       }
+
+  | _NEW type_identifier
+      {
+	  DNODE *constructor_dnode;
+          TNODE *constructor_tnode;
+          TNODE *type_tnode = $2;
+
+          snail_check_type_contains_non_null_ref( type_tnode );
+          snail_compile_alloc( snail_cc, type_tnode, px );
+
+          /* --- function call generations starts here: */
+
+          dlist_push_dnode( &snail_cc->current_call_stack,
+                            &snail_cc->current_call, px );
+
+          dlist_push_dnode( &snail_cc->current_arg_stack,
+                            &snail_cc->current_arg, px );
+
+          constructor_dnode = type_tnode ?
+              tnode_constructor( type_tnode ) : NULL;
+
+          constructor_tnode = constructor_dnode ?
+              dnode_type( constructor_dnode ) : NULL;
+
+          snail_cc->current_call = constructor_dnode;
+          
+	  snail_cc->current_arg = constructor_tnode ?
+	      dnode_list_last( tnode_args( constructor_tnode )) : NULL;
+
+	  snail_push_guarding_arg( snail_cc, px );
+	}
+    '(' opt_actual_argument_list ')'
+        {
+	    DNODE *constructor_dnode = snail_cc->current_call;
+	    TNODE *constructor_tnode = constructor_dnode ?
+                dnode_type( constructor_dnode ) : NULL;
+            int nretvals;
+            char *constructor_name = constructor_tnode ?
+                tnode_name( constructor_tnode ) : NULL;
+
+	    nretvals = snail_compile_multivalue_function_call( snail_cc, px );
+
+            if( nretvals > 1 ) {
+                yyerrorf( "constructor '%s()' must return one value",
+                          constructor_name ? constructor_name : "???" );
+            }
+	}
+
   | _NEW compact_type_description '[' expression ']'
       {
           snail_check_array_component_is_not_null( $2 );
@@ -9203,6 +9256,13 @@ method_definition
     function_or_operator_end
   ;
 
+constructor_definition
+  : constructor_header
+    function_or_operator_start
+    function_or_operator_body
+    function_or_operator_end
+  ;
+
 function_definition
   : function_header
     function_or_operator_start
@@ -9488,6 +9548,60 @@ method_header
 	      delete_dnode( $10 );
 	      delete_dnode( funct );
               delete_dnode( self_dnode );
+	      $$ = NULL;
+	      cexception_reraise( inner, px );
+	  }
+	}
+  ;
+
+constructor_header
+  : opt_function_attributes function_code_start _CONSTRUCTOR
+        {
+	    //snail_begin_scope( snail_cc, px );
+	}
+    __IDENTIFIER '(' argument_list ')'
+        {
+	  cexception_t inner;
+	  DNODE *volatile funct = NULL;
+          DNODE *volatile self_dnode = NULL;
+          
+          int function_attributes = $1;
+          char *constructor_name = $5;
+          DNODE *parameter_list = $7;
+          DNODE *return_dnode = NULL;
+
+    	  cexception_guard( inner ) {
+              TNODE *class_tnode = $<tnode>-1;
+
+              self_dnode = new_dnode_name( "self", &inner );
+              dnode_insert_type( self_dnode, share_tnode( class_tnode ));
+
+              parameter_list = dnode_append( parameter_list, self_dnode );
+              self_dnode = NULL;
+
+              return_dnode = new_dnode( px );
+              dnode_insert_type( return_dnode, share_tnode( class_tnode ));
+
+	      $$ = funct = new_dnode_constructor( constructor_name, parameter_list,
+                                                  return_dnode, &inner );
+	      parameter_list = NULL;
+	      return_dnode = NULL;
+              
+	      dnode_set_flags( funct, DF_FNPROTO );
+	      if( function_attributes & DF_BYTECODE )
+	          dnode_set_flags( funct, DF_BYTECODE );
+	      if( function_attributes & DF_INLINE )
+	          dnode_set_flags( funct, DF_INLINE );
+	      funct = $$ =
+		  snail_check_and_set_fn_proto( snail_cc, funct, px );
+
+              /* Constructors are always functions (?): */
+              /* snail_set_function_arguments_readonly( dnode_type( funct )); */
+	  }
+	  cexception_catch {
+	      delete_dnode( parameter_list );
+	      delete_dnode( return_dnode );
+	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );
 	  }

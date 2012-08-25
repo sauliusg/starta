@@ -79,6 +79,8 @@ struct TNODE {
 			     arguments, NULL if function has no arguments */
     DNODE *return_vals;   /* value (or several values), returned by the
 			     function */
+
+    DNODE *constructor;   /* class constructor */
     TNODE *next;
 };
 
@@ -105,6 +107,7 @@ void delete_tnode( TNODE *tnode )
 	delete_tnode( tnode->base_type );
 	delete_tnode( tnode->element_type );
         delete_tlist( tnode->interfaces );
+	delete_dnode( tnode->constructor );
 	delete_tnode( tnode->next );
 	free_tnode( tnode );
     }
@@ -499,6 +502,15 @@ TNODE *new_tnode_function( char *name,
 {
     return new_tnode_function_or_operator( name, parameters, return_dnodes,
 					   TK_FUNCTION, ex );
+}
+
+TNODE *new_tnode_constructor( char *name,
+                              DNODE *parameters,
+                              DNODE *return_dnodes,
+                              cexception_t *ex )
+{
+    return new_tnode_function_or_operator( name, parameters, return_dnodes,
+					   TK_CONSTRUCTOR, ex );
 }
 
 TNODE *new_tnode_method( char *name,
@@ -2124,6 +2136,12 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
     }
     yyerrorf( "Unknown type attribute '%s'", attr_name );
     return NULL;
+}
+
+DNODE *tnode_constructor( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->constructor;
 }
 
 TNODE *tnode_next( TNODE* list )

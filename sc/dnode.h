@@ -54,6 +54,10 @@ DNODE *new_dnode_return_value( TNODE *retval_type, cexception_t *ex );
 DNODE* new_dnode_function( char *name, DNODE *parameters, DNODE *return_values, 
 			   cexception_t *ex );
 
+DNODE* new_dnode_constructor( char *name, DNODE *parameters,
+                              DNODE *return_values, 
+                              cexception_t *ex );
+
 DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
                          cexception_t *ex );
 
