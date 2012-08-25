@@ -4,6 +4,9 @@
 -- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
 -- implement 'foreach ... in'
+-- Implement precondition and postconditions
+-- Implement assert'ions.
+-- Implement pre-compiled modules.
 xx Think if there would be a benefit from BNZ operator that removes its value from the stack only on branch.
 xx Make sure that begin_scope() function calls begin_subscope()
 xx Change i/o operators from << and >> to <- and ->.
@@ -51,8 +54,6 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 -- Implement readonly structure members.
 -- Implement readline() opcode and function
 -- Implement push and pop to the arrays.
--- Implement precondition, postcondition, and invariant assertions.
--- Implement pre-compiled modules.
 -- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
 -+ Implement objects.
 -- Implement dynamic, runtime-bound messages to objects.
