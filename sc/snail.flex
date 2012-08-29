@@ -203,6 +203,7 @@ break       { MARK; return _BREAK; }
 bytecode    { MARK; return _BYTECODE; }
 catch       { MARK; return _CATCH; }
 class       { MARK; return _CLASS; }
+closure     { MARK; return _CLOSURE; }
 const       { MARK; return _CONST; }
 constructor { MARK; return _CONSTRUCTOR; }
 continue    { MARK; return _CONTINUE; }
