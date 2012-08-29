@@ -9557,12 +9557,18 @@ method_header
 	}
   ;
 
+opt_base_class_initialisation
+: __IDENTIFIER '(' opt_actual_argument_list ')'
+| /* empty */
+;
+
 constructor_header
   : opt_function_attributes function_code_start _CONSTRUCTOR
         {
 	    //snail_begin_scope( snail_cc, px );
 	}
     __IDENTIFIER '(' argument_list ')'
+    opt_base_class_initialisation
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
