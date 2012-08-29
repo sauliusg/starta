@@ -5317,6 +5317,7 @@ static cexception_t *px; /* parser exception */
 %token _BYTECODE
 %token _CATCH
 %token _CLASS
+%token _CLOSURE
 %token _CONST
 %token _CONSTRUCTOR
 %token _CONTINUE
@@ -8254,6 +8255,34 @@ null_expression
       }
   ;
 
+opt_closure_initialisation_list
+: closure_initialisation_list
+| closure_initialisation_list ';'
+| /* empty */
+;
+
+closure_initialisation_list
+: variable_declaration
+| closure_initialisation_list variable_declaration
+| closure_initialisation_list ';' variable_declaration
+;
+
+function_expression
+:   function_or_procedure_keyword '(' argument_list ')'
+         opt_retval_description_list
+    function_or_operator_start
+    function_or_operator_body
+    function_or_operator_end
+
+| _CLOSURE
+      opt_closure_initialisation_list
+  function_or_procedure_keyword '(' argument_list ')'
+      opt_retval_description_list
+  function_or_operator_start
+  function_or_operator_body
+  function_or_operator_end
+;
+
 simple_expression
   : constant
   | variable
@@ -8270,6 +8299,7 @@ simple_expression
   | array_expression
   | struct_expression
   | unpack_expression
+  | function_expression
   ;
 
 opt_comma
