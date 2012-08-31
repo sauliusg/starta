@@ -8075,25 +8075,32 @@ multivalue_function_call
             DNODE *object = $1;
             TNODE *object_type = dnode_type( object );
             DNODE *method = tnode_lookup_field( object_type, $3 );
+            DNODE *last_arg = NULL;
 
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-		dlist_push_dnode( &snail_cc->current_call_stack,
-				  &snail_cc->current_call, px );
+                dlist_push_dnode( &snail_cc->current_call_stack,
+                                  &snail_cc->current_call, px );
 
-		dlist_push_dnode( &snail_cc->current_arg_stack,
-				  &snail_cc->current_arg, px );
-
-		snail_cc->current_call = share_dnode( method );
+                dlist_push_dnode( &snail_cc->current_arg_stack,
+                                  &snail_cc->current_arg, px );
 
 		if( fn_tnode && tnode_kind( fn_tnode ) != TK_METHOD ) {
 		    yyerrorf( "called field is not a method" );
-		}
+                    snail_cc->current_call = NULL;
+		} else {
+                    snail_cc->current_call = share_dnode( method );
+                }
 
-		snail_cc->current_arg = fn_tnode ?
-		    dnode_prev( dnode_list_last( tnode_args( fn_tnode ))) :
-		    NULL;
+                last_arg = fn_tnode ?
+                    tnode_args( fn_tnode ) : NULL;
+
+                last_arg = last_arg ?
+                    dnode_list_last( last_arg ) : NULL;
+
+		snail_cc->current_arg = last_arg ?
+		    dnode_prev( last_arg ) : NULL;
 	    } else {
 		char *object_name = object ? dnode_name( object ) : NULL;
 		char *method_name = $3;
