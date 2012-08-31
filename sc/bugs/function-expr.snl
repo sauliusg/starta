@@ -1,0 +1,4 @@
+
+use std;
+
+var f = function( x, y : float ) { return x*y/(x+y) };

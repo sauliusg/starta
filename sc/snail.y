@@ -9595,7 +9595,39 @@ method_header
   ;
 
 opt_base_class_initialisation
-: __IDENTIFIER '(' opt_actual_argument_list ')'
+: __IDENTIFIER 
+    {
+        TNODE *type_tnode = $<tnode>-1;
+        TNODE *base_type_tnode = tnode_base_type( type_tnode );
+        DNODE *constructor_dnode;
+        TNODE *constructor_tnode;
+
+        dlist_push_dnode( &snail_cc->current_call_stack,
+                          &snail_cc->current_call, px );
+
+        dlist_push_dnode( &snail_cc->current_arg_stack,
+                          &snail_cc->current_arg, px );
+
+        constructor_dnode = base_type_tnode ?
+            tnode_constructor( base_type_tnode ) : NULL;
+
+        constructor_tnode = constructor_dnode ?
+            dnode_type( constructor_dnode ) : NULL;
+
+        snail_cc->current_call = share_dnode( constructor_dnode );
+          
+        snail_cc->current_arg = constructor_tnode ?
+            dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+            NULL;
+
+        snail_compile_dup( snail_cc, px );
+        snail_push_guarding_arg( snail_cc, px );
+        compiler_swap_top_expressions( snail_cc );
+    }
+'(' opt_actual_argument_list ')'
+{
+    
+}
 | /* empty */
 ;
 
