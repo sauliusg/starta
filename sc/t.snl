@@ -1,4 +1,26 @@
 
 use std;
 
-var f = function( x, y : float ) { return x*y/(x+y) };
+class C {
+    var i : int;
+
+    constructor C( int x )
+    {
+        self.i = x;
+    }
+}
+
+class D : C {
+    var j : int;
+
+    constructor D( int x )
+        super( x + 3 );
+    {
+        self.j = x;
+    }
+}
+
+
+var d = new D( 5 );
+
+. d.i;

@@ -1,0 +1,16 @@
+
+use std;
+
+class C {
+    var i : int;
+
+    // constructor C( int x )
+    // {
+    //     self.i = x;
+    // }
+}
+
+
+var c = new C( 5 );
+
+. c.i;
