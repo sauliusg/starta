@@ -9299,6 +9299,7 @@ method_definition
 constructor_definition
   : constructor_header
     function_or_operator_start
+    opt_base_class_initialisation
     function_or_operator_body
     function_or_operator_end
   ;
@@ -9594,13 +9595,21 @@ method_header
 	}
   ;
 
+opt_semicolon
+  : ';'
+  | /* empty */
+  ;
+
 opt_base_class_initialisation
 : __IDENTIFIER 
     {
-        TNODE *type_tnode = $<tnode>-1;
+        TNODE *type_tnode = $<tnode>-3;
         TNODE *base_type_tnode = tnode_base_type( type_tnode );
         DNODE *constructor_dnode;
         TNODE *constructor_tnode;
+        DNODE *self_dnode;
+
+        snail_emit( snail_cc, px, "T\n", "# Initialising base class:" );
 
         dlist_push_dnode( &snail_cc->current_call_stack,
                           &snail_cc->current_call, px );
@@ -9620,14 +9629,16 @@ opt_base_class_initialisation
             dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
             NULL;
 
-        snail_compile_dup( snail_cc, px );
+        self_dnode = snail_lookup_dnode( snail_cc, NULL, "self", "variable" );
         snail_push_guarding_arg( snail_cc, px );
-        compiler_swap_top_expressions( snail_cc );
+        snail_compile_load_variable_value( snail_cc, self_dnode, px );
     }
-'(' opt_actual_argument_list ')'
-{
-    
-}
+'(' opt_actual_argument_list ')' opt_semicolon
+    {
+        ssize_t nretval;
+        nretval = snail_compile_multivalue_function_call( snail_cc, px );
+        assert( nretval == 0 );
+    }
 | /* empty */
 ;
 
@@ -9637,7 +9648,6 @@ constructor_header
 	    //snail_begin_scope( snail_cc, px );
 	}
     __IDENTIFIER '(' argument_list ')'
-    opt_base_class_initialisation
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
