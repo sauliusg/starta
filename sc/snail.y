@@ -9676,6 +9676,8 @@ constructor_header
                                                   &inner );
 	      parameter_list = NULL;
 	      // return_dnode = NULL;
+
+              tnode_insert_constructor( class_tnode, funct );
               
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )

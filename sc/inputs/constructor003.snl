@@ -5,27 +5,12 @@ null class C {
     var i : int;
     var next : C;
 
-    // constructor C( int x );
-
     constructor C( int x )
     {
         if x > 0 then
            self.next = new C( x - 1 );
         endif;
         self.i = x;
-    }
-
-    method list_rec();
-
-    method list_rec()
-    {
-        < self.i;
-        if self.next == null then
-            . ""
-        else
-            < " x ";
-            self.next->list_rec()
-        endif
     }
 
     method list_iter()
@@ -54,13 +39,9 @@ var c = new C( 5 );
 var d = new D( 5 );
 
 . c.i;
-c->list_rec();
-. "";
 c->list_iter();
 
 . "\n-------------";
 
 . d.i;
-d->list_rec();
-. "";
 d->list_iter();
