@@ -1706,7 +1706,7 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
     assert( tnode );
     assert( constructor );
 
-    if( !tnode->constructor ) {
+    if( !tnode->constructor || tnode->constructor == constructor ) {
         tnode->constructor = constructor;
     } else {
         if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,

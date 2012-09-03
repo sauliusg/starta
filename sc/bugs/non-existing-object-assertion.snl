@@ -1,7 +1,7 @@
 
 use std;
 
-null class C {
+class C {
     var i : int;
     var next : C;
 
@@ -15,31 +15,18 @@ null class C {
         self.i = x;
     }
 
-    method list_rec();
-
-    method list_rec()
+    method list()
     {
         < self.i;
-        if self.next == null then
+        if !self.next then
             . ""
         else
-            < " x ";
-            self.next->list_rec()
+            self.next->list()
         endif
-    }
-
-    method list_iter()
-    {
-        var C curr = self;
-        while curr.next != null do
-            < curr.i, "";
-            curr = curr.next;
-        enddo
-        . ""
     }
 }
 
-null class D : C {
+class D : C {
     var j : int;
 
     constructor D( int x )
@@ -54,13 +41,7 @@ var c = new C( 5 );
 var d = new D( 5 );
 
 . c.i;
-c->list_rec();
-. "";
-c->list_iter();
-
-. "\n-------------";
+c->list();
 
 . d.i;
-d->list_rec();
-. "";
-d->list_iter();
+s->list();
