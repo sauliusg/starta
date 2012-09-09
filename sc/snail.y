@@ -5106,17 +5106,12 @@ i-face 1 VMT offs.:             |
 
 */
 
-static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
-						   TNODE *class_descr,
-						   cexception_t *ex )
+static void compiler_start_virtual_method_table( SNAIL_COMPILER *cc,
+                                                 TNODE *class_descr,
+                                                 cexception_t *ex )
 {
-    ssize_t vmt_address, vmt_start, i;
-    ssize_t max_vmt_entry;
+    ssize_t vmt_address;
     ssize_t interface_nr;
-    ssize_t *itable; /* interface VMT offset table */
-    ssize_t *vtable; /* a VMT table with method offsets*/
-    DNODE *volatile method;
-    TNODE *volatile base;
 
     assert( class_descr );
 
@@ -5124,8 +5119,14 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
         return;
     }
 
-    max_vmt_entry = tnode_max_vmt_offset( class_descr );
     interface_nr = tnode_max_interface( class_descr );
+
+#if 0
+    printf( ">>> interface_nr = %d\n", interface_nr );
+#endif
+#if 0
+    printf( ">>> class name = %s\n", tnode_name(class_descr) );
+#endif
 
     compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t), ex );
 
@@ -5133,7 +5134,7 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 
     tnode_set_vmt_offset( class_descr, vmt_address );
 
-#if 1
+#if 0
     compiler_assemble_static_ssize_t( cc, vmt_address +
                                       (2+interface_nr) * sizeof(ssize_t), ex );
     compiler_assemble_static_data( cc, NULL,
@@ -5143,10 +5144,32 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
 				   (1+interface_nr) * sizeof(ssize_t), ex );
 #endif
 
+}
+
+static void compiler_finish_virtual_method_table( SNAIL_COMPILER *cc,
+                                                  TNODE *class_descr,
+                                                  cexception_t *ex )
+{
+    ssize_t vmt_address, vmt_start, i;
+    ssize_t max_vmt_entry;
+    ssize_t interface_nr;
+    ssize_t *itable; /* interface VMT offset table */
+    ssize_t *vtable; /* a VMT table with method offsets*/
+    DNODE *volatile method;
+    TNODE *volatile base;
+
+    vmt_address = tnode_vmt_offset( class_descr );
+    max_vmt_entry = tnode_max_vmt_offset( class_descr );
+    interface_nr = tnode_max_interface( class_descr );
+
+#if 0
+    printf( ">>> interface_nr = %d\n", interface_nr );
+#endif
+
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
 
-    assert( vmt_start == vmt_address + (2+interface_nr) * sizeof(ssize_t) );
+    // assert( vmt_start == vmt_address + (2+interface_nr) * sizeof(ssize_t) );
 
     itable = (ssize_t*)(cc->static_data + vmt_address);
     itable[1] = vmt_start;
@@ -5157,6 +5180,7 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
             vmt_address, vmt_start );
 #endif
 
+    /* allocate the main class VMT: */
     compiler_assemble_static_data( cc, NULL,
 				   max_vmt_entry * sizeof(ssize_t), ex );
 
@@ -5184,12 +5208,16 @@ static void compiler_compile_virtual_method_table( SNAIL_COMPILER *cc,
        entries with table offsets: */
     for( i = 2; i <= interface_nr+1; i++ ) {
         ssize_t method_count = itable[i];
+#if 0
+        printf( ">>> class '%s', interface %d, method count  %d\n",
+                tnode_name( base ), i, method_count );
+#endif
         itable[i] = compiler_assemble_static_data( cc, NULL,
                                                    (method_count + 1) *
                                                    sizeof(ssize_t), ex );
         itable = (ssize_t*)(cc->static_data + vmt_address);
         ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
-    } 
+    }
 
     /* Now, fill the VMT table with the real method addresses: */
     itable = (ssize_t*)(cc->static_data + vmt_address);
@@ -7000,7 +7028,7 @@ class_description
     }
     struct_or_class_description_body
     {
-        compiler_compile_virtual_method_table( snail_cc, $4, px );
+        compiler_finish_virtual_method_table( snail_cc, $4, px );
         $$ = tnode_finish_class( $4, px );
         if( $1 ) {
             tnode_set_flags( $$, TF_NON_NULL );
@@ -7111,6 +7139,8 @@ finish_fields
 	  tnode_insert_base_type( current_class, share_tnode( base_type ));
           tnode_insert_interfaces( current_class, interfaces );
       }
+
+      compiler_start_virtual_method_table( snail_cc, current_class, px );
 
       $$ = current_class;
   }
@@ -7631,7 +7661,7 @@ class_declaration
     struct_or_class_declaration_body
     {
  	tnode_finish_class( $5, px );
-	compiler_compile_virtual_method_table( snail_cc, $5, px );
+	compiler_finish_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
 	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
@@ -7648,7 +7678,7 @@ class_declaration
             tnode_set_flags( $6, TF_NON_NULL );
         }
  	tnode_finish_class( $6, px );
-	compiler_compile_virtual_method_table( snail_cc, $6, px );
+	compiler_finish_virtual_method_table( snail_cc, $6, px );
 	snail_end_scope( snail_cc, px );
 	snail_compile_type_declaration( snail_cc, $6, px );
 	snail_cc->current_type = NULL;
@@ -7676,7 +7706,7 @@ interface_declaration
     interface_declaration_body
     {
  	tnode_finish_interface( $5, ++snail_cc->last_interface_number, px );
-	compiler_compile_virtual_method_table( snail_cc, $5, px );
+	//compiler_finish_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
 	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
