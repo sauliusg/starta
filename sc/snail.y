@@ -5158,6 +5158,9 @@ static void compiler_finish_virtual_method_table( SNAIL_COMPILER *cc,
     DNODE *volatile method;
     TNODE *volatile base;
 
+    assert( class_descr );
+    assert( tnode_kind( class_descr ) != TK_INTERFACE );
+
     vmt_address = tnode_vmt_offset( class_descr );
     max_vmt_entry = tnode_max_vmt_offset( class_descr );
     interface_nr = tnode_max_interface( class_descr );
@@ -7706,7 +7709,6 @@ interface_declaration
     interface_declaration_body
     {
  	tnode_finish_interface( $5, ++snail_cc->last_interface_number, px );
-	//compiler_finish_virtual_method_table( snail_cc, $5, px );
 	snail_end_scope( snail_cc, px );
 	snail_typetab_insert( snail_cc, $5, px );
 	snail_cc->current_type = NULL;
