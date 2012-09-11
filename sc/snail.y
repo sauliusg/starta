@@ -699,6 +699,20 @@ static void snail_vartab_insert_named_vars( SNAIL_COMPILER *cc,
     }
 }
 
+static void snail_vartab_insert_single_named_var( SNAIL_COMPILER *cc,
+                                                  DNODE *var,
+                                                  cexception_t *ex )
+{
+    char *name = dnode_name( var );
+    assert( name );
+
+    vartab_insert( cc->vartab, name, var, ex );
+    if( cc->current_package && dnode_scope( var ) == 0 ) {
+	dnode_vartab_insert_dnode( cc->current_package, name,
+                                   share_dnode( var ), ex );
+    }
+}
+
 static void snail_consttab_insert_consts( SNAIL_COMPILER *cc, DNODE *consts,
 					  cexception_t *ex )
 {
@@ -3010,7 +3024,7 @@ static DNODE *snail_check_and_set_fn_proto( SNAIL_COMPILER *cc,
 	delete_dnode( fn_proto );
 	return fn_dnode;
     } else {
-	snail_vartab_insert_named_vars( cc, fn_proto, ex );
+	snail_vartab_insert_single_named_var( cc, fn_proto, ex );
 	return fn_proto;
     }
 }
@@ -9613,18 +9627,10 @@ method_header
 	      funct = $$ =
 		  snail_check_and_set_fn_proto( snail_cc, funct, px );
 	      share_dnode( funct );
+              tnode_insert_single_method( current_class, share_dnode( funct ));
 	      if( is_function ) {
 		  snail_set_function_arguments_readonly( dnode_type( funct ));
 	      }
-
-              /* Unfortunately, this tnode_insert_single_method() must
-                 be the last call in this block, after the
-                 tnode_insert_single_method() call, since otherwices
-                 the symbol table will try to insert all methods of
-                 the current_class, not just the 'funct' (since the
-                 funct after the tnode_insert_single_method() will be
-                 linked with other methods. */
-              tnode_insert_single_method( current_class, share_dnode( funct ));
 	  }
 	  cexception_catch {
 	      delete_dnode( $8 );
