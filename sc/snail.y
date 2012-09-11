@@ -9557,6 +9557,7 @@ method_header
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
           DNODE *volatile self_dnode = NULL;
+          TNODE *current_class = $<tnode>-1;
           char *method_name = $5;
           DNODE *implements_method = $6;
           DNODE *parameter_list = $8;
@@ -9566,7 +9567,7 @@ method_header
     	  cexception_guard( inner ) {
               self_dnode = new_dnode_name( "self", &inner );
 
-              dnode_insert_type( self_dnode, share_tnode( $<tnode>-1 ));
+              dnode_insert_type( self_dnode, share_tnode( current_class ));
 
               parameter_list = dnode_append( parameter_list, self_dnode );
               self_dnode = NULL;
@@ -9615,6 +9616,15 @@ method_header
 	      if( is_function ) {
 		  snail_set_function_arguments_readonly( dnode_type( funct ));
 	      }
+
+              /* Unfortunately, this tnode_insert_single_method() must
+                 be the last call in this block, after the
+                 tnode_insert_single_method() call, since otherwices
+                 the symbol table will try to insert all methods of
+                 the current_class, not just the 'funct' (since the
+                 funct after the tnode_insert_single_method() will be
+                 linked with other methods. */
+              tnode_insert_single_method( current_class, share_dnode( funct ));
 	  }
 	  cexception_catch {
 	      delete_dnode( $8 );
