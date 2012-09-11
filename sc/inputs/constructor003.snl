@@ -16,7 +16,7 @@ null class C {
     method list_iter()
     {
         var C curr = self;
-        while curr.next != null do
+        while curr != null do
             < curr.i, "";
             curr = curr.next;
         enddo
