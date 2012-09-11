@@ -9725,7 +9725,9 @@ constructor_header
 	      parameter_list = NULL;
 	      // return_dnode = NULL;
 
-              tnode_insert_constructor( class_tnode, funct );
+              dnode_set_scope( funct, snail_current_scope( snail_cc ));
+
+              tnode_insert_constructor( class_tnode, share_dnode( funct ));
               
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
