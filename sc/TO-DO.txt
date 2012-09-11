@@ -1,4 +1,4 @@
--- Implement constructors for classes.
+++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
 -- Implement program() { ... } construct.
 -- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
