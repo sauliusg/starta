@@ -5356,8 +5356,9 @@ static cexception_t *px; /* parser exception */
 }
 
 %token _ADDRESSOF
-%token _BLOB
 %token _ARRAY
+%token _ASSERT
+%token _BLOB
 %token _BREAK
 %token _BYTECODE
 %token _CATCH
@@ -5598,8 +5599,25 @@ delimited_statement
   | package_statement
   | break_or_continue_statement
   | pack_statement
+  | assert_statement
 
   | /* empty statement */
+  ;
+
+assert_statement
+  : _ASSERT boolean_expression
+  {
+    ssize_t current_line_no = snail_flex_current_line_number();
+
+    ssize_t file_name_offset = compiler_assemble_static_string
+        ( snail_cc, snail_cc->filename, px );
+
+    ssize_t current_line_offset = compiler_assemble_static_string
+        ( snail_cc, (char*)snail_flex_current_line(), px );
+
+    snail_emit( snail_cc, px, "\tceee\n", ASSERT,
+                &current_line_no, &file_name_offset, &current_line_offset );
+  }
   ;
 
 /* pack a,    20,     4,    8;
