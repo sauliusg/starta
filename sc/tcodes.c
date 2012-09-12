@@ -4806,3 +4806,20 @@ int FILLMDARRAY( INSTRUCTION_FN_ARGS )
 
     return 2;
 }
+
+int ASSERT( INSTRUCTION_FN_ARGS )
+{
+    int assertion_ok = istate.ep[0].num.b;
+    ssize_t line_no = istate.code[istate.ip+1].ssizeval;
+    char *filename = istate.static_data + istate.code[istate.ip+2].ssizeval;
+    char *message = istate.static_data + istate.code[istate.ip+3].ssizeval;
+
+    if( !assertion_ok ) {
+        fprintf( stderr, "Assertion '%s' failed: line %d, file '%s'\n",
+                 message, line_no, filename );
+    }
+
+    istate.ep ++;
+
+    return 4;
+}
