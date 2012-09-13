@@ -8138,7 +8138,8 @@ multivalue_function_call
         {
             DNODE *object = $1;
             TNODE *object_type = dnode_type( object );
-            DNODE *method = tnode_lookup_field( object_type, $3 );
+            DNODE *method = object_type ?
+                tnode_lookup_field( object_type, $3 ) : NULL;
             DNODE *last_arg = NULL;
 
 	    if( method ) {
@@ -8165,7 +8166,7 @@ multivalue_function_call
 
 		snail_cc->current_arg = last_arg ?
 		    dnode_prev( last_arg ) : NULL;
-	    } else {
+	    } else if( object ) {
 		char *object_name = object ? dnode_name( object ) : NULL;
 		char *method_name = $3;
 		char *class_name =
