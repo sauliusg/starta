@@ -32,6 +32,8 @@ class S implements UnDoable {
 
 var s = new S;
 
+var i : UnDoable = s;
+
 . s->name();
 
 s->undoable_do( 10 );
@@ -42,17 +44,19 @@ s->undoable_do( 17 );
 . s->undo();
 . s->undo();
 
-// procedure pp( UnDoable d )
-// {
-//     d->undoable_do( 20 );
-//     d->undoable_do( 21 );
-//     d->undoable_do( 25 );
-//     d->undoable_do( 26 );
-// 
-//     d->undo();
-//     d->undo();
-//     d->undo();
-//     d->undo();
-// }
-// 
-// pp( s );
+procedure pp( UnDoable d )
+{
+    . "";
+
+    d->undoable_do( 20 );
+    d->undoable_do( 21 );
+    d->undoable_do( 25 );
+    d->undoable_do( 26 );
+
+    . d->undo();
+    . d->undo();
+    . d->undo();
+    . d->undo();
+}
+
+pp( s );
