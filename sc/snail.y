@@ -5450,6 +5450,7 @@ static cexception_t *px; /* parser exception */
 %type <tnode> enum_member_list
 %type <i>     expression_list
 %type <dnode> field_designator
+%type <dnode> function_expression_header
 %type <dnode> function_header
 %type <dnode> method_header
 %type <dnode> method_definition
@@ -8339,12 +8340,25 @@ closure_initialisation_list
 | closure_initialisation_list ';' variable_declaration
 ;
 
-function_expression
+function_expression_header
 :   function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
+    {
+        $$ = new_dnode_function( /* name = */ NULL,
+                                 /* parameters = */ $3,
+                                 /* return_values = */ $5,
+                                 px );
+    }
+;
+
+function_expression
+:   function_expression_header
     function_or_operator_start
     function_or_operator_body
     function_or_operator_end
+    {
+        snail_compile_load_function_address( snail_cc, $1, px );
+    }
 
 | _CLOSURE
       opt_closure_initialisation_list
