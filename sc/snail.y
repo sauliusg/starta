@@ -5441,6 +5441,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> argument
 %type <dnode> argument_list
 %type <dnode> argument_identifier_list
+%type <dnode> closure_header
 %type <c>     constant_expression
 %type <i>     constant_integer_expression
 %type <dnode> constructor_header
@@ -8351,6 +8352,19 @@ function_expression_header
     }
 ;
 
+closure_header
+: _CLOSURE
+      opt_closure_initialisation_list
+  function_or_procedure_keyword '(' argument_list ')'
+      opt_retval_description_list
+    {
+        $$ = new_dnode_function( /* name = */ NULL,
+                                 /* parameters = */ $5,
+                                 /* return_values = */ $7,
+                                 px );
+    }
+;
+
 function_expression
 :   function_expression_header
     function_or_operator_start
@@ -8360,13 +8374,13 @@ function_expression
         snail_compile_load_function_address( snail_cc, $1, px );
     }
 
-| _CLOSURE
-      opt_closure_initialisation_list
-  function_or_procedure_keyword '(' argument_list ')'
-      opt_retval_description_list
+| closure_header
   function_or_operator_start
   function_or_operator_body
   function_or_operator_end
+    {
+        snail_compile_load_function_address( snail_cc, $1, px );
+    }
 ;
 
 simple_expression

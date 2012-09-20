@@ -1,7 +1,8 @@
 
 use std;
 
-var fff = function( x, y : float ): float { return x*y/(x+y) };
+var fff = closure 
+function( x, y : float ): float { return x*y/(x+y) };
 
 . fff( 2, 3 );
 . fff( 5, 3 );
