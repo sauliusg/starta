@@ -1,7 +1,7 @@
 
 use std;
 
-var x = 7;
+var fff = function( x, y : float ): float { return x*y/(x+y) };
 
-assert x < 8;
-assert x >= 8;
+. fff( 2, 3 );
+. fff( 5, 3 );
