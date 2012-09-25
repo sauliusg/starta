@@ -1,8 +1,12 @@
 
 use std;
 
+var x, y, z = 1, 2, 3;
+
 var fff = closure 
-function( x, y : float ): float { return x*y/(x+y) };
+    var a = x + 1;
+    var b = y - z;
+function( x, y : float ): float { return x*y/<float>(a+b) };
 
 . fff( 2, 3 );
 . fff( 5, 3 );
