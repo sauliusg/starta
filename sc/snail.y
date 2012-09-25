@@ -8354,13 +8354,25 @@ function_expression_header
 
 closure_header
 : _CLOSURE
+      {
+          ssize_t zero = 0;
+          snail_push_absolute_fixup( snail_cc, px );
+          snail_emit( snail_cc, px, "\tc", ALLOC );
+          snail_push_absolute_fixup( snail_cc, px );
+          snail_emit( snail_cc, px, "ee\n", &zero, &zero );
+      }
       opt_closure_initialisation_list
+      {
+          snail_fixup( snail_cc, 5 ); /* nref */
+          snail_fixup( snail_cc, 10 * sizeof(stackcell_t) );
+          /* ALLOC size */
+      }
   function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
     {
         $$ = new_dnode_function( /* name = */ NULL,
-                                 /* parameters = */ $5,
-                                 /* return_values = */ $7,
+                                 /* parameters = */ $7,
+                                 /* return_values = */ $9,
                                  px );
     }
 ;
