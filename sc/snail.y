@@ -8360,6 +8360,7 @@ closure_header
           snail_emit( snail_cc, px, "\tc", ALLOC );
           snail_push_absolute_fixup( snail_cc, px );
           snail_emit( snail_cc, px, "ee\n", &zero, &zero );
+          snail_emit( snail_cc, px, "\tc\n", DUP );
       }
       opt_closure_initialisation_list
       {
@@ -8392,6 +8393,7 @@ function_expression
   function_or_operator_end
     {
         snail_compile_load_function_address( snail_cc, $1, px );
+        snail_emit( snail_cc, px, "\tc\n", PSTI );
     }
 ;
 
