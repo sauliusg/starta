@@ -1010,10 +1010,14 @@ int ICALL( INSTRUCTION_FN_ARGS )
 
     (--istate.sp)->num.ssize = istate.ip + 1; /* push the return address */
     (--istate.sp)->num.ptr = istate.fp;       /* push old frame pointer */
-    istate.fp = istate.sp;                    /* set the frame pointer for the
-						 called procedure */
+    istate.fp = istate.sp;                    /* set the frame pointer
+						 for the called procedure */
     STACKCELL_ZERO_PTR( istate.sp[0] );
     STACKCELL_ZERO_PTR( istate.sp[1] );
+
+    if( fn_ptr < istate.code || fn_ptr > istate.code + istate.code_length ) {
+        fn_ptr = STACKCELL_PTR( *(stackcell_t*)fn_ptr );
+    }
 
     istate.ip = fn_ptr - istate.code;
     return 0; /* jump to the called procedure -- absolute offset */
