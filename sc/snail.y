@@ -1127,8 +1127,9 @@ static void snail_emit_function_call( SNAIL_COMPILER *cc,
 	}
     } else {
 	TNODE *fn_tnode = function ? dnode_type( function ) : NULL;
+        type_kind_t fn_kind = fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
-	if( fn_tnode && tnode_kind( fn_tnode ) == TK_FUNCTION_REF ) {
+	if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
 	    snail_emit( cc, ex, "\tc\n", ICALL );
 	} else if( fn_tnode && tnode_kind( fn_tnode ) == TK_METHOD ) {
 	    char *fn_name = dnode_name( function );
@@ -4991,6 +4992,7 @@ static void snail_check_and_push_function_name( SNAIL_COMPILER *cc,
 						cexception_t *ex )
 {
     TNODE *fn_tnode = NULL;
+    type_kind_t fn_kind;
 
     dlist_push_dnode( &cc->current_call_stack,
 		      &cc->current_call, ex );
@@ -5005,10 +5007,12 @@ static void snail_check_and_push_function_name( SNAIL_COMPILER *cc,
     fn_tnode = cc->current_call ?
 	dnode_type( cc->current_call ) : NULL;
 
-    if( fn_tnode &&
-	tnode_kind( fn_tnode ) != TK_FUNCTION_REF &&
-	tnode_kind( fn_tnode ) != TK_FUNCTION &&
-	tnode_kind( fn_tnode ) != TK_OPERATOR ) {
+    fn_kind = fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
+
+    if( fn_kind != TK_FUNCTION_REF &&
+	fn_kind != TK_FUNCTION &&
+	fn_kind != TK_OPERATOR &&
+        fn_kind != TK_CLOSURE ) {
 	char *fn_name = cc->current_call ?
 	    dnode_name( cc->current_call ) : NULL;
 	if( fn_name ) {
@@ -8073,6 +8077,7 @@ multivalue_function_call
   : function_identifier 
         {
 	  TNODE *fn_tnode;
+          type_kind_t fn_kind;
 
 	  fn_tnode = snail_cc->current_call ?
 	      dnode_type( snail_cc->current_call ) : NULL;
@@ -8080,7 +8085,9 @@ multivalue_function_call
 	  snail_cc->current_arg = fn_tnode ?
 	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
 
-          if( fn_tnode && tnode_kind( fn_tnode ) == TK_FUNCTION_REF ) {
+          fn_kind= fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
+
+          if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
               snail_push_type( snail_cc, share_tnode(fn_tnode), px );
           }
 
@@ -8090,8 +8097,23 @@ multivalue_function_call
         {
 	    DNODE *function = snail_cc->current_call;
 	    TNODE *fn_tnode = function ? dnode_type( function ) : NULL;
+            type_kind_t fn_kind = fn_tnode ?
+                tnode_kind( fn_tnode ) : TK_NONE;
 
-	    if( fn_tnode && tnode_kind( fn_tnode ) == TK_FUNCTION_REF ) {
+            if( fn_kind == TK_CLOSURE ) {
+                DNODE *closure_arg = tnode_args( fn_tnode );
+                TNODE *closure_type = closure_arg ?
+                    dnode_type( closure_arg ) : NULL;
+		char *fn_name = dnode_name( function );
+		ssize_t offset = dnode_offset( function );
+
+		snail_emit( snail_cc, px, "\tceN\n", PLD, &offset, fn_name );
+                snail_push_type( snail_cc, share_tnode( closure_type ), px );
+                snail_cc->current_arg = snail_cc->current_arg ? 
+                    dnode_prev( snail_cc->current_arg ) : NULL;
+            }
+
+	    if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
 		char *fn_name = dnode_name( function );
 		ssize_t offset = dnode_offset( function );
 		snail_emit( snail_cc, px, "\tceN\n", PLD, &offset, fn_name );
@@ -8356,11 +8378,15 @@ closure_header
 : _CLOSURE
       {
           ssize_t zero = 0;
+          /* Allocate the closure structure: */
           snail_push_absolute_fixup( snail_cc, px );
           snail_emit( snail_cc, px, "\tc", ALLOC );
           snail_push_absolute_fixup( snail_cc, px );
           snail_emit( snail_cc, px, "ee\n", &zero, &zero );
           snail_emit( snail_cc, px, "\tc\n", DUP );
+          snail_push_type( snail_cc, 
+                           tnode_set_kind( new_tnode_ref( px ), TK_STRUCT ),
+                           px );
       }
       opt_closure_initialisation_list
       {
@@ -8371,10 +8397,23 @@ closure_header
   function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
     {
-        $$ = new_dnode_function( /* name = */ NULL,
-                                 /* parameters = */ $7,
-                                 /* return_values = */ $9,
-                                 px );
+          DNODE *parameters = $7;
+          DNODE *return_values = $9;
+          DNODE *self_dnode = new_dnode_name( "closure", px );
+          ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
+          TNODE *closure_type = share_tnode( enode_type( closure_expr ));
+
+          delete_enode( closure_expr );
+          closure_expr = NULL;
+
+          dnode_insert_type( self_dnode, share_tnode( closure_type ));
+
+          parameters = dnode_append( self_dnode, parameters );
+          self_dnode = NULL;
+        
+          $$ = new_dnode_function( /* name = */ NULL, 
+                                   parameters, return_values, px );
+          tnode_set_kind( dnode_type( $$ ), TK_CLOSURE );
     }
 ;
 

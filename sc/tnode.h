@@ -49,6 +49,7 @@ typedef enum {
     TK_BLOB,
     TK_FUNCTION,
     TK_OPERATOR,
+    TK_CLOSURE,
     TK_METHOD, /* class (virtual) methods, or virtual functions */
     TK_CONSTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
