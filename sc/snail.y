@@ -8443,6 +8443,8 @@ function_expression_header
 
 closure_header
 : _CLOSURE
+  function_or_procedure_keyword '(' argument_list ')'
+      opt_retval_description_list
       {
           ssize_t zero = 0;
           /* Allocate the closure structure: */
@@ -8457,28 +8459,23 @@ closure_header
       }
       opt_closure_initialisation_list
       {
-          ENODE *top_expr = snail_cc->e_stack;
-          TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
+          DNODE *parameters = $4;
+          DNODE *return_values = $6;
+          DNODE *self_dnode = new_dnode_name( $8, px );
+          ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
+          TNODE *closure_type = share_tnode( enode_type( closure_expr ));
+
           ssize_t nref, size;
 
-          nref = tnode_number_of_references( top_type );
-          size = tnode_size( top_type );
+          nref = tnode_number_of_references( closure_type );
+          size = tnode_size( closure_type );
 
           if( nref > 0 ) {
-              nref = dnode_list_length( tnode_fields( top_type ));
+              nref = dnode_list_length( tnode_fields( closure_type ));
           }
 
           snail_fixup( snail_cc, nref );
           snail_fixup( snail_cc, size );
-      }
-  function_or_procedure_keyword '(' argument_list ')'
-      opt_retval_description_list
-    {
-          DNODE *parameters = $7;
-          DNODE *return_values = $9;
-          DNODE *self_dnode = new_dnode_name( $3, px );
-          ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
-          TNODE *closure_type = share_tnode( enode_type( closure_expr ));
 
           delete_enode( closure_expr );
           closure_expr = NULL;
