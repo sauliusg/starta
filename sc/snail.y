@@ -8441,9 +8441,14 @@ function_expression_header
     }
 ;
 
+opt_function_or_procedure_keyword
+: function_or_procedure_keyword
+| /* empty */
+;
+
 closure_header
 : _CLOSURE
-  function_or_procedure_keyword '(' argument_list ')'
+  opt_function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
       {
           ssize_t zero = 0;
