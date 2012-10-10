@@ -5009,7 +5009,8 @@ static void snail_check_and_push_function_name( SNAIL_COMPILER *cc,
 
     fn_kind = fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
-    if( fn_kind != TK_FUNCTION_REF &&
+    if( fn_tnode &&
+        fn_kind != TK_FUNCTION_REF &&
 	fn_kind != TK_FUNCTION &&
 	fn_kind != TK_OPERATOR &&
         fn_kind != TK_CLOSURE ) {
