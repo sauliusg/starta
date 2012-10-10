@@ -3,10 +3,18 @@ use std;
 
 var x, y, z = 1, 2, 3;
 
-var fff = closure 
-    var a = x + 1;
-    var b = y - z;
-function( x, y : float ): float { return x*y/<float>(a+b) };
+var fff = closure
+lambda {
+    var a : int = x + 1;
+    var b : int = y + z;
+    var s : string = "va va";
+}
+function( x, y : float ): float
+{ 
+  return x*y/<float>(lambda.a + lambda.b)
+};
+
+x, y, z = 2, 4, 6;
 
 . fff( 2, 3 );
 . fff( 5, 3 );

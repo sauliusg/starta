@@ -5476,6 +5476,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
 %type <i>     function_or_procedure_type_keyword
+%type <s>     opt_closure_initialisation_list
 %type <i>     opt_null_type_designator
 %type <tnode> opt_base_type
 %type <i>     opt_function_attributes
@@ -8353,15 +8354,80 @@ null_expression
   ;
 
 opt_closure_initialisation_list
-: closure_initialisation_list
-| closure_initialisation_list ';'
+: __IDENTIFIER '{' closure_initialisation_list '}'
+{
+    $$ = $1;
+}
+| __IDENTIFIER '{' closure_initialisation_list ';' '}'
+{
+    $$ = $1;
+}
 | /* empty */
+{
+    $$ = NULL;
+}
 ;
 
 closure_initialisation_list
-: variable_declaration
-| closure_initialisation_list variable_declaration
-| closure_initialisation_list ';' variable_declaration
+: struct_var_declaration
+{
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var = $1;
+    TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
+    ssize_t offset = 0;
+
+    assert( closure_tnode );
+    assert( var_type );
+
+    tnode_insert_fields( closure_tnode, closure_var );
+    offset = dnode_offset( closure_var );
+    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+    snail_push_type( snail_cc,
+                     new_tnode_addressof( share_tnode( var_type ), px ), 
+                     px );
+}
+ '=' expression
+{
+    snail_compile_sti( snail_cc, px );
+    snail_emit( snail_cc, px, "\tc\n", DUP );
+}
+
+| variable_identifier '=' expression
+{
+    snail_emit( snail_cc, px, "\tc\n", DROP );
+}
+
+| closure_initialisation_list ';'
+  struct_var_declaration
+{
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var = $3;
+    TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
+    ssize_t offset = 0;
+
+    assert( closure_tnode );
+    assert( var_type );
+
+    tnode_insert_fields( closure_tnode, closure_var );
+    offset = dnode_offset( closure_var );
+    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+    snail_push_type( snail_cc,
+                     new_tnode_addressof( share_tnode( var_type ), px ), 
+                     px );
+}
+ '=' expression
+{
+    snail_compile_sti( snail_cc, px );
+    snail_emit( snail_cc, px, "\tc\n", DUP );
+}
+
+| closure_initialisation_list ';'
+  variable_identifier '=' expression
+{
+    snail_emit( snail_cc, px, "\tc\n", DROP );
+}
 ;
 
 function_expression_header
@@ -8391,16 +8457,26 @@ closure_header
       }
       opt_closure_initialisation_list
       {
-          snail_fixup( snail_cc, 5 ); /* nref */
-          snail_fixup( snail_cc, 10 * sizeof(stackcell_t) );
-          /* ALLOC size */
+          ENODE *top_expr = snail_cc->e_stack;
+          TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
+          ssize_t nref, size;
+
+          nref = tnode_number_of_references( top_type );
+          size = tnode_size( top_type );
+
+          if( nref > 0 ) {
+              nref = dnode_list_length( tnode_fields( top_type ));
+          }
+
+          snail_fixup( snail_cc, nref );
+          snail_fixup( snail_cc, size );
       }
   function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
     {
           DNODE *parameters = $7;
           DNODE *return_values = $9;
-          DNODE *self_dnode = new_dnode_name( "closure", px );
+          DNODE *self_dnode = new_dnode_name( $3, px );
           ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
           TNODE *closure_type = share_tnode( enode_type( closure_expr ));
 
