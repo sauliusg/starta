@@ -1481,14 +1481,16 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	}
     }
 
-    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION ) {
+    if( t1->kind == TK_FUNCTION_REF && 
+        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
 	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
                                                         NULL, 0, ex );
     }
 
     if( t1->name && t2->name ) return 0;
 
-    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
+    if( t1->kind == TK_FUNCTION_REF && 
+        (t2->kind == TK_FUNCTION_REF || t2->kind == TK_CLOSURE )) {
 	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
                                                         NULL, 0, ex );
     }
