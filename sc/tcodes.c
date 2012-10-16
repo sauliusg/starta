@@ -1006,8 +1006,6 @@ int ICALL( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    istate.ep ++;
-
     (--istate.sp)->num.ssize = istate.ip + 1; /* push the return address */
     (--istate.sp)->num.ptr = istate.fp;       /* push old frame pointer */
     istate.fp = istate.sp;                    /* set the frame pointer
@@ -1016,7 +1014,11 @@ int ICALL( INSTRUCTION_FN_ARGS )
     STACKCELL_ZERO_PTR( istate.sp[1] );
 
     if( fn_ptr < istate.code || fn_ptr > istate.code + istate.code_length ) {
+        /* we are calling a closure: */
         fn_ptr = STACKCELL_PTR( *(stackcell_t*)fn_ptr );
+    } else {
+        /* we are calling a function: */
+        istate.ep ++;
     }
 
     istate.ip = fn_ptr - istate.code;

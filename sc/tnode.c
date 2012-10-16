@@ -2186,3 +2186,17 @@ TNODE *tnode_next( TNODE* list )
     if( !list ) return NULL;
     else return list->next;
 }
+
+TNODE *tnode_drop_first_argument( TNODE *tnode )
+{
+    DNODE *first_arg;
+
+    if( tnode ) {
+        first_arg = tnode->args;
+        tnode->args = dnode_next( first_arg );
+        dnode_disconnect( first_arg );
+        delete_dnode( first_arg );
+    }
+
+    return tnode;
+}

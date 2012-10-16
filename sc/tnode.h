@@ -266,6 +266,8 @@ DNODE *tnode_constructor( TNODE *tnode );
 
 TNODE *tnode_next( TNODE* list );
 
+TNODE *tnode_drop_first_argument( TNODE *tnode );
+
 #define foreach_tnode_base_class( NODE, LIST ) \
    for( NODE = LIST; NODE != NULL; NODE = tnode_base_type( NODE ))
 

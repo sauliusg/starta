@@ -167,6 +167,7 @@ typedef struct {
     /* loop stack for the describing nested loops, needed to implement
        'break' and 'continue' statements: */
     DNODE *loops;
+    DLIST *loop_stack;
 
     /* track down exception declared in each module or in the main
        program; start from the beginning in each new module and
@@ -227,6 +228,7 @@ static void delete_snail_compiler( SNAIL_COMPILER *c )
 	delete_fixup_list( c->bytecode_fixups );
 
 	delete_dnode( c->loops );
+        delete_dlist( c->loop_stack );
 
         freex( c->local_offset_stack );
 	freex( c->addr_stack );
@@ -8102,19 +8104,6 @@ multivalue_function_call
             type_kind_t fn_kind = fn_tnode ?
                 tnode_kind( fn_tnode ) : TK_NONE;
 
-            if( fn_kind == TK_CLOSURE ) {
-                DNODE *closure_arg = tnode_args( fn_tnode );
-                TNODE *closure_type = closure_arg ?
-                    dnode_type( closure_arg ) : NULL;
-		char *fn_name = dnode_name( function );
-		ssize_t offset = dnode_offset( function );
-
-		snail_emit( snail_cc, px, "\tceN\n", PLD, &offset, fn_name );
-                snail_push_type( snail_cc, share_tnode( closure_type ), px );
-                snail_cc->current_arg = snail_cc->current_arg ? 
-                    dnode_prev( snail_cc->current_arg ) : NULL;
-            }
-
 	    if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
 		char *fn_name = dnode_name( function );
 		ssize_t offset = dnode_offset( function );
@@ -8434,6 +8423,7 @@ function_expression_header
 :   function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
+        dlist_push_dnode( &snail_cc->loop_stack, &snail_cc->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
                                  /* parameters = */ $3,
                                  /* return_values = */ $5,
@@ -8451,6 +8441,7 @@ closure_header
   opt_function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
       {
+          TNODE *closure_tnode = new_tnode_ref( px );
           ssize_t zero = 0;
           /* Allocate the closure structure: */
           snail_push_absolute_fixup( snail_cc, px );
@@ -8458,9 +8449,11 @@ closure_header
           snail_push_absolute_fixup( snail_cc, px );
           snail_emit( snail_cc, px, "ee\n", &zero, &zero );
           snail_emit( snail_cc, px, "\tc\n", DUP );
-          snail_push_type( snail_cc, 
-                           tnode_set_kind( new_tnode_ref( px ), TK_STRUCT ),
-                           px );
+          tnode_set_kind( closure_tnode, TK_STRUCT );
+          /* reserve one stackcell for a function pointer of the
+             closure: */
+          tnode_insert_fields( closure_tnode, new_dnode_name( "", px ));
+          snail_push_type( snail_cc, closure_tnode, px );
       }
       opt_closure_initialisation_list
       {
@@ -8490,6 +8483,8 @@ closure_header
           parameters = dnode_append( self_dnode, parameters );
           self_dnode = NULL;
         
+          dlist_push_dnode( &snail_cc->loop_stack, &snail_cc->loops, px );
+
           $$ = new_dnode_function( /* name = */ NULL, 
                                    parameters, return_values, px );
           tnode_set_kind( dnode_type( $$ ), TK_CLOSURE );
@@ -8502,6 +8497,7 @@ function_expression
     function_or_operator_body
     function_or_operator_end
     {
+        snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
         snail_compile_load_function_address( snail_cc, $1, px );
     }
 
@@ -8510,6 +8506,7 @@ function_expression
   function_or_operator_body
   function_or_operator_end
     {
+        snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
         snail_compile_load_function_address( snail_cc, $1, px );
         snail_emit( snail_cc, px, "\tc\n", PSTI );
     }
@@ -9444,6 +9441,7 @@ function_or_operator_start
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = $<dnode>0;
+          TNODE *fn_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
 
           dlist_push_dnode( &snail_cc->current_function_stack,
@@ -9474,6 +9472,9 @@ function_or_operator_start
 	  if( !is_bytecode ) {
 	      snail_emit_function_arguments( funct, snail_cc, px );
 	  }
+          if( fn_tnode && tnode_kind( fn_tnode ) == TK_CLOSURE ) {
+              tnode_drop_first_argument( fn_tnode );
+          }
 	}
 ;
 
