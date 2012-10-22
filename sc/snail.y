@@ -2922,7 +2922,11 @@ static DNODE* snail_make_stack_top_field_type( SNAIL_COMPILER *cc,
 		yyerrorf( "this type has no field named '%s'", field_name );
 	    }
 	} else {
-	    enode_replace_type( cc->e_stack, share_tnode( dnode_type( field )));
+	    enode_replace_type( cc->e_stack,
+                                share_tnode( dnode_type( field )));
+            if( field && dnode_has_flags( field, DF_IS_READONLY )) {
+                enode_set_flags( cc->e_stack, EF_IS_READONLY );
+            }
 	}
 	return field;
     } else {
@@ -8371,12 +8375,20 @@ closure_var_declaration
   | variable_declaration_keyword
     variable_identifier_list ':' var_type_description
       {
+       int readonly = $1;
+       if( readonly ) {
+           dnode_list_set_flags( $2, DF_IS_READONLY );
+       }
        $$ = dnode_list_append_type( $2, $4 );
       }
 
   | variable_declaration_keyword
     var_type_description uninitialised_var_declarator_list
       {
+        int readonly = $1;
+        if( readonly ) {
+            dnode_list_set_flags( $3, DF_IS_READONLY );
+        }
         $$ = dnode_list_append_type( $3, $2 );
       }
 
@@ -8389,8 +8401,12 @@ closure_var_declaration
     compact_type_description dimension_list
     uninitialised_var_declarator_list
       {
-	tnode_append_element_type( $3, $2 );
-	$$ = dnode_list_append_type( $4, $3 );
+        int readonly = $1;
+        if( readonly ) {
+            dnode_list_set_flags( $4, DF_IS_READONLY );
+        }
+        tnode_append_element_type( $3, $2 );
+        $$ = dnode_list_append_type( $4, $3 );
       }
 
   | compact_type_description dimension_list uninitialised_var_declarator_list
@@ -8460,12 +8476,17 @@ closure_initialisation
 
 | variable_declaration_keyword variable_identifier
 {
+    int readonly = $1;
     ENODE *top_expr = snail_cc->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var = $2;
     ssize_t offset = 0;
 
     assert( closure_tnode );
+
+    if( readonly ) {
+        dnode_list_set_flags( closure_var, DF_IS_READONLY );
+    }
 
     tnode_insert_fields( closure_tnode, closure_var );
     offset = dnode_offset( closure_var );
