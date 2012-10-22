@@ -7366,7 +7366,8 @@ struct_var_declaration
       {
        $$ = dnode_list_append_type( $1, $3 );
       }
-  | _VAR variable_identifier_list ':' var_type_description
+  | variable_declaration_keyword 
+    variable_identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $2, $4 );
       }
@@ -7377,7 +7378,8 @@ struct_var_declaration
        $$ = dnode_list_set_flags( $$, DF_IS_READONLY );
       }
 
-  | _VAR var_type_description uninitialised_var_declarator_list
+  | variable_declaration_keyword var_type_description
+    uninitialised_var_declarator_list
       {
         $$ = dnode_list_append_type( $3, $2 );
       }
@@ -7387,7 +7389,8 @@ struct_var_declaration
         $$ = dnode_list_append_type( $2, $1 );
       }
 
-  | _VAR compact_type_description dimension_list
+  | variable_declaration_keyword 
+    compact_type_description dimension_list
     uninitialised_var_declarator_list
       {
 	tnode_append_element_type( $3, $2 );
@@ -8358,6 +8361,11 @@ opt_closure_initialisation_list
 ;
 
 closure_initialisation_list
+: closure_initialisation
+| closure_initialisation_list ';' closure_initialisation
+;
+
+closure_initialisation
 : struct_var_declaration
 {
     ENODE *top_expr = snail_cc->e_stack;
@@ -8382,41 +8390,72 @@ closure_initialisation_list
     snail_emit( snail_cc, px, "\tc\n", DUP );
 }
 
-| variable_identifier '=' expression
-{
-    snail_emit( snail_cc, px, "\tc\n", DROP );
-}
-
-| closure_initialisation_list ';'
-  struct_var_declaration
+| variable_identifier
 {
     ENODE *top_expr = snail_cc->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
-    DNODE *closure_var = $3;
-    TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
+    DNODE *closure_var = $1;
     ssize_t offset = 0;
 
     assert( closure_tnode );
-    assert( var_type );
 
     tnode_insert_fields( closure_tnode, closure_var );
     offset = dnode_offset( closure_var );
     snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-    snail_push_type( snail_cc,
-                     new_tnode_addressof( share_tnode( var_type ), px ), 
-                     px );
 }
- '=' expression
+'=' expression
 {
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var = $1;
+
+    assert( top_type );
+
+    dnode_insert_type( closure_var, share_tnode( top_type ));
+
+    snail_push_type( snail_cc,
+                     new_tnode_addressof( share_tnode( top_type ), px ), 
+                     px );
+
+    compiler_swap_top_expressions( snail_cc );
+
     snail_compile_sti( snail_cc, px );
     snail_emit( snail_cc, px, "\tc\n", DUP );
 }
 
-| closure_initialisation_list ';'
-  variable_identifier '=' expression
+| variable_declaration_keyword variable_identifier
 {
-    snail_emit( snail_cc, px, "\tc\n", DROP );
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var = $2;
+    ssize_t offset = 0;
+
+    assert( closure_tnode );
+
+    tnode_insert_fields( closure_tnode, closure_var );
+    offset = dnode_offset( closure_var );
+    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
 }
+ '=' expression
+{
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var = $2;
+
+    assert( top_type );
+
+    dnode_insert_type( closure_var, share_tnode( top_type ));
+
+    snail_push_type( snail_cc,
+                     new_tnode_addressof( share_tnode( top_type ), px ), 
+                     px );
+
+    compiler_swap_top_expressions( snail_cc );
+
+    snail_compile_sti( snail_cc, px );
+    snail_emit( snail_cc, px, "\tc\n", DUP );
+}
+
 ;
 
 function_expression_header

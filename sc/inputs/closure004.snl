@@ -5,9 +5,9 @@ var x, y, z = 1, 20, 3;
 
 var fff = closure procedure( x, y : float ): float
 lambda {
-    a = x + 1;
-    b = y + z;
-    s = "va va";
+    var a = x + 1;
+    var b = y + z;
+    var s = "va va";
 }
 { 
   lambda.a ++;
