@@ -10,7 +10,7 @@ lambda {
     readonly var s = "va va";
 }
 { 
-  lambda.s = "argi?";
+  lambda.a ++;
   return x*y/<float>(lambda.a + lambda.b)
 };
 
