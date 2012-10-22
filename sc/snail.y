@@ -5449,6 +5449,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> argument_list
 %type <dnode> argument_identifier_list
 %type <dnode> closure_header
+%type <dnode> closure_var_declaration
 %type <c>     constant_expression
 %type <i>     constant_integer_expression
 %type <dnode> constructor_header
@@ -7366,8 +7367,7 @@ struct_var_declaration
       {
        $$ = dnode_list_append_type( $1, $3 );
       }
-  | variable_declaration_keyword 
-    variable_identifier_list ':' var_type_description
+  | _VAR variable_identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $2, $4 );
       }
@@ -7378,8 +7378,7 @@ struct_var_declaration
        $$ = dnode_list_set_flags( $$, DF_IS_READONLY );
       }
 
-  | variable_declaration_keyword var_type_description
-    uninitialised_var_declarator_list
+  | _VAR var_type_description uninitialised_var_declarator_list
       {
         $$ = dnode_list_append_type( $3, $2 );
       }
@@ -7389,8 +7388,7 @@ struct_var_declaration
         $$ = dnode_list_append_type( $2, $1 );
       }
 
-  | variable_declaration_keyword 
-    compact_type_description dimension_list
+  | _VAR compact_type_description dimension_list
     uninitialised_var_declarator_list
       {
 	tnode_append_element_type( $3, $2 );
@@ -8365,8 +8363,45 @@ closure_initialisation_list
 | closure_initialisation_list ';' closure_initialisation
 ;
 
+closure_var_declaration
+  : variable_identifier_list ':' var_type_description
+      {
+       $$ = dnode_list_append_type( $1, $3 );
+      }
+  | variable_declaration_keyword
+    variable_identifier_list ':' var_type_description
+      {
+       $$ = dnode_list_append_type( $2, $4 );
+      }
+
+  | variable_declaration_keyword
+    var_type_description uninitialised_var_declarator_list
+      {
+        $$ = dnode_list_append_type( $3, $2 );
+      }
+
+  | var_type_description uninitialised_var_declarator_list
+      {
+        $$ = dnode_list_append_type( $2, $1 );
+      }
+
+  | variable_declaration_keyword
+    compact_type_description dimension_list
+    uninitialised_var_declarator_list
+      {
+	tnode_append_element_type( $3, $2 );
+	$$ = dnode_list_append_type( $4, $3 );
+      }
+
+  | compact_type_description dimension_list uninitialised_var_declarator_list
+      {
+	tnode_append_element_type( $2, $1 );
+	$$ = dnode_list_append_type( $3, $2 );
+      }
+  ;
+
 closure_initialisation
-: struct_var_declaration
+: closure_var_declaration
 {
     ENODE *top_expr = snail_cc->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
