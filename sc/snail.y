@@ -7384,12 +7384,6 @@ struct_var_declaration
        $$ = dnode_list_append_type( $2, $4 );
       }
 
-  | _CONST variable_identifier_list ':' var_type_description
-      {
-       $$ = dnode_list_append_type( $2, $4 );
-       $$ = dnode_list_set_flags( $$, DF_IS_READONLY );
-      }
-
   | _VAR var_type_description uninitialised_var_declarator_list
       {
         $$ = dnode_list_append_type( $3, $2 );
