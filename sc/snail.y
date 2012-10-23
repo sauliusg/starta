@@ -5492,6 +5492,7 @@ static cexception_t *px; /* parser exception */
 %type <s>     opt_label
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
+%type <i>     opt_variable_declaration_keyword
 %type <dnode> package_name
 %type <dnode> raised_exception_identifier;
 %type <dnode> retval_description_list
@@ -6126,6 +6127,12 @@ variable_declaration_keyword
   | _READONLY { $$ = 1; }
   | _READONLY _VAR { $$ = 1; }
   ;
+
+opt_variable_declaration_keyword
+  : variable_declaration_keyword
+  | /* empty */
+      { $$ = 0; }
+;
 
 variable_declaration
   : variable_declaration_keyword variable_identifier ':' var_type_description
@@ -8369,11 +8376,7 @@ closure_initialisation_list
 ;
 
 closure_var_declaration
-  : variable_identifier_list ':' var_type_description
-      {
-       $$ = dnode_list_append_type( $1, $3 );
-      }
-  | variable_declaration_keyword
+  : opt_variable_declaration_keyword
     variable_identifier_list ':' var_type_description
       {
        int readonly = $1;
@@ -8383,7 +8386,7 @@ closure_var_declaration
        $$ = dnode_list_append_type( $2, $4 );
       }
 
-  | variable_declaration_keyword
+  | opt_variable_declaration_keyword
     var_type_description uninitialised_var_declarator_list
       {
         int readonly = $1;
@@ -8393,12 +8396,7 @@ closure_var_declaration
         $$ = dnode_list_append_type( $3, $2 );
       }
 
-  | var_type_description uninitialised_var_declarator_list
-      {
-        $$ = dnode_list_append_type( $2, $1 );
-      }
-
-  | variable_declaration_keyword
+  | opt_variable_declaration_keyword
     compact_type_description dimension_list
     uninitialised_var_declarator_list
       {
@@ -8408,12 +8406,6 @@ closure_var_declaration
         }
         tnode_append_element_type( $3, $2 );
         $$ = dnode_list_append_type( $4, $3 );
-      }
-
-  | compact_type_description dimension_list uninitialised_var_declarator_list
-      {
-	tnode_append_element_type( $2, $1 );
-	$$ = dnode_list_append_type( $3, $2 );
       }
   ;
 
@@ -8442,40 +8434,7 @@ closure_initialisation
     snail_emit( snail_cc, px, "\tc\n", DUP );
 }
 
-| variable_identifier
-{
-    ENODE *top_expr = snail_cc->e_stack;
-    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
-    DNODE *closure_var = $1;
-    ssize_t offset = 0;
-
-    assert( closure_tnode );
-
-    tnode_insert_fields( closure_tnode, closure_var );
-    offset = dnode_offset( closure_var );
-    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-}
-'=' expression
-{
-    ENODE *top_expr = snail_cc->e_stack;
-    TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
-    DNODE *closure_var = $1;
-
-    assert( top_type );
-
-    dnode_insert_type( closure_var, share_tnode( top_type ));
-
-    snail_push_type( snail_cc,
-                     new_tnode_addressof( share_tnode( top_type ), px ), 
-                     px );
-
-    compiler_swap_top_expressions( snail_cc );
-
-    snail_compile_sti( snail_cc, px );
-    snail_emit( snail_cc, px, "\tc\n", DUP );
-}
-
-| variable_declaration_keyword variable_identifier
+| opt_variable_declaration_keyword variable_identifier
 {
     int readonly = $1;
     ENODE *top_expr = snail_cc->e_stack;
