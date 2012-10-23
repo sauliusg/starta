@@ -5487,6 +5487,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     opt_null_type_designator
 %type <tnode> opt_base_type
 %type <i>     opt_function_attributes
+%type <i>     opt_function_or_procedure_keyword
 %type <tlist> opt_implemented_interfaces
 %type <s>     opt_label
 %type <i>     opt_readonly
@@ -8529,6 +8530,7 @@ function_expression_header
 opt_function_or_procedure_keyword
 : function_or_procedure_keyword
 | /* empty */
+    { $$ = 1; }
 ;
 
 closure_header
