@@ -6298,7 +6298,8 @@ variable_declaration
      }
      snail_compile_initialise_variable( snail_cc, var, px );
     }
-  | variable_declaration_keyword variable_identifier ','
+ 
+ | variable_declaration_keyword variable_identifier ','
     variable_identifier_list '=' multivalue_expression_list
     {
      int readonly = $1;
@@ -8569,6 +8570,92 @@ closure_initialisation
 
     snail_compile_sti( snail_cc, px );
     snail_emit( snail_cc, px, "\tc\n", DUP );
+}
+
+| opt_variable_declaration_keyword variable_identifier ','
+  variable_identifier_list
+{
+    int readonly = $1;
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var;
+    DNODE *closure_var_list = dnode_append( $2, $4 );
+    ssize_t offset = 0;
+    int first_variable = 1;
+
+    assert( closure_tnode );
+
+    if( readonly ) {
+        dnode_list_set_flags( closure_var_list, DF_IS_READONLY );
+    }
+
+    tnode_insert_fields( closure_tnode, closure_var_list );
+
+    foreach_dnode( closure_var, closure_var_list ) {
+
+        if( !first_variable ) {
+            share_tnode( closure_tnode );
+        }
+        offset = dnode_offset( closure_var );
+        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+        snail_emit( snail_cc, px, "\tc\n", RTOR );
+        snail_emit( snail_cc, px, "\tc\n", DUP );
+        first_variable = 0;
+    }
+}
+ '=' multivalue_expression_list
+{
+    DNODE *closure_var_list = $2;
+    DNODE *var;
+    ssize_t len = dnode_list_length( closure_var_list );
+    ssize_t expr_nr = $7;
+
+    if( expr_nr < len ) {
+        yyerrorf( "number of expressions (%d) is less than "
+                  "is needed to initialise %d variables",
+                  expr_nr, len );
+    }
+
+    if( expr_nr > len ) {
+        if( expr_nr == len + 1 ) {
+            snail_compile_drop( snail_cc, px );
+        } else {
+            snail_compile_dropn( snail_cc, expr_nr - len, px );
+        }
+    }
+
+    len = 0;
+    foreach_dnode( var, closure_var_list ) {
+        len ++;
+        TNODE *expr_type = snail_cc->e_stack ?
+            share_tnode( enode_type( snail_cc->e_stack )) : NULL;
+        type_kind_t expr_type_kind = expr_type ?
+            tnode_kind( expr_type ) : TK_NONE;
+        if( expr_type_kind == TK_FUNCTION ||
+            expr_type_kind == TK_OPERATOR ||
+                 expr_type_kind == TK_METHOD ) {
+            TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+            expr_type = new_tnode_function_or_proc_ref
+                ( share_dnode( tnode_args( expr_type )),
+                  share_dnode( tnode_retvals( expr_type )),
+                  share_tnode( base_type ),
+                  px );
+        }
+        dnode_append_type( var, expr_type );
+        if( len <= expr_nr ) {
+            TNODE *var_type = var ? dnode_type( var ) : NULL;
+
+            assert( var_type );
+
+            snail_emit( snail_cc, px, "\tc\n", RFROMR );
+            snail_push_type( snail_cc,
+                             new_tnode_addressof( share_tnode( var_type ),
+                                                  px ), 
+                             px );
+            snail_compile_swap( snail_cc, px );
+            snail_compile_sti( snail_cc, px );
+        }
+    }
 }
 
 ;
