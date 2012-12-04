@@ -6000,10 +6000,13 @@ program_header
                   snail_emit( snail_cc, px, "\tc\n", DUP );
                   snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
                                           NULL, tnode_suffix( retval_type ), 
-                                          "integer", "0", px );
+                                          "function return value", "0", px );
                   snail_compile_operator( snail_cc, retval_type, "==", 2, px );
                   snail_emit( snail_cc, px, "\n" );
-                  snail_emit( snail_cc, px, "\tcI\n", BJNZ, 3 );
+                  snail_emit( snail_cc, px, "\tcI\n", BJNZ, 6 );
+                  snail_emit( snail_cc, px, "\tcI\n", LDC, 0 );
+                  snail_compile_operator( snail_cc, retval_type,
+                                          "nth-byte", 2, px );
                   snail_emit( snail_cc, px, "\tc\n", EXIT );
                   snail_emit( snail_cc, px, "\tc\n", DROP );
               }
