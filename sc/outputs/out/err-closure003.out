@@ -1,0 +1,5 @@
+./sl: inputs/err-closure003.snl(8,37): ERROR, too little values (2) to initialise 3 closure variables
+    var a, b, c : int = x + 1, y + z;
+                                    ^
+./sl: 1 error(s) detected
+
