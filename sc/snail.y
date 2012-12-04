@@ -5495,6 +5495,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> opt_retval_description_list
 %type <i>     opt_variable_declaration_keyword
 %type <dnode> package_name
+%type <dnode> program_header
 %type <dnode> raised_exception_identifier;
 %type <dnode> retval_description_list
 %type <i>     size_constant
@@ -5613,6 +5614,7 @@ delimited_statement
   | incdec_statement
   | io_statement
   | program_statement
+  | program_definition
   | delimited_control_statement
   | package_statement
   | break_or_continue_statement
@@ -5972,6 +5974,40 @@ program_statement
      {
 	 compiler_compile_program_args( snail_cc, NULL, NULL, $3, px );
      }
+  ;
+
+program_header
+  :  _PROGRAM __IDENTIFIER '(' argument_list ')' opt_retval_description_list
+        {
+	  cexception_t inner;
+	  DNODE *volatile funct = NULL;
+          ssize_t program_addr;
+
+    	  cexception_guard( inner ) {
+	      $$ = funct = new_dnode_function( $2, $4, $6, &inner );
+	      funct = $$ =
+		  snail_check_and_set_fn_proto( snail_cc, funct, &inner );
+
+              compiler_compile_program_args( snail_cc, $2, $4,
+                                             dnode_type( $6 ), &inner );
+              program_addr = thrcode_length( snail_cc->function_thrcode );
+              snail_emit( snail_cc, &inner, "\tce\n", CALL, &program_addr );
+	  }
+	  cexception_catch {
+	      delete_dnode( $4 );
+	      delete_dnode( $6 );
+	      delete_dnode( funct );
+	      $$ = NULL;
+	      cexception_reraise( inner, px );
+	  }
+	}
+;
+
+program_definition
+:   program_header
+    function_or_operator_start
+    function_or_operator_body
+    function_or_operator_end
   ;
 
 module_list
