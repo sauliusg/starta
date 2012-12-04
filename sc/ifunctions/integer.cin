@@ -461,6 +461,32 @@ int @PREFIX1@FILEPRINT( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * NthBYTE Return the N-th byte of a number; the least significan byte
+ * has index 0. Return 0 if the byte is not available.
+ *
+ * bytecode:
+ * NthBYTE
+ *
+ * stack:
+ * index --> signed_byte
+ *
+ */
+
+int @PREFIX1@NthBYTE( INSTRUCTION_FN_ARGS )
+{
+    int index = istate.ep[0].num.i;
+    @type@ value = istate.ep[1].I;
+
+    TRACE_FUNCTION();
+
+    istate.ep ++;
+
+    istate.ep[0].num.b = (value >> (8*index)) & 0xFF;
+
+    return 1;    
+}
+
+/*
  * SUBARRAY -- return an allocated sub-array 
  * 
  * bytecode:

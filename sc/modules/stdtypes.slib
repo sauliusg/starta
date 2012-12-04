@@ -268,6 +268,9 @@ type byte = {
     inline bytecode operator "unpackarray"( blob b; int offset;
                                        	    string description ) : array of byte
         { BUNPACKARRAY };
+
+    inline bytecode operator "nth-byte"( byte i; int index ): byte
+        { BNthBYTE };
 }
 
 type short = {
@@ -376,6 +379,9 @@ type short = {
     inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { HUNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( short i; int index ): byte
+        { HNthBYTE };
 }
 
 type int = {
@@ -503,6 +509,9 @@ type int = {
     inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { UNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( int i; int index ): byte
+        { NthBYTE };
 }
 
 type long = {
@@ -621,6 +630,9 @@ type long = {
     inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { LUNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( long i; int index ): byte
+        { LNthBYTE };
 }
 
 type llong = {
@@ -738,6 +750,9 @@ type llong = {
     inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { LLUNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( llong i; int index ): byte
+        { LLNthBYTE };
 }
 
 type float = {
