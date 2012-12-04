@@ -4006,7 +4006,6 @@ static int compiler_check_and_emit_program_arguments( SNAIL_COMPILER *cc,
 static void compiler_compile_program_args( SNAIL_COMPILER *cc,
 					   char *program_name,
 					   DNODE *argument_list,
-					   TNODE *return_type,
 					   cexception_t *ex )
 {
     if( compiler_check_and_emit_program_arguments( cc, argument_list, ex )) {
@@ -5956,23 +5955,11 @@ pragma_statement
 program_statement
   : _PROGRAM __IDENTIFIER '(' argument_list ')'
      {
-	 compiler_compile_program_args( snail_cc, $2, $4, NULL, px );
-     }
-  | _PROGRAM __IDENTIFIER '(' argument_list ')' ':' var_type_description
-     {
-	 compiler_compile_program_args( snail_cc, $2, $4, $7, px );
+	 compiler_compile_program_args( snail_cc, $2, $4, px );
      }
   | _PROGRAM '(' argument_list ')'
      {
-	 compiler_compile_program_args( snail_cc, NULL, $3, NULL, px );
-     }
-  | _PROGRAM '(' argument_list ')' ':' var_type_description
-     {
-	 compiler_compile_program_args( snail_cc, NULL, $3, $6, px );
-     }
-  | _PROGRAM ':' var_type_description
-     {
-	 compiler_compile_program_args( snail_cc, NULL, NULL, $3, px );
+	 compiler_compile_program_args( snail_cc, NULL, $3, px );
      }
   ;
 
