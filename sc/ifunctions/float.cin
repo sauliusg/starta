@@ -9,7 +9,12 @@
 #undef I
 #endif
 
+#ifdef CVAL
+#undef CVAL
+#endif
+
 #define I num.@field@
+#define CVAL @codeval@
 
 /*
  FLDCS (load float constant)
@@ -27,6 +32,8 @@
 
  */
 
+#if DO_NOT_USE_LDCS_OPTIMISATION
+
 int @PREFIX@LDCS( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = istate.code[istate.ip+1].ssizeval;
@@ -40,6 +47,43 @@ int @PREFIX@LDCS( INSTRUCTION_FN_ARGS )
 
     return 2;
 }
+
+#else
+
+int @PREFIX@LDCS( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+#if 2@cval_star@3 == 6
+
+    istate.code[istate.ip+1].CVAL = malloc(sizeof(@type@));
+    if( istate.code[istate.ip+1].CVAL ) {
+        istate.code[istate.ip].fn = @PREFIX@LDC;
+        sscanf( istate.static_data + offset, "%@format@", 
+                istate.code[istate.ip+1].CVAL );
+        return 0;
+    } else {
+        /* If allocation failed, use a fallback to the old
+           behaviour: */
+        @type@ value;
+        istate.ep --;
+        sscanf( istate.static_data + offset, "%@format@", &value );
+        istate.ep[0].I = value;
+
+        return 2;
+    }
+    
+#else
+    istate.code[istate.ip].fn = @PREFIX@LDC;
+    sscanf( istate.static_data + offset, "%@format@",
+            &istate.code[istate.ip+1].CVAL );
+    return 0;
+#endif
+}
+
+#endif
 
 #if 0
 int @PREFIX@POW( INSTRUCTION_FN_ARGS )

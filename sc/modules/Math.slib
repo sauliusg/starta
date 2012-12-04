@@ -35,7 +35,7 @@ inline bytecode function floorf( float x ) : int
 
 inline bytecode function lround( double x ) : long
 {
-    DLDC 0.5 DADD libmath::LFLOORD
+    FLDC 0.5 F2D DADD libmath::LFLOORD
 }
 
 inline bytecode function lfloor( double x ) : long
@@ -45,7 +45,7 @@ inline bytecode function lfloor( double x ) : long
 
 inline bytecode function round( double x ) : int
 {
-    DLDC 0.5 DADD libmath::LFLOORD LOWINT
+    FLDC 0.5 F2D DADD libmath::LFLOORD LOWINT
 }
 
 inline bytecode function floor( double x ) : int
@@ -55,7 +55,7 @@ inline bytecode function floor( double x ) : int
 
 inline bytecode function llroundl( ldouble x ) : llong
 {
-    LDLDC 0.5 LDADD libmath::LLFLOORLD
+    FLDC 0.5 F2LD LDADD libmath::LLFLOORLD
 }
 
 inline bytecode function llfloorl( ldouble x ) : llong
@@ -65,7 +65,7 @@ inline bytecode function llfloorl( ldouble x ) : llong
 
 inline bytecode function lroundl( ldouble x ) : long
 {
-    LDLDC 0.5 LDADD libmath::LLFLOORLD LOWLONG
+    FLDC 0.5 F2LD LDADD libmath::LLFLOORLD LOWLONG
 }
 
 inline bytecode function lfloorl( ldouble x ) : long
