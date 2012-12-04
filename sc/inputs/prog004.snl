@@ -1,7 +1,7 @@
 
 use std;
 
-program mano( string argv[] );
+program mano( string argv[] )
 begin
     if length(argv) > 1 then
         . argv[0] _ ":", "Hello,", argv[1]
