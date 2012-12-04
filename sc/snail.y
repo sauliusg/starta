@@ -5454,6 +5454,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> argument_identifier_list
 %type <dnode> closure_header
 %type <dnode> closure_var_declaration
+%type <dnode> closure_var_list_declaration
 %type <c>     constant_expression
 %type <i>     constant_integer_expression
 %type <dnode> constructor_header
@@ -8371,7 +8372,7 @@ closure_initialisation_list
 
 closure_var_declaration
   : opt_variable_declaration_keyword
-    variable_identifier_list ':' var_type_description
+    variable_identifier ':' var_type_description
       {
        int readonly = $1;
        if( readonly ) {
@@ -8381,7 +8382,7 @@ closure_var_declaration
       }
 
   | opt_variable_declaration_keyword
-    var_type_description uninitialised_var_declarator_list
+    var_type_description variable_declarator
       {
         int readonly = $1;
         if( readonly ) {
@@ -8392,7 +8393,7 @@ closure_var_declaration
 
   | opt_variable_declaration_keyword
     compact_type_description dimension_list
-    uninitialised_var_declarator_list
+    variable_declarator
       {
         int readonly = $1;
         if( readonly ) {
@@ -8400,6 +8401,44 @@ closure_var_declaration
         }
         tnode_append_element_type( $3, $2 );
         $$ = dnode_list_append_type( $4, $3 );
+      }
+  ;
+
+closure_var_list_declaration
+  : opt_variable_declaration_keyword
+    variable_identifier ',' variable_identifier_list ':' var_type_description
+      {
+       int readonly = $1;
+       DNODE *variables = dnode_append( $4, $2 );
+       if( readonly ) {
+           dnode_list_set_flags( variables, DF_IS_READONLY );
+       }
+       $$ = dnode_list_append_type( variables, $6 );
+      }
+
+  | opt_variable_declaration_keyword
+    var_type_description
+    variable_declarator ',' uninitialised_var_declarator_list
+      {
+        int readonly = $1;
+        DNODE *variables = dnode_append( $5, $3 );
+        if( readonly ) {
+            dnode_list_set_flags( variables, DF_IS_READONLY );
+        }
+        $$ = dnode_list_append_type( variables, $2 );
+      }
+
+  | opt_variable_declaration_keyword
+    compact_type_description dimension_list
+    variable_declarator ',' uninitialised_var_declarator_list
+      {
+        int readonly = $1;
+        DNODE *variables = dnode_append( $6, $4 );
+        if( readonly ) {
+            dnode_list_set_flags( variables, DF_IS_READONLY );
+        }
+        tnode_append_element_type( $3, $2 );
+        $$ = dnode_list_append_type( variables, $3 );
       }
   ;
 
@@ -8423,6 +8462,30 @@ closure_initialisation
                      px );
 }
  '=' expression
+{
+    snail_compile_sti( snail_cc, px );
+    snail_emit( snail_cc, px, "\tc\n", DUP );
+}
+
+| closure_var_list_declaration
+{
+    ENODE *top_expr = snail_cc->e_stack;
+    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
+    DNODE *closure_var = $1;
+    TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
+    ssize_t offset = 0;
+
+    assert( closure_tnode );
+    assert( var_type );
+
+    tnode_insert_fields( closure_tnode, closure_var );
+    offset = dnode_offset( closure_var );
+    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+    snail_push_type( snail_cc,
+                     new_tnode_addressof( share_tnode( var_type ), px ), 
+                     px );
+}
+ '=' multivalue_expression_list
 {
     snail_compile_sti( snail_cc, px );
     snail_emit( snail_cc, px, "\tc\n", DUP );
