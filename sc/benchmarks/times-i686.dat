@@ -1,15 +1,15 @@
-Tue Dec  4 15:14:19 EET 2012
+Tue Dec  4 15:40:04 EET 2012
 Linux 2.6.38-16-generic i686
 Intel(R) Celeron(R) M processor          900MHz
 gcc (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
-fn001-loop.snl       real 0m0.026s
-fn001.snl            real 0m0.722s
-l-slow.snl           real 0m1.074s
-l-slower.snl         real 0m4.251s
-l.snl                real 0m1.823s
-mat001.snl           real 2m5.553s
-mat001asm.snl        real 1m9.299s
-mat002.snl           real 0m2.475s
-pl-slow.snl          real 0m0.557s
-pl-slower.snl        real 0m2.263s
-pl.snl               real 0m1.052s
+fn001-loop.snl       real 0m0.022s
+fn001.snl            real 0m0.592s
+l-slow.snl           real 0m1.109s
+l-slower.snl         real 0m3.675s
+l.snl                real 0m1.419s
+mat001.snl           real 2m8.174s
+mat001asm.snl        real 1m10.985s
+mat002.snl           real 0m2.321s
+pl-slow.snl          real 0m0.603s
+pl-slower.snl        real 0m1.992s
+pl.snl               real 0m0.608s

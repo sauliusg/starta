@@ -13,7 +13,12 @@
 #undef I
 #endif
 
+#ifdef CVAL
+#undef CVAL
+#endif
+
 #define I    num.@field@
+#define CVAL @codeval@
 
 /*
  LDCS (load constant)
@@ -31,6 +36,8 @@
 
  */
 
+#if DO_NOT_USE_LDCS_OPTIMISATION
+
 int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = istate.code[istate.ip+1].ssizeval;
@@ -42,6 +49,24 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
 
     return 2;
 }
+
+#else
+
+int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.code[istate.ip].fn = @PREFIX1@LDC;
+
+    istate.code[istate.ip+1].CVAL =
+        strtol( istate.static_data + offset, NULL, 0 );
+
+    return 0;
+}
+
+#endif
 
 int @PREFIX1@MOD( INSTRUCTION_FN_ARGS )
 {
