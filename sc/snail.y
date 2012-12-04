@@ -5988,8 +5988,8 @@ program_header
 	      funct = $$ =
 		  snail_check_and_set_fn_proto( snail_cc, funct, &inner );
 
-              compiler_compile_program_args( snail_cc, $2, $4,
-                                             dnode_type( $6 ), &inner );
+              compiler_check_and_emit_program_arguments( snail_cc, $4,
+                                                         &inner );
               program_addr = thrcode_length( snail_cc->function_thrcode );
               snail_emit( snail_cc, &inner, "\tce\n", CALL, &program_addr );
 	  }
