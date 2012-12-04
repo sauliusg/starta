@@ -6215,10 +6215,21 @@ variable_declaration
              yyerrorf( "number of expressions (%d) is less "
                        "the number of variables (%d)", expr_nr, len );
          }
-         
+
+         if( expr_nr > len ) {
+             if( expr_nr == len + 1 ) {
+                 snail_compile_drop( snail_cc, px );
+             } else {
+                 snail_compile_dropn( snail_cc, expr_nr - len, px );
+             }
+         }
+
          if( expr_nr > 1 ) {
+             len = 0;
              foreach_dnode( var, lst ) {
-                 snail_compile_initialise_variable( snail_cc, var, px );
+                 len ++;
+                 if( len <= expr_nr )
+                     snail_compile_initialise_variable( snail_cc, var, px );
              }
          } else {
              foreach_dnode( var, lst ) {
@@ -6330,8 +6341,26 @@ variable_declaration
      {
 	 DNODE *var;
 	 DNODE *lst = $2;
+         ssize_t len = dnode_list_length( lst );
+         ssize_t expr_nr = $6;
 
+         if( expr_nr < len ) {
+             yyerrorf( "number of expressions (%d) is less than "
+                       "is needed to initialise %d variables",
+                       expr_nr, len );
+         }
+
+         if( expr_nr > len ) {
+             if( expr_nr == len + 1 ) {
+                 snail_compile_drop( snail_cc, px );
+             } else {
+                 snail_compile_dropn( snail_cc, expr_nr - len, px );
+             }
+         }
+
+         len = 0;
 	 foreach_dnode( var, lst ) {
+             len ++;
              TNODE *expr_type = snail_cc->e_stack ?
                  share_tnode( enode_type( snail_cc->e_stack )) : NULL;
              type_kind_t expr_type_kind = expr_type ?
@@ -6347,7 +6376,8 @@ variable_declaration
                        px );
              }
              dnode_append_type( var, expr_type );
-	     snail_compile_initialise_variable( snail_cc, var, px );
+             if( len <= expr_nr )
+                 snail_compile_initialise_variable( snail_cc, var, px );
 	 }
      }
     }
