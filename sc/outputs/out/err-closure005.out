@@ -1,0 +1,8 @@
+./sl: inputs/err-closure005.snl(6,23): ERROR, number of expressions (2) is less than is needed to initialise 3 variables
+    var a, b, c = 1, 2;
+                      ^
+./sl: inputs/err-closure005.snl(10,34): ERROR, this type has no unary operator named '.'
+  . local.a; . local.b; . local.c;
+                                 ^
+./sl: 2 error(s) detected
+
