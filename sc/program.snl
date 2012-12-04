@@ -1,0 +1,7 @@
+
+use std;
+
+program mano()
+begin
+    . "Hello!"
+end;
