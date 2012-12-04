@@ -5999,7 +5999,8 @@ program_header
                   assert( retval_type );
                   snail_emit( snail_cc, px, "\tc\n", DUP );
                   snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
-                                          NULL, "bool", "integer", "0", px );
+                                          NULL, tnode_suffix( retval_type ), 
+                                          "integer", "0", px );
                   snail_compile_operator( snail_cc, retval_type, "==", 2, px );
                   snail_emit( snail_cc, px, "\n" );
                   snail_emit( snail_cc, px, "\tcI\n", BJNZ, 3 );
