@@ -3,7 +3,7 @@ use std;
 
 var fff = closure function( x, y : float ): float
 local {
-    var a, b, c = 1, 2, 3;
+    var int a, b, c = 1, 2, 3;
     var s : string = "va va";
 }
 { 
