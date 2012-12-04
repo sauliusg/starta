@@ -1,6 +1,5 @@
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
--+ Implement program() { ... } construct. (to be done: program return values).
 -- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
 -- Implement 'foreach ... in'
@@ -20,6 +19,7 @@ xx Change i/o operators from << and >> to <- and ->.
 ?? Write comments how begin_scope() and begin_subscope() are supposed to work
 ?? The same for end_{sub}scope() functions
 ?? Implement exception types (classes?).
+++ Implement program() { ... } construct. (to be done: program return values).
 ++ Implement subarrays and substrings.
 xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 ++ Implement 'strstart()', 'strend()' and similar string comparison functions
