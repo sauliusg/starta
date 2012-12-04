@@ -8489,11 +8489,6 @@ closure_initialisation
         }
         offset = dnode_offset( closure_var );
         snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-        /*
-        snail_push_type( snail_cc,
-                         new_tnode_addressof( share_tnode( var_type ), px ), 
-                         px );
-        */
         snail_emit( snail_cc, px, "\tc\n", RTOR );
         snail_emit( snail_cc, px, "\tc\n", DUP );
         first_variable = 0;
@@ -8505,18 +8500,39 @@ closure_initialisation
 {
     DNODE *var_list = $1;
     DNODE *var;
+    ssize_t value_count = $4;
+    ssize_t variable_count = dnode_list_length( var_list );
 
+    if( variable_count > value_count ) {
+        yyerrorf( "too little values (%d) to initialise "
+                  "%d closure variables", value_count, variable_count );
+    } else {
+        if( variable_count < value_count ) {
+            if( variable_count == value_count - 1 ) {
+                snail_compile_drop( snail_cc, px );
+            } else {
+                snail_compile_dropn( snail_cc, value_count - variable_count,
+                                     px );
+            }
+        }
+    }
+
+    variable_count = 0;
     foreach_dnode( var, var_list ) {
-        TNODE *var_type = var ? dnode_type( var ) : NULL;
+        variable_count ++;
+        if( variable_count <= value_count ) {
+            TNODE *var_type = var ? dnode_type( var ) : NULL;
 
-        assert( var_type );
+            assert( var_type );
 
-        snail_emit( snail_cc, px, "\tc\n", RFROMR );
-        snail_push_type( snail_cc,
-                         new_tnode_addressof( share_tnode( var_type ), px ), 
-                         px );
-        snail_compile_swap( snail_cc, px );
-        snail_compile_sti( snail_cc, px );
+            snail_emit( snail_cc, px, "\tc\n", RFROMR );
+            snail_push_type( snail_cc,
+                             new_tnode_addressof( share_tnode( var_type ),
+                                                  px ), 
+                             px );
+            snail_compile_swap( snail_cc, px );
+            snail_compile_sti( snail_cc, px );
+        }
     }
 }
 
