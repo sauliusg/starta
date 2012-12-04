@@ -1,6 +1,6 @@
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
--- Implement program() { ... } construct.
+-+ Implement program() { ... } construct. (to be done: program return values).
 -- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
 -- Implement 'foreach ... in'
