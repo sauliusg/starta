@@ -362,6 +362,7 @@ static void thrcode_emit_float( THRCODE *tc, float fval,
   c assembles tcode (pointer to a function)
   C assembles tcode (from char* to an opcode (function) name)
   i assembles integer
+  I assembles ssize_t from an integer value; must get an integer value.
   e assembles ssize_t, must get an address of the ssize_t variable.
   f assembles float
   p assembles pointer
@@ -395,9 +396,7 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 		      va_list ap )
 {
     void *tcode;
-#if 0
     int ival;
-#endif
     ssize_t sszval;
     float fval;
     char *sval;
@@ -464,6 +463,12 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 		    thrcode_printf( tc, ex, "%d ", ival );
 		break;
 #endif
+	    case 'I':
+	        ival = va_arg( ap, int );
+		thrcode_emit_ssize_t( tc, (ssize_t)ival, ex );
+		if( thrcode_debug )
+		    thrcode_printf( tc, ex, "%d ", ival );
+		break;
 	    case 'e':
 	        sszval = *va_arg( ap, ssize_t* );
 		thrcode_emit_ssize_t( tc, sszval, ex );
