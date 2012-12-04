@@ -8471,24 +8471,53 @@ closure_initialisation
 {
     ENODE *top_expr = snail_cc->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
-    DNODE *closure_var = $1;
-    TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
+    DNODE *closure_var_list = $1;
+    DNODE *closure_var;
     ssize_t offset = 0;
+    int first_variable = 1;
 
     assert( closure_tnode );
-    assert( var_type );
 
-    tnode_insert_fields( closure_tnode, closure_var );
-    offset = dnode_offset( closure_var );
-    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-    snail_push_type( snail_cc,
-                     new_tnode_addressof( share_tnode( var_type ), px ), 
-                     px );
+    tnode_insert_fields( closure_tnode, closure_var_list );
+
+    closure_var_list = dnode_list_invert( closure_var_list );
+
+    foreach_dnode( closure_var, closure_var_list ) {
+
+        if( !first_variable ) {
+            share_tnode( closure_tnode );
+        }
+        offset = dnode_offset( closure_var );
+        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+        /*
+        snail_push_type( snail_cc,
+                         new_tnode_addressof( share_tnode( var_type ), px ), 
+                         px );
+        */
+        snail_emit( snail_cc, px, "\tc\n", RTOR );
+        snail_emit( snail_cc, px, "\tc\n", DUP );
+        first_variable = 0;
+    }
+
+    dnode_list_invert( closure_var_list );
 }
  '=' multivalue_expression_list
 {
-    snail_compile_sti( snail_cc, px );
-    snail_emit( snail_cc, px, "\tc\n", DUP );
+    DNODE *var_list = $1;
+    DNODE *var;
+
+    foreach_dnode( var, var_list ) {
+        TNODE *var_type = var ? dnode_type( var ) : NULL;
+
+        assert( var_type );
+
+        snail_emit( snail_cc, px, "\tc\n", RFROMR );
+        snail_push_type( snail_cc,
+                         new_tnode_addressof( share_tnode( var_type ), px ), 
+                         px );
+        snail_compile_swap( snail_cc, px );
+        snail_compile_sti( snail_cc, px );
+    }
 }
 
 | opt_variable_declaration_keyword variable_identifier
