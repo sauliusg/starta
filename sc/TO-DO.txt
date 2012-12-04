@@ -1,6 +1,5 @@
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
-++ Implement multivalue assignment to closure variables.
 -- Implement program() { ... } construct.
 -- Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
@@ -72,7 +71,6 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 -- Implement map operator.
 -- Implement i/o to strings.
 -- Implement functions to narrow numbers.
--- Implement function closures.
 -- Implement array concatenation operators.
 -- Implement array "stringification".
 -- Implement AND ALSO and OR ALSO.
@@ -88,6 +86,8 @@ xx Implement "square" multidimensional arrays.
 -+ Think about the possibility of "generic" functions with type "placeholders"
 ++ Implement garbage collector invocation policy.
 -+ Implement anonymous array and struct compatibility.
+++ Implement multivalue assignment to closure variables.
+++ Implement function closures.
 ++ Implement blobs and pack/unpack.
 ++ Write thorough tests for multidimensional array allocators.
 ++ Implement string indexing.
