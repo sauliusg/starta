@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <cexceptions.h>
+#include <typesize.h>
 
 typedef struct FIXUP FIXUP;
 
