@@ -10,6 +10,7 @@
 
 /* uses: */
 #include <stdlib.h>
+#include <unistd.h>
 
 const char *size_t_format( void )
 {
