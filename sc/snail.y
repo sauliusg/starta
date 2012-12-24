@@ -3537,7 +3537,6 @@ static void snail_merge_functions_and_main( SNAIL_COMPILER *cc,
     cc->main_thrcode = cc->function_thrcode;
     cc->function_thrcode = NULL;
     cc->thrcode = cc->main_thrcode;
-	
 }
 
 static void snail_push_thrcode( SNAIL_COMPILER *sc,
