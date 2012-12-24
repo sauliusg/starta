@@ -21,21 +21,20 @@
 
 void *interpret_subsystem = &interpret_subsystem;
 
-/* leave some stack cells unused at the begining and at the end of the
-   stack -- to minimise segfaults and facilitate stack under/overflow
-   diagnostics */
-
 /* A size of a runtime-allocated data to be allcoated in one chunk: */
 #define RUNTIME_DATA_NODE_CHUNK 1024
 
 struct runtime_data_node {
+    struct runtime_data_node *next;
     union {
         double d;
         ldouble ld;
-    } data;
-    struct runtime_data_node *next;
+    } value;
 };
 
+/* leave some stack cells unused at the begining and at the end of the
+   stack -- to minimise segfaults and facilitate stack under/overflow
+   diagnostics: */
 #define STACK_SAFETY_MARGIN 4
 
 /* internal state of the interpreter */
@@ -96,28 +95,16 @@ static void cleanup_istate( istate_t *istate )
     assert( istate->env == NULL );
 }
 
-double *interpret_alloc_double( istate_t *is )
+void *interpret_alloc( istate_t *is, ssize_t size )
 {
     runtime_data_node *current = is->extra_data;
-    is->extra_data = calloc( 1, sizeof(*is->extra_data));
+
+    is->extra_data = calloc( 1, sizeof(*is->extra_data) + size -
+                             sizeof(is->extra_data->value) );
 
     if( is->extra_data ) {
         is->extra_data->next = current;
-        return &(is->extra_data->data.d);
-    } else {
-        is->extra_data = current;
-        return NULL;
-    }
-}
-
-ldouble *interpret_alloc_ldouble( istate_t *is )
-{
-    runtime_data_node *current = is->extra_data;
-    is->extra_data = calloc( 1, sizeof(*is->extra_data));
-
-    if( is->extra_data ) {
-        is->extra_data->next = current;
-        return &(is->extra_data->data.ld);
+        return &(is->extra_data->value);
     } else {
         is->extra_data = current;
         return NULL;
