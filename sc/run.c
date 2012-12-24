@@ -84,10 +84,13 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
 
 static void cleanup_istate( istate_t *istate )
 {
-    runtime_data_node *current;
+    runtime_data_node *current, *next;
 
-    for( current = istate->extra_data; current; current = current->next ) {
+    current = istate->extra_data;
+    while( current ) {
+        next = current->next;
         free( current );
+        current = next;
     }
     memset( istate, 0, sizeof(*istate) );
     assert( istate->env == NULL );
