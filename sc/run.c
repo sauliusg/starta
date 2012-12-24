@@ -25,6 +25,17 @@ void *interpret_subsystem = &interpret_subsystem;
    stack -- to minimise segfaults and facilitate stack under/overflow
    diagnostics */
 
+/* A size of a runtime-allocated data to be allcoated in one chunk: */
+#define RUNTIME_DATA_NODE_CHUNK 1024
+
+struct runtime_data_node {
+    union {
+        double d;
+        ldouble ld;
+    } data;
+    struct runtime_data_node *next;
+};
+
 #define STACK_SAFETY_MARGIN 4
 
 /* internal state of the interpreter */
@@ -36,8 +47,8 @@ static int gc_debug = 0;
 
 static void thrcode_print_stack( void );
 
-void interpret( THRCODE *code, int argc, char *argv[], char *env[],
-		cexception_t *ex )
+static void make_istate( istate_t *new_istate, THRCODE *code,
+                         int argc, char *argv[], char *env[] )
 {
     static stackcell_t call_stack[2000];
     static stackcell_t eval_stack[2000];
@@ -48,24 +59,74 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
     const int eval_stack_size = sizeof(eval_stack);
     const int eval_stack_length = eval_stack_size/sizeof(stackcell_t);
 
-    istate.bottom = call_stack + call_stack_length - STACK_SAFETY_MARGIN;
-    istate.fp = istate.gp = istate.sp = istate.bottom - 1;
-    istate.top = call_stack + STACK_SAFETY_MARGIN;
+    new_istate->bottom = call_stack + call_stack_length - STACK_SAFETY_MARGIN;
+    new_istate->fp = new_istate->gp = new_istate->sp = new_istate->bottom - 1;
+    new_istate->top = call_stack + STACK_SAFETY_MARGIN;
 
     memset( call_stack, 0x55, call_stack_size );
-    memset( istate.fp, 0, ( istate.bottom - istate.fp ) *
-	    sizeof( *istate.fp ) );
+    memset( new_istate->fp, 0, ( new_istate->bottom - new_istate->fp ) *
+	    sizeof( *new_istate->fp ) );
 
     memset( eval_stack, 0x00, sizeof(eval_stack) );
-    istate.ep_bottom = eval_stack + eval_stack_length - STACK_SAFETY_MARGIN;
-    istate.ep = istate.ep_bottom - 1;
-    istate.ep_top = eval_stack + STACK_SAFETY_MARGIN;
 
-    istate.argc = argc;
-    istate.argv = argv;
-    istate.env = env;
+    new_istate->ep_bottom = eval_stack + eval_stack_length -
+        STACK_SAFETY_MARGIN;
 
+    new_istate->ep = new_istate->ep_bottom - 1;
+    new_istate->ep_top = eval_stack + STACK_SAFETY_MARGIN;
+
+    new_istate->argc = argc;
+    new_istate->argv = argv;
+    new_istate->env = env;
+
+    new_istate->extra_data = NULL;
+}
+
+static void cleanup_istate( istate_t *istate )
+{
+    runtime_data_node *current;
+
+    for( current = istate->extra_data; current; current = current->next ) {
+        free( current );
+    }
+    memset( istate, 0, sizeof(*istate) );
+    assert( istate->env == NULL );
+}
+
+double *interpret_alloc_double( istate_t *is )
+{
+    runtime_data_node *current = is->extra_data;
+    is->extra_data = calloc( 1, sizeof(*is->extra_data));
+
+    if( is->extra_data ) {
+        is->extra_data->next = current;
+        return &(is->extra_data->data.d);
+    } else {
+        is->extra_data = current;
+        return NULL;
+    }
+}
+
+ldouble *interpret_alloc_ldouble( istate_t *is )
+{
+    runtime_data_node *current = is->extra_data;
+    is->extra_data = calloc( 1, sizeof(*is->extra_data));
+
+    if( is->extra_data ) {
+        is->extra_data->next = current;
+        return &(is->extra_data->data.ld);
+    } else {
+        is->extra_data = current;
+        return NULL;
+    }
+}
+
+void interpret( THRCODE *code, int argc, char *argv[], char *env[],
+		cexception_t *ex )
+{
+    make_istate( &istate, code, argc, argv, env );
     run( code, ex );
+    cleanup_istate( &istate );
 }
 
 static void check_runtime_stacks( cexception_t * ex )

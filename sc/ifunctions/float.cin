@@ -58,7 +58,7 @@ int @PREFIX@LDCS( INSTRUCTION_FN_ARGS )
 
 #if 2@cval_star@3 == 6
 
-    istate.code[istate.ip+1].CVAL = malloc(sizeof(@type@));
+    istate.code[istate.ip+1].CVAL = interpret_alloc_@type@( &istate );
     if( istate.code[istate.ip+1].CVAL ) {
         istate.code[istate.ip].fn = @PREFIX@LDC;
         sscanf( istate.static_data + offset, "%@format@", 
