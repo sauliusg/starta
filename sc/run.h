@@ -157,8 +157,7 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 
 void run( THRCODE *code, cexception_t *ex );
 
-double *interpret_alloc_double( istate_t *is );
-ldouble *interpret_alloc_ldouble( istate_t *is );
+void *interpret_alloc( istate_t *is, ssize_t size );
 
 void thrcode_trace_on( void );
 void thrcode_trace_off( void );
