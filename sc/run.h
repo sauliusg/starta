@@ -152,7 +152,7 @@ extern int trace;
 void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 		cexception_t *ex );
 
-void run( THRCODE *code, cexception_t *ex );
+void run( cexception_t *ex );
 
 void *interpret_alloc( istate_t *is, ssize_t size );
 
