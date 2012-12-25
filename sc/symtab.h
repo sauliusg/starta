@@ -19,6 +19,7 @@ typedef struct SYMTAB SYMTAB; /* variable symbol table */
 SYMTAB *new_symtab( VARTAB *vartab,
 		    VARTAB *consts,
 		    TYPETAB *typetab,
+		    VARTAB *operators,
 		    cexception_t *ex );
 
 void delete_symtab( SYMTAB *table );
@@ -26,6 +27,7 @@ void delete_symtab( SYMTAB *table );
 void obtain_tables_from_symtab( SYMTAB *symtab,
 				VARTAB **vartab,
 				VARTAB **consts,
-				TYPETAB **typetab );
+				TYPETAB **typetab,
+				VARTAB **operators );
 
 #endif

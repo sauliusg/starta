@@ -35,6 +35,6 @@ module M
 
 end module M;
 
-// use M;
+use M;
 
 . i * i;

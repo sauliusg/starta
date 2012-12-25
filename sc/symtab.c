@@ -21,11 +21,13 @@ struct SYMTAB {
     VARTAB *vartab;   /* declared variables, with scopes */
     VARTAB *consts;   /* declared constants, with scopes */
     TYPETAB *typetab; /* declared types and their scopes */
+    VARTAB *operators; /* operators declared outside types */
 };
 
 SYMTAB *new_symtab( VARTAB *vartab,
 		    VARTAB *consts,
 		    TYPETAB *typetab,
+		    VARTAB *operators,
 		    cexception_t *ex )
 {
     SYMTAB *symtab = callocx( sizeof(SYMTAB), 1, ex );
@@ -33,6 +35,7 @@ SYMTAB *new_symtab( VARTAB *vartab,
     symtab->vartab = vartab;
     symtab->consts = consts;
     symtab->typetab = typetab;
+    symtab->operators = operators;
 
     return symtab;
 }
@@ -43,13 +46,15 @@ void delete_symtab( SYMTAB *table )
     delete_vartab( table->vartab );
     delete_vartab( table->consts );
     delete_typetab( table->typetab );
+    delete_vartab( table->operators );
     freex( table );
 }
 
 void obtain_tables_from_symtab( SYMTAB *symtab,
 				VARTAB **vartab,
 				VARTAB **consts,
-				TYPETAB **typetab )
+				TYPETAB **typetab,
+				VARTAB **operators )
 {
     assert( symtab );
     assert( vartab );
@@ -59,8 +64,10 @@ void obtain_tables_from_symtab( SYMTAB *symtab,
     *vartab = symtab->vartab;
     *consts = symtab->consts;
     *typetab = symtab->typetab;
+    *operators = symtab->operators;
 
     symtab->vartab = NULL;
     symtab->consts = NULL;
     symtab->typetab = NULL;
+    symtab->operators = NULL;
 }

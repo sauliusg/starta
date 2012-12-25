@@ -192,6 +192,8 @@ VARTAB *dnode_vartab( DNODE *dnode );
 
 VARTAB *dnode_constants_vartab( DNODE *dnode );
 
+VARTAB *dnode_operator_vartab( DNODE *dnode );
+
 TYPETAB *dnode_typetab( DNODE *dnode );
 
 void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *var,
@@ -199,6 +201,9 @@ void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *var,
 
 void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *vars,
 				     cexception_t *ex );
+
+void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
+                                        cexception_t *ex );
 
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name );
 
