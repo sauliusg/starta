@@ -68,6 +68,10 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
     new_istate->argc = argc;
     new_istate->argv = argv;
     new_istate->env = env;
+
+    new_istate->code = thrcode_instructions( code );
+    new_istate->code_length = thrcode_length( code );
+    new_istate->static_data = thrcode_static_data( code, &istate.static_data_size );
 }
 
 void *interpret_alloc( istate_t *is, ssize_t size )
@@ -79,7 +83,7 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 		cexception_t *ex )
 {
     make_istate( &istate, code, argc, argv, env );
-    run( code, ex );
+    run( ex );
 }
 
 static void check_runtime_stacks( cexception_t * ex )
@@ -115,17 +119,15 @@ static void check_runtime_stacks( cexception_t * ex )
     }
 }
 
-void run( THRCODE *code, cexception_t *ex )
+void run( cexception_t *ex )
 {
     cexception_t inner;
     register int (*function)( void );
 
+    // istate.ex = &inner;
     istate.ex = ex;
-    istate.code = thrcode_instructions( code );
-    istate.code_length = thrcode_length( code );
     istate.ip = 0;
-    istate.static_data = thrcode_static_data( code, &istate.static_data_size );
-    
+
     function = istate.code[0].fn;
 
     while( function ) {
