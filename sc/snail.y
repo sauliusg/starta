@@ -1418,36 +1418,57 @@ static void snail_check_operator_args( SNAIL_COMPILER *cc,
 	op_args = od->describing_type ? tnode_args( od->describing_type ) :
 	    NULL;
 
-	expr = cc->e_stack;
+        if( strcmp( od->name, "st" ) == 0 ) {
+            /* The custom "st" operators will be emitted when
+               compiling function parameter list (stores); at that
+               point there will be no expressions emulated on the
+               e_stack, and the compatibility check needs a special
+               treatment: */
+            TNODE *arg_type = op_args ? dnode_type( op_args ) : NULL;
 
-	nargs = dnode_list_length( op_args );
+            if( !arg_type ||
+                !tnode_types_are_assignment_compatible( dnode_type( op_args ),
+                                                        od->containing_type,
+                                                        generic_types,
+                                                        ex )) {
+                yyerrorf( "incompatible type of an argument "
+                          "for operator '%s'", od->name );
+            }
+        } else {
+            expr = cc->e_stack;
 
-	foreach_dnode( arg, op_args ) {
-	    TNODE *argument_type;
-	    TNODE *expr_type;
+            nargs = dnode_list_length( op_args );
 
-	    if( !expr ) {
-		yyerrorf( "too little values in the stack for operator '%s'",
-			  dnode_name( od->operator ));
-		break;
-	    }
+            foreach_dnode( arg, op_args ) {
+                TNODE *argument_type;
+                TNODE *expr_type;
 
-	    argument_type = dnode_type( arg );
-	    expr_type = enode_type( expr );
+                if( !expr ) {
+                    yyerrorf( "too little values in the stack for operator '%s'",
+                              dnode_name( od->operator ));
+                    break;
+                }
+
+                argument_type = dnode_type( arg );
+                expr_type = enode_type( expr );
 
 #if 1
-            if( !tnode_types_are_compatible( argument_type, expr_type,
-					     generic_types, ex )) {
+                if( !tnode_types_are_compatible( argument_type, expr_type,
+                                                 generic_types, ex )) {
 #else
-            if( !tnode_types_are_assignment_compatible( argument_type, expr_type,
-                                                        generic_types, ex )) {
+                if( !tnode_types_are_assignment_compatible( argument_type,
+                                                            expr_type,
+                                                            generic_types,
+                                                            ex )) {
 #endif
-		yyerrorf( "incompatible type of argument %d for operator '%s'",
-			  nargs, dnode_name( od->operator ));
-	    }
+                    yyerrorf( "incompatible type of argument %d "
+                              "for operator '%s'",
+                              nargs, dnode_name( od->operator ));
+                }
 
-	    expr = enode_next( expr );
-	    nargs --;
+                expr = enode_next( expr );
+                nargs --;
+            }
 	}
     }
 }
