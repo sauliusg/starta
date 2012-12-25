@@ -1,4 +1,4 @@
-./sl: inputs/err-st002.snl(33,7): ERROR, incompatible type of argument 1 for operator 'st'
+./sl: inputs/err-st002.snl(33,7): ERROR, incompatible type of an argument for operator 'st'
 a = 11;
       ^
 ./sl: inputs/err-st002.snl(35,6): ERROR, incompatible types for assignment to variable 'x'
