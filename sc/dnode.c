@@ -67,6 +67,7 @@ struct DNODE {
     VARTAB *vartab;        /* variables declared in a module */
     VARTAB *consts;        /* constants declared in a module */
     TYPETAB *typetab;      /* types declared in a module */
+    VARTAB *operators;     /* operators declared in modules */
 
     DNODE *next; /* reference to the next declaration in a declaration
 		    list */
@@ -94,6 +95,7 @@ void delete_dnode( DNODE *node )
 	delete_vartab( node->vartab );
 	delete_vartab( node->consts );
 	delete_typetab( node->typetab );
+	delete_vartab( node->operators );
 #if 0
 	{
 	    FIXUP *f;
@@ -300,6 +302,7 @@ DNODE *new_dnode_package( char *name, cexception_t *ex )
 	node->vartab = new_vartab( &inner );
 	node->consts = new_vartab( &inner );
 	node->typetab = new_typetab( &inner );
+	node->operators = new_vartab( &inner );
     }
     cexception_catch {
 	delete_dnode( node );
@@ -868,6 +871,12 @@ VARTAB *dnode_constants_vartab( DNODE *dnode )
     return dnode->consts;
 }
 
+VARTAB *dnode_operator_vartab( DNODE *dnode )
+{
+    assert( dnode );
+    return dnode->operators;
+}
+
 TYPETAB *dnode_typetab( DNODE *dnode )
 {
     assert( dnode );
@@ -893,6 +902,13 @@ void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *vars,
 {
     assert( dnode->vartab );
     vartab_insert_named_vars( dnode->vartab, vars, ex );
+}
+
+void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
+                                        cexception_t *ex )
+{
+    assert( dnode->vartab );
+    vartab_insert_named_operator( dnode->operators, operator, ex );
 }
 
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name )

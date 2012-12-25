@@ -119,6 +119,24 @@ int vartab_current_scope( VARTAB *vartab )
     return vartab->current_scope;
 }
 
+void vartab_insert_operator( VARTAB *table, const char *name,
+                             DNODE *dnode, cexception_t *ex )
+{
+    VAR_NODE * volatile node = NULL;
+    assert( table );
+    table->node = new_var_node( dnode, name,
+                                table->current_scope,
+                                table->current_subscope,
+                                /* count = */ 1,
+                                table->node, ex );
+}
+
+void vartab_insert_named_operator( VARTAB *table, DNODE *dnode,
+                                   cexception_t *ex )
+{
+    vartab_insert_operator( table, dnode_name( dnode ), dnode, ex );
+}
+
 void vartab_insert_named_vars( VARTAB *table, DNODE *dnode_list,
 			       cexception_t *ex )
 {
@@ -266,6 +284,55 @@ static VAR_NODE *vartab_lookup_varnode( VARTAB *table, const char *name )
         if( strcmp( name, node->name ) == 0 ) {
 	    assert( node->dnode );
 	    return node;
+	}
+    }
+    return NULL;
+}
+
+DNODE *vartab_lookup_operator( VARTAB *table, const char *name,
+                               TLIST *argument_types )
+{
+    VAR_NODE *node;
+    TLIST *current_arg;
+    int found;
+
+    assert( table );
+    for( node = table->node; node != NULL; node = node->next ) {
+        assert( node->dnode );
+        if( strcmp( name, node->name ) == 0 ) {
+            TNODE *operator_type = dnode_type( node->dnode );
+            DNODE *parameter = operator_type ?
+                dnode_list_last( tnode_args( operator_type )) : NULL;
+            found = 1;
+            {
+                cexception_t inner;
+                TYPETAB *volatile generic_types = NULL;
+
+                cexception_guard( inner ) {
+                    TNODE *argument_type, *parameter_type;
+                    generic_types = new_typetab( &inner );
+                    foreach_tlist( current_arg, argument_types ) {
+                        if( !parameter ) {
+                            found = 0;
+                            break;
+                        }
+                        argument_type = tlist_data( current_arg );
+                        parameter_type = dnode_type( parameter );
+                        if( !tnode_types_are_identical( argument_type, 
+                                                        parameter_type,
+                                                        generic_types,
+                                                        &inner )) {
+                            found = 0;
+                            break;
+                        }
+                        parameter = dnode_prev( parameter );
+                    }
+                }
+                delete_typetab( generic_types );
+            }
+            if( found ) {
+                return node->dnode;
+            }
 	}
     }
     return NULL;
