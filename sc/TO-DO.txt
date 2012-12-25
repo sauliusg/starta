@@ -1,6 +1,6 @@
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
--+ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
+++ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
 -- Implement 'foreach ... in'
 -- Implement a separate operator table, remove operators from type bodies.

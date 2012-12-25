@@ -21,17 +21,6 @@
 
 void *interpret_subsystem = &interpret_subsystem;
 
-/* A size of a runtime-allocated data to be allcoated in one chunk: */
-#define RUNTIME_DATA_NODE_CHUNK 1024
-
-struct runtime_data_node {
-    struct runtime_data_node *next;
-    union {
-        double d;
-        ldouble ld;
-    } value;
-};
-
 /* leave some stack cells unused at the begining and at the end of the
    stack -- to minimise segfaults and facilitate stack under/overflow
    diagnostics: */
@@ -58,6 +47,8 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
     const int eval_stack_size = sizeof(eval_stack);
     const int eval_stack_length = eval_stack_size/sizeof(stackcell_t);
 
+    new_istate->thrcode = code;
+
     new_istate->bottom = call_stack + call_stack_length - STACK_SAFETY_MARGIN;
     new_istate->fp = new_istate->gp = new_istate->sp = new_istate->bottom - 1;
     new_istate->top = call_stack + STACK_SAFETY_MARGIN;
@@ -77,38 +68,11 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
     new_istate->argc = argc;
     new_istate->argv = argv;
     new_istate->env = env;
-
-    new_istate->extra_data = NULL;
-}
-
-static void cleanup_istate( istate_t *istate )
-{
-    runtime_data_node *current, *next;
-
-    current = istate->extra_data;
-    while( current ) {
-        next = current->next;
-        free( current );
-        current = next;
-    }
-    memset( istate, 0, sizeof(*istate) );
-    assert( istate->env == NULL );
 }
 
 void *interpret_alloc( istate_t *is, ssize_t size )
 {
-    runtime_data_node *current = is->extra_data;
-
-    is->extra_data = calloc( 1, sizeof(*is->extra_data) + size -
-                             sizeof(is->extra_data->value) );
-
-    if( is->extra_data ) {
-        is->extra_data->next = current;
-        return &(is->extra_data->value);
-    } else {
-        is->extra_data = current;
-        return NULL;
-    }
+    return thrcode_alloc_extra_data( is->thrcode, size );
 }
 
 void interpret( THRCODE *code, int argc, char *argv[], char *env[],
@@ -116,7 +80,6 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 {
     make_istate( &istate, code, argc, argv, env );
     run( code, ex );
-    cleanup_istate( &istate );
 }
 
 static void check_runtime_stacks( cexception_t * ex )
