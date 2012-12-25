@@ -49,6 +49,8 @@ void create_thrcode( THRCODE * volatile *thrcode, cexception_t *ex );
 
 void dispose_thrcode( THRCODE * volatile *thrcode );
 
+void *thrcode_alloc_extra_data( THRCODE *tc, ssize_t size );
+
 void *thrcode_instructions( THRCODE *bc );
 
 size_t thrcode_length( THRCODE *bc );

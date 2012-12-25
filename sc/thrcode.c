@@ -76,6 +76,33 @@ void thrcode_heapdebug_off( void )
     thrcode_heapdebug = 0;
 }
 
+typedef struct RUNTIME_DATA_NODE {
+    struct RUNTIME_DATA_NODE *next;
+    union {
+        double d;
+        ldouble ld;
+    } value;
+} RUNTIME_DATA_NODE;
+
+static RUNTIME_DATA_NODE*
+alloc_runtime_data_node( ssize_t size )
+{
+    RUNTIME_DATA_NODE *rdnode;
+
+    return calloc( 1, sizeof(*rdnode) + size - sizeof(rdnode->value) );
+}
+
+void delete_runtime_data_nodes( RUNTIME_DATA_NODE *nodes )
+{
+    RUNTIME_DATA_NODE *next;
+
+    while( nodes ) {
+        next = nodes->next;
+        free( nodes );
+        nodes = next;
+    }
+}
+
 typedef enum {
     THRF_NONE = 0,
     THRF_IMMEDIATE_PRINTOUT = 0x01
@@ -108,6 +135,13 @@ struct THRCODE {
     thrcode_t last_opcode;   /* last assembled opcode */
     char *data;              /* static data used by some commands */
     ssize_t data_size;
+    RUNTIME_DATA_NODE *extra_data;     
+    /* Extra data, allocated during run time and not garbage collected
+       -- for instance, binary representations allocated for the
+       optimized DLDC (double load constant) commands. These data
+       should live as long as the code is necessary (since there may
+       be pointers in the code to those nodes) and can be free'd when
+       the interpreter finishes. */
 };
 
 THRCODE *new_thrcode( cexception_t *ex )
@@ -122,6 +156,7 @@ void delete_thrcode( THRCODE *bc )
 	delete_fixup_list( bc->forward_function_calls );
 	delete_fixup_list( bc->op_continue_fixups );
 	delete_fixup_list( bc->op_break_fixups );
+        delete_runtime_data_nodes( bc->extra_data );
 	if( bc->lines ) {
 	    int i;
 	    for( i = 0; bc->lines[i] != NULL; i++ ) {
@@ -149,6 +184,21 @@ void dispose_thrcode( THRCODE * volatile *thrcode )
     if( *thrcode ) {
 	delete_thrcode( *thrcode );
 	*thrcode = NULL;
+    }
+}
+
+void *thrcode_alloc_extra_data( THRCODE *tc, ssize_t size )
+{
+    RUNTIME_DATA_NODE *current = tc->extra_data;
+
+    tc->extra_data = alloc_runtime_data_node( size );
+
+    if( tc->extra_data ) {
+        tc->extra_data->next = current;
+        return &(tc->extra_data->value);
+    } else {
+        tc->extra_data = current;
+        return NULL;
     }
 }
 

@@ -116,18 +116,15 @@ struct interpret_exception_t {
 typedef struct runtime_data_node runtime_data_node;
 
 typedef struct {
+    THRCODE *thrcode;     /* Threaded code structure that holds all
+                             code; it will also own all dynamically
+                             allocated data that may be referenced
+                             from the opcodes in the 'code' array
+                             below. */
     thrcode_t *code;      /* array of 'opcodes' (funtion addresses) */
     size_t code_length;   /* length of the vector *code */
     char *static_data;    /* static data used by some commands */
     ssize_t static_data_size;
-    runtime_data_node *extra_data;     
-    /* Extra data, allocated during run time and not garbage collected
-       -- for instance, binary representations allocated for the
-       optimized DLDC (double load constant) commands. These data
-       should live as long as the code is necessary (since there may
-       be pointers in the code to those nodes) and can be free'd when
-       the interpreter finishes. */
-
     stackcell_t *sp, *fp; /* stack pointer, frame pointer */
     stackcell_t *ep;      /* evaluation stack pointer */
     ssize_t ip;           /* bytecode instruction pointer: */
