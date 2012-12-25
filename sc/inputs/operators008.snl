@@ -48,9 +48,14 @@ use M;
 
 . i * i;
 
-{
-    use P;
-    . i * i;
-}
+use P;
+
+. i * i;
+
+use M;
+
+. i * i;
+
+use P;
 
 . i * i;
