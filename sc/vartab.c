@@ -294,7 +294,7 @@ DNODE *vartab_lookup_operator( VARTAB *table, const char *name,
 {
     VAR_NODE *node;
     TLIST *current_arg;
-    int found;
+    int found = 0;
 
     assert( table );
     for( node = table->node; node != NULL; node = node->next ) {
@@ -303,7 +303,7 @@ DNODE *vartab_lookup_operator( VARTAB *table, const char *name,
             TNODE *operator_type = dnode_type( node->dnode );
             DNODE *parameter = operator_type ?
                 dnode_list_last( tnode_args( operator_type )) : NULL;
-            found = 1;
+            found = 0;
             {
                 cexception_t inner;
                 TYPETAB *volatile generic_types = NULL;
@@ -312,13 +312,14 @@ DNODE *vartab_lookup_operator( VARTAB *table, const char *name,
                     TNODE *argument_type, *parameter_type;
                     generic_types = new_typetab( &inner );
                     foreach_tlist( current_arg, argument_types ) {
+                        found = 1;
                         if( !parameter ) {
                             found = 0;
                             break;
                         }
                         argument_type = tlist_data( current_arg );
                         parameter_type = dnode_type( parameter );
-                        if( !tnode_types_are_identical( argument_type, 
+                        if( !tnode_types_are_identical( argument_type,
                                                         parameter_type,
                                                         generic_types,
                                                         &inner )) {
