@@ -3,7 +3,7 @@
 ++ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
 -- Implement 'foreach ... in'
--- Implement a separate operator table, remove operators from type bodies.
+++ Implement a separate operator table.
 -- Implement generation of standalone executable files.
 -- Think about convenient interface to use modules in my language in other languages.
 -- Think about convenient use of modules written in other languages in my language programs.
