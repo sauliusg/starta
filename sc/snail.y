@@ -1279,6 +1279,7 @@ static void snail_compile_return( SNAIL_COMPILER *cc,
 static DNODE *
 compiler_lookup_optab_operator( SNAIL_COMPILER *cc,
                                 char *operator_name,
+                                TNODE *argument_tnode,
                                 int arity,
                                 cexception_t *ex )
 {
@@ -1291,14 +1292,19 @@ compiler_lookup_optab_operator( SNAIL_COMPILER *cc,
     int i = 0;
 
     cexception_guard( inner ) {
-        for( expr = top_expr; expr; expr = enode_next( expr )) {
-            if( enode_has_flags( expr, EF_GUARDING_ARG )) {
-                break;
+        if( !top_expr && strcmp( operator_name, "st" ) == 0 ) {
+            share_tnode( argument_tnode );
+            tlist_push_tnode( &expr_types, &argument_tnode, &inner );
+        } else {
+            for( expr = top_expr; expr; expr = enode_next( expr )) {
+                if( enode_has_flags( expr, EF_GUARDING_ARG )) {
+                    break;
+                }
+                current = share_tnode( enode_type( expr ));
+                tlist_push_tnode( &expr_types, &current, &inner );
+                i++;
+                if( i >= arity ) break;
             }
-            current = share_tnode( enode_type( expr ));
-            tlist_push_tnode( &expr_types, &current, &inner );
-            i++;
-            if( i >= arity ) break;
         }
     }
     cexception_catch {
@@ -1338,7 +1344,7 @@ static DNODE* compiler_lookup_operator( SNAIL_COMPILER *cc,
     DNODE *operator;
 
     if( (operator = compiler_lookup_optab_operator( cc, operator_name,
-                                                    arity, ex ))) {
+                                                    tnode, arity, ex ))) {
         return operator;
     } else {
         return tnode_lookup_operator( tnode, operator_name, arity );
@@ -1381,7 +1387,7 @@ static void snail_init_operator_description( operator_description_t *od,
     od->arity = arity;
     od->containing_type = op_type;
     od->operator = 
-        compiler_lookup_optab_operator( cc, op_name, arity, ex );
+        compiler_lookup_optab_operator( cc, op_name, op_type, arity, ex );
     if( !od->operator ) {
         od->operator = op_type ?
             tnode_lookup_operator_nonrecursive( op_type, op_name, arity )

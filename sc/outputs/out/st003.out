@@ -1,0 +1,6 @@
+type 'myint' has a special ST operator
+222
+type 'int' has a redefined ST operator
+101
+type 'myint' has a special ST operator
+10
