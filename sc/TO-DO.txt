@@ -10,7 +10,7 @@
 -- Think about modules to implement simple and convenient GUI.
 -- Rethink the implmentation of names for interface method implementations.
 -- Implement precondition and postconditions
--- Implement assert'ions.
+++ Implement assert'ions.
 -- Implement pre-compiled modules.
 -- Implement peephole optimiser.
 xx Think if there would be a benefit from BNZ operator that removes its value from the stack only on branch.
