@@ -1,0 +1,9 @@
+
+use std;
+
+function h( int x ): long, float
+{
+    return x + 2, x - 2
+}
+
+. h( 5 );

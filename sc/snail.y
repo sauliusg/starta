@@ -1194,6 +1194,76 @@ static void snail_push_function_retvals( SNAIL_COMPILER *cc, DNODE *function,
     }
 }
 
+static void snail_compile_type_conversion( SNAIL_COMPILER *cc,
+					   char *target_name,
+					   cexception_t *ex )
+{
+    cexception_t inner;
+    ENODE * volatile expr = enode_list_pop( &cc->e_stack );
+    ENODE * volatile converted_expr = NULL;
+    TNODE * expr_type = expr ? enode_type( expr ) : NULL;
+    char *source_name = expr_type ? tnode_name( expr_type ) : NULL;
+
+    cexception_guard( inner ) {
+	if( !expr ) {
+	    yyerrorf( "not enough values on the stack for type conversion "
+		      "from '%s' to '%s'", source_name, target_name );
+	} else {
+	    TNODE *target_type =
+		typetab_lookup( cc->typetab, target_name );
+	    DNODE *conversion =
+		target_type ?
+		    tnode_lookup_conversion( target_type, source_name ) :
+		    NULL;
+	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
+	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
+	    int retval_nr = dnode_list_length( retvals );
+
+	    if( !target_type ) {
+		yyerrorf( "type conversion impossible - "
+			  "target type '%s' not defined in the current scope",
+			  target_name );
+	    } else
+	    if( !conversion ) {
+		if( source_name && target_name ) {
+		    yyerrorf( "type '%s' has no conversion from type '%s'",
+			      target_name, source_name );
+		} else {
+		    if( target_name ) {
+			yyerrorf( "type '%s' has no conversion from the given "
+				  "type",  target_name );
+		    } else {
+			yyerrorf( "the required type has no conversion from "
+				  "the given type" );
+		    }
+		}
+	    } else
+	    if( retval_nr != 1 ) {
+		yyerrorf( "type conversion operators should return "
+			  "a single value, but conversion to from '%s' to '%s' "
+			  "returns %d values",
+			  target_name, source_name, retval_nr );
+	    }
+	    if( conversion ) {
+		snail_emit_function_call( cc, conversion, NULL, "\n", ex );
+	    }
+
+	    if( target_type ) {
+		converted_expr = new_enode_typed( target_type, &inner );
+		share_tnode( target_type );
+		enode_list_push( &cc->e_stack, converted_expr );
+		delete_enode( expr );
+	    } else {
+		enode_list_push( &cc->e_stack, expr );
+	    }
+	}
+    }
+    cexception_catch {
+	enode_list_push( &cc->e_stack, expr );
+	cexception_reraise( inner, ex );
+    }
+}
+
 static void snail_compile_return( SNAIL_COMPILER *cc,
 				  int nretvals,
 				  cexception_t *ex )
@@ -1225,9 +1295,28 @@ static void snail_compile_return( SNAIL_COMPILER *cc,
 	if( !tnode_types_are_assignment_compatible
             ( returned_type, available_type, NULL /* generic type table */,
               ex )) {
-	    yyerrorf( "incompatible types of returned value %d "
-		      "of function '%s'",
-		      nretvals - i, dnode_name( cc->current_function ));
+#if 1
+            char *available_type_name = available_type ?
+                tnode_name( available_type ) : NULL;
+            char *returned_type_name = returned_type ?
+                tnode_name( returned_type ) : NULL;
+            if( available_type_name && returned_type_name && 
+                i == 0 &&
+                tnode_lookup_conversion( returned_type,
+                                         available_type_name  )) {
+                snail_compile_type_conversion( cc, returned_type_name, ex );
+                expr = cc->e_stack;
+                if( expr ) {
+                    available_type = enode_type( expr );
+                }
+            } else {
+#endif
+                yyerrorf( "incompatible types of returned value %d "
+                          "of function '%s'",
+                          nretvals - i, dnode_name( cc->current_function ));
+#if 1
+            }
+#endif
 	}
 
 	retval = dnode_next( retval );
@@ -1883,76 +1972,6 @@ static void snail_emit_st( SNAIL_COMPILER *cc,
     }
 
     snail_check_operator_retvals( cc, &od, 0, 0 );
-}
-
-static void snail_compile_type_conversion( SNAIL_COMPILER *cc,
-					   char *target_name,
-					   cexception_t *ex )
-{
-    cexception_t inner;
-    ENODE * volatile expr = enode_list_pop( &cc->e_stack );
-    ENODE * volatile converted_expr = NULL;
-    TNODE * expr_type = expr ? enode_type( expr ) : NULL;
-    char *source_name = expr_type ? tnode_name( expr_type ) : NULL;
-
-    cexception_guard( inner ) {
-	if( !expr ) {
-	    yyerrorf( "not enough values on the stack for type conversion "
-		      "from '%s' to '%s'", source_name, target_name );
-	} else {
-	    TNODE *target_type =
-		typetab_lookup( cc->typetab, target_name );
-	    DNODE *conversion =
-		target_type ?
-		    tnode_lookup_conversion( target_type, source_name ) :
-		    NULL;
-	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
-	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
-	    int retval_nr = dnode_list_length( retvals );
-
-	    if( !target_type ) {
-		yyerrorf( "type conversion impossible - "
-			  "target type '%s' not defined in the current scope",
-			  target_name );
-	    } else
-	    if( !conversion ) {
-		if( source_name && target_name ) {
-		    yyerrorf( "type '%s' has no conversion from type '%s'",
-			      target_name, source_name );
-		} else {
-		    if( target_name ) {
-			yyerrorf( "type '%s' has no conversion from the given "
-				  "type",  target_name );
-		    } else {
-			yyerrorf( "the required type has no conversion from "
-				  "the given type" );
-		    }
-		}
-	    } else
-	    if( retval_nr != 1 ) {
-		yyerrorf( "type conversion operators should return "
-			  "a single value, but conversion to from '%s' to '%s' "
-			  "returns %d values",
-			  target_name, source_name, retval_nr );
-	    }
-	    if( conversion ) {
-		snail_emit_function_call( cc, conversion, NULL, "\n", ex );
-	    }
-
-	    if( target_type ) {
-		converted_expr = new_enode_typed( target_type, &inner );
-		share_tnode( target_type );
-		enode_list_push( &cc->e_stack, converted_expr );
-		delete_enode( expr );
-	    } else {
-		enode_list_push( &cc->e_stack, expr );
-	    }
-	}
-    }
-    cexception_catch {
-	enode_list_push( &cc->e_stack, expr );
-	cexception_reraise( inner, ex );
-    }
 }
 
 static void snail_compile_variable_assignment_or_init(
