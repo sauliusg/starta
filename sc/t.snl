@@ -1,55 +1,28 @@
 
 use std;
 
-type myint = {
-    kind = integer;
-    suffix = "I";
-    size = sizeof native "int";
-
-    inline bytecode operator "ldc" () : myint
-    { LDCS }
-};
-
-begin
-    inline bytecode operator "st" ( i : myint )
-    {
-        SLDC "type 'myint' has a special ST operator in the inner scope 1\n"
-        SPRINT
-        ST
-    }
-end
-
-inline bytecode operator "+" ( a, b : myint ): myint
-{ ADD }
-
-inline bytecode operator "." ( i : myint )
-{ IPRINT }
-
-function f( x : myint )
+function mini( point: type T;
+               makearray: function( length : long ) -> (array of T);
+               makecenter: function( simplex: array of T; i: long )->(type T)
+             ) -> float, float
 {
-    . x;
+    return 0.0, 0.0;
 }
 
-f( 222I );
-
-function g( x: int; p: function ( i : myint ) )
+function g( int x ): float
 {
-    . x;
-    p( 10I );
+    return x + 2
 }
 
-g( 101, closure ( ii : myint ) my { i = 20I } { . "closure:", ii + my.i } );
+. g( 5 );
 
-begin
-    inline bytecode operator "st" ( i : myint )
-    {
-        SLDC "type 'myint' has a special ST operator in the inner scope 2\n"
-        SPRINT
-        ST
-    }
+function h( int x ): long, float
+{
+    return <long>x + 2L, x - 2
+}
 
-    var t = 120I;
+. h( 5 );
 
-    g( 101, closure( ii : myint ) my { ii = t } { . "closure2:", ii + my.ii } );
-end
+var x, y = h( 6 );
 
+. x, y;

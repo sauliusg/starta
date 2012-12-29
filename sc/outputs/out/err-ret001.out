@@ -1,6 +1,3 @@
-./sl: inputs/err-ret001.snl(15,14): ERROR, incompatible types of returned value 1 of function 'f1'
-    return 10;
-             ^
 ./sl: inputs/err-ret001.snl(20,21): ERROR, incompatible types of returned value 3 of function 'f2'
     return 1, 1, 10L;
                     ^
@@ -19,5 +16,5 @@
 ./sl: inputs/err-ret001.snl(35,24): ERROR, incompatible types of returned value 3 of function 'f5'
     return 1.0, 1L, 10L;
                        ^
-./sl: 7 error(s) detected
+./sl: 6 error(s) detected
 
