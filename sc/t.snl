@@ -2,43 +2,17 @@
 use std;
 
 function mini( point: type T;
+               ndim: long;
 
                makearray: function( length : long ) -> (array of T);
-               makecenter: function( simplex: array [][] of type T; i: long )->(array of type T)
+               makecenter: function( simplex: array of type T; i: long )->(type T)
 
              ) -> float, float
 {
+    # The following assignment is type-incompatible!
+    var simplex: array [][][][] of T = makearray( ndim+1L );
+
+    simplex[0] = makecenter( simplex, 2 );
+
     return 0.0, 0.0;
 }
-
-procedure mkcenter( simplex: array [][] of float;
-                    exclude: long ): array of float
-{
-    var center = new float[length(simplex[0])];
-
-    for( var dim = 0L; dim < llength(center); dim++ ) {
-        center[dim] = 0.0;
-        for( var i = 0L; i < llength(simplex); i++ ) {
-            if( i != exclude ) {
-                center[dim] += simplex[i][dim];
-            }
-        }
-    }
-
-    var ndim = <float>llength(simplex) - 1.0;
-    if( exclude < 0L ) {
-        ndim += 1.0;
-    }
-    for( var i = 0L; i < llength(center); i++ ) {
-        center[i] /= ndim;
-    }
-
-    return center;
-}
-
-function mkarray( length: long ): array of float
-{
-    return new float[length];
-}
-
-mini( 10.0, mkarray, mkcenter );
