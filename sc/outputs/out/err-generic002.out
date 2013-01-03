@@ -1,0 +1,6 @@
+Debug statement reached in line 12
+./sl: inputs/err-generic002.snl(15,60): ERROR, incompatible types for assignment to variable 'simplex'
+    var simplex: array [][][][] of T = makearray( ndim+1L );
+                                                           ^
+./sl: 1 error(s) detected
+
