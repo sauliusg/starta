@@ -771,6 +771,24 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
 	    cexception_reraise( inner, ex );
 	}
 	return NULL; // control should not reach this point
+    } else if( generic_tnode->kind == TK_ARRAY &&
+               !generic_tnode->name ) {
+	cexception_t inner;
+	TNODE *volatile element_tnode =
+	    new_tnode_implementation( generic_tnode->element_type,
+				      generic_types, ex );
+	cexception_guard( inner ) {
+	    TNODE *array_type =
+		new_tnode_array( element_tnode, 
+                                 share_tnode( generic_tnode ),
+                                 &inner );
+            return array_type;
+	}
+	cexception_catch {
+	    delete_tnode( element_tnode );
+	    cexception_reraise( inner, ex );
+	}
+	return NULL; // control should not reach this point
     } else {
         return share_tnode( generic_tnode );
     }
@@ -1333,10 +1351,13 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					    generic_types, ex );
     }
 
-    if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
-			   t2->kind == TK_PLACEHOLDER )) {
-        return tnode_create_and_check_generic_types
-            ( t1, t2, generic_types, tnode_types_are_identical, ex );
+    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
+        if( generic_types ) {
+            return tnode_create_and_check_generic_types
+                ( t1, t2, generic_types, tnode_types_are_identical, ex );
+        } else {
+            return 0;
+        }
     }
 
     if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
@@ -1462,10 +1483,13 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return tnode_implements_interface( t2, t1 );
     }
 
-    if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
-			   t2->kind == TK_PLACEHOLDER )) {
-        return tnode_create_and_check_generic_types
-            ( t1, t2, generic_types, tnode_types_are_identical, ex );
+    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
+        if( generic_types ) {
+            return tnode_create_and_check_generic_types
+                ( t1, t2, generic_types, tnode_types_are_identical, ex );
+        } else {
+            return 0;
+        }
     }
 
     if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {

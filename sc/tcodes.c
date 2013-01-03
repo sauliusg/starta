@@ -4829,3 +4829,21 @@ int ASSERT( INSTRUCTION_FN_ARGS )
 
     return 4;
 }
+
+
+/*
+ * DEBUG Does nothing but provides convenient points to insert
+ *       debugger breakpoints into the bytecode.
+ * 
+ * bytecode:
+ * DEBUG
+ * 
+ * stack:
+ * ... -> ...
+ */
+
+int DEBUG( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+    return 1;
+}
