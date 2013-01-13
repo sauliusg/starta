@@ -8,10 +8,10 @@ use std;
 
 var s = "two";
 
-var s1 = s[2..-1];
-var s2 = s[3..-1];
-var s3 = s[2..1];
-var s4 = s[3..1];
+var s1 = s[2 .. -1];
+var s2 = s[3 .. -1];
+var s3 = s[2 .. 1];
+var s4 = s[3 .. 1];
 
 . length(s);
 . s;
