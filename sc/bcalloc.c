@@ -53,9 +53,10 @@ static struct {
 };
 #endif
 
-void *bcalloc( size_t size, ssize_t length, ssize_t nref )
+void *bcalloc( size_t element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
+    ssize_t size = length > 0 ? element_size * length : element_size;
 
     assert( nref <= length || length == 0 );
     assert( size >= nref * sizeof(stackcell_t) );
@@ -82,7 +83,7 @@ void *bcalloc( size_t size, ssize_t length, ssize_t nref )
 	allocated = ptr;
 	ptr->rcount = 1;
 	ptr->magic = BC_MAGIC;
-	ptr->size = size;
+	ptr->element_size = size;
 	ptr->length = length;
 	ptr->nref = nref;
 	total_allocated_bytes += size;
@@ -124,7 +125,7 @@ void *bcalloc_stackcells( ssize_t length, ssize_t nref )
 void *bcalloc_array( ssize_t length, ssize_t nref )
 {
     assert( nref == 1 || nref == 0 );
-    return bcalloc( sizeof(stackcell_t) * length, length, nref * length );
+    return bcalloc( sizeof(stackcell_t), length, nref * length );
 }
 
 void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
@@ -184,14 +185,15 @@ void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
 void *bcrealloc_blob( void *memory, size_t size )
 {
     alloccell_t *ptr, *old;
-    ssize_t old_size;
+    ssize_t old_size, old_element_size;
 
     if( !memory ) 
         return bcalloc_blob( size );
 
     old = memory;
     old --;
-    old_size = old->size;
+    old_element_size = old->element_size;
+    old_size = old_element_size * old->length;
 
     assert( old->magic == BC_MAGIC );
     assert( old == allocated || old->prev );
@@ -204,7 +206,7 @@ void *bcrealloc_blob( void *memory, size_t size )
     if( allocated == old )
         allocated = old->next;
 
-    ptr = realloc( old, sizeof(alloccell_t) + size );
+    ptr = realloc( old, sizeof(alloccell_t) + size * old_element_size );
     if( !ptr ) {
 	/* GNU Linux Programmer's Manual, malloc(3): "If realloc()
            fails the original block is left untouched; it is not freed
@@ -222,7 +224,7 @@ void *bcrealloc_blob( void *memory, size_t size )
 	ptr->next = allocated;
 	allocated = ptr;
 	assert( ptr->magic == BC_MAGIC );
-	ptr->size = size;
+	ptr->element_size = old_element_size;
 	ptr->length = size;
 	if( !alloc_min || alloc_min > (void*)ptr )
 	    alloc_min = ptr;
@@ -256,10 +258,13 @@ ssize_t bccollect( void )
 {
     alloccell_t *curr, *prev, *next;
     ssize_t reclamed = 0;
+    ssize_t length;
 
     prev = NULL;
     curr = allocated;
+
     while( curr != NULL ) {
+        length = curr->length ? curr->length : 1;
         next = curr->next;
 	/* printf( "%p %ld\n", curr, curr->rcount ); */
 	if( thrcode_heapdebug_is_on()) {
@@ -269,7 +274,7 @@ ssize_t bccollect( void )
 		printf( "leaving    " );
 	    }
 	    printf( "%p (%p) (%ld bytes)\n",
-		    curr, curr+1, (long)curr->size );
+		    curr, curr+1, (long)curr->element_size * length );
 	}
         if( (curr->flags & AF_USED) == 0 ) {
 	    if( curr != allocated ) {
@@ -279,7 +284,7 @@ ssize_t bccollect( void )
 	    } else {
 	        prev = allocated = next;
 	    }
-	    reclamed += curr->size;
+	    reclamed += curr->element_size * length;
 	    bcfree( curr );
 	} else {
 	    curr->prev = prev;

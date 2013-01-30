@@ -29,11 +29,32 @@ typedef struct alloccell_t {
 				 strlen() of the string, which will be
 				 as a rule size - 1 (the last '\0'
 				 byte is not counted in 'length'. */
-    ssize_t size;             /* Contains size the allocated memory
-			         block in bytes (NOT including
-			         sizeof(alloccell_t) ). */
-    ssize_t nref;             /* Number of references (garbage collected 
-				 pointers) in this memory block */
+    ssize_t element_size;     /* Contains size of elements in the
+			         allocated memory block, in bytes (NOT
+			         including sizeof(alloccell_t) ). If
+			         length > 0, then each element has
+			         this size. If nref > 0, then each
+			         element contains one reference,
+			         otherwise references are allocated at
+			         negative offsets and are not included
+			         into element_size. If length == 0,
+			         then element_size is the size of
+			         memory block allocated at the
+			         positive offsets after the header. If
+			         nref > 0, then these references are
+			         included at the beginning of the
+			         block. if nref < 0, then the
+			         element_size contains only
+			         non-references (numbers). */
+    ssize_t nref;             /* Number of references (garbage
+				 collected pointers) in this memory
+				 block. Negative nref signals that the
+				 references are allocated before the
+				 header, not after it, and grow
+				 towards the beginning of the
+				 memory. Negative references are not
+				 included into the block sizes given
+				 by elemet_size.  */
     ssize_t rcount;           /* Reference counter. Used also by garbage collector. */
     ssize_t *vmt_offset;      /* Offset to a virtual method table of a
 				 class in the static data area; 0 if
