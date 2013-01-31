@@ -35,7 +35,7 @@ int pack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
 
     assert( blob_header->magic == BC_MAGIC );
 
-    if( blob_header->size < size + *offset ) {
+    if( blob_header->length < size + *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */
@@ -88,7 +88,7 @@ int pack_array_values( byte *blob, stackcell_t *array,
 
         if( count > 0 ) {
             if( size > 0 ) {
-                if( blob_header->size < size * count + *offset ) {
+                if( blob_header->length < size * count + *offset ) {
                     interpret_raise_exception_with_bcalloc_message
                         ( /* err_code = */ -1,
                           /* message = */
@@ -123,7 +123,7 @@ int pack_array_values( byte *blob, stackcell_t *array,
                 if( size <= 0 ) {
                     for( i = 0; i < count; i++ ) {
                         length = strnlen( (char*)blob + *offset,
-                                          blob_header->size - *offset ) + 1;
+                                          blob_header->length - *offset ) + 1;
                         *offset += length;
                     }
                 } else {
@@ -193,7 +193,7 @@ int unpack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
 
     assert( blob_header->magic == BC_MAGIC );
 
-    if( blob_header->size < size + *offset ) {
+    if( blob_header->length < size + *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */
@@ -255,7 +255,7 @@ int unpack_array_values( byte *blob, stackcell_t *array_stackcell,
 	    description++;
     }
 
-    array_ptr = bcalloc_array( count, 1 );
+    array_ptr = bcalloc_array( sizeof(stackcell_t), count, 1 );
     BC_CHECK_PTR( array_ptr, ex );
     STACKCELL_SET_ADDR( *array_stackcell, array_ptr );
 
@@ -282,7 +282,7 @@ int unpack_array_values( byte *blob, stackcell_t *array_stackcell,
 
         if( count > 0 ) {
             if( size > 0 ) {
-                if( blob_header->size < size * count + *offset ) {
+                if( blob_header->length < size * count + *offset ) {
                     interpret_raise_exception_with_bcalloc_message
                         ( /* err_code = */ -1,
                           /* message = */
@@ -307,7 +307,7 @@ int unpack_array_values( byte *blob, stackcell_t *array_stackcell,
                 if( size <= 0 ) {
                     for( i = 0; i < count; i++ ) {
                         length = strnlen( (char*)blob + *offset,
-                                          blob_header->size - *offset ) + 1;
+                                          blob_header->length - *offset ) + 1;
                         *offset += length;
                     }
                 } else {

@@ -3240,6 +3240,7 @@ static ssize_t compiler_assemble_static_data( SNAIL_COMPILER *cc,
 #define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((ssize_t)(N)) % (lim)) % (lim) )
 
 static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
+                                                ssize_t element_size,
 						ssize_t len,
 						cexception_t *ex )
 {
@@ -3256,7 +3257,7 @@ static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
     hdr->magic = BC_MAGIC;
     hdr->flags |= AF_USED;
     hdr->length = len;
-    hdr->size = len;
+    hdr->element_size = element_size;
 }
 
 static ssize_t compiler_assemble_static_ssize_t( SNAIL_COMPILER *cc,
@@ -3270,7 +3271,7 @@ static ssize_t compiler_assemble_static_string( SNAIL_COMPILER *cc,
 						char *str,
 						cexception_t *ex )
 {
-    compiler_assemble_static_alloc_hdr( cc, strlen(str) + 1, ex );
+    compiler_assemble_static_alloc_hdr( cc, 1, strlen(str) + 1, ex );
     return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
 }
 
@@ -5300,7 +5301,8 @@ static void compiler_start_virtual_method_table( SNAIL_COMPILER *cc,
     printf( ">>> class name = %s\n", tnode_name(class_descr) );
 #endif
 
-    compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t), ex );
+    compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t),
+                                        sizeof(ssize_t), ex );
 
     vmt_address = compiler_assemble_static_ssize_t( cc, 1 + interface_nr, ex );
 

@@ -343,18 +343,23 @@ int COPY( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *ptr0 = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *ptr1 = STACKCELL_PTR( istate.ep[1] );
-    ssize_t size0 = ptr0 ? ptr0[-1].size : 0;
-    ssize_t size1 = ptr1 ? ptr1[-1].size : 0;
-    ssize_t size = size1 < size0 ? size1 : size0;
+    ssize_t length0 = ptr0 ? ptr0[-1].length : 0;
+    ssize_t length1 = ptr1 ? ptr1[-1].length : 0;
+    ssize_t size0 = ptr0 ? ptr0[-1].element_size : 0;
+    ssize_t size1 = ptr1 ? ptr1[-1].element_size : 0;
+    ssize_t size;
 
     TRACE_FUNCTION();
 
+    if( length0 > 0 ) size0 *= length0;
+    if( length1 > 0 ) size1 *= length1;
+
+    size = size1 < size0 ? size1 : size0;
+
     if( ptr0 && ptr1 ) {
-	ssize_t length0 = ptr0[-1].size/sizeof(stackcell_t);
-	ssize_t length1 = ptr1[-1].size/sizeof(stackcell_t);
-	ssize_t length = length0 < length1 ? length0 : length1;
-	ssize_t nref0 = ptr0[-1].nref <= length ? ptr0[-1].nref : length;
-	ssize_t nref1 = ptr1[-1].nref <= length ? ptr1[-1].nref : length;
+        ssize_t length = length0 < length1 ? length0 : length1;
+        ssize_t nref0 = ptr0[-1].nref <= length ? ptr0[-1].nref : length;
+        ssize_t nref1 = ptr1[-1].nref <= length ? ptr1[-1].nref : length;
         assert( nref0 == nref1 );
 	memcpy( ptr1, ptr0, size );
     }
@@ -669,7 +674,7 @@ int ALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, /* length */ 0, nref );
+    ptr = bcalloc( size, nref );
 
     BC_CHECK_PTR( ptr );
 
@@ -699,7 +704,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, /* length */ 0, nref );
+    ptr = bcalloc( size, nref );
 
     BC_CHECK_PTR( ptr );
 
@@ -733,7 +738,7 @@ int MKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( nele, nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), nele, nref );
 
     BC_CHECK_PTR( ptr );
 
@@ -766,7 +771,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( nele, 1 );
+    ptr = bcalloc_array( sizeof(stackcell_t), nele, 1 );
 
     BC_CHECK_PTR( ptr );
 
@@ -801,15 +806,19 @@ int CLONE( INSTRUCTION_FN_ARGS )
 
     if( !array ) return 1;
 
-    size = array[-1].size;
+    size = array[-1].element_size;
     nref = array[-1].nref;
     nele = array[-1].length;
 
-    ptr = bcalloc( size, nele, nref );
+    if( nele > 0 ) {
+        ptr = bcalloc_array( size, nele, nref );
+    } else {
+        ptr = bcalloc( size, nref );
+    }
 
     BC_CHECK_PTR( ptr );
 
-    memcpy( ptr, array, size );
+    memcpy( ptr, array, nele > 0 ? size * nele : size );
 
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -898,7 +907,7 @@ int ZAALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( n_elem, elem_nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -1284,7 +1293,7 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
     if( istate.argc >= 0 && istate.argv != NULL ) {
 
-	argv = bcalloc_array( istate.argc + 1, 1 );
+	argv = bcalloc_array( sizeof(stackcell_t), istate.argc + 1, 1 );
 
 	BC_CHECK_PTR( argv );
 	STACKCELL_SET_ADDR( istate.ep[0], argv );
@@ -1324,7 +1333,7 @@ int ALLOCENV( INSTRUCTION_FN_ARGS )
 	    n++;
 	}
 	if( n > 0 ) {
-	    env = bcalloc_array( n, 1 );
+	    env = bcalloc_array( sizeof(stackcell_t), n, 1 );
 
 	    BC_CHECK_PTR( env );
 	    STACKCELL_SET_ADDR( istate.ep[0], env );
@@ -1350,8 +1359,8 @@ int TRY( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = istate.code[istate.ip+1].ssizeval;
     ssize_t tryreg = istate.code[istate.ip+2].ssizeval;
-    interpret_exception_t *rg_store =
-	bcalloc( sizeof(interpret_exception_t), 0, INTERPRET_EXCEPTION_PTRS );
+    interpret_exception_t *rg_store = bcalloc
+        ( sizeof(interpret_exception_t), INTERPRET_EXCEPTION_PTRS );
 
     TRACE_FUNCTION();
 
@@ -1618,14 +1627,14 @@ int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    files = bcalloc_array( n, 1 );
+    files = bcalloc_array( sizeof(stackcell_t), n, 1 );
     BC_CHECK_PTR( files );
     STACKCELL_SET_ADDR( istate.ep[0], files );
 
     for( i = 0; i < n; i++ ) {
         bytecode_file_hdr_t* current_file;
 	files[i].ptr =
-            bcalloc( sizeof(bytecode_file_hdr_t), 0, INTERPRET_FILE_PTRS );
+            bcalloc( sizeof(bytecode_file_hdr_t), INTERPRET_FILE_PTRS );
 	BC_CHECK_PTR( files[i].ptr );
         current_file = (bytecode_file_hdr_t*)files[i].ptr;
 
@@ -1671,7 +1680,7 @@ int FDFILE( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    file = bcalloc( sizeof(bytecode_file_hdr_t), 0, INTERPRET_FILE_PTRS );
+    file = bcalloc( sizeof(bytecode_file_hdr_t), INTERPRET_FILE_PTRS );
     BC_CHECK_PTR( file );
     STACKCELL_SET_ADDR( istate.ep[0], file );
 
@@ -1743,7 +1752,7 @@ int FOPEN( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    file = bcalloc( sizeof(*file), 0, INTERPRET_FILE_PTRS );
+    file = bcalloc( sizeof(*file), INTERPRET_FILE_PTRS );
 
     BC_CHECK_PTR( file );
     fp = fopen( name, mode );
@@ -1820,7 +1829,7 @@ int FREAD( INSTRUCTION_FN_ARGS )
     bytecode_file_hdr_t *file = STACKCELL_PTR(istate.ep[1]);
     FILE *fp = file ? file->fp : NULL;
     /* Below we must check blob, not blob_header, for NULL: */
-    ssize_t blob_size = blob ? blob_header->size : 0;
+    ssize_t blob_size = blob ? blob_header->length : 0;
     ssize_t elements_read = 0;
 
     TRACE_FUNCTION();
@@ -1903,7 +1912,7 @@ int FWRITE( INSTRUCTION_FN_ARGS )
     bytecode_file_hdr_t *file = STACKCELL_PTR(istate.ep[1]);
     FILE *fp = file ? file->fp : NULL;
     /* Below we must check blob, not blob_header, for NULL: */
-    ssize_t blob_size = blob ? blob_header->size : 0;
+    ssize_t blob_size = blob ? blob_header->length : 0;
     ssize_t elements_written = 0;
 
     TRACE_FUNCTION();
@@ -3428,7 +3437,7 @@ int STRCAT( INSTRUCTION_FN_ARGS )
     len2 = str2 ? strlen( str2 ) : 0;
     length = len1 + len2;
 
-    dst = bcalloc( length + 1, length + 1, 0 );
+    dst = bcalloc_array( 1, length + 1, 0 );
     BC_CHECK_PTR( dst );
     STACKCELL_SET_ADDR( istate.ep[1], dst );
     STACKCELL_ZERO_PTR( istate.ep[0] );
@@ -3725,7 +3734,7 @@ int STRLEN( INSTRUCTION_FN_ARGS )
 {
     char *str = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *block = istate.ep[0].PTR;
-    ssize_t size = block[-1].size;
+    ssize_t size = block[-1].length;
 
     TRACE_FUNCTION();
 
@@ -4193,7 +4202,7 @@ int ASWAPW( INSTRUCTION_FN_ARGS )
 {
     unsigned char *array = istate.ep[0].PTR;
     alloccell_t *array_header = &((alloccell_t*)array)[-1];
-    ssize_t array_size = array ? array_header->size : 0;
+    ssize_t array_size = array ? array_header->element_size : 0;
     ssize_t nwords = array_size / 2;
     ssize_t i;
     unsigned char tmp;
@@ -4226,7 +4235,7 @@ int ASWAPD( INSTRUCTION_FN_ARGS )
 {
     unsigned char *array = istate.ep[0].PTR;
     alloccell_t *array_header = &((alloccell_t*)array)[-1];
-    ssize_t array_size = array ? array_header->size : 0;
+    ssize_t array_size = array ? array_header->element_size : 0;
     ssize_t nwords = array_size / 4;
     ssize_t i;
     unsigned char tmp;
@@ -4282,7 +4291,7 @@ pack_string_value( stackcell_t *stackcell, char typechar, ssize_t size,
 
     assert( blob_header->magic == BC_MAGIC );
 
-    if( blob_header->size < size + *offset ) {
+    if( blob_header->length < size + *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */
@@ -4493,7 +4502,7 @@ unpack_string_value( stackcell_t *stackcell, char typechar,
 
     if( size <= 0 ) {
         length = strnlen( (char*)blob + *offset,
-                          blob_header->size - *offset );
+                          blob_header->length - *offset );
         size = length + 1;
     } else {
         length = size;
@@ -4501,8 +4510,8 @@ unpack_string_value( stackcell_t *stackcell, char typechar,
 
     /* At this point, either size == length || size == length + 1 */
 
-    if( blob_header->size < length + *offset ||
-        blob_header->size <= *offset ) {
+    if( blob_header->length < length + *offset ||
+        blob_header->length <= *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */
@@ -4513,7 +4522,7 @@ unpack_string_value( stackcell_t *stackcell, char typechar,
 	return 0;
     }
 
-    value = bcalloc( size + 1, size + 1, 0 );
+    value = bcalloc_array( size + 1, size + 1, 0 );
     if( !value ) return 0;
 
     STACKCELL_SET_ADDR( *stackcell, value );
