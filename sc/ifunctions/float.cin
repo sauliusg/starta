@@ -241,7 +241,7 @@ pack_@field@( stackcell_t *stackcell, char typechar, ssize_t size,
 
     assert( blob_header->magic == BC_MAGIC );
 
-    if( blob_header->size < size + *offset ) {
+    if( blob_header->length < size + *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */
@@ -338,7 +338,7 @@ unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
 
     assert( blob_header->magic == BC_MAGIC );
 
-    if( blob_header->size < size + *offset ) {
+    if( blob_header->length < size + *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */

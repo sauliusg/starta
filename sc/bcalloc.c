@@ -53,15 +53,11 @@ static struct {
 };
 #endif
 
-void *bcalloc( size_t element_size, ssize_t length, ssize_t nref )
+void *bcalloc( size_t size, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
-    ssize_t size = length > 0 ? element_size * length : element_size;
 
-    assert( nref <= length || length == 0 );
     assert( size >= nref * sizeof(stackcell_t) );
-    assert( nref == 0 || size >= length * sizeof(stackcell_t) );
-    assert( nref != 0 || size >= length );
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {
@@ -84,7 +80,7 @@ void *bcalloc( size_t element_size, ssize_t length, ssize_t nref )
 	ptr->rcount = 1;
 	ptr->magic = BC_MAGIC;
 	ptr->element_size = size;
-	ptr->length = length;
+	ptr->length = 0;
 	ptr->nref = nref;
 	total_allocated_bytes += size;
 	if( !alloc_min || alloc_min > (void*)ptr )
@@ -99,7 +95,7 @@ void *bcalloc( size_t element_size, ssize_t length, ssize_t nref )
 
 void *bcalloc_blob( size_t size )
 {
-    return bcalloc( size, size, 0 );
+    return bcalloc_array( 1, size, 0 );
 }
 
 char* bcstrdup( char *str )
@@ -109,7 +105,7 @@ char* bcstrdup( char *str )
 
     if( str ) {
 	len = strlen( str );
-	ptr = bcalloc_blob( sizeof(str[0]) * (len+1) );
+	ptr = bcalloc_array( sizeof(str[0]), len+1, 0 );
 	if( ptr ) {
 	    strcpy( ptr, str );
 	}
@@ -119,13 +115,19 @@ char* bcstrdup( char *str )
 
 void *bcalloc_stackcells( ssize_t length, ssize_t nref )
 {
-    return bcalloc( sizeof(stackcell_t) * length, length, nref );
+    return bcalloc_array( sizeof(stackcell_t), length, nref );
 }
 
-void *bcalloc_array( ssize_t length, ssize_t nref )
+void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
+    alloccell_t *ptr;
     assert( nref == 1 || nref == 0 );
-    return bcalloc( sizeof(stackcell_t), length, nref * length );
+    ptr = bcalloc( element_size * length, nref * length );
+    if( ptr ) {
+        ptr[-1].length = length;
+        ptr[-1].element_size = element_size;
+    }
+    return ptr;
 }
 
 void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
@@ -133,7 +135,7 @@ void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
 {
     assert( nref == 1 || nref == 0 );
     if( level == 0 ) {
-	return bcalloc_array( length, nref );
+	return bcalloc_array( sizeof(stackcell_t), length, nref );
     } else {
 	alloccell_t *header = (alloccell_t*)array;
 	ssize_t layer_len = header[-1].length;
@@ -185,15 +187,14 @@ void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
 void *bcrealloc_blob( void *memory, size_t size )
 {
     alloccell_t *ptr, *old;
-    ssize_t old_size, old_element_size;
+    ssize_t old_size;
 
     if( !memory ) 
         return bcalloc_blob( size );
 
     old = memory;
     old --;
-    old_element_size = old->element_size;
-    old_size = old_element_size * old->length;
+    old_size = old->length;
 
     assert( old->magic == BC_MAGIC );
     assert( old == allocated || old->prev );
@@ -206,7 +207,7 @@ void *bcrealloc_blob( void *memory, size_t size )
     if( allocated == old )
         allocated = old->next;
 
-    ptr = realloc( old, sizeof(alloccell_t) + size * old_element_size );
+    ptr = realloc( old, sizeof(alloccell_t) + size );
     if( !ptr ) {
 	/* GNU Linux Programmer's Manual, malloc(3): "If realloc()
            fails the original block is left untouched; it is not freed
@@ -224,8 +225,7 @@ void *bcrealloc_blob( void *memory, size_t size )
 	ptr->next = allocated;
 	allocated = ptr;
 	assert( ptr->magic == BC_MAGIC );
-	ptr->element_size = old_element_size;
-	ptr->length = size;
+        ptr->length = size;
 	if( !alloc_min || alloc_min > (void*)ptr )
 	    alloc_min = ptr;
 	if( !alloc_max || alloc_max < (void*)ptr + size + sizeof(ptr[0]) )
@@ -264,7 +264,7 @@ ssize_t bccollect( void )
     curr = allocated;
 
     while( curr != NULL ) {
-        length = curr->length ? curr->length : 1;
+        length = curr->length;
         next = curr->next;
 	/* printf( "%p %ld\n", curr, curr->rcount ); */
 	if( thrcode_heapdebug_is_on()) {

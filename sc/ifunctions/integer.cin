@@ -320,7 +320,7 @@ int @PREFIX1@AALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( n_elem, elem_nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -370,13 +370,10 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
     const ssize_t nref = 1;
     ssize_t n_elem = istate.ep[0].I;
     void *ptr;
-    ssize_t alloc_size;
-
-    alloc_size = sizeof(stackcell_t);
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( n_elem * 2, nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem * 2, nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -580,7 +577,8 @@ int @PREFIX1@SUBARRAY( INSTRUCTION_FN_ARGS )
             length = upper_bound - lower_bound + 1;
             nref = array_header->nref;
 
-            subarray = bcalloc_array( length, nref > 0 ? 1 : 0 );
+            subarray = bcalloc_array( sizeof(stackcell_t), 
+                                      length, nref > 0 ? 1 : 0 );
             BC_CHECK_PTR( subarray );
 
             memcpy( subarray, &array[lower_bound], sizeof(array[0]) * length );
@@ -675,7 +673,7 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
         } else {
             length = upper_bound - lower_bound + 1;
 
-            substr = bcalloc( (length + 1) * element_sz, length + 1, 0 );
+            substr = bcalloc_array( element_sz, length + 1, 0 );
             BC_CHECK_PTR( substr );
 
             strncpy( substr, &str[lower_bound], element_sz * length );
@@ -818,7 +816,7 @@ unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
 
     value = 0;
 
-    if( blob_header->size < size + *offset ) {
+    if( blob_header->length < size + *offset ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */

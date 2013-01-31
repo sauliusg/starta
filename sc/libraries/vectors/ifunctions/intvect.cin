@@ -32,7 +32,7 @@ int @PREFIX1@MKVECTOR( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( element_size, length, /* nref */ 0 );
+    ptr = bcalloc_array( element_size, length, /* nref */ 0 );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
