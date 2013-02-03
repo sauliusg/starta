@@ -80,7 +80,7 @@ void *bcalloc( size_t size, ssize_t nref )
 	ptr->rcount = 1;
 	ptr->magic = BC_MAGIC;
 	ptr->element_size = size;
-	ptr->length = 0;
+	ptr->length = -1;
 	ptr->nref = nref;
 	total_allocated_bytes += size;
 	if( !alloc_min || alloc_min > (void*)ptr )
@@ -264,7 +264,7 @@ ssize_t bccollect( void )
     curr = allocated;
 
     while( curr != NULL ) {
-        length = curr->length;
+        length = curr->length >= 0 ? curr->length : 1;
         next = curr->next;
 	/* printf( "%p %ld\n", curr, curr->rcount ); */
 	if( thrcode_heapdebug_is_on()) {
