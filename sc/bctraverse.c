@@ -60,7 +60,7 @@ void bctraverse( void *root )
 	assert( p != NULL );
 	assert( p[-1].magic == BC_MAGIC );
         if( p[-1].nref > 0  ) {
-            if( p[-1].length > 0 &&
+            if( p[-1].length >= 0 &&
                 p[-1].element_size == sizeof(stackcell_t) ) {
                 base = (void**)&(((stackcell_t*)p)->ptr);
             } else {
@@ -96,7 +96,7 @@ void bctraverse( void *root )
 	    break;
 	} else {
             if( q[-1].nref > 0  ) {
-                if( q[-1].length > 0 &&
+                if( q[-1].length >= 0 &&
                     q[-1].element_size == sizeof(stackcell_t) ) {
                     base = (void**)&(((stackcell_t*)q)->ptr);
                 } else {
