@@ -8971,6 +8971,10 @@ simple_expression
   | struct_expression
   | unpack_expression
   | function_expression
+  | _TYPE __IDENTIFIER
+      { assert(0); }
+  | _TYPE _OF __IDENTIFIER
+      { assert(0); }
   ;
 
 opt_comma
@@ -9460,6 +9464,7 @@ generator_new
           snail_compile_mdalloc( snail_cc, element_type, level, px );
           snail_emit( snail_cc, px, "\tce\n", FILLMDARRAY, &level );
       }
+  | _NEW type_identifier _OF type_identifier '(' opt_actual_argument_list ')'
   ;
 
 md_array_allocator
