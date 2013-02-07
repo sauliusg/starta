@@ -9464,7 +9464,7 @@ generator_new
           snail_compile_mdalloc( snail_cc, element_type, level, px );
           snail_emit( snail_cc, px, "\tce\n", FILLMDARRAY, &level );
       }
-  | _NEW type_identifier _OF type_identifier '(' opt_actual_argument_list ')'
+  | _NEW type_identifier _OF '(' _TYPE type_identifier ',' opt_actual_argument_list ')'
   ;
 
 md_array_allocator
