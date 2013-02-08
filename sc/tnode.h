@@ -59,6 +59,8 @@ typedef enum {
     TK_FUNCTION_REF,
     TK_NULLREF,
     TK_IGNORE, /* "type" of ignored arguments, e.g. for the "over" operator */
+    TK_TYPE_DESC, /* type descriptor - RTTI - making types "first
+                     class" values. */
     TK_EXCEPTION,
     last_type_kind_t
 } type_kind_t;
