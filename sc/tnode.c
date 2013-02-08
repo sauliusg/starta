@@ -371,6 +371,23 @@ TNODE *new_tnode_blob( TNODE *base_type,
     return node;
 }
 
+TNODE *new_tnode_type_descriptor( cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE * volatile node = new_tnode( ex );
+
+    cexception_guard( inner ) {
+	node->kind = TK_TYPE_DESCR;
+	node->size = REF_SIZE;
+	tnode_set_flags( node, TF_IS_REF );
+    }
+    cexception_catch {
+        delete_tnode( node );
+        cexception_reraise( inner, ex );
+    }
+    return node;
+}
+
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex )
 {
     cexception_t inner;

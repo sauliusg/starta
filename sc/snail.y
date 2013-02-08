@@ -7230,7 +7230,7 @@ delimited_type_description
     { $$ = new_tnode_blob_snail( snail_cc->typetab, px ); }
 
   | _TYPE _OF _VAR
-    { assert(0); }
+    { $$ = new_tnode_type_descriptor( px ); }
   ;
 
 
