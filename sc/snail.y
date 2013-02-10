@@ -40,6 +40,7 @@
 #include <snail_flex.h>
 #include <yy.h>
 #include <alloccell.h>
+#include <rtti.h>
 #include <assert.h>
 
 static char *compiler_version = "0.0";
@@ -5491,6 +5492,29 @@ static void snail_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
+static void snail_compile_type_descriptor_loader( SNAIL_COMPILER *cc,
+                                                  TNODE *tnode,
+                                                  cexception_t *ex )
+{
+    TNODE *type_descriptor_type;
+    rtti_t type_descriptor;
+    ssize_t offset;
+
+    type_descriptor.size = tnode_size( tnode );
+    type_descriptor.nref = tnode_number_of_references( tnode );
+
+    compiler_assemble_static_alloc_hdr( cc, sizeof(type_descriptor),
+                                        /* len */ -1, ex );
+
+    offset = compiler_assemble_static_data( cc, &type_descriptor,
+                                            sizeof(type_descriptor), ex );
+
+    snail_emit( cc, ex, "\tce\n", SLDC, &offset );
+
+    type_descriptor_type = new_tnode_type_descriptor( ex );
+    snail_push_type( cc, type_descriptor_type, ex );
+}
+
 static SNAIL_COMPILER * volatile snail_cc;
 
 static cexception_t *px; /* parser exception */
@@ -8974,10 +8998,17 @@ simple_expression
   | struct_expression
   | unpack_expression
   | function_expression
-  | _TYPE __IDENTIFIER
-      { assert(0); }
-  | _TYPE _OF __IDENTIFIER
-      { assert(0); }
+  | _TYPE type_identifier
+      {
+          TNODE *tnode = $2;
+          snail_compile_type_descriptor_loader( snail_cc, tnode, px );
+      }
+  | _TYPE _OF variable_access_identifier
+      {
+          DNODE *var_dnode = $3;
+          TNODE *var_type = dnode_type( var_dnode );
+          snail_compile_type_descriptor_loader( snail_cc, var_type, px );
+      }
   ;
 
 opt_comma

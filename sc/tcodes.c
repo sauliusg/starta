@@ -25,6 +25,7 @@
 #include <hashcell.h>
 #include <bcalloc.h>
 #include <bytecode_file.h>
+#include <rtti.h>
 #include <allocx.h>
 #include <stringx.h>
 #include <cxprintf.h>
@@ -4854,5 +4855,33 @@ int ASSERT( INSTRUCTION_FN_ARGS )
 int DEBUG( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
+    return 1;
+}
+
+/*
+ * RTTIDUMP Print out the RTTI information left by compiler.
+ * 
+ * bytecode:
+ * RTTY
+ * 
+ * stack:
+ * type_of_var -> 
+ */
+
+int RTTIDUMP( INSTRUCTION_FN_ARGS )
+{
+    rtti_t *type_descr = STACKCELL_PTR( istate.ep[0] );
+
+    TRACE_FUNCTION();
+
+    if( type_descr ) {
+        printf( "RTTIDUMP: size = %d, nref = %d\n",
+                type_descr->size, type_descr->nref );
+    } else {
+        printf( "RTTIDUMP: null type descriptor\n" );
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep ++;
     return 1;
 }
