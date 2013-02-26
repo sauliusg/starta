@@ -174,6 +174,8 @@ ssize_t tnode_max_interface( TNODE *class_descr );
 
 const char * tnode_kind_name( TNODE * );
 
+int tnode_align( TNODE *tnode );
+
 type_kind_t tnode_kind( TNODE *tnode );
 
 DNODE *tnode_args( TNODE* tnode );

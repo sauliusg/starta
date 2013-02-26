@@ -1048,10 +1048,16 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
     static key_value_t empty_list[1] = {{ NULL }};
     static key_value_t list[] = {
 	{ "element_nref" },
+        { "element_size" },
+        { "element_align" },
 	{ NULL },
     };
 
     if( !tnode ) return empty_list;
+
+    list[0].val = tnode_number_of_references( tnode );
+    list[1].val = tnode_size( tnode );
+    list[2].val = tnode_align( tnode );
 
     /* For placeholders, we just in case allocate arrays thay say they
        contain references. This is necessary so that GC does not
@@ -1071,6 +1077,8 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
     static key_value_t list[] = {
 	{ "element_nref" },
 	{ "level" },
+        { "element_size" },
+        { "element_align" },
 	{ NULL },
     };
 
@@ -1078,6 +1086,8 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
 
     list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
     list[1].val = level;
+    list[2].val = tnode_size( tnode );
+    list[3].val = tnode_align( tnode );
 
     return list;
 }
