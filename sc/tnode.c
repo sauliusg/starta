@@ -60,6 +60,8 @@ struct TNODE {
 			     the size of explicitely declared
 			     fields. */
 
+    int  align;           /* alignment of variable of a given type */
+
     long rcount;          /* reference count */
 
     DNODE *fields;        /* for structure types, contains a list of
@@ -1078,6 +1080,19 @@ ssize_t tnode_max_interface( TNODE *class_descr )
     }
 
     return max_interface;
+}
+
+int tnode_align( TNODE *tnode )
+{
+    assert( tnode );
+    if( tnode_is_reference( tnode )) {
+        return REF_SIZE;
+    } else {
+        if( tnode->align != 0 )
+            return tnode->align;
+        else
+            return tnode->size;
+    }
 }
 
 type_kind_t tnode_kind( TNODE *tnode ) { assert( tnode ); return tnode->kind; }
