@@ -25,10 +25,7 @@ typedef struct alloccell_t {
     ssize_t length;           /* contains number of elements if the
 				 allocated block is an array; for
 				 non-array elements contains value
-				 0. For strings should contain
-				 strlen() of the string, which will be
-				 as a rule size - 1 (the last '\0'
-				 byte is not counted in 'length'. */
+				 a negative value (say -1). */
     ssize_t element_size;     /* Contains size of elements in the
 			         allocated memory block, in bytes (NOT
 			         including sizeof(alloccell_t) ). If
@@ -37,7 +34,7 @@ typedef struct alloccell_t {
 			         element contains one reference,
 			         otherwise references are allocated at
 			         negative offsets and are not included
-			         into element_size. If length == 0,
+			         into element_size. If length < 0,
 			         then element_size is the size of
 			         memory block allocated at the
 			         positive offsets after the header. If

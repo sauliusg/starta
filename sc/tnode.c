@@ -40,6 +40,13 @@ struct TNODE {
     ssize_t nrefs;        /* number of fields in the type (structure, class,
 			     etc.) that are references and should be garbage
 			     collected */
+
+    ssize_t nextnumoffs;  /* The offset of the next numeric
+                             (non-reference) field to be assigned. */
+
+    ssize_t nextrefoffs;  /* The offset of the next reference field to
+                             be assigned. */
+
     ssize_t max_vmt_offset;
                           /* maximum Virtual method offset assigned in
 			     this type.*/
@@ -1737,15 +1744,18 @@ static TNODE *tnode_insert_single_enum_value( TNODE* tnode, DNODE *field )
     return tnode;
 }
 
+#if 0
 #define STRUCT_FIELD_SIZE sizeof(stackcell_t)
+#endif
+
+#define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((int)(N)) % (lim)) % (lim) )
 
 TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 {
     TNODE *field_type;
-    DNODE *current;
     type_kind_t field_kind;
-    char *name;
-    size_t field_size;
+    size_t field_size, field_align;
+    DNODE *current;
 
     assert( tnode );
     tnode_check_field_does_not_exist( tnode, tnode->fields, "field", field );
@@ -1753,16 +1763,51 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
     foreach_dnode( current, field ) {
 	field_type = dnode_type( current );
 	field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
-	name = field_type ? tnode_name( field_type ) : NULL;
-	field_size = sizeof(stackcell_t);
+        field_size = tnode_is_reference( field_type ) ?
+            REF_SIZE : tnode_size( field_type );
+        field_align = tnode_align( field_type );
 
-	if( field_kind != TK_FUNCTION ) {
-	    dnode_set_offset( current, tnode->size );
-	    tnode->size += STRUCT_FIELD_SIZE;
-            tnode_set_flags( tnode, TF_IS_REF );
-	    if( field_type && ( tnode_is_reference( field_type ) ||
-                                field_type->kind == TK_PLACEHOLDER )) {
-		tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
+	if( field_size != 0 && field_kind != TK_FUNCTION ) {
+            if( tnode_is_reference( field_type )) {
+                int direction = -1;
+                /* If no references are seen so far, let's choose
+                   which direction references will run. For generic
+                   types, they will be allocated with positive
+                   offsets; for all other types (structures, classes,
+                   closure variable blocks) they will run in negative
+                   diretion: */
+                if( tnode->nrefs == 0 ) {
+                    if( tnode_kind( tnode ) == TK_COMPOSITE ) {
+                        if( tnode->nextnumoffs != 0 ) {
+                            yyerrorf( "For composite types, all reference "
+                                      "fields must be declared before "
+                                      "non-reference fields." );
+                        } else {
+                            direction = 1;
+                            tnode->nextrefoffs = 0;
+                        }
+                    } else {
+                        direction = -1;
+                        tnode->nextrefoffs = -sizeof(alloccell_t) - REF_SIZE;
+                    }
+                } else {
+                    direction = tnode->nrefs > 0 ? 1 : -1;
+                }
+                dnode_set_offset( current, tnode->nextrefoffs );
+                tnode->nrefs += direction;
+                tnode->size += REF_SIZE;
+                tnode->nextrefoffs += REF_SIZE * direction;
+            } else {
+                ALIGN_NUMBER( tnode->size, field_align );
+                dnode_set_offset( current, tnode->nextnumoffs );
+                tnode->nextnumoffs += field_size;
+                tnode->size += field_size;
+                if( tnode->align < field_align )
+                    tnode->align = field_align;
+            }
+	} else {
+	    if( field_kind != TK_FUNCTION ) {
+		yyerrorf( "field '%s' has zero size", dnode_name( current ));
 	    }
 	}
     }
@@ -1984,6 +2029,11 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
 	tnode->max_vmt_offset = base_type->max_vmt_offset;
 	tnode->size += tnode_size( base_type );
 	tnode->nrefs += base_type->nrefs;
+	tnode->nextnumoffs += base_type->nextnumoffs;
+	tnode->nextrefoffs += base_type->nextrefoffs;
+        if( tnode->align < base_type->align ) {
+            tnode->align = base_type->align;
+        }
 	foreach_dnode( field, tnode->fields ) {
 	    TNODE *field_type = dnode_type( field );
 	    type_kind_t field_kind =
