@@ -242,7 +242,7 @@ type byte = {
         { BINDEX };
 
     inline bytecode operator "new[]" ( i : byte ) : array
-        { BAALLOC %%element_nref };
+        { BAALLOC %%element_size %%element_nref };
 
     inline bytecode operator "blob[]" ( i : byte ) : blob
         { BBLOB };
@@ -345,7 +345,7 @@ type short = {
         { HINDEX };
 
     inline bytecode operator "new[]" ( i : short ) : array
-        { HAALLOC %%element_nref };
+        { HAALLOC %%element_size %%element_nref };
 
     inline bytecode operator "blob[]" ( i : short ) : blob
         { HBLOB };
@@ -470,7 +470,7 @@ type int = {
         { SUBARRAY };
 
     inline bytecode operator "new[]" ( i : int ) : array
-        { AALLOC %%element_nref };
+        { AALLOC %%element_size %%element_nref };
 
     inline bytecode operator "blob[]" ( i : int ) : blob
         { BLOB };
@@ -596,7 +596,7 @@ type long = {
         { LSUBARRAY };
 
     inline bytecode operator "new[]" ( i : long ) : array
-        { LAALLOC %%element_nref };
+        { LAALLOC %%element_size %%element_nref };
 
     inline bytecode operator "blob[]" ( i : long ) : blob
         { LBLOB };
@@ -716,7 +716,7 @@ type llong = {
         { LLINDEX };
 
     inline bytecode operator "new[]" ( i : llong ) : array
-        { LLAALLOC %%element_nref };
+        { LLAALLOC %%element_size %%element_nref };
 
     inline bytecode operator "blob[]" ( i : llong ) : blob
         { LBLOB };
