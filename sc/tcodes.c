@@ -3893,7 +3893,7 @@ static size_t hash_value( char *string )
  * HASHADDR 
  *
  * bytecode:
- * HASHADDR
+ * HASHADDR element_size
  *
  * stack:
  * ..., hash, string -> ..., adressof
@@ -3901,29 +3901,31 @@ static size_t hash_value( char *string )
 
 int HASHADDR( INSTRUCTION_FN_ARGS )
 {
+    ssize_t element_size = istate.code[istate.ip+1].ssizeval;
     char *key = STACKCELL_PTR( istate.ep[0] );
-    hashcell_t *hash_table = STACKCELL_PTR( istate.ep[1] );
+    void *hash_table = STACKCELL_PTR( istate.ep[1] );
+    ssize_t hash_cell_size;
     ssize_t hash_length;
     ssize_t hash_index, current_index;
-    hashcell_t *current_hash_cell;
+    char **current_hash_cell;
     int all_searched = 0;
 
     TRACE_FUNCTION();
 
     if( !key || !hash_table ) {
 	STACKCELL_ZERO_PTR( istate.ep[0] );
-	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
+	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));	
     } else {
-	hash_length = ((alloccell_t*)hash_table)[-1].length / 2;
+	hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size;
+	hash_length = ((alloccell_t*)hash_table)[-1].length;
 	hash_index = hash_value( key ) % hash_length;
 
 	current_index = hash_index;
 
 	while( !all_searched ) {
-	    current_hash_cell = &hash_table[current_index];
-
-	    if( !current_hash_cell->key.ptr ||
-		strcmp( key, current_hash_cell->key.ptr ) == 0 ) {
+	    current_hash_cell = (char**)((char*)hash_table +
+					 current_index * hash_cell_size);
+	    if( !*current_hash_cell || strcmp( key, *current_hash_cell ) == 0 ) {
 		break;
 	    }
 	    current_index = (current_index + 1) % hash_length;
@@ -3942,25 +3944,26 @@ int HASHADDR( INSTRUCTION_FN_ARGS )
 		EXCEPTION );
 	    return 0;
 	} else {
-	    if( !current_hash_cell->key.ptr ) {
-		current_hash_cell->key.ptr = key;
+	    if( !*current_hash_cell ) {
+		*current_hash_cell = key;
 	    }
 	    STACKCELL_SET_PTR( istate.ep[1], hash_table,
-			       (char*)current_hash_cell -
-			       (char*)hash_table +
-			       sizeof(stackcell_t));
+			       ((char*)current_hash_cell +
+				hash_cell_size - element_size) -
+			       (char*)hash_table );
+
 	    STACKCELL_ZERO_PTR( istate.ep[0] );
 	}
     }
     istate.ep ++;
-    return 1;
+    return 2;
 }
 
 /*
  * HASHVAL
  *
  * bytecode:
- * HASHVAL
+ * HASHVAL element_size
  *
  * stack:
  * ..., hash, string -> ..., value
@@ -3968,28 +3971,34 @@ int HASHADDR( INSTRUCTION_FN_ARGS )
 
 int HASHVAL( INSTRUCTION_FN_ARGS )
 {
+    ssize_t element_size = istate.code[istate.ip+1].ssizeval;
     char *key = STACKCELL_PTR( istate.ep[0] );
-    hashcell_t *hash_table = STACKCELL_PTR( istate.ep[1] );
+    void *hash_table = STACKCELL_PTR( istate.ep[1] );
+    ssize_t hash_cell_size;
     ssize_t hash_length;
     ssize_t hash_index, current_index;
-    hashcell_t *current_hash_cell;
+    char **current_hash_cell;
     int all_searched = 0;
 
     TRACE_FUNCTION();
+
+    assert( element_size >= 0 );
+    assert( element_size <= sizeof(union stackunion) );
 
     if( !key || !hash_table ) {
 	STACKCELL_ZERO_PTR( istate.ep[0] );
 	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
     } else {
-	hash_length = ((alloccell_t*)hash_table)[-1].length / 2;
+	hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size;
+	hash_length = ((alloccell_t*)hash_table)[-1].length;
 	hash_index = hash_value( key ) % hash_length;
 
 	current_index = hash_index;
 
 	while( !all_searched ) {
-	    current_hash_cell = &hash_table[current_index];
-	    if( !current_hash_cell->key.ptr ||
-		strcmp( key, current_hash_cell->key.ptr ) == 0 ) {
+	    current_hash_cell = (char**)((char*)hash_table +
+					 current_index * hash_cell_size);
+	    if( !*current_hash_cell || strcmp( key, *current_hash_cell ) == 0 ) {
 		break;
 	    }
 	    current_index = (current_index + 1) % hash_length;
@@ -4000,9 +4009,11 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
 	if( all_searched ) {
 	    memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	} else {
-	    if( current_hash_cell->key.ptr ) {
-		istate.ep[1].num =
-		    current_hash_cell->value.num;
+	    if( *current_hash_cell ) {
+		memcpy( &istate.ep[1],
+			((char*)current_hash_cell +
+			 hash_cell_size - element_size),
+			element_size );
 	    } else {
 		memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	    }
@@ -4010,7 +4021,7 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
     }
     STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep ++;
-    return 1;
+    return 2;
 }
 
 /*
@@ -4025,35 +4036,34 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
 
 int HASHPTR( INSTRUCTION_FN_ARGS )
 {
-    /* ssize_t element_size = REF_SIZE; */
+    ssize_t element_size = REF_SIZE;
     char *key = STACKCELL_PTR( istate.ep[0] );
-    hashcell_t *hash_table = STACKCELL_PTR( istate.ep[1] );
-    /* ssize_t hash_cell_size; */
+    void *hash_table = STACKCELL_PTR( istate.ep[1] );
+    ssize_t hash_cell_size;
     ssize_t hash_length;
     ssize_t hash_index, current_index;
-    hashcell_t *current_hash_cell;
+    char **current_hash_cell;
     int all_searched = 0;
 
     TRACE_FUNCTION();
 
-    /* assert( element_size >= 0 ); */
-    /* assert( element_size <= sizeof(union stackunion) ); */
+    assert( element_size >= 0 );
+    assert( element_size <= sizeof(union stackunion) );
 
     if( !key || !hash_table ) {
 	STACKCELL_ZERO_PTR( istate.ep[0] );
 	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
     } else {
-	/* hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size; */
-	hash_length = ((alloccell_t*)hash_table)[-1].length / 2;
+	hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size;
+	hash_length = ((alloccell_t*)hash_table)[-1].length;
 	hash_index = hash_value( key ) % hash_length;
 
 	current_index = hash_index;
 
 	while( !all_searched ) {
-	    current_hash_cell = &hash_table[current_index];
-
-	    if( !current_hash_cell->key.ptr ||
-		strcmp( key, current_hash_cell->key.ptr ) == 0 ) {
+	    current_hash_cell = (char**)((char*)hash_table +
+					 current_index * hash_cell_size);
+	    if( !*current_hash_cell || strcmp( key, *current_hash_cell ) == 0 ) {
 		break;
 	    }
 	    current_index = (current_index + 1) % hash_length;
@@ -4064,8 +4074,9 @@ int HASHPTR( INSTRUCTION_FN_ARGS )
 	if( all_searched ) {
 	    memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	} else {
-	    if( current_hash_cell->key.ptr ) {
-		void *ptr = current_hash_cell->value.ptr;
+	    if( *current_hash_cell ) {
+		void *ptr = *(void**)((char*)current_hash_cell +
+				      hash_cell_size - element_size);
 		STACKCELL_SET_ADDR( istate.ep[1], ptr );
 	    } else {
 		STACKCELL_ZERO_PTR( istate.ep[1] );

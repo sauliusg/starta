@@ -306,7 +306,7 @@ int @PREFIX1@BLOB( INSTRUCTION_FN_ARGS )
  * AALLOC (allocate array of a given length, initialised with zeros)
  *
  * bytecode:
- * AALLOC nref
+ * AALLOC size nref
  *
  * stack:
  * length --> array_ptr
@@ -315,30 +315,32 @@ int @PREFIX1@BLOB( INSTRUCTION_FN_ARGS )
 int @PREFIX1@AALLOC( INSTRUCTION_FN_ARGS )
 {
     void *ptr;
-    ssize_t elem_nref = istate.code[istate.ip+1].ssizeval;
+    ssize_t elem_size = istate.code[istate.ip+1].ssizeval;
+    ssize_t elem_nref = istate.code[istate.ip+2].ssizeval;
     ssize_t n_elem = istate.ep[0].I;
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
+    ptr = bcalloc_array( elem_size, n_elem, elem_nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
-    return 2;
+    return 3;
 }
 
 /*
  * MDALLOCC (allocate multidimesional array's dimension's layer)
  *
- * MDALLOCC nref level
+ * MDALLOCC elem_size nref level
  *
  * dstptr length -> dstptr 
  */
 
 int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
 {
-    ssize_t nref = istate.code[istate.ip+1].ssizeval;
-    int level = istate.code[istate.ip+2].ssizeval;
+    ssize_t element_size = istate.code[istate.ip+1].ssizeval;
+    ssize_t nref = istate.code[istate.ip+2].ssizeval;
+    int level = istate.code[istate.ip+3].ssizeval;
     int length = istate.ep[0].I;
     void *ptr;
 
@@ -351,7 +353,7 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
     STACKCELL_SET_ADDR( istate.ep[1], ptr );
     istate.ep ++;
 
-    return 3;
+    return 4;
 }
 
 /*
@@ -359,25 +361,35 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
  *            initialised with zeros)
  *
  * bytecode:
- * HASHALLOC
+ * HASHALLOC element_size nref element_alignment
  *
  * stack:
  * ..., size -> ..., adressof
  */
 
+#define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((int)(N)) % (lim)) % (lim) )
+
 int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 {
-    const ssize_t nref = 1;
+    ssize_t element_size = istate.code[istate.ip+1].ssizeval;
+    ssize_t nref = istate.code[istate.ip+2].ssizeval;
+    ssize_t element_align = istate.code[istate.ip+3].ssizeval;
     ssize_t n_elem = istate.ep[0].I;
     void *ptr;
+    ssize_t hash_key_ptr_size = REF_SIZE;
+    ssize_t alloc_size;
+
+    ALIGN_NUMBER( hash_key_ptr_size, element_align );
+
+    alloc_size = element_size + hash_key_ptr_size;
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), n_elem * 2, nref );
+    ptr = bcalloc_array( alloc_size, nref+hash_key_ptr_size/REF_SIZE, n_elem );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
-    return 1;
+    return 4;
 }
 
 #include <alloccell.h>
