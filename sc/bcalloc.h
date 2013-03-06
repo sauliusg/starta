@@ -32,9 +32,8 @@ void *bcalloc_stackcells( ssize_t length, ssize_t nref );
 void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref );
 void *bcrealloc_blob( void *memory, size_t size );
 ssize_t bccollect( void );
-void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
-                               ssize_t nref, int level );
-
+void *bcalloc_mdarray( void **array, ssize_t element_size,
+		       ssize_t nref, ssize_t length, int level );
 int bcalloc_is_in_heap( void *p );
 void bcalloc_reset_allocated_nodes( void );
 

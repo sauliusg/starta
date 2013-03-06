@@ -346,8 +346,8 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_stackcell_layer( STACKCELL_PTR( istate.ep[1] ), length,
-                                   nref, level );
+    ptr = bcalloc_mdarray( STACKCELL_PTR( istate.ep[1] ), element_size, nref,
+			   length, level );
 
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[1], ptr );

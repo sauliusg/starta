@@ -130,12 +130,11 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
     return ptr;
 }
 
-void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
-                               ssize_t nref, int level )
+void *bcalloc_mdarray( void **array, ssize_t element_size,
+		       ssize_t nref, ssize_t length, int level )
 {
-    assert( nref == 1 || nref == 0 );
     if( level == 0 ) {
-	return bcalloc_array( sizeof(stackcell_t), length, nref );
+	return bcalloc_array( element_size, nref, length );
     } else {
 	alloccell_t *header = (alloccell_t*)array;
 	ssize_t layer_len = header[-1].length;
@@ -147,9 +146,9 @@ void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
 
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> allocating element %d of layer %d\n", i, level ); */
-	    array[i].ptr = bcalloc_stackcell_layer( array[i].ptr, length, nref,
-                                                    level - 1 );
-	    if( !array[i].ptr ) {
+	    array[i] = bcalloc_mdarray( array[i], element_size, nref, length,
+					level - 1 );
+	    if( !array[i] ) {
 		return NULL;
 	    }
 	}
