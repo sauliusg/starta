@@ -57,8 +57,6 @@ void *bcalloc( size_t size, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
 
-    assert( size >= nref * sizeof(stackcell_t) );
-
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {
 	    thrcode_gc_mark_and_sweep();
