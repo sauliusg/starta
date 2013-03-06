@@ -70,6 +70,10 @@ void *bcalloc( size_t size, ssize_t nref )
 
     ptr = calloc( 1, sizeof(alloccell_t) + size );
 
+    if( ptr && nref < 0 ) {
+	ptr = (alloccell_t*)((void**)ptr + (-nref));
+    }
+
     if( ptr != NULL ) {
 	if( allocated )
 	    allocated->prev = ptr;
