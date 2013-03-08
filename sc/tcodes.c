@@ -344,23 +344,15 @@ int COPY( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *ptr0 = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *ptr1 = STACKCELL_PTR( istate.ep[1] );
-    ssize_t length0 = ptr0 ? ptr0[-1].length : 0;
-    ssize_t length1 = ptr1 ? ptr1[-1].length : 0;
-    ssize_t size0 = ptr0 ? ptr0[-1].element_size : 0;
-    ssize_t size1 = ptr1 ? ptr1[-1].element_size : 0;
-    ssize_t size;
+    ssize_t size0 = ptr0 ? (ptr0[-1].element_size * ptr0[-1].length ) : 0;
+    ssize_t size1 = ptr1 ? (ptr1[-1].element_size * ptr1[-1].length ) : 0;
+    ssize_t size = size1 < size0 ? size1 : size0;
 
     TRACE_FUNCTION();
 
-    if( length0 > 0 ) size0 *= length0;
-    if( length1 > 0 ) size1 *= length1;
-
-    size = size1 < size0 ? size1 : size0;
-
     if( ptr0 && ptr1 ) {
-        ssize_t length = length0 < length1 ? length0 : length1;
-        ssize_t nref0 = ptr0[-1].nref <= length ? ptr0[-1].nref : length;
-        ssize_t nref1 = ptr1[-1].nref <= length ? ptr1[-1].nref : length;
+        ssize_t nref0 = ptr0[-1].nref ;
+        ssize_t nref1 = ptr1[-1].nref ;
         assert( nref0 == nref1 );
 	memcpy( ptr1, ptr0, size );
     }
@@ -558,41 +550,49 @@ int STG( INSTRUCTION_FN_ARGS )
 }
 
 /*
- LDI (load indirect)
- 
- address --> value
- 
+ * LDI (load indirect)
+ *
+ * bytecode:
+ * LDI size
+ * 
+ * address --> value
+ *
  */
 
 int LDI( INSTRUCTION_FN_ARGS )
 {
+    ssize_t size = istate.code[istate.ip+1].ssizeval;
+
     TRACE_FUNCTION();
 
-    // istate.ep[0].num = ((stackcell_t*)STACKCELL_PTR(istate.ep[0]))->num;
-    istate.ep[0] = *((stackcell_t*)STACKCELL_PTR(istate.ep[0]));
-    // STACKCELL_ZERO_PTR( istate.ep[0] );
+    memcpy( &istate.ep[0], STACKCELL_PTR(istate.ep[0]), size );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
 
-    return 1;
+    return 2;
 }
 
 /*
- STI (store indirect)
- 
- ..., address, value --> 
- 
+ * STI (store indirect)
+ *
+ * bytecode:
+ * STI size
+ * 
+ * ..., address, value --> 
+ *
  */
 
 int STI( INSTRUCTION_FN_ARGS )
 {
+    ssize_t size = istate.code[istate.ip+1].ssizeval;
+
     TRACE_FUNCTION();
 
-    // ((stackcell_t*)STACKCELL_PTR(istate.ep[1]))->num = istate.ep[0].num;
-    *((stackcell_t*)STACKCELL_PTR(istate.ep[1])) = istate.ep[0];
+    memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0], size );
     STACKCELL_ZERO_PTR( istate.ep[1] );
 
     istate.ep += 2;
 
-    return 1;
+    return 2;
 }
 
 /*
@@ -724,7 +724,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
  * MKARRAY (create array from computed expressions on the stack)
  *
  * bytecode:
- * MKARRAY nref nelements
+ * MKARRAY size nref nelements
  *
  * stack:
  * ..., elem1, ..., elemN --> mem_ptr
@@ -732,26 +732,26 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
 int MKARRAY( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *ptr;
-    ssize_t nref = istate.code[istate.ip+1].ssizeval;
-    ssize_t nele = istate.code[istate.ip+2].ssizeval;
+    void *ptr;
+    ssize_t size = istate.code[istate.ip+1].ssizeval;
+    ssize_t nref = istate.code[istate.ip+2].ssizeval;
+    ssize_t nele = istate.code[istate.ip+3].ssizeval;
     ssize_t i;
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), nele, nref );
+    ptr = bcalloc_array( size, nref, nele );
 
     BC_CHECK_PTR( ptr );
 
     for( i = 0; i < nele; i ++ ) {
-	memcpy( &ptr[i].num, &istate.ep[nele - 1 - i].num,
-                sizeof(ptr[i].num) );
+	memcpy( ((char*)ptr) + i * size, &istate.ep[nele - 1 - i], size );
     }
 
     istate.ep += nele - 1;
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
-    return 3;
+    return 4;
 }
 
 /*
@@ -766,18 +766,18 @@ int MKARRAY( INSTRUCTION_FN_ARGS )
 
 int PMKARRAY( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *ptr;
+    void *ptr;
     ssize_t nele = istate.code[istate.ip+1].ssizeval;
     ssize_t i;
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), nele, 1 );
+    ptr = bcalloc_array( sizeof(void*), 1, nele );
 
     BC_CHECK_PTR( ptr );
 
     for( i = 0; i < nele; i ++ ) {
-	ptr[i].ptr = STACKCELL_PTR( istate.ep[nele - 1 - i] );
+	((void**)ptr)[i] = STACKCELL_PTR( istate.ep[nele - 1 - i] );
 	STACKCELL_ZERO_PTR( istate.ep[nele - 1 - i] );
     }
 
@@ -886,33 +886,6 @@ int MEMCPY( INSTRUCTION_FN_ARGS )
     memcpy( dst, src, size );
 
     return 2;
-}
-
-/*
- * ZAALLOC (allocate array of a given length, initialised with zeros)
- *
- * bytecode:
- * ZAALLOC size nref
- *
- * stack:
- * ssize_t_length --> array_ptr
- */
-
-int ZAALLOC( INSTRUCTION_FN_ARGS )
-{
-    void *ptr;
-    // ssize_t elem_size = istate.code[istate.ip+1].ssizeval;
-    // ssize_t elem_nref = istate.code[istate.ip+2].ssizeval;
-    ssize_t elem_nref = 1;
-    ssize_t n_elem = istate.ep[0].num.ssize;
-
-    TRACE_FUNCTION();
-
-    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
-    BC_CHECK_PTR( ptr );
-    STACKCELL_SET_ADDR( istate.ep[0], ptr );
-
-    return 3;
 }
 
 /*
@@ -3015,7 +2988,7 @@ int PLDA( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.ep --;
-    STACKCELL_SET_ADDR( istate.ep[0], &(istate.fp[offset]) );
+    STACKCELL_SET_ADDR( istate.ep[0], &(istate.fp[offset].PTR) );
 
     return 2;
 }
@@ -3127,10 +3100,10 @@ int PSTG( INSTRUCTION_FN_ARGS )
 }
 
 /*
- PLDI (pointer load indirect)
- 
- pointer address --> pointer
- 
+ * PLDI (pointer load indirect)
+ * 
+ * pointer address --> pointer
+ *
  */
 
 int PLDI( INSTRUCTION_FN_ARGS )
@@ -3139,7 +3112,7 @@ int PLDI( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    addr = ((stackcell_t*)STACKCELL_PTR(istate.ep[0]))->ptr;
+    addr = *((void**)STACKCELL_PTR(istate.ep[0]));
     STACKCELL_SET_ADDR( istate.ep[0], addr );
 
     return 1;
@@ -3156,12 +3129,7 @@ int PSTI( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-#if 0
     *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
-#else
-    ((stackcell_t*)STACKCELL_PTR(istate.ep[1]))->ptr =
-        STACKCELL_PTR( istate.ep[0] );
-#endif
     STACKCELL_ZERO_PTR( istate.ep[1] );
     STACKCELL_ZERO_PTR( istate.ep[0] );
 
