@@ -60,13 +60,6 @@ struct TNODE {
                              it must be used when computing VMT offset
                              to call this method. */
 
-    ssize_t attr_size;    /* attr_size is the size of the type set via
-			     'type attributes', i.e. specified as
-			     'size = 1234' statements in the type
-			     definition; this size should be added to
-			     the size of explicitely declared
-			     fields. */
-
     int  align;           /* alignment of variable of a given type */
 
     long rcount;          /* reference count */
@@ -1056,7 +1049,7 @@ char *tnode_suffix( TNODE *tnode )
 ssize_t tnode_size( TNODE *tnode )
 {
     assert( tnode );
-    return tnode->size + tnode->attr_size;
+    return tnode->size;
 }
 
 ssize_t tnode_number_of_references( TNODE *tnode )
@@ -1798,11 +1791,11 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                 tnode->size += REF_SIZE;
                 tnode->nextrefoffs += REF_SIZE * direction;
             } else {
-                if( tnode->size != 0 )
-                    ALIGN_NUMBER( tnode->size, field_align );
+                ssize_t old_offset = tnode->nextnumoffs;
+                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
                 dnode_set_offset( current, tnode->nextnumoffs );
                 tnode->nextnumoffs += field_size;
-                tnode->size += field_size;
+                tnode->size += tnode->nextnumoffs - old_offset;
                 if( tnode->align < field_align )
                     tnode->align = field_align;
             }
@@ -2265,7 +2258,7 @@ TNODE *tnode_set_integer_attribute( TNODE *tnode, const char *attr_name,
 {
     assert( tnode );
     if( strcmp( attr_name, "size" ) == 0 ) {
-        tnode->attr_size = attr_value;
+        tnode->size = attr_value;
 	return tnode;
     }
     if( strcmp( attr_name, "reference" ) == 0 ) {
