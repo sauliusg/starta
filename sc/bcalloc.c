@@ -136,7 +136,7 @@ void *bcalloc_mdarray( void **array, ssize_t element_size,
 		       ssize_t nref, ssize_t length, int level )
 {
     if( level == 0 ) {
-	return bcalloc_array( element_size, nref, length );
+	return bcalloc_array( element_size, length, nref );
     } else {
 	alloccell_t *header = (alloccell_t*)array;
 	ssize_t layer_len = header[-1].length;
