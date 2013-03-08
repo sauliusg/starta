@@ -248,7 +248,7 @@ type byte = {
         { BBLOB };
 
     inline bytecode operator "new[][]" ( i : byte ) : array
-        { BMDALLOCC %%element_nref %%level };
+        { BMDALLOCC %%element_size %%element_nref %%level };
 
     inline bytecode operator "%%" ( format : string; x : byte ) : string
         { BSPRINTF };
@@ -351,7 +351,7 @@ type short = {
         { HBLOB };
 
     inline bytecode operator "new[][]" ( i : short ) : array
-        { HMDALLOCC %%element_nref %%level };
+        { HMDALLOCC %%element_size %%element_nref %%level };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; short value )
@@ -476,7 +476,7 @@ type int = {
         { BLOB };
 
     inline bytecode operator "new[][]" ( i : int ) : array
-        { MDALLOCC %%element_nref %%level };
+        { MDALLOCC %%element_size %%element_nref %%level };
 
     inline bytecode operator "exceptionval" ( p : ref ) : int
         { ERRORCODE };
@@ -602,7 +602,7 @@ type long = {
         { LBLOB };
 
     inline bytecode operator "new[][]" ( i : long ) : array
-        { LMDALLOCC %%element_nref %%level };
+        { LMDALLOCC %%element_size %%element_nref %%level };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; long value )
@@ -722,7 +722,7 @@ type llong = {
         { LBLOB };
 
     inline bytecode operator "new[][]" ( i : llong ) : array
-        { LLMDALLOCC %%element_nref %%level };
+        { LLMDALLOCC %%element_size %%element_nref %%level };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; llong value )

@@ -2877,8 +2877,9 @@ static void snail_compile_array_alloc( SNAIL_COMPILER *cc,
 static void snail_compile_blob_alloc( SNAIL_COMPILER *cc,
 				      cexception_t *ex )
 {
-    static key_value_t fixup_values[2] = {
+    static key_value_t fixup_values[] = {
 	{ "element_nref", 0 },
+	{ "element_size", 1 },
 	{ NULL },
     };
 
@@ -2902,7 +2903,9 @@ static void snail_compile_mdalloc( SNAIL_COMPILER *cc,
 	snail_append_expression_type( cc, share_tnode( element_type ));
     } else {
 	key_value_t fixup_vals[] = {
+	    { "element_size", sizeof(void*) },
 	    { "element_nref", 1 },
+	    { "element_align", sizeof(void*) },
 	    { "level", level },
 	    { NULL }
 	};
