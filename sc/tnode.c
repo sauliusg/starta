@@ -1798,7 +1798,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                 tnode->size += REF_SIZE;
                 tnode->nextrefoffs += REF_SIZE * direction;
             } else {
-                ALIGN_NUMBER( tnode->size, field_align );
+                if( tnode->size != 0 )
+                    ALIGN_NUMBER( tnode->size, field_align );
                 dnode_set_offset( current, tnode->nextnumoffs );
                 tnode->nextnumoffs += field_size;
                 tnode->size += field_size;
