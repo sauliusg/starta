@@ -1,10 +1,10 @@
-A.name.offset=	 0
-A.a.offset=	 1
-A.c.offset=	 2
-A.i.offset=	 3
-A.c1.offset=	 4
-A.i1.offset=	 5
-A.c2.offset=	 6
-A.i2.offset=	 7
+A.name.offset=	 -40
+A.a.offset=	 -44
+A.c.offset=	 0
+A.i.offset=	 4
+A.c1.offset=	 8
+A.i1.offset=	 12
+A.c2.offset=	 16
+A.i2.offset=	 20
 
-A.size=	 8
+A.size=	 32
