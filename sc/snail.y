@@ -2159,11 +2159,30 @@ static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
 	} else {
 	    TNODE *element_type =
 		expr_type ? tnode_element_type( expr_type ) : NULL;
+	    ssize_t element_size =
+		element_type ? tnode_size( element_type ) : 0;
+	    char *name = element_type ? tnode_name( element_type ) : NULL;
+
+	    if( element_size > sizeof(union stackunion)) {
+		if( name ) {
+		    yyerrorf( "value of type '%s' is too large to be loaded "
+			      "onto the stack", name );
+		} else {
+		    yyerrorf( "value to be loaded by LDI is too large "
+			      "to fit onto the stack" );
+		}
+	    }
+
+	    if( element_type && !tnode_is_reference( element_type ) &&
+		tnode_number_of_references( element_type ) > 0 ) {
+		yyerrorf( "values with references should not be loaded "
+			  "onto the stack" );
+	    }
 
 	    if( element_type && tnode_is_reference( element_type )) {
 		snail_emit( cc, ex, "\tc\n", PLDI );
 	    } else {
-		snail_emit( cc, ex, "\tc\n", LDI );
+		snail_emit( cc, ex, "\tce\n", LDI, &element_size );
 	    }
 	    snail_stack_top_dereference( cc );
 	}
@@ -2236,7 +2255,8 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 		if( expr_type && tnode_is_reference( expr_type )) {
 		    snail_emit( cc, &inner, "\tc\n", PSTI );
 		} else {
-		    snail_emit( cc, &inner, "\tc\n", STI );
+		    ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
+		    snail_emit( cc, &inner, "\tce\n", STI, &expr_size );
 		}
 	    }
 	}

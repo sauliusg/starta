@@ -7,6 +7,7 @@
 
 #include <pack.h>
 #include <refsize.h>
+#include <alloccell.h>
 /* #include <hashcell.h> */
 
 #ifdef I
@@ -209,9 +210,12 @@ int @PREFIX1@JNZ( INSTRUCTION_FN_ARGS )
 
 int @PREFIX1@INDEX( INSTRUCTION_FN_ARGS )
 {
+    alloccell_t *array_ptr = istate.ep[1].PTR;
+    ssize_t element_size = array_ptr[-1].element_size;
+
     TRACE_FUNCTION();
 
-    STACKCELL_OFFSET_PTR( istate.ep[1], istate.ep[0].I * sizeof(stackcell_t) );
+    STACKCELL_OFFSET_PTR( istate.ep[1], istate.ep[0].I * element_size );
     istate.ep ++;
 
     return 1;
