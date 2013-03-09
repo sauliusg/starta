@@ -772,7 +772,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(void*), 1, nele );
+    ptr = bcalloc_array( sizeof(void*), nele, 1 );
 
     BC_CHECK_PTR( ptr );
 
