@@ -4754,6 +4754,7 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
     if( nexpr > 0 ) {
 	ENODE *top = enode_list_pop( &cc->e_stack );
 	TNODE *top_type = enode_type( top );
+	ssize_t element_size = tnode_size( top_type );
 	ssize_t nrefs = tnode_is_reference( top_type ) ? 1 : 0;
 
 	for( i = 1; i < nexpr; i++ ) {
@@ -4767,7 +4768,8 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
 	if( tnode_is_reference( top_type )) {
 	    snail_emit( cc, ex, "\tce\n", PMKARRAY, &nexpr );
 	} else {
-	    snail_emit( cc, ex, "\tcee\n", MKARRAY, &nrefs, &nexpr );
+	    snail_emit( cc, ex, "\tceee\n", MKARRAY, &element_size,
+                        &nrefs, &nexpr );
 	}
 	snail_push_array_of_type( cc, share_tnode( top_type ), ex );
 	delete_enode( top );

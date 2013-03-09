@@ -740,7 +740,7 @@ int MKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( size, nref, nele );
+    ptr = bcalloc_array( size, nele, nref );
 
     BC_CHECK_PTR( ptr );
 
