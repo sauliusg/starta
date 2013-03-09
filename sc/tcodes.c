@@ -347,12 +347,16 @@ int COPY( INSTRUCTION_FN_ARGS )
     ssize_t size0 = ptr0 ? (ptr0[-1].element_size * ptr0[-1].length ) : 0;
     ssize_t size1 = ptr1 ? (ptr1[-1].element_size * ptr1[-1].length ) : 0;
     ssize_t size = size1 < size0 ? size1 : size0;
+    ssize_t length = ptr0[-1].length < ptr1[-1].length ?
+        ptr0[-1].length : ptr1[-1].length;
 
     TRACE_FUNCTION();
 
     if( ptr0 && ptr1 ) {
-        ssize_t nref0 = ptr0[-1].nref ;
-        ssize_t nref1 = ptr1[-1].nref ;
+        ssize_t nref0 = length >= 0 && ptr0[-1].nref < length ?
+            ptr0[-1].nref : length;
+        ssize_t nref1 = length >= 0 && ptr1[-1].nref < length ?
+            ptr1[-1].nref : length;
         assert( nref0 == nref1 );
 	memcpy( ptr1, ptr0, size );
     }
