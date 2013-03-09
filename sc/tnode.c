@@ -2033,9 +2033,15 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
 	    type_kind_t field_kind =
 		field_type ? tnode_kind( field_type ) : TK_NONE;
 	    if( field_kind != TK_FUNCTION ) {
-		dnode_set_offset( field,
-				  dnode_offset( field ) +
-                                  tnode_size( base_type ));
+                if( tnode_is_reference( field_type )) {
+                    dnode_set_offset( field,
+                                      dnode_offset( field ) +
+                                      base_type->nextrefoffs );
+                } else {
+                    dnode_set_offset( field,
+                                      dnode_offset( field ) +
+                                      base_type->nextnumoffs );
+                }
 	    }
 	}
     }
