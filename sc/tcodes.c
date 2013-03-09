@@ -1597,7 +1597,7 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS )
 
 int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *files = NULL;
+    bytecode_file_hdr_t **files = NULL;
     int i;
     const int n = 3;
 
@@ -1605,35 +1605,35 @@ int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    files = bcalloc_array( sizeof(stackcell_t), n, 1 );
+    files = bcalloc_array( REF_SIZE, n, 1 );
     BC_CHECK_PTR( files );
     STACKCELL_SET_ADDR( istate.ep[0], files );
 
     for( i = 0; i < n; i++ ) {
         bytecode_file_hdr_t* current_file;
-	files[i].ptr =
+	files[i] =
             bcalloc( sizeof(bytecode_file_hdr_t), INTERPRET_FILE_PTRS );
-	BC_CHECK_PTR( files[i].ptr );
-        current_file = (bytecode_file_hdr_t*)files[i].ptr;
+	BC_CHECK_PTR( files[i] );
+        current_file = (bytecode_file_hdr_t*)files[i];
 
         current_file->fd = i;
 	switch(i) {
 	case 0:
 	    current_file->fp = stdin;
-	    current_file->filename.ptr = bcstrdup( "-" );
+	    current_file->filename = bcstrdup( "-" );
 	    break;
 	case 1:
 	    current_file->fp = stdout;
-	    current_file->filename.ptr = bcstrdup( "-" );
+	    current_file->filename = bcstrdup( "-" );
 	    break;
 	case 2:
 	    current_file->fp = stderr;
-	    current_file->filename.ptr = bcstrdup( "<stderr>" );
+	    current_file->filename = bcstrdup( "<stderr>" );
 	    break;
 	default:
 	    assert( 0 );
 	}
-	BC_CHECK_PTR( current_file->filename.ptr );
+	BC_CHECK_PTR( current_file->filename );
     }
     return 1;
 }
@@ -1666,15 +1666,15 @@ int FDFILE( INSTRUCTION_FN_ARGS )
     switch(fd) {
     case 0:
         file->fp = stdin;
-        file->filename.ptr = bcstrdup( "-" );
+        file->filename = bcstrdup( "-" );
         break;
     case 1:
         file->fp = stdout;
-        file->filename.ptr = bcstrdup( "-" );
+        file->filename = bcstrdup( "-" );
         break;
     case 2:
         file->fp = stderr;
-        file->filename.ptr = bcstrdup( "<stderr>" );
+        file->filename = bcstrdup( "<stderr>" );
         break;
     default:
         assert( 0 );
@@ -1702,7 +1702,7 @@ int FNAME( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     if( fhdr ) {
-	filename = fhdr->filename.ptr;
+	filename = fhdr->filename;
     }
 
     STACKCELL_SET_ADDR( istate.ep[0], filename );
@@ -1737,7 +1737,7 @@ int FOPEN( INSTRUCTION_FN_ARGS )
 
     if( fp ) {
 	file->fp = fp;
-	file->filename.ptr = name;
+	file->filename = name;
 
 	STACKCELL_ZERO_PTR( istate.ep[0] );
 	istate.ep ++;
@@ -1780,7 +1780,7 @@ int FCLOSE( INSTRUCTION_FN_ARGS )
 
     fclose( file->fp );
     file->fp = NULL;
-    file->filename.ptr = NULL;
+    file->filename = NULL;
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep ++;
@@ -2692,7 +2692,7 @@ int SFILEPRINT( INSTRUCTION_FN_ARGS )
 {
     bytecode_file_hdr_t *file = STACKCELL_PTR( istate.ep[1] );
     FILE *fp = file ? file->fp : NULL;
-    char *format = file ? file->string_format.ptr : NULL;
+    char *format = file ? file->string_format : NULL;
 
     TRACE_FUNCTION();
 
@@ -2751,7 +2751,7 @@ int SFILESCAN( INSTRUCTION_FN_ARGS )
 {
     bytecode_file_hdr_t *file = STACKCELL_PTR( istate.ep[0] );
     FILE *fp = file ? file->fp : NULL;
-    char *format = file ? file->string_scanf_format.ptr : NULL;
+    char *format = file ? file->string_scanf_format : NULL;
     char *length_str = NULL;
     char *buff = NULL;
     ssize_t length, delta_length, old_length;

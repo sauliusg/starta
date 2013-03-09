@@ -16,11 +16,11 @@
 typedef struct {
     /* Garbage collected pointer fields must be at the beginning of
        the structure, so that garbage collector finds them */
-    stackcell_t filename;
-    stackcell_t int_format;
-    stackcell_t float_format;
-    stackcell_t string_format;
-    stackcell_t string_scanf_format;
+    char* filename;
+    char* int_format;
+    char* float_format;
+    char* string_format;
+    char* string_scanf_format;
     int fd;
     int flags;
     FILE *fp;

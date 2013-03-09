@@ -16,5 +16,5 @@ int bytecode_file_calculate_header_size( void )
 
 char *bytecode_file_name( bytecode_file_hdr_t *hdr )
 {
-    return hdr->filename.ptr;
+    return hdr->filename;
 }

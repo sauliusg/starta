@@ -167,7 +167,7 @@ int @PREFIX1@FILEPRINT( INSTRUCTION_FN_ARGS )
 {
     bytecode_file_hdr_t *file = STACKCELL_PTR( istate.ep[1] );
     FILE *fp = file->fp;
-    char *format = file->float_format.ptr;
+    char *format = file->float_format;
 
     TRACE_FUNCTION();
 
