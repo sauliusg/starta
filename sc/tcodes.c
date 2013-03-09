@@ -1258,7 +1258,7 @@ int JMP( INSTRUCTION_FN_ARGS )
 
 int ALLOCARGV( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *argv = NULL;
+    char **ptr = NULL;
     int i;
 
     TRACE_FUNCTION();
@@ -1267,15 +1267,15 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
     if( istate.argc >= 0 && istate.argv != NULL ) {
 
-	argv = bcalloc_array( sizeof(stackcell_t), istate.argc + 1, 1 );
+	ptr = bcalloc_array( REF_SIZE, istate.argc + 1, 1 );
 
-	BC_CHECK_PTR( argv );
-	STACKCELL_SET_ADDR( istate.ep[0], argv );
+	BC_CHECK_PTR( ptr );
+	STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
 	for( i = 0; i <= istate.argc; i++ ) {
-	    argv[i].ptr = bcalloc_blob( strlen(istate.argv[i]) + 1 );
-	    BC_CHECK_PTR( argv[i].ptr );
-	    strcpy( argv[i].ptr, istate.argv[i] );
+	    ptr[i] = bcalloc_blob( strlen( istate.argv[i]) + 1 );
+	    BC_CHECK_PTR( ptr[i] );
+	    strcpy( ptr[i], istate.argv[i] );
 	}
     }
 
