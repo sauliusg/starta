@@ -2872,7 +2872,12 @@ static void snail_compile_array_alloc( SNAIL_COMPILER *cc,
 {
     key_value_t *fixup_values = make_tnode_key_value_list( element_type );
 
-    snail_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
+    if( tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+        snail_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
+    } else {
+        yyerrorf( "in this type representation, can not allocate array "
+                  "of generic type %s", tnode_name( element_type ));
+    }
     snail_push_array_of_type( cc, element_type, ex );
 }
 
