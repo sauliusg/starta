@@ -1,12 +1,12 @@
 for variable 't':
-t.offset =	 0
-t.nref =	 1
-t.size =	 2
+t.offset =	 -3
+t.nref =	 -1
+t.size =	 16
 
 field offsets:
-t.s.offset =	 0
-t.x.offset =	 1
+t.s.offset =	 -40
+t.x.offset =	 0
 
 for type 'T':
-T.nref =	 1
-T.size =	 2
+T.nref =	 -1
+T.size =	 16
