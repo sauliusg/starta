@@ -2160,7 +2160,9 @@ static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
 	    TNODE *element_type =
 		expr_type ? tnode_element_type( expr_type ) : NULL;
 	    ssize_t element_size =
-		element_type ? tnode_size( element_type ) : 0;
+		element_type ? 
+                ( tnode_is_reference( element_type ) ? 
+                  REF_SIZE : tnode_size( element_type )) : 0;
 	    char *name = element_type ? tnode_name( element_type ) : NULL;
 
 	    if( element_size > sizeof(union stackunion)) {

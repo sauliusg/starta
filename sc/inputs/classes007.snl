@@ -34,11 +34,11 @@ class B : A {
     method name() : string { return "class B" }
 }
 
-. "B.ii.offset =", const(B.ii.offset/.stackcellsize);
-. "B.xx.offset =", const(B.xx.offset/.stackcellsize);
-. "B.a.offset  =", const(B.a.offset/.stackcellsize);
-. "B.nn.offset =", const(B.nn.offset/.stackcellsize);
-. "B.nm.offset =", const(B.nm.offset/.stackcellsize);
+. "B.ii.offset =", const(B.ii.offset);
+. "B.xx.offset =", const(B.xx.offset);
+. "B.a.offset  =", const(B.a.offset);
+. "B.nn.offset =", const(B.nn.offset);
+. "B.nm.offset =", const(B.nm.offset);
 . "B.name.offset =", const(B.name.offset);
 
 var a = new A;

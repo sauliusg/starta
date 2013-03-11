@@ -14,4 +14,4 @@ type A = class {
     d : double;
 }
 
-. const(A.size/.stackcellsize);
+. const(A.size);
