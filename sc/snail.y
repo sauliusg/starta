@@ -8808,30 +8808,30 @@ closure_initialisation
 | opt_variable_declaration_keyword variable_identifier
 {
     int readonly = $1;
-    ENODE *top_expr = snail_cc->e_stack;
-    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var = $2;
-    ssize_t offset = 0;
-
-    assert( closure_tnode );
 
     if( readonly ) {
         dnode_list_set_flags( closure_var, DF_IS_READONLY );
     }
-
-    tnode_insert_fields( closure_tnode, closure_var );
-    offset = dnode_offset( closure_var );
-    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
 }
  '=' expression
 {
     ENODE *top_expr = snail_cc->e_stack;
     TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
+    ENODE *second_expr = enode_next( snail_cc->e_stack );
+    TNODE *closure_tnode = second_expr ? enode_type( second_expr ) : NULL;
     DNODE *closure_var = $2;
+    ssize_t offset = 0;
 
+    assert( closure_tnode );
     assert( top_type );
 
     dnode_insert_type( closure_var, share_tnode( top_type ));
+    tnode_insert_fields( closure_tnode, closure_var );
+    offset = dnode_offset( closure_var );
+    snail_emit( snail_cc, px, "\tc\n", SWAP );
+    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+    snail_emit( snail_cc, px, "\tc\n", SWAP );
 
     snail_push_type( snail_cc,
                      new_tnode_addressof( share_tnode( top_type ), px ), 
