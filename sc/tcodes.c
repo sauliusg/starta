@@ -1002,7 +1002,7 @@ int ICALL( INSTRUCTION_FN_ARGS )
 
     if( fn_ptr < istate.code || fn_ptr > istate.code + istate.code_length ) {
         /* we are calling a closure: */
-        fn_ptr = STACKCELL_PTR( *(stackcell_t*)fn_ptr );
+        fn_ptr = ((void**)(((alloccell_t*)(fn_ptr))-1))[-1];
     } else {
         /* we are calling a function: */
         istate.ep ++;
