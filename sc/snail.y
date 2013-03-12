@@ -8975,23 +8975,22 @@ closure_header
           DNODE *parameters = $4;
           DNODE *return_values = $6;
           DNODE *self_dnode = new_dnode_name( $8, px );
-          ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
-          TNODE *closure_type = share_tnode( enode_type( closure_expr ));
+          ENODE *closure_expr = snail_cc->e_stack;
+          TNODE *closure_type = enode_type( closure_expr );
 
           ssize_t nref, size;
 
           nref = tnode_number_of_references( closure_type );
           size = tnode_size( closure_type );
 
+#if 0
           if( nref > 0 ) {
               nref = dnode_list_length( tnode_fields( closure_type ));
           }
+#endif
 
           snail_fixup( snail_cc, nref );
           snail_fixup( snail_cc, size );
-
-          delete_enode( closure_expr );
-          closure_expr = NULL;
 
           dnode_insert_type( self_dnode, share_tnode( closure_type ));
 
@@ -9021,11 +9020,18 @@ function_expression
   function_or_operator_body
   function_or_operator_end
     {
-        ssize_t offs = -sizeof(alloccell_t)-sizeof(void*);
+        ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
+        TNODE *closure_type = enode_type( closure_expr );
+        DNODE *fields = tnode_fields( closure_type );
+        ssize_t offs = dnode_offset( fields );
+
+        /* assert( offs == -sizeof(alloccell_t)-sizeof(void*) ); */
+
         snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
         snail_emit( snail_cc, px, "\tce\n", OFFSET, &offs );
         snail_compile_load_function_address( snail_cc, $1, px );
         snail_emit( snail_cc, px, "\tc\n", PSTI );
+        delete_enode( closure_expr );
     }
 ;
 
