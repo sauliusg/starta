@@ -8955,6 +8955,7 @@ closure_header
       opt_retval_description_list
       {
           TNODE *closure_tnode = new_tnode_ref( px );
+          DNODE *closure_fn_ref = NULL;
           ssize_t zero = 0;
           /* Allocate the closure structure: */
           snail_push_absolute_fixup( snail_cc, px );
@@ -8965,7 +8966,8 @@ closure_header
           tnode_set_kind( closure_tnode, TK_STRUCT );
           /* reserve one stackcell for a function pointer of the
              closure: */
-          tnode_insert_fields( closure_tnode, new_dnode_name( "", px ));
+          closure_fn_ref = new_dnode_typed( "",  new_tnode_ref( px ), px );
+          tnode_insert_fields( closure_tnode, closure_fn_ref );
           snail_push_type( snail_cc, closure_tnode, px );
       }
       opt_closure_initialisation_list
@@ -9019,7 +9021,9 @@ function_expression
   function_or_operator_body
   function_or_operator_end
     {
+        ssize_t offs = -sizeof(alloccell_t)-sizeof(void*);
         snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
+        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offs );
         snail_compile_load_function_address( snail_cc, $1, px );
         snail_emit( snail_cc, px, "\tc\n", PSTI );
     }
