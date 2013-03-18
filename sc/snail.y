@@ -8983,12 +8983,6 @@ closure_header
           nref = tnode_number_of_references( closure_type );
           size = tnode_size( closure_type );
 
-#if 0
-          if( nref > 0 ) {
-              nref = dnode_list_length( tnode_fields( closure_type ));
-          }
-#endif
-
           snail_fixup( snail_cc, nref );
           snail_fixup( snail_cc, size );
 
