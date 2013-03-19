@@ -8847,39 +8847,66 @@ closure_initialisation
   variable_identifier_list
 {
     int readonly = $1;
-    ENODE *top_expr = snail_cc->e_stack;
-    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
-    DNODE *closure_var;
     DNODE *closure_var_list = dnode_append( $2, $4 );
-    ssize_t offset = 0;
-    int first_variable = 1;
-
-    assert( closure_tnode );
 
     if( readonly ) {
         dnode_list_set_flags( closure_var_list, DF_IS_READONLY );
     }
+}
+ '=' multivalue_expression_list
+{
+    ENODE *top_expr = snail_cc->e_stack;
+    ENODE *current_expr, *closure_expr;
+    TNODE *closure_tnode;
+    DNODE *closure_var_list = $2;
+    ssize_t len = dnode_list_length( closure_var_list );
+    ssize_t expr_nr = $7;
+    ssize_t offset = 0;
+    int i, first_variable = 1;
+    DNODE *var;
+
+    closure_expr = top_expr;
+    for( i = 0; i < expr_nr; i++ ) {
+        closure_expr = enode_next( closure_expr );
+    }
+
+    closure_tnode = closure_expr ? enode_type( closure_expr ) : NULL;
+    
+    assert( closure_tnode );
+
+    current_expr = top_expr;
+    foreach_dnode( var, closure_var_list ) {
+        TNODE *expr_type = current_expr ?
+            share_tnode( enode_type( current_expr )) : NULL;
+        type_kind_t expr_type_kind = expr_type ?
+            tnode_kind( expr_type ) : TK_NONE;
+        if( expr_type_kind == TK_FUNCTION ||
+            expr_type_kind == TK_OPERATOR ||
+                 expr_type_kind == TK_METHOD ) {
+            TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+            expr_type = new_tnode_function_or_proc_ref
+                ( share_dnode( tnode_args( expr_type )),
+                  share_dnode( tnode_retvals( expr_type )),
+                  share_tnode( base_type ),
+                  px );
+        }
+        dnode_append_type( var, expr_type );
+        current_expr = current_expr ? enode_next( current_expr ) : NULL;
+    }
 
     tnode_insert_fields( closure_tnode, closure_var_list );
 
-    foreach_dnode( closure_var, closure_var_list ) {
+    foreach_dnode( var, closure_var_list ) {
 
         if( !first_variable ) {
             share_tnode( closure_tnode );
         }
-        offset = dnode_offset( closure_var );
+        offset = dnode_offset( var );
         snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
         snail_emit( snail_cc, px, "\tc\n", RTOR );
         snail_emit( snail_cc, px, "\tc\n", DUP );
         first_variable = 0;
     }
-}
- '=' multivalue_expression_list
-{
-    DNODE *closure_var_list = $2;
-    DNODE *var;
-    ssize_t len = dnode_list_length( closure_var_list );
-    ssize_t expr_nr = $7;
 
     if( expr_nr < len ) {
         yyerrorf( "number of expressions (%d) is less than "
@@ -8898,21 +8925,6 @@ closure_initialisation
     len = 0;
     foreach_dnode( var, closure_var_list ) {
         len ++;
-        TNODE *expr_type = snail_cc->e_stack ?
-            share_tnode( enode_type( snail_cc->e_stack )) : NULL;
-        type_kind_t expr_type_kind = expr_type ?
-            tnode_kind( expr_type ) : TK_NONE;
-        if( expr_type_kind == TK_FUNCTION ||
-            expr_type_kind == TK_OPERATOR ||
-                 expr_type_kind == TK_METHOD ) {
-            TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
-            expr_type = new_tnode_function_or_proc_ref
-                ( share_dnode( tnode_args( expr_type )),
-                  share_dnode( tnode_retvals( expr_type )),
-                  share_tnode( base_type ),
-                  px );
-        }
-        dnode_append_type( var, expr_type );
         if( len <= expr_nr ) {
             TNODE *var_type = var ? dnode_type( var ) : NULL;
 
