@@ -8852,6 +8852,8 @@ closure_initialisation
     if( readonly ) {
         dnode_list_set_flags( closure_var_list, DF_IS_READONLY );
     }
+
+    snail_emit( snail_cc, px, "\tc\n", RTOR );
 }
  '=' multivalue_expression_list
 {
@@ -8896,18 +8898,6 @@ closure_initialisation
 
     tnode_insert_fields( closure_tnode, closure_var_list );
 
-    foreach_dnode( var, closure_var_list ) {
-
-        if( !first_variable ) {
-            share_tnode( closure_tnode );
-        }
-        offset = dnode_offset( var );
-        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-        snail_emit( snail_cc, px, "\tc\n", RTOR );
-        snail_emit( snail_cc, px, "\tc\n", DUP );
-        first_variable = 0;
-    }
-
     if( expr_nr < len ) {
         yyerrorf( "number of expressions (%d) is less than "
                   "is needed to initialise %d variables",
@@ -8923,6 +8913,7 @@ closure_initialisation
     }
 
     len = 0;
+    closure_var_list = dnode_list_invert( closure_var_list );
     foreach_dnode( var, closure_var_list ) {
         len ++;
         if( len <= expr_nr ) {
@@ -8930,15 +8921,23 @@ closure_initialisation
 
             assert( var_type );
 
-            snail_emit( snail_cc, px, "\tc\n", RFROMR );
             snail_push_type( snail_cc,
                              new_tnode_addressof( share_tnode( var_type ),
                                                   px ), 
                              px );
+
+            snail_emit( snail_cc, px, "\tc\n", RFROMR );
+            snail_emit( snail_cc, px, "\tc\n", DUP );
+            snail_emit( snail_cc, px, "\tc\n", RTOR );
+            offset = dnode_offset( var );
+            snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
             snail_compile_swap( snail_cc, px );
             snail_compile_sti( snail_cc, px );
         }
     }
+    closure_var_list = dnode_list_invert( closure_var_list );
+
+    snail_emit( snail_cc, px, "\tc\n", RFROMR );
 }
 
 ;
