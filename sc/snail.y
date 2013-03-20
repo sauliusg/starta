@@ -8877,6 +8877,7 @@ closure_initialisation
     assert( closure_tnode );
 
     current_expr = top_expr;
+    closure_var_list = dnode_list_invert( closure_var_list );
     foreach_dnode( var, closure_var_list ) {
         TNODE *expr_type = current_expr ?
             share_tnode( enode_type( current_expr )) : NULL;
@@ -8895,6 +8896,7 @@ closure_initialisation
         dnode_append_type( var, expr_type );
         current_expr = current_expr ? enode_next( current_expr ) : NULL;
     }
+    closure_var_list = dnode_list_invert( closure_var_list );
 
     tnode_insert_fields( closure_tnode, closure_var_list );
 
