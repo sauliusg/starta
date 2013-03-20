@@ -8823,25 +8823,29 @@ closure_initialisation
     }
 
     len = 0;
+    closure_var_list = dnode_list_invert( closure_var_list );
     foreach_dnode( var, closure_var_list ) {
         len ++;
-        TNODE *expr_type = snail_cc->e_stack ?
-            share_tnode( enode_type( snail_cc->e_stack )) : NULL;
-        type_kind_t expr_type_kind = expr_type ?
-            tnode_kind( expr_type ) : TK_NONE;
-        if( expr_type_kind == TK_FUNCTION ||
-            expr_type_kind == TK_OPERATOR ||
-                 expr_type_kind == TK_METHOD ) {
-            TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
-            expr_type = new_tnode_function_or_proc_ref
-                ( share_dnode( tnode_args( expr_type )),
-                  share_dnode( tnode_retvals( expr_type )),
-                  share_tnode( base_type ),
-                  px );
-        }
-        dnode_append_type( var, expr_type );
         if( len <= expr_nr ) {
-            TNODE *var_type = var ? dnode_type( var ) : NULL;
+            TNODE *var_type = NULL;
+            TNODE *expr_type = snail_cc->e_stack ?
+                share_tnode( enode_type( snail_cc->e_stack )) : NULL;
+            type_kind_t expr_type_kind = expr_type ?
+                tnode_kind( expr_type ) : TK_NONE;
+            if( expr_type_kind == TK_FUNCTION ||
+                expr_type_kind == TK_OPERATOR ||
+                expr_type_kind == TK_METHOD ) {
+                TNODE *base_type = typetab_lookup( snail_cc->typetab,
+                                                   "procedure" );
+                expr_type = new_tnode_function_or_proc_ref
+                    ( share_dnode( tnode_args( expr_type )),
+                      share_dnode( tnode_retvals( expr_type )),
+                      share_tnode( base_type ),
+                      px );
+            }
+            dnode_append_type( var, expr_type );
+
+            var_type = var ? dnode_type( var ) : NULL;
 
             assert( var_type );
 
@@ -8854,6 +8858,8 @@ closure_initialisation
             snail_compile_sti( snail_cc, px );
         }
     }
+
+    closure_var_list = dnode_list_invert( closure_var_list );
 }
 
 ;
