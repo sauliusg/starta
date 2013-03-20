@@ -1757,8 +1757,9 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 	field_type = dnode_type( current );
 	field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
         field_size = tnode_is_reference( field_type ) ?
-            REF_SIZE : tnode_size( field_type );
-        field_align = tnode_align( field_type );
+            REF_SIZE : 
+            ( field_type ? tnode_size( field_type ) : 0 );
+        field_align = field_type ? tnode_align( field_type ) : 0;
 
 	if( field_size != 0 && field_kind != TK_FUNCTION ) {
             if( tnode_is_reference( field_type )) {
@@ -1800,7 +1801,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                     tnode->align = field_align;
             }
 	} else {
-	    if( field_kind != TK_FUNCTION ) {
+	    if( field_type && field_kind != TK_FUNCTION ) {
 		yyerrorf( "field '%s' has zero size", dnode_name( current ));
 	    }
 	}
