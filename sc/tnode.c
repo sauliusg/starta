@@ -1801,7 +1801,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                     tnode->align = field_align;
             }
 	} else {
-	    if( field_type && field_kind != TK_FUNCTION ) {
+	    if( field_type && field_kind != TK_FUNCTION &&
+                field_kind != TK_PLACEHOLDER ) {
 		yyerrorf( "field '%s' has zero size", dnode_name( current ));
 	    }
 	}
