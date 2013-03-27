@@ -4267,10 +4267,10 @@ int ZEROSTACK( INSTRUCTION_FN_ARGS )
 }
 
 static int
-pack_string_value( stackcell_t *stackcell, char typechar, ssize_t size,
+pack_string_value( void **str, char typechar, ssize_t size,
                    ssize_t *offset, byte *blob )
 {
-    char *value = STACKCELL_PTR( *stackcell );
+    char *value = *str;
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
     assert( blob_header->magic == BC_MAGIC );
@@ -4361,7 +4361,7 @@ int STRPACK( INSTRUCTION_FN_ARGS )
         size = strlen( value ) + 1;
     }
 
-    if( pack_value( &istate.ep[0], typechar, size, &offset, 
+    if( pack_value( &istate.ep[0].PTR, typechar, size, &offset, 
                     blob, pack_string_value, EXCEPTION ) == 0 ) {
 	return 0;
     }
