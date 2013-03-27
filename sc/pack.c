@@ -23,9 +23,9 @@
         return 0; \
     }
 
-int pack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
+int pack_value( void *value, char typechar, ssize_t size,
                 ssize_t *offset, byte *blob,
-                int (*pack)( stackcell_t *stack_cell, char typechar,
+                int (*pack)( void *value, char typechar,
                              ssize_t size, ssize_t *offset, byte *blob ),
                 cexception_t *ex
                 )
@@ -46,14 +46,14 @@ int pack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
 	return 0;
     }
 
-    retval = (*pack)( stack_cell, typechar, size, offset, blob );
+    retval = (*pack)( value, typechar, size, offset, blob );
 
     return retval;
 }
 
-int pack_array_values( byte *blob, stackcell_t *array,
+int pack_array_values( byte *blob, void **array,
                        char *description, ssize_t *offset,
-                       int (*pack)( stackcell_t *stack_cell, 
+                       int (*pack)( void *value, 
                                     char typechar, ssize_t size, 
                                     ssize_t *offset, byte *blob ),
                        cexception_t *ex )
@@ -141,9 +141,9 @@ int pack_array_values( byte *blob, stackcell_t *array,
     return 1;
 }
 
-int pack_array_layer( byte *blob, stackcell_t *array, char *description,
+int pack_array_layer( byte *blob, void **array, char *description,
                       ssize_t *offset, ssize_t level,
-                      int (*pack)( stackcell_t *stack_cell, 
+                      int (*pack)( void *value, 
                                    char typechar, ssize_t size, 
                                    ssize_t *offset, byte *blob ),
                       cexception_t *ex  )
@@ -168,7 +168,7 @@ int pack_array_layer( byte *blob, stackcell_t *array, char *description,
 
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> packing element %d of layer %d\n", i, level ); */
-	    if( !pack_array_layer( blob, STACKCELL_PTR( array[i] ), description,
+	    if( !pack_array_layer( blob, array[i], description,
                                    offset, level - 1, pack, ex  )) {
 		return 0;
 	    }

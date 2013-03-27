@@ -12,23 +12,23 @@
 #include <stackcell.h>
 #include <cexceptions.h>
 
-int pack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
+int pack_value( void *value, char typechar, ssize_t size,
                 ssize_t *offset, byte *blob,
-                int (*pack)( stackcell_t *stack_cell, char typechar,
+                int (*pack)( void *value, char typechar,
                              ssize_t size, ssize_t *offset, byte *blob ),
                 cexception_t *ex
                 );
 
-int pack_array_values( byte *blob, stackcell_t *array,
+int pack_array_values( byte *blob, void **array,
                        char *description, ssize_t *offset,
-                       int (*pack)( stackcell_t *stack_cell, 
+                       int (*pack)( void *value, 
                                     char typechar, ssize_t size, 
                                     ssize_t *offset, byte *blob ),
                        cexception_t *ex );
 
-int pack_array_layer( byte *blob, stackcell_t *array, char *description,
+int pack_array_layer( byte *blob, void **array, char *description,
                       ssize_t *offset, ssize_t level,
-                      int (*pack)( stackcell_t *stack_cell, 
+                      int (*pack)( void *value, 
                                    char typechar, ssize_t size, 
                                    ssize_t *offset, byte *blob ),
                       cexception_t *ex  );
