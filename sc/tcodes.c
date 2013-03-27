@@ -3071,7 +3071,7 @@ int PLDGA( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.ep --;
-    STACKCELL_SET_ADDR( istate.ep[0], &(istate.gp[offset]) );
+    STACKCELL_SET_ADDR( istate.ep[0], &(istate.gp[offset].PTR) );
 
     return 2;
 }
