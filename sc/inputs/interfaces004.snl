@@ -38,7 +38,7 @@ class S implements If, Ig {
     }
 }
 
-. "S.size = ", const(S.size)/const(.stackcellsize);
+. "S.size = ", const(S.size)/const(S.i.size);
 
 var s = new S;
 

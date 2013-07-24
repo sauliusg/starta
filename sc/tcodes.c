@@ -347,8 +347,12 @@ int COPY( INSTRUCTION_FN_ARGS )
     ssize_t size0 = ptr0 ? (ptr0[-1].element_size * ptr0[-1].length ) : 0;
     ssize_t size1 = ptr1 ? (ptr1[-1].element_size * ptr1[-1].length ) : 0;
     ssize_t size = size1 < size0 ? size1 : size0;
-    ssize_t length = ptr0[-1].length < ptr1[-1].length ?
-        ptr0[-1].length : ptr1[-1].length;
+    ssize_t length = 0;
+
+    if( ptr0 && ptr1 ) {
+        length = ptr0[-1].length < ptr1[-1].length ?
+            ptr0[-1].length : ptr1[-1].length;
+    }
 
     TRACE_FUNCTION();
 
