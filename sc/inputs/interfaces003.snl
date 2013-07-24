@@ -21,7 +21,7 @@ class S implements If, Ig {
     float k;
 }
 
-. "S.size (stackcells) = ", const(S.size/.stackcellsize);
+. "S.size (stackcells) = ", const(S.size/S.k.size);
 
 . "here";
 

@@ -21,7 +21,7 @@ struct S implements If, Ig {
     float k;
 }
 
-. "S.size (stackcesls) = ", const(S.size)/const(.stackcellsize);
+. "S.size = ", const(S.size)/const(S.i.size);
 
 . "here";
 
