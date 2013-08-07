@@ -181,7 +181,7 @@ int pack_array_layer( byte *blob, void **array, char *description,
 ** Unpacking of blob values:
  */
 
-int unpack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
+int unpack_value( void *value, char typechar, ssize_t size,
                   ssize_t *offset, byte *blob,
                   int (*unpack)( stackcell_t *stack_cell, char typechar,
                                  ssize_t size, ssize_t *offset, byte *blob,
@@ -209,7 +209,7 @@ int unpack_value( stackcell_t *stack_cell, char typechar, ssize_t size,
     return retval;
 }
 
-int unpack_array_values( byte *blob, stackcell_t *array_stackcell,
+int unpack_array_values( byte *blob, void **array,
                          char *description, ssize_t *offset,
                          int (*unpack)( stackcell_t *stack_cell, 
                                         char typechar, ssize_t size,
