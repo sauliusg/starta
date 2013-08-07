@@ -795,25 +795,24 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 /*---------------------------------------------------------------------------*/
 
 static int
-pack_@field@( stackcell_t *stackcell, char typechar, ssize_t size,
+pack_@field@( @type@ *value, char typechar, ssize_t size,
               ssize_t *offset, byte *blob )
 {
     int i;
-    @type@ value = stackcell->I;
 
     switch( typechar ) {
     case 'u':
     case 'i':
 	for( i = 0; i < size; i++ ) {
-	    *(blob + *offset + i) = value & 0xFF;
-	    value >>= 8;
+	    *(blob + *offset + i) = *value & 0xFF;
+	    *value >>= 8;
 	}
 	break;
     case 'U':
     case 'I':
 	for( i = size - 1; i >= 0; i-- ) {
-	    *(blob + *offset + i) = value & 0xFF;
-	    value >>= 8;
+	    *(blob + *offset + i) = *value & 0xFF;
+	    *value >>= 8;
 	}
 	break;
     default:
@@ -836,7 +835,7 @@ pack_@field@( stackcell_t *stackcell, char typechar, ssize_t size,
 }
 
 static int
-unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
+unpack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
                 ssize_t *offset, byte *blob, cexception_t *ex )
 {
     @type@ value;
@@ -903,7 +902,7 @@ unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
         break;
     }
 
-    stack_cell->I = value;
+    *value_ptr = value;
 
     *offset += size;
 

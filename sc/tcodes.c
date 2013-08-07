@@ -4509,7 +4509,7 @@ int STRPACKMDARRAY( INSTRUCTION_FN_ARGS )
 }
 
 static int
-unpack_string_value( stackcell_t *stackcell, char typechar,
+unpack_string_value( char **value_ptr, char typechar,
                      ssize_t size, ssize_t *offset, byte *blob,
                      cexception_t *ex )
 {
@@ -4545,7 +4545,8 @@ unpack_string_value( stackcell_t *stackcell, char typechar,
     value = bcalloc_array( size + 1, size + 1, 0 );
     if( !value ) return 0;
 
-    STACKCELL_SET_ADDR( *stackcell, value );
+    /* STACKCELL_SET_ADDR( *stackcell, value ); */
+    *value_ptr = value;
 
     switch( typechar ) {
     case 'c':
