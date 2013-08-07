@@ -3880,10 +3880,10 @@ int HASHADDR( INSTRUCTION_FN_ARGS )
     ssize_t element_size = istate.code[istate.ip+1].ssizeval;
     char *key = STACKCELL_PTR( istate.ep[0] );
     void *hash_table = STACKCELL_PTR( istate.ep[1] );
-    ssize_t hash_cell_size;
+    char **hash_keys = (char**)hash_table;
     ssize_t hash_length;
     ssize_t hash_index, current_index;
-    char **current_hash_cell;
+    char **current_hash_key;
     int all_searched = 0;
 
     TRACE_FUNCTION();
@@ -3892,16 +3892,14 @@ int HASHADDR( INSTRUCTION_FN_ARGS )
 	STACKCELL_ZERO_PTR( istate.ep[0] );
 	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));	
     } else {
-	hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size;
 	hash_length = ((alloccell_t*)hash_table)[-1].length;
 	hash_index = hash_value( key ) % hash_length;
 
 	current_index = hash_index;
 
 	while( !all_searched ) {
-	    current_hash_cell = (char**)((char*)hash_table +
-					 current_index * hash_cell_size);
-	    if( !*current_hash_cell || strcmp( key, *current_hash_cell ) == 0 ) {
+	    current_hash_key = hash_keys + current_index;
+	    if( !*current_hash_key || strcmp( key, *current_hash_key ) == 0 ) {
 		break;
 	    }
 	    current_index = (current_index + 1) % hash_length;
@@ -3920,13 +3918,14 @@ int HASHADDR( INSTRUCTION_FN_ARGS )
 		EXCEPTION );
 	    return 0;
 	} else {
-	    if( !*current_hash_cell ) {
-		*current_hash_cell = key;
+            ssize_t hash_cells_offset = REF_SIZE * hash_length;
+	    if( !*current_hash_key ) {
+		*current_hash_key = key;
 	    }
+
 	    STACKCELL_SET_PTR( istate.ep[1], hash_table,
-			       ((char*)current_hash_cell +
-				hash_cell_size - element_size) -
-			       (char*)hash_table );
+                               hash_cells_offset +
+                               element_size * current_index );
 
 	    STACKCELL_ZERO_PTR( istate.ep[0] );
 	}
@@ -3950,10 +3949,10 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
     ssize_t element_size = istate.code[istate.ip+1].ssizeval;
     char *key = STACKCELL_PTR( istate.ep[0] );
     void *hash_table = STACKCELL_PTR( istate.ep[1] );
-    ssize_t hash_cell_size;
+    char **hash_keys = (char**)hash_table;
     ssize_t hash_length;
     ssize_t hash_index, current_index;
-    char **current_hash_cell;
+    char **current_hash_key;
     int all_searched = 0;
 
     TRACE_FUNCTION();
@@ -3965,16 +3964,14 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
 	STACKCELL_ZERO_PTR( istate.ep[0] );
 	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
     } else {
-	hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size;
 	hash_length = ((alloccell_t*)hash_table)[-1].length;
 	hash_index = hash_value( key ) % hash_length;
 
 	current_index = hash_index;
 
 	while( !all_searched ) {
-	    current_hash_cell = (char**)((char*)hash_table +
-					 current_index * hash_cell_size);
-	    if( !*current_hash_cell || strcmp( key, *current_hash_cell ) == 0 ) {
+	    current_hash_key = hash_keys + current_index;
+	    if( !*current_hash_key || strcmp( key, *current_hash_key ) == 0 ) {
 		break;
 	    }
 	    current_index = (current_index + 1) % hash_length;
@@ -3985,10 +3982,10 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
 	if( all_searched ) {
 	    memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	} else {
-	    if( *current_hash_cell ) {
+	    if( *current_hash_key ) {
+                char **hash_cells = (char**)hash_table + hash_length;
 		memcpy( &istate.ep[1],
-			((char*)current_hash_cell +
-			 hash_cell_size - element_size),
+			(char*)hash_cells + current_index * element_size,
 			element_size );
 	    } else {
 		memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
@@ -4015,10 +4012,10 @@ int HASHPTR( INSTRUCTION_FN_ARGS )
     ssize_t element_size = REF_SIZE;
     char *key = STACKCELL_PTR( istate.ep[0] );
     void *hash_table = STACKCELL_PTR( istate.ep[1] );
-    ssize_t hash_cell_size;
+    char **hash_keys = (char**)hash_table;
     ssize_t hash_length;
     ssize_t hash_index, current_index;
-    char **current_hash_cell;
+    char **current_hash_key;
     int all_searched = 0;
 
     TRACE_FUNCTION();
@@ -4030,16 +4027,14 @@ int HASHPTR( INSTRUCTION_FN_ARGS )
 	STACKCELL_ZERO_PTR( istate.ep[0] );
 	memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
     } else {
-	hash_cell_size = ((alloccell_t*)hash_table)[-1].element_size;
 	hash_length = ((alloccell_t*)hash_table)[-1].length;
 	hash_index = hash_value( key ) % hash_length;
 
 	current_index = hash_index;
 
 	while( !all_searched ) {
-	    current_hash_cell = (char**)((char*)hash_table +
-					 current_index * hash_cell_size);
-	    if( !*current_hash_cell || strcmp( key, *current_hash_cell ) == 0 ) {
+	    current_hash_key = hash_keys + current_index;
+	    if( !*current_hash_key || strcmp( key, *current_hash_key ) == 0 ) {
 		break;
 	    }
 	    current_index = (current_index + 1) % hash_length;
@@ -4050,15 +4045,52 @@ int HASHPTR( INSTRUCTION_FN_ARGS )
 	if( all_searched ) {
 	    memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	} else {
-	    if( *current_hash_cell ) {
-		void *ptr = *(void**)((char*)current_hash_cell +
-				      hash_cell_size - element_size);
-		STACKCELL_SET_ADDR( istate.ep[1], ptr );
+	    if( *current_hash_key ) {
+                char **hash_cells = (char**)hash_table + hash_length;
+		void **ptr =
+                    (void**)((char*)hash_cells + current_index * element_size);
+		STACKCELL_SET_ADDR( istate.ep[1], *ptr );
 	    } else {
 		STACKCELL_ZERO_PTR( istate.ep[1] );
 	    }
 	}
     }
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep ++;
+    return 1;
+}
+
+/*
+ * HASHDUMP
+ *
+ * bytecode:
+ * HASHDUMP
+ *
+ * stack:
+ * ..., hash -> ...
+ */
+
+int HASHDUMP( INSTRUCTION_FN_ARGS )
+{
+    void *hash_table = STACKCELL_PTR( istate.ep[0] );
+    char **hash_keys = (char**)hash_table;
+    alloccell_t *hash_header = &((alloccell_t*)hash_table)[-1];
+    ssize_t hash_length = hash_header->length;
+    ssize_t hash_nref = hash_header->nref;
+    ssize_t element_size = hash_header->element_size;
+    char **hash_cells = hash_keys + hash_length;
+
+    ssize_t i;
+
+    for( i = 0; i < hash_length; i ++ ) {
+        if( hash_nref > hash_length ) {
+            printf( "%d: '%s' -> (%p) '%s'\n", i, hash_keys[i],
+                    hash_cells[i], hash_cells[i] );
+        } else {
+            printf( "%d: '%s'\n", i, hash_keys[i] );
+        }
+    }
+
     STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep ++;
     return 1;

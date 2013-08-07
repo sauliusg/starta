@@ -52,6 +52,8 @@ s.idict = new hash [300] of int;
 
 dd["new key"] = "val";
 dd["another key"] = "val2";
+// bytecode { PLD %dd HASHDUMP }
+
 . dd["new key"];
 . dd["another key"];
 . dd["no key"];

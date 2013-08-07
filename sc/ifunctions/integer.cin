@@ -383,19 +383,27 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
     ssize_t n_elem = istate.ep[0].I;
     void *ptr;
     ssize_t hash_key_ptr_size = REF_SIZE;
-    ssize_t alloc_size;
 
     TRACE_FUNCTION();
 
     assert( nref == 0 || nref == 1 );
 
     if( nref == 0 ) {
-        alloc_size = element_size + hash_key_ptr_size;
+#if 1
+        ssize_t alloc_size = (element_size + hash_key_ptr_size) * n_elem;
+        ptr = bcalloc_memory( alloc_size, element_size,
+                              /* length = */ n_elem, /* nref = */ n_elem );
+#else
+        ssize_t alloc_size = element_size + hash_key_ptr_size;
         ptr = bcalloc_array( alloc_size, n_elem, 1 );
+#endif
     } else {
         /* one reference is for key, another is for a value which is
            a refernece: */
-        ptr = bcalloc_array( alloc_size, n_elem * 2, 1 );
+        ssize_t alloc_size = REF_SIZE * n_elem * 2;
+        assert( element_size == REF_SIZE );
+        ptr = bcalloc_memory( alloc_size, element_size,
+                              /* length = */ n_elem, /* nref = */ n_elem * 2 );
     }
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
