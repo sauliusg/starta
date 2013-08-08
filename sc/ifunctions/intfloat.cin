@@ -752,13 +752,17 @@ int @PREFIX1@UNPACKARRAY( INSTRUCTION_FN_ARGS )
         return 0;
     }
 
-    if( !unpack_array_values( blob, &istate.ep[2], description,
+    if( !unpack_array_values( blob, &istate.ep[2].ptr, sizeof(@type@),
+                              description,
                               &offset, unpack_@field@,
                               EXCEPTION )) {
         return 0;
     }
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
+#if USE_OFFSETTED_POINTERS
+    istate.ep[2].num.offs = 0;
+#endif
 
     istate.ep += 2;
 
@@ -796,7 +800,8 @@ int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS )
 	      EXCEPTION );        
     }
 
-    if( !unpack_array_layer( blob, array, description,
+    if( !unpack_array_layer( blob, &array->ptr, sizeof(@type@),
+                             description,
                              &offset, level,
                              unpack_@field@, EXCEPTION )) {
         return 0;

@@ -59,12 +59,23 @@ int pack_array_values( byte *blob, void **array,
                        cexception_t *ex )
 {
     alloccell_t *blob_header;
+    alloccell_t *array_header;
+    char *array_ptr;
     int i;
     ssize_t size, length, count, start;
+    ssize_t element_size;
     char *count_str;
     char typechar;
 
+    if( !array || !blob ) {
+        /* Nothing to unpack -- return success: */
+        return 1;
+    }
+
     blob_header = ((alloccell_t*)blob) - 1;
+    array_header = ((alloccell_t*)array) - 1;
+    element_size = array_header->element_size;
+    array_ptr = (char*)array;
     start = 0;
     while( *description ) {
 
@@ -83,7 +94,7 @@ int pack_array_values( byte *blob, void **array,
 
 	if( count <= 0 ) {
 	    BC_CHECK_PTR( array, ex );
-	    count = ((alloccell_t*)array)[-1].length - start;
+	    count = array_header->length - start;
 	}
 
         if( count > 0 ) {
@@ -100,7 +111,7 @@ int pack_array_values( byte *blob, void **array,
                 }
             }
 
-            if( count > ((alloccell_t*)array)[-1].length - start ) {
+            if( count > array_header->length - start ) {
                 interpret_raise_exception_with_bcalloc_message
                     ( /* err_code = */ -1,
                       /* message = */
@@ -113,7 +124,8 @@ int pack_array_values( byte *blob, void **array,
 
             if( typechar != 'X' && typechar != 'x' ) {
                 for( i = 0; i < count; i ++ ) {
-                    if( pack_value( &array[start+i], typechar, size, offset,
+                    if( pack_value( array_ptr + (start+i) * element_size,
+                                    typechar, size, offset,
                                     blob, pack, ex ) == 0 ) {
                         return 0;
                     }
@@ -183,7 +195,7 @@ int pack_array_layer( byte *blob, void **array, char *description,
 
 int unpack_value( void *value, char typechar, ssize_t size,
                   ssize_t *offset, byte *blob,
-                  int (*unpack)( stackcell_t *stack_cell, char typechar,
+                  int (*unpack)( void *value, char typechar,
                                  ssize_t size, ssize_t *offset, byte *blob,
                                  cexception_t *ex ),
                   cexception_t *ex )
@@ -204,20 +216,20 @@ int unpack_value( void *value, char typechar, ssize_t size,
 	return 0;
     }
 
-    retval = (*unpack)( stack_cell, typechar, size, offset, blob, ex );
+    retval = (*unpack)( value, typechar, size, offset, blob, ex );
 
     return retval;
 }
 
-int unpack_array_values( byte *blob, void **array,
+int unpack_array_values( byte *blob, void **array, ssize_t element_size,
                          char *description, ssize_t *offset,
-                         int (*unpack)( stackcell_t *stack_cell, 
+                         int (*unpack)( void *value,
                                         char typechar, ssize_t size,
                                         ssize_t *offset, byte *blob,
                                         cexception_t *ex ),
                          cexception_t *ex )
 {
-    stackcell_t *array_ptr;
+    char *array_ptr;
     alloccell_t *blob_header;
     char *descr_ptr;
     ssize_t size, length, count, start;
@@ -255,9 +267,9 @@ int unpack_array_values( byte *blob, void **array,
 	    description++;
     }
 
-    array_ptr = bcalloc_array( sizeof(stackcell_t), count, 1 );
+    array_ptr = bcalloc_array( element_size, count, 1 );
     BC_CHECK_PTR( array_ptr, ex );
-    STACKCELL_SET_ADDR( *array_stackcell, array_ptr );
+    *array = array_ptr;
 
     description = descr_ptr;
     start = 0;
@@ -296,8 +308,8 @@ int unpack_array_values( byte *blob, void **array,
 
             if( typechar != 'X' && typechar != 'x' ) {
                 for( i = 0; i < count; i ++ ) {
-                    if( unpack_value( &array_ptr[start + i], typechar,
-                                      size, offset, blob,
+                    if( unpack_value( array_ptr + (start + i)*element_size,
+                                      typechar, size, offset, blob,
                                       unpack, ex ) == 0 ) {
                         return 0;
                     }
@@ -325,21 +337,21 @@ int unpack_array_values( byte *blob, void **array,
     return 1;
 }
 
-void *unpack_array_layer( byte *blob, stackcell_t *array, char *description,
-                          ssize_t *offset, ssize_t level,
-                          int (*unpack)( stackcell_t *stack_cell, 
+void *unpack_array_layer( byte *blob, void **array, ssize_t element_size,
+                          char *description, ssize_t *offset, ssize_t level,
+                          int (*unpack)( void *value,
                                          char typechar, ssize_t size,
                                          ssize_t *offset, byte *blob,
                                          cexception_t *ex ),
                           cexception_t *ex  )
 {
     if( level == 0 ) {
-	if( !unpack_array_values( blob, array, description,
+	if( !unpack_array_values( blob, array, element_size, description,
                                   offset, unpack, ex )) {
 	    return NULL;
 	}
     } else {
-        stackcell_t *layer = STACKCELL_PTR(*array);
+        void **layer = array;
 	alloccell_t *header = (alloccell_t*)layer;
 	ssize_t layer_len = header[-1].length;
 	ssize_t i;
@@ -348,7 +360,7 @@ void *unpack_array_layer( byte *blob, stackcell_t *array, char *description,
 
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> unpacking element %d of layer %d\n", i, level ); */
-	    if( !unpack_array_layer( blob, &layer[i], description,
+	    if( !unpack_array_layer( blob, &layer[i], element_size, description,
                                      offset, level - 1,
                                      unpack, ex )) {
                 return NULL;
