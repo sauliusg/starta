@@ -221,7 +221,8 @@ int unpack_value( void *value, char typechar, ssize_t size,
     return retval;
 }
 
-int unpack_array_values( byte *blob, void **array, ssize_t element_size,
+int unpack_array_values( byte *blob, void **array,
+                         ssize_t element_size, int element_nref,
                          char *description, ssize_t *offset,
                          int (*unpack)( void *value,
                                         char typechar, ssize_t size,
@@ -267,7 +268,7 @@ int unpack_array_values( byte *blob, void **array, ssize_t element_size,
 	    description++;
     }
 
-    array_ptr = bcalloc_array( element_size, count, /*nref = */ 0 );
+    array_ptr = bcalloc_array( element_size, count, element_nref );
     BC_CHECK_PTR( array_ptr, ex );
     *array = array_ptr;
 
@@ -337,7 +338,8 @@ int unpack_array_values( byte *blob, void **array, ssize_t element_size,
     return 1;
 }
 
-void *unpack_array_layer( byte *blob, void **array, ssize_t element_size,
+void *unpack_array_layer( byte *blob, void **array,
+                          ssize_t element_size, int element_nref,
                           char *description, ssize_t *offset, ssize_t level,
                           int (*unpack)( void *value,
                                          char typechar, ssize_t size,
@@ -346,8 +348,8 @@ void *unpack_array_layer( byte *blob, void **array, ssize_t element_size,
                           cexception_t *ex  )
 {
     if( level == 0 ) {
-	if( !unpack_array_values( blob, array, element_size, description,
-                                  offset, unpack, ex )) {
+	if( !unpack_array_values( blob, array, element_size, element_nref,
+                                  description, offset, unpack, ex )) {
 	    return NULL;
 	}
     } else {
@@ -361,7 +363,8 @@ void *unpack_array_layer( byte *blob, void **array, ssize_t element_size,
         /* printf( ">>> layer %d length %d\n", level, layer_len ); */
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> unpacking element %d of layer %d\n", i, level ); */
-	    if( !unpack_array_layer( blob, &layer[i], element_size, description,
+	    if( !unpack_array_layer( blob, &layer[i], element_size,
+                                     element_nref, description,
                                      offset, level - 1,
                                      unpack, ex )) {
                 return NULL;

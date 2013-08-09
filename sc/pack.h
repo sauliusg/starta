@@ -40,7 +40,8 @@ int unpack_value( void *value, char typechar, ssize_t size,
                                  cexception_t *ex ),
                   cexception_t *ex );
 
-int unpack_array_values( byte *blob, void **array, ssize_t element_size,
+int unpack_array_values( byte *blob, void **array,
+                         ssize_t element_size, int element_nref,
                          char *description, ssize_t *offset,
                          int (*unpack)( void *value, 
                                         char typechar, ssize_t size,
@@ -48,7 +49,8 @@ int unpack_array_values( byte *blob, void **array, ssize_t element_size,
                                         cexception_t *ex ),
                          cexception_t *ex );
 
-void *unpack_array_layer( byte *blob, void **array, ssize_t element_size,
+void *unpack_array_layer( byte *blob, void **array,
+                          ssize_t element_size, int element_nref,
                           char *description, ssize_t *offset, ssize_t level,
                           int (*unpack)( void *value,
                                          char typechar, ssize_t size,
