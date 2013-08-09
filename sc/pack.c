@@ -351,13 +351,14 @@ void *unpack_array_layer( byte *blob, void **array, ssize_t element_size,
 	    return NULL;
 	}
     } else {
-        void **layer = array;
+        void **layer = *array;
 	alloccell_t *header = (alloccell_t*)layer;
 	ssize_t layer_len = header[-1].length;
 	ssize_t i;
 
         assert( layer );
 
+        /* printf( ">>> layer %d length %d\n", level, layer_len ); */
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> unpacking element %d of layer %d\n", i, level ); */
 	    if( !unpack_array_layer( blob, &layer[i], element_size, description,
