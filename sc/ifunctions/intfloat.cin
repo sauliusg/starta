@@ -579,7 +579,7 @@ int @PREFIX1@PACK( INSTRUCTION_FN_ARGS )
 
 int @PREFIX1@PACKARRAY( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
@@ -626,7 +626,7 @@ int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS )
 {
     int level = istate.code[istate.ip+1].ssizeval - 1;
 
-    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );

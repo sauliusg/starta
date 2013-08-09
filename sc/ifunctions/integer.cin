@@ -379,7 +379,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 {
     ssize_t element_size = istate.code[istate.ip+1].ssizeval;
     ssize_t nref = istate.code[istate.ip+2].ssizeval;
-    ssize_t element_align = istate.code[istate.ip+3].ssizeval;
+    /* ssize_t element_align = istate.code[istate.ip+3].ssizeval; */
     ssize_t n_elem = istate.ep[0].I;
     void *ptr;
     ssize_t hash_key_ptr_size = REF_SIZE;
@@ -795,10 +795,11 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 /*---------------------------------------------------------------------------*/
 
 static int
-pack_@field@( @type@ *value, char typechar, ssize_t size,
+pack_@field@( void *value_ptr, char typechar, ssize_t size,
               ssize_t *offset, byte *blob )
 {
     int i;
+    @type@ *value = value_ptr;
 
     switch( typechar ) {
     case 'u':
@@ -835,7 +836,7 @@ pack_@field@( @type@ *value, char typechar, ssize_t size,
 }
 
 static int
-unpack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
+unpack_@field@( void *value_ptr, char typechar, ssize_t size,
                 ssize_t *offset, byte *blob, cexception_t *ex )
 {
     @type@ value;
@@ -902,7 +903,7 @@ unpack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
         break;
     }
 
-    *value_ptr = value;
+    *(@type@*)value_ptr = value;
 
     *offset += size;
 

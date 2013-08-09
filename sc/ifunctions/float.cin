@@ -227,12 +227,12 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 /*---------------------------------------------------------------------------*/
 
 static int
-pack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
+pack_@field@( void *value_ptr, char typechar, ssize_t size,
 	      ssize_t *offset, byte *blob )
 {
     int i;
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
-    @type@ fvalue = *value_ptr;
+    @type@ fvalue = *(@type@*)value_ptr;
     llong value;
     union value {
         union stackunion num;
@@ -324,7 +324,7 @@ pack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
 }
 
 static int
-unpack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
+unpack_@field@( void *value_ptr, char typechar, ssize_t size,
 		ssize_t *offset, byte *blob, cexception_t *ex )
 {
     llong value = 0;
@@ -415,7 +415,7 @@ unpack_@field@( @type@ *value_ptr, char typechar, ssize_t size,
         break;
     }
 
-    *value_ptr = fvalue;
+    *(@type@*)value_ptr = fvalue;
 
     *offset += size;
 
