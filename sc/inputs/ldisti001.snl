@@ -15,7 +15,7 @@ type loader = {
         { INDEX };
 
     inline bytecode operator "new[]" ( size : loader ) : array
-        { AALLOC %%element_nref };
+        { AALLOC %%element_size %%element_nref };
 
     inline bytecode operator "ldc" () : loader
 	{ LDCS };
