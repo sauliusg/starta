@@ -267,7 +267,7 @@ int unpack_array_values( byte *blob, void **array, ssize_t element_size,
 	    description++;
     }
 
-    array_ptr = bcalloc_array( element_size, count, 1 );
+    array_ptr = bcalloc_array( element_size, count, /*nref = */ 0 );
     BC_CHECK_PTR( array_ptr, ex );
     *array = array_ptr;
 

@@ -4077,7 +4077,7 @@ int HASHDUMP( INSTRUCTION_FN_ARGS )
     alloccell_t *hash_header = &((alloccell_t*)hash_table)[-1];
     ssize_t hash_length = hash_header->length;
     ssize_t hash_nref = hash_header->nref;
-    ssize_t element_size = hash_header->element_size;
+    /* ssize_t element_size = hash_header->element_size; */
     char **hash_cells = hash_keys + hash_length;
 
     ssize_t i;
@@ -4303,10 +4303,10 @@ int ZEROSTACK( INSTRUCTION_FN_ARGS )
 }
 
 static int
-pack_string_value( void **str, char typechar, ssize_t size,
+pack_string_value( void *str, char typechar, ssize_t size,
                    ssize_t *offset, byte *blob )
 {
-    char *value = *str;
+    char *value = *(char**)str;
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
     assert( blob_header->magic == BC_MAGIC );
@@ -4419,7 +4419,7 @@ int STRPACK( INSTRUCTION_FN_ARGS )
 
 int STRPACKARRAY( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
@@ -4467,7 +4467,7 @@ int STRPACKMDARRAY( INSTRUCTION_FN_ARGS )
 {
     int level = istate.code[istate.ip+1].ssizeval - 1;
 
-    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
@@ -4509,7 +4509,7 @@ int STRPACKMDARRAY( INSTRUCTION_FN_ARGS )
 }
 
 static int
-unpack_string_value( char **value_ptr, char typechar,
+unpack_string_value( void *value_ptr, char typechar,
                      ssize_t size, ssize_t *offset, byte *blob,
                      cexception_t *ex )
 {
@@ -4546,7 +4546,7 @@ unpack_string_value( char **value_ptr, char typechar,
     if( !value ) return 0;
 
     /* STACKCELL_SET_ADDR( *stackcell, value ); */
-    *value_ptr = value;
+    *(char**)value_ptr = value;
 
     switch( typechar ) {
     case 'c':
@@ -4618,7 +4618,7 @@ int STRUNPACK( INSTRUCTION_FN_ARGS )
                      length itself. */
     }
 
-    if( unpack_value( &istate.ep[2], typechar, size, &offset, blob,
+    if( unpack_value( (void*)&istate.ep[2].ptr, typechar, size, &offset, blob,
                       unpack_string_value, EXCEPTION ) == 0 ) {
 	return 0;
     }
@@ -4665,8 +4665,8 @@ int STRUNPACKARRAY( INSTRUCTION_FN_ARGS )
 
     STACKCELL_SET_ADDR(istate.ep[1], STACKCELL_PTR( istate.ep[2] ));
 
-    if( !unpack_array_values( blob, &istate.ep[2], description,
-                              &offset, unpack_string_value,
+    if( !unpack_array_values( blob, &istate.ep[2].ptr, sizeof(char*),
+                              description, &offset, unpack_string_value,
                               EXCEPTION )) {
         return 0;
     }
@@ -4709,8 +4709,8 @@ int STRUNPACKMDARRAY( INSTRUCTION_FN_ARGS )
 	      EXCEPTION );        
     }
 
-    if( !unpack_array_layer( blob, &istate.ep[3], description,
-                             &offset, level, unpack_string_value,
+    if( !unpack_array_layer( blob, &istate.ep[3].ptr, sizeof(char*),
+                             description, &offset, level, unpack_string_value,
                              EXCEPTION )) {
         return 0;
     }
