@@ -752,7 +752,9 @@ int @PREFIX1@UNPACKARRAY( INSTRUCTION_FN_ARGS )
         return 0;
     }
 
-    if( !unpack_array_values( blob, &istate.ep[2].ptr, sizeof(@type@),
+    if( !unpack_array_values( blob, &istate.ep[2].ptr,
+                              /* element_size = */ sizeof(@type@),
+                              /* element_nref = */ 0,
                               description,
                               &offset, unpack_@field@,
                               EXCEPTION )) {
@@ -800,7 +802,9 @@ int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS )
 	      EXCEPTION );        
     }
 
-    if( !unpack_array_layer( blob, &array->ptr, sizeof(@type@),
+    if( !unpack_array_layer( blob, &array->ptr,
+                             /* element_size = */ sizeof(@type@),
+                             /* element_nref = */ 0,
                              description,
                              &offset, level,
                              unpack_@field@, EXCEPTION )) {

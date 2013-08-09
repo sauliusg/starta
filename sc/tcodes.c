@@ -4665,7 +4665,9 @@ int STRUNPACKARRAY( INSTRUCTION_FN_ARGS )
 
     STACKCELL_SET_ADDR(istate.ep[1], STACKCELL_PTR( istate.ep[2] ));
 
-    if( !unpack_array_values( blob, &istate.ep[2].ptr, sizeof(char*),
+    if( !unpack_array_values( blob, &istate.ep[2].ptr,
+                              /* element_size = */ sizeof(char*),
+                              /* element_nref = */ 1,
                               description, &offset, unpack_string_value,
                               EXCEPTION )) {
         return 0;
@@ -4709,7 +4711,9 @@ int STRUNPACKMDARRAY( INSTRUCTION_FN_ARGS )
 	      EXCEPTION );        
     }
 
-    if( !unpack_array_layer( blob, &istate.ep[3].ptr, sizeof(char*),
+    if( !unpack_array_layer( blob, &istate.ep[3].ptr,
+                             /* element_nref = */ sizeof(char*),
+                             /* element_nref = */ 1,
                              description, &offset, level, unpack_string_value,
                              EXCEPTION )) {
         return 0;
