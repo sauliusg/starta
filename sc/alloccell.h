@@ -31,6 +31,7 @@ typedef struct alloccell_t {
 			         has sence if length >= 0. In case
 			         length < 0, element size is
 			         undefined and MAY be set to 0. */
+#if 0
     size_t size;              /* Contains total memory size, in bytes,
                                  allocated for this memory block (not
                                  includingsizeof(alloccell_t)). References
@@ -39,6 +40,7 @@ typedef struct alloccell_t {
                                  be larger than needed for all
                                  elements, i.e. size >= length *
                                  element_size. */
+#endif
     ssize_t length;           /* contains number of elements if the
 				 allocated block is an array; for
 				 non-array elements contains value
