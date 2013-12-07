@@ -7,7 +7,7 @@ the idea as of 2013-12-07.
  4  |                |  |
     +----------------+  |
  3  |                |  |
-    +----------------+  | nref elements, poiter (reference) sized
+    +----------------+  | nref elements, pointer (reference) sized
  2  |                |  |
     +----------------+  |
  1  |                |  |
