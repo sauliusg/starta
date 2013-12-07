@@ -20,7 +20,7 @@ the idea as of 2013-12-07.
     +----------------+ |              
     |     nref       | |              Number of references
     +----------------+ | h e a d e r  
-    |   el. size     | |              Size of en element (in bytes)
+    |   el. size     | |              Size of an element (in bytes)
     +----------------+ |              
     |    length      | |              Length of the "number" part (in elements)
     +================+ v              
