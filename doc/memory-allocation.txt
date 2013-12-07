@@ -1,0 +1,61 @@
+This file described a new packed type memory representation layout,
+the idea as of 2013-12-07.
+
+    <-- ref. size --->
+
+    +----------------+  ^
+ 4  |                |  |
+    +----------------+  |
+ 3  |                |  |
+    +----------------+  | nref elements, poiter (reference) sized
+ 2  |                |  |
+    +----------------+  |
+ 1  |                |  |
+    +----------------+  |
+ 0  |    ref[0]      |  v
+    +================+ ^
+    |    flags       | |              Various flags (also for garbage collector)
+    +----------------+ |              
+    |    rcount      | |              Reference count -- for garbage collector
+    +----------------+ |              
+    |     nref       | |              Number of references
+    +----------------+ | h e a d e r  
+    |   el. size     | |              Size of en element (in bytes)
+    +----------------+ |              
+    |    length      | |              Length of the "number" part (in elements)
+    +================+ v              
+ 0  |                |             ^  <--- reference points here
+    |                |             |
+    |                |             |
+    +----------------+ ^           |
+ 1  |                | |           |
+    |                | | el. size  |
+    |                | |           |
+    +----------------+ v           |
+ 2  |                |             |
+    |                |             | length
+    |                |             |
+    +----------------+             |
+ 3  |                |             |
+    |                |             |
+    |                |             |
+    +----------------+             |
+ 4  |                |             |
+    |                |             |
+    |                |             |
+    +----------------+             v
+
+Positive offsets are in bytes, negative offsets are in elements
+(reference sized).
+
+The 'nref' field is independent of the 'length' and 'size' attributes.
+
+When length == -1, this means that one 'el. size'-sized block is
+allocated in the positive direction, and the allocated block is used
+for a structure or an object (that are further subdivided into
+fields). For a reference-implemented fields such as arrays or strings,
+extra 'nref' slots would be allocated in the negative offset direction.
+
+The same strategy could be used for 'slotted' number representation,
+where each element with positive offset is the same size (probably the
+size of reference, but not necessarily).
