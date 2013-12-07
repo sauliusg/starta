@@ -102,7 +102,7 @@ void *bcalloc_memory( size_t sz, short element_size,
 
 void *bcalloc( size_t size, ssize_t nref )
 {
-    return bcalloc_memory( size, /* element_size = */ 0,
+    return bcalloc_memory( size, /* element_size = */ size,
                            /* length = */ -1, /*nref = */ nref );
 }
 
