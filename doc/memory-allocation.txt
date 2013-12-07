@@ -1,4 +1,4 @@
-This file described a new packed type memory representation layout,
+This file describes a new packed type memory representation layout,
 the idea as of 2013-12-07.
 
     <-- ref. size --->
