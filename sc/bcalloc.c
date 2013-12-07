@@ -11,6 +11,7 @@
 /* uses: */
 #include <string.h>
 #include <alloccell.h>
+#include <refsize.h>
 #include <run.h>
 #include <thrcode.h> /* for thrcode_heapdebug_is_on() */
 #include <cexceptions.h>
@@ -53,10 +54,12 @@ static struct {
 };
 #endif
 
-void *bcalloc_memory( size_t size, short element_size,
+void *bcalloc_memory( size_t sz, short element_size,
                       ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
+    ssize_t size = (length < 0 ? 1 : length) * element_size +
+        abs(nref) * REF_SIZE;
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {
@@ -82,7 +85,7 @@ void *bcalloc_memory( size_t size, short element_size,
 	allocated = ptr;
 	ptr->rcount = 1;
 	ptr->magic = BC_MAGIC;
-	ptr->size = size;
+	// ptr->size = size;
 	ptr->element_size = element_size;
 	ptr->length = length;
 	ptr->nref = nref;
