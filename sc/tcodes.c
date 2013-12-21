@@ -862,19 +862,20 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nref = array[-1].nref;
     nele = array[-1].length;
 
-    if( nele > 0 ) {
-        /* assert( nref == nele ); */
-        ptr = bcalloc_array( element_size, nele, 1 );
+    if( nele >= 0 ) {
+        assert( nref == 0 || nref == nele );
+        ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
     } else {
         ptr = bcalloc( element_size, nref );
     }
 
     BC_CHECK_PTR( ptr );
 
-    memcpy( ptr, array, nele > 0 ? element_size * nele : element_size );
+    memcpy( ptr, array,
+            nele >= 0 ? (ssize_t)element_size * (ssize_t)nele : element_size );
 
     if( nref < 0 ) {
-        ssize_t ref_size = abs(nref) * REF_SIZE;
+        ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;
         void *ref_dst = (char*)ptr - sizeof(alloccell_t) - ref_size;
         void *ref_src = (char*)array - sizeof(alloccell_t) - ref_size;
         memcpy( ref_dst, ref_src, ref_size );
