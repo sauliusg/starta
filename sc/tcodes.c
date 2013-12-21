@@ -824,25 +824,33 @@ int CLONE( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *ptr;
-    ssize_t nref, size, nele;
+    ssize_t nref, element_size, nele;
 
     TRACE_FUNCTION();
 
     if( !array ) return 1;
 
-    size = array[-1].element_size;
+    element_size = array[-1].element_size;
     nref = array[-1].nref;
     nele = array[-1].length;
 
     if( nele > 0 ) {
-        ptr = bcalloc_array( size, nele, nref );
+        assert( nref == nele );
+        ptr = bcalloc_array( element_size, nele, 1 );
     } else {
-        ptr = bcalloc( size, nref );
+        ptr = bcalloc( element_size, nref );
     }
 
     BC_CHECK_PTR( ptr );
 
-    memcpy( ptr, array, nele > 0 ? size * nele : size );
+    memcpy( ptr, array, nele > 0 ? element_size * nele : element_size );
+
+    if( nref < 0 ) {
+        ssize_t ref_size = abs(nref) * REF_SIZE;
+        void *ref_dst = (char*)ptr - sizeof(alloccell_t) - ref_size;
+        void *ref_src = (char*)array - sizeof(alloccell_t) - ref_size;
+        memcpy( ref_dst, ref_src, ref_size );
+    }
 
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
