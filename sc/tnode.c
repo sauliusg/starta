@@ -1771,7 +1771,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 
                    FIXME: the above described policy must be changed
                    (relaxed) in the final version of this
-                   compiler/runtime.*/
+                   compiler/runtime. */
                 if( tnode->nrefs == 0 ) {
                     if( tnode_kind( tnode ) == TK_COMPOSITE ) {
                         if( tnode->nextnumoffs != 0 ) {
