@@ -592,10 +592,16 @@ int LDI( INSTRUCTION_FN_ARGS )
 int STI( INSTRUCTION_FN_ARGS )
 {
     ssize_t size = istate.code[istate.ip+1].ssizeval;
+    ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
 
     TRACE_FUNCTION();
 
-    memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0], size );
+    if( offset >= 0 ) {
+        memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num, size );
+    } else {
+        *(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
+    }
+
     STACKCELL_ZERO_PTR( istate.ep[1] );
 
     istate.ep += 2;
