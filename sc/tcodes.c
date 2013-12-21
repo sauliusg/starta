@@ -4821,9 +4821,12 @@ int CHECKREF( INSTRUCTION_FN_ARGS )
 
 int FILLARRAY( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *array_ref = STACKCELL_PTR( istate.ep[0] );
+    void* array_ref = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *array_hdr = (alloccell_t*)array_ref - 1;
     stackcell_t value = istate.ep[1];
-    ssize_t length, i;
+    ssize_t length, el_size, i;
+
+    TRACE_FUNCTION();
 
     if( !array_ref ) {
         STACKCELL_ZERO_PTR( istate.ep[0] );
@@ -4832,10 +4835,17 @@ int FILLARRAY( INSTRUCTION_FN_ARGS )
         return 0;
     }
 
-    length = ((alloccell_t*)array_ref)[-1].length;
+    length = array_hdr->length;
+    el_size = array_hdr->element_size;
 
-    for( i = 0; i < length; i++ ) {
-        array_ref[i] = value;
+    if( array_hdr->nref == 0 ) {
+        for( i = 0; i < length; i++ ) {
+            memcpy( (char*)array_ref + i * el_size, &value.num, el_size );
+        }
+    } else {
+        for( i = 0; i < length; i++ ) {
+            ((void**)array_ref)[i] = value.PTR;
+        }
     }
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
@@ -4857,18 +4867,28 @@ int FILLARRAY( INSTRUCTION_FN_ARGS )
  */
 
 static int
-fill_md_array( stackcell_t *array_ref, ssize_t level, stackcell_t *value )
+fill_md_array( void **array_ref, ssize_t level, stackcell_t *value )
 {
-    ssize_t length, i;
-    length = ((alloccell_t*)array_ref)[-1].length;
+    alloccell_t *array_hdr = (alloccell_t*)array_ref - 1;
+    ssize_t length = array_hdr->length;
+    ssize_t i;
 
     if( level == 0 ) {
-        for( i = 0; i < length; i++ ) {
-            array_ref[i] = *value;
+        if( array_hdr->nref == 0 ) {
+            ssize_t el_size = array_hdr->element_size;
+            for( i = 0; i < length; i++ ) {
+                memcpy( (char*)array_ref + i * el_size, &value->num, el_size );
+            }
+        } else {
+            assert( array_hdr->nref == array_hdr->length );
+            assert( array_hdr->nref >= 0 );
+            for( i = 0; i < length; i++ ) {
+                array_ref[i] = value->PTR;
+            }
         }
     } else {
         for( i = 0; i < length; i++ ) {
-            fill_md_array( STACKCELL_PTR(array_ref[i]), level-1, value );
+            fill_md_array( array_ref[i], level-1, value );
         }
     }
 
@@ -4877,9 +4897,11 @@ fill_md_array( stackcell_t *array_ref, ssize_t level, stackcell_t *value )
 
 int FILLMDARRAY( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *array_ref = STACKCELL_PTR( istate.ep[0] );
+    void **array_ref = STACKCELL_PTR( istate.ep[0] );
     stackcell_t value = istate.ep[1];
     int level = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
 
     if( !array_ref ) {
         STACKCELL_ZERO_PTR( istate.ep[0] );
