@@ -26,25 +26,26 @@ typedef struct alloccell_t {
     short element_size;       /* Contains size of elements in the
 			         allocated memory block, in bytes (NOT
 			         including sizeof(alloccell_t)). This
-			         size is intended to be used for
-			         indexing arrays and hashes, and only
-			         has sence if length >= 0. In case
-			         length < 0, element size is
-			         undefined and MAY be set to 0. */
-#if 0
-    size_t size;              /* Contains total memory size, in bytes,
-                                 allocated for this memory block (not
-                                 includingsizeof(alloccell_t)). References
-                                 allcoated at negative offsets are
-                                 INCLUDED into this size. The size may
-                                 be larger than needed for all
-                                 elements, i.e. size >= length *
-                                 element_size. */
-#endif
+			         size does *not* include any
+			         references allocated at the negative
+			         offsets. If length > 0, there are
+			         'length' blocks of size
+			         'element_size'. If length == 0, there
+			         MAY be *no* blocks allocated after
+			         the alloccell_t header. If length ==
+			         -1, the allocated block is not an
+			         array, but rather a structure or an
+			         object and there is exactely *one*
+			         block of size 'element_size'
+			         allocated after the header;
+			         'element_size' includes all
+			         non-reference fields of the
+			         structure. */
     ssize_t length;           /* contains number of elements if the
 				 allocated block is an array; for
-				 non-array elements contains value
-				 a negative value (say -1). */
+				 non-array elements contains value a
+				 negative value -1. Other negative
+				 values are reserved.*/
     ssize_t nref;             /* Number of references (garbage
 				 collected pointers) in this memory
 				 block. Negative nref signals that the
@@ -54,7 +55,7 @@ typedef struct alloccell_t {
 				 memory. Negative references are not
 				 included into the block sizes given
 				 by elemet_size.  */
-    ssize_t rcount;           /* Reference counter. Used also by garbage collector. */
+    ssize_t rcount;           /* Reference counter. Used by garbage collectors. */
     ssize_t *vmt_offset;      /* Offset to a virtual method table of a
 				 class in the static data area; 0 if
 				 the allocated block is not an
