@@ -578,7 +578,9 @@ int LDI( INSTRUCTION_FN_ARGS )
         memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
         STACKCELL_ZERO_PTR( istate.ep[0] );
     } else {
+        // istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
         istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
+        istate.ep[0].num.offs = 0;
     }
 
     return 2;
@@ -604,9 +606,11 @@ int STI( INSTRUCTION_FN_ARGS )
     if( offset >= 0 ) {
         memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num, size );
     } else {
-        *(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
+        //*(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
+        *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
     }
 
+    STACKCELL_ZERO_PTR( istate.ep[0] );
     STACKCELL_ZERO_PTR( istate.ep[1] );
 
     istate.ep += 2;
