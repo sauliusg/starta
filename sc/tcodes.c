@@ -626,8 +626,8 @@ int STI( INSTRUCTION_FN_ARGS )
     if( offset >= 0 ) {
         memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num, size );
     } else {
-        //*(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
-        *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
+        *(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
+        //*((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
         if( length == -1 && element_size > -offset ) {
             /* offset < 0 here */
             /* We have a field of generic type, and need to store the
