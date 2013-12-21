@@ -1806,42 +1806,31 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             if( field_kind == TK_PLACEHOLDER ) {
                 int direction = -1;
                 ssize_t old_offset = tnode->nextnumoffs;
-                ssize_t negoffset, posoffset;
                 field_size = sizeof(union stackunion);
-                field_align = sizeof(union stackunion);
                 //printf( ">>>>(2) inserting TK_PLACEHOLDER\n" );
                 /* When we allocate a placeholder variable, we must
                    make sure that we can store any value from a stack
                    cell there. For this, we allocate both memory
                    negative offset for references and at the same
                    positive offset for numeric values. */
-                tnode->nrefs += direction;
 
-                //tnode->nextrefoffs += REF_SIZE * direction;
-                negoffset = tnode->nextrefoffs + REF_SIZE * direction;
-
-                //printf( ">>> negoffset = %d, nextrefoffs = %d\n", negoffset, tnode->nextrefoffs );
-                
-                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
-                //tnode->nextnumoffs += field_size;
-                posoffset = tnode->nextnumoffs + field_size;
-
-                if( abs(posoffset) > abs(negoffset)) {
-                    ALIGN_NUMBER( posoffset, REF_SIZE );
-                    negoffset = -posoffset;
-                } else
-                if( abs(posoffset) < abs(negoffset)) {
-                    posoffset = abs(negoffset);
+                /* Make sure we have allocated space for both numeric
+                   and pointer part of the generic type field: */
+                if( abs(tnode->nextnumoffs) > abs(tnode->nextrefoffs)) {
+                    ALIGN_NUMBER( tnode->nextnumoffs, REF_SIZE );
+                    tnode->nextrefoffs = -tnode->nextnumoffs;
+                } else {
+                    tnode->nextnumoffs = abs(tnode->nextrefoffs);
                 }
 
                 dnode_set_offset( current, tnode->nextrefoffs );
 
-                tnode->nextrefoffs = negoffset;
-                tnode->nextnumoffs = posoffset;
+                tnode->nrefs += direction;
+
+                tnode->nextrefoffs += REF_SIZE * direction;
+                tnode->nextnumoffs += field_size;
 
                 tnode->size += tnode->nextnumoffs - old_offset;
-                if( tnode->align < field_align )
-                    tnode->align = field_align;
             }
             if( field_type && field_kind != TK_FUNCTION &&
                 field_kind != TK_PLACEHOLDER ) {
