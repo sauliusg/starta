@@ -14,4 +14,4 @@ type A = struct {
     d : double;
 }
 
-. const(A.size/.stackcellsize);
+. const(A.size/A.b.size);
