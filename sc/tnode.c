@@ -1779,8 +1779,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                                       "fields must be declared before "
                                       "non-reference fields." );
                         } else {
-                            direction = 1;
-                            tnode->nextrefoffs = 0;
+                            direction = -1;
+                            tnode->nextrefoffs = -sizeof(alloccell_t) - REF_SIZE;
                         }
                     } else {
                         direction = -1;
@@ -1817,10 +1817,11 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                    positive offset for numeric values. */
                 tnode->nrefs += direction;
 
-                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
                 //tnode->nextrefoffs += REF_SIZE * direction;
                 negoffset = tnode->nextrefoffs + REF_SIZE * direction;
 
+                //printf( ">>> negoffset = %d, nextrefoffs = %d\n", negoffset, tnode->nextrefoffs );
+                
                 ALIGN_NUMBER( tnode->nextnumoffs, field_align );
                 //tnode->nextnumoffs += field_size;
                 posoffset = tnode->nextnumoffs + field_size;
@@ -1830,11 +1831,10 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                 if( abs(posoffset) < abs(negoffset)) {
                 }
 
+                dnode_set_offset( current, tnode->nextrefoffs );
+
                 tnode->nextrefoffs = negoffset;
                 tnode->nextnumoffs = posoffset;
-
-                dnode_set_offset( current, tnode->nextrefoffs );
-                dnode_set_offset( current, tnode->nextrefoffs );
 
                 tnode->size += tnode->nextnumoffs - old_offset;
                 if( tnode->align < field_align )
@@ -1846,6 +1846,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 	    }
 	}
     }
+
+    // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
 
     tnode->fields = dnode_append( tnode->fields, field );
 
