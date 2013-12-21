@@ -571,6 +571,9 @@ int LDI( INSTRUCTION_FN_ARGS )
 {
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
+    alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
+    ssize_t element_size = src_header->element_size;
+    ssize_t length = src_header->length;
 
     TRACE_FUNCTION();
 
@@ -578,9 +581,23 @@ int LDI( INSTRUCTION_FN_ARGS )
         memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
         STACKCELL_ZERO_PTR( istate.ep[0] );
     } else {
-        // istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
+#if 0
         istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
         istate.ep[0].num.offs = 0;
+#else
+        void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
+        if( length == -1 && element_size > -offset ) {
+            /* NB.: offset < 0 */
+            /* We have a field of generic type, and need to store the
+               numeric stackcell at the positive offset: */
+            void* num_src = (char*)istate.ep[0].PTR - offset;
+            memcpy( &istate.ep[0].num, num_src, sizeof(istate.ep[0].num));
+            // printf( ">>> loaded positive part as well: %d\n", *(int*)num_src );
+        } else {
+            istate.ep[0].num.offs = 0;
+        }
+        istate.ep[0].PTR = *ref_src;
+#endif
     }
 
     return 2;
@@ -600,6 +617,9 @@ int STI( INSTRUCTION_FN_ARGS )
 {
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
+    alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
+    ssize_t element_size = dst_header->element_size;
+    ssize_t length = dst_header->length;
 
     TRACE_FUNCTION();
 
@@ -608,6 +628,14 @@ int STI( INSTRUCTION_FN_ARGS )
     } else {
         //*(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
         *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
+    }
+
+    if( length == -1 && offset < 0 && element_size > -offset ) {
+        /* We have a field of generic type, and need to store the
+           numeric stackcell at the positive offset: */
+        // printf( ">>> storing positive part as well: %d\n", istate.ep[0].num.i );
+        void* dst = (char*)istate.ep[1].PTR - offset;
+        memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
     }
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
@@ -835,7 +863,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nele = array[-1].length;
 
     if( nele > 0 ) {
-        assert( nref == nele );
+        /* assert( nref == nele ); */
         ptr = bcalloc_array( element_size, nele, 1 );
     } else {
         ptr = bcalloc( element_size, nref );
