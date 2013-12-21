@@ -19,9 +19,9 @@ type C = struct : A {
     int b
 }
 
-. "C.ii.offset =", const(C.ii.offset/.stackcellsize);
-. "C.xx.offset =", const(C.xx.offset/.stackcellsize);
-. "C.a.offset  =", const(C.a.offset/.stackcellsize);
-. "C.b.offset  =", const(C.b.offset/.stackcellsize);
-. "C.nn.offset =", const(C.nn.offset/.stackcellsize);
-. "C.nm.offset =", const(C.nm.offset/.stackcellsize);
+. "C.ii.offset =", const(C.ii.offset/C.ii.size);
+. "C.xx.offset =", const(C.xx.offset/C.ii.size);
+. "C.a.offset  =", const(C.a.offset/C.ii.size);
+. "C.b.offset  =", const(C.b.offset/C.ii.size);
+. "C.nn.offset =", const(C.nn.offset/C.ii.size);
+. "C.nm.offset =", const(C.nm.offset/C.ii.size);

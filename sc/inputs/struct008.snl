@@ -18,8 +18,8 @@ struct C : A {
     int a;
 }
 
-. "C.ii.offset =", const(C.ii.offset/.stackcellsize);
-. "C.xx.offset =", const(C.xx.offset/.stackcellsize);
-. "C.a.offset  =", const(C.a.offset/.stackcellsize);
-. "C.nn.offset =", const(C.nn.offset/.stackcellsize);
-. "C.nm.offset =", const(C.nm.offset/.stackcellsize);
+. "C.ii.offset =", const(C.ii.offset/A.ii.size);
+. "C.xx.offset =", const(C.xx.offset/A.ii.size);
+. "C.a.offset  =", const(C.a.offset/A.ii.size);
+. "C.nn.offset =", const(C.nn.offset/A.ii.size);
+. "C.nm.offset =", const(C.nm.offset/A.ii.size);
