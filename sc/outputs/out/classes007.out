@@ -1,8 +1,8 @@
 B.ii.offset = 0
 B.xx.offset = 4
 B.a.offset  = 8
-B.nn.offset = -40
-B.nm.offset = -44
+B.nn.offset = -36
+B.nm.offset = -40
 B.name.offset = 2
 class A
 class B
