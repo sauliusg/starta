@@ -15,6 +15,7 @@
 /* uses: */
 #include <string.h> /* for memset() */
 #include <alloccell.h>
+#include <stackcell.h>
 #include <tcodes.h>
 #include <tlist.h>
 #include <allocx.h>
@@ -1737,10 +1738,6 @@ static TNODE *tnode_insert_single_enum_value( TNODE* tnode, DNODE *field )
     return tnode;
 }
 
-#if 0
-#define STRUCT_FIELD_SIZE sizeof(stackcell_t)
-#endif
-
 #define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((int)(N)) % (lim)) % (lim) )
 
 TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
@@ -1761,7 +1758,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             ( field_type ? tnode_size( field_type ) : 0 );
         field_align = field_type ? tnode_align( field_type ) : 0;
 
-	if( field_size != 0 && field_kind != TK_FUNCTION ) {
+	if( field_size != 0 && field_kind != TK_FUNCTION &&
+            field_kind != TK_PLACEHOLDER ) {
             if( tnode_is_reference( field_type )) {
                 int direction = -1;
                 /* If no references are seen so far, let's choose
@@ -1769,7 +1767,11 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                    types, they will be allocated with positive
                    offsets; for all other types (structures, classes,
                    closure variable blocks) they will run in negative
-                   diretion: */
+                   diretion.
+
+                   FIXME: the above described policy must be changed
+                   (relaxed) in the final version of this
+                   compiler/runtime.*/
                 if( tnode->nrefs == 0 ) {
                     if( tnode_kind( tnode ) == TK_COMPOSITE ) {
                         if( tnode->nextnumoffs != 0 ) {
@@ -1801,7 +1803,44 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                     tnode->align = field_align;
             }
 	} else {
-	    if( field_type && field_kind != TK_FUNCTION &&
+            if( field_kind == TK_PLACEHOLDER ) {
+                int direction = -1;
+                ssize_t old_offset = tnode->nextnumoffs;
+                ssize_t negoffset, posoffset;
+                field_size = sizeof(union stackunion);
+                field_align = sizeof(union stackunion);
+                //printf( ">>>>(2) inserting TK_PLACEHOLDER\n" );
+                /* When we allocate a placeholder variable, we must
+                   make sure that we can store any value from a stack
+                   cell there. For this, we allocate both memory
+                   negative offset for references and at the same
+                   positive offset for numeric values. */
+                tnode->nrefs += direction;
+
+                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+                //tnode->nextrefoffs += REF_SIZE * direction;
+                negoffset = tnode->nextrefoffs + REF_SIZE * direction;
+
+                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+                //tnode->nextnumoffs += field_size;
+                posoffset = tnode->nextnumoffs + field_size;
+
+                if( abs(posoffset) > abs(negoffset)) {
+                } else
+                if( abs(posoffset) < abs(negoffset)) {
+                }
+
+                tnode->nextrefoffs = negoffset;
+                tnode->nextnumoffs = posoffset;
+
+                dnode_set_offset( current, tnode->nextrefoffs );
+                dnode_set_offset( current, tnode->nextrefoffs );
+
+                tnode->size += tnode->nextnumoffs - old_offset;
+                if( tnode->align < field_align )
+                    tnode->align = field_align;
+            }
+            if( field_type && field_kind != TK_FUNCTION &&
                 field_kind != TK_PLACEHOLDER ) {
 		yyerrorf( "field '%s' has zero size", dnode_name( current ));
 	    }
