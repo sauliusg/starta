@@ -3349,12 +3349,14 @@ int CLDCS( INSTRUCTION_FN_ARGS )
 
 int INDEXVAR( INSTRUCTION_FN_ARGS )
 {
+    alloccell_t *array_ptr = istate.ep[0].PTR;
+    ssize_t element_size = array_ptr[-1].element_size;
     ssize_t idxvar = istate.code[istate.ip+1].ssizeval;
     int idx = istate.fp[idxvar].num.i;
 
     TRACE_FUNCTION();
 
-    STACKCELL_OFFSET_PTR( istate.ep[0], idx * sizeof(stackcell_t) );
+    STACKCELL_OFFSET_PTR( istate.ep[0], idx * element_size );
 
     return 2;
 }
@@ -3377,9 +3379,7 @@ int ILDXVAR( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    istate.ep[0].num.i =
-        ((stackcell_t*)STACKCELL_PTR( istate.ep[0] ))[idx].num.i;
-
+    istate.ep[0].num.i = ((int*)STACKCELL_PTR( istate.ep[0] ))[idx];
     STACKCELL_ZERO_PTR( istate.ep[0] );
 
     return 2;
@@ -3399,15 +3399,14 @@ int ILDXVAR( INSTRUCTION_FN_ARGS )
 int PLDXVAR2( INSTRUCTION_FN_ARGS )
 {
     ssize_t arrayvar = istate.code[istate.ip+1].ssizeval;
-    // void** array = STACKCELL_PTR( istate.fp[arrayvar] );
-    stackcell_t* array = STACKCELL_PTR( istate.fp[arrayvar] );
+    void** array = STACKCELL_PTR( istate.fp[arrayvar] );
     ssize_t idxvar = istate.code[istate.ip+2].ssizeval;
     int idx = istate.fp[idxvar].num.i;
 
     TRACE_FUNCTION();
 
     istate.ep --;
-    STACKCELL_SET_ADDR( istate.ep[0], array[idx].ptr );
+    STACKCELL_SET_ADDR( istate.ep[0], array[idx] );
 
     return 3;
 }
