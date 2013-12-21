@@ -1827,8 +1827,11 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                 posoffset = tnode->nextnumoffs + field_size;
 
                 if( abs(posoffset) > abs(negoffset)) {
+                    ALIGN_NUMBER( posoffset, REF_SIZE );
+                    negoffset = -posoffset;
                 } else
                 if( abs(posoffset) < abs(negoffset)) {
+                    posoffset = abs(negoffset);
                 }
 
                 dnode_set_offset( current, tnode->nextrefoffs );
