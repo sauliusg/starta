@@ -570,11 +570,16 @@ int STG( INSTRUCTION_FN_ARGS )
 int LDI( INSTRUCTION_FN_ARGS )
 {
     ssize_t size = istate.code[istate.ip+1].ssizeval;
+    ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
 
     TRACE_FUNCTION();
 
-    memcpy( &istate.ep[0], STACKCELL_PTR(istate.ep[0]), size );
-    STACKCELL_ZERO_PTR( istate.ep[0] );
+    if( offset >= 0 ) {
+        memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
+        STACKCELL_ZERO_PTR( istate.ep[0] );
+    } else {
+        istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
+    }
 
     return 2;
 }
