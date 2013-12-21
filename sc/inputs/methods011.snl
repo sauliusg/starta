@@ -45,9 +45,9 @@ var s = new S;
 
 . "-------------";
 
-. "s.name offset =", const(s.name.offset/.stackcellsize);
-. "s.next offset =", const(s.next.offset/.stackcellsize);
-. "s.i    offset =", const(s.i.offset/.stackcellsize);
+. "s.name offset =", const(s.name.offset/s.name.size);
+. "s.next offset =", const(s.next.offset/s.next.size);
+. "s.i    offset =", const(s.i.offset/s.i.size);
 
 . "-------------";
 
