@@ -628,14 +628,14 @@ int STI( INSTRUCTION_FN_ARGS )
     } else {
         //*(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
         *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
-    }
-
-    if( length == -1 && offset < 0 && element_size > -offset ) {
-        /* We have a field of generic type, and need to store the
-           numeric stackcell at the positive offset: */
-        // printf( ">>> storing positive part as well: %d\n", istate.ep[0].num.i );
-        void* dst = (char*)istate.ep[1].PTR - offset;
-        memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
+        if( length == -1 && element_size > -offset ) {
+            /* offset < 0 here */
+            /* We have a field of generic type, and need to store the
+               numeric stackcell at the positive offset: */
+            // printf( ">>> storing positive part as well: %d\n", istate.ep[0].num.i );
+            void* dst = (char*)istate.ep[1].PTR - offset;
+            memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
+        }
     }
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
