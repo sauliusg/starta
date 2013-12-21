@@ -1355,7 +1355,7 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
 int ALLOCENV( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *env = NULL;
+    char **env = NULL;
     int i, n;
 
     TRACE_FUNCTION();
@@ -1367,15 +1367,15 @@ int ALLOCENV( INSTRUCTION_FN_ARGS )
 	    n++;
 	}
 	if( n > 0 ) {
-	    env = bcalloc_array( sizeof(stackcell_t), n, 1 );
+	    env = bcalloc_array( REF_SIZE, n, 1 );
 
 	    BC_CHECK_PTR( env );
 	    STACKCELL_SET_ADDR( istate.ep[0], env );
 	    
 	    for( i = 0; i < n; i++ ) {
-		env[i].ptr = bcalloc_blob( strlen( istate.env[i]) + 1 );
-		BC_CHECK_PTR( env[i].ptr );
-		strcpy( env[i].ptr, istate.env[i] );
+		env[i] = bcalloc_blob( strlen( istate.env[i]) + 1 );
+		BC_CHECK_PTR( env[i] );
+		strcpy( env[i], istate.env[i] );
 	    }
 	} else {
 	    STACKCELL_SET_ADDR( istate.ep[0], NULL );
