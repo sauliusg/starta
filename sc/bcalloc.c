@@ -58,7 +58,7 @@ void *bcalloc( short element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
     ssize_t size = (length < 0 ? 1 : length) * element_size +
-        abs(nref) * REF_SIZE;
+        (nref >= 0 ? 0 : abs(nref) * REF_SIZE);
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {

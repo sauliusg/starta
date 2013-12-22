@@ -402,7 +402,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
            a refernece: */
         /* ssize_t alloc_size = REF_SIZE * n_elem * 2; */
         assert( element_size == REF_SIZE );
-        ptr = bcalloc( /* element_size * 2 */ 0,
+        ptr = bcalloc( element_size * 2,
                        /* length = */ n_elem, /* nref = */ n_elem * 2 );
     }
     BC_CHECK_PTR( ptr );
