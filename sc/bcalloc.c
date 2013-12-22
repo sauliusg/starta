@@ -54,8 +54,7 @@ static struct {
 };
 #endif
 
-void *bcalloc_memory( size_t sz, short element_size,
-                      ssize_t length, ssize_t nref )
+void *bcalloc( short element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
     ssize_t size = (length < 0 ? 1 : length) * element_size +
@@ -100,12 +99,6 @@ void *bcalloc_memory( size_t sz, short element_size,
     }
 }
 
-void *bcalloc( size_t size, ssize_t nref )
-{
-    return bcalloc_memory( size, /* element_size = */ size,
-                           /* length = */ -1, /*nref = */ nref );
-}
-
 void *bcalloc_blob( size_t size )
 {
     return bcalloc_array( 1, size, 0 );
@@ -130,7 +123,7 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr;
     assert( nref == 1 || nref == 0 );
-    ptr = bcalloc( (ssize_t)element_size * length, nref * length );
+    ptr = bcalloc( element_size, length, nref * length );
     if( ptr ) {
         ptr[-1].length = length;
         ptr[-1].element_size = element_size;

@@ -726,7 +726,7 @@ int ALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, nref );
+    ptr = bcalloc( size, /* length = */ -1, nref );
 
     BC_CHECK_PTR( ptr );
 
@@ -756,7 +756,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, nref );
+    ptr = bcalloc( size, -1, nref );
 
     BC_CHECK_PTR( ptr );
 
@@ -866,7 +866,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
         assert( nref == 0 || nref == nele );
         ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
     } else {
-        ptr = bcalloc( element_size, nref );
+        ptr = bcalloc( element_size, -1, nref );
     }
 
     BC_CHECK_PTR( ptr );
@@ -1360,7 +1360,7 @@ int TRY( INSTRUCTION_FN_ARGS )
     ssize_t offset = istate.code[istate.ip+1].ssizeval;
     ssize_t tryreg = istate.code[istate.ip+2].ssizeval;
     interpret_exception_t *rg_store = bcalloc
-        ( sizeof(interpret_exception_t), INTERPRET_EXCEPTION_PTRS );
+        ( sizeof(interpret_exception_t), -1, INTERPRET_EXCEPTION_PTRS );
 
     TRACE_FUNCTION();
 
@@ -1634,7 +1634,7 @@ int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
     for( i = 0; i < n; i++ ) {
         bytecode_file_hdr_t* current_file;
 	files[i] =
-            bcalloc( sizeof(bytecode_file_hdr_t), INTERPRET_FILE_PTRS );
+            bcalloc( sizeof(bytecode_file_hdr_t), -1, INTERPRET_FILE_PTRS );
 	BC_CHECK_PTR( files[i] );
         current_file = (bytecode_file_hdr_t*)files[i];
 
@@ -1680,7 +1680,7 @@ int FDFILE( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    file = bcalloc( sizeof(bytecode_file_hdr_t), INTERPRET_FILE_PTRS );
+    file = bcalloc( sizeof(bytecode_file_hdr_t), -1, INTERPRET_FILE_PTRS );
     BC_CHECK_PTR( file );
     STACKCELL_SET_ADDR( istate.ep[0], file );
 
@@ -1752,7 +1752,7 @@ int FOPEN( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    file = bcalloc( sizeof(*file), INTERPRET_FILE_PTRS );
+    file = bcalloc( sizeof(*file), -1, INTERPRET_FILE_PTRS );
 
     BC_CHECK_PTR( file );
     fp = fopen( name, mode );

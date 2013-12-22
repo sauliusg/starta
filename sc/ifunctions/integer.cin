@@ -390,9 +390,9 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 
     if( nref == 0 ) {
 #if 1
-        ssize_t alloc_size = (element_size + hash_key_ptr_size) * n_elem;
-        ptr = bcalloc_memory( alloc_size, element_size,
-                              /* length = */ n_elem, /* nref = */ n_elem );
+        /* ssize_t alloc_size = (element_size + hash_key_ptr_size) * n_elem; */
+        ptr = bcalloc( element_size, 
+                       /* length = */ n_elem, /* nref = */ -n_elem );
 #else
         ssize_t alloc_size = element_size + hash_key_ptr_size;
         ptr = bcalloc_array( alloc_size, n_elem, 1 );
@@ -400,10 +400,10 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
     } else {
         /* one reference is for key, another is for a value which is
            a refernece: */
-        ssize_t alloc_size = REF_SIZE * n_elem * 2;
+        /* ssize_t alloc_size = REF_SIZE * n_elem * 2; */
         assert( element_size == REF_SIZE );
-        ptr = bcalloc_memory( alloc_size, element_size,
-                              /* length = */ n_elem, /* nref = */ n_elem * 2 );
+        ptr = bcalloc( /* element_size * 2 */ 0,
+                       /* length = */ n_elem, /* nref = */ n_elem * 2 );
     }
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
