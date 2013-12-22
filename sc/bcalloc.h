@@ -25,9 +25,7 @@ typedef enum {
 void bcalloc_set_gc_collector_policy( gc_policy_t new_policy );
 gc_policy_t bcalloc_gc_collector_policy( void );
 void bc_merror( cexception_t *ex );
-void *bcalloc_memory( size_t size, short element_size,
-                      ssize_t length, ssize_t nref );
-void *bcalloc( size_t size, ssize_t nref );
+void *bcalloc( short element_size, ssize_t length, ssize_t nref );
 void *bcalloc_blob( size_t size );
 char* bcstrdup( char *str );
 void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref );
