@@ -30,7 +30,6 @@ void *bcalloc_memory( size_t size, short element_size,
 void *bcalloc( size_t size, ssize_t nref );
 void *bcalloc_blob( size_t size );
 char* bcstrdup( char *str );
-void *bcalloc_stackcells( ssize_t length, ssize_t nref );
 void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref );
 void *bcrealloc_blob( void *memory, size_t size );
 ssize_t bccollect( void );

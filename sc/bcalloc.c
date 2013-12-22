@@ -126,11 +126,6 @@ char* bcstrdup( char *str )
     return ptr;
 }
 
-void *bcalloc_stackcells( ssize_t length, ssize_t nref )
-{
-    return bcalloc_array( sizeof(stackcell_t), length, nref );
-}
-
 void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr;

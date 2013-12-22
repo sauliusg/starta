@@ -887,40 +887,6 @@ int CLONE( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * FIXED2ARRAY (convert a fixed-length array to the dynamic array)
- *
- * bytecode:
- * FIXED2ARRAY element_size length
- *
- * stack:
- * fixed_array_addr --> array_ptr
- */
-
-int FIXED2ARRAY( INSTRUCTION_FN_ARGS )
-{
-    stackcell_t *ptr;
-    ssize_t fixed_element_size = istate.code[istate.ip+1].ssizeval;
-    ssize_t n_elem = istate.code[istate.ip+2].ssizeval;
-    const ssize_t nref = 1;
-    char *fixed_array_addr = STACKCELL_PTR( istate.ep[0] );
-    ssize_t i;
-
-    TRACE_FUNCTION();
-
-    ptr = bcalloc_stackcells( n_elem, nref );
-    BC_CHECK_PTR( ptr );
-
-    for( i = 0; i < n_elem; i++ ) {
-        memcpy( &ptr[i].num, fixed_array_addr + i * fixed_element_size,
-                fixed_element_size );
-    }
-
-    STACKCELL_SET_ADDR( istate.ep[0], ptr );
-
-    return 3;
-}
-
-/*
  * MEMCPY (copy memory)
  *
  * bytecode:
