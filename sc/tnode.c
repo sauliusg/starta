@@ -1825,7 +1825,11 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 
                 dnode_set_offset( current, tnode->nextrefoffs );
 
-                tnode->nrefs += direction;
+                /* !!! FIXME: the assignemnt below is most probably
+                       wrong -- the nrefs field might be advanced more
+                       than one reference if numeric field offset is
+                       much higher than reference offset: */
+                tnode->nrefs += direction; /* <<< FIXME! */
 
                 tnode->nextrefoffs += REF_SIZE * direction;
                 tnode->nextnumoffs += field_size;
