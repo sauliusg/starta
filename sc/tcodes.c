@@ -4099,6 +4099,8 @@ int HASHDUMP( INSTRUCTION_FN_ARGS )
 
     ssize_t i;
 
+    printf( "HASHDUMP: el. size = %d, nref = %d, length = %d\n",
+            hash_header->element_size, hash_nref, hash_length );
     for( i = 0; i < hash_length; i ++ ) {
         if( hash_nref > hash_length ) {
             printf( "%d: '%s' -> (%p) '%s'\n", i, hash_keys[i],

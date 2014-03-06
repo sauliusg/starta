@@ -389,7 +389,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
     assert( nref == 0 || nref == 1 );
 
     if( nref == 0 ) {
-#if 1
+#if 0
         /* ssize_t alloc_size = (element_size + hash_key_ptr_size) * n_elem; */
         ptr = bcalloc( element_size, 
                        /* length = */ n_elem, /* nref = */ -n_elem );
