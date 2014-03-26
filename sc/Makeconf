@@ -1,5 +1,7 @@
 
-OTHER_DIRS = ../common ../lists
+INTERPRETER_DIR = interpreters/packed-type
+
+OTHER_DIRS = ../common ../lists ${INTERPRETER_DIR}
 LIB_DIRS   = ../getoptions ../cexceptions
 
 ## LIBFLAGS = -ldl -lduma
@@ -9,21 +11,3 @@ LIBFLAGS = -ldl
 EXT = .snl
 TEST_OPTIONS = -I inputs -I modules -I . -G
 SIZE_OPTIONS = -c -d dump
-
-.PHONY: libraries
-
-all: libraries
-
-test tests alltests: libraries
-
-outputs: libraries
-
-.PHONY: cleanlibraries
-
-cleanAll: cleanlibraries
-
-cleanlibraries:
-	${MAKE} -C libraries cleanAll
-
-libraries:
-	${MAKE} -C $@ CC=gcc LD=ld
