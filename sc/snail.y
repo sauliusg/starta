@@ -2258,7 +2258,7 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 		    snail_emit( cc, &inner, "\tc\n", PSTI );
 		} else {
 		    ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
-		    snail_emit( cc, &inner, "\tce\n", STI, &expr_size );
+		    snail_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}
 	    }
 	}
