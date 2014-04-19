@@ -414,6 +414,9 @@ static void thrcode_emit_float( THRCODE *tc, float fval,
   i assembles integer
   I assembles ssize_t from an integer value; must get an integer value.
   e assembles ssize_t, must get an address of the ssize_t variable.
+  s assembles element size of ssize_t, must get an address of the ssize_t variable.
+    May be ignored by those implementations that do not need it (e.g. which 
+    have all slement slots of the same size).
   f assembles float
   p assembles pointer
   S assembles string
@@ -519,6 +522,7 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 		if( thrcode_debug )
 		    thrcode_printf( tc, ex, "%d ", ival );
 		break;
+            case 's': /* element size */
 	    case 'e':
 	        sszval = *va_arg( ap, ssize_t* );
 		thrcode_emit_ssize_t( tc, sszval, ex );

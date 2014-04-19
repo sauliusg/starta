@@ -2184,7 +2184,7 @@ static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
 	    if( element_type && tnode_is_reference( element_type )) {
 		snail_emit( cc, ex, "\tc\n", PLDI );
 	    } else {
-		snail_emit( cc, ex, "\tce\n", LDI, &element_size );
+		snail_emit( cc, ex, "\tcs\n", LDI, &element_size );
 	    }
 	    snail_stack_top_dereference( cc );
 	}
