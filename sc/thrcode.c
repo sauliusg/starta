@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <cxprintf.h>
 #include <stringx.h>
+#include <implementation.h>
 
 void *thrcode_subsystem = &thrcode_subsystem;
 
@@ -458,7 +459,7 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 
     tc->last_opcode.fn = NULL;
     while( *format ) {
-        switch( *format++ ) {
+        switch( *format ) {
 	    case 'c':
 	        tcode = va_arg( ap, void* );
 		tc->last_opcode.fn = tcode;
@@ -485,7 +486,7 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 		break;
 	    case 'M':
 		lib_name = va_arg( ap, char* );
-		if( *format++ != 'C' ) {
+		if( format[1] != 'C' ) {
 		    cexception_raise_in( ex, thrcode_subsystem,
 					 THRCODE_WRONG_FORMAT,
 					 cxprintf( "format 'M' must be "
@@ -507,6 +508,7 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 						       "is not defined", sval ));
 		    }
 		}
+                format++;
 		break;
 #if 0
 	    case 'i':
@@ -524,11 +526,13 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 		break;
             case 's': /* element size */
 	    case 'e':
-	        sszval = *va_arg( ap, ssize_t* );
-		thrcode_emit_ssize_t( tc, sszval, ex );
-		if( thrcode_debug )
-		    thrcode_printf( tc, ex, "%Ld ", (llong)sszval );
-		break;
+                if( *format == 'e' || implementation_has_format( *format )) {
+                    sszval = *va_arg( ap, ssize_t* );
+                    thrcode_emit_ssize_t( tc, sszval, ex );
+                    if( thrcode_debug )
+                        thrcode_printf( tc, ex, "%Ld ", (llong)sszval );
+                    break;
+                }
 	    case 'p':
 	        pval = va_arg( ap, void* );
 		thrcode_emit_ptr( tc, pval, ex );
@@ -585,6 +589,7 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 	        assert( 0 );
 		break;
 	}
+        format++;
     }
 }
 

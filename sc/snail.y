@@ -41,6 +41,7 @@
 #include <yy.h>
 #include <alloccell.h>
 #include <rtti.h>
+#include <implementation.h>
 #include <assert.h>
 
 static char *compiler_version = "0.0";

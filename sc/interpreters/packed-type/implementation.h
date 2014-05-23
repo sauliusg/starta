@@ -10,6 +10,6 @@
 
 int implementation_has_attribute( char *attribute );
 
-int implementation_has_format( char *format );
+int implementation_has_format( char format );
 
 #endif
