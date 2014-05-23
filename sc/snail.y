@@ -8315,12 +8315,15 @@ bytecode_constant
 	    yyerrorf( "type attribute '%%%%%s' is not available here "
 		      "(are you compiling a function or operator?)", $2 );
 	} else {
-	    FIXUP *type_attribute_fixup =
-		new_fixup_absolute( $2, thrcode_length( snail_cc->thrcode ) - 1,
-				    NULL /* next */, px );
+            if( implementation_has_attribute( $2 )) {
+                FIXUP *type_attribute_fixup =
+                    new_fixup_absolute
+                    ( $2, thrcode_length( snail_cc->thrcode ) - 1,
+                      NULL /* next */, px );
 
-	    dnode_insert_code_fixup( snail_cc->current_function,
-				     type_attribute_fixup );
+                dnode_insert_code_fixup( snail_cc->current_function,
+                                         type_attribute_fixup );
+            }
 	}
       }
 
