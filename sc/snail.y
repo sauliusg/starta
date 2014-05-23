@@ -8310,12 +8310,13 @@ bytecode_constant
   | __DOUBLE_PERCENT __IDENTIFIER
       {
 	static const ssize_t zero = 0;
-        snail_emit( snail_cc, px, "\te\n", &zero );
 	if( !snail_cc->current_function ) {
 	    yyerrorf( "type attribute '%%%%%s' is not available here "
 		      "(are you compiling a function or operator?)", $2 );
 	} else {
             if( implementation_has_attribute( $2 )) {
+                snail_emit( snail_cc, px, "\te\n", &zero );
+                
                 FIXUP *type_attribute_fixup =
                     new_fixup_absolute
                     ( $2, thrcode_length( snail_cc->thrcode ) - 1,
