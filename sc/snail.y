@@ -4776,7 +4776,7 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
 	if( tnode_is_reference( top_type )) {
 	    snail_emit( cc, ex, "\tce\n", PMKARRAY, &nexpr );
 	} else {
-	    snail_emit( cc, ex, "\tceee\n", MKARRAY, &element_size,
+	    snail_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
                         &nrefs, &nexpr );
 	}
 	snail_push_array_of_type( cc, share_tnode( top_type ), ex );
