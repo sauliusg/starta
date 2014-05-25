@@ -734,7 +734,7 @@ int MKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( nele, nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), nele, nref );
 
     BC_CHECK_PTR( ptr );
 
@@ -767,7 +767,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( nele, 1 );
+    ptr = bcalloc_array( sizeof(stackcell_t), nele, 1 );
 
     BC_CHECK_PTR( ptr );
 
@@ -865,7 +865,7 @@ int ZAALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( n_elem, elem_nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -1251,7 +1251,7 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
     if( istate.argc >= 0 && istate.argv != NULL ) {
 
-	argv = bcalloc_array( istate.argc + 1, 1 );
+	argv = bcalloc_array( sizeof(stackcell_t), istate.argc + 1, 1 );
 
 	BC_CHECK_PTR( argv );
 	STACKCELL_SET_ADDR( istate.ep[0], argv );
@@ -1291,7 +1291,7 @@ int ALLOCENV( INSTRUCTION_FN_ARGS )
 	    n++;
 	}
 	if( n > 0 ) {
-	    env = bcalloc_array( n, 1 );
+	    env = bcalloc_array( sizeof(stackcell_t), n, 1 );
 
 	    BC_CHECK_PTR( env );
 	    STACKCELL_SET_ADDR( istate.ep[0], env );
@@ -1585,7 +1585,7 @@ int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    files = bcalloc_array( n, 1 );
+    files = bcalloc_array( sizeof(stackcell_t), n, 1 );
     BC_CHECK_PTR( files );
     STACKCELL_SET_ADDR( istate.ep[0], files );
 
