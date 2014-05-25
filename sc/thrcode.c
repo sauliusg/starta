@@ -526,13 +526,13 @@ void thrcode_emit_va( THRCODE *tc, cexception_t *ex, const char *format,
 		break;
             case 's': /* element size */
 	    case 'e':
+                sszval = *va_arg( ap, ssize_t* );
                 if( *format == 'e' || implementation_has_format( *format )) {
-                    sszval = *va_arg( ap, ssize_t* );
                     thrcode_emit_ssize_t( tc, sszval, ex );
                     if( thrcode_debug )
                         thrcode_printf( tc, ex, "%Ld ", (llong)sszval );
-                    break;
                 }
+                break;
 	    case 'p':
 	        pval = va_arg( ap, void* );
 		thrcode_emit_ptr( tc, pval, ex );
