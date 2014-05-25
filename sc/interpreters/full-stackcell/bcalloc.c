@@ -121,7 +121,12 @@ void *bcalloc_stackcells( ssize_t length, ssize_t nref )
     return bcalloc( sizeof(stackcell_t) * length, length, nref );
 }
 
-void *bcalloc_array( ssize_t length, ssize_t nref )
+/* In this implementation, the 'element_size' is ignored since all
+   array elements have the same size, but it must be present to
+   maintain interface compatibility with the packed-type
+   representation: */
+
+void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
     assert( nref == 1 || nref == 0 );
     return bcalloc( sizeof(stackcell_t) * length, length, nref * length );
@@ -132,7 +137,7 @@ void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
 {
     assert( nref == 1 || nref == 0 );
     if( level == 0 ) {
-	return bcalloc_array( length, nref );
+	return bcalloc_array( sizeof(stackcell_t), length, nref );
     } else {
 	alloccell_t *header = (alloccell_t*)array;
 	ssize_t layer_len = header[-1].length;

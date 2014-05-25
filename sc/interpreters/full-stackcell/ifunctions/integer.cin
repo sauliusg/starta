@@ -320,7 +320,7 @@ int @PREFIX1@AALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( n_elem, elem_nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -376,7 +376,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( n_elem * 2, nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem * 2, nref );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -580,7 +580,8 @@ int @PREFIX1@SUBARRAY( INSTRUCTION_FN_ARGS )
             length = upper_bound - lower_bound + 1;
             nref = array_header->nref;
 
-            subarray = bcalloc_array( length, nref > 0 ? 1 : 0 );
+            subarray = bcalloc_array( sizeof(stackcell_t), length,
+                                      nref > 0 ? 1 : 0 );
             BC_CHECK_PTR( subarray );
 
             memcpy( subarray, &array[lower_bound], sizeof(array[0]) * length );
