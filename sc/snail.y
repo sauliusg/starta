@@ -3297,11 +3297,9 @@ static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
     compiler_assemble_static_data( cc, /* data */ NULL,
 				   new_size - old_size + sizeof(alloccell_t),
 				   ex );
+
     hdr = (alloccell_t*)(cc->static_data + new_size);
-    hdr->magic = BC_MAGIC;
-    hdr->flags |= AF_USED;
-    hdr->length = len;
-    /* hdr->element_size = element_size; */
+    alloccell_set_values( hdr, element_size, len );
 }
 
 static ssize_t compiler_assemble_static_ssize_t( SNAIL_COMPILER *cc,
