@@ -5,6 +5,8 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
+#include <arrays.h>
+
 #ifdef I
 #undef I
 #endif
@@ -25,8 +27,8 @@
 int @PREFIX@SUM( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
-    @type@ *array = STACKCELL_PTR( istate.ep[0] );
-    alloccell_t* hdr = (alloccell_t*)array;
+    @element_type@ *array = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *hdr = (alloccell_t*)array;
     double sum = 0.0;
 
     TRACE_FUNCTION();
@@ -34,7 +36,7 @@ int @PREFIX@SUM( INSTRUCTION_FN_ARGS )
     if( array ) {
         length = hdr[-1].length;
         for( i = 0; i < length; i++ ) {
-            sum += array[i];
+            sum += ARRAY_ELEMENT(array[i]);
         }
     }
     STACKCELL_ZERO_PTR( istate.ep[0] );
