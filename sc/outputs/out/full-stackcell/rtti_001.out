@@ -1,0 +1,29 @@
+./sl: inputs/full-stackcell/rtti_001.snl(10,1): ERROR, bytecode operation 'RTTIDUMP' is not defined
+}
+^
+./sl: inputs/full-stackcell/rtti_001.snl(12,13): ERROR, incompatible types for assignment to variable 't'
+t = type int;
+            ^
+./sl: inputs/full-stackcell/rtti_001.snl(13,20): ERROR, incompatible types for function 'print_type_rtti' argument nr. 1
+print_type_rtti( t );
+                   ^
+./sl: inputs/full-stackcell/rtti_001.snl(15,14): ERROR, incompatible types for assignment to variable 't'
+t = type of i;
+             ^
+./sl: inputs/full-stackcell/rtti_001.snl(16,20): ERROR, incompatible types for function 'print_type_rtti' argument nr. 1
+print_type_rtti( t );
+                   ^
+./sl: inputs/full-stackcell/rtti_001.snl(18,14): ERROR, incompatible types for assignment to variable 't'
+t = type of t;
+             ^
+./sl: inputs/full-stackcell/rtti_001.snl(19,20): ERROR, incompatible types for function 'print_type_rtti' argument nr. 1
+print_type_rtti( t );
+                   ^
+./sl: inputs/full-stackcell/rtti_001.snl(23,30): ERROR, incompatible types for function 'print_type_rtti' argument nr. 1
+print_type_rtti( type string );
+                             ^
+./sl: inputs/full-stackcell/rtti_001.snl(24,25): ERROR, incompatible types for function 'print_type_rtti' argument nr. 1
+print_type_rtti( type S );
+                        ^
+./sl: 9 error(s) detected
+
