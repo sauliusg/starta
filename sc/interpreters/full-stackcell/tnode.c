@@ -1348,6 +1348,9 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 	return 1;
     }
 
+    if( t1->kind == TK_TYPE_DESCR ) {
+	return t2->kind == TK_TYPE_DESCR;
+    }
     if( t1->kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
@@ -1451,6 +1454,12 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
+    if( t1->kind == TK_TYPE_DESCR ) {
+	return t2->kind == TK_TYPE_DESCR;
+    }
+    if( t1->kind == TK_TYPE_DESCR ) {
+	return t2->kind == TK_TYPE_DESCR;
+    }
     if( t1->kind == TK_DERIVED && t2->kind != TK_DERIVED ) {
 	return tnode_types_are_compatible( t1->base_type, t2,
 					   generic_types, ex );
@@ -1489,6 +1498,9 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         return 0;
     }
 
+    if( t1->kind == TK_TYPE_DESCR ) {
+	return t2->kind == TK_TYPE_DESCR;
+    }
     if( t1->kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
