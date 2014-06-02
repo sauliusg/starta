@@ -1,0 +1,85 @@
+
+use std;
+
+type hash of T = ?{
+    reference;
+
+    inline bytecode operator "new[int]" ( i : int ) : hash of T
+    { HASHALLOC %%element_size %%element_nref %%element_align };
+
+    inline bytecode operator "[string]" ( h : hash of T; key : string ) 
+        : addressof
+    { HASHADDR %%element_size };
+
+    inline bytecode operator "ldx" ( h : ref /*addressof*/; key : string ) : T
+    { HASHVAL %%element_size };
+
+    inline bytecode operator "pldx" ( h : ref /*addressof*/; key : string ) : T
+    { HASHPTR }
+};
+
+null struct S {
+     name : string;
+     dict : hash of string;
+     idict : hash of int;
+     val : int;
+}
+
+type dict = hash of string;
+type dict1 = hash of string;
+type idict = hash of int;
+
+var lookup_table : hash of int;
+
+var d : dict;
+var dd : dict;
+var id : idict = new hash [200] of int;
+
+var d1 = new hash [20] of string;
+
+dd = new hash [241] of string;
+
+. dd["one"];
+
+var s = new S;
+
+s.dict = new hash [300] of string;
+s.idict = new hash [300] of int;
+
+. s.dict["something"];
+
+. "===========";
+
+dd["new key"] = "val";
+dd["another key"] = "val2";
+// bytecode { PLD %dd HASHDUMP }
+
+. dd["new key"];
+. dd["another key"];
+. dd["no key"];
+
+id["ATOM"] = 1234;
+id["SIGATM"] = 4567;
+. id["ATOM"];
+. id["SIGATM"];
+. id["NOKEY"];
+
+. "===========";
+
+s.dict["one"] = "vienas";
+s.dict["two"] = "du";
+s.dict["three"] = "trys";
+ 
+. s.dict["one"];
+. s.dict["two"];
+. s.dict["three"];
+. s.dict["four"];
+
+s.idict["one"] = 1;
+s.idict["two"] = 2;
+s.idict["three"] = 3;
+
+. s.idict["one"];
+. s.idict["two"];
+. s.idict["three"];
+. s.idict["four"];
