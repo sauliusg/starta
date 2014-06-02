@@ -231,7 +231,9 @@ TEST_DIR = ./inputs
 OUTPUT_DIR = ./outputs/out
 DIFFIL_DIR = ./outputs/diff
 
-TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}}
+TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}} \
+	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/*${EXT}}
+
 RES_FILES  = ${patsubst ${TEST_DIR}/%${EXT},${OUTPUT_DIR}/%.out,${TEST_FILES}}
 DIFF_FILES = ${patsubst ${TEST_DIR}/%${EXT},${DIFFIL_DIR}/%.diff,${TEST_FILES}}
 
@@ -316,7 +318,8 @@ tests alltests: test shtests
 
 listdiff: # test
 	@-( test -d ${DIFFIL_DIR} && \
-	    ls -l ${DIFFIL_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
+	    ls -l ${DIFFIL_DIR}/*.diff ${DIFFIL_DIR}/*/*.diff \
+	| awk '{if( $$5 > 0 ) print}' ) || \
 	    true
 	@-( test -d ${TST_DIF_DIR} && \
 	    ls -l ${TST_DIF_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
