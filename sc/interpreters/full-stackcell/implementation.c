@@ -16,6 +16,9 @@ int implementation_has_attribute( char *attribute )
     if( strcmp( attribute, "element_size" ) == 0 ) {
         return 0;
     }
+    if( strcmp( attribute, "element_align" ) == 0 ) {
+        return 0;
+    }
     return 1;
 }
 

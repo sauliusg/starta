@@ -359,7 +359,7 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
  *            initialised with zeros)
  *
  * bytecode:
- * HASHALLOC
+ * HASHALLOC nref
  *
  * stack:
  * ..., size -> ..., adressof
@@ -367,7 +367,7 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
 
 int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 {
-    const ssize_t nref = 1;
+    ssize_t nref = istate.code[istate.ip+1].ssizeval;
     ssize_t n_elem = istate.ep[0].I;
     void *ptr;
     ssize_t alloc_size;
@@ -380,7 +380,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
-    return 1;
+    return 2;
 }
 
 #include <alloccell.h>
