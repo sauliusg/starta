@@ -376,7 +376,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), n_elem * 2, nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem * 2, /* nref = */ 1 );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
