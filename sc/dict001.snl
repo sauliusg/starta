@@ -1,0 +1,42 @@
+#
+# Snail language compiler tests
+#
+
+# Test 'dictionary of T', using the inline 'new' operator to pass
+# compile time parameters.
+
+use std;
+
+type hash of T = ?{
+    reference;
+
+    inline bytecode operator "new[int]" ( i : int ) : hash of T
+    { HASHALLOC %%element_size %%element_nref %%element_align };
+
+    inline bytecode operator "[string]" ( h : hash of T; key : string ) 
+        : addressof
+    { HASHADDR %%element_size };
+
+    inline bytecode operator "ldx" ( h : ref /*addressof*/; key : string ) : T
+    { HASHVAL %%element_size };
+
+    inline bytecode operator "pldx" ( h : ref /*addressof*/; key : string ) : T
+    { HASHPTR }
+};
+
+type dictionary of X = null struct {
+    h : hash of X;
+    length : int;
+
+    inline bytecode operator "new" (): ref
+    {
+        ALLOC %%size
+        DUP
+        SLDC "HERE!"
+        SPRINT
+    }
+}
+
+var d : dictionary of int;
+
+d = new (dictionary of int);
