@@ -2737,9 +2737,11 @@ static void snail_compile_alloc( SNAIL_COMPILER *cc,
 		  "(e.g. 'a = new int[20]')" );
     }
 
-    if( snail_stack_top_has_operator( cc, "new", 1, ex )) {
-	compiler_drop_top_expression( cc );
-	snail_compile_operator( cc, alloc_type, "new", 1, ex );
+    /* if( tnode_has_operator( cc, "new", 1, ex )) { */
+    if ( compiler_lookup_operator( cc, alloc_type, "new",
+                                   /* arity = */0, ex )) {
+	/* compiler_drop_top_expression( cc ); */
+	snail_compile_operator( cc, alloc_type, "new", 0, ex );
     } else {
 	ssize_t alloc_size = tnode_size( alloc_type );
 	ssize_t alloc_nref = tnode_number_of_references( alloc_type );
