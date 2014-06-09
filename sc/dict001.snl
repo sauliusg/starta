@@ -28,7 +28,7 @@ type dictionary of X = null struct {
     h : hash of X;
     length : int;
 
-    inline bytecode operator "new" (): ref
+    inline bytecode operator "new" (): dictionary of X
     {
         ALLOC %%size
         DUP
