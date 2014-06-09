@@ -35,6 +35,12 @@ type dictionary of X = null struct {
         SLDC "HERE!"
         SPRINT
     }
+
+    inline bytecode constructor dictionary()
+    {
+        SLDC "HERE!"
+        SPRINT
+    }
 }
 
 var d : dictionary of int;
