@@ -1541,11 +1541,21 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
-	    return (!t1->name || !t2->name || strcmp( t1->name, t2->name ) == 0) &&
-		/* tnode_types_are_identical( t1->element_type, t2->element_type ); */
-		tnode_types_are_assignment_compatible
-                ( t1->element_type, t2->element_type, generic_types, ex );
-	}
+            if( t2->element_type &&
+                t2->element_type->kind == TK_PLACEHOLDER &&
+                t1->base_type ) {
+                return
+                    tnode_types_are_assignment_compatible
+                    ( t1->base_type, t2, generic_types, ex );                
+            } else {
+                return (!t1->name || !t2->name ||
+                        strcmp( t1->name, t2->name ) == 0) &&
+                    /* tnode_types_are_identical( t1->element_type,
+                       t2->element_type ); */
+                    tnode_types_are_assignment_compatible
+                    ( t1->element_type, t2->element_type, generic_types, ex );
+            }
+        }
     }
 
     if( t1->kind == TK_FUNCTION_REF && 

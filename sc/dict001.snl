@@ -30,16 +30,13 @@ type dictionary of X = null struct {
 
     inline bytecode operator "new" (): dictionary of X
     {
-        ALLOC %%size
+        ALLOC %%alloc_size %%nref
         DUP
+        LDC 100
+        HASHALLOC %%element_size %%element_nref %%element_align
+        PSTI
         SLDC "HERE!"
-        SPRINT
-    }
-
-    inline bytecode constructor dictionary()
-    {
-        SLDC "HERE!"
-        SPRINT
+        SPRINT NEWLINE
     }
 }
 

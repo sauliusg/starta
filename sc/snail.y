@@ -1051,6 +1051,8 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
 	{ "element_nref" },
         { "element_size" },
         { "element_align" },
+        { "nref" },
+        { "alloc_size" },
 	{ NULL },
     };
 
@@ -1060,6 +1062,9 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
     list[1].val = tnode_is_reference( tnode ) ? 
         REF_SIZE : tnode_size( tnode );
     list[2].val = tnode_align( tnode );
+
+    list[3].val = tnode_number_of_references( tnode );
+    list[4].val = tnode_size( tnode );
 
     /* For placeholders, we just in case allocate arrays thay say they
        contain references. This is necessary so that GC does not
@@ -2741,7 +2746,10 @@ static void snail_compile_alloc( SNAIL_COMPILER *cc,
     if ( compiler_lookup_operator( cc, alloc_type, "new",
                                    /* arity = */0, ex )) {
 	/* compiler_drop_top_expression( cc ); */
-	snail_compile_operator( cc, alloc_type, "new", 0, ex );
+        key_value_t *fixup_values = make_tnode_key_value_list( alloc_type );
+	snail_check_and_compile_operator( cc, alloc_type, "new",
+                                          /* arity = */0, 
+                                          fixup_values, ex );
     } else {
 	ssize_t alloc_size = tnode_size( alloc_type );
 	ssize_t alloc_nref = tnode_number_of_references( alloc_type );
