@@ -34,6 +34,7 @@
 #include <symtab.h>
 #include <stlist.h>
 #include <fixup.h>
+#include <tnode_compat.h>
 #include <bytecode_file.h> /* for bytecode_file_hdr_t, needed by
 			      compiler_native_type_size() */
 #include <cvalue_t.h>
