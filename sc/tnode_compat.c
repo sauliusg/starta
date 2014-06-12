@@ -10,6 +10,8 @@
 
 /* uses: */
 #include <tnode.ci>
+#include <string.h>
+#include <stdio.h>
 #include <assert.h>
 
 static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
