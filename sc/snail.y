@@ -1054,6 +1054,7 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
         { "element_align" },
         { "nref" },
         { "alloc_size" },
+        { "vmt_offset" },
 	{ NULL },
     };
 
@@ -1066,6 +1067,7 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
 
     list[3].val = tnode_number_of_references( tnode );
     list[4].val = tnode_size( tnode );
+    list[5].val = tnode_vmt_offset( tnode );
 
     /* For placeholders, we just in case allocate arrays thay say they
        contain references. This is necessary so that GC does not
