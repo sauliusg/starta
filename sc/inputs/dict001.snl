@@ -32,7 +32,7 @@ type dictionary of X = null struct {
     {
         ALLOCVMT %%alloc_size %%nref %%vmt_offset
         DUP
-        OFFSET -36
+        OFFSET const((dictionary of X).h.offset) // -36
         LDC 100
         HASHALLOC %%element_size %%element_nref %%element_align
         PSTI
@@ -53,7 +53,7 @@ type dictionary of X = null struct {
     inline bytecode operator "ldx" ( d : ref; key : string ) : T
     {
       SWAP
-      OFFSET -36
+      OFFSET const((dictionary of X).h.offset)
       PLDI
       SWAP
       HASHVAL %%element_size
@@ -62,7 +62,7 @@ type dictionary of X = null struct {
     inline bytecode operator "pldx" ( d : ref /*addressof*/; key : string ) : T
     { 
       SWAP
-      OFFSET -36
+      OFFSET const((dictionary of X).h.offset) 
       PLDI
       SWAP
       HASHPTR 

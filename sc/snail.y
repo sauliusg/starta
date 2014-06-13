@@ -5121,6 +5121,26 @@ static DNODE* compiler_lookup_type_field( SNAIL_COMPILER *cc,
     }
 }
 
+static DNODE* compiler_lookup_tnode_field( SNAIL_COMPILER *cc,
+                                           TNODE *tnode,
+                                           char *field_identifier )
+{
+    DNODE *field;
+
+    if( tnode ) {
+	field = tnode_lookup_field( tnode, field_identifier );
+	if( !field ) {
+	    yyerrorf( "type '%s' does not have member '%s'",
+		      tnode_name( tnode ), field_identifier );
+	    return NULL;
+	} else {
+	    return field;
+	}
+    } else {
+	return NULL;
+    }
+}
+
 static char *basename( char *filename )
 {
     char *start = filename;
@@ -10558,6 +10578,10 @@ field_designator
   : __IDENTIFIER '.' __IDENTIFIER
     {
 	$$ = compiler_lookup_type_field( snail_cc, NULL, $1, $3 );
+    }
+  | '(' compact_type_description ')' '.' __IDENTIFIER
+    {
+	$$ = compiler_lookup_tnode_field( snail_cc, $2, $5 );
     }
   | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
