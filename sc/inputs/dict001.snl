@@ -44,7 +44,7 @@ type dictionary of X = null struct {
         : addressof
     {
       SWAP
-      OFFSET -36
+      OFFSET const((dictionary of X).h.offset)
       PLDI
       SWAP
       HASHADDR %%element_size
