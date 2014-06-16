@@ -10579,9 +10579,14 @@ field_designator
     {
 	$$ = compiler_lookup_type_field( snail_cc, NULL, $1, $3 );
     }
-  | '(' compact_type_description ')' '.' __IDENTIFIER
+  | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_tnode_field( snail_cc, $2, $5 );
+        TNODE *composite = $2;
+        composite = new_tnode_synonim( composite, px );
+        tnode_set_kind( composite, TK_COMPOSITE );
+        tnode_insert_element_type( composite, $4 );
+        
+	$$ = compiler_lookup_tnode_field( snail_cc, composite, $7 );
     }
   | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
