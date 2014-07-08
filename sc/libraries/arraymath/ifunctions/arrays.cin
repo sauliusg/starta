@@ -11,7 +11,7 @@
 #undef I
 #endif
 
-#define I num.@field@
+#define I @field@
 
 /*
  * FSUM   Sum all values in an array
@@ -40,7 +40,7 @@ int @PREFIX@SUM( INSTRUCTION_FN_ARGS )
         }
     }
     STACKCELL_ZERO_PTR( istate.ep[0] );
-    istate.ep[0].I = sum;
+    istate.ep[0].num.I = sum;
 
     return 1;
 }

@@ -1,1 +1,1 @@
-s/@element_type@/stackcell_t/g;
+s/@element_type@/stackunion_t/g;
