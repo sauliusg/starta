@@ -21,7 +21,8 @@ procedure f()
 
 end package Types;
 
-program Tester();
-
+program Tester()
+begin
 var xx : Types::LocalType;
 var yy : Types::PackageType;
+end;

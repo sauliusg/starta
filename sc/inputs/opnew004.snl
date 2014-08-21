@@ -20,7 +20,7 @@ type int = {
     inline bytecode operator "[]" ( a : array; i : int ) : addressof
         { INDEX };
     inline bytecode operator "new[]" ( i : int ) : array
-        { AALLOC %%element_nref };
+        { AALLOC %%element_size %%element_nref };
 };
 
 var i, j : int;

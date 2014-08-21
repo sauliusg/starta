@@ -1,3 +1,4 @@
+# --*- Makefile -*--
 
 IFUNCTION_DIR = ifunctions
 GEN_DIR = locally-generated
@@ -12,10 +13,12 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%_arrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.hin
-	sed -f $^ > $@
+	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	| sed -f $< > $@
 
 ${GEN_DIR}/%_arrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.cin
-	sed -f $^ > $@
+	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	| sed -f $< > $@
 
 #-----------------------------------------------------------------------------
 

@@ -1,4 +1,25 @@
-IFUNCTION_DIR = ifunctions
+
+.PHONY: libraries
+
+all: libraries
+
+test tests alltests: libraries
+
+outputs: libraries
+
+.PHONY: cleanlibraries
+
+cleanAll: cleanlibraries
+
+cleanlibraries:
+	${MAKE} -C libraries cleanAll
+
+libraries:
+	${MAKE} -C $@ CC=gcc LD=ld
+
+#-----------------------------------------------------------------------------
+
+IFUNCTION_DIR = ${INTERPRETER_DIR}/ifunctions
 
 ${GEN_DIR}/tcodes.tab.c: tcodes.h
 	awk '/^ *int /{print $$2}' $< \

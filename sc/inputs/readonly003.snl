@@ -7,7 +7,8 @@
 
 use std;
 
-program (args : array of string; io : array of file);
+// program (args : array of string; io : array of file);
+var io = stdfiles();
 
 var file stdin = io[0];
 var file stdout = io[1];

@@ -13,7 +13,8 @@ begin
 end;
 
 program test( args : array of string;
-              stdio : array of file );
+              stdio : array of file )
+begin
 
 var i : int;
 
@@ -26,3 +27,5 @@ enddo;
 for i = 0 to last( stdio ) do
     . filename(stdio[i]);
 enddo;
+
+end

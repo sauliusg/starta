@@ -1,0 +1,83 @@
+This file describes a new packed type memory representation layout,
+the idea as of 2013-12-07.
+
+    <-- ref. size --->
+
+    +----------------+  ^
+ 4  |                |  |
+    +----------------+  |
+ 3  |                |  |
+    +----------------+  | nref elements, pointer (reference) sized
+ 2  |                |  |
+    +----------------+  |
+ 1  |                |  |
+    +----------------+  |
+ 0  |    ref[0]      |  v
+    +================+ ^
+    |    flags       | |              Various flags (also for garbage collector)
+    +----------------+ |              
+    |    rcount      | |              Reference count -- for garbage collector
+    +----------------+ |              
+    |     nref       | |              Number of references
+    +----------------+ | h e a d e r  
+    |   el. size     | |              Size of an element (in bytes)
+    +----------------+ |              
+    |    length      | |              Length of the "number" part (in elements)
+    +================+ v              
+ 0  |                |             ^  <--- reference points here
+    |                |             |
+    |                |             |
+    +----------------+ ^           |
+ 1  |                | |           |
+    |                | | el. size  |
+    |                | |           |
+    +----------------+ v           |
+ 2  |                |             |
+    |                |             | length
+    |                |             |
+    +----------------+             |
+ 3  |                |             |
+    |                |             |
+    |                |             |
+    +----------------+             |
+ 4  |                |             |
+    |                |             |
+    |                |             |
+    +----------------+             v
+
+Fig. 1
+
+Positive offsets are in bytes, negative offsets are in elements
+(reference sized).
+
+The 'nref' field is independent of the 'length' and 'size' attributes.
+
+If 'nref' is negative, then the references are located at negative
+offset from the alloccrll_t header; at positive offsets, only numbers
+are allocated, and they contain either an array of 'length' elements
+of size 'el. size' (if length >= 0), or a single block of size
+'el. size'. IN this case, size of the 'nref' references is *not*
+included into the (abs(length) * element_size) bytes allocated at
+positive offsets.
+
+If nref is non-negative, them we have 'nref' references allocated at
+positive direction. In this case, elementh_size * abs(length) MUST be
+larger or equal to nref * REF_SIZE. The 'nref' references are
+allocated continously at the beginning of the block (for packed type
+and split stackcell representations), or are used in the first 'nref'
+stackcells (for the full stackcell representation); otherwise, the
+memory in the block can be used at the application program
+discretion. Note that in this case the 'nref' references are
+*included* into the block of size elementh_size * abs(length)
+allocated right after the alloccell_t header in the positive
+direction.
+
+When length == -1, this means that one 'el. size'-sized block is
+allocated in the positive direction, and the allocated block is used
+for a structure or an object (that are further subdivided into
+fields). For a reference-implemented fields such as arrays or strings,
+extra 'nref' slots would be allocated in the negative offset direction.
+
+The same strategy is used for 'slotted' number representation, where
+each element with positive offset is the same size (probably the size
+of reference, but not necessarily).

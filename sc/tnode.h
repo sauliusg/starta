@@ -59,6 +59,8 @@ typedef enum {
     TK_FUNCTION_REF,
     TK_NULLREF,
     TK_IGNORE, /* "type" of ignored arguments, e.g. for the "over" operator */
+    TK_TYPE_DESCR, /* type descriptor - RTTI - making types "first
+                      class" values. */
     TK_EXCEPTION,
     last_type_kind_t
 } type_kind_t;
@@ -78,6 +80,7 @@ TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
 TNODE *new_tnode_synonim( TNODE *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
+TNODE *new_tnode_type_descriptor( cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
 TNODE *tnode_set_nref( TNODE *tnode, ssize_t nref );
 
@@ -171,6 +174,8 @@ ssize_t tnode_max_interface( TNODE *class_descr );
 
 const char * tnode_kind_name( TNODE * );
 
+int tnode_align( TNODE *tnode );
+
 type_kind_t tnode_kind( TNODE *tnode );
 
 DNODE *tnode_args( TNODE* tnode );
@@ -186,18 +191,6 @@ DNODE *tnode_retvals( TNODE* tnode );
 DNODE *tnode_retval_next( TNODE* tnode, DNODE *retval );
 
 TNODE *tnode_set_size( TNODE *tnode, int size );
-
-int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
-				TYPETAB *generic_types,
-				cexception_t *ex );
-
-int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
-                                           TYPETAB *generic_types,
-                                           cexception_t *ex );
-
-int tnode_types_are_identical( TNODE *t1, TNODE *t2,
-			       TYPETAB *generic_types,
-			       cexception_t *ex );
 
 const char *tnode_kind_name( TNODE *tnode );
 void tnode_print( TNODE *tnode );

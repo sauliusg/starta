@@ -5,7 +5,10 @@
 #$URL$
 #------------------------------------------------------------------------------
 
-MAKECONF_FILES = ${filter-out %~, ${wildcard Makeconf*}}
+MAKECONF_EXAMPLES = ${filter-out %~, ${wildcard Makeconf*.example}}
+
+MAKECONF_FILES = ${filter-out %~, ${wildcard Makeconf*}} \
+	${MAKECONF_EXAMPLES:%.example=%}
 
 ifneq ("${MAKECONF_FILES}","")
 include ${MAKECONF_FILES}
@@ -176,6 +179,12 @@ ${LIB_DIRS}: FORCE
 
 FORCE:;
 
+# A file can be create from a repository-committed example; used for
+# Makeconfig files:
+
+%: %.example
+	cp $< $@
+
 #------------------------------------------------------------------------------
 #
 # How to build library in the current directory
@@ -231,7 +240,9 @@ TEST_DIR = ./inputs
 OUTPUT_DIR = ./outputs/out
 DIFFIL_DIR = ./outputs/diff
 
-TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}}
+TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}} \
+	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/*${EXT}}
+
 RES_FILES  = ${patsubst ${TEST_DIR}/%${EXT},${OUTPUT_DIR}/%.out,${TEST_FILES}}
 DIFF_FILES = ${patsubst ${TEST_DIR}/%${EXT},${DIFFIL_DIR}/%.diff,${TEST_FILES}}
 
@@ -316,7 +327,8 @@ tests alltests: test shtests
 
 listdiff: # test
 	@-( test -d ${DIFFIL_DIR} && \
-	    ls -l ${DIFFIL_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
+	    ls -l ${DIFFIL_DIR}/*.diff ${DIFFIL_DIR}/*/*.diff \
+	| awk '{if( $$5 > 0 ) print}' ) || \
 	    true
 	@-( test -d ${TST_DIF_DIR} && \
 	    ls -l ${TST_DIF_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \

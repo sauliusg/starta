@@ -1,14 +1,14 @@
 shtests/programs/readword.snl
 >>> use <<<
 >>> std; <<<
->>> program <<<
->>> ( <<<
+>>> var <<<
 >>> args <<<
 >>> : <<<
 >>> array <<<
 >>> of <<<
 >>> string <<<
->>> ); <<<
+>>> = <<<
+>>> arguments(); <<<
 >>> var <<<
 >>> s <<<
 >>> : <<<

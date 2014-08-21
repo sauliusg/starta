@@ -7,7 +7,7 @@
 
 use std;
 
-program ( argv : array of string );
+var argv = arguments();
 
 type R = blob;
 
