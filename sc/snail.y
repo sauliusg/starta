@@ -1136,6 +1136,7 @@ static void snail_emit_function_call( SNAIL_COMPILER *cc,
 	if( code_length > 0 ) {
 	    if( !is_bytecode ) {
 		snail_emit( cc, ex, "\tc\n", PUSHFRM );
+                code_start ++;
 	    }
 	    thrcode_emit( cc->thrcode, ex, "\t" );
 	    for( i = 0; i < code_length; i++ ) {
