@@ -2749,7 +2749,11 @@ static void snail_compile_alloc( SNAIL_COMPILER *cc,
     if ( compiler_lookup_operator( cc, alloc_type, "new",
                                    /* arity = */0, ex )) {
 	/* compiler_drop_top_expression( cc ); */
-        key_value_t *fixup_values = make_tnode_key_value_list( alloc_type );
+        TNODE *element_type =
+            alloc_type && tnode_kind( alloc_type ) == TK_COMPOSITE ?
+            tnode_element_type( alloc_type ) : NULL;
+        key_value_t *fixup_values =
+            make_tnode_key_value_list( element_type ? element_type : alloc_type );
 	snail_check_and_compile_operator( cc, alloc_type, "new",
                                           /* arity = */0, 
                                           fixup_values, ex );
