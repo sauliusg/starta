@@ -13,7 +13,7 @@ type collection of T = null {
 
     inline bytecode operator "new[char]" ( i : char ) : collection of T
     {
-      BAALLOC %%element_nref
+      BAALLOC %%element_size %%element_nref
       SLDC "This is 'collection of T' new[char]" SPRINT NEWLINE
     };
 

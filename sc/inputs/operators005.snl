@@ -13,7 +13,7 @@ type list_of_string = ?struct {
 }
 
 inline bytecode operator "." ( l : list_of_string )
-{ OFFSET const(.stackcellsize) PLDI SPRINT }
+{ OFFSET const(list_of_string.value.offset) PLDI SPRINT }
 
 procedure cons( s : string; l : list_of_string = null ) : list_of_string
 {

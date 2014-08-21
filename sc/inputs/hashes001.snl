@@ -5,14 +5,14 @@ type hash of T = ?{
     reference;
 
     inline bytecode operator "new[int]" ( i : int ) : hash of T
-    { HASHALLOC };
+    { HASHALLOC %%element_size %%element_nref %%element_align };
 
     inline bytecode operator "[string]" ( h : hash of T; key : string ) 
         : addressof
-    { HASHADDR };
+    { HASHADDR %%element_size };
 
     inline bytecode operator "ldx" ( h : ref /*addressof*/; key : string ) : T
-    { HASHVAL };
+    { HASHVAL %%element_size };
 
     inline bytecode operator "pldx" ( h : ref /*addressof*/; key : string ) : T
     { HASHPTR }
@@ -52,6 +52,8 @@ s.idict = new hash [300] of int;
 
 dd["new key"] = "val";
 dd["another key"] = "val2";
+// bytecode { PLD %dd HASHDUMP }
+
 . dd["new key"];
 . dd["another key"];
 . dd["no key"];

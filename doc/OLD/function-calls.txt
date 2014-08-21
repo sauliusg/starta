@@ -1,26 +1,63 @@
 
-Semantics of the CALL instruction and function calls.
+=== Function calls, parameter passing and returning of values ===
+=================================================================
 
-Before the function call, a caller should push onto the stack:
+Before the function call, a caller should arrange its stack as follows:
 
-    a) addresses of the returned values of the function. If the return value
-       is to be ignored, a fake temporary cell on the stack should be
-       allocated and its address passed to the function.
+    a) past the last currently used temporary stackcel, it should allocate
+       temporary stackcells for each returned value of the called function.
+       The called function will simply store its returned values into these
+       stackcells. The return value stackcells belong both to a stackframe
+       of the caller and to a stackframe of the callee; thus, the stack
+       frames of the caller and the calle overlap. The callee will be able
+       to simply calculate values directly into return value stackcells, and
+       the calle will be able to use any of these returned values
+       immediately in its own calculations. In this scheme, no PUSH or POP
+       instructions are necessary, parameters and return values can be
+       handled by inter-stackcell MOVE and other instructions (such as ADD).
+       The caller may ignore any (or all) of the values returned by any
+       function. It also minimises stack operations (pushes and pops) during
+       parameter passing and value return.
        
-    b) actual parameters (arguments) are pushed onto the stack. Last
-       argument is pushed first (language C calling order).
+       Return values are allocated on the stack in the order they are
+       declared in the function definition or prototype; thus, the first
+       value declared is placed on the stack first. The first value gets
+       smallest absolute offset value when accessed from the caller's stack
+       frame, and largest absolute offset value when accessed from the
+       called function's stack frame.
+       
+    b) actual parameters (arguments) are placed onto the stack. First
+       argument is pushed first (Pascal calling order). Parameters are
+       placed on the stack in the order they are declared in the function
+       definition or prototype; thus, the first parameter is placed on the
+       stack first. The first parameter gets smallest absolute offset value
+       when accessed from the caller's stack frame, and largest absolute
+       offset value when accessed from the called function's stack frame.
 
-After the function returns, the RET command removes local variables
-arguments from the stack (Pascal calling convetion).
+After the function returns, the RET command restores old FP _and_ old SP;
+thus, it effectively restores the stack frame of the caller. However, both
+arguments and returned values are still accessible to the caller after the
+called function returns, since they belong to normal temporary stack cells
+of the caller.
 
-Values on the stack immediately after the execution of the CALL command.
+*Semantics of the CALL instruction.
+===================================
 
-^ 0xFF                  offset
-|			from FP:
+Fig. Values on the stack immediately after the execution of the CALL
+command:
+
+^ 0xFF
+|
+                        offset from
+			calee's FP:
           +----------+
-	  | retval   |  4         return value of the function
+	  | retval1  |  6         first return value of the function
           +----------+
-          | arg1     |  3         first function argument, if any
+	  | retval2  |  5         second return value of the function
+          +----------+
+          | arg1     |  4         first function argument
+          +----------+
+          | arg2     |  3         second function argument
           +----------+
           | old SP   |  2         old stack pointer
           +----------+

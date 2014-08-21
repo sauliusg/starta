@@ -7,7 +7,7 @@
 
 use std;
 
-program (args : array of string; io : array of file);
+program (args : array of string; io : array of file) {
 
 readonly m : array of int = [10, 20, 30];
 
@@ -18,3 +18,4 @@ var int i;
 for i = 0 to last(m) do
     <stdin> >> m[i]; // ERROR: can not assign to readonly component.
 enddo
+}

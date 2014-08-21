@@ -1,0 +1,32 @@
+#
+# Snail compiler tests
+#
+#
+# Test compile time type attributes
+#
+
+use std;
+
+type T = null {
+    reference;
+    size = 8;
+    s : string;
+    x : int;
+};
+
+var t : T;
+
+. "for variable 't':";
+. "t.offset =\t", const(t.offset);
+. "t.nref =\t", const(t.nref);
+. "t.size =\t", const(t.size);
+
+."";
+. "field offsets:";
+. "t.s.offset =\t", const(t.s.offset);
+. "t.x.offset =\t", const(t.x.offset);
+
+."";
+. "for type 'T':";
+. "T.nref =\t", const(T.nref);
+. "T.size =\t", const(T.size);

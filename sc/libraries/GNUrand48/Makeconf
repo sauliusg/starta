@@ -1,2 +1,4 @@
-CFLAGS = -I../.. -I../../../cexceptions
+include ../../Makeconf
+
+CFLAGS = -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions
 LIBFLAGS =

@@ -6,10 +6,13 @@
 
 include "modules/stdtypes.slib"
 
-program args( argv : array of string );
+program args( argv : array of string )
+begin
 
-var i : int;
+    var i : int;
 
-for i = 0 to last(argv) do
-    . argv[i];
-enddo;
+    for i = 0 to last(argv) do
+        . argv[i];
+    enddo;
+
+end;

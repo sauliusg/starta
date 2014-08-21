@@ -34,12 +34,15 @@
 #include <symtab.h>
 #include <stlist.h>
 #include <fixup.h>
+#include <tnode_compat.h>
 #include <bytecode_file.h> /* for bytecode_file_hdr_t, needed by
 			      compiler_native_type_size() */
 #include <cvalue_t.h>
 #include <snail_flex.h>
 #include <yy.h>
 #include <alloccell.h>
+#include <rtti.h>
+#include <implementation.h>
 #include <assert.h>
 
 static char *compiler_version = "0.0";
@@ -1047,10 +1050,24 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
     static key_value_t empty_list[1] = {{ NULL }};
     static key_value_t list[] = {
 	{ "element_nref" },
+        { "element_size" },
+        { "element_align" },
+        { "nref" },
+        { "alloc_size" },
+        { "vmt_offset" },
 	{ NULL },
     };
 
     if( !tnode ) return empty_list;
+
+    list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
+    list[1].val = tnode_is_reference( tnode ) ? 
+        REF_SIZE : tnode_size( tnode );
+    list[2].val = tnode_align( tnode );
+
+    list[3].val = tnode_number_of_references( tnode );
+    list[4].val = tnode_size( tnode );
+    list[5].val = tnode_vmt_offset( tnode );
 
     /* For placeholders, we just in case allocate arrays thay say they
        contain references. This is necessary so that GC does not
@@ -1070,6 +1087,8 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
     static key_value_t list[] = {
 	{ "element_nref" },
 	{ "level" },
+        { "element_size" },
+        { "element_align" },
 	{ NULL },
     };
 
@@ -1077,6 +1096,9 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
 
     list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
     list[1].val = level;
+    list[2].val = tnode_is_reference( tnode ) ? 
+        REF_SIZE : tnode_size( tnode );
+    list[3].val = tnode_align( tnode );
 
     return list;
 }
@@ -1114,6 +1136,7 @@ static void snail_emit_function_call( SNAIL_COMPILER *cc,
 	if( code_length > 0 ) {
 	    if( !is_bytecode ) {
 		snail_emit( cc, ex, "\tc\n", PUSHFRM );
+                code_start ++;
 	    }
 	    thrcode_emit( cc->thrcode, ex, "\t" );
 	    for( i = 0; i < code_length; i++ ) {
@@ -2146,11 +2169,32 @@ static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
 	} else {
 	    TNODE *element_type =
 		expr_type ? tnode_element_type( expr_type ) : NULL;
+	    ssize_t element_size =
+		element_type ? 
+                ( tnode_is_reference( element_type ) ? 
+                  REF_SIZE : tnode_size( element_type )) : 0;
+	    char *name = element_type ? tnode_name( element_type ) : NULL;
+
+	    if( element_size > sizeof(union stackunion)) {
+		if( name ) {
+		    yyerrorf( "value of type '%s' is too large to be loaded "
+			      "onto the stack", name );
+		} else {
+		    yyerrorf( "value to be loaded by LDI is too large "
+			      "to fit onto the stack" );
+		}
+	    }
+
+	    if( element_type && !tnode_is_reference( element_type ) &&
+		tnode_number_of_references( element_type ) > 0 ) {
+		yyerrorf( "values with references should not be loaded "
+			  "onto the stack" );
+	    }
 
 	    if( element_type && tnode_is_reference( element_type )) {
 		snail_emit( cc, ex, "\tc\n", PLDI );
 	    } else {
-		snail_emit( cc, ex, "\tc\n", LDI );
+		snail_emit( cc, ex, "\tcs\n", LDI, &element_size );
 	    }
 	    snail_stack_top_dereference( cc );
 	}
@@ -2223,7 +2267,8 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 		if( expr_type && tnode_is_reference( expr_type )) {
 		    snail_emit( cc, &inner, "\tc\n", PSTI );
 		} else {
-		    snail_emit( cc, &inner, "\tc\n", STI );
+		    ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
+		    snail_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}
 	    }
 	}
@@ -2701,9 +2746,18 @@ static void snail_compile_alloc( SNAIL_COMPILER *cc,
 		  "(e.g. 'a = new int[20]')" );
     }
 
-    if( snail_stack_top_has_operator( cc, "new", 1, ex )) {
-	compiler_drop_top_expression( cc );
-	snail_compile_operator( cc, alloc_type, "new", 1, ex );
+    /* if( tnode_has_operator( cc, "new", 1, ex )) { */
+    if ( compiler_lookup_operator( cc, alloc_type, "new",
+                                   /* arity = */0, ex )) {
+	/* compiler_drop_top_expression( cc ); */
+        TNODE *element_type =
+            alloc_type && tnode_kind( alloc_type ) == TK_COMPOSITE ?
+            tnode_element_type( alloc_type ) : NULL;
+        key_value_t *fixup_values =
+            make_tnode_key_value_list( element_type ? element_type : alloc_type );
+	snail_check_and_compile_operator( cc, alloc_type, "new",
+                                          /* arity = */0, 
+                                          fixup_values, ex );
     } else {
 	ssize_t alloc_size = tnode_size( alloc_type );
 	ssize_t alloc_nref = tnode_number_of_references( alloc_type );
@@ -2837,15 +2891,21 @@ static void snail_compile_array_alloc( SNAIL_COMPILER *cc,
 {
     key_value_t *fixup_values = make_tnode_key_value_list( element_type );
 
-    snail_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
+    if( tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+        snail_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
+    } else {
+        yyerrorf( "in this type representation, can not allocate array "
+                  "of generic type %s", tnode_name( element_type ));
+    }
     snail_push_array_of_type( cc, element_type, ex );
 }
 
 static void snail_compile_blob_alloc( SNAIL_COMPILER *cc,
 				      cexception_t *ex )
 {
-    static key_value_t fixup_values[2] = {
+    static key_value_t fixup_values[] = {
 	{ "element_nref", 0 },
+	{ "element_size", 1 },
 	{ NULL },
     };
 
@@ -2869,7 +2929,9 @@ static void snail_compile_mdalloc( SNAIL_COMPILER *cc,
 	snail_append_expression_type( cc, share_tnode( element_type ));
     } else {
 	key_value_t fixup_vals[] = {
+	    { "element_size", sizeof(void*) },
 	    { "element_nref", 1 },
+	    { "element_align", sizeof(void*) },
 	    { "level", level },
 	    { NULL }
 	};
@@ -3240,6 +3302,7 @@ static ssize_t compiler_assemble_static_data( SNAIL_COMPILER *cc,
 #define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((ssize_t)(N)) % (lim)) % (lim) )
 
 static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
+                                                ssize_t element_size,
 						ssize_t len,
 						cexception_t *ex )
 {
@@ -3252,11 +3315,9 @@ static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
     compiler_assemble_static_data( cc, /* data */ NULL,
 				   new_size - old_size + sizeof(alloccell_t),
 				   ex );
+
     hdr = (alloccell_t*)(cc->static_data + new_size);
-    hdr->magic = BC_MAGIC;
-    hdr->flags |= AF_USED;
-    hdr->length = len;
-    hdr->size = len;
+    alloccell_set_values( hdr, element_size, len );
 }
 
 static ssize_t compiler_assemble_static_ssize_t( SNAIL_COMPILER *cc,
@@ -3270,7 +3331,7 @@ static ssize_t compiler_assemble_static_string( SNAIL_COMPILER *cc,
 						char *str,
 						cexception_t *ex )
 {
-    compiler_assemble_static_alloc_hdr( cc, strlen(str) + 1, ex );
+    compiler_assemble_static_alloc_hdr( cc, 1, strlen(str) + 1, ex );
     return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
 }
 
@@ -4717,6 +4778,7 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
     if( nexpr > 0 ) {
 	ENODE *top = enode_list_pop( &cc->e_stack );
 	TNODE *top_type = enode_type( top );
+	ssize_t element_size = tnode_size( top_type );
 	ssize_t nrefs = tnode_is_reference( top_type ) ? 1 : 0;
 
 	for( i = 1; i < nexpr; i++ ) {
@@ -4730,7 +4792,8 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
 	if( tnode_is_reference( top_type )) {
 	    snail_emit( cc, ex, "\tce\n", PMKARRAY, &nexpr );
 	} else {
-	    snail_emit( cc, ex, "\tcee\n", MKARRAY, &nrefs, &nexpr );
+	    snail_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
+                        &nrefs, &nexpr );
 	}
 	snail_push_array_of_type( cc, share_tnode( top_type ), ex );
 	delete_enode( top );
@@ -5063,6 +5126,26 @@ static DNODE* compiler_lookup_type_field( SNAIL_COMPILER *cc,
     }
 }
 
+static DNODE* compiler_lookup_tnode_field( SNAIL_COMPILER *cc,
+                                           TNODE *tnode,
+                                           char *field_identifier )
+{
+    DNODE *field;
+
+    if( tnode ) {
+	field = tnode_lookup_field( tnode, field_identifier );
+	if( !field ) {
+	    yyerrorf( "type '%s' does not have member '%s'",
+		      tnode_name( tnode ), field_identifier );
+	    return NULL;
+	} else {
+	    return field;
+	}
+    } else {
+	return NULL;
+    }
+}
+
 static char *basename( char *filename )
 {
     char *start = filename;
@@ -5300,7 +5383,8 @@ static void compiler_start_virtual_method_table( SNAIL_COMPILER *cc,
     printf( ">>> class name = %s\n", tnode_name(class_descr) );
 #endif
 
-    compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t), ex );
+    compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t),
+                                        sizeof(ssize_t), ex );
 
     vmt_address = compiler_assemble_static_ssize_t( cc, 1 + interface_nr, ex );
 
@@ -5489,6 +5573,29 @@ static void snail_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
+static void snail_compile_type_descriptor_loader( SNAIL_COMPILER *cc,
+                                                  TNODE *tnode,
+                                                  cexception_t *ex )
+{
+    TNODE *type_descriptor_type;
+    rtti_t type_descriptor;
+    ssize_t offset;
+
+    type_descriptor.size = tnode_size( tnode );
+    type_descriptor.nref = tnode_number_of_references( tnode );
+
+    compiler_assemble_static_alloc_hdr( cc, sizeof(type_descriptor),
+                                        /* len */ -1, ex );
+
+    offset = compiler_assemble_static_data( cc, &type_descriptor,
+                                            sizeof(type_descriptor), ex );
+
+    snail_emit( cc, ex, "\tce\n", SLDC, &offset );
+
+    type_descriptor_type = new_tnode_type_descriptor( ex );
+    snail_push_type( cc, type_descriptor_type, ex );
+}
+
 static SNAIL_COMPILER * volatile snail_cc;
 
 static cexception_t *px; /* parser exception */
@@ -5626,6 +5733,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     md_array_allocator
 %type <dnode> operator_definition
 %type <dnode> operator_header
+%type <s>     opt_identifier
 %type <dnode> opt_implements_method
 %type <i>     function_attributes
 %type <dnode> function_definition
@@ -5760,7 +5868,6 @@ delimited_statement
   | raise_statement
   | incdec_statement
   | io_statement
-  | program_statement
   | program_definition
   | delimited_control_statement
   | package_statement
@@ -6109,19 +6216,13 @@ pragma_statement
    }
    ;
 
-program_statement
-  : _PROGRAM __IDENTIFIER '(' argument_list ')'
-     {
-	 compiler_compile_program_args( snail_cc, $2, $4, px );
-     }
-  | _PROGRAM '(' argument_list ')'
-     {
-	 compiler_compile_program_args( snail_cc, NULL, $3, px );
-     }
-  ;
+opt_identifier
+: __IDENTIFIER
+| { $$ = ""; }
+;
 
 program_header
-  :  _PROGRAM __IDENTIFIER '(' argument_list ')' opt_retval_description_list
+  :  _PROGRAM opt_identifier '(' argument_list ')' opt_retval_description_list
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
@@ -7226,6 +7327,9 @@ delimited_type_description
 
   | _BLOB
     { $$ = new_tnode_blob_snail( snail_cc->typetab, px ); }
+
+  | _TYPE _OF _VAR
+    { $$ = new_tnode_type_descriptor( px ); }
   ;
 
 
@@ -8237,17 +8341,21 @@ bytecode_constant
   | __DOUBLE_PERCENT __IDENTIFIER
       {
 	static const ssize_t zero = 0;
-        snail_emit( snail_cc, px, "\te\n", &zero );
 	if( !snail_cc->current_function ) {
 	    yyerrorf( "type attribute '%%%%%s' is not available here "
 		      "(are you compiling a function or operator?)", $2 );
 	} else {
-	    FIXUP *type_attribute_fixup =
-		new_fixup_absolute( $2, thrcode_length( snail_cc->thrcode ) - 1,
-				    NULL /* next */, px );
+            if( implementation_has_attribute( $2 )) {
+                snail_emit( snail_cc, px, "\te\n", &zero );
+                
+                FIXUP *type_attribute_fixup =
+                    new_fixup_absolute
+                    ( $2, thrcode_length( snail_cc->thrcode ) - 1,
+                      NULL /* next */, px );
 
-	    dnode_insert_code_fixup( snail_cc->current_function,
-				     type_attribute_fixup );
+                dnode_insert_code_fixup( snail_cc->current_function,
+                                         type_attribute_fixup );
+            }
 	}
       }
 
@@ -8735,30 +8843,30 @@ closure_initialisation
 | opt_variable_declaration_keyword variable_identifier
 {
     int readonly = $1;
-    ENODE *top_expr = snail_cc->e_stack;
-    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var = $2;
-    ssize_t offset = 0;
-
-    assert( closure_tnode );
 
     if( readonly ) {
         dnode_list_set_flags( closure_var, DF_IS_READONLY );
     }
-
-    tnode_insert_fields( closure_tnode, closure_var );
-    offset = dnode_offset( closure_var );
-    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
 }
  '=' expression
 {
     ENODE *top_expr = snail_cc->e_stack;
     TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
+    ENODE *second_expr = enode_next( snail_cc->e_stack );
+    TNODE *closure_tnode = second_expr ? enode_type( second_expr ) : NULL;
     DNODE *closure_var = $2;
+    ssize_t offset = 0;
 
+    assert( closure_tnode );
     assert( top_type );
 
     dnode_insert_type( closure_var, share_tnode( top_type ));
+    tnode_insert_fields( closure_tnode, closure_var );
+    offset = dnode_offset( closure_var );
+    snail_emit( snail_cc, px, "\tc\n", SWAP );
+    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
+    snail_emit( snail_cc, px, "\tc\n", SWAP );
 
     snail_push_type( snail_cc,
                      new_tnode_addressof( share_tnode( top_type ), px ), 
@@ -8774,39 +8882,58 @@ closure_initialisation
   variable_identifier_list
 {
     int readonly = $1;
-    ENODE *top_expr = snail_cc->e_stack;
-    TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
-    DNODE *closure_var;
     DNODE *closure_var_list = dnode_append( $2, $4 );
-    ssize_t offset = 0;
-    int first_variable = 1;
-
-    assert( closure_tnode );
 
     if( readonly ) {
         dnode_list_set_flags( closure_var_list, DF_IS_READONLY );
     }
 
-    tnode_insert_fields( closure_tnode, closure_var_list );
-
-    foreach_dnode( closure_var, closure_var_list ) {
-
-        if( !first_variable ) {
-            share_tnode( closure_tnode );
-        }
-        offset = dnode_offset( closure_var );
-        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-        snail_emit( snail_cc, px, "\tc\n", RTOR );
-        snail_emit( snail_cc, px, "\tc\n", DUP );
-        first_variable = 0;
-    }
+    snail_emit( snail_cc, px, "\tc\n", RTOR );
 }
  '=' multivalue_expression_list
 {
+    ENODE *top_expr = snail_cc->e_stack;
+    ENODE *current_expr, *closure_expr;
+    TNODE *closure_tnode;
     DNODE *closure_var_list = $2;
-    DNODE *var;
     ssize_t len = dnode_list_length( closure_var_list );
     ssize_t expr_nr = $7;
+    ssize_t offset = 0;
+    int i, first_variable = 1;
+    DNODE *var;
+
+    closure_expr = top_expr;
+    for( i = 0; i < expr_nr; i++ ) {
+        closure_expr = enode_next( closure_expr );
+    }
+
+    closure_tnode = closure_expr ? enode_type( closure_expr ) : NULL;
+    
+    assert( closure_tnode );
+
+    current_expr = top_expr;
+    closure_var_list = dnode_list_invert( closure_var_list );
+    foreach_dnode( var, closure_var_list ) {
+        TNODE *expr_type = current_expr ?
+            share_tnode( enode_type( current_expr )) : NULL;
+        type_kind_t expr_type_kind = expr_type ?
+            tnode_kind( expr_type ) : TK_NONE;
+        if( expr_type_kind == TK_FUNCTION ||
+            expr_type_kind == TK_OPERATOR ||
+                 expr_type_kind == TK_METHOD ) {
+            TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+            expr_type = new_tnode_function_or_proc_ref
+                ( share_dnode( tnode_args( expr_type )),
+                  share_dnode( tnode_retvals( expr_type )),
+                  share_tnode( base_type ),
+                  px );
+        }
+        dnode_append_type( var, expr_type );
+        current_expr = current_expr ? enode_next( current_expr ) : NULL;
+    }
+    closure_var_list = dnode_list_invert( closure_var_list );
+
+    tnode_insert_fields( closure_tnode, closure_var_list );
 
     if( expr_nr < len ) {
         yyerrorf( "number of expressions (%d) is less than "
@@ -8827,39 +8954,27 @@ closure_initialisation
     foreach_dnode( var, closure_var_list ) {
         len ++;
         if( len <= expr_nr ) {
-            TNODE *var_type = NULL;
-            TNODE *expr_type = snail_cc->e_stack ?
-                share_tnode( enode_type( snail_cc->e_stack )) : NULL;
-            type_kind_t expr_type_kind = expr_type ?
-                tnode_kind( expr_type ) : TK_NONE;
-            if( expr_type_kind == TK_FUNCTION ||
-                expr_type_kind == TK_OPERATOR ||
-                expr_type_kind == TK_METHOD ) {
-                TNODE *base_type = typetab_lookup( snail_cc->typetab,
-                                                   "procedure" );
-                expr_type = new_tnode_function_or_proc_ref
-                    ( share_dnode( tnode_args( expr_type )),
-                      share_dnode( tnode_retvals( expr_type )),
-                      share_tnode( base_type ),
-                      px );
-            }
-            dnode_append_type( var, expr_type );
-
-            var_type = var ? dnode_type( var ) : NULL;
+            TNODE *var_type = var ? dnode_type( var ) : NULL;
 
             assert( var_type );
 
-            snail_emit( snail_cc, px, "\tc\n", RFROMR );
             snail_push_type( snail_cc,
                              new_tnode_addressof( share_tnode( var_type ),
                                                   px ), 
                              px );
+
+            snail_emit( snail_cc, px, "\tc\n", RFROMR );
+            snail_emit( snail_cc, px, "\tc\n", DUP );
+            snail_emit( snail_cc, px, "\tc\n", RTOR );
+            offset = dnode_offset( var );
+            snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
             snail_compile_swap( snail_cc, px );
             snail_compile_sti( snail_cc, px );
         }
     }
-
     closure_var_list = dnode_list_invert( closure_var_list );
+
+    snail_emit( snail_cc, px, "\tc\n", RFROMR );
 }
 
 ;
@@ -8888,6 +9003,7 @@ closure_header
       opt_retval_description_list
       {
           TNODE *closure_tnode = new_tnode_ref( px );
+          DNODE *closure_fn_ref = NULL;
           ssize_t zero = 0;
           /* Allocate the closure structure: */
           snail_push_absolute_fixup( snail_cc, px );
@@ -8898,7 +9014,8 @@ closure_header
           tnode_set_kind( closure_tnode, TK_STRUCT );
           /* reserve one stackcell for a function pointer of the
              closure: */
-          tnode_insert_fields( closure_tnode, new_dnode_name( "", px ));
+          closure_fn_ref = new_dnode_typed( "",  new_tnode_ref( px ), px );
+          tnode_insert_fields( closure_tnode, closure_fn_ref );
           snail_push_type( snail_cc, closure_tnode, px );
       }
       opt_closure_initialisation_list
@@ -8906,23 +9023,16 @@ closure_header
           DNODE *parameters = $4;
           DNODE *return_values = $6;
           DNODE *self_dnode = new_dnode_name( $8, px );
-          ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
-          TNODE *closure_type = share_tnode( enode_type( closure_expr ));
+          ENODE *closure_expr = snail_cc->e_stack;
+          TNODE *closure_type = enode_type( closure_expr );
 
           ssize_t nref, size;
 
           nref = tnode_number_of_references( closure_type );
           size = tnode_size( closure_type );
 
-          if( nref > 0 ) {
-              nref = dnode_list_length( tnode_fields( closure_type ));
-          }
-
           snail_fixup( snail_cc, nref );
           snail_fixup( snail_cc, size );
-
-          delete_enode( closure_expr );
-          closure_expr = NULL;
 
           dnode_insert_type( self_dnode, share_tnode( closure_type ));
 
@@ -8952,9 +9062,18 @@ function_expression
   function_or_operator_body
   function_or_operator_end
     {
+        ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
+        TNODE *closure_type = enode_type( closure_expr );
+        DNODE *fields = tnode_fields( closure_type );
+        ssize_t offs = dnode_offset( fields );
+
+        /* assert( offs == -sizeof(alloccell_t)-sizeof(void*) ); */
+
         snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
+        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offs );
         snail_compile_load_function_address( snail_cc, $1, px );
         snail_emit( snail_cc, px, "\tc\n", PSTI );
+        delete_enode( closure_expr );
     }
 ;
 
@@ -8975,6 +9094,17 @@ simple_expression
   | struct_expression
   | unpack_expression
   | function_expression
+  | _TYPE type_identifier
+      {
+          TNODE *tnode = $2;
+          snail_compile_type_descriptor_loader( snail_cc, tnode, px );
+      }
+  | _TYPE _OF variable_access_identifier
+      {
+          DNODE *var_dnode = $3;
+          TNODE *var_type = dnode_type( var_dnode );
+          snail_compile_type_descriptor_loader( snail_cc, var_type, px );
+      }
   ;
 
 opt_comma
@@ -9464,6 +9594,7 @@ generator_new
           snail_compile_mdalloc( snail_cc, element_type, level, px );
           snail_emit( snail_cc, px, "\tce\n", FILLMDARRAY, &level );
       }
+  | _NEW type_identifier _OF '(' _TYPE type_identifier ',' opt_actual_argument_list ')'
   ;
 
 md_array_allocator
@@ -10446,6 +10577,15 @@ field_designator
   : __IDENTIFIER '.' __IDENTIFIER
     {
 	$$ = compiler_lookup_type_field( snail_cc, NULL, $1, $3 );
+    }
+  | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
+    {
+        TNODE *composite = $2;
+        composite = new_tnode_synonim( composite, px );
+        tnode_set_kind( composite, TK_COMPOSITE );
+        tnode_insert_element_type( composite, $4 );
+        
+	$$ = compiler_lookup_tnode_field( snail_cc, composite, $7 );
     }
   | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
