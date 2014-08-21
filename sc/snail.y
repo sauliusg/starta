@@ -5733,6 +5733,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     md_array_allocator
 %type <dnode> operator_definition
 %type <dnode> operator_header
+%type <s>     opt_identifier
 %type <dnode> opt_implements_method
 %type <i>     function_attributes
 %type <dnode> function_definition
@@ -5867,7 +5868,6 @@ delimited_statement
   | raise_statement
   | incdec_statement
   | io_statement
-  | program_statement
   | program_definition
   | delimited_control_statement
   | package_statement
@@ -6216,19 +6216,13 @@ pragma_statement
    }
    ;
 
-program_statement
-  : _PROGRAM __IDENTIFIER '(' argument_list ')'
-     {
-	 compiler_compile_program_args( snail_cc, $2, $4, px );
-     }
-  | _PROGRAM '(' argument_list ')'
-     {
-	 compiler_compile_program_args( snail_cc, NULL, $3, px );
-     }
-  ;
+opt_identifier
+: __IDENTIFIER
+| { $$ = ""; }
+;
 
 program_header
-  :  _PROGRAM __IDENTIFIER '(' argument_list ')' opt_retval_description_list
+  :  _PROGRAM opt_identifier '(' argument_list ')' opt_retval_description_list
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;

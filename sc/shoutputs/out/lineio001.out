@@ -8,8 +8,8 @@ shtests/programs/lineio.snl
 7 	 >>>  <<<
 8 	 >>> use std; <<<
 9 	 >>>  <<<
-10 	 >>> program lines( string args[] ); <<<
-11 	 >>>  <<<
+10 	 >>> program lines( string args[] ) <<<
+11 	 >>> { <<<
 12 	 >>> for var i = 1 to last(args) do <<<
 13 	 >>>     . args[i]; <<<
 14 	 >>>  <<<
@@ -27,3 +27,4 @@ shtests/programs/lineio.snl
 26 	 >>>      <<<
 27 	 >>>     fclose( in ); <<<
 28 	 >>> enddo; <<<
+29 	 >>> } <<<

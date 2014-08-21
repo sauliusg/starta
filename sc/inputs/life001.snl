@@ -92,7 +92,8 @@ procedure printfield( f : array [][] of Cell )
     . "";
 }
 
-program life( string argv[] );
+## program life( string argv[] );
+var argv = arguments();
 
 var generations = 10;
 

@@ -13,7 +13,9 @@ function array_length( array a ) : int
     return last(a) + 1;
 }
 
-program Test( string[] argv; file[] files; string[] env );
+program Test( string[] argv; file[] files; string[] env )
+{
 
-. array_length(argv);
-. array_length(files);
+    . array_length(argv);
+    . array_length(files);
+}
