@@ -2,7 +2,7 @@ shtests/programs/readline.snl
 >>>  <<<
 >>> use std; <<<
 >>>  <<<
->>> program ( args : array of string ); <<<
+>>> var args : array of string = arguments(); <<<
 >>>  <<<
 >>> var s : string; <<<
 >>> var f : file; <<<

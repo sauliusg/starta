@@ -7,10 +7,6 @@
 
 include "stdtypes.slib"
 
-program ( argv : array of string );
-
-var fp : file;
-
 bytecode function fopen( name : string; mode : string ) : file
 {
     FOPEN
@@ -35,6 +31,11 @@ bytecode function fwrite( f : file; m : ref ) : int
 {
     FWRITE
 }
+
+program ( argv : array of string )
+{
+
+var fp : file;
 
 const INT_SIZE = 4;
 
@@ -63,3 +64,5 @@ var format = "i%d" %% const(INT_SIZE);
 for i = 0 to length(n)/const(INT_SIZE) - 1 do
     . unpack int( n, i * const(INT_SIZE), format );
 enddo
+
+} // end program
