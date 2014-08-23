@@ -641,6 +641,105 @@ int STI( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ GLDI (generic load indirect)
+ 
+ address --> value
+ 
+ */
+
+int GLDI( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
+    void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
+    alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
+    ssize_t size = src_header->size;
+    ssize_t length = src_header->length;
+
+    TRACE_FUNCTION();
+
+    if( offset >= 0 ) {
+        if( src_header->nref <= 0 ) {
+            istate.ep[0].num = *((stackunion_t*)STACKCELL_PTR(istate.ep[0]));
+            STACKCELL_ZERO_PTR( istate.ep[0] );
+        } else {
+            STACKCELL_SET_ADDR( istate.ep[0], *ref_src );
+        }
+    } else {
+#if 0
+        STACKCELL_SET_ADDR( istate.ep[0],
+                            *((void**)STACKCELL_PTR(istate.ep[0])));
+#else
+        ssize_t numoffset =
+            ((-offset - sizeof(alloccell_t) - REF_SIZE)/REF_SIZE) * 
+            sizeof(stackunion_t);
+
+        if( length == -1
+            && size >= numoffset + sizeof(istate.ep[0].num) ) {
+            /* NB.: offset < 0 */
+            /* We have a field of generic type, and need to load the
+               numeric stackcell at the positive offset: */
+            char* num_src = (char*)istate.ep[0].PTR + numoffset;
+            istate.ep[0].num = *(stackunion_t*)num_src;
+        } else {
+            istate.ep[0].num.offs = 0;
+        }
+        istate.ep[0].PTR = *ref_src;
+#endif
+    }
+
+    return 1;
+}
+
+/*
+ GSTI (generic store indirect)
+ 
+ ..., address, value --> 
+ 
+ */
+
+int GSTI( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
+    alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
+    ssize_t size = dst_header->size;
+    ssize_t length = dst_header->length;
+
+    TRACE_FUNCTION();
+
+    if( offset >= 0 ) {
+        if( dst_header->nref <= 0 ) {
+            memcpy( (char*)STACKCELL_PTR(istate.ep[1]),
+                    &istate.ep[0].num, sizeof(stackunion_t) );
+        } else {
+            *(void**)STACKCELL_PTR(istate.ep[1]) =
+                STACKCELL_PTR( istate.ep[0] );
+        }
+    } else {
+        *((void**)STACKCELL_PTR(istate.ep[1])) = istate.ep[0].PTR;
+        /* The numeric part will have to be stored for generic
+           types at the same positive offset: */
+        ssize_t numoffset =
+            ((-offset - sizeof(alloccell_t) - REF_SIZE)/REF_SIZE) * 
+            sizeof(stackunion_t);
+
+        if( length == -1
+            && size >= numoffset + sizeof(istate.ep[0].num) ) {
+            /* offset < 0 here */
+            /* We have a field of generic type, and need to store the
+               numeric stackcell at the positive offset: */
+            void* dst = (char*)istate.ep[1].PTR + numoffset;
+            memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
+        }
+    }
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
  * EXIT Call libc exit() to exit the program.
  * 
  * bytecode:

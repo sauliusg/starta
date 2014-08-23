@@ -1,0 +1,86 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2013-09-12 09:13:30 +0300 (Thu, 12 Sep 2013) $ 
+//$Revision: 10 $
+//$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/scilib/trunk/sc/simplex-minimisation/FloatSimplexFns.slib $
+//---------------------------------------------------------------------------*/
+//*
+// Minimise a multidimensional function using simplex method.
+//**
+
+package FloatSimplexFns;
+
+use std;
+
+procedure mkcenter( simplex: array [][] of float;
+                    exclude: long ): array of float
+{
+    var center = new float[length(simplex[0])];
+
+    for( var dim = 0L; dim < llength(center); dim++ ) {
+        center[dim] = 0.0;
+        for( var i = 0L; i < llength(simplex); i++ ) {
+            if( i != exclude ) {
+                center[dim] += simplex[i][dim];
+            }
+        }
+    }
+
+    var ndim = <float>llength(simplex) - 1.0;
+    if( exclude < 0L ) {
+        ndim += 1.0;
+    }
+    for( var i = 0L; i < llength(center); i++ ) {
+        center[i] /= ndim;
+    }
+
+    return center;
+}
+
+function mkarray( length: long ): array [][] of float
+{
+    return new (array of float)[length];
+}
+
+procedure flip( simplex: array [][] of float;
+                center: array of float;
+                index: long;
+                factor: float
+                ): array of float
+{
+    var new_point = new float[length(simplex[index])];
+
+    for( var i = 0L; i < llength(new_point); i++ ) {
+        new_point[i] = center[i] + factor * ( simplex[index][i] - center[i] );
+    }
+
+    return new_point;
+}
+
+procedure scale( simplex: array [][] of float; index: long; factor: float )
+{
+    var best = simplex[index];
+    var factor1 = 1.0 - factor;
+
+    for( var i = 0L; i < llength(simplex); i++ ) {
+        if( i != index ) {
+            for( var d = 0L; d < llength(simplex[i]); d++ ) {
+                simplex[i][d] = factor * simplex[i][d] + factor1 * best[d];
+                // simplex[i][d] = 
+                //    best[d] + factor * ( simplex[i][d] - best[d] );
+            }
+        }
+    }
+}
+
+function shift( point: array of float; index: long; shift: float ) ->
+    (array of float)
+{
+    var new_point = new float[llength(point)];
+    new_point := point;
+    // var new_point = point[];
+    new_point[index] += shift;
+    return new_point;
+}
+
+end package FloatSimplexFns
