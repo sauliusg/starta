@@ -2192,7 +2192,7 @@ static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
 	    }
 
             if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
-		snail_emit( cc, ex, "\tc\n", GLDI );
+		snail_emit( cc, ex, "\tcs\n", GLDI, &element_size );
 	    } else if( element_type && tnode_is_reference( element_type )) {
 		snail_emit( cc, ex, "\tc\n", PLDI );
 	    } else {
@@ -2266,12 +2266,12 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
 		snail_emit_function_call( cc, od.operator, NULL, "\n", &inner );
 		snail_check_operator_retvals( cc, &od, 0, 0 );
 	    } else {
+                ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
 		if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
-		    snail_emit( cc, &inner, "\tc\n", GSTI );
+		    snail_emit( cc, &inner, "\tcs\n", GSTI, &expr_size );
                 } else if( expr_type && tnode_is_reference( expr_type )) {
 		    snail_emit( cc, &inner, "\tc\n", PSTI );
 		} else {
-		    ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
 		    snail_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}
 	    }
