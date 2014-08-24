@@ -24,6 +24,8 @@
 #include <stringx.h>
 #include <cxprintf.h>
 
+static char *source_URL = "$URL$";
+
 static char **include_paths = NULL;
 
 static ssize_t string_count( char **strings )
@@ -100,6 +102,87 @@ static void gc_collect_never( int argc, char *argv[], int *i,
     bcalloc_set_gc_collector_policy( GC_NEVER );
 }
 
+static char *usage_text[2] = {
+
+"Compile and run an SLC program\n",
+
+"Options:\n"
+
+"  -c, --compile-only  Only compile a program, do not run it.\n"
+"  -q, --quiet         Do not print file name on successful compilation.\n"
+"  -q-,--verbose       Print file name and 'OK' on successful compilation.\n"
+"\n"
+
+"  -G, --gc-always\n"
+"      Invoke garbage collector (GC) before every allocation\n"
+"      (slow, for debugging).\n"
+
+"  -g, --gc-on-hit\n"
+"      Invoke GC when a pre-set memory limit is hit (default).\n"
+
+"  -g-,--gc-never\n"
+"      Never invoke GC (leaks memory! For debugging).\n"
+"\n"
+
+"  "
+"--garbage-collect-always, "
+"--garbage-collect-on-hit, "
+"--garbage-collect-never\n"
+"      Synonims for -G, -g and -g-, respectively.\n"
+"\n"
+
+"  -d, --debug code,flex\n"
+"      Debug the compiler. Possible (comma-separated) debug flags are:\n"
+"      flex  - print FLEX debug output\n"
+"      yacc  - print YACC/Bison debug output\n"
+"      code  - print the generated code in a bytecode assembler notation\n"
+"      dump  - dump the generated code after patching addresses\n"
+"      trace - print opcode names and stack top during program execution\n"
+"\n"
+
+"  -I, --include-path path/to/modules\n"
+"      Add a directory for module and library (*.so*) search.\n\n"
+
+"  --use-environment\n"
+"      Use environment variable SL_INCLUDE_PATHS to search for modules\n"
+"      and libraries (default). -I supplied values take precedence over\n"
+"      the SL_INCLUDE_PATHS variable.\n"
+"\n"
+
+"  "
+"--dont-use-environment, "
+"--no-use-environment, "
+"--no-environment\n"
+"      Ignore the SL_INCLUDE_PATHS value, use only -I options\n"
+"\n"
+
+"  --version  print program version (SVN Id) and exit\n"
+
+"  --help     print short usage message (this message) and exit\n"
+};
+
+static void usage( int argc, char *argv[], int *i, option_t *option,
+		   cexception_t * ex )
+{
+    puts( usage_text[0] );
+    puts( "Usage:" );
+    printf( "   %s --options programs*.snl\n", argv[0] );
+    printf( "   %s --options programs*.snl -- "
+            "--program-options program-args\n", argv[0] );
+    printf( "   %s --options -- program.snl "
+            "--program-options program-args\n\n", argv[0] );
+    puts( usage_text[1] );
+    exit( 0 );
+};
+
+static void version( int argc, char *argv[], int *i, option_t *option,
+                     cexception_t * ex )
+{
+    printf( "%s svnversion %s\n", argv[0], SVN_VERSION );
+    printf( "%s\n", source_URL );
+    exit( 0 );
+}
+
 static option_value_t verbose;
 static option_value_t debug;
 static option_value_t only_compile;
@@ -121,6 +204,10 @@ static option_t options[] = {
   { NULL, "--use-environment",      OT_BOOLEAN_TRUE,  &use_environment },
   { NULL, "--dont-use-environment", OT_BOOLEAN_FALSE, &use_environment },
   { NULL, "--no-use-environment",   OT_BOOLEAN_FALSE, &use_environment },
+  { NULL, "--no-environment",       OT_BOOLEAN_FALSE, &use_environment },
+  { NULL, "--help",         OT_FUNCTION,      NULL, &usage },
+  { NULL, "--options",      OT_FUNCTION,      NULL, &usage },
+  { NULL, "--version",      OT_FUNCTION,      NULL, &version },
   { NULL }
 };
 
@@ -154,12 +241,18 @@ int main( int argc, char *argv[], char *env[] )
       files = get_optionsx( argc, argv, options, &inner );
   }
   cexception_catch {
-      fprintf( stderr, "%s: %s\n", argv[0], cexception_message( &inner ));
+      fprintf( stderr, "%s: %s\n", progname, cexception_message( &inner ));
       exit(1);
   }
 
+  if( only_compile.value.bool && !verbose.present ) {
+      verbose.value.bool = 1;
+  }
+
   if( files[0] == NULL ) {
-      fprintf( stderr, "%s: Usage: %s program.snl\n", argv[0], argv[0] );
+      fprintf( stderr, "%s: Usage: %s program.snl\n", progname, progname );
+      fprintf( stderr, "%s: please try '%s --help' for more options\n",
+               progname, progname );
       exit(2);
   }
 
@@ -200,7 +293,11 @@ int main( int argc, char *argv[], char *env[] )
 	  }
 	  if( !only_compile.value.bool ) {
 	      interpret( code, i - 1, files, env, &inner );
-	  }
+          } else {
+              if( verbose.value.bool ) {
+                  printf( "%s: '%s' -- OK\n", progname, files[0] );
+              }
+          }
       } else {
 	  for( i = 0; files[i] != NULL; i++ ) {
 	      code = new_thrcode_from_snail_file( files[i], include_paths,
@@ -211,7 +308,11 @@ int main( int argc, char *argv[], char *env[] )
 	      }
 	      if( !only_compile.value.bool ) {
 		  interpret( code, 0/*argc*/, files, env, &inner );
-	      }
+	      } else {
+                  if( verbose.value.bool ) {
+                      printf( "%s: '%s' syntax OK\n", progname, files[i] );
+                  }
+              }
 	      delete_thrcode( code );
 	      code = NULL;
 	  }
