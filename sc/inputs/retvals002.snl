@@ -10,7 +10,7 @@ function g( int x ): float
 
 function h( int x ): long, float
 {
-    return <long>x + 2L, x - 2
+    return x@long + 2L, x - 2
 }
 
 . h( 5 );

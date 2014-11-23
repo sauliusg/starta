@@ -30,7 +30,7 @@ null class S : P {
     method h(int x) : int;
     method h(int x) : int { return self.i*self.i + x }
     method f(int x) : int { return self.i * x }
-    method k(int x; int y) : float {return <float>self.i * <float>x * <float>y}
+    method k(int x; int y) : float {return (self.i)@float * x@float * y@float}
 
     inline bytecode operator "*"(S a, b) : S { return null };
 };

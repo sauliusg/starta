@@ -17,14 +17,14 @@ type S = struct { i, j, k: I };
 type U = array of S;
 type V = array of struct { i,j,k: I };
 
-type C = class { x, y : L; method f( i : I ) { self.x = <L>i }}
+type C = class { x, y : L; method f( i : I ) { self.x = i@L }}
 
 type W = array of C;
 
-type X1 = array [] of class { x, y : L; method f( i : I ) { self.x = <L>i }};
-type X2 = array [][] of class { x, y : L; method f( i : I ) { self.x = <L>i }};
-type X3 = array [] of class { x, y : L; method f( i : I ) { self.x = <L>i }};
-type X4 = array [][] of class { x, y : L; method f( i : I ) { self.x = <L>i }};
+type X1 = array [] of class { x, y : L; method f( i : I ) { self.x = i@L }};
+type X2 = array [][] of class { x, y : L; method f( i : I ) { self.x = i@L }};
+type X3 = array [] of class { x, y : L; method f( i : I ) { self.x = i@L }};
+type X4 = array [][] of class { x, y : L; method f( i : I ) { self.x = i@L }};
 
 begin
     use std;

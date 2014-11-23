@@ -26,7 +26,7 @@ procedure mkcenter( simplex: array [][] of float;
         }
     }
 
-    var ndim = <float>llength(simplex) - 1.0;
+    var ndim = llength(simplex)@float - 1.0;
     if( exclude < 0L ) {
         ndim += 1.0;
     }

@@ -8,7 +8,7 @@ use std;
 
 function multitype( int i ) : int, long, double
 {
-    return i * 10, <long>i * 10000L, <double>i/3.0D
+    return i * 10, i@long * 10000L, i@double/3.0D
 }
 
 // errors:

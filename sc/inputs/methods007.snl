@@ -19,7 +19,7 @@ null class S {
     method h(int i) : int;
     method f(int i) : int { return i * i }
     method h(int i) : int { return i*i + i }
-    method h21() : float { return <float>self.i }
+    method h21() : float { return (self.i)@float }
 
     inline bytecode operator "*"(S a, b) : S { return null };
 

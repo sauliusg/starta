@@ -11,7 +11,7 @@ function g( int i; float j ) : float
 {
     i = 2 * i;
     j = j / 2.0;
-    return <float> i * j;
+    return i@float * j;
 }
 
 . g( 2, 4 );
