@@ -120,6 +120,19 @@ int EXCEPTIONID( INSTRUCTION_FN_ARGS );
 int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS );
 
 /*
+ * Standard input management bytecode operators -- to implement
+ * 'whil(<>) { ... }' a-la Perl.
+ */
+
+/*
+** STDREAD -- read STDIO and/or the specified files as a single
+** stream, in the same fashion like Perl does for the 'while(<>)'
+** construct.
+*/
+
+int STDREAD( INSTRUCTION_FN_ARGS );
+
+/*
 ** File management bytecode operators.
 */
 
