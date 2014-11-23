@@ -5809,9 +5809,9 @@ static cexception_t *px; /* parser exception */
 %left  '*' '/' '%' '&' _SHR _SHL __LEFT_TO_RIGHT  __RIGHT_TO_LEFT
 %left  __STAR_STAR
 
-%left __COLON_COLON /* :: */
-
 %left '@'
+
+%left __COLON_COLON /* :: */
 
 /* %left _AS */
 
@@ -6428,7 +6428,6 @@ file_io_statement
       {
 	snail_compile_file_input_operator( snail_cc, px );
       }
-
   ;
 
 variable_declaration_keyword
@@ -9247,9 +9246,10 @@ array_expression
      {
 	 snail_compile_array_expression( snail_cc, $2, px );
      }
-
+/*
+  Expression never used and unnecessary duplication:
   | '{' expression_list opt_comma '}'
-
+*/
   ;
 
 struct_expression
@@ -9435,10 +9435,12 @@ arithmetic_expression
        snail_compile_binop( snail_cc, "%%", px );
       }
 
+/*
   | '<' __IDENTIFIER '>' expression %prec __UNARY
       {
-       snail_compile_type_conversion( snail_cc, /*target_name*/$2, px );
+       snail_compile_type_conversion( snail_cc, /*target_name* /$2, px );
       }
+*/
 
   | expression '@' __IDENTIFIER
       {

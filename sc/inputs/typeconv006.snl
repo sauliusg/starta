@@ -28,12 +28,12 @@ bytecode function write( i : int )
     bytecode { IPRINT }
 };
 
-d = <long>( a + b ) / ( <long>a - c );
+d = ( a + b )@long / ( a@long - c );
 
-lwriteln( <long>a );
+lwriteln( a@long );
 writeln( a );
 lwriteln( d );
 
-c = <long>b - d * c + <long>a;
+c = b@long - d * c + a@long;
 
 lwriteln( c );

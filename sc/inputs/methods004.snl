@@ -10,7 +10,7 @@ type L = { size = 4; kind = integer; suffix = "L";
     inline bytecode operator "@L"( i : I ) : L { EXTEND }
 }
 
-type C = class { x, y : L; method f( i : I ) { self.x = <L>i }}
+type C = class { x, y : L; method f( i : I ) { self.x = i@L }}
 
 var c = new C;
 

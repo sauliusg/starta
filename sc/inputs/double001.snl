@@ -9,7 +9,7 @@ use std;
 var double x = 2.0;
 var ldouble y = 3.0;
 
-. <ldouble>x / y;
+. x@ldouble / y;
 
 . 2.0;
 . 2.0D;

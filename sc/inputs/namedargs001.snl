@@ -9,7 +9,7 @@ use std;
 
 function ff( x : int = 100; y : long = 200 ) : long
 {
-    return <long>x * y / ( <long>x + y );
+    return x@long * y / ( x@long + y );
 }
 
 . ff( 300 );

@@ -9,7 +9,7 @@ use std;
 
 function ff( x : int = 0; y : float = 1 ) : float
 {
-    return <float>x * y / ( <float>x + y );
+    return x@float * y / ( x@float + y );
 }
 
 . p . ff( 2 );

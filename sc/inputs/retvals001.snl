@@ -10,9 +10,9 @@ use std;
 function good( int x ) : long
 {
     if( x > 0 ) {
-    	return (<long>x * <long>x);
+    	return (x@long * x@long);
     } else {
-    	return -(<long>x * <long>x);
+    	return -(x@long * x@long);
     }
 }
 
@@ -24,7 +24,7 @@ bytecode { ESPRINT };
 function bad( int x ) : long
 {
     if( x > 0 ) {
-    	return (<long>x * <long>x);
+    	return (x@long * x@long);
     }
 }
 

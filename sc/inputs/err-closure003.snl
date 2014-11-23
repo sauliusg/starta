@@ -9,7 +9,7 @@ lambda {
     var s : string = "va va";
 }
 { 
-  return x*y/<float>(lambda.a + lambda.b)
+  return x*y/(lambda.a + lambda.b)@float
 };
 
 x, y, z = 2, 4, 6;
