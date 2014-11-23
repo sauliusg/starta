@@ -120,6 +120,13 @@ int EXCEPTIONID( INSTRUCTION_FN_ARGS );
 int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS );
 
 /*
+ * Standard input management bytecode operators -- to implement
+ * 'whil(<>) { ... }' a-la Perl.
+ */
+
+int STDREAD( INSTRUCTION_FN_ARGS );
+
+/*
 ** File management bytecode operators.
 */
 

@@ -6409,6 +6409,11 @@ file_io_statement
 	  snail_compile_file_input_operator( snail_cc, px );
       }
 
+  | '<' '>' __LEFT_TO_RIGHT lvalue
+      {
+          assert( "'<>' operator is not yet implemented" == 0 );
+      }
+
   | file_io_statement __RIGHT_TO_LEFT expression
       {
         snail_check_and_compile_top_operator( snail_cc, "<<", 2, px );
@@ -6724,7 +6729,7 @@ opt_label
   ;
 
 if_condition
-  : _IF /* expression */ condition
+  : _IF /* expression */ {} condition
       {
         snail_push_relative_fixup( snail_cc, px );
 	snail_compile_jz( snail_cc, 0, px );
@@ -6751,7 +6756,7 @@ for_variable_declaration
   ;
 
 elsif_condition
-  : _ELSIF /* expression */ condition
+  : _ELSIF /* expression */ {} condition
       {
         snail_push_relative_fixup( snail_cc, px );
 	snail_compile_jz( snail_cc, 0, px );
@@ -6844,6 +6849,7 @@ control_statement
   | opt_label _WHILE
       {
 	  ssize_t zero = 0;
+          snail_begin_subscope( snail_cc, px );
 	  snail_push_loop( snail_cc, $1, px );
           snail_push_relative_fixup( snail_cc, px );
 	  snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
@@ -6862,6 +6868,7 @@ control_statement
 	snail_compile_jnz( snail_cc, snail_pop_offset( snail_cc, px ), px );
 	snail_fixup_op_break( snail_cc, px );
 	snail_pop_loop( snail_cc );
+        snail_end_subscope( snail_cc, px );
       }
 
   | opt_label _FOR
@@ -8626,9 +8633,47 @@ expression_list
       { $$ = $1 + 1; }
   ;
 
+stdio_inpupt_condition
+: '<' '>'
+{
+    cexception_t inner;
+    TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+    DNODE *default_var = NULL;
+    ssize_t default_var_offset = 0;
+
+    cexception_guard( inner ) {
+        default_var = new_dnode_typed( "$_", type_tnode, &inner );
+        share_tnode( type_tnode );
+        snail_vartab_insert_named_vars( snail_cc, default_var, &inner );
+        default_var_offset = dnode_offset( default_var );
+
+        snail_cc->local_offset ++;
+        default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
+        share_tnode( type_tnode );
+        snail_vartab_insert_named_vars( snail_cc, default_var, &inner );
+
+        snail_push_type( snail_cc, type_tnode, &inner );
+        snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+        snail_emit( snail_cc, &inner, "\tc\n", DUP );
+        snail_emit( snail_cc, &inner, "\tce\n", PST, &default_var_offset );        
+    }
+    cexception_catch {
+        delete_tnode( type_tnode );
+        delete_dnode( default_var );
+        cexception_reraise( inner, px );
+    }
+}
+;
+
 condition
   : function_call
   | simple_expression
+  | '<' expression '>'
+  {
+      assert( "'<>' simple expression is not implemented yet" );
+  }
+  | stdio_inpupt_condition
+  | '(' stdio_inpupt_condition ')'
 /*
   | arithmetic_expression
 */
@@ -8644,6 +8689,17 @@ multivalue_expression_list
       { $$ = $3 + 1; }
   ;
 
+io_expression
+  : '<' expression '>'
+  {
+      assert( "'<>' simple expression is not implemented yet" );
+  }
+  | '<' '>'
+  {
+      assert( "'<>' simple expression is not implemented yet" );
+  }
+;
+
 expression
   : function_call
   | simple_expression
@@ -8651,6 +8707,7 @@ expression
   | boolean_expression
   | assignment_expression
   | null_expression
+  | io_expression
   ;
 
 null_expression

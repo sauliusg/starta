@@ -1562,6 +1562,140 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * Standard input management bytecode operators -- to implement
+ * 'whil(<>) { ... }' a-la Perl.
+ */
+
+/*
+** STDREAD -- read STDIO and/or the specified files as a single
+** stream, in the same fashion like Perl does for the 'while(<>)'
+** construct.
+*/
+
+int STDREAD( INSTRUCTION_FN_ARGS )
+{
+    int ch;
+    char *buff = NULL;
+    ssize_t length = 0, delta_length = 20, char_count = 0;
+    FILE *in = NULL;
+
+    /* Decide which file to read from; prepare the input stream: */
+
+    if( istate.argnr == 0 ) {
+        istate.argnr = 1;
+    }
+
+    if( istate.in != NULL ) {
+        ch = getc( istate.in );
+        if( feof( istate.in )) {
+            fclose( istate.in );
+            istate.in = NULL;
+            istate.argnr ++;
+        } else {
+            ungetc( ch, istate.in );
+        }
+    }
+
+    if( istate.in == NULL ) {
+        if( istate.argnr == 1 && istate.argc == 0 ) {
+            istate.in = stdin;
+        } else
+        if( istate.argnr <= istate.argc ) {
+            while( istate.argnr <= istate.argc ) {
+                if( strcmp( istate.argv[istate.argnr], "-" ) == 0 ) {
+                    istate.in = stdin;
+                } else {
+                    istate.in = fopen( istate.argv[istate.argnr], "r" );
+                    if( !istate.in ) {
+                        char *name = istate.argv[istate.argnr];
+                        char *message =
+                            (char*)cxprintf( "could not open file '%s' "
+                                             "for reading: %s",
+                                             name, strerror( errno ));
+
+                        interpret_raise_exception_with_bcalloc_message
+                            ( /* err_code = */  errno,
+                              /* message = */   message,
+                              /* module_id = */ 0,
+                              /* exception_id = */
+                              SL_EXCEPTION_SYSTEM_ERROR,
+                              EXCEPTION );
+                        istate.argnr ++;
+                        return 1;
+                    }
+                }
+                if( istate.in != NULL ) {
+                    ch = getc( istate.in );
+                    if( ch == EOF || feof( istate.in )) {
+                        fclose( istate.in );
+                        istate.in = NULL;
+                    } else {
+                        ungetc( ch, istate.in );
+                        break;
+                    }
+                }
+                istate.argnr ++;
+            }
+            if( istate.argnr > istate.argc ) {
+                istate.ep --;
+                STACKCELL_SET_ADDR( istate.ep[0], NULL );
+                return 1;
+            }
+        } else {
+            istate.ep --;
+            STACKCELL_SET_ADDR( istate.ep[0], NULL );
+            return 1;
+        }
+    }
+
+    in = istate.in;
+
+    /* Read a string from the prepared input stream (an open file
+       handle or stdin): */
+    while( (ch = getc( in )) != EOF ) {
+	if( ferror( in )) {
+	    interpret_raise_exception_with_bcalloc_message
+                ( /* err_code = */ -1,
+                  /* message = */ strerror(errno),
+                  /* module_id = */ 0,
+                  /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+                  EXCEPTION );
+	    return 0;
+	}
+	if( ch == '\n' ) {
+	    break;
+	}
+	if( char_count >= length ) {
+	    length += delta_length;
+	    assert( !buff || ((alloccell_t*)buff)[-1].magic == BC_MAGIC );
+	    buff = bcrealloc_blob( buff, length + 1 );
+	    BC_CHECK_PTR( buff );
+	    STACKCELL_SET_ADDR( istate.ep[0], buff );
+	}
+
+	buff[char_count] = ch;
+	char_count ++;
+    }
+
+    if( buff ) {
+	buff = bcrealloc_blob( buff, char_count+1 );
+	BC_CHECK_PTR( buff );
+	buff[char_count] = '\0';
+    } else {
+	if( ch == '\n' ) {
+	    buff = bcrealloc_blob( buff, 1 );
+	    BC_CHECK_PTR( buff );
+	    buff[char_count] = '\0';
+	}
+    }
+
+    istate.ep --;
+    STACKCELL_SET_ADDR( istate.ep[0], buff );
+
+    return 1;
+}
+
+/*
 ** File management bytecode operators.
 */
 

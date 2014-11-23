@@ -1,0 +1,14 @@
+
+
+use std;
+use std;
+
+
+while(<>) {
+while(<>) {
+    . $_;
+    . $_;
+    . $ARG;
+    . $ARG;
+}
+}

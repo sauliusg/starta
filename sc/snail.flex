@@ -13,7 +13,7 @@
 %x	m2comment
 
 DECIMAL_DIGIT  [0-9]
-NAME	       [a-zA-Z_][a-zA-Z0-9_]*
+NAME	       [a-zA-Z$_][a-zA-Z0-9_]*
 INTEGER	       {DECIMAL_DIGIT}+
 FIXED	       ({DECIMAL_DIGIT}+"."{DECIMAL_DIGIT}*)|("."{DECIMAL_DIGIT}+)
 REAL           {FIXED}([eE]([-+]?)[0-9]+)?

@@ -8,6 +8,7 @@
 #ifndef __RUN_H
 #define __RUN_H
 
+#include <stdio.h>
 #include <stackcell.h>
 #include <cexceptions.h>
 #include <thrcode_t.h>
@@ -113,8 +114,6 @@ struct interpret_exception_t {
    of bytecode (subcode).
  */
 
-typedef struct runtime_data_node runtime_data_node;
-
 typedef struct {
     THRCODE *thrcode;     /* Threaded code structure that holds all
                              code; it will also own all dynamically
@@ -143,6 +142,13 @@ typedef struct {
     char **argv;
     int argc;
     char **env;
+
+    /* Fields use to implement Perl's 'while(<>) {...}' behaviour in
+       the STDREAD opcode: */
+    int argnr; /* File name in the 'argv' array which is currently
+                  being processed; 1 <= argnr < argc */
+
+    FILE *in;  /* Current open input file */
 } istate_t;
 
 extern istate_t istate;
