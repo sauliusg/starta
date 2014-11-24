@@ -8695,7 +8695,17 @@ io_expression
   }
   | '<' '>'
   {
-      assert( "'<>' simple expression is not implemented yet" );
+    cexception_t inner;
+    TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+
+    cexception_guard( inner ) {
+        snail_push_type( snail_cc, type_tnode, &inner );
+        snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+    }
+    cexception_catch {
+        delete_tnode( type_tnode );
+        cexception_reraise( inner, px );
+    }
   }
 ;
 
