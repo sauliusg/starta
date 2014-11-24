@@ -2,9 +2,16 @@
 use std;
 
 var line = new struct { s: string; nr: int };
+
+line.s = "First";
+
 do {
    <> >> line.s;
-   // break unless line.s;
+   // . line.s;
+   // var l = <>;
+   // line.s = l;
+   // line.s = <>;
+   do { break } if not line.s;
    line.nr ++;
-   . line.nr, line.s
+   . line.nr, line.s;
 } while line.s;

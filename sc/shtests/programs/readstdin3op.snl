@@ -1,0 +1,10 @@
+
+use std;
+
+var line = new struct { s: string; nr: int };
+
+do {
+   <> >> line.s;
+   line.nr ++;
+   do { . line.nr, line.s } if line.s;
+} while line.s;
