@@ -1709,6 +1709,13 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS )
 ** STDREAD -- read STDIO and/or the specified files as a single
 ** stream, in the same fashion like Perl does for the 'while(<>)'
 ** construct.
+**
+** bytecode:
+** STDREAD
+**
+** stack:
+** --> string
+** 
 */
 
 int STDREAD( INSTRUCTION_FN_ARGS )
