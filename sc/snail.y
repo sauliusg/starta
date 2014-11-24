@@ -6390,7 +6390,43 @@ io_statement
 	snail_emit( snail_cc, px, "\tc\n", PDROP );
 	compiler_drop_top_expression( snail_cc );
     }
+
+  | stdread_io_statement
   ;
+
+stdread_io_statement
+: '<' '>' __LEFT_TO_RIGHT variable_access_identifier
+      {
+          cexception_t inner;
+          TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+
+          cexception_guard( inner ) {
+              snail_push_type( snail_cc, type_tnode, &inner );
+              snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+          }
+          cexception_catch {
+              delete_tnode( type_tnode );
+              cexception_reraise( inner, px );
+          }
+          snail_compile_store_variable( snail_cc, $4, px );
+      }
+
+  | '<' '>' __LEFT_TO_RIGHT lvalue
+      {
+          cexception_t inner;
+          TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+
+          cexception_guard( inner ) {
+              snail_push_type( snail_cc, type_tnode, &inner );
+              snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+          }
+          cexception_catch {
+              delete_tnode( type_tnode );
+              cexception_reraise( inner, px );
+          }
+          snail_compile_sti( snail_cc, px );
+      }
+;
 
 file_io_statement
 
@@ -6407,11 +6443,6 @@ file_io_statement
     __LEFT_TO_RIGHT lvariable
       {
 	  snail_compile_file_input_operator( snail_cc, px );
-      }
-
-  | '<' '>' __LEFT_TO_RIGHT lvalue
-      {
-          assert( "'<>' operator is not yet implemented" == 0 );
       }
 
   | file_io_statement __RIGHT_TO_LEFT expression
