@@ -2,7 +2,7 @@
 use std;
 
 var line: string;
-do {
+repeat {
    line = <>;
    do { . line } if line;
 } while line;
