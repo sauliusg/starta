@@ -9,11 +9,11 @@ use std;
 
 var i = 0;
 
-do {
+repeat {
   . i; i++
 } while i < 10;
 
-do
+repeat
   . i; i++
 while i < 20;
 

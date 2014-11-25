@@ -244,6 +244,7 @@ procedure   { MARK; return _PROCEDURE; }
 program     { MARK; return _PROGRAM; }
 raise       { MARK; return _RAISE; }
 readonly    { MARK; return _READONLY; }
+repeat      { MARK; return _REPEAT; }
 reraise     { MARK; return _RERAISE; }
 return      { MARK; return _RETURN; }
 ro          { MARK; return _READONLY; }

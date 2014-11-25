@@ -3,11 +3,9 @@ use std;
 
 var line = new struct { s: string; nr: int };
 
-line.s = "First";
-
-do {
+repeat {
    <> >> line.s;
-   do { break } if !line.s;
+   do break if !line.s;
    line.nr ++;
    . line.nr, line.s;
 } while line.s;

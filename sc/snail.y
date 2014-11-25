@@ -5670,6 +5670,7 @@ static cexception_t *px; /* parser exception */
 %token _PROGRAM
 %token _RAISE
 %token _READONLY
+%token _REPEAT
 %token _RERAISE
 %token _RETURN
 %token _SHL
@@ -6004,8 +6005,15 @@ debug_statement
 do_prefix
   : _DO
     {
-      snail_push_current_address( snail_cc, px );
       snail_push_thrcode( snail_cc, px );
+    }
+  ;
+
+repeat_prefix
+  : _REPEAT
+    {
+      snail_push_loop( snail_cc, /* loop label = */ NULL, px );
+      snail_push_current_address( snail_cc, px );
     }
   ;
 
@@ -6023,19 +6031,18 @@ delimited_control_statement
       {
 	snail_merge_top_thrcodes( snail_cc, px );
         snail_fixup_here( snail_cc );
-	snail_pop_offset( snail_cc, px );
       }
 
-  | do_prefix non_control_statement_list _WHILE 
+  | repeat_prefix non_control_statement_list _WHILE 
       {
-	snail_swap_thrcodes( snail_cc );
-	snail_merge_top_thrcodes( snail_cc, px );
+	snail_fixup_op_continue( snail_cc, px );
       }
     expression
       {
 	snail_compile_jnz( snail_cc, snail_pop_offset( snail_cc, px ), px );
+	snail_fixup_op_break( snail_cc, px );
+        snail_pop_loop( snail_cc );
       }
-
   ;
 
 raised_exception_identifier

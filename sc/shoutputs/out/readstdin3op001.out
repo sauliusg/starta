@@ -3,8 +3,8 @@
 3 
 4 var line = new struct { s: string; nr: int };
 5 
-6 do {
+6 repeat {
 7    <> >> line.s;
 8    line.nr ++;
-9    do { . line.nr, line.s } if line.s;
+9    do . line.nr, line.s if line.s;
 10 } while line.s;
