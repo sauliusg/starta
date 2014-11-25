@@ -7,11 +7,7 @@ line.s = "First";
 
 do {
    <> >> line.s;
-   // . line.s;
-   // var l = <>;
-   // line.s = l;
-   // line.s = <>;
-   do { break } if not line.s;
+   do { break } if !line.s;
    line.nr ++;
    . line.nr, line.s;
 } while line.s;
