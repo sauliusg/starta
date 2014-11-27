@@ -49,63 +49,63 @@ USTRING         {UDSTRING}|{USSTRING}
 #include <cexceptions.h>
 
 typedef enum {
-  SNAIL_FLEX_DEBUG_OFF = 0x00,
-  SNAIL_FLEX_DEBUG_TEXT = 0x01,
-  SNAIL_FLEX_DEBUG_YYLVAL = 0x02,
-  SNAIL_FLEX_DEBUG_YYFLEX = 0x04,
-  SNAIL_FLEX_DEBUG_LINES = 0x08,
-} SNAIL_FLEX_DEBUG_FLAGS;
+  COMPILER_FLEX_DEBUG_OFF = 0x00,
+  COMPILER_FLEX_DEBUG_TEXT = 0x01,
+  COMPILER_FLEX_DEBUG_YYLVAL = 0x02,
+  COMPILER_FLEX_DEBUG_YYFLEX = 0x04,
+  COMPILER_FLEX_DEBUG_LINES = 0x08,
+} COMPILER_FLEX_DEBUG_FLAGS;
 
-static int snail_flex_debug_flags = 0;
+static int compiler_flex_debug_flags = 0;
 
 static char * currentLine = NULL;
 static int currentLineLength = 0;
 static int lineCnt = 1;
 static int linePos, nextPos;
 
-/* structure SNAIL_FLEX_STATE is used for creating a stack of states
+/* structure COMPILER_FLEX_STATE is used for creating a stack of states
    when processing included files */
 
-typedef struct SNAIL_FLEX_STATE {
+typedef struct COMPILER_FLEX_STATE {
     YY_BUFFER_STATE flex_state;
-    struct SNAIL_FLEX_STATE *next;
-} SNAIL_FLEX_STATE;
+    struct COMPILER_FLEX_STATE *next;
+} COMPILER_FLEX_STATE;
 
-static SNAIL_FLEX_STATE *new_snail_flex_state( YY_BUFFER_STATE flex_state,
-                                               SNAIL_FLEX_STATE *next,
+static COMPILER_FLEX_STATE *new_compiler_flex_state( YY_BUFFER_STATE flex_state,
+                                               COMPILER_FLEX_STATE *next,
                                                cexception_t *ex )
 {
-    SNAIL_FLEX_STATE *state = callocx( sizeof(*state), 1, ex );
+    COMPILER_FLEX_STATE *state = callocx( sizeof(*state), 1, ex );
     state->flex_state = flex_state;
     state->next = next;
 
     return state;
 }
 
-static void delete_snail_flex_state( SNAIL_FLEX_STATE *state )
+static void delete_compiler_flex_state( COMPILER_FLEX_STATE *state )
 {
     freex( state );
 }
 
-static SNAIL_FLEX_STATE *Include_stack;
+static COMPILER_FLEX_STATE *Include_stack;
 
-void snail_flex_push_state( FILE *replace_yyin, cexception_t *ex )
+void compiler_flex_push_state( FILE *replace_yyin, cexception_t *ex )
 {
-    SNAIL_FLEX_STATE *save_state =
-	new_snail_flex_state( YY_CURRENT_BUFFER, Include_stack, ex );
+    COMPILER_FLEX_STATE *save_state =
+	new_compiler_flex_state( YY_CURRENT_BUFFER, Include_stack, ex );
 
     Include_stack = save_state;
     yy_switch_to_buffer( yy_create_buffer( replace_yyin, YY_BUF_SIZE ));
 }
 
-void snail_flex_pop_state( void )
+void compiler_flex_pop_state( void )
 {
-    SNAIL_FLEX_STATE *top = Include_stack;
+    COMPILER_FLEX_STATE *top = Include_stack;
     if( top ) {
 	Include_stack = top->next;
 	yy_delete_buffer( YY_CURRENT_BUFFER );
 	yy_switch_to_buffer( top->flex_state );
-	delete_snail_flex_state( top );
+	delete_compiler_flex_state( top );
     }
 }
 
@@ -265,8 +265,8 @@ while       { MARK; return _WHILE; }
 
 {NAME}			%{
                            MARK;
-                           if( snail_flex_debug_flags &
-			           SNAIL_FLEX_DEBUG_YYLVAL )
+                           if( compiler_flex_debug_flags &
+			           COMPILER_FLEX_DEBUG_YYLVAL )
                                printf("yylval.s = %s\n", yytext);
                            yylval.s = strclone(yytext);
                            return __IDENTIFIER;
@@ -343,51 +343,51 @@ while       { MARK; return _WHILE; }
 
 %%
 
-void snail_flex_debug_off( void )
+void compiler_flex_debug_off( void )
 {
-    snail_flex_debug_flags = 0;
+    compiler_flex_debug_flags = 0;
 #ifdef YYDEBUG
     yy_flex_debug = 0;
 #endif
 }
 
-void snail_flex_debug_yyflex( void )
+void compiler_flex_debug_yyflex( void )
 {
-    snail_flex_debug_flags |= SNAIL_FLEX_DEBUG_YYFLEX;
+    compiler_flex_debug_flags |= COMPILER_FLEX_DEBUG_YYFLEX;
 #ifdef YYDEBUG
     yy_flex_debug = 1;
 #endif
 }
 
-void snail_flex_debug_yylval( void )
+void compiler_flex_debug_yylval( void )
 {
-    snail_flex_debug_flags |= SNAIL_FLEX_DEBUG_YYLVAL;
+    compiler_flex_debug_flags |= COMPILER_FLEX_DEBUG_YYLVAL;
 }
 
-void snail_flex_debug_yytext( void )
+void compiler_flex_debug_yytext( void )
 {
-    snail_flex_debug_flags |= SNAIL_FLEX_DEBUG_TEXT;
+    compiler_flex_debug_flags |= COMPILER_FLEX_DEBUG_TEXT;
 }
 
-void snail_flex_debug_lines( void )
+void compiler_flex_debug_lines( void )
 {
-    snail_flex_debug_flags |= SNAIL_FLEX_DEBUG_LINES;
+    compiler_flex_debug_flags |= COMPILER_FLEX_DEBUG_LINES;
 }
 
-int snail_flex_current_line_number( void ) { return lineCnt; }
-void snail_flex_set_current_line_number( ssize_t line ) { lineCnt = line; }
-int snail_flex_current_position( void ) { return linePos+1; }
-void snail_flex_set_current_position( ssize_t pos ) { linePos = pos - 1; }
-const char *snail_flex_current_line( void ) { return currentLine; }
+int compiler_flex_current_line_number( void ) { return lineCnt; }
+void compiler_flex_set_current_line_number( ssize_t line ) { lineCnt = line; }
+int compiler_flex_current_position( void ) { return linePos+1; }
+void compiler_flex_set_current_position( ssize_t pos ) { linePos = pos - 1; }
+const char *compiler_flex_current_line( void ) { return currentLine; }
 
 static void storeCurrentLine( char *line, int length )
 {
    assert( line != NULL );
   
    #ifdef YYDEBUG
-   if( snail_flex_debug_flags & SNAIL_FLEX_DEBUG_TEXT )
+   if( compiler_flex_debug_flags & COMPILER_FLEX_DEBUG_TEXT )
        printf("\t%3d : %s\n", lineCnt, line);
-   if( snail_flex_debug_flags & SNAIL_FLEX_DEBUG_YYLVAL )
+   if( compiler_flex_debug_flags & COMPILER_FLEX_DEBUG_YYLVAL )
        printf("length = %d\nline = %s\n", length, line);
    #endif
 
@@ -398,13 +398,13 @@ static void storeCurrentLine( char *line, int length )
    }
    strncpy(currentLine, line, length);
    currentLine[length] = '\0';
-   if( snail_flex_debug_flags & SNAIL_FLEX_DEBUG_LINES ) {
+   if( compiler_flex_debug_flags & COMPILER_FLEX_DEBUG_LINES ) {
        char *first_nonblank = currentLine;
        while( isspace( *first_nonblank )) first_nonblank++;
        if( *first_nonblank == '#' ) {
-           snail_printf( NULL, "%s\n", currentLine );
+           compiler_printf( NULL, "%s\n", currentLine );
        } else {
-           snail_printf( NULL, "#\n# %s\n#\n", currentLine );
+           compiler_printf( NULL, "#\n# %s\n#\n", currentLine );
        }
    }
 }
