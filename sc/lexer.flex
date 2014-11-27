@@ -30,7 +30,7 @@ USTRING         {UDSTRING}|{USSTRING}
 
 %{
 /* exports: */
-#include <snail_flex.h>
+#include <lexer_flex.h>
 
 /* uses: */
 #include <stdio.h>
@@ -43,7 +43,7 @@ USTRING         {UDSTRING}|{USSTRING}
 #include <tnode.h>
 #include <dnode.h>
 #include <enode.h>
-#include <snail_y.h>
+#include <grammar_y.h>
 #include <grammar.tab.h>
 #include <allocx.h>
 #include <cexceptions.h>

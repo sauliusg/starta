@@ -7,7 +7,7 @@
 
 %{
 /* exports: */
-#include <snail_y.h>
+#include <grammar_y.h>
 
 /* uses: */
 #include <stdio.h>
@@ -38,7 +38,7 @@
 #include <bytecode_file.h> /* for bytecode_file_hdr_t, needed by
 			      compiler_native_type_size() */
 #include <cvalue_t.h>
-#include <snail_flex.h>
+#include <lexer_flex.h>
 #include <yy.h>
 #include <alloccell.h>
 #include <rtti.h>
