@@ -44,7 +44,7 @@ USTRING         {UDSTRING}|{USSTRING}
 #include <dnode.h>
 #include <enode.h>
 #include <snail_y.h>
-#include <snail.tab.h>
+#include <grammar.tab.h>
 #include <allocx.h>
 #include <cexceptions.h>
 
