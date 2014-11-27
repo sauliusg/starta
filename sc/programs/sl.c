@@ -256,23 +256,23 @@ int main( int argc, char *argv[], char *env[] )
       exit(2);
   }
 
-  snail_yy_debug_off();    
-  snail_flex_debug_off();    
+  compiler_yy_debug_off();    
+  compiler_flex_debug_off();    
   thrcode_debug_off();
   thrcode_trace_off();
   thrcode_stackdebug_off();
   thrcode_heapdebug_off();
   if( debug.present ) {
-      if( strstr(debug.value.s, "lex") != NULL ) snail_flex_debug_yyflex();
-      if( strstr(debug.value.s, "yylval") != NULL ) snail_flex_debug_yylval();
-      if( strstr(debug.value.s, "text") != NULL ) snail_flex_debug_yytext();
+      if( strstr(debug.value.s, "lex") != NULL ) compiler_flex_debug_yyflex();
+      if( strstr(debug.value.s, "yylval") != NULL ) compiler_flex_debug_yylval();
+      if( strstr(debug.value.s, "text") != NULL ) compiler_flex_debug_yytext();
       if( strstr(debug.value.s, "trace") != NULL ) thrcode_trace_on();
-      if( strstr(debug.value.s, "yacc") != NULL ) snail_yy_debug_on();
+      if( strstr(debug.value.s, "yacc") != NULL ) compiler_yy_debug_on();
       if( strstr(debug.value.s, "stack") != NULL ) thrcode_stackdebug_on();
       if( strstr(debug.value.s, "heap") != NULL ) thrcode_heapdebug_on();
       if( strstr(debug.value.s, "gc") != NULL ) thrcode_gc_debug_on();
       if( strstr(debug.value.s, "code") != NULL ) {
-	  snail_flex_debug_lines();
+	  compiler_flex_debug_lines();
 	  thrcode_debug_on();
       }
   }
@@ -286,7 +286,7 @@ int main( int argc, char *argv[], char *env[] )
 	  for( i = 0; files[i] != NULL; ) {
 	      i++;
 	  }
-	  code = new_thrcode_from_snail_file( files[0], include_paths, &inner );
+	  code = new_thrcode_from_file( files[0], include_paths, &inner );
 
 	  if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
 	      thrcode_dump( code );
@@ -300,8 +300,8 @@ int main( int argc, char *argv[], char *env[] )
           }
       } else {
 	  for( i = 0; files[i] != NULL; i++ ) {
-	      code = new_thrcode_from_snail_file( files[i], include_paths,
-						  &inner );
+	      code = new_thrcode_from_file( files[i], include_paths,
+                                            &inner );
 
 	      if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
 		  thrcode_dump( code );

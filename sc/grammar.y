@@ -302,9 +302,9 @@ static void compiler_save_flex_stream( COMPILER *c, char *filename,
     c->filename = strdupx( filename, ex );
     c->yyin = yyin = fopenx( filename, "r", ex );
 
-    snail_flex_push_state( yyin, ex );
-    snail_flex_set_current_line_number( 1 );
-    snail_flex_set_current_position( 1 );
+    compiler_flex_push_state( yyin, ex );
+    compiler_flex_set_current_line_number( 1 );
+    compiler_flex_set_current_position( 1 );
 }
 
 static void compiler_restore_flex_stream( COMPILER *c )
@@ -319,9 +319,9 @@ static void compiler_restore_flex_stream( COMPILER *c )
     freex( c->filename );
     c->filename = NULL;
 
-    snail_flex_set_current_line_number( top->line_no );
-    snail_flex_set_current_position( top->column_no );
-    snail_flex_pop_state();
+    compiler_flex_set_current_line_number( top->line_no );
+    compiler_flex_set_current_position( top->column_no );
+    compiler_flex_pop_state();
 }
 
 static void compiler_push_compiler_state( COMPILER *c,
@@ -330,8 +330,8 @@ static void compiler_push_compiler_state( COMPILER *c,
     COMPILER_STATE *cstate;
 
     cstate = new_compiler_state( c->filename, c->use_package_name, c->yyin,
-				 snail_flex_current_line_number(),
-				 snail_flex_current_position(),
+				 compiler_flex_current_line_number(),
+				 compiler_flex_current_position(),
 				 c->include_files, ex );
 
     c->filename = NULL;
@@ -562,7 +562,7 @@ static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
     (*size) ++;
 }
 
-static void snail_push_current_address( COMPILER *c, cexception_t *ex )
+static void compiler_push_current_address( COMPILER *c, cexception_t *ex )
 {
     push_ssize_t( &c->addr_stack, &c->addr_stack_size,
 		  thrcode_length(c->thrcode), ex );
@@ -574,43 +574,43 @@ static ssize_t pop_ssize_t( ssize_t **array, int *size, cexception_t *ex )
     return (*array)[*size];
 }
 
-static ssize_t snail_pop_address( COMPILER *c, cexception_t *ex )
+static ssize_t compiler_pop_address( COMPILER *c, cexception_t *ex )
 {
     return pop_ssize_t( &c->addr_stack, &c->addr_stack_size, ex );
 }
 
-static ssize_t snail_pop_offset( COMPILER *c, cexception_t *ex )
+static ssize_t compiler_pop_offset( COMPILER *c, cexception_t *ex )
 {
     return pop_ssize_t( &c->addr_stack, &c->addr_stack_size, ex )
            - thrcode_length( c->thrcode );
 }
 
-static ssize_t snail_code_length( COMPILER *c )
+static ssize_t compiler_code_length( COMPILER *c )
 {
     return thrcode_length( c->thrcode );
 }
 
-static void snail_push_relative_fixup( COMPILER *c, cexception_t *ex )
+static void compiler_push_relative_fixup( COMPILER *c, cexception_t *ex )
 {
     thrcode_push_relative_fixup_here( c->thrcode, "", ex );
 }
 
-static void snail_push_absolute_fixup( COMPILER *c, cexception_t *ex )
+static void compiler_push_absolute_fixup( COMPILER *c, cexception_t *ex )
 {
     thrcode_push_absolute_fixup_here( c->thrcode, "", ex );
 }
 
-static void snail_fixup_here( COMPILER *c )
+static void compiler_fixup_here( COMPILER *c )
 {
     thrcode_internal_fixup_here( c->thrcode );
 }
 
-static void snail_fixup( COMPILER *c, ssize_t value )
+static void compiler_fixup( COMPILER *c, ssize_t value )
 {
     thrcode_internal_fixup( c->thrcode, value );
 }
 
-static void snail_swap_fixups( COMPILER *c )
+static void compiler_swap_fixups( COMPILER *c )
 {
     thrcode_internal_fixup_swap( c->thrcode );
 }
@@ -634,7 +634,7 @@ static void compiler_check_enum_basetypes( TNODE *lookup_tnode, TNODE *tnode )
     }
 }
 
-static TNODE *snail_typetab_insert_msg( COMPILER *cc,
+static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 					char *name,
 					type_suffix_t suffix_type,
 					TNODE *tnode,
@@ -680,27 +680,27 @@ static TNODE *snail_typetab_insert_msg( COMPILER *cc,
     }
 }
 
-static int snail_current_scope( COMPILER *cc )
+static int compiler_current_scope( COMPILER *cc )
 {
     return vartab_current_scope( cc->vartab );
 }
 
-static void snail_typetab_insert( COMPILER *cc,
+static void compiler_typetab_insert( COMPILER *cc,
 				  TNODE *tnode,
 				  cexception_t *ex )
 {
     TNODE *lookup_tnode =
-	snail_typetab_insert_msg( cc, tnode_name( tnode ),
+	compiler_typetab_insert_msg( cc, tnode_name( tnode ),
 				  TS_NOT_A_SUFFIX, tnode,
 				  "type '%s' is already declared", ex );
     if( cc->current_package && lookup_tnode == tnode &&
-        snail_current_scope( cc )  == 0 ) {
+        compiler_current_scope( cc )  == 0 ) {
 	dnode_typetab_insert_named_tnode( cc->current_package,
 					  share_tnode( tnode ), ex );
     }
 }
 
-static void snail_vartab_insert_named_vars( COMPILER *cc,
+static void compiler_vartab_insert_named_vars( COMPILER *cc,
 					    DNODE *vars,
 					    cexception_t *ex )
 {
@@ -711,7 +711,7 @@ static void snail_vartab_insert_named_vars( COMPILER *cc,
     }
 }
 
-static void snail_vartab_insert_single_named_var( COMPILER *cc,
+static void compiler_vartab_insert_single_named_var( COMPILER *cc,
                                                   DNODE *var,
                                                   cexception_t *ex )
 {
@@ -725,7 +725,7 @@ static void snail_vartab_insert_single_named_var( COMPILER *cc,
     }
 }
 
-static void snail_consttab_insert_consts( COMPILER *cc, DNODE *consts,
+static void compiler_consttab_insert_consts( COMPILER *cc, DNODE *consts,
 					  cexception_t *ex )
 {
     vartab_insert_named_vars( cc->consts, consts, ex );
@@ -735,7 +735,7 @@ static void snail_consttab_insert_consts( COMPILER *cc, DNODE *consts,
     }
 }
 
-static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
+static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 						 TNODE *tnode,
 						 cexception_t *ex )
 {
@@ -764,7 +764,7 @@ static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "integer type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	snail_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX, tnode,
+	compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX, tnode,
 				  type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
@@ -781,7 +781,7 @@ static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "real type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	snail_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX, tnode,
+	compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX, tnode,
 				  type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
@@ -798,7 +798,7 @@ static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "string type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	snail_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX, tnode,
+	compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX, tnode,
 				  type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
@@ -815,7 +815,7 @@ static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	snail_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX, tnode,
+	compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX, tnode,
 				  type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
@@ -841,7 +841,7 @@ static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
     }
 }
 
-static void snail_push_type( COMPILER *c, TNODE *tnode,
+static void compiler_push_type( COMPILER *c, TNODE *tnode,
 			     cexception_t *ex )
 {
     ENODE *expr_enode = NULL;
@@ -850,7 +850,7 @@ static void snail_push_type( COMPILER *c, TNODE *tnode,
     enode_list_push( &c->e_stack, expr_enode );
 }
 
-static void snail_push_error_type( COMPILER *c,
+static void compiler_push_error_type( COMPILER *c,
 				   cexception_t *ex )
 {
     ENODE *expr_enode = NULL;
@@ -860,7 +860,7 @@ static void snail_push_error_type( COMPILER *c,
     enode_list_push( &c->e_stack, expr_enode );
 }
 
-static void snail_append_expression_type( COMPILER *c,
+static void compiler_append_expression_type( COMPILER *c,
 					  TNODE *base_tnode )
 {
     assert( c->e_stack );
@@ -881,7 +881,7 @@ static TNODE *new_tnode_blob_snail( TYPETAB *typetab, cexception_t *ex )
     return new_tnode_blob( base_type, ex );
 }
 
-static void snail_compile_exception( COMPILER *c,
+static void compiler_compile_exception( COMPILER *c,
 				     char *exception_name,
 				     ssize_t exception_nr,
 				     cexception_t *ex )
@@ -908,14 +908,14 @@ static void snail_compile_exception( COMPILER *c,
     }
 }
 
-static void snail_compile_next_exception( COMPILER *c,
+static void compiler_compile_next_exception( COMPILER *c,
 					  char *exception_name,
 					  cexception_t *ex )
 {
-    snail_compile_exception( c, exception_name, ++c->latest_exception_nr, ex );
+    compiler_compile_exception( c, exception_name, ++c->latest_exception_nr, ex );
 }
 
-static void snail_push_array_of_type( COMPILER *c, TNODE *tnode,
+static void compiler_push_array_of_type( COMPILER *c, TNODE *tnode,
 				      cexception_t *ex )
 {
     cexception_t inner;
@@ -949,7 +949,7 @@ static void compiler_swap_top_expressions( COMPILER *cc )
     enode_list_push( &cc->e_stack, e2 );    
 }
 
-static void snail_check_and_remove_index_type( COMPILER *cc )
+static void compiler_check_and_remove_index_type( COMPILER *cc )
 {
     ENODE *idx_enode;
 
@@ -991,7 +991,7 @@ static void tnode_report_missing_operator( TNODE *tnode,
     }
 }
 
-static void snail_emit( COMPILER *cc,
+static void compiler_emit( COMPILER *cc,
 			cexception_t *ex,
 			const char *format, ... )
 {
@@ -1103,7 +1103,7 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
     return list;
 }
 
-static void snail_fixup_inlined_function( COMPILER *cc,
+static void compiler_fixup_inlined_function( COMPILER *cc,
 					  DNODE *function,
 					  key_value_t *fixup_values,
 					  ssize_t code_start )
@@ -1120,7 +1120,7 @@ static void snail_fixup_inlined_function( COMPILER *cc,
     }
 }
 
-static void snail_emit_function_call( COMPILER *cc,
+static void compiler_emit_function_call( COMPILER *cc,
 				      DNODE *function,
 				      key_value_t *fixup_values,
 				      char *trailer,
@@ -1135,7 +1135,7 @@ static void snail_emit_function_call( COMPILER *cc,
 
 	if( code_length > 0 ) {
 	    if( !is_bytecode ) {
-		snail_emit( cc, ex, "\tc\n", PUSHFRM );
+		compiler_emit( cc, ex, "\tc\n", PUSHFRM );
                 code_start ++;
 	    }
 	    thrcode_emit( cc->thrcode, ex, "\t" );
@@ -1150,11 +1150,11 @@ static void snail_emit_function_call( COMPILER *cc,
 		thrcode_emit( cc->thrcode, ex, trailer );
 	    }
 	    if( !is_bytecode ) {
-		snail_emit( cc, ex, "\n\tc\n", POPFRM );
+		compiler_emit( cc, ex, "\n\tc\n", POPFRM );
 	    }
 	}
 	if( fixup_values ) {
-	    snail_fixup_inlined_function( cc, function, fixup_values,
+	    compiler_fixup_inlined_function( cc, function, fixup_values,
 					  code_start );
 	}
     } else {
@@ -1162,12 +1162,12 @@ static void snail_emit_function_call( COMPILER *cc,
         type_kind_t fn_kind = fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
 	if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
-	    snail_emit( cc, ex, "\tc\n", ICALL );
+	    compiler_emit( cc, ex, "\tc\n", ICALL );
 	} else if( fn_tnode && tnode_kind( fn_tnode ) == TK_METHOD ) {
 	    char *fn_name = dnode_name( function );
 	    ssize_t fn_address = dnode_offset( function );
 	    ssize_t interface_nr = tnode_interface_number( fn_tnode );
-	    snail_emit( cc, ex, "\tceeN\n", VCALL,
+	    compiler_emit( cc, ex, "\tceeN\n", VCALL,
 			&interface_nr, &fn_address, fn_name );
 	} else {
 	    char *fn_name = dnode_name( function );
@@ -1177,17 +1177,17 @@ static void snail_emit_function_call( COMPILER *cc,
 		thrcode_push_forward_function( cc->thrcode, fn_name,
 					       thrcode_length( cc->thrcode ) + 1,
 					       ex );
-		snail_emit( cc, ex, "\tceN\n", CALL, &zero, fn_name );
+		compiler_emit( cc, ex, "\tceN\n", CALL, &zero, fn_name );
 	    } else {
-		/* ssize_t code_length = thrcode_length( snail_cc->thrcode ); */
+		/* ssize_t code_length = thrcode_length( compiler_cc->thrcode ); */
 		/* fn_address -= code_length; */
-		snail_emit( cc, ex, "\tceN\n", CALL, &fn_address, fn_name );
+		compiler_emit( cc, ex, "\tceN\n", CALL, &fn_address, fn_name );
 	    }
 	}
     }
 }
 
-static void snail_push_function_retvals( COMPILER *cc, DNODE *function,
+static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
                                          TYPETAB *generic_types,
 					 cexception_t *ex )
 {
@@ -1217,7 +1217,7 @@ static void snail_push_function_retvals( COMPILER *cc, DNODE *function,
     }
 }
 
-static void snail_compile_type_conversion( COMPILER *cc,
+static void compiler_compile_type_conversion( COMPILER *cc,
 					   char *target_name,
 					   cexception_t *ex )
 {
@@ -1268,7 +1268,7 @@ static void snail_compile_type_conversion( COMPILER *cc,
 			  target_name, source_name, retval_nr );
 	    }
 	    if( conversion ) {
-		snail_emit_function_call( cc, conversion, NULL, "\n", ex );
+		compiler_emit_function_call( cc, conversion, NULL, "\n", ex );
 	    }
 
 	    if( target_type ) {
@@ -1287,7 +1287,7 @@ static void snail_compile_type_conversion( COMPILER *cc,
     }
 }
 
-static void snail_compile_return( COMPILER *cc,
+static void compiler_compile_return( COMPILER *cc,
 				  int nretvals,
 				  cexception_t *ex )
 {
@@ -1327,7 +1327,7 @@ static void snail_compile_return( COMPILER *cc,
                 i == 0 &&
                 tnode_lookup_conversion( returned_type,
                                          available_type_name  )) {
-                snail_compile_type_conversion( cc, returned_type_name, ex );
+                compiler_compile_type_conversion( cc, returned_type_name, ex );
                 expr = cc->e_stack;
                 if( expr ) {
                     available_type = enode_type( expr );
@@ -1379,12 +1379,12 @@ static void snail_compile_return( COMPILER *cc,
     {
 	int i;
 	for( i = 0; i < cc->try_block_level; i++ ) {
-	    snail_emit( cc, ex, "\tc\n", RESTORE );
+	    compiler_emit( cc, ex, "\tc\n", RESTORE );
 	}
     }
 
     if( function && !dnode_has_flags( function, DF_INLINE )) {
-	snail_emit( cc, ex, "\tc\n", RET );
+	compiler_emit( cc, ex, "\tc\n", RET );
     }
 }
 
@@ -1482,7 +1482,7 @@ typedef struct {
     int retval_nr;
 } operator_description_t;
 
-static void snail_init_operator_description( operator_description_t *od,
+static void compiler_init_operator_description( operator_description_t *od,
                                              COMPILER *cc,
 					     TNODE *op_type,
 					     char *op_name,
@@ -1518,7 +1518,7 @@ static void snail_init_operator_description( operator_description_t *od,
     od->retval_nr = dnode_list_length( od->retvals );
 }
 
-static void snail_check_operator_args( COMPILER *cc,
+static void compiler_check_operator_args( COMPILER *cc,
 				       operator_description_t *od,
 				       TYPETAB *generic_types,
                                        cexception_t *ex )
@@ -1591,7 +1591,7 @@ static void snail_check_operator_args( COMPILER *cc,
     }
 }
 
-static void snail_drop_operator_args( COMPILER *cc,
+static void compiler_drop_operator_args( COMPILER *cc,
 				      operator_description_t *od )
 {
     DNODE *op_args;
@@ -1610,7 +1610,7 @@ static void snail_drop_operator_args( COMPILER *cc,
     }
 }
 
-static void snail_push_operator_retvals( COMPILER *cc,
+static void compiler_push_operator_retvals( COMPILER *cc,
 					 operator_description_t *od,
 					 ENODE * volatile *on_error_expr,
                                          TYPETAB *generic_types,
@@ -1648,7 +1648,7 @@ static void snail_push_operator_retvals( COMPILER *cc,
     }
 
     if( retval_type ) {
-	snail_push_type( cc, retval_type, ex );
+	compiler_push_type( cc, retval_type, ex );
 	share_tnode( retval_type );
     }  else {
 	if( !od->operator && on_error_expr && *on_error_expr ) {
@@ -1659,7 +1659,7 @@ static void snail_push_operator_retvals( COMPILER *cc,
     }
 }
 
-static void snail_emit_operator_or_report_missing( COMPILER *cc,
+static void compiler_emit_operator_or_report_missing( COMPILER *cc,
 						   operator_description_t *od,
 						   key_value_t *fixup_values,
 						   char *trailer,
@@ -1669,14 +1669,14 @@ static void snail_emit_operator_or_report_missing( COMPILER *cc,
     assert( od->magic == OD_MAGIC );
 
     if( od->operator ) {
-	snail_emit_function_call( cc, od->operator, fixup_values, trailer, ex );
+	compiler_emit_function_call( cc, od->operator, fixup_values, trailer, ex );
     } else {
 	tnode_report_missing_operator( od->containing_type,
 				       od->name, od->arity );
     }
 }
 
-static void snail_check_operator_retvals( COMPILER *cc,
+static void compiler_check_operator_retvals( COMPILER *cc,
 					  operator_description_t *od,
 					  int minvals,
 					  int maxvals )
@@ -1738,7 +1738,7 @@ static int compiler_test_top_types_are_identical( COMPILER *cc,
     }    
 }
 
-static int snail_test_top_types_are_assignment_compatible(
+static int compiler_test_top_types_are_assignment_compatible(
     COMPILER *cc,
     cexception_t *ex )
 {
@@ -1764,7 +1764,7 @@ static int snail_test_top_types_are_assignment_compatible(
     }    
 }
 
-static int snail_test_top_types_are_readonly_compatible_for_copy(
+static int compiler_test_top_types_are_readonly_compatible_for_copy(
     COMPILER *cc,
     cexception_t *ex )
 {
@@ -1844,7 +1844,7 @@ static void compiler_check_top_2_expressions_and_drop( COMPILER *cc,
 
 */
 
-static void snail_compile_binop( COMPILER *cc,
+static void compiler_compile_binop( COMPILER *cc,
 				 char *binop_name,
 				 cexception_t *ex )
 {
@@ -1866,25 +1866,25 @@ static void snail_compile_binop( COMPILER *cc,
 	    TNODE *type1 = enode_type( expr1 );
 	    operator_description_t od;
 
-	    snail_init_operator_description( &od, cc, type1,
+	    compiler_init_operator_description( &od, cc, type1,
                                              binop_name, 2, ex );
 	    if( !od.operator ) {
 		TNODE *type2 = enode_type( expr2 );
-		snail_init_operator_description( &od, cc, type2,
+		compiler_init_operator_description( &od, cc, type2,
                                                  binop_name, 2, ex );
 	    }
 
 	    if( stack_is_ok ) {
-		snail_check_operator_args( cc, &od, generic_types, &inner );
+		compiler_check_operator_args( cc, &od, generic_types, &inner );
 	    }
 
 	    top1 = enode_list_pop( &cc->e_stack );
 	    top2 = enode_list_pop( &cc->e_stack );
 
-	    snail_emit_operator_or_report_missing( cc, &od, NULL, "\n",
+	    compiler_emit_operator_or_report_missing( cc, &od, NULL, "\n",
                                                    &inner );
-	    snail_check_operator_retvals( cc, &od, 1, 1 );
-	    snail_push_operator_retvals( cc, &od, &top2, generic_types,
+	    compiler_check_operator_retvals( cc, &od, 1, 1 );
+	    compiler_push_operator_retvals( cc, &od, &top2, generic_types,
                                          &inner );
 	}
     }
@@ -1908,7 +1908,7 @@ static key_value_t *make_array_element_key_value_list( TNODE *array )
     return make_tnode_key_value_list( element_type );
 }
 
-static void snail_compile_unop( COMPILER *cc,
+static void compiler_compile_unop( COMPILER *cc,
 				char *unop_name,
 				cexception_t *ex )
 {
@@ -1928,16 +1928,16 @@ static void snail_compile_unop( COMPILER *cc,
 	    key_value_t *fixup_values =
 		make_array_element_key_value_list( expr_type );
 
-	    snail_init_operator_description( &od, cc, expr_type,
+	    compiler_init_operator_description( &od, cc, expr_type,
                                              unop_name, 1, ex );
-	    snail_check_operator_args( cc, &od, generic_types, &inner );
+	    compiler_check_operator_args( cc, &od, generic_types, &inner );
 
 	    top = enode_list_pop( &cc->e_stack );
 
-	    snail_emit_operator_or_report_missing( cc, &od, fixup_values,
+	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
 						   "\n", ex );
-	    snail_check_operator_retvals( cc, &od, 0, 1 );
-	    snail_push_operator_retvals( cc, &od, &top, generic_types, &inner );
+	    compiler_check_operator_retvals( cc, &od, 0, 1 );
+	    compiler_push_operator_retvals( cc, &od, &top, generic_types, &inner );
 	}
     }
     cexception_catch {
@@ -1949,7 +1949,7 @@ static void snail_compile_unop( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_emit_st( COMPILER *cc,
+static void compiler_emit_st( COMPILER *cc,
 			   TNODE *expr_type,
 			   char *var_name,
 			   ssize_t var_offset,
@@ -1958,34 +1958,34 @@ static void snail_emit_st( COMPILER *cc,
 {
     operator_description_t od;
 
-    if( var_scope == snail_current_scope( cc )) {
+    if( var_scope == compiler_current_scope( cc )) {
 
-	snail_init_operator_description( &od, cc, expr_type, "st", 1, ex );
-	snail_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+	compiler_init_operator_description( &od, cc, expr_type, "st", 1, ex );
+	compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
 
 	if( od.operator ) {
-	    snail_emit_function_call( cc, od.operator, NULL, "", ex );
-	    snail_emit( cc, ex, "eN\n", &var_offset, var_name );
+	    compiler_emit_function_call( cc, od.operator, NULL, "", ex );
+	    compiler_emit( cc, ex, "eN\n", &var_offset, var_name );
 	} else {
 	    if( tnode_is_reference( expr_type )) {
-		snail_emit( cc, ex, "\tceN\n", PST, &var_offset, var_name );
+		compiler_emit( cc, ex, "\tceN\n", PST, &var_offset, var_name );
 	    } else {
-		snail_emit( cc, ex, "\tceN\n", ST, &var_offset, var_name );
+		compiler_emit( cc, ex, "\tceN\n", ST, &var_offset, var_name );
 	    }
 	}
     } else {
 	if( var_scope == 0 ) {
-	    snail_init_operator_description( &od, cc, expr_type, "stg", 1, ex );
-	    snail_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+	    compiler_init_operator_description( &od, cc, expr_type, "stg", 1, ex );
+	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
 
 	    if( od.operator ) {
-		snail_emit_function_call( cc, od.operator, NULL, "", ex );
-		snail_emit( cc, ex, "eN\n", &var_offset, var_name );
+		compiler_emit_function_call( cc, od.operator, NULL, "", ex );
+		compiler_emit( cc, ex, "eN\n", &var_offset, var_name );
 	    } else {
 		if( tnode_is_reference( expr_type )) {
-		    snail_emit( cc, ex, "\tceN\n", PSTG, &var_offset, var_name );
+		    compiler_emit( cc, ex, "\tceN\n", PSTG, &var_offset, var_name );
 		} else {
-		    snail_emit( cc, ex, "\tceN\n", STG, &var_offset, var_name );
+		    compiler_emit( cc, ex, "\tceN\n", STG, &var_offset, var_name );
 		}
 	    }
 	} else {
@@ -1994,10 +1994,10 @@ static void snail_emit_st( COMPILER *cc,
 	}
     }
 
-    snail_check_operator_retvals( cc, &od, 0, 0 );
+    compiler_check_operator_retvals( cc, &od, 0, 0 );
 }
 
-static void snail_compile_variable_assignment_or_init(
+static void compiler_compile_variable_assignment_or_init(
     COMPILER *cc,
     DNODE *variable,
     int (*enode_is_readonly_compatible)( ENODE *, DNODE * ),
@@ -2024,10 +2024,10 @@ static void snail_compile_variable_assignment_or_init(
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( src_name && dst_name &&
 		tnode_lookup_conversion( var_type, src_name )) {
-		snail_compile_type_conversion( cc, dst_name, ex );
+		compiler_compile_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
-		snail_emit_st( cc, expr_type, var_name, var_offset,
+		compiler_emit_st( cc, expr_type, var_name, var_offset,
 			       var_scope, ex );
 	    } else {
 		if( var_name ) {
@@ -2056,7 +2056,7 @@ static void snail_compile_variable_assignment_or_init(
 		}
 	    }
 	} else {
-	    snail_emit_st( cc, expr_type, var_name, var_offset,
+	    compiler_emit_st( cc, expr_type, var_name, var_offset,
 			   var_scope, ex );
 	}
         delete_typetab( generic_types );
@@ -2064,45 +2064,45 @@ static void snail_compile_variable_assignment_or_init(
     }
 }
 
-static void snail_compile_variable_assignment( COMPILER *cc,
+static void compiler_compile_variable_assignment( COMPILER *cc,
 					       DNODE *variable,
 					       cexception_t *ex )
 {
-    snail_compile_variable_assignment_or_init(
+    compiler_compile_variable_assignment_or_init(
         cc, variable, enode_is_readonly_compatible_with_var, ex );
 }
 
-static void snail_compile_variable_initialisation( COMPILER *cc,
+static void compiler_compile_variable_initialisation( COMPILER *cc,
 						   DNODE *variable,
 						   cexception_t *ex )
 {
-    snail_compile_variable_assignment_or_init(
+    compiler_compile_variable_assignment_or_init(
         cc, variable, enode_is_readonly_compatible_for_init, ex );
 }
 
-static void snail_compile_store_variable( COMPILER *cc,
+static void compiler_compile_store_variable( COMPILER *cc,
 					  DNODE *varnode,
 					  cexception_t *ex )
 {
     if( varnode ) {
-        snail_compile_variable_assignment( cc, varnode, ex );
+        compiler_compile_variable_assignment( cc, varnode, ex );
     } else {
-        snail_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
+        compiler_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
     }
 }
 
-static void snail_compile_initialise_variable( COMPILER *cc,
+static void compiler_compile_initialise_variable( COMPILER *cc,
 					       DNODE *varnode,
 					       cexception_t *ex )
 {
     if( varnode ) {
-        snail_compile_variable_initialisation( cc, varnode, ex );
+        compiler_compile_variable_initialisation( cc, varnode, ex );
     } else {
-        snail_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
+        compiler_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
     }
 }
 
-static void snail_stack_top_dereference( COMPILER *cc )
+static void compiler_stack_top_dereference( COMPILER *cc )
 {
     if( cc->e_stack ) {
 	TNODE *expr_type = enode_type( cc->e_stack );
@@ -2116,7 +2116,7 @@ static void snail_stack_top_dereference( COMPILER *cc )
     }    
 }
 
-static int snail_stack_top_is_addressof( COMPILER *cc )
+static int compiler_stack_top_is_addressof( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
@@ -2127,13 +2127,13 @@ static int snail_stack_top_is_addressof( COMPILER *cc )
 #endif
 }
 
-static void snail_compile_ldi( COMPILER *cc, cexception_t *ex )
+static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
 {
     ENODE * volatile expr;
 
     expr = cc->e_stack;
 
-    if( !snail_stack_top_is_addressof( cc )) return;
+    if( !compiler_stack_top_is_addressof( cc )) return;
 
     if( !expr ) {
 	yyerrorf( "not enough values on the stack for indirect load (LDI)" );
@@ -2143,12 +2143,12 @@ static void snail_compile_ldi( COMPILER *cc, cexception_t *ex )
 	    expr_type ? tnode_element_type( expr_type ) : NULL;
 	operator_description_t od;
 
-	snail_init_operator_description( &od, cc, element_type, "ldi", 1, ex );
+	compiler_init_operator_description( &od, cc, element_type, "ldi", 1, ex );
 
 	if( !expr_type || tnode_kind( expr_type ) != TK_ADDRESSOF ) {
 	    yyerrorf( "lvalue is needed for indirect load (LDI)" );
 	} else {
-	    snail_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
 	}
 
 	if( od.operator ) {
@@ -2156,9 +2156,9 @@ static void snail_compile_ldi( COMPILER *cc, cexception_t *ex )
 
 	    expr = enode_list_pop( &cc->e_stack );
 	    cexception_guard( inner ) {
-		snail_emit_function_call( cc, od.operator, NULL, "\n", &inner );
-		snail_check_operator_retvals( cc, &od, 1, 1 );
-		snail_push_operator_retvals( cc, &od, &expr,
+		compiler_emit_function_call( cc, od.operator, NULL, "\n", &inner );
+		compiler_check_operator_retvals( cc, &od, 1, 1 );
+		compiler_push_operator_retvals( cc, &od, &expr,
                                              NULL /*generic_types*/, &inner );
 	    }
 	    cexception_catch {
@@ -2192,18 +2192,18 @@ static void snail_compile_ldi( COMPILER *cc, cexception_t *ex )
 	    }
 
             if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
-		snail_emit( cc, ex, "\tcs\n", GLDI, &element_size );
+		compiler_emit( cc, ex, "\tcs\n", GLDI, &element_size );
 	    } else if( element_type && tnode_is_reference( element_type )) {
-		snail_emit( cc, ex, "\tc\n", PLDI );
+		compiler_emit( cc, ex, "\tc\n", PLDI );
 	    } else {
-		snail_emit( cc, ex, "\tcs\n", LDI, &element_size );
+		compiler_emit( cc, ex, "\tcs\n", LDI, &element_size );
 	    }
-	    snail_stack_top_dereference( cc );
+	    compiler_stack_top_dereference( cc );
 	}
     }
 }
 
-static void snail_compile_sti( COMPILER *cc, cexception_t *ex )
+static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 {
     cexception_t inner;
     ENODE *expr = NULL;
@@ -2233,7 +2233,7 @@ static void snail_compile_sti( COMPILER *cc, cexception_t *ex )
 		    char *dst_name = tnode_name( element_type );
 		    if( src_name && dst_name &&
 			tnode_lookup_conversion( element_type, src_name )) {
-			snail_compile_type_conversion( cc, dst_name, ex );
+			compiler_compile_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
 		    } else {
 			yyerrorf( "incompatible types for assignment" );
@@ -2249,13 +2249,13 @@ static void snail_compile_sti( COMPILER *cc, cexception_t *ex )
 		}
 	    }
 
-	    snail_init_operator_description( &od, cc, expr_type, "sti", 2, ex );
+	    compiler_init_operator_description( &od, cc, expr_type, "sti", 2, ex );
 
 	    if( ( !addr_type || tnode_kind( addr_type ) != TK_ADDRESSOF ) &&
                 !enode_has_errors( lval )) {
 		yyerrorf( "lvalue is needed for assignment" );
 	    } else {
-		snail_check_operator_args( cc, &od, NULL /*generic_types*/,
+		compiler_check_operator_args( cc, &od, NULL /*generic_types*/,
                                            &inner );
 	    }
 
@@ -2263,16 +2263,16 @@ static void snail_compile_sti( COMPILER *cc, cexception_t *ex )
 	    top2 = enode_list_pop( &cc->e_stack );
 
 	    if( od.operator ) {
-		snail_emit_function_call( cc, od.operator, NULL, "\n", &inner );
-		snail_check_operator_retvals( cc, &od, 0, 0 );
+		compiler_emit_function_call( cc, od.operator, NULL, "\n", &inner );
+		compiler_check_operator_retvals( cc, &od, 0, 0 );
 	    } else {
                 ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
 		if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
-		    snail_emit( cc, &inner, "\tcs\n", GSTI, &expr_size );
+		    compiler_emit( cc, &inner, "\tcs\n", GSTI, &expr_size );
                 } else if( expr_type && tnode_is_reference( expr_type )) {
-		    snail_emit( cc, &inner, "\tc\n", PSTI );
+		    compiler_emit( cc, &inner, "\tc\n", PSTI );
 		} else {
-		    snail_emit( cc, &inner, "\tcs\n", STI, &expr_size );
+		    compiler_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}
 	    }
 	}
@@ -2298,11 +2298,11 @@ static void compiler_duplicate_top_expression( COMPILER *cc,
 		  "of expression" );
     } else {
 	TNODE *expr_type = enode_type( expr );
-	snail_push_type( cc, share_tnode( expr_type ), ex );
+	compiler_push_type( cc, share_tnode( expr_type ), ex );
     }
 }
 
-static void snail_compile_operator( COMPILER *cc,
+static void compiler_compile_operator( COMPILER *cc,
 				    TNODE *tnode,
 				    char *operator_name,
 				    int arity,
@@ -2310,13 +2310,13 @@ static void snail_compile_operator( COMPILER *cc,
 {
     operator_description_t od;
 
-    snail_init_operator_description( &od, cc, tnode, operator_name, arity, ex );
-    snail_emit_operator_or_report_missing( cc, &od, NULL, "", ex );
-    snail_check_operator_retvals( cc, &od, 0, 1 );
-    snail_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, ex );
+    compiler_init_operator_description( &od, cc, tnode, operator_name, arity, ex );
+    compiler_emit_operator_or_report_missing( cc, &od, NULL, "", ex );
+    compiler_check_operator_retvals( cc, &od, 0, 1 );
+    compiler_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, ex );
 }
 
-static void snail_check_and_compile_operator( COMPILER *cc,
+static void compiler_check_and_compile_operator( COMPILER *cc,
 					      TNODE *tnode,
 					      char *operator_name,
 					      int arity,
@@ -2329,13 +2329,13 @@ static void snail_check_and_compile_operator( COMPILER *cc,
 
     generic_types = new_typetab( ex );
     cexception_guard( inner ) {
-	snail_init_operator_description( &od, cc, tnode, 
+	compiler_init_operator_description( &od, cc, tnode, 
                                          operator_name, arity, ex );
-	snail_check_operator_args( cc, &od, generic_types, ex );
-	snail_drop_operator_args( cc, &od );
-	snail_emit_operator_or_report_missing( cc, &od, fixup_values, "", ex );
-	snail_check_operator_retvals( cc, &od, 0, 1 );
-	snail_push_operator_retvals( cc, &od, NULL, generic_types, ex );
+	compiler_check_operator_args( cc, &od, generic_types, ex );
+	compiler_drop_operator_args( cc, &od );
+	compiler_emit_operator_or_report_missing( cc, &od, fixup_values, "", ex );
+	compiler_check_operator_retvals( cc, &od, 0, 1 );
+	compiler_push_operator_retvals( cc, &od, NULL, generic_types, ex );
     }
     cexception_catch {
 	delete_typetab( generic_types );
@@ -2344,7 +2344,7 @@ static void snail_check_and_compile_operator( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_check_and_compile_top_operator( COMPILER *cc,
+static void compiler_check_and_compile_top_operator( COMPILER *cc,
 						  char *operator,
 						  int arity,
 						  cexception_t *ex )
@@ -2370,12 +2370,12 @@ static void snail_check_and_compile_top_operator( COMPILER *cc,
 			  operator );
 	    }
 	}
-	snail_check_and_compile_operator( cc, tnode, operator, arity, 
+	compiler_check_and_compile_operator( cc, tnode, operator, arity, 
 					  /*fixup_values:*/ NULL, ex );
     }
 }
 
-static void snail_check_and_compile_top_2_operator( COMPILER *cc,
+static void compiler_check_and_compile_top_2_operator( COMPILER *cc,
 						    char * operator,
 						    int arity,
 						    cexception_t *ex )
@@ -2402,16 +2402,16 @@ static void snail_check_and_compile_top_2_operator( COMPILER *cc,
 	    key_value_t *fixup_values = element_type ?
 		make_tnode_key_value_list( element_type ) : NULL;
 
-	    snail_check_and_compile_operator( cc, tnode2, operator, arity,
+	    compiler_check_and_compile_operator( cc, tnode2, operator, arity,
 					      fixup_values, ex );
 	} else {
-	    snail_check_and_compile_operator( cc, tnode, operator, arity, 
+	    compiler_check_and_compile_operator( cc, tnode, operator, arity, 
 					      /*fixup_values:*/ NULL, ex );
 	}
     }
 }
 
-static void snail_compile_dup( COMPILER *cc, cexception_t *ex )
+static void compiler_compile_dup( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr;
 
@@ -2423,46 +2423,46 @@ static void snail_compile_dup( COMPILER *cc, cexception_t *ex )
 	TNODE *expr_type = enode_type( expr );
 	operator_description_t od;
 
-	snail_init_operator_description( &od, cc, expr_type, "dup", 1, ex );
+	compiler_init_operator_description( &od, cc, expr_type, "dup", 1, ex );
 
 	if( od.operator ) {
 	    ENODE *new_expr = expr;
-	    snail_emit_function_call( cc, od.operator, NULL, "\n", ex );
-	    snail_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
-	    snail_check_operator_retvals( cc, &od, 1, 1 );
-	    snail_push_operator_retvals( cc, &od, &new_expr,
+	    compiler_emit_function_call( cc, od.operator, NULL, "\n", ex );
+	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+	    compiler_check_operator_retvals( cc, &od, 1, 1 );
+	    compiler_push_operator_retvals( cc, &od, &new_expr,
                                          NULL /* generic_types */, ex );
 	    if( !new_expr ) {
 		share_enode( expr );
 	    }
 	} else {
-	    snail_emit( cc, ex, "\tc\n", DUP );
-	    snail_push_type( cc, expr_type, ex );
+	    compiler_emit( cc, ex, "\tc\n", DUP );
+	    compiler_push_type( cc, expr_type, ex );
 	    share_tnode( expr_type );
 	}
     }
 }
 
-static int snail_dnode_is_reference( COMPILER *cc, DNODE *dnode )
+static int compiler_dnode_is_reference( COMPILER *cc, DNODE *dnode )
 {
     return dnode ? dnode_type_is_reference( dnode ) : 0;
 }
 
-static int snail_stack_top_is_integer( COMPILER *cc )
+static int compiler_stack_top_is_integer( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
     return etype ? tnode_is_integer( etype ) : 0;
 }
 
-static int snail_stack_top_is_reference( COMPILER *cc )
+static int compiler_stack_top_is_reference( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
     return etype ? tnode_is_reference( etype ) : 0;
 }
 
-static int snail_stack_top_base_is_reference( COMPILER *cc )
+static int compiler_stack_top_base_is_reference( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
@@ -2470,14 +2470,14 @@ static int snail_stack_top_base_is_reference( COMPILER *cc )
     return ebase ? tnode_is_reference( ebase ) : 0;
 }
  
-static int snail_stack_top_is_array( COMPILER *cc )
+static int compiler_stack_top_is_array( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
     return etype ? tnode_kind( etype ) == TK_ARRAY : 0;
 }
 
-static int snail_stack_top_has_references( COMPILER *cc,
+static int compiler_stack_top_has_references( COMPILER *cc,
 					   ssize_t drop_retvals )
 {
     ssize_t i;
@@ -2495,33 +2495,33 @@ static int snail_stack_top_has_references( COMPILER *cc,
     return 0;
 }
 
-static void snail_compile_drop( COMPILER *cc, cexception_t *ex )
+static void compiler_compile_drop( COMPILER *cc, cexception_t *ex )
 {
-    if( snail_stack_top_is_reference( cc )) {
-	snail_emit( cc, ex, "\tc\n", PDROP );
+    if( compiler_stack_top_is_reference( cc )) {
+	compiler_emit( cc, ex, "\tc\n", PDROP );
     } else {
-	snail_emit( cc, ex, "\tc\n", DROP );
+	compiler_emit( cc, ex, "\tc\n", DROP );
     }
     compiler_drop_top_expression( cc );
 }
 
-static void snail_compile_dropn( COMPILER *cc,
+static void compiler_compile_dropn( COMPILER *cc,
 				 ssize_t drop_values,
 				 cexception_t *ex )
 {
     ssize_t i;
 
-    if( snail_stack_top_has_references( cc, drop_values )) {
-	snail_emit( cc, ex, "\tce\n", PDROPN, &drop_values );
+    if( compiler_stack_top_has_references( cc, drop_values )) {
+	compiler_emit( cc, ex, "\tce\n", PDROPN, &drop_values );
     } else {
-	snail_emit( cc, ex, "\tce\n", DROPN, &drop_values );
+	compiler_emit( cc, ex, "\tce\n", DROPN, &drop_values );
     }
     for( i = 0; i < drop_values; i ++ ) {
 	compiler_drop_top_expression( cc );
     }
 }
 
-static void snail_compile_swap( COMPILER *cc, cexception_t *ex )
+static void compiler_compile_swap( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr1 = enode_list_pop( &cc->e_stack );
     ENODE *expr2 = enode_list_pop( &cc->e_stack );
@@ -2533,10 +2533,10 @@ static void snail_compile_swap( COMPILER *cc, cexception_t *ex )
     enode_list_push( &cc->e_stack, expr1 );
     enode_list_push( &cc->e_stack, expr2 );
 
-    snail_emit( cc, ex, "\tc\n", SWAP );
+    compiler_emit( cc, ex, "\tc\n", SWAP );
 }
 
-static void snail_compile_over( COMPILER *cc, cexception_t *ex )
+static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr1 = cc->e_stack;
     ENODE *expr2 = expr1 ? enode_next( expr1 ) : NULL;
@@ -2554,23 +2554,23 @@ static void snail_compile_over( COMPILER *cc, cexception_t *ex )
 	if( compiler_lookup_operator( cc, expr2_type, "over", 2, ex )) {
 	    operator_description_t od;
 
-	    snail_init_operator_description( &od, cc, expr2_type,
+	    compiler_init_operator_description( &od, cc, expr2_type,
                                              "over", 2, ex );
-	    snail_check_operator_args( cc, &od, generic_types, ex );
-	    snail_emit_operator_or_report_missing( cc, &od, NULL, "", ex );
-	    snail_check_operator_retvals( cc, &od, 1, 1 );
-	    snail_push_operator_retvals( cc, &od, NULL, generic_types,
+	    compiler_check_operator_args( cc, &od, generic_types, ex );
+	    compiler_emit_operator_or_report_missing( cc, &od, NULL, "", ex );
+	    compiler_check_operator_retvals( cc, &od, 1, 1 );
+	    compiler_push_operator_retvals( cc, &od, NULL, generic_types,
 					 ex );
-	    snail_emit( cc, ex, "\n" );
+	    compiler_emit( cc, ex, "\n" );
 	} else {
 	    if( expr2_type ) {
-		snail_push_type( cc, expr2_type, ex );
+		compiler_push_type( cc, expr2_type, ex );
 		share_tnode( expr2_type );
 	    } else {
 		yyerrorf( "when generating OVER, second expression from the "
 			  "stack top has no type (?!)" );
 	    }
-	    snail_emit( cc, ex, "\tc\n", OVER );
+	    compiler_emit( cc, ex, "\tc\n", OVER );
 	}
     }
     cexception_catch {
@@ -2580,7 +2580,7 @@ static void snail_compile_over( COMPILER *cc, cexception_t *ex )
     delete_typetab( generic_types );
 }
 
-static int snail_stack_top_has_operator( COMPILER *c,
+static int compiler_stack_top_has_operator( COMPILER *c,
 					 char *operator_name,
 					 int arity,
                                          cexception_t *ex )
@@ -2599,7 +2599,7 @@ static int snail_stack_top_has_operator( COMPILER *c,
     return 1;
 }
 
-static int snail_nth_stack_value_has_operator( COMPILER *c,
+static int compiler_nth_stack_value_has_operator( COMPILER *c,
 					       int number_from_top,
 					       char *operator_name,
 					       int arity,
@@ -2630,7 +2630,7 @@ static int snail_nth_stack_value_has_operator( COMPILER *c,
     return 1;
 }
 
-static int snail_variable_has_operator( COMPILER *c,
+static int compiler_variable_has_operator( COMPILER *c,
                                         DNODE *var_dnode,
 					char *operator_name,
 					int arity,
@@ -2655,7 +2655,7 @@ static int snail_variable_has_operator( COMPILER *c,
     return 1;
 }
 
-static void snail_compile_jnz_or_jz( COMPILER *c,
+static void compiler_compile_jnz_or_jz( COMPILER *c,
 				     ssize_t offset,
 				     char *operator_name,
 				     void *pointer_opcode,
@@ -2666,39 +2666,39 @@ static void snail_compile_jnz_or_jz( COMPILER *c,
     TNODE * volatile top_tnode = top_enode ? enode_type( top_enode ) : NULL;
 
     if( compiler_lookup_operator( c, top_tnode, operator_name, 1, ex )) {
-	snail_check_and_compile_operator( c, top_tnode, operator_name,
+	compiler_check_and_compile_operator( c, top_tnode, operator_name,
 					  /*arity:*/ 1,
 					  /*fixup_values:*/ NULL, ex );
-	snail_emit( c, ex, "e\n", &offset );
+	compiler_emit( c, ex, "e\n", &offset );
     } else {
 	if( tnode_is_reference( top_tnode )) {
-	    snail_emit( c, ex, "\tce\n", pointer_opcode, &offset );
+	    compiler_emit( c, ex, "\tce\n", pointer_opcode, &offset );
 	} else {
 	    ssize_t zero = 0;
 	    tnode_report_missing_operator( top_tnode, operator_name, 1 );
 	    /* emit JMP instead of missing JNZ/JZ to avoid triggering
 	       assertions later during backpatching: */
-	    snail_emit( c, ex, "\tce\n", JMP, &zero );
+	    compiler_emit( c, ex, "\tce\n", JMP, &zero );
 	}
 	compiler_drop_top_expression( c );
     }
 }
 
-static void snail_compile_jnz( COMPILER *c,
+static void compiler_compile_jnz( COMPILER *c,
 			       ssize_t offset,
 			       cexception_t *ex )
 {
-    snail_compile_jnz_or_jz( c, offset, "jnz", PJNZ, JNZ, ex );
+    compiler_compile_jnz_or_jz( c, offset, "jnz", PJNZ, JNZ, ex );
 }
 
-static void snail_compile_jz( COMPILER *c,
+static void compiler_compile_jz( COMPILER *c,
 			      ssize_t offset,
 			      cexception_t *ex )
 {
-    snail_compile_jnz_or_jz( c, offset, "jz", PJZ, JZ, ex );
+    compiler_compile_jnz_or_jz( c, offset, "jz", PJZ, JZ, ex );
 }
 
-static void snail_compile_loop( COMPILER *c,
+static void compiler_compile_loop( COMPILER *c,
 				ssize_t offset,
 				cexception_t *ex )
 {
@@ -2726,21 +2726,21 @@ static void snail_compile_loop( COMPILER *c,
 
     if( limit_tnode ) {
 	if( compiler_lookup_operator( c, limit_tnode, "loop", 2, ex )) {
-	    snail_check_and_compile_operator( c, limit_tnode, "loop",
+	    compiler_check_and_compile_operator( c, limit_tnode, "loop",
 					      /*arity:*/ 2,
 					      /*fixup_values:*/ NULL, ex );
-	    snail_emit( c, ex, "e\n", &offset );
+	    compiler_emit( c, ex, "e\n", &offset );
 	} else {
 	    tnode_report_missing_operator( limit_tnode, "loop", 2 );
 	}
     }
 }
 
-static void snail_compile_alloc( COMPILER *cc,
+static void compiler_compile_alloc( COMPILER *cc,
 				 TNODE *alloc_type,
 				 cexception_t *ex )
 {
-    snail_push_type( cc, alloc_type, ex );
+    compiler_push_type( cc, alloc_type, ex );
     if( !tnode_is_reference( alloc_type )) {
 	yyerrorf( "only reference-implemented types can be "
 		  "used in new operator" );
@@ -2759,7 +2759,7 @@ static void snail_compile_alloc( COMPILER *cc,
             tnode_element_type( alloc_type ) : NULL;
         key_value_t *fixup_values =
             make_tnode_key_value_list( element_type ? element_type : alloc_type );
-	snail_check_and_compile_operator( cc, alloc_type, "new",
+	compiler_check_and_compile_operator( cc, alloc_type, "new",
                                           /* arity = */0, 
                                           fixup_values, ex );
     } else {
@@ -2768,15 +2768,15 @@ static void snail_compile_alloc( COMPILER *cc,
 	ssize_t vmt_offset = tnode_vmt_offset( alloc_type );
 
 	if( vmt_offset == 0 ) {
-	    snail_emit( cc, ex, "\tcee\n", ALLOC, &alloc_size, &alloc_nref );
+	    compiler_emit( cc, ex, "\tcee\n", ALLOC, &alloc_size, &alloc_nref );
 	} else {
-	    snail_emit( cc, ex, "\tceee\n", ALLOCVMT, &alloc_size, &alloc_nref,
+	    compiler_emit( cc, ex, "\tceee\n", ALLOCVMT, &alloc_size, &alloc_nref,
 			&vmt_offset );
 	}
     }
 }
 
-static char *snail_make_typed_operator_name( TNODE *index_type1,
+static char *compiler_make_typed_operator_name( TNODE *index_type1,
                                              TNODE *index_type2,
 					     char *name_format,
 					     cexception_t *ex )
@@ -2813,13 +2813,13 @@ static char *snail_make_typed_operator_name( TNODE *index_type1,
     }
 }
 
-static char* snail_indexing_operator_name( TNODE *index_type,
+static char* compiler_indexing_operator_name( TNODE *index_type,
 					   cexception_t *ex )
 {
-    return snail_make_typed_operator_name( index_type, NULL, "[%s]", ex );
+    return compiler_make_typed_operator_name( index_type, NULL, "[%s]", ex );
 }
 
-static void snail_compile_composite_alloc_operator( COMPILER *cc,
+static void compiler_compile_composite_alloc_operator( COMPILER *cc,
 						    TNODE *composite_type,
 						    key_value_t *fixup_values,
 						    cexception_t *ex )
@@ -2830,11 +2830,11 @@ static void snail_compile_composite_alloc_operator( COMPILER *cc,
     char *operator_name;
 
     operator_name =
-        snail_make_typed_operator_name( top_type, NULL, "new[%s]", ex );
+        compiler_make_typed_operator_name( top_type, NULL, "new[%s]", ex );
 
     if( compiler_lookup_operator( cc, composite_type, operator_name,
                                   arity, ex )) {
-	snail_check_and_compile_operator( cc, composite_type, operator_name,
+	compiler_check_and_compile_operator( cc, composite_type, operator_name,
 					  arity, fixup_values, ex );
 	/* Return value pushed by ..._compile_operator() function must
 	   be dropped, since it only describes return value as having
@@ -2842,12 +2842,12 @@ static void snail_compile_composite_alloc_operator( COMPILER *cc,
 	   a correct return value 'composite of proper_element_type' */
 	compiler_drop_top_expression( cc );
     } else {
-	snail_check_and_remove_index_type( cc );
+	compiler_check_and_remove_index_type( cc );
 	tnode_report_missing_operator( composite_type, operator_name, arity );
     }
 }
 
-static void snail_compile_composite_alloc( COMPILER *cc,
+static void compiler_compile_composite_alloc( COMPILER *cc,
 					   TNODE *composite_type,
 					   TNODE *element_type,
 					   cexception_t *ex )
@@ -2858,14 +2858,14 @@ static void snail_compile_composite_alloc( COMPILER *cc,
     allocated_type = new_tnode_composite_synonim( composite_type, element_type,
 						  ex );
 
-    snail_compile_composite_alloc_operator( cc, allocated_type,
+    compiler_compile_composite_alloc_operator( cc, allocated_type,
 					    fixup_values, ex );
 
-    snail_push_type( cc, allocated_type, ex );
-    /* snail_push_composite_of_type( cc, composite_type, element_type, ex ); */
+    compiler_push_type( cc, allocated_type, ex );
+    /* compiler_push_composite_of_type( cc, composite_type, element_type, ex ); */
 }
 
-static void snail_compile_array_alloc_operator( COMPILER *cc,
+static void compiler_compile_array_alloc_operator( COMPILER *cc,
 						char *operator_name,
 						key_value_t *fixup_values,
 						cexception_t *ex )
@@ -2874,37 +2874,37 @@ static void snail_compile_array_alloc_operator( COMPILER *cc,
     TNODE *volatile top_type = top_expr ? enode_type( top_expr ) : NULL;
     const int arity = 1;
 
-    if( snail_stack_top_has_operator( cc, operator_name, arity, ex )) {
-	snail_check_and_compile_operator( cc, top_type, operator_name,
+    if( compiler_stack_top_has_operator( cc, operator_name, arity, ex )) {
+	compiler_check_and_compile_operator( cc, top_type, operator_name,
 					  arity, fixup_values, ex );
 	/* Return value pushed by ..._compile_operator() function must
 	   be dropped, since it only describes return value as having
 	   type 'array'. The caller of the current function will push
 	   a correct return value 'array of proper_element_type' */
 	compiler_drop_top_expression( cc );
-        snail_emit( cc, ex, "\n" );
+        compiler_emit( cc, ex, "\n" );
     } else {
-	snail_check_and_remove_index_type( cc );
+	compiler_check_and_remove_index_type( cc );
 	tnode_report_missing_operator( top_type, operator_name, arity );
     }
 }
 
-static void snail_compile_array_alloc( COMPILER *cc,
+static void compiler_compile_array_alloc( COMPILER *cc,
 				       TNODE *element_type,
 				       cexception_t *ex )
 {
     key_value_t *fixup_values = make_tnode_key_value_list( element_type );
 
     if( tnode_kind( element_type ) != TK_PLACEHOLDER ) {
-        snail_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
+        compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
         yyerrorf( "in this type representation, can not allocate array "
                   "of generic type %s", tnode_name( element_type ));
     }
-    snail_push_array_of_type( cc, element_type, ex );
+    compiler_push_array_of_type( cc, element_type, ex );
 }
 
-static void snail_compile_blob_alloc( COMPILER *cc,
+static void compiler_compile_blob_alloc( COMPILER *cc,
 				      cexception_t *ex )
 {
     static key_value_t fixup_values[] = {
@@ -2913,11 +2913,11 @@ static void snail_compile_blob_alloc( COMPILER *cc,
 	{ NULL },
     };
 
-    snail_compile_array_alloc_operator( cc, "blob[]", fixup_values, ex );
-    snail_push_type( cc, new_tnode_blob_snail( cc->typetab, ex ), ex );
+    compiler_compile_array_alloc_operator( cc, "blob[]", fixup_values, ex );
+    compiler_push_type( cc, new_tnode_blob_snail( cc->typetab, ex ), ex );
 }
 
-static void snail_compile_mdalloc( COMPILER *cc,
+static void compiler_compile_mdalloc( COMPILER *cc,
 				   TNODE *element_type,
 				   int level,
 				   cexception_t *ex )
@@ -2928,9 +2928,9 @@ static void snail_compile_mdalloc( COMPILER *cc,
 	key_value_t *fixup_values =
 	    make_mdalloc_key_value_list( element_type, level );
 
-	snail_compile_array_alloc_operator( cc, "new[][]", fixup_values, ex );
-	snail_append_expression_type( cc, array_tnode );
-	snail_append_expression_type( cc, share_tnode( element_type ));
+	compiler_compile_array_alloc_operator( cc, "new[][]", fixup_values, ex );
+	compiler_append_expression_type( cc, array_tnode );
+	compiler_append_expression_type( cc, share_tnode( element_type ));
     } else {
 	key_value_t fixup_vals[] = {
 	    { "element_size", sizeof(void*) },
@@ -2941,16 +2941,16 @@ static void snail_compile_mdalloc( COMPILER *cc,
 	};
 
 	if( level == 0 ) {
-	    snail_compile_array_alloc_operator( cc, "new[]", fixup_vals, ex );
-	    snail_push_type( cc, array_tnode, ex );
+	    compiler_compile_array_alloc_operator( cc, "new[]", fixup_vals, ex );
+	    compiler_push_type( cc, array_tnode, ex );
 	} else {
-	    snail_compile_array_alloc_operator( cc, "new[][]", fixup_vals, ex );
-	    snail_append_expression_type( cc, array_tnode );
+	    compiler_compile_array_alloc_operator( cc, "new[][]", fixup_vals, ex );
+	    compiler_append_expression_type( cc, array_tnode );
 	}
     }
 }
 
-static void snail_begin_scope( COMPILER *c,
+static void compiler_begin_scope( COMPILER *c,
 			       cexception_t *ex )
 {
     assert( c );
@@ -2966,7 +2966,7 @@ static void snail_begin_scope( COMPILER *c,
     typetab_begin_scope( c->typetab, ex );
 }
 
-static void snail_end_scope( COMPILER *c, cexception_t *ex )
+static void compiler_end_scope( COMPILER *c, cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -2980,7 +2980,7 @@ static void snail_end_scope( COMPILER *c, cexception_t *ex )
     typetab_end_scope( c->typetab, ex );
 }
 
-static void snail_begin_subscope( COMPILER *c,
+static void compiler_begin_subscope( COMPILER *c,
 				  cexception_t *ex )
 {
     assert( c );
@@ -2992,7 +2992,7 @@ static void snail_begin_subscope( COMPILER *c,
     typetab_begin_subscope( c->typetab, ex );
 }
 
-static void snail_end_subscope( COMPILER *c, cexception_t *ex )
+static void compiler_end_subscope( COMPILER *c, cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -3003,20 +3003,20 @@ static void snail_end_subscope( COMPILER *c, cexception_t *ex )
     typetab_end_subscope( c->typetab, ex );
 }
 
-static void snail_push_guarding_arg( COMPILER *cc, cexception_t *ex )
+static void compiler_push_guarding_arg( COMPILER *cc, cexception_t *ex )
 {
     ENODE *arg = new_enode_guarding_arg( ex );
     enode_list_push( &cc->e_stack, arg );
 }
 
-static void snail_push_guarding_retval( COMPILER *cc, cexception_t *ex )
+static void compiler_push_guarding_retval( COMPILER *cc, cexception_t *ex )
 {
     ENODE *arg = new_enode_guarding_arg( ex );
     enode_set_flags( arg, EF_RETURN_VALUE );
     enode_list_push( &cc->e_stack, arg );
 }
 
-static DNODE* snail_lookup_dnode_silently( COMPILER *cc,
+static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
 					   char *module_name,
 					   char *identifier )
 {
@@ -3036,13 +3036,13 @@ static DNODE* snail_lookup_dnode_silently( COMPILER *cc,
     }
 }
 
-static DNODE* snail_lookup_dnode( COMPILER *cc,
+static DNODE* compiler_lookup_dnode( COMPILER *cc,
 				  char *module_name,
 				  char *identifier,
 				  char *message )
 {
     DNODE *varnode =
-	snail_lookup_dnode_silently( cc, module_name, identifier );
+	compiler_lookup_dnode_silently( cc, module_name, identifier );
 
     if( !varnode ) {
 	if( !message ) message = "name";
@@ -3059,7 +3059,7 @@ static DNODE* snail_lookup_dnode( COMPILER *cc,
 }
 
 /*
-  Function snail_push_varaddr_expr() pushes a fake expression with
+  Function compiler_push_varaddr_expr() pushes a fake expression with
   variable reference onto the stack. It is fake because no code is
   generated to push this "address". Instead, code emitter will emit
   'ST %variable' when encountered such expression.
@@ -3070,11 +3070,11 @@ static DNODE* snail_lookup_dnode( COMPILER *cc,
   %variable'.
 */
 
-static void snail_push_varaddr_expr( COMPILER *cc,
+static void compiler_push_varaddr_expr( COMPILER *cc,
 				     char *variable_name,
 				     cexception_t *ex )
 {
-    DNODE *var_dnode = snail_lookup_dnode( cc, NULL /* module_name */,
+    DNODE *var_dnode = compiler_lookup_dnode( cc, NULL /* module_name */,
                                            variable_name, "variable" );
     ENODE *arg = var_dnode ?
         new_enode_varaddr_expr( var_dnode, ex ) : NULL;
@@ -3082,11 +3082,11 @@ static void snail_push_varaddr_expr( COMPILER *cc,
         share_dnode( var_dnode );
         enode_list_push( &cc->e_stack, arg );
     } else {
-        snail_push_error_type( cc, ex );
+        compiler_push_error_type( cc, ex );
     }
 }
 
-static type_kind_t snail_stack_top_type_kind( COMPILER *cc )
+static type_kind_t compiler_stack_top_type_kind( COMPILER *cc )
 {
     ENODE *top_expr = cc->e_stack;
     TNODE *top_type = top_expr ? enode_type( cc->e_stack ) : NULL;
@@ -3098,7 +3098,7 @@ static type_kind_t snail_stack_top_type_kind( COMPILER *cc )
     }
 }
 
-static void snail_make_stack_top_element_type( COMPILER *cc )
+static void compiler_make_stack_top_element_type( COMPILER *cc )
 {
     if( cc->e_stack ) {
 	enode_make_type_to_element_type( cc->e_stack );
@@ -3108,7 +3108,7 @@ static void snail_make_stack_top_element_type( COMPILER *cc )
     }
 }
 
-static DNODE* snail_make_stack_top_field_type( COMPILER *cc,
+static DNODE* compiler_make_stack_top_field_type( COMPILER *cc,
 					       char *field_name )
 {
     if( cc->e_stack ) {
@@ -3145,7 +3145,7 @@ static DNODE* snail_make_stack_top_field_type( COMPILER *cc,
     }
 }
 
-static void snail_make_stack_top_addressof( COMPILER *cc,
+static void compiler_make_stack_top_addressof( COMPILER *cc,
 					    cexception_t *ex )
 {
     if( cc->e_stack ) {
@@ -3156,7 +3156,7 @@ static void snail_make_stack_top_addressof( COMPILER *cc,
     }    
 }
 
-static void snail_check_and_drop_function_args( COMPILER *cc,
+static void compiler_check_and_drop_function_args( COMPILER *cc,
 						DNODE *function,
                                                 TYPETAB *generic_types,
                                                 cexception_t *ex )
@@ -3212,7 +3212,7 @@ static void snail_check_and_drop_function_args( COMPILER *cc,
     enode_list_drop( &cc->e_stack );
 }
 
-static DNODE *snail_check_and_set_fn_proto( COMPILER *cc,
+static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
 					    DNODE *fn_proto,
 					    cexception_t *ex )
 {
@@ -3240,12 +3240,12 @@ static DNODE *snail_check_and_set_fn_proto( COMPILER *cc,
 	delete_dnode( fn_proto );
 	return fn_dnode;
     } else {
-	snail_vartab_insert_single_named_var( cc, fn_proto, ex );
+	compiler_vartab_insert_single_named_var( cc, fn_proto, ex );
 	return fn_proto;
     }
 }
 
-static void snail_emit_argument_list( COMPILER *cc,
+static void compiler_emit_argument_list( COMPILER *cc,
                                       DNODE *argument_list,
 				      cexception_t *ex )
 {
@@ -3258,26 +3258,26 @@ static void snail_emit_argument_list( COMPILER *cc,
 	vartab_insert_named( cc->vartab, varnode, ex );
 	share_dnode( varnode );
 
-	snail_emit_st( cc, argtype, dnode_name( varnode ),
+	compiler_emit_st( cc, argtype, dnode_name( varnode ),
 		       dnode_offset( varnode ), dnode_scope( varnode ), ex );
     }
 }
 
-static void snail_emit_function_arguments( DNODE *function, COMPILER *cc,
+static void compiler_emit_function_arguments( DNODE *function, COMPILER *cc,
 					   cexception_t *ex )
 {
     assert( function );
-    snail_emit_argument_list( cc, dnode_function_args( function ), ex );
+    compiler_emit_argument_list( cc, dnode_function_args( function ), ex );
 }
 
-static void snail_emit_drop_returned_values( COMPILER *cc,
+static void compiler_emit_drop_returned_values( COMPILER *cc,
 					     ssize_t drop_retvals,
 					     cexception_t *ex  )
 {
     if( drop_retvals > 1 ) {
-	snail_compile_dropn( cc, drop_retvals, ex );
+	compiler_compile_dropn( cc, drop_retvals, ex );
     } else if( drop_retvals == 1 ) {
-	snail_compile_drop( cc, ex );
+	compiler_compile_drop( cc, ex );
     }    
 }
 
@@ -3339,7 +3339,7 @@ static ssize_t compiler_assemble_static_string( COMPILER *cc,
     return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
 }
 
-static TNODE *snail_lookup_suffix_tnode( COMPILER *cc,
+static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
 					 type_suffix_t suffix_type,
 					 char *module_name,
 					 char *suffix,
@@ -3387,7 +3387,7 @@ static TNODE *snail_lookup_suffix_tnode( COMPILER *cc,
     return const_type;
 }
 
-static void snail_compile_enum_const_from_tnode( COMPILER *cc,
+static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
 						 char *value_name,
 						 TNODE *const_type,
 						 cexception_t *ex )
@@ -3398,14 +3398,14 @@ static void snail_compile_enum_const_from_tnode( COMPILER *cc,
 	dnode_offset( const_dnode ) : 0;
 
     if( !const_type ) {
-	snail_push_error_type( cc, ex );
+	compiler_push_error_type( cc, ex );
 	return;
     }
 
     if( compiler_lookup_operator( cc, const_type, "ldc", 0, ex ) != NULL ) {
-	snail_compile_operator( cc, const_type, "ldc", 0, ex );
+	compiler_compile_operator( cc, const_type, "ldc", 0, ex );
     } else {
-	snail_push_type( cc, const_type, ex );
+	compiler_push_type( cc, const_type, ex );
 	share_tnode( const_type );
 	tnode_report_missing_operator( const_type, "ldc", 0 );
     }
@@ -3425,10 +3425,10 @@ static void snail_compile_enum_const_from_tnode( COMPILER *cc,
 	}
     }
 
-    snail_emit( cc, ex, "e\n", &string_offset );
+    compiler_emit( cc, ex, "e\n", &string_offset );
 }
 
-static TNODE* snail_lookup_tnode_with_function( COMPILER *cc,
+static TNODE* compiler_lookup_tnode_with_function( COMPILER *cc,
                                                 char *module_name,
                                                 char *identifier,
                                                 TNODE* (*typetab_lookup_fn)
@@ -3448,21 +3448,21 @@ static TNODE* snail_lookup_tnode_with_function( COMPILER *cc,
     }
 }
 
-static TNODE* snail_lookup_tnode_silently( COMPILER *cc,
+static TNODE* compiler_lookup_tnode_silently( COMPILER *cc,
 					   char *module_name,
 					   char *identifier )
 {
-    return snail_lookup_tnode_with_function( cc, module_name,
+    return compiler_lookup_tnode_with_function( cc, module_name,
                                              identifier,
                                              typetab_lookup_silently );
 }
 
-static TNODE* snail_lookup_tnode( COMPILER *cc,
+static TNODE* compiler_lookup_tnode( COMPILER *cc,
 				  char *module_name,
 				  char *identifier,
 				  char *message )
 {
-    TNODE *typenode = snail_lookup_tnode_with_function( cc, module_name, 
+    TNODE *typenode = compiler_lookup_tnode_with_function( cc, module_name, 
                                                         identifier, 
                                                         typetab_lookup );
 
@@ -3480,19 +3480,19 @@ static TNODE* snail_lookup_tnode( COMPILER *cc,
     return typenode;
 }
 
-static void snail_compile_enumeration_constant( COMPILER *cc,
+static void compiler_compile_enumeration_constant( COMPILER *cc,
 						char *module_name,
 						char *value_name,
 						char *type_name,
 						cexception_t *ex )
 {
     TNODE *const_type =
-	snail_lookup_tnode( cc, module_name, type_name, "enumeration type" );
+	compiler_lookup_tnode( cc, module_name, type_name, "enumeration type" );
 
-    return snail_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
+    return compiler_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
 }
 
-static void snail_compile_typed_constant( COMPILER *cc,
+static void compiler_compile_typed_constant( COMPILER *cc,
 					  TNODE *const_type,
 					  char *value,
 					  cexception_t *ex )
@@ -3508,7 +3508,7 @@ static void snail_compile_typed_constant( COMPILER *cc,
 
 		if( val_end ) *val_end = '\0';
 		cexception_guard( inner ) {
-		    snail_compile_enum_const_from_tnode( cc, enum_value_name,
+		    compiler_compile_enum_const_from_tnode( cc, enum_value_name,
 							 const_type, &inner );
 		}
 		cexception_catch {
@@ -3525,18 +3525,18 @@ static void snail_compile_typed_constant( COMPILER *cc,
 	}
 
 	if( compiler_lookup_operator( cc, const_type, "ldc", 0, ex ) != NULL ) {
-	    snail_compile_operator( cc, const_type, "ldc", 0, ex );
+	    compiler_compile_operator( cc, const_type, "ldc", 0, ex );
 	} else {
-	    snail_push_type( cc, const_type, ex );
+	    compiler_push_type( cc, const_type, ex );
 	    share_tnode( const_type );
 	    tnode_report_missing_operator( const_type, "ldc", 0 );
 	}
 	string_offset = compiler_assemble_static_string( cc, value, ex );
-	snail_emit( cc, ex, "e\n", &string_offset );
+	compiler_emit( cc, ex, "e\n", &string_offset );
     }
 }
 
-static void snail_compile_constant( COMPILER *cc,
+static void compiler_compile_constant( COMPILER *cc,
 				    type_suffix_t suffix_type,
 				    char *module_name,
 				    char *suffix, char *constant_kind_name,
@@ -3544,13 +3544,13 @@ static void snail_compile_constant( COMPILER *cc,
 				    cexception_t *ex )
 {
     TNODE *const_type =
-	snail_lookup_suffix_tnode( cc, suffix_type, module_name,
+	compiler_lookup_suffix_tnode( cc, suffix_type, module_name,
 				   suffix, constant_kind_name );
 
-    snail_compile_typed_constant( cc, const_type, value, ex );
+    compiler_compile_typed_constant( cc, const_type, value, ex );
 }
 
-static DNODE* snail_lookup_constant( COMPILER *cc,
+static DNODE* compiler_lookup_constant( COMPILER *cc,
 				     char *module_name,
 				     char *identifier,
 				     char *message )
@@ -3584,7 +3584,7 @@ static DNODE* snail_lookup_constant( COMPILER *cc,
     return constnode;
 }
 
-static void snail_compile_ld( COMPILER *cc,
+static void compiler_compile_ld( COMPILER *cc,
 			      DNODE *varnode,
 			      char *operator_name,
 			      void *fallback_opcode,
@@ -3610,7 +3610,7 @@ static void snail_compile_ld( COMPILER *cc,
 		expr_type = var_type;
 	    }
 	    share_tnode( var_type );
-	    snail_push_type( cc, expr_type, &inner );
+	    compiler_push_type( cc, expr_type, &inner );
 	    if( dnode_has_flags( varnode, DF_IS_READONLY )) {
 		enode_set_flags( cc->e_stack, EF_IS_READONLY );
 	    }
@@ -3621,14 +3621,14 @@ static void snail_compile_ld( COMPILER *cc,
 	}
 
 	if( operator ) {
-	    snail_emit_function_call( cc, operator, NULL, "", ex );
+	    compiler_emit_function_call( cc, operator, NULL, "", ex );
 	} else {
 	    if( fallback_opcode == LDA ) {
-		if( dnode_scope( varnode ) == snail_current_scope( cc )) {
+		if( dnode_scope( varnode ) == compiler_current_scope( cc )) {
 		    if( tnode_is_reference( var_type )) {
-			snail_emit( cc, ex, "\tc", PLDA );
+			compiler_emit( cc, ex, "\tc", PLDA );
 		    } else {
-			snail_emit( cc, ex, "\tc", LDA );
+			compiler_emit( cc, ex, "\tc", LDA );
 		    }
 		} else {
 		    if( dnode_scope( varnode ) == 0 ) {
@@ -3636,13 +3636,13 @@ static void snail_compile_ld( COMPILER *cc,
                                                              "ldga",
                                                              arity, ex );
 			if( operator ) {
-			    snail_emit_function_call( cc, operator, NULL,
+			    compiler_emit_function_call( cc, operator, NULL,
 						      "", ex );
 			} else {
 			    if( tnode_is_reference( var_type )) {
-				snail_emit( cc, ex, "\tc", PLDGA );
+				compiler_emit( cc, ex, "\tc", PLDGA );
 			    } else {
-				snail_emit( cc, ex, "\tc", LDGA );
+				compiler_emit( cc, ex, "\tc", LDGA );
 			    }
 			}
 		    } else {
@@ -3651,11 +3651,11 @@ static void snail_compile_ld( COMPILER *cc,
 		    }
 		}
 	    } else if( fallback_opcode == LD ) {
-		if( dnode_scope( varnode ) == snail_current_scope( cc )) {
+		if( dnode_scope( varnode ) == compiler_current_scope( cc )) {
 		    if( tnode_is_reference( var_type )) {
-			snail_emit( cc, ex, "\tc", PLD );
+			compiler_emit( cc, ex, "\tc", PLD );
 		    } else {
-			snail_emit( cc, ex, "\tc", LD );
+			compiler_emit( cc, ex, "\tc", LD );
 		    }
 		} else {
 		    if( dnode_scope( varnode ) == 0 ) {
@@ -3663,13 +3663,13 @@ static void snail_compile_ld( COMPILER *cc,
                                                              "ldg",
                                                              arity, ex );
 			if( operator ) {
-			    snail_emit_function_call( cc, operator, NULL,
+			    compiler_emit_function_call( cc, operator, NULL,
 						      "", ex );
 			} else {
 			    if( tnode_is_reference( var_type )) {
-				snail_emit( cc, ex, "\tc", PLDG );
+				compiler_emit( cc, ex, "\tc", PLDG );
 			    } else {
-				snail_emit( cc, ex, "\tc", LDG );
+				compiler_emit( cc, ex, "\tc", LDG );
 			    }
 			}
 		    } else {
@@ -3679,38 +3679,38 @@ static void snail_compile_ld( COMPILER *cc,
 		    }
 		}
 	    } else {
-		snail_emit( cc, ex, "\tc", fallback_opcode );
+		compiler_emit( cc, ex, "\tc", fallback_opcode );
 	    }
 	}
 	varnode_offset = dnode_offset( varnode );
-	snail_emit( cc, ex, "eN\n", &varnode_offset, dnode_name( varnode ));
+	compiler_emit( cc, ex, "eN\n", &varnode_offset, dnode_name( varnode ));
     } else {
 	/* yyerrorf( "name '%s' not declared in the current scope",
 	   identifier ); */
-	snail_emit( cc, ex, "\tcNN\n", operator, "???", "???" );
-	snail_push_error_type( cc, ex );
+	compiler_emit( cc, ex, "\tcNN\n", operator, "???", "???" );
+	compiler_push_error_type( cc, ex );
     }
 }
 
-static void snail_compile_load_variable_value( COMPILER *cc,
+static void compiler_compile_load_variable_value( COMPILER *cc,
 					       DNODE *varnode,
 					       cexception_t *ex )
 {
-    snail_compile_ld( cc, varnode, "ld", LD, NULL, ex );
+    compiler_compile_ld( cc, varnode, "ld", LD, NULL, ex );
 }
 
-static void snail_compile_load_function_address( COMPILER *cc,
+static void compiler_compile_load_function_address( COMPILER *cc,
 						 DNODE *varnode,
 						 cexception_t *ex )
 {
-    snail_compile_ld( cc, varnode, "ldfn", LDFN, NULL, ex );
+    compiler_compile_ld( cc, varnode, "ldfn", LDFN, NULL, ex );
 }
 
-static void snail_compile_load_variable_address( COMPILER *cc,
+static void compiler_compile_load_variable_address( COMPILER *cc,
 						 DNODE *varnode,
 						 cexception_t *ex )
 {
-    snail_compile_ld( cc, varnode, "lda", LDA, new_tnode_addressof, ex );
+    compiler_compile_ld( cc, varnode, "lda", LDA, new_tnode_addressof, ex );
 }
 
 static void compiler_fixup_function_calls( THRCODE *tc, DNODE *funct )
@@ -3725,21 +3725,21 @@ static void compiler_fixup_function_calls( THRCODE *tc, DNODE *funct )
     thrcode_fixup_function_calls( tc, name, address );
 }
 
-static void snail_compile_function_thrcode( COMPILER *cc )
+static void compiler_compile_function_thrcode( COMPILER *cc )
 {
     assert( cc );
     assert( cc->thrcode != cc->function_thrcode );
     cc->thrcode = cc->function_thrcode;
 }
 
-static void snail_compile_main_thrcode( COMPILER *cc )
+static void compiler_compile_main_thrcode( COMPILER *cc )
 {
     assert( cc );
     assert( cc->thrcode != cc->main_thrcode );
     cc->thrcode = cc->main_thrcode;
 }
 
-static void snail_merge_functions_and_main( COMPILER *cc,
+static void compiler_merge_functions_and_main( COMPILER *cc,
 					    cexception_t *ex  )
 {
     assert( cc );
@@ -3750,7 +3750,7 @@ static void snail_merge_functions_and_main( COMPILER *cc,
     cc->thrcode = cc->main_thrcode;
 }
 
-static void snail_push_thrcode( COMPILER *sc,
+static void compiler_push_thrcode( COMPILER *sc,
 			 cexception_t *ex )
 {
     thrlist_push_data( &sc->thrstack, &sc->thrcode, delete_thrcode, NULL, ex );
@@ -3759,7 +3759,7 @@ static void snail_push_thrcode( COMPILER *sc,
     sc->e_stack = NULL;
 }
 
-static void snail_swap_thrcodes( COMPILER *sc )
+static void compiler_swap_thrcodes( COMPILER *sc )
 {
     THRCODE *code1 = thrlist_extract_data( sc->thrstack );
     ENODE *enode1 = elist_extract_data( sc->saved_estacks );
@@ -3773,7 +3773,7 @@ static void snail_swap_thrcodes( COMPILER *sc )
     sc->e_stack = enode1;
 }
 
-static void snail_merge_top_thrcodes( COMPILER *sc, cexception_t *ex )
+static void compiler_merge_top_thrcodes( COMPILER *sc, cexception_t *ex )
 {
     thrcode_merge( sc->thrcode, thrlist_data( sc->thrstack ), ex );
     thrlist_drop( &sc->thrstack );
@@ -3781,7 +3781,7 @@ static void snail_merge_top_thrcodes( COMPILER *sc, cexception_t *ex )
 	enode_append( elist_pop_data( &sc->saved_estacks ), sc->e_stack );
 }
 
-static void snail_merge_functions_and_top( COMPILER *cc,
+static void compiler_merge_functions_and_top( COMPILER *cc,
                                            cexception_t *ex )
 {
     assert( cc );
@@ -3801,11 +3801,11 @@ static void snail_merge_functions_and_top( COMPILER *cc,
 	enode_append( elist_pop_data( &cc->saved_estacks ), cc->e_stack );
 }
 
-static void snail_get_inline_code( COMPILER *cc,
+static void compiler_get_inline_code( COMPILER *cc,
 					    DNODE *function,
 					    cexception_t *ex )
 {
-    ssize_t code_start = snail_pop_address( cc, ex );
+    ssize_t code_start = compiler_pop_address( cc, ex );
     ssize_t code_end = thrcode_length( cc->thrcode );
     ssize_t code_length = code_end - code_start;
     int is_inline = dnode_has_flags( function, DF_INLINE );
@@ -3818,7 +3818,7 @@ static void snail_get_inline_code( COMPILER *cc,
     }
 }
 
-static int snail_count_return_values( DNODE *funct )
+static int compiler_count_return_values( DNODE *funct )
 {
     TNODE *function_type = funct ? dnode_type( funct ) : NULL;
     DNODE *retvals = function_type ? tnode_retvals( function_type ) : NULL;
@@ -3826,7 +3826,7 @@ static int snail_count_return_values( DNODE *funct )
     return dnode_list_length( retvals );
 }
 
-static void snail_compile_address_of_indexed_element( COMPILER *cc,
+static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 						      cexception_t *ex )
 {
     cexception_t inner;
@@ -3847,7 +3847,7 @@ static void snail_compile_address_of_indexed_element( COMPILER *cc,
 
     cexception_guard( inner ) {
         generic_types = new_typetab( &inner );
-	idx_name = snail_indexing_operator_name( index_type, &inner );
+	idx_name = compiler_indexing_operator_name( index_type, &inner );
 
 	if( array_expr ) {
 	    array_type = enode_type( array_expr );
@@ -3863,15 +3863,15 @@ static void snail_compile_address_of_indexed_element( COMPILER *cc,
 
 	if( compiler_lookup_operator( cc, array_type, idx_name,
                                       idx_arity, ex )) {
-	    snail_init_operator_description( &od, cc, array_type, idx_name,
+	    compiler_init_operator_description( &od, cc, array_type, idx_name,
 					     idx_arity, ex );
 	} else {
-	    snail_init_operator_description( &od, cc, index_type, "[]",
+	    compiler_init_operator_description( &od, cc, index_type, "[]",
                                              idx_arity, ex );
 	}
 
 	if( od.operator ) {
-	    snail_check_operator_args( cc, &od, generic_types,
+	    compiler_check_operator_args( cc, &od, generic_types,
                                        &inner );
 	}
 
@@ -3885,10 +3885,10 @@ static void snail_compile_address_of_indexed_element( COMPILER *cc,
 
 	    fixup_values = make_tnode_key_value_list( element_type );
 
-	    snail_emit_operator_or_report_missing( cc, &od, fixup_values,
+	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
 						   "", &inner );
 
-	    snail_check_operator_retvals( cc, &od, 1, 1 );
+	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
 
 	    if( return_type ) {
@@ -3898,21 +3898,21 @@ static void snail_compile_address_of_indexed_element( COMPILER *cc,
 			yyerrorf( "can not index array with unknown element "
 				  "type" );
 		    }
-		    if( snail_stack_top_type_kind( cc ) ==  TK_ADDRESSOF ) {
-			snail_make_stack_top_element_type( cc );
+		    if( compiler_stack_top_type_kind( cc ) ==  TK_ADDRESSOF ) {
+			compiler_make_stack_top_element_type( cc );
 		    }
-		    snail_make_stack_top_element_type( cc );
-		    snail_make_stack_top_addressof( cc, &inner );
+		    compiler_make_stack_top_element_type( cc );
+		    compiler_make_stack_top_addressof( cc, &inner );
 		} else {
 		    enode_list_drop( &cc->e_stack );
-		    snail_push_type( cc, return_type, &inner );
+		    compiler_push_type( cc, return_type, &inner );
 		    share_tnode( return_type );
 		}
 	    }
-	    snail_emit( cc, &inner, "\n" );
+	    compiler_emit( cc, &inner, "\n" );
 	} else {
-	    snail_make_stack_top_element_type( cc );
-	    snail_make_stack_top_addressof( cc, &inner );
+	    compiler_make_stack_top_element_type( cc );
+	    compiler_make_stack_top_addressof( cc, &inner );
 	    tnode_report_missing_operator( index_type, "[]", idx_arity );
 	}
     }
@@ -3925,7 +3925,7 @@ static void snail_compile_address_of_indexed_element( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_compile_subarray( COMPILER *cc,
+static void compiler_compile_subarray( COMPILER *cc,
                                     cexception_t *ex )
 {
     cexception_t inner;
@@ -3955,14 +3955,14 @@ static void snail_compile_subarray( COMPILER *cc,
            something must have been very wrong during the compilation
            of the range... S.G. */
         cexception_raise
-            ( ex, SNAIL_UNRECOVERABLE_ERROR,
+            ( ex, COMPILER_UNRECOVERABLE_ERROR,
               "subarray index range expressions were not generated properly" );
     }
     /* From now on, index_expr1 and index_expr2 are not NULL */
 
     cexception_guard( inner ) {
         generic_types = new_typetab( &inner );
-        idx_name = snail_make_typed_operator_name( index_type1, index_type2,
+        idx_name = compiler_make_typed_operator_name( index_type1, index_type2,
                                                    "[%s..%s]", ex );
 
 	if( array_expr ) {
@@ -3980,18 +3980,18 @@ static void snail_compile_subarray( COMPILER *cc,
 
 	if( compiler_lookup_operator( cc, array_type, idx_name,
                                       idx_arity, &inner )) {
-	    snail_init_operator_description( &od, cc, array_type, idx_name,
+	    compiler_init_operator_description( &od, cc, array_type, idx_name,
 					     idx_arity, &inner );
 	} else if( tnode_lookup_operator( index_type1, idx_name, idx_arity )) {
-	    snail_init_operator_description( &od, cc, index_type1, "[..]",
+	    compiler_init_operator_description( &od, cc, index_type1, "[..]",
                                              idx_arity, &inner );
 	} else {
-            snail_init_operator_description( &od, cc, index_type2, "[..]",
+            compiler_init_operator_description( &od, cc, index_type2, "[..]",
                                              idx_arity, &inner );
         }
 
 	if( od.operator ) {
-	    snail_check_operator_args( cc, &od, generic_types,
+	    compiler_check_operator_args( cc, &od, generic_types,
                                        &inner );
 	}
 
@@ -4006,10 +4006,10 @@ static void snail_compile_subarray( COMPILER *cc,
 
 	    fixup_values = make_tnode_key_value_list( element_type );
 
-	    snail_emit_operator_or_report_missing( cc, &od, fixup_values,
+	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
 						   "", &inner );
 
-	    snail_check_operator_retvals( cc, &od, 1, 1 );
+	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
 
 	    if( return_type ) {
@@ -4017,11 +4017,11 @@ static void snail_compile_subarray( COMPILER *cc,
                 if( tnode_kind( return_type ) == TK_ARRAY &&
                     tnode_element_type( return_type )) {
                     enode_list_drop( &cc->e_stack );
-                    snail_push_type( cc, return_type, &inner );
+                    compiler_push_type( cc, return_type, &inner );
                     share_tnode( return_type );
                 }
 	    }
-	    snail_emit( cc, &inner, "\n" );
+	    compiler_emit( cc, &inner, "\n" );
 	} else {
 	    tnode_report_missing_operator( index_type1, "[..]", idx_arity );
 	}
@@ -4037,27 +4037,27 @@ static void snail_compile_subarray( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_compile_indexing( COMPILER *cc,
+static void compiler_compile_indexing( COMPILER *cc,
 				    int array_is_reference,
 				    int expr_count,
 				    cexception_t *ex )
 {
     if( expr_count == 1 ) {
-	snail_compile_address_of_indexed_element( cc, ex );
+	compiler_compile_address_of_indexed_element( cc, ex );
     } else if( expr_count == 0 ) {
 	assert( array_is_reference );
-        snail_emit( cc, ex, "\tc\n", CLONE );
+        compiler_emit( cc, ex, "\tc\n", CLONE );
     } else if( expr_count == -1 ) {
 	assert( 0 );
     } else if( expr_count == 2 ) {
 	// assert( array_is_reference );
-        snail_compile_subarray( cc, ex );
+        compiler_compile_subarray( cc, ex );
     } else {
 	assert( 0 );
     }
 }
 
-static void snail_compile_type_declaration( COMPILER *cc,
+static void compiler_compile_type_declaration( COMPILER *cc,
 					    TNODE *type_descr,
 					    cexception_t *ex )
 {
@@ -4086,10 +4086,10 @@ static void snail_compile_type_declaration( COMPILER *cc,
 	} else {
 	    tnode = type_descr;
 	}
-	snail_typetab_insert( cc, tnode, &inner );
+	compiler_typetab_insert( cc, tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
-	snail_insert_tnode_into_suffix_list( cc, tnode, &inner );
+	compiler_insert_tnode_into_suffix_list( cc, tnode, &inner );
 	cc->current_type = NULL;
 	freex( type_name );
     }
@@ -4191,9 +4191,9 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 		retval = 0;
 	    }
 	    if( n == 1 ) {
-		snail_emit( cc, ex, "\tcT\n", ALLOCARGV, "(* argv *)" );
+		compiler_emit( cc, ex, "\tcT\n", ALLOCARGV, "(* argv *)" );
 	    } else {
-		snail_emit( cc, ex, "\tcT\n", ALLOCENV, "(* env *)" );
+		compiler_emit( cc, ex, "\tcT\n", ALLOCENV, "(* env *)" );
 	    }
 	    break;
 	case 2:
@@ -4202,7 +4202,7 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 			  "'array of file'", n );
 		retval = 0;
 	    }
-	    snail_emit( cc, ex, "\tcT\n", ALLOCSTDIO, "(* stdio *)" );
+	    compiler_emit( cc, ex, "\tcT\n", ALLOCSTDIO, "(* stdio *)" );
 	    break;
 	}
 	n++;
@@ -4222,71 +4222,71 @@ static void compiler_compile_program_args( COMPILER *cc,
 					   cexception_t *ex )
 {
     if( compiler_check_and_emit_program_arguments( cc, argument_list, ex )) {
-	snail_emit_argument_list( cc, argument_list, ex );
+	compiler_emit_argument_list( cc, argument_list, ex );
     }
 }
 
-static void snail_emit_catch_comparison( COMPILER *cc,
+static void compiler_emit_catch_comparison( COMPILER *cc,
 					 char *module_name,
 					 char *exception_name,
 					 cexception_t *ex )
 {
     DNODE *exception =
-        snail_lookup_dnode( cc, module_name, exception_name, "exception" );
+        compiler_lookup_dnode( cc, module_name, exception_name, "exception" );
     ssize_t zero = 0;
     ssize_t exception_val;
     ssize_t try_var_offset = cc->try_variable_stack ?
 	cc->try_variable_stack[cc->try_block_level-1] : 0;
 
     if( module_name ) {
-	snail_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
-	snail_emit( cc, ex, "\n\tc\n", EXCEPTIONMODULE );
-	snail_emit( cc, ex, "\tce\n", SLDC, &module_name );
-	snail_emit( cc, ex, "\tc\n", PEQBOOL );
-	snail_emit( cc, ex, "\tc\n", DUP );
-	snail_push_relative_fixup( cc, ex );
-	snail_emit( cc, ex, "\tce\n", BJNZ, &zero );
-	snail_emit( cc, ex, "\tc\n", DROP );
+	compiler_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
+	compiler_emit( cc, ex, "\n\tc\n", EXCEPTIONMODULE );
+	compiler_emit( cc, ex, "\tce\n", SLDC, &module_name );
+	compiler_emit( cc, ex, "\tc\n", PEQBOOL );
+	compiler_emit( cc, ex, "\tc\n", DUP );
+	compiler_push_relative_fixup( cc, ex );
+	compiler_emit( cc, ex, "\tce\n", BJNZ, &zero );
+	compiler_emit( cc, ex, "\tc\n", DROP );
     }
 
-    snail_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
-    snail_emit( cc, ex, "\n\tc\n", EXCEPTIONID );
+    compiler_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
+    compiler_emit( cc, ex, "\n\tc\n", EXCEPTIONID );
 
     exception_val = exception ? dnode_ssize_value( exception ) : 0;
-    snail_emit( cc, ex, "\tce\n", LDC, &exception_val );
-    snail_emit( cc, ex, "\tc\n", EQBOOL );
+    compiler_emit( cc, ex, "\tce\n", LDC, &exception_val );
+    compiler_emit( cc, ex, "\tc\n", EQBOOL );
 
     if( module_name ) {
-	snail_fixup_here( cc );
+	compiler_fixup_here( cc );
     }
 }
 
-static void snail_finish_catch_comparisons( COMPILER *cc,
+static void compiler_finish_catch_comparisons( COMPILER *cc,
 					    int nfixups,
 					    cexception_t *ex )
 {
     int i;
     ssize_t zero = 0;
 
-    snail_push_relative_fixup( cc, ex );
-    snail_emit( cc, ex, "\tce\n", BJZ, &zero );
+    compiler_push_relative_fixup( cc, ex );
+    compiler_emit( cc, ex, "\tce\n", BJZ, &zero );
     for( i = 0; i < nfixups; i ++ ) {
 	/* fixup all JNZs emitted in the 'exception_identifier_list'
 	   rule: */
-	snail_swap_fixups( cc );
-	snail_fixup_here( cc );
+	compiler_swap_fixups( cc );
+	compiler_fixup_here( cc );
     }
 }
 
-static void snail_finish_catch_block( COMPILER *cc, cexception_t *ex )
+static void compiler_finish_catch_block( COMPILER *cc, cexception_t *ex )
 {
     ssize_t zero = 0;
 
     cc->catch_jumpover_nr ++;
-    snail_push_relative_fixup( cc, ex );
-    snail_emit( cc, ex, "\tce\n", JMP, &zero );
-    snail_swap_fixups( cc );
-    snail_fixup_here( cc );
+    compiler_push_relative_fixup( cc, ex );
+    compiler_emit( cc, ex, "\tce\n", JMP, &zero );
+    compiler_swap_fixups( cc );
+    compiler_fixup_here( cc );
 }
 
 static void compiler_check_enum_attributes( TNODE *tnode )
@@ -4307,7 +4307,7 @@ static void compiler_check_enum_attributes( TNODE *tnode )
     }
 }
 
-static void snail_convert_function_argument( COMPILER *cc,
+static void compiler_convert_function_argument( COMPILER *cc,
 					     cexception_t *ex )
 {
     TNODE *arg_type = cc->current_arg ? dnode_type( cc->current_arg ) : NULL;
@@ -4318,14 +4318,14 @@ static void snail_convert_function_argument( COMPILER *cc,
 	    !tnode_types_are_assignment_compatible( arg_type, exp_type, NULL, ex )) {
 	    char *arg_type_name = tnode_name( arg_type );
 	    if( arg_type_name ) {
-		snail_compile_type_conversion( cc, arg_type_name, ex );
+		compiler_compile_type_conversion( cc, arg_type_name, ex );
 	    }
 	}
     }
     cc->current_arg = cc->current_arg ? dnode_prev( cc->current_arg ) : NULL;
 }
 
-static void snail_compile_typed_const_value( COMPILER *cc,
+static void compiler_compile_typed_const_value( COMPILER *cc,
 					     TNODE *const_type,
 					     const_value_t *v,
 					     cexception_t *ex )
@@ -4338,33 +4338,33 @@ static void snail_compile_typed_const_value( COMPILER *cc,
 	switch( vtype ) {
 	    case VT_INT:
 		const_value_to_string( v, &inner );
-		snail_compile_typed_constant( cc, const_type,
+		compiler_compile_typed_constant( cc, const_type,
 					      const_value_string( v ),
 					      &inner );
 		break;
 	    case VT_FLOAT:
 		const_value_to_string( v, &inner );
-		snail_compile_typed_constant( cc, const_type,
+		compiler_compile_typed_constant( cc, const_type,
 					      const_value_string( v ),
 					      &inner );
 		break;
 	    case VT_STRING:
 		const_value_to_string( v, &inner );
-		snail_compile_typed_constant( cc, const_type,
+		compiler_compile_typed_constant( cc, const_type,
 					      const_value_string( v ),
 					      &inner );
 		break;
 	    case VT_ENUM:
 		const_value_to_string( v, &inner );
-		snail_compile_typed_constant( cc, const_type,
+		compiler_compile_typed_constant( cc, const_type,
 					      const_value_string( v ),
 					      &inner );
 		break;
 	    case VT_NULL: {
 		    tnode = new_tnode_nullref( &inner );
-		    snail_push_type( cc, tnode, &inner );
+		    compiler_push_type( cc, tnode, &inner );
 		    tnode = NULL;
-		    snail_emit( cc, &inner, "\tc\n", PLDZ );
+		    compiler_emit( cc, &inner, "\tc\n", PLDZ );
 	        }
 		break;
 	    default:
@@ -4379,7 +4379,7 @@ static void snail_compile_typed_const_value( COMPILER *cc,
     }
 }
 
-static void snail_compile_multitype_const_value( COMPILER *cc,
+static void compiler_compile_multitype_const_value( COMPILER *cc,
                                                  const_value_t *v,
                                                  char *module_name,
                                                  char *suffix_name,
@@ -4390,17 +4390,17 @@ static void snail_compile_multitype_const_value( COMPILER *cc,
 
     switch( vtype ) {
     case VT_INT:
-	const_type = snail_lookup_suffix_tnode( cc, TS_INTEGER_SUFFIX,
+	const_type = compiler_lookup_suffix_tnode( cc, TS_INTEGER_SUFFIX,
 						module_name, suffix_name,
 						"integer" );
 	break;
     case VT_FLOAT:
-	const_type = snail_lookup_suffix_tnode( cc, TS_FLOAT_SUFFIX,
+	const_type = compiler_lookup_suffix_tnode( cc, TS_FLOAT_SUFFIX,
 						module_name, suffix_name,
 						"float" );
 	break;
     case VT_STRING:
-	const_type = snail_lookup_suffix_tnode( cc, TS_STRING_SUFFIX,
+	const_type = compiler_lookup_suffix_tnode( cc, TS_STRING_SUFFIX,
 						module_name, suffix_name,
 						"string" );
 	break;
@@ -4422,7 +4422,7 @@ static void snail_compile_multitype_const_value( COMPILER *cc,
 	*value_name_terminator = '\0';
 
 	cexception_guard( inner ) {
-	    snail_compile_enumeration_constant( cc, module_name,
+	    compiler_compile_enumeration_constant( cc, module_name,
 						value_name, type_name,
 						&inner );
 	}
@@ -4442,10 +4442,10 @@ static void snail_compile_multitype_const_value( COMPILER *cc,
 	break;
     }
 
-    snail_compile_typed_const_value( cc, const_type, v, ex );
+    compiler_compile_typed_const_value( cc, const_type, v, ex );
 }
 
-static void snail_emit_default_arguments( COMPILER *cc,
+static void compiler_emit_default_arguments( COMPILER *cc,
 					  char *arg_name,
 					  cexception_t *ex )
 {
@@ -4457,7 +4457,7 @@ static void snail_emit_default_arguments( COMPILER *cc,
 	    const_value_t const_value = make_zero_const_value();
 
 	    const_value_copy( &const_value, dnode_value( arg ), ex );
-	    snail_compile_typed_const_value( cc, dnode_type( arg ),
+	    compiler_compile_typed_const_value( cc, dnode_type( arg ),
 					     &const_value, ex );
 	} else {
 	    if( arg ) {
@@ -4505,7 +4505,7 @@ static void compiler_check_raise_expression( COMPILER *c,
 	yyerrorf( "Value on the top of the stack is untyped when "
 		  "raising exception?" );
     }
-    snail_check_and_compile_operator( c, top_type, "exceptionset", 1,
+    compiler_check_and_compile_operator( c, top_type, "exceptionset", 1,
                                       NULL, ex );
 }
 
@@ -4532,14 +4532,14 @@ static struct {
     { NULL, SL_EXCEPTION_NULL }
 };
 
-static void snail_insert_default_exceptions( COMPILER *c,
+static void compiler_insert_default_exceptions( COMPILER *c,
 					     cexception_t *ex )
 {
     int i;
 
     for( i = 0; default_exceptions[i].exception_name != NULL; i ++ ) {
 
-	snail_compile_exception( c, default_exceptions[i].exception_name,
+	compiler_compile_exception( c, default_exceptions[i].exception_name,
 				 default_exceptions[i].exception_nr, ex );
 
 	c->latest_exception_nr = default_exceptions[i].exception_nr;
@@ -4547,7 +4547,7 @@ static void snail_insert_default_exceptions( COMPILER *c,
     }
 }
 
-static void snail_compile_file_input_operator( COMPILER *cc,
+static void compiler_compile_file_input_operator( COMPILER *cc,
 					       cexception_t *ex )
 {
     ENODE *top_expr = cc->e_stack;
@@ -4557,29 +4557,29 @@ static void snail_compile_file_input_operator( COMPILER *cc,
 	top_type = tnode_element_type( top_type );
     }
 
-    snail_swap_thrcodes( cc );
+    compiler_swap_thrcodes( cc );
 
     if( top_type ) {
 	ENODE *file_expr = cc->e_stack;
 	TNODE *file_type = file_expr ? enode_type( file_expr ) : NULL;
 
 	if( file_type ) {
-	    snail_push_type( cc, share_tnode( file_type ), ex );
+	    compiler_push_type( cc, share_tnode( file_type ), ex );
 	} else {
-	    snail_push_type( cc, NULL, ex );
+	    compiler_push_type( cc, NULL, ex );
 	}
-	snail_check_and_compile_operator( cc, top_type, ">>",
+	compiler_check_and_compile_operator( cc, top_type, ">>",
 					  /*arity:*/ 1,
 					  /*fixup_values:*/ NULL, ex );
-	snail_emit( cc, ex, "\n" );
+	compiler_emit( cc, ex, "\n" );
     }
 
-    snail_merge_top_thrcodes( cc, ex );
-    snail_compile_swap( cc, ex );
-    snail_compile_sti( cc, ex );
+    compiler_merge_top_thrcodes( cc, ex );
+    compiler_compile_swap( cc, ex );
+    compiler_compile_sti( cc, ex );
 }
 
-static void snail_check_non_null_variable( DNODE *dnode )
+static void compiler_check_non_null_variable( DNODE *dnode )
 {
     TNODE *var_type = dnode_type( dnode );
     if( tnode_is_non_null_reference( var_type )) {
@@ -4588,16 +4588,16 @@ static void snail_check_non_null_variable( DNODE *dnode )
     }
 }
 
-static void snail_check_non_null_variables( DNODE *dnode_list )
+static void compiler_check_non_null_variables( DNODE *dnode_list )
 {
     DNODE *var_dnode;
 
     foreach_dnode( var_dnode, dnode_list ) {
-        snail_check_non_null_variable( var_dnode );
+        compiler_check_non_null_variable( var_dnode );
     }
 }
 
-static void snail_compile_variable_initialisations( COMPILER *cc,
+static void compiler_compile_variable_initialisations( COMPILER *cc,
 						    DNODE *lst,
 						    cexception_t *ex )
 {
@@ -4605,14 +4605,14 @@ static void snail_compile_variable_initialisations( COMPILER *cc,
 
     foreach_dnode( var, lst ) {
 	if( dnode_has_flags( var, DF_HAS_INITIALISER )) {
-	    snail_compile_initialise_variable( cc, var, ex );
+	    compiler_compile_initialise_variable( cc, var, ex );
 	} else {
-            snail_check_non_null_variable( var );
+            compiler_check_non_null_variable( var );
         }
     }
 }
 
-static void snail_compile_zero_out_stackcells( COMPILER *cc,
+static void compiler_compile_zero_out_stackcells( COMPILER *cc,
 					       DNODE *variables,
 					       cexception_t *ex )
 {
@@ -4633,7 +4633,7 @@ static void snail_compile_zero_out_stackcells( COMPILER *cc,
 	}
     }
     if( must_zero ) {
-	snail_emit( cc, ex, "\tcee\n", ZEROSTACK, &min_offset, &nvars );
+	compiler_emit( cc, ex, "\tcee\n", ZEROSTACK, &min_offset, &nvars );
     }
 }
 
@@ -4736,10 +4736,10 @@ static void compiler_use_package( COMPILER *c,
 static void compiler_debug()
 {
     printf( "Debug statement reached in line %d\n",
-	    snail_flex_current_line_number() );
+	    compiler_flex_current_line_number() );
 }
 
-static void snail_compile_multiple_assignment( COMPILER *cc,
+static void compiler_compile_multiple_assignment( COMPILER *cc,
 					       ssize_t nvars,
 					       ssize_t nvars_left,
 					       ssize_t nvalues,
@@ -4752,28 +4752,28 @@ static void snail_compile_multiple_assignment( COMPILER *cc,
     }
 
     if( nvars < nvalues ) {
-	snail_compile_dropn( cc, nvalues - nvars, ex );
+	compiler_compile_dropn( cc, nvalues - nvars, ex );
     }
 
     for( i = 0; i < nvars_left; i++ ) {
-	snail_merge_top_thrcodes( cc, ex );
+	compiler_merge_top_thrcodes( cc, ex );
 	if( enode_is_varaddr( cc->e_stack )) {
 	    DNODE *var = enode_variable( cc->e_stack );
 
 	    share_dnode( var );
 	    compiler_drop_top_expression( cc );
-	    snail_compile_variable_assignment( cc, var, ex );
+	    compiler_compile_variable_assignment( cc, var, ex );
 	    delete_dnode( var );
 	} else {
-	    snail_compile_swap( cc, ex );
-	    snail_compile_sti( cc, ex );
+	    compiler_compile_swap( cc, ex );
+	    compiler_compile_sti( cc, ex );
 	}
     }
-    snail_swap_thrcodes( cc );
-    snail_merge_top_thrcodes( cc, ex );
+    compiler_swap_thrcodes( cc );
+    compiler_merge_top_thrcodes( cc, ex );
 }
 
-static void snail_compile_array_expression( COMPILER* cc,
+static void compiler_compile_array_expression( COMPILER* cc,
 					    ssize_t nexpr,
 					    cexception_t *ex )
 {
@@ -4794,17 +4794,17 @@ static void snail_compile_array_expression( COMPILER* cc,
 	    delete_enode( curr );
 	}
 	if( tnode_is_reference( top_type )) {
-	    snail_emit( cc, ex, "\tce\n", PMKARRAY, &nexpr );
+	    compiler_emit( cc, ex, "\tce\n", PMKARRAY, &nexpr );
 	} else {
-	    snail_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
+	    compiler_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
                         &nrefs, &nexpr );
 	}
-	snail_push_array_of_type( cc, share_tnode( top_type ), ex );
+	compiler_push_array_of_type( cc, share_tnode( top_type ), ex );
 	delete_enode( top );
     }
 }
 
-static void snail_push_loop( COMPILER *cc, char *loop_label,
+static void compiler_push_loop( COMPILER *cc, char *loop_label,
 			     cexception_t *ex )
 {
     char label[200];
@@ -4817,7 +4817,7 @@ static void snail_push_loop( COMPILER *cc, char *loop_label,
     }
 }
 
-static void snail_pop_loop( COMPILER *cc )
+static void compiler_pop_loop( COMPILER *cc )
 {
     DNODE *top_loop = cc->loops;
 
@@ -4828,7 +4828,7 @@ static void snail_pop_loop( COMPILER *cc )
     delete_dnode( top_loop );
 }
 
-static void snail_fixup_op_continue( COMPILER *cc, cexception_t *ex )
+static void compiler_fixup_op_continue( COMPILER *cc, cexception_t *ex )
 {
     DNODE *loop = cc->loops;
 
@@ -4838,7 +4838,7 @@ static void snail_fixup_op_continue( COMPILER *cc, cexception_t *ex )
 			       thrcode_length( cc->thrcode ));
 }
 
-static void snail_fixup_op_break( COMPILER *cc, cexception_t *ex )
+static void compiler_fixup_op_break( COMPILER *cc, cexception_t *ex )
 {
     DNODE *loop = cc->loops;
 
@@ -4848,7 +4848,7 @@ static void snail_fixup_op_break( COMPILER *cc, cexception_t *ex )
 			    thrcode_length( cc->thrcode ));
 }
 
-static char *snail_get_loop_name( COMPILER *cc, char *label )
+static char *compiler_get_loop_name( COMPILER *cc, char *label )
 {
     if( !label ) {
 	DNODE *latest_loop = cc->loops;
@@ -4894,7 +4894,7 @@ static ssize_t check_loop_types( COMPILER *cc, char *label )
     return count;
 }
 
-static int snail_check_break_and_cont_statements( COMPILER *cc )
+static int compiler_check_break_and_cont_statements( COMPILER *cc )
 {
     assert( cc );
     if( !cc->loops ) {
@@ -4905,7 +4905,7 @@ static int snail_check_break_and_cont_statements( COMPILER *cc )
     return 1;
 }
 
-static void snail_drop_loop_counters( COMPILER *cc, char *name,
+static void compiler_drop_loop_counters( COMPILER *cc, char *name,
 				      int delta,
 				      cexception_t *ex )
 {
@@ -4913,45 +4913,45 @@ static void snail_drop_loop_counters( COMPILER *cc, char *name,
 
     if( loop_values > 0 ) {
 	ssize_t nvalues = ( loop_values - delta ) * 2;
-	snail_emit( cc, ex, "\tce\n", PDROPN, &nvalues );
+	compiler_emit( cc, ex, "\tce\n", PDROPN, &nvalues );
     }
 }
 
-static void snail_compile_break( COMPILER *cc, char *label,
+static void compiler_compile_break( COMPILER *cc, char *label,
 				 cexception_t *ex )
 {
     ssize_t zero = 0;
 
-    if( snail_check_break_and_cont_statements( cc )) {
-	char *name = snail_get_loop_name( cc, label );
+    if( compiler_check_break_and_cont_statements( cc )) {
+	char *name = compiler_get_loop_name( cc, label );
 
-	snail_drop_loop_counters( cc, name, 0, ex );
+	compiler_drop_loop_counters( cc, name, 0, ex );
 
 	if( name ) {
 	    thrcode_push_op_break_fixup( cc->thrcode, name, ex );
 	}
-	snail_emit( cc, ex, "\tce\n", JMP, &zero );
+	compiler_emit( cc, ex, "\tce\n", JMP, &zero );
     }
 }
 
-static void snail_compile_continue( COMPILER *cc, char *label,
+static void compiler_compile_continue( COMPILER *cc, char *label,
 				    cexception_t *ex )
 {
     ssize_t zero = 0;
 
-    if( snail_check_break_and_cont_statements( cc )) {
-	char *name = snail_get_loop_name( cc, label );
+    if( compiler_check_break_and_cont_statements( cc )) {
+	char *name = compiler_get_loop_name( cc, label );
 
-	snail_drop_loop_counters( cc, name, 1, ex );
+	compiler_drop_loop_counters( cc, name, 1, ex );
 
 	if( name ) {
 	    thrcode_push_op_continue_fixup( cc->thrcode, name, ex );
 	}
-	snail_emit( cc, ex, "\tce\n", JMP, &zero );
+	compiler_emit( cc, ex, "\tce\n", JMP, &zero );
     }
 }
 
-static void snail_set_function_arguments_readonly( TNODE *funct_type )
+static void compiler_set_function_arguments_readonly( TNODE *funct_type )
 {
     DNODE *arg;
     DNODE *arg_list = funct_type ? tnode_args( funct_type ) : NULL;
@@ -4965,7 +4965,7 @@ static void snail_set_function_arguments_readonly( TNODE *funct_type )
     }
 }
 
-static void snail_check_default_value_compatibility( DNODE *arg,
+static void compiler_check_default_value_compatibility( DNODE *arg,
 						     const_value_t *val )
 {
     TNODE *arg_type = dnode_type( arg );
@@ -5069,10 +5069,10 @@ static const_value_t compiler_make_compile_time_value( COMPILER *cc,
     DNODE *variable = NULL;
     TNODE *tnode = NULL;
 
-    variable = snail_lookup_dnode_silently( cc, package_name, identifier );
+    variable = compiler_lookup_dnode_silently( cc, package_name, identifier );
 
     if( !variable ) {
-	tnode = snail_lookup_tnode_silently( cc, package_name, identifier );
+	tnode = compiler_lookup_tnode_silently( cc, package_name, identifier );
 	if( tnode ) {
 	    return compiler_get_tnode_compile_time_attribute( tnode,
 							      attribute_name,
@@ -5100,10 +5100,10 @@ static DNODE* compiler_lookup_type_field( COMPILER *cc,
     TNODE *tnode = NULL;
     DNODE *field;
 
-    variable = snail_lookup_dnode_silently( cc, package_name, identifier );
+    variable = compiler_lookup_dnode_silently( cc, package_name, identifier );
 
     if( !variable ) {
-	tnode = snail_lookup_tnode_silently( cc, package_name, identifier );
+	tnode = compiler_lookup_tnode_silently( cc, package_name, identifier );
 	if( !tnode ) {
 	    yyerrorf( "neither type nor variable '%s' can be found when "
 		      "searching for field '%s'", identifier, field_identifier );
@@ -5169,7 +5169,7 @@ static char *extension( char *filename )
 
 typedef void DL_HANDLE;
 
-static void compiler_load_library( COMPILER *snail_cc,
+static void compiler_load_library( COMPILER *compiler_cc,
 				   char *library_filename,
 				   char *opcode_array_name,
 				   cexception_t *ex )
@@ -5181,7 +5181,7 @@ static void compiler_load_library( COMPILER *snail_cc,
     char *library_name = callocx( 1, library_name_length + 1, ex );
 
     char *library_path =
-        compiler_find_include_file( snail_cc, library_filename, ex );
+        compiler_find_include_file( compiler_cc, library_filename, ex );
 
     strncpy( library_name, library_name_start, library_name_length );
 
@@ -5226,7 +5226,7 @@ static void compiler_load_library( COMPILER *snail_cc,
     freex( library_name );
 }
 
-static void snail_check_and_push_function_name( COMPILER *cc,
+static void compiler_check_and_push_function_name( COMPILER *cc,
 						char *module_name,
 						char *function_name,
 						cexception_t *ex )
@@ -5241,7 +5241,7 @@ static void snail_check_and_push_function_name( COMPILER *cc,
 		      &cc->current_arg, ex );
 
     cc->current_call = 
-	share_dnode( snail_lookup_dnode( cc, module_name, function_name,
+	share_dnode( compiler_lookup_dnode( cc, module_name, function_name,
 					 "function" ));
 
     fn_tnode = cc->current_call ?
@@ -5264,7 +5264,7 @@ static void snail_check_and_push_function_name( COMPILER *cc,
     }
 }
 
-static ssize_t snail_compile_multivalue_function_call( COMPILER *cc,
+static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
 						       cexception_t *ex )
 {
     cexception_t inner;
@@ -5279,15 +5279,15 @@ static ssize_t snail_compile_multivalue_function_call( COMPILER *cc,
     cexception_guard( inner ) {
 	generic_types = new_typetab( &inner );
         if( funct && fn_type ) {
-            snail_emit_default_arguments( cc, NULL, &inner );
-            snail_check_and_drop_function_args( cc, funct, generic_types,
+            compiler_emit_default_arguments( cc, NULL, &inner );
+            compiler_check_and_drop_function_args( cc, funct, generic_types,
                                                 &inner );
-            snail_emit_function_call( cc, funct, NULL, "\n", &inner );
+            compiler_emit_function_call( cc, funct, NULL, "\n", &inner );
             if( tnode_kind( fn_type ) == TK_FUNCTION_REF ) {
                 compiler_drop_top_expression( cc );
             }
-            snail_push_function_retvals( cc, funct, generic_types, &inner );
-            rval_nr = snail_count_return_values( funct );
+            compiler_push_function_retvals( cc, funct, generic_types, &inner );
+            rval_nr = compiler_count_return_values( funct );
         } else {
             while( cc->e_stack &&
                    !enode_has_flags( cc->e_stack, EF_GUARDING_ARG )) {
@@ -5298,7 +5298,7 @@ static ssize_t snail_compile_multivalue_function_call( COMPILER *cc,
             compiler_drop_top_expression( cc );
             /* Push NULL value to maintain stack value balance and
                avoid segfaults or asserts in the downstream code: */
-            snail_push_error_type( cc, &inner );
+            compiler_push_error_type( cc, &inner );
             rval_nr = 1;
         }
 	delete_typetab( generic_types );
@@ -5546,7 +5546,7 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     }
 }
 
-static void snail_check_array_component_is_not_null( TNODE *tnode )
+static void compiler_check_array_component_is_not_null( TNODE *tnode )
 {
     if( tnode_is_non_null_reference( tnode )) {
         char *type_name = tnode_name( tnode );
@@ -5561,7 +5561,7 @@ static void snail_check_array_component_is_not_null( TNODE *tnode )
     }
 }
 
-static void snail_check_type_contains_non_null_ref( TNODE *tnode )
+static void compiler_check_type_contains_non_null_ref( TNODE *tnode )
 {
     if( tnode_has_non_null_ref_field( tnode ) &&
         tnode_kind( tnode ) != TK_CLASS ) {
@@ -5577,7 +5577,7 @@ static void snail_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
-static void snail_compile_type_descriptor_loader( COMPILER *cc,
+static void compiler_compile_type_descriptor_loader( COMPILER *cc,
                                                   TNODE *tnode,
                                                   cexception_t *ex )
 {
@@ -5594,13 +5594,13 @@ static void snail_compile_type_descriptor_loader( COMPILER *cc,
     offset = compiler_assemble_static_data( cc, &type_descriptor,
                                             sizeof(type_descriptor), ex );
 
-    snail_emit( cc, ex, "\tce\n", SLDC, &offset );
+    compiler_emit( cc, ex, "\tce\n", SLDC, &offset );
 
     type_descriptor_type = new_tnode_type_descriptor( ex );
-    snail_push_type( cc, type_descriptor_type, ex );
+    compiler_push_type( cc, type_descriptor_type, ex );
 }
 
-static COMPILER * volatile snail_cc;
+static COMPILER * volatile compiler_cc;
 
 static cexception_t *px; /* parser exception */
 
@@ -5823,23 +5823,23 @@ static cexception_t *px; /* parser exception */
 Program
   :   {
         ssize_t zero = 0;
-        assert( snail_cc );
-        snail_insert_default_exceptions( snail_cc, px );
-        snail_compile_function_thrcode( snail_cc );
-	snail_push_absolute_fixup( snail_cc, px );
-	snail_emit( snail_cc, px, "\tce\n", ENTER, &zero );
-	snail_push_relative_fixup( snail_cc, px );
-	snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_compile_main_thrcode( snail_cc );
+        assert( compiler_cc );
+        compiler_insert_default_exceptions( compiler_cc, px );
+        compiler_compile_function_thrcode( compiler_cc );
+	compiler_push_absolute_fixup( compiler_cc, px );
+	compiler_emit( compiler_cc, px, "\tce\n", ENTER, &zero );
+	compiler_push_relative_fixup( compiler_cc, px );
+	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_compile_main_thrcode( compiler_cc );
       }
     statement_list
       {
-	snail_compile_function_thrcode( snail_cc );
-	snail_fixup_here( snail_cc );
-	snail_fixup( snail_cc, -snail_cc->local_offset );
-	snail_merge_functions_and_main( snail_cc, px );
-	compiler_check_forward_functions( snail_cc );
-	snail_emit( snail_cc, px, "\tc\n", NULL );
+	compiler_compile_function_thrcode( compiler_cc );
+	compiler_fixup_here( compiler_cc );
+	compiler_fixup( compiler_cc, -compiler_cc->local_offset );
+	compiler_merge_functions_and_main( compiler_cc, px );
+	compiler_check_forward_functions( compiler_cc );
+	compiler_emit( compiler_cc, px, "\tc\n", NULL );
       }
   ;
 
@@ -5862,7 +5862,7 @@ statement
 
 delimited_statement
   : multivalue_function_call
-    { snail_emit_drop_returned_values( snail_cc, $1, px ); }
+    { compiler_emit_drop_returned_values( compiler_cc, $1, px ); }
   | assignment_statement
   | variable_declaration
   | constant_declaration
@@ -5886,15 +5886,15 @@ delimited_statement
 assert_statement
   : _ASSERT boolean_expression
   {
-    ssize_t current_line_no = snail_flex_current_line_number();
+    ssize_t current_line_no = compiler_flex_current_line_number();
 
     ssize_t file_name_offset = compiler_assemble_static_string
-        ( snail_cc, snail_cc->filename, px );
+        ( compiler_cc, compiler_cc->filename, px );
 
     ssize_t current_line_offset = compiler_assemble_static_string
-        ( snail_cc, (char*)snail_flex_current_line(), px );
+        ( compiler_cc, (char*)compiler_flex_current_line(), px );
 
-    snail_emit( snail_cc, px, "\tceee\n", ASSERT,
+    compiler_emit( compiler_cc, px, "\tceee\n", ASSERT,
                 &current_line_no, &file_name_offset, &current_line_offset );
   }
   ;
@@ -5905,7 +5905,7 @@ assert_statement
 pack_statement
 : _PACK expression ',' expression ',' expression ',' expression
 {
-    TNODE *type_to_pack = enode_type( snail_cc->e_stack );
+    TNODE *type_to_pack = enode_type( compiler_cc->e_stack );
 
     if( type_to_pack ) {
 	if( tnode_kind( type_to_pack ) == TK_ARRAY ) {
@@ -5919,20 +5919,20 @@ pack_statement
 		} while( element_type && tnode_kind( element_type ) == TK_ARRAY );
 		fixup_values =
 		    make_mdalloc_key_value_list( element_type, level );
-		snail_check_and_compile_operator( snail_cc, element_type,
+		compiler_check_and_compile_operator( compiler_cc, element_type,
 						  "packmdarray", 4 /* arity */,
 						  fixup_values, px );
 	    } else {
-		snail_check_and_compile_operator( snail_cc, element_type,
+		compiler_check_and_compile_operator( compiler_cc, element_type,
 						  "packarray", 4 /* arity */,
 						  NULL /* fixup_values */, px );
 	    }
 	} else {
-	    snail_check_and_compile_operator( snail_cc, type_to_pack,
+	    compiler_check_and_compile_operator( compiler_cc, type_to_pack,
 					      "pack", 4 /* arity */,
 					  NULL /* fixup_values */, px );
 	}
-	snail_emit( snail_cc, px, "\n" );
+	compiler_emit( compiler_cc, px, "\n" );
     } else {
 	yyerrorf( "top expression has no type???" );
     }
@@ -5941,22 +5941,22 @@ pack_statement
 
 break_or_continue_statement
   : _BREAK
-    { snail_compile_break( snail_cc, NULL, px ); }
+    { compiler_compile_break( compiler_cc, NULL, px ); }
   | _BREAK __IDENTIFIER
-    { snail_compile_break( snail_cc, $2, px ); }
+    { compiler_compile_break( compiler_cc, $2, px ); }
   | _CONTINUE
-    { snail_compile_continue( snail_cc, NULL, px ); }
+    { compiler_compile_continue( compiler_cc, NULL, px ); }
   | _CONTINUE __IDENTIFIER
-    { snail_compile_continue( snail_cc, $2, px ); }
+    { compiler_compile_continue( compiler_cc, $2, px ); }
   ;
 
 undelimited_simple_statement
   : include_statement
-       { compiler_open_include_file( snail_cc, $1, px ); }
+       { compiler_open_include_file( compiler_cc, $1, px ); }
   | import_statement
-       { compiler_import_package( snail_cc, $1, px ); }
+       { compiler_import_package( compiler_cc, $1, px ); }
   | use_statement
-       { compiler_use_package( snail_cc, $1, px ); }
+       { compiler_use_package( compiler_cc, $1, px ); }
   | load_library_statement
   | pragma_statement
   | bytecode_statement
@@ -5972,9 +5972,9 @@ undelimited_simple_statement
 	   same module as the type. */
 	tnode_insert_single_operator( arg1_type, $1 );
 #else
-        vartab_insert_named_operator( snail_cc->operators, $1, px );
-        if( snail_cc->current_package && dnode_scope( $1 ) == 0 ) {
-            dnode_optab_insert_named_operator( snail_cc->current_package,
+        vartab_insert_named_operator( compiler_cc->operators, $1, px );
+        if( compiler_cc->current_package && dnode_scope( $1 ) == 0 ) {
+            dnode_optab_insert_named_operator( compiler_cc->current_package,
                                                share_dnode( $1 ), px );
         }
 
@@ -6005,15 +6005,15 @@ debug_statement
 do_prefix
   : _DO
     {
-      snail_push_thrcode( snail_cc, px );
+      compiler_push_thrcode( compiler_cc, px );
     }
   ;
 
 repeat_prefix
   : _REPEAT
     {
-      snail_push_loop( snail_cc, /* loop label = */ NULL, px );
-      snail_push_current_address( snail_cc, px );
+      compiler_push_loop( compiler_cc, /* loop label = */ NULL, px );
+      compiler_push_current_address( compiler_cc, px );
     }
   ;
 
@@ -6025,34 +6025,34 @@ non_control_statement_list
 delimited_control_statement
   : do_prefix non_control_statement_list
       {
-	snail_swap_thrcodes( snail_cc );
+	compiler_swap_thrcodes( compiler_cc );
       }
     if_condition
       {
-	snail_merge_top_thrcodes( snail_cc, px );
-        snail_fixup_here( snail_cc );
+	compiler_merge_top_thrcodes( compiler_cc, px );
+        compiler_fixup_here( compiler_cc );
       }
 
   | repeat_prefix non_control_statement_list _WHILE 
       {
-	snail_fixup_op_continue( snail_cc, px );
+	compiler_fixup_op_continue( compiler_cc, px );
       }
     expression
       {
-	snail_compile_jnz( snail_cc, snail_pop_offset( snail_cc, px ), px );
-	snail_fixup_op_break( snail_cc, px );
-        snail_pop_loop( snail_cc );
+	compiler_compile_jnz( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_fixup_op_break( compiler_cc, px );
+        compiler_pop_loop( compiler_cc );
       }
   ;
 
 raised_exception_identifier
   : __IDENTIFIER
       {
-          $$ = vartab_lookup( snail_cc->vartab, $1 );
+          $$ = vartab_lookup( compiler_cc->vartab, $1 );
       }
   | module_list __COLON_COLON __IDENTIFIER
       {
-          $$ = snail_lookup_dnode( snail_cc, $1, $3, "exception" );
+          $$ = compiler_lookup_dnode( compiler_cc, $1, $3, "exception" );
       }
   ;
 
@@ -6061,9 +6061,9 @@ raise_statement
     {
 	ssize_t zero = 0;
 	ssize_t minus_one = -1;
-	snail_emit( snail_cc, px, "\tce\n", LDC, &minus_one );
-	snail_emit( snail_cc, px, "\tc\n", PLDZ );
-	snail_emit( snail_cc, px, "\tcee\n", RAISE, &zero, &zero );
+	compiler_emit( compiler_cc, px, "\tce\n", LDC, &minus_one );
+	compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
+	compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &zero );
     }
 
   | _RAISE raised_exception_identifier
@@ -6074,13 +6074,13 @@ raise_statement
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
         if( exception ) {
-            compiler_check_raise_expression( snail_cc, dnode_name( exception ),
+            compiler_check_raise_expression( compiler_cc, dnode_name( exception ),
                                              px );
         }
 
-	snail_emit( snail_cc, px, "\tce\n", LDC, &minus_one );
-	snail_emit( snail_cc, px, "\tc\n", PLDZ );
-	snail_emit( snail_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
+	compiler_emit( compiler_cc, px, "\tce\n", LDC, &minus_one );
+	compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
+	compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
     }
   | _RAISE raised_exception_identifier '(' expression ')'
     {
@@ -6089,19 +6089,19 @@ raise_statement
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
         if( exception ) {
-            compiler_check_raise_expression( snail_cc, dnode_name(exception),
+            compiler_check_raise_expression( compiler_cc, dnode_name(exception),
                                              px );
         }
 
-        if( tnode_is_reference( enode_type( snail_cc->e_stack ))) {
-            snail_emit( snail_cc, px, "\tce\n", LLDC, &zero );
-            snail_emit( snail_cc, px, "\tc\n", SWAP );            
+        if( tnode_is_reference( enode_type( compiler_cc->e_stack ))) {
+            compiler_emit( compiler_cc, px, "\tce\n", LLDC, &zero );
+            compiler_emit( compiler_cc, px, "\tc\n", SWAP );            
         } else {
-            snail_emit( snail_cc, px, "\tc\n", PLDZ );
+            compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
         }
-        snail_emit( snail_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
+        compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
 
-	compiler_drop_top_expression( snail_cc );
+	compiler_drop_top_expression( compiler_cc );
     }
 
   | _RAISE raised_exception_identifier '(' expression ','
@@ -6109,10 +6109,10 @@ raise_statement
         DNODE *exception = $2;
 
         if( exception ) {
-            compiler_check_raise_expression( snail_cc, dnode_name(exception),
+            compiler_check_raise_expression( compiler_cc, dnode_name(exception),
                                              px );
         }
-	if( !snail_stack_top_is_integer( snail_cc )) {
+	if( !compiler_stack_top_is_integer( compiler_cc )) {
 	    yyerrorf( "The first expression in 'raise' operator "
 		      "must be of integer type" );
 	}
@@ -6123,33 +6123,33 @@ raise_statement
 	DNODE *exception = $2;
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
-	if( !snail_stack_top_is_reference( snail_cc )) {
+	if( !compiler_stack_top_is_reference( compiler_cc )) {
 	    yyerrorf( "The second expression in 'raise' operator "
 		      "must be of string type" );
 	}
 
-	compiler_drop_top_expression( snail_cc );
-	compiler_drop_top_expression( snail_cc );
-	snail_emit( snail_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
+	compiler_drop_top_expression( compiler_cc );
+	compiler_drop_top_expression( compiler_cc );
+	compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
     }
 
   | _RERAISE
     {
-	if( !snail_cc->try_variable_stack || snail_cc->try_block_level < 1 ) {
+	if( !compiler_cc->try_variable_stack || compiler_cc->try_block_level < 1 ) {
 	    yyerror( "'reraise' operator can only be used after "
 		     "a try block" );
 	} else {
-	    ssize_t try_var_offset = snail_cc->try_variable_stack ?
-		snail_cc->try_variable_stack[snail_cc->try_block_level-1] : 0;
+	    ssize_t try_var_offset = compiler_cc->try_variable_stack ?
+		compiler_cc->try_variable_stack[compiler_cc->try_block_level-1] : 0;
 
-	    snail_emit( snail_cc, px, "\tce\n", RERAISE, &try_var_offset );
+	    compiler_emit( compiler_cc, px, "\tce\n", RERAISE, &try_var_offset );
 	}
     }
 ;
 
 exception_declaration
   : _EXCEPTION __IDENTIFIER
-    { snail_compile_next_exception( snail_cc, $2, px ); }
+    { compiler_compile_next_exception( compiler_cc, $2, px ); }
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -6168,21 +6168,21 @@ package_keyword : _PACKAGE | _MODULE;
 package_statement
   : package_keyword package_name
       {
-	  vartab_insert_named( snail_cc->vartab, $2, px );
-	  compiler_begin_package( snail_cc, share_dnode( $2 ), px );
+	  vartab_insert_named( compiler_cc->vartab, $2, px );
+	  compiler_begin_package( compiler_cc, share_dnode( $2 ), px );
       }
     statement_list
     '}' package_keyword __IDENTIFIER
       {
 	  char *name;
-	  if( snail_cc->current_package &&
-	      (name = dnode_name( snail_cc->current_package )) != NULL ) {
+	  if( compiler_cc->current_package &&
+	      (name = dnode_name( compiler_cc->current_package )) != NULL ) {
 	      if( strcmp( $7, name ) != 0 ) {
 		  yyerrorf( "package '%s' ends with 'end package %s'",
 			    name, $7 );
 	      }
 	  }
-	  compiler_end_package( snail_cc, px );
+	  compiler_end_package( compiler_cc, px );
       }
   ;
 
@@ -6199,7 +6199,7 @@ use_statement
 load_library_statement
    : _LOAD __STRING_CONST
        {
-	   compiler_load_library( snail_cc, $2, "SL_OPCODES", px );
+	   compiler_load_library( compiler_cc, $2, "SL_OPCODES", px );
        }
    ;
 
@@ -6214,12 +6214,12 @@ pragma_statement
        TNODE *default_type = $2;
 
        if( default_type ) {
-           typetab_override_suffix( snail_cc->typetab, /*name*/ "",
+           typetab_override_suffix( compiler_cc->typetab, /*name*/ "",
                                     TS_INTEGER_SUFFIX,
                                     share_tnode( default_type ),
                                     px );
 
-           typetab_override_suffix( snail_cc->typetab, /*name*/ "",
+           typetab_override_suffix( compiler_cc->typetab, /*name*/ "",
                                     TS_FLOAT_SUFFIX, 
                                     share_tnode( default_type ),
                                     px );
@@ -6244,27 +6244,27 @@ program_header
     	  cexception_guard( inner ) {
 	      $$ = funct = new_dnode_function( $2, $4, $6, &inner );
 	      funct = $$ =
-		  snail_check_and_set_fn_proto( snail_cc, funct, &inner );
+		  compiler_check_and_set_fn_proto( compiler_cc, funct, &inner );
 
-              compiler_check_and_emit_program_arguments( snail_cc, $4,
+              compiler_check_and_emit_program_arguments( compiler_cc, $4,
                                                          &inner );
-              program_addr = thrcode_length( snail_cc->function_thrcode );
-              snail_emit( snail_cc, &inner, "\tce\n", CALL, &program_addr );
+              program_addr = thrcode_length( compiler_cc->function_thrcode );
+              compiler_emit( compiler_cc, &inner, "\tce\n", CALL, &program_addr );
               /* Chech program return value; exit if the value is not zero: */
               if( retvals ) {
                   assert( retval_type );
-                  snail_emit( snail_cc, px, "\tc\n", DUP );
-                  snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
+                  compiler_emit( compiler_cc, px, "\tc\n", DUP );
+                  compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
                                           NULL, tnode_suffix( retval_type ), 
                                           "function return value", "0", px );
-                  snail_compile_operator( snail_cc, retval_type, "==", 2, px );
-                  snail_emit( snail_cc, px, "\n" );
-                  snail_emit( snail_cc, px, "\tcI\n", BJNZ, 6 );
-                  snail_emit( snail_cc, px, "\tcI\n", LDC, 0 );
-                  snail_compile_operator( snail_cc, retval_type,
+                  compiler_compile_operator( compiler_cc, retval_type, "==", 2, px );
+                  compiler_emit( compiler_cc, px, "\n" );
+                  compiler_emit( compiler_cc, px, "\tcI\n", BJNZ, 6 );
+                  compiler_emit( compiler_cc, px, "\tcI\n", LDC, 0 );
+                  compiler_compile_operator( compiler_cc, retval_type,
                                           "nth-byte", 2, px );
-                  snail_emit( snail_cc, px, "\tc\n", EXIT );
-                  snail_emit( snail_cc, px, "\tc\n", DROP );
+                  compiler_emit( compiler_cc, px, "\tc\n", EXIT );
+                  compiler_emit( compiler_cc, px, "\tc\n", DROP );
               }
 	  }
 	  cexception_catch {
@@ -6292,110 +6292,110 @@ module_list
 variable_access_identifier
   : __IDENTIFIER
      {
-	 $$ = snail_lookup_dnode( snail_cc, NULL, $1, "variable" );
+	 $$ = compiler_lookup_dnode( compiler_cc, NULL, $1, "variable" );
      }
   | module_list __COLON_COLON __IDENTIFIER
      {
-	 $$ = snail_lookup_dnode( snail_cc, $1, $3, "variable" );
+	 $$ = compiler_lookup_dnode( compiler_cc, $1, $3, "variable" );
      }
   ;
 
 incdec_statement
   : variable_access_identifier __INC
       {
-	  if( snail_variable_has_operator( snail_cc, $1, "incvar", 0, px )) {
+	  if( compiler_variable_has_operator( compiler_cc, $1, "incvar", 0, px )) {
 	      TNODE *var_type = dnode_type( $1 );
 	      ssize_t var_offset = dnode_offset( $1 );
 
-	      snail_compile_operator( snail_cc, var_type, "incvar", 0, px );
-	      snail_emit( snail_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
+	      compiler_compile_operator( compiler_cc, var_type, "incvar", 0, px );
+	      compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
 	  } else {
-	      snail_compile_load_variable_value( snail_cc, $1, px );
-	      snail_compile_unop( snail_cc, "++", px );
-	      snail_compile_store_variable( snail_cc, $1, px );
+	      compiler_compile_load_variable_value( compiler_cc, $1, px );
+	      compiler_compile_unop( compiler_cc, "++", px );
+	      compiler_compile_store_variable( compiler_cc, $1, px );
 	  }
       }
   | variable_access_identifier __DEC
       {
-	  if( snail_variable_has_operator( snail_cc, $1, "decvar", 0, px )) {
+	  if( compiler_variable_has_operator( compiler_cc, $1, "decvar", 0, px )) {
 	      TNODE *var_type = dnode_type( $1 );
 	      ssize_t var_offset = dnode_offset( $1 );
 
-	      snail_compile_operator( snail_cc, var_type, "decvar", 0, px );
-	      snail_emit( snail_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
+	      compiler_compile_operator( compiler_cc, var_type, "decvar", 0, px );
+	      compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
 	  } else {
-	      snail_compile_load_variable_value( snail_cc, $1, px );
-	      snail_compile_unop( snail_cc, "--", px );
-	      snail_compile_store_variable( snail_cc, $1, px );
+	      compiler_compile_load_variable_value( compiler_cc, $1, px );
+	      compiler_compile_unop( compiler_cc, "--", px );
+	      compiler_compile_store_variable( compiler_cc, $1, px );
 	  }
       }
   | lvalue __INC
       {
-	  snail_compile_dup( snail_cc, px );
-	  snail_compile_ldi( snail_cc, px );
-	  snail_compile_unop( snail_cc, "++", px );
-	  snail_compile_sti( snail_cc, px );
+	  compiler_compile_dup( compiler_cc, px );
+	  compiler_compile_ldi( compiler_cc, px );
+	  compiler_compile_unop( compiler_cc, "++", px );
+	  compiler_compile_sti( compiler_cc, px );
       }
   | lvalue __DEC
       {
-	  snail_compile_dup( snail_cc, px );
-	  snail_compile_ldi( snail_cc, px );
-	  snail_compile_unop( snail_cc, "--", px );
-	  snail_compile_sti( snail_cc, px );
+	  compiler_compile_dup( compiler_cc, px );
+	  compiler_compile_ldi( compiler_cc, px );
+	  compiler_compile_unop( compiler_cc, "--", px );
+	  compiler_compile_sti( compiler_cc, px );
       }
   ;
 
 print_expression_list
   : expression
       {
-	  snail_compile_unop( snail_cc, ".", px );
+	  compiler_compile_unop( compiler_cc, ".", px );
       }
   | print_expression_list ',' expression
       {
-	  snail_emit( snail_cc, px, "\tc\n", SPACE );
-	  snail_compile_unop( snail_cc, ".", px );
+	  compiler_emit( compiler_cc, px, "\tc\n", SPACE );
+	  compiler_compile_unop( compiler_cc, ".", px );
       }
 ; 
 
 output_expression_list
   : expression
       {
-	  snail_compile_unop( snail_cc, "<", px );
+	  compiler_compile_unop( compiler_cc, "<", px );
       }
   | output_expression_list ',' expression
       {
-	  snail_emit( snail_cc, px, "\tc\n", SPACE );
-	  snail_compile_unop( snail_cc, "<", px );
+	  compiler_emit( compiler_cc, px, "\tc\n", SPACE );
+	  compiler_compile_unop( compiler_cc, "<", px );
       }
 ; 
 
 io_statement
   : '.' print_expression_list
      {
-	 snail_emit( snail_cc, px, "\tc\n", NEWLINE );
+	 compiler_emit( compiler_cc, px, "\tc\n", NEWLINE );
      }
 
   | '<' output_expression_list
 
   | '>' lvariable
      {
-	 snail_compile_unop( snail_cc, ">", px );
+	 compiler_compile_unop( compiler_cc, ">", px );
      }
 
   | __RIGHT_TO_LEFT expression
      {
-	 snail_compile_unop( snail_cc, "<<", px );
+	 compiler_compile_unop( compiler_cc, "<<", px );
      }
 
   | __LEFT_TO_RIGHT lvariable
      {
-	 snail_compile_unop( snail_cc, ">>", px );
+	 compiler_compile_unop( compiler_cc, ">>", px );
      }
 
   | file_io_statement
     {
-	snail_emit( snail_cc, px, "\tc\n", PDROP );
-	compiler_drop_top_expression( snail_cc );
+	compiler_emit( compiler_cc, px, "\tc\n", PDROP );
+	compiler_drop_top_expression( compiler_cc );
     }
 
   | stdread_io_statement
@@ -6405,33 +6405,33 @@ stdread_io_statement
 : '<' '>' __LEFT_TO_RIGHT variable_access_identifier
       {
           cexception_t inner;
-          TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+          TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
 
           cexception_guard( inner ) {
-              snail_push_type( snail_cc, type_tnode, &inner );
-              snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+              compiler_push_type( compiler_cc, type_tnode, &inner );
+              compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
           }
           cexception_catch {
               delete_tnode( type_tnode );
               cexception_reraise( inner, px );
           }
-          snail_compile_store_variable( snail_cc, $4, px );
+          compiler_compile_store_variable( compiler_cc, $4, px );
       }
 
   | '<' '>' __LEFT_TO_RIGHT lvalue
       {
           cexception_t inner;
-          TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+          TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
 
           cexception_guard( inner ) {
-              snail_push_type( snail_cc, type_tnode, &inner );
-              snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+              compiler_push_type( compiler_cc, type_tnode, &inner );
+              compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
           }
           cexception_catch {
               delete_tnode( type_tnode );
               cexception_reraise( inner, px );
           }
-          snail_compile_sti( snail_cc, px );
+          compiler_compile_sti( compiler_cc, px );
       }
 ;
 
@@ -6439,32 +6439,32 @@ file_io_statement
 
   : '<' expression '>' __RIGHT_TO_LEFT expression
       {
-       snail_check_and_compile_top_operator( snail_cc, "<<", 2, px );
-       snail_emit( snail_cc, px, "\n" );
+       compiler_check_and_compile_top_operator( compiler_cc, "<<", 2, px );
+       compiler_emit( compiler_cc, px, "\n" );
       }
 
   | '<' expression '>'
       {
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_thrcode( compiler_cc, px );
       } 
     __LEFT_TO_RIGHT lvariable
       {
-	  snail_compile_file_input_operator( snail_cc, px );
+	  compiler_compile_file_input_operator( compiler_cc, px );
       }
 
   | file_io_statement __RIGHT_TO_LEFT expression
       {
-        snail_check_and_compile_top_operator( snail_cc, "<<", 2, px );
-        snail_emit( snail_cc, px, "\n" );
+        compiler_check_and_compile_top_operator( compiler_cc, "<<", 2, px );
+        compiler_emit( compiler_cc, px, "\n" );
       }
 
   | file_io_statement __LEFT_TO_RIGHT
       {
-        snail_push_thrcode( snail_cc, px );
+        compiler_push_thrcode( compiler_cc, px );
       }
     lvariable
       {
-	snail_compile_file_input_operator( snail_cc, px );
+	compiler_compile_file_input_operator( compiler_cc, px );
       }
   ;
 
@@ -6486,15 +6486,15 @@ variable_declaration
      int readonly = $1;
 
      dnode_list_append_type( $2, $4 );
-     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
-     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
+     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
-     if( snail_cc->loops ) {
-	 snail_compile_zero_out_stackcells( snail_cc, $2, px );
+     if( compiler_cc->loops ) {
+	 compiler_compile_zero_out_stackcells( compiler_cc, $2, px );
      }
-     snail_check_non_null_variables( $2 );
+     compiler_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword 
     variable_identifier ',' variable_identifier_list ':' var_type_description
@@ -6503,15 +6503,15 @@ variable_declaration
 
      $2 = dnode_append( $2, $4 );
      dnode_list_append_type( $2, $6 );
-     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
-     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
+     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
-     if( snail_cc->loops ) {
-	 snail_compile_zero_out_stackcells( snail_cc, $2, px );
+     if( compiler_cc->loops ) {
+	 compiler_compile_zero_out_stackcells( compiler_cc, $2, px );
      }
-     snail_check_non_null_variables( $2 );
+     compiler_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword
     variable_identifier ':' var_type_description initialiser
@@ -6520,12 +6520,12 @@ variable_declaration
      DNODE *var = $2;
 
      dnode_list_append_type( var, $4 );
-     dnode_list_assign_offsets( var, &snail_cc->local_offset );
-     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     dnode_list_assign_offsets( var, &compiler_cc->local_offset );
+     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( var, DF_IS_READONLY );
      }
-     snail_compile_initialise_variable( snail_cc, var, px );
+     compiler_compile_initialise_variable( compiler_cc, var, px );
     }
 
   | variable_declaration_keyword variable_identifier ','
@@ -6536,8 +6536,8 @@ variable_declaration
 
      $2 = dnode_list_invert( dnode_append( $2, $4 ));
      dnode_list_append_type( $2, $6 );
-     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
-     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
+     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
@@ -6553,9 +6553,9 @@ variable_declaration
 
          if( expr_nr > len ) {
              if( expr_nr == len + 1 ) {
-                 snail_compile_drop( snail_cc, px );
+                 compiler_compile_drop( compiler_cc, px );
              } else {
-                 snail_compile_dropn( snail_cc, expr_nr - len, px );
+                 compiler_compile_dropn( compiler_cc, expr_nr - len, px );
              }
          }
 
@@ -6563,7 +6563,7 @@ variable_declaration
          foreach_dnode( var, lst ) {
              len ++;
              if( len <= expr_nr )
-                 snail_compile_initialise_variable( snail_cc, var, px );
+                 compiler_compile_initialise_variable( compiler_cc, var, px );
          }
      }
     }
@@ -6576,8 +6576,8 @@ variable_declaration
 
         $2 = dnode_list_invert( dnode_append( $2, $4 ));
         dnode_list_append_type( $2, $6 );
-        dnode_list_assign_offsets( $2, &snail_cc->local_offset );
-        snail_vartab_insert_named_vars( snail_cc, $2, px );
+        dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
+        compiler_vartab_insert_named_vars( compiler_cc, $2, px );
     }
 
   | variable_declaration_keyword var_type_description variable_declarator_list
@@ -6585,15 +6585,15 @@ variable_declaration
         int readonly = $1;
 
 	dnode_list_append_type( $3, $2 );
-	dnode_list_assign_offsets( $3, &snail_cc->local_offset );
-	snail_vartab_insert_named_vars( snail_cc, $3, px );
+	dnode_list_assign_offsets( $3, &compiler_cc->local_offset );
+	compiler_vartab_insert_named_vars( compiler_cc, $3, px );
 	if( readonly ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
 	}
-	if( snail_cc->loops ) {
-	    snail_compile_zero_out_stackcells( snail_cc, $3, px );
+	if( compiler_cc->loops ) {
+	    compiler_compile_zero_out_stackcells( compiler_cc, $3, px );
 	}
-	snail_compile_variable_initialisations( snail_cc, $3, px );
+	compiler_compile_variable_initialisations( compiler_cc, $3, px );
       }
 
   | variable_declaration_keyword 
@@ -6603,21 +6603,21 @@ variable_declaration
 
 	tnode_append_element_type( $3, $2 );
 	dnode_list_append_type( $4, $3 );
-	dnode_list_assign_offsets( $4, &snail_cc->local_offset );
-	snail_vartab_insert_named_vars( snail_cc, $4, px );
+	dnode_list_assign_offsets( $4, &compiler_cc->local_offset );
+	compiler_vartab_insert_named_vars( compiler_cc, $4, px );
 	if( readonly ) {
 	    dnode_list_set_flags( $4, DF_IS_READONLY );
 	}
-	if( snail_cc->loops ) {
-	    snail_compile_zero_out_stackcells( snail_cc, $4, px );
+	if( compiler_cc->loops ) {
+	    compiler_compile_zero_out_stackcells( compiler_cc, $4, px );
 	}
-	snail_compile_variable_initialisations( snail_cc, $4, px );
+	compiler_compile_variable_initialisations( compiler_cc, $4, px );
       }
 
   | variable_declaration_keyword variable_identifier initialiser
     {
-     TNODE *expr_type = snail_cc->e_stack ?
-	 share_tnode( enode_type( snail_cc->e_stack )) : NULL;
+     TNODE *expr_type = compiler_cc->e_stack ?
+	 share_tnode( enode_type( compiler_cc->e_stack )) : NULL;
      int readonly = $1;
      DNODE *var = $2;
 
@@ -6627,7 +6627,7 @@ variable_declaration
      if( expr_type_kind == TK_FUNCTION ||
          expr_type_kind == TK_OPERATOR ||
          expr_type_kind == TK_METHOD ) {
-         TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+         TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
          expr_type = new_tnode_function_or_proc_ref
              ( share_dnode( tnode_args( expr_type )),
                share_dnode( tnode_retvals( expr_type )),
@@ -6636,12 +6636,12 @@ variable_declaration
      }
 
      dnode_list_append_type( var, expr_type );
-     dnode_list_assign_offsets( var, &snail_cc->local_offset );
-     snail_vartab_insert_named_vars( snail_cc, var, px );
+     dnode_list_assign_offsets( var, &compiler_cc->local_offset );
+     compiler_vartab_insert_named_vars( compiler_cc, var, px );
      if( readonly ) {
 	 dnode_list_set_flags( var, DF_IS_READONLY );
      }
-     snail_compile_initialise_variable( snail_cc, var, px );
+     compiler_compile_initialise_variable( compiler_cc, var, px );
     }
  
  | variable_declaration_keyword variable_identifier ','
@@ -6650,8 +6650,8 @@ variable_declaration
      int readonly = $1;
 
      $2 = dnode_list_invert( dnode_append( $2, $4 ));
-     dnode_list_assign_offsets( $2, &snail_cc->local_offset );
-     snail_vartab_insert_named_vars( snail_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
+     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
@@ -6669,23 +6669,23 @@ variable_declaration
 
          if( expr_nr > len ) {
              if( expr_nr == len + 1 ) {
-                 snail_compile_drop( snail_cc, px );
+                 compiler_compile_drop( compiler_cc, px );
              } else {
-                 snail_compile_dropn( snail_cc, expr_nr - len, px );
+                 compiler_compile_dropn( compiler_cc, expr_nr - len, px );
              }
          }
 
          len = 0;
 	 foreach_dnode( var, lst ) {
              len ++;
-             TNODE *expr_type = snail_cc->e_stack ?
-                 share_tnode( enode_type( snail_cc->e_stack )) : NULL;
+             TNODE *expr_type = compiler_cc->e_stack ?
+                 share_tnode( enode_type( compiler_cc->e_stack )) : NULL;
              type_kind_t expr_type_kind = expr_type ?
                  tnode_kind( expr_type ) : TK_NONE;
              if( expr_type_kind == TK_FUNCTION ||
                  expr_type_kind == TK_OPERATOR ||
                  expr_type_kind == TK_METHOD ) {
-                 TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+                 TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
                  expr_type = new_tnode_function_or_proc_ref
                      ( share_dnode( tnode_args( expr_type )),
                        share_dnode( tnode_retvals( expr_type )),
@@ -6694,7 +6694,7 @@ variable_declaration
              }
              dnode_append_type( var, expr_type );
              if( len <= expr_nr )
-                 snail_compile_initialise_variable( snail_cc, var, px );
+                 compiler_compile_initialise_variable( compiler_cc, var, px );
 	 }
      }
     }
@@ -6736,19 +6736,19 @@ variable_identifier_list
 return_statement
   : _RETURN
       {
-	snail_push_guarding_retval( snail_cc, px );
-	snail_compile_return( snail_cc, 0, px );
+	compiler_push_guarding_retval( compiler_cc, px );
+	compiler_compile_return( compiler_cc, 0, px );
       }
   | _RETURN 
       {
-	if( snail_cc->loops ) {
-            char *name = dnode_name( snail_cc->loops );
-	    snail_drop_loop_counters( snail_cc, name, 0, px );
+	if( compiler_cc->loops ) {
+            char *name = dnode_name( compiler_cc->loops );
+	    compiler_drop_loop_counters( compiler_cc, name, 0, px );
 	}
-        snail_push_guarding_retval( snail_cc, px );
+        compiler_push_guarding_retval( compiler_cc, px );
       }
     expression_list
-      { snail_compile_return( snail_cc, $3, px ); }
+      { compiler_compile_return( compiler_cc, $3, px ); }
   ;
 
 variable_identifier
@@ -6768,8 +6768,8 @@ opt_label
 if_condition
   : _IF /* expression */ {} condition
       {
-        snail_push_relative_fixup( snail_cc, px );
-	snail_compile_jz( snail_cc, 0, px );
+        compiler_push_relative_fixup( compiler_cc, px );
+	compiler_compile_jz( compiler_cc, 0, px );
       }
   ;
 
@@ -6777,13 +6777,13 @@ for_variable_declaration
   : variable_identifier ':' var_type_description
       {
 	  dnode_append_type( $1, $3 );
-	  dnode_assign_offset( $1, &snail_cc->local_offset );
+	  dnode_assign_offset( $1, &compiler_cc->local_offset );
 	  $$ = $1;
       }
   | var_type_description variable_identifier
       {
 	  dnode_append_type( $2, $1 );
-	  dnode_assign_offset( $2, &snail_cc->local_offset );
+	  dnode_assign_offset( $2, &compiler_cc->local_offset );
 	  $$ = $2;
       }
   | variable_identifier
@@ -6795,197 +6795,197 @@ for_variable_declaration
 elsif_condition
   : _ELSIF /* expression */ {} condition
       {
-        snail_push_relative_fixup( snail_cc, px );
-	snail_compile_jz( snail_cc, 0, px );
+        compiler_push_relative_fixup( compiler_cc, px );
+	compiler_compile_jz( compiler_cc, 0, px );
       }
   ;
 
 elsif_statement
   : elsif_condition _THEN statement_list _ENDIF
     {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
     }
 
   | elsif_condition _THEN statement_list
     {
 	ssize_t zero = 0;
-        snail_push_relative_fixup( snail_cc, px );
-        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_swap_fixups( snail_cc );
-        snail_fixup_here( snail_cc );
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler_cc );
+        compiler_fixup_here( compiler_cc );
     }
     elsif_statement
     {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
     }
 
   | elsif_condition _THEN statement_list
     {
 	ssize_t zero = 0;
-        snail_push_relative_fixup( snail_cc, px );
-        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_swap_fixups( snail_cc );
-        snail_fixup_here( snail_cc );
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler_cc );
+        compiler_fixup_here( compiler_cc );
     }
     _ELSE statement_list _ENDIF
     {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
     }
 ;
 
 control_statement
   : if_condition _THEN statement_list _ENDIF
       {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
       }
 
   | if_condition _THEN statement_list
       {
 	ssize_t zero = 0;
-        snail_push_relative_fixup( snail_cc, px );
-        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_swap_fixups( snail_cc );
-        snail_fixup_here( snail_cc );
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler_cc );
+        compiler_fixup_here( compiler_cc );
       }
     _ELSE statement_list _ENDIF
       {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
       }
 
   | if_condition _THEN statement_list
       {
 	ssize_t zero = 0;
-        snail_push_relative_fixup( snail_cc, px );
-        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_swap_fixups( snail_cc );
-        snail_fixup_here( snail_cc );
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler_cc );
+        compiler_fixup_here( compiler_cc );
       }
     elsif_statement
       {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
       }
 
   | if_condition compound_statement
       {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
       }
 
   | if_condition compound_statement _ELSE 
       {
 	ssize_t zero = 0;
-        snail_push_relative_fixup( snail_cc, px );
-        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_swap_fixups( snail_cc );
-        snail_fixup_here( snail_cc );
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler_cc );
+        compiler_fixup_here( compiler_cc );
       }
     compound_statement
       {
-        snail_fixup_here( snail_cc );
+        compiler_fixup_here( compiler_cc );
       }
 
   | opt_label _WHILE
       {
 	  ssize_t zero = 0;
-          snail_begin_subscope( snail_cc, px );
-	  snail_push_loop( snail_cc, $1, px );
-          snail_push_relative_fixup( snail_cc, px );
-	  snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-	  snail_push_current_address( snail_cc, px );
-	  snail_push_thrcode( snail_cc, px );
+          compiler_begin_subscope( compiler_cc, px );
+	  compiler_push_loop( compiler_cc, $1, px );
+          compiler_push_relative_fixup( compiler_cc, px );
+	  compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	  compiler_push_current_address( compiler_cc, px );
+	  compiler_push_thrcode( compiler_cc, px );
       }
     condition
       {
-	snail_swap_thrcodes( snail_cc );
+	compiler_swap_thrcodes( compiler_cc );
       }
     loop_body
       {
-        snail_fixup_here( snail_cc );
-	snail_fixup_op_continue( snail_cc, px );
-	snail_merge_top_thrcodes( snail_cc, px );
-	snail_compile_jnz( snail_cc, snail_pop_offset( snail_cc, px ), px );
-	snail_fixup_op_break( snail_cc, px );
-	snail_pop_loop( snail_cc );
-        snail_end_subscope( snail_cc, px );
+        compiler_fixup_here( compiler_cc );
+	compiler_fixup_op_continue( compiler_cc, px );
+	compiler_merge_top_thrcodes( compiler_cc, px );
+	compiler_compile_jnz( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_fixup_op_break( compiler_cc, px );
+	compiler_pop_loop( compiler_cc );
+        compiler_end_subscope( compiler_cc, px );
       }
 
   | opt_label _FOR
       {
-	snail_begin_subscope( snail_cc, px );
+	compiler_begin_subscope( compiler_cc, px );
       } 
     '(' statement ';'
       {
-	snail_push_loop( snail_cc, $1, px );
-	snail_push_thrcode( snail_cc, px );
+	compiler_push_loop( compiler_cc, $1, px );
+	compiler_push_thrcode( compiler_cc, px );
       }
     condition ';'
       {
-	snail_push_thrcode( snail_cc, px );
+	compiler_push_thrcode( compiler_cc, px );
       }
     statement ')'
       {
         ssize_t zero = 0;
-	snail_push_thrcode( snail_cc, px );
-        snail_push_relative_fixup( snail_cc, px );
-	snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+	compiler_push_thrcode( compiler_cc, px );
+        compiler_push_relative_fixup( compiler_cc, px );
+	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
       }
     loop_body
       {
-	snail_fixup_op_continue( snail_cc, px );
-	snail_merge_top_thrcodes( snail_cc, px );
+	compiler_fixup_op_continue( compiler_cc, px );
+	compiler_merge_top_thrcodes( compiler_cc, px );
 
-        snail_fixup_here( snail_cc );
-	snail_merge_top_thrcodes( snail_cc, px );
+        compiler_fixup_here( compiler_cc );
+	compiler_merge_top_thrcodes( compiler_cc, px );
 
-	snail_compile_jnz( snail_cc, -snail_code_length( snail_cc ) + 2, px );
+	compiler_compile_jnz( compiler_cc, -compiler_code_length( compiler_cc ) + 2, px );
 
-	snail_swap_thrcodes( snail_cc );
-	snail_merge_top_thrcodes( snail_cc, px );
-	snail_fixup_op_break( snail_cc, px );
-	snail_pop_loop( snail_cc );
-	snail_end_subscope( snail_cc, px );
+	compiler_swap_thrcodes( compiler_cc );
+	compiler_merge_top_thrcodes( compiler_cc, px );
+	compiler_fixup_op_break( compiler_cc, px );
+	compiler_pop_loop( compiler_cc );
+	compiler_end_subscope( compiler_cc, px );
       }
 
   | opt_label _FOR lvariable
       {
-	snail_push_loop( snail_cc, $1, px );
-	dnode_set_flags( snail_cc->loops, DF_LOOP_HAS_VAL );
-	snail_compile_dup( snail_cc, px );
+	compiler_push_loop( compiler_cc, $1, px );
+	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
+	compiler_compile_dup( compiler_cc, px );
       }
     '=' expression
       {
-        snail_compile_sti( snail_cc, px );
+        compiler_compile_sti( compiler_cc, px );
       }
     _TO expression
       {
-	snail_compile_over( snail_cc, px );
-	snail_compile_ldi( snail_cc, px );
-	snail_compile_over( snail_cc, px );
-	if( compiler_test_top_types_are_identical( snail_cc, px )) {
-	    snail_compile_binop( snail_cc, ">", px );
-	    snail_push_relative_fixup( snail_cc, px );
-	    snail_compile_jnz( snail_cc, 0, px );
+	compiler_compile_over( compiler_cc, px );
+	compiler_compile_ldi( compiler_cc, px );
+	compiler_compile_over( compiler_cc, px );
+	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
+	    compiler_compile_binop( compiler_cc, ">", px );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
 	    ssize_t zero = 0;
-	    compiler_drop_top_expression( snail_cc );
-	    compiler_drop_top_expression( snail_cc );
-	    snail_push_relative_fixup( snail_cc, px );
-	    snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
 
-        snail_push_current_address( snail_cc, px );
+        compiler_push_current_address( compiler_cc, px );
       }
      loop_body
       {
-	snail_fixup_here( snail_cc );
-	snail_fixup_op_continue( snail_cc, px );
-	snail_compile_loop( snail_cc, snail_pop_offset( snail_cc, px ), px );
-	snail_fixup_op_break( snail_cc, px );
-	snail_pop_loop( snail_cc );
+	compiler_fixup_here( compiler_cc );
+	compiler_fixup_op_continue( compiler_cc, px );
+	compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_fixup_op_break( compiler_cc, px );
+	compiler_pop_loop( compiler_cc );
       }
 
   | opt_label _FOR variable_declaration_keyword
       {
-	snail_begin_subscope( snail_cc, px );
+	compiler_begin_subscope( compiler_cc, px );
       }
     for_variable_declaration
       {
@@ -6993,8 +6993,8 @@ control_statement
 	if( readonly ) {
 	    dnode_set_flags( $5, DF_IS_READONLY );
 	}
-	snail_push_loop( snail_cc, $1, px );
-	dnode_set_flags( snail_cc->loops, DF_LOOP_HAS_VAL );
+	compiler_push_loop( compiler_cc, $1, px );
+	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
       }
     '=' expression
       {
@@ -7002,60 +7002,60 @@ control_statement
 
 	if( dnode_type( loop_counter ) == NULL ) {
 	    dnode_append_type( loop_counter,
-			       share_tnode( enode_type( snail_cc->e_stack )));
-	    dnode_assign_offset( loop_counter, &snail_cc->local_offset );
+			       share_tnode( enode_type( compiler_cc->e_stack )));
+	    dnode_assign_offset( loop_counter, &compiler_cc->local_offset );
 	}
-	snail_vartab_insert_named_vars( snail_cc, loop_counter, px );
-        snail_compile_store_variable( snail_cc, loop_counter, px );
-	snail_compile_load_variable_address( snail_cc, loop_counter, px );
+	compiler_vartab_insert_named_vars( compiler_cc, loop_counter, px );
+        compiler_compile_store_variable( compiler_cc, loop_counter, px );
+	compiler_compile_load_variable_address( compiler_cc, loop_counter, px );
       }
     _TO expression
       {
-	snail_compile_over( snail_cc, px );
-	snail_compile_ldi( snail_cc, px );
-	snail_compile_over( snail_cc, px );
-	if( compiler_test_top_types_are_identical( snail_cc, px )) {
-	    snail_compile_binop( snail_cc, ">", px );
-	    snail_push_relative_fixup( snail_cc, px );
-	    snail_compile_jnz( snail_cc, 0, px );
+	compiler_compile_over( compiler_cc, px );
+	compiler_compile_ldi( compiler_cc, px );
+	compiler_compile_over( compiler_cc, px );
+	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
+	    compiler_compile_binop( compiler_cc, ">", px );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
 	    ssize_t zero = 0;
-	    compiler_drop_top_expression( snail_cc );
-	    compiler_drop_top_expression( snail_cc );
-	    snail_push_relative_fixup( snail_cc, px );
-	    snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
 
-        snail_push_current_address( snail_cc, px );
+        compiler_push_current_address( compiler_cc, px );
       }
      loop_body
       {
-	snail_fixup_here( snail_cc );
-	snail_fixup_op_continue( snail_cc, px );
-	snail_compile_loop( snail_cc, snail_pop_offset( snail_cc, px ), px );
-	snail_fixup_op_break( snail_cc, px );
-	snail_pop_loop( snail_cc );
-	snail_end_subscope( snail_cc, px );
+	compiler_fixup_here( compiler_cc );
+	compiler_fixup_op_continue( compiler_cc, px );
+	compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_fixup_op_break( compiler_cc, px );
+	compiler_pop_loop( compiler_cc );
+	compiler_end_subscope( compiler_cc, px );
       }
 
   | _TRY
       {
 	cexception_t inner;
 	ssize_t zero = 0;
-	ssize_t try_var_offset = snail_cc->local_offset--;
+	ssize_t try_var_offset = compiler_cc->local_offset--;
 
-	push_ssize_t( &snail_cc->try_variable_stack, &snail_cc->try_block_level,
+	push_ssize_t( &compiler_cc->try_variable_stack, &compiler_cc->try_block_level,
 		      try_var_offset, px );
 
-	push_ssize_t( &snail_cc->catch_jumpover_stack,
-		      &snail_cc->catch_jumpover_stack_length,
-		      snail_cc->catch_jumpover_nr, px );
+	push_ssize_t( &compiler_cc->catch_jumpover_stack,
+		      &compiler_cc->catch_jumpover_stack_length,
+		      compiler_cc->catch_jumpover_nr, px );
 
-	snail_cc->catch_jumpover_nr = 0;
+	compiler_cc->catch_jumpover_nr = 0;
 
 	cexception_guard( inner ) {
-	    snail_push_relative_fixup( snail_cc, &inner );
-	    snail_emit( snail_cc, px, "\tcee\n", TRY, &zero, &try_var_offset );
+	    compiler_push_relative_fixup( compiler_cc, &inner );
+	    compiler_emit( compiler_cc, px, "\tcee\n", TRY, &zero, &try_var_offset );
 	}
 	cexception_catch {
 	    cexception_reraise( inner, px );
@@ -7064,27 +7064,27 @@ control_statement
     compound_statement
       {
 	ssize_t zero = 0;
-	snail_emit( snail_cc, px, "\tc\n", RESTORE );
-	snail_push_relative_fixup( snail_cc, px );
-	snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-	snail_swap_fixups( snail_cc );
-	snail_fixup_here( snail_cc );
+	compiler_emit( compiler_cc, px, "\tc\n", RESTORE );
+	compiler_push_relative_fixup( compiler_cc, px );
+	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	compiler_swap_fixups( compiler_cc );
+	compiler_fixup_here( compiler_cc );
       }
     opt_catch_list
       {
 	int i;
 
-	for( i = 0; i < snail_cc->catch_jumpover_nr; i ++ ) { 
-	    snail_fixup_here( snail_cc );
+	for( i = 0; i < compiler_cc->catch_jumpover_nr; i ++ ) { 
+	    compiler_fixup_here( compiler_cc );
 	}
 	
-	snail_cc->catch_jumpover_nr = 
-	    pop_ssize_t( &snail_cc->catch_jumpover_stack, 
-			 &snail_cc->catch_jumpover_stack_length, px );
+	compiler_cc->catch_jumpover_nr = 
+	    pop_ssize_t( &compiler_cc->catch_jumpover_stack, 
+			 &compiler_cc->catch_jumpover_stack_length, px );
 
-	snail_fixup_here( snail_cc );
-	pop_ssize_t( &snail_cc->try_variable_stack,
-		     &snail_cc->try_block_level, px );
+	compiler_fixup_here( compiler_cc );
+	pop_ssize_t( &compiler_cc->try_variable_stack,
+		     &compiler_cc->try_block_level, px );
       }
 
   ;
@@ -7092,22 +7092,22 @@ control_statement
 compound_statement
   : '{'
       {
-	snail_begin_subscope( snail_cc, px );
+	compiler_begin_subscope( compiler_cc, px );
       }
     statement_list '}'
       {
-	snail_end_subscope( snail_cc, px );
+	compiler_end_subscope( compiler_cc, px );
       }
   ;
 
 loop_body
   : _DO
       {
-	snail_begin_subscope( snail_cc, px );
+	compiler_begin_subscope( compiler_cc, px );
       }
     statement_list
       {
-	snail_end_subscope( snail_cc, px );
+	compiler_end_subscope( compiler_cc, px );
       }
     _ENDDO
   | compound_statement
@@ -7127,24 +7127,24 @@ catch_var_identifier
   : __IDENTIFIER
     {
      char *opname = "exceptionval";
-     ssize_t try_var_offset = snail_cc->try_variable_stack ?
-	 snail_cc->try_variable_stack[snail_cc->try_block_level-1] : 0;
-     DNODE *catch_var = vartab_lookup( snail_cc->vartab, $1 );
+     ssize_t try_var_offset = compiler_cc->try_variable_stack ?
+	 compiler_cc->try_variable_stack[compiler_cc->try_block_level-1] : 0;
+     DNODE *catch_var = vartab_lookup( compiler_cc->vartab, $1 );
      TNODE *catch_var_type = catch_var ? dnode_type( catch_var ) : NULL;
 
      if( !catch_var_type ||
-         !compiler_lookup_operator( snail_cc, catch_var_type, opname, 1, px )) {
+         !compiler_lookup_operator( compiler_cc, catch_var_type, opname, 1, px )) {
 	 yyerrorf( "type of variable in a 'catch' clause must "
 		   "have unary '%s' operator", opname );
      } else {
-	 snail_emit( snail_cc, px, "\n\tce\n", PLD, &try_var_offset );
-	 snail_push_type( snail_cc, new_tnode_ref( px ), px );
-	 snail_check_and_compile_operator( snail_cc, catch_var_type,
+	 compiler_emit( compiler_cc, px, "\n\tce\n", PLD, &try_var_offset );
+	 compiler_push_type( compiler_cc, new_tnode_ref( px ), px );
+	 compiler_check_and_compile_operator( compiler_cc, catch_var_type,
 					   opname, /*arity:*/1,
 					   /*fixup_values:*/ NULL,
 					   px );
-	 snail_emit( snail_cc, px, "\n" );
-	 snail_compile_variable_assignment( snail_cc, catch_var, px );
+	 compiler_emit( compiler_cc, px, "\n" );
+	 compiler_compile_variable_assignment( compiler_cc, catch_var, px );
      }
     }
   ;
@@ -7153,27 +7153,27 @@ catch_variable_declaration
   : _VAR variable_identifier_list ':' var_type_description
     {
      char *opname = "exceptionval";
-     ssize_t try_var_offset = snail_cc->try_variable_stack ?
-	 snail_cc->try_variable_stack[snail_cc->try_block_level-1] : 0;
+     ssize_t try_var_offset = compiler_cc->try_variable_stack ?
+	 compiler_cc->try_variable_stack[compiler_cc->try_block_level-1] : 0;
 
      dnode_list_append_type( $2, $4 );
-     dnode_list_assign_offsets( $2, &snail_cc->local_offset );     
+     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );     
      if( $2 && dnode_list_length( $2 ) > 1 ) {
 	 yyerrorf( "only one variable may be declared in the 'catch' clause" );
      }
-     if( !$4 || !compiler_lookup_operator( snail_cc, $4, opname, 1, px )) {
+     if( !$4 || !compiler_lookup_operator( compiler_cc, $4, opname, 1, px )) {
 	 yyerrorf( "type of variable declared in a 'catch' clause must "
 		   "have unary '%s' operator", opname );
      } else {
-	 snail_emit( snail_cc, px, "\n\tce\n", PLD, &try_var_offset );
-	 snail_push_type( snail_cc, new_tnode_ref( px ), px );
-	 snail_check_and_compile_operator( snail_cc, $4, opname,
+	 compiler_emit( compiler_cc, px, "\n\tce\n", PLD, &try_var_offset );
+	 compiler_push_type( compiler_cc, new_tnode_ref( px ), px );
+	 compiler_check_and_compile_operator( compiler_cc, $4, opname,
 					   /*arity:*/1,
 					   /*fixup_values:*/ NULL, px );
-	 snail_emit( snail_cc, px, "\n" );
-	 snail_compile_variable_assignment( snail_cc, $2, px );	 
+	 compiler_emit( compiler_cc, px, "\n" );
+	 compiler_compile_variable_assignment( compiler_cc, $2, px );	 
      }
-     vartab_insert_named_vars( snail_cc->vartab, $2, px );
+     vartab_insert_named_vars( compiler_cc->vartab, $2, px );
     }
   ;
 
@@ -7187,28 +7187,28 @@ catch_variable_list
 exception_identifier_list
   : __IDENTIFIER
     {
-      snail_emit_catch_comparison( snail_cc, NULL, $1, px );
+      compiler_emit_catch_comparison( compiler_cc, NULL, $1, px );
       $$ = 0;
     }
   | module_list __COLON_COLON __IDENTIFIER
     {
-      snail_emit_catch_comparison( snail_cc, $1, $3, px );
+      compiler_emit_catch_comparison( compiler_cc, $1, $3, px );
       $$ = 0;
     }
   | exception_identifier_list ',' __IDENTIFIER
     {
       ssize_t zero = 0;
-      snail_push_relative_fixup( snail_cc, px );
-      snail_emit( snail_cc, px, "\tce\n", BJNZ, &zero );
-      snail_emit_catch_comparison( snail_cc, NULL, $3, px );
+      compiler_push_relative_fixup( compiler_cc, px );
+      compiler_emit( compiler_cc, px, "\tce\n", BJNZ, &zero );
+      compiler_emit_catch_comparison( compiler_cc, NULL, $3, px );
       $$ = $1 + 1;
     }
   | exception_identifier_list ',' module_list __COLON_COLON __IDENTIFIER
     {
       ssize_t zero = 0;
-      snail_push_relative_fixup( snail_cc, px );
-      snail_emit( snail_cc, px, "\tce\n", BJNZ, &zero );
-      snail_emit_catch_comparison( snail_cc, $3, $5, px );
+      compiler_push_relative_fixup( compiler_cc, px );
+      compiler_emit( compiler_cc, px, "\tce\n", BJNZ, &zero );
+      compiler_emit_catch_comparison( compiler_cc, $3, $5, px );
       $$ = $1 + 1;
     }
   ;
@@ -7218,44 +7218,44 @@ catch_statement
     compound_statement
       {
 	ssize_t zero = 0;
-	snail_cc->catch_jumpover_nr ++;
-	snail_push_relative_fixup( snail_cc, px );
-	snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
+	compiler_cc->catch_jumpover_nr ++;
+	compiler_push_relative_fixup( compiler_cc, px );
+	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
       }
 
   | _CATCH
       {
-	snail_begin_subscope( snail_cc,  px );
+	compiler_begin_subscope( compiler_cc,  px );
       }
     '(' catch_variable_list ')'
     compound_statement
       {
 	ssize_t zero = 0;
-	snail_cc->catch_jumpover_nr ++;
-	snail_push_relative_fixup( snail_cc, px );
-	snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-	snail_end_subscope( snail_cc, px );
+	compiler_cc->catch_jumpover_nr ++;
+	compiler_push_relative_fixup( compiler_cc, px );
+	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	compiler_end_subscope( compiler_cc, px );
       }
 
   | _CATCH exception_identifier_list
       {
-	snail_finish_catch_comparisons( snail_cc, $2, px );
-	snail_begin_subscope( snail_cc,  px );
+	compiler_finish_catch_comparisons( compiler_cc, $2, px );
+	compiler_begin_subscope( compiler_cc,  px );
       }
     '(' catch_variable_list ')'  
     compound_statement
       {
-	snail_end_subscope( snail_cc, px );
-	snail_finish_catch_block( snail_cc, px );
+	compiler_end_subscope( compiler_cc, px );
+	compiler_finish_catch_block( compiler_cc, px );
       }
 
   | _CATCH exception_identifier_list
       {
-	snail_finish_catch_comparisons( snail_cc, $2, px );
+	compiler_finish_catch_comparisons( compiler_cc, $2, px );
       }
     compound_statement
       {
-	snail_finish_catch_block( snail_cc, px );
+	compiler_finish_catch_block( compiler_cc, px );
       }
 
 ;
@@ -7271,7 +7271,7 @@ var_type_description
   : delimited_type_description
   | undelimited_or_structure_description
   | _ARRAY
-    { $$ = new_tnode_array_snail( NULL, snail_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( NULL, compiler_cc->typetab, px ); }
   ;
 
 undelimited_or_structure_description
@@ -7284,11 +7284,11 @@ undelimited_or_structure_description
 type_identifier
   : __IDENTIFIER
      {
-	 $$ = snail_lookup_tnode( snail_cc, NULL, $1, "type" );
+	 $$ = compiler_lookup_tnode( compiler_cc, NULL, $1, "type" );
      }
   | module_list __COLON_COLON __IDENTIFIER
      {
-	 $$ = snail_lookup_tnode( snail_cc, $1, $3, "type" );
+	 $$ = compiler_lookup_tnode( compiler_cc, $1, $3, "type" );
      }
   ;
 
@@ -7317,8 +7317,8 @@ delimited_type_description
 	$$ = tnode_move_operators( $$, $3 );
 	delete_tnode( $3 );
 	$3 = NULL;
-	assert( snail_cc->current_type );
-	tnode_set_suffix( $$, tnode_name( snail_cc->current_type ), px );
+	assert( compiler_cc->current_type );
+	tnode_set_suffix( $$, tnode_name( compiler_cc->current_type ), px );
     }
 
   | type_identifier _OF delimited_type_description
@@ -7332,7 +7332,7 @@ delimited_type_description
     { $$ = new_tnode_addressof( NULL, px ); }
 
   | _ARRAY _OF delimited_type_description
-    { $$ = new_tnode_array_snail( $3, snail_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( $3, compiler_cc->typetab, px ); }
 
   | _ARRAY dimension_list _OF delimited_type_description
     { $$ = tnode_append_element_type( $2, $4 ); }
@@ -7340,11 +7340,11 @@ delimited_type_description
   | _TYPE __IDENTIFIER
     {
 	char *type_name = $2;
-	TNODE *tnode = typetab_lookup( snail_cc->typetab, type_name );
+	TNODE *tnode = typetab_lookup( compiler_cc->typetab, type_name );
 	if( !tnode ) {
 	    tnode = new_tnode_placeholder( type_name, px );
 	    tnode_set_size( tnode, 1 );
-	    typetab_insert( snail_cc->typetab, type_name, tnode, px );
+	    typetab_insert( compiler_cc->typetab, type_name, tnode, px );
 	}
 	$$ = share_tnode( tnode );
     }
@@ -7352,29 +7352,29 @@ delimited_type_description
   | function_or_procedure_type_keyword '(' argument_list ')'
     {
 	int is_function = $1;
-	TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+	TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
 
 	share_tnode( base_type );
 	$$ = new_tnode_function_or_proc_ref( $3, NULL, base_type, px );
 	if( is_function ) {
-	    snail_set_function_arguments_readonly( $$ );
+	    compiler_set_function_arguments_readonly( $$ );
 	}
     }
   | function_or_procedure_type_keyword '(' argument_list ')'
     __ARROW '(' retval_description_list ')'
     {
 	int is_function = $1;
-	TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+	TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
 
 	share_tnode( base_type );
 	$$ = new_tnode_function_or_proc_ref( $3, $7, base_type, px );
 	if( is_function ) {
-	    snail_set_function_arguments_readonly( $$ );
+	    compiler_set_function_arguments_readonly( $$ );
 	}
     }
 
   | _BLOB
-    { $$ = new_tnode_blob_snail( snail_cc->typetab, px ); }
+    { $$ = new_tnode_blob_snail( compiler_cc->typetab, px ); }
 
   | _TYPE _OF _VAR
     { $$ = new_tnode_type_descriptor( px ); }
@@ -7435,22 +7435,22 @@ struct_description
 class_description
   : opt_null_type_designator _CLASS 
     {
-        snail_begin_subscope( snail_cc, px );
+        compiler_begin_subscope( compiler_cc, px );
     }
     struct_or_class_description_body
     {
-        compiler_finish_virtual_method_table( snail_cc, $4, px );
+        compiler_finish_virtual_method_table( compiler_cc, $4, px );
         $$ = tnode_finish_class( $4, px );
         if( $1 ) {
             tnode_set_flags( $$, TF_NON_NULL );
         }
-        snail_end_subscope( snail_cc, px );
+        compiler_end_subscope( compiler_cc, px );
     }
 ;
 
 undelimited_type_description
   : _ARRAY _OF undelimited_or_structure_description
-    { $$ = new_tnode_array_snail( $3, snail_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( $3, compiler_cc->typetab, px ); }
 
   | _ARRAY dimension_list _OF undelimited_or_structure_description
     { $$ = tnode_append_element_type( $2, $4 ); }
@@ -7467,14 +7467,14 @@ undelimited_type_description
 
   | _ENUM __IDENTIFIER '(' enum_member_list ')'
     {
-      TNODE *enum_implementing_type = typetab_lookup( snail_cc->typetab, $2 );
+      TNODE *enum_implementing_type = typetab_lookup( compiler_cc->typetab, $2 );
       ssize_t tsize = enum_implementing_type ?
 	  tnode_size( enum_implementing_type ) : 0;
 
-      if( snail_cc->current_type &&
-	      tnode_is_forward( snail_cc->current_type )) {
-	  tnode_set_kind( snail_cc->current_type, TK_ENUM );
-	  tnode_set_size( snail_cc->current_type, tsize );
+      if( compiler_cc->current_type &&
+	      tnode_is_forward( compiler_cc->current_type )) {
+	  tnode_set_kind( compiler_cc->current_type, TK_ENUM );
+	  tnode_set_size( compiler_cc->current_type, tsize );
       }
       $$ = tnode_finish_enum( $4, NULL, enum_implementing_type, px );
       compiler_check_enum_attributes( $$ );
@@ -7482,8 +7482,8 @@ undelimited_type_description
 
   | '(' __THREE_DOTS ',' enum_member_list ')'
     {
-      if( !snail_cc->current_type ||
-	  tnode_is_forward( snail_cc->current_type )) {
+      if( !compiler_cc->current_type ||
+	  tnode_is_forward( compiler_cc->current_type )) {
 	  yyerror( "one can only extend previously defined enumeration types" );
 	  tnode_set_size( $4, 1 );
       }
@@ -7496,8 +7496,8 @@ enum_member_list
      {
        $$ = new_tnode( px );
        tnode_set_kind( $$, TK_ENUM );
-       if( snail_cc->current_type ) {
-	   tnode_merge_field_lists( $$, snail_cc->current_type );
+       if( compiler_cc->current_type ) {
+	   tnode_merge_field_lists( $$, compiler_cc->current_type );
        }
        tnode_insert_enum_value( $$, $1 );
      }
@@ -7544,14 +7544,14 @@ finish_fields
       TNODE *current_class = $<tnode>0;
       TLIST *interfaces = $<tlist>-2;
       TNODE *base_type = $<tnode>-3 ?
-          $<tnode>-3 : typetab_lookup( snail_cc->typetab, "struct" );
+          $<tnode>-3 : typetab_lookup( compiler_cc->typetab, "struct" );
 
       if( current_class != base_type ) {
 	  tnode_insert_base_type( current_class, share_tnode( base_type ));
           tnode_insert_interfaces( current_class, interfaces );
       }
 
-      compiler_start_virtual_method_table( snail_cc, current_class, px );
+      compiler_start_virtual_method_table( compiler_cc, current_class, px );
 
       $$ = current_class;
   }
@@ -7560,8 +7560,8 @@ finish_fields
 struct_declaration_field_list
   : struct_field
      {
-	 assert( snail_cc->current_type );
-	 $$ = share_tnode( snail_cc->current_type );
+	 assert( compiler_cc->current_type );
+	 $$ = share_tnode( compiler_cc->current_type );
          tnode_insert_type_member( $$, $1 );
      }
   | type_attribute
@@ -7569,8 +7569,8 @@ struct_declaration_field_list
        cexception_t inner;
 
        cexception_guard( inner ) {
-	   assert( snail_cc->current_type );
-	   $$ = share_tnode( snail_cc->current_type );
+	   assert( compiler_cc->current_type );
+	   $$ = share_tnode( compiler_cc->current_type );
 	   tnode_set_attribute( $$, $1, &inner );
        }
        cexception_catch {
@@ -7688,8 +7688,8 @@ struct_operator
 interface_type_placeholder
   : /* empty */
      {
-         assert( snail_cc->current_type );
-	 $$ = share_tnode( snail_cc->current_type );
+         assert( compiler_cc->current_type );
+	 $$ = share_tnode( compiler_cc->current_type );
      }
   ;
 
@@ -7707,7 +7707,7 @@ interface_declaration_body
 interface_operator_list
   : interface_operator
     {
-	TNODE *struct_type = snail_cc->current_type;
+	TNODE *struct_type = compiler_cc->current_type;
 	tnode_insert_type_member( struct_type, $1 );
 	$$ = struct_type;
     }
@@ -7795,10 +7795,10 @@ type_attribute
 
 dimension_list
   : '[' ']'
-    { $$ = new_tnode_array_snail( NULL, snail_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( NULL, compiler_cc->typetab, px ); }
   | dimension_list '[' ']'
     {
-      TNODE *array_type = new_tnode_array_snail( NULL, snail_cc->typetab, px );
+      TNODE *array_type = new_tnode_array_snail( NULL, compiler_cc->typetab, px );
       $$ = tnode_append_element_type( $1, array_type );
     }
   ;
@@ -7827,36 +7827,36 @@ type_declaration_name
 type_declaration_start
   : _TYPE type_declaration_name
       {
-	TNODE *old_tnode = typetab_lookup_silently( snail_cc->typetab, $2 );
+	TNODE *old_tnode = typetab_lookup_silently( compiler_cc->typetab, $2 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
 	    TNODE *tnode = new_tnode_forward( $2, px );
-	    snail_typetab_insert( snail_cc, tnode, px );
+	    compiler_typetab_insert( compiler_cc, tnode, px );
 	}
-	tnode = typetab_lookup_silently( snail_cc->typetab, $2 );
-	assert( !snail_cc->current_type );
-	snail_cc->current_type = tnode;
-	snail_begin_scope( snail_cc, px );
+	tnode = typetab_lookup_silently( compiler_cc->typetab, $2 );
+	assert( !compiler_cc->current_type );
+	compiler_cc->current_type = tnode;
+	compiler_begin_scope( compiler_cc, px );
       }
 ;
 
 delimited_type_declaration
   : type_declaration_start '=' delimited_type_description
       {
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $3, px );
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $3, px );
       }
   | type_declaration_start '=' delimited_type_description /*type_*/initialiser
       {
-        snail_compile_drop( snail_cc, px );
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $3, px );
+        compiler_compile_drop( compiler_cc, px );
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $3, px );
       }
   | type_declaration_start
       {
-	snail_end_scope( snail_cc, px );
-	snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_cc->current_type = NULL;
       }
   | forward_struct_declaration
   | forward_class_declaration
@@ -7865,16 +7865,16 @@ delimited_type_declaration
 undelimited_type_declaration
   : type_declaration_start '=' undelimited_type_description
       {
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $3, px );
-	snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $3, px );
+	compiler_cc->current_type = NULL;
       }
 
   | type_declaration_start '=' undelimited_type_description type_initialiser
       {
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $3, px );
-	snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $3, px );
+	compiler_cc->current_type = NULL;
       }
 
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '='
@@ -7883,17 +7883,17 @@ undelimited_type_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// snail_begin_scope( snail_cc, px );
+	// compiler_begin_scope( compiler_cc, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    snail_typetab_insert( snail_cc, tnode, &inner );
-	    tnode = typetab_lookup( snail_cc->typetab, $2 );
-	    snail_cc->current_type = tnode;
-	    snail_typetab_insert( snail_cc, share_tnode( base ), &inner );
-	    snail_begin_scope( snail_cc, &inner );
+	    compiler_typetab_insert( compiler_cc, tnode, &inner );
+	    tnode = typetab_lookup( compiler_cc->typetab, $2 );
+	    compiler_cc->current_type = tnode;
+	    compiler_typetab_insert( compiler_cc, share_tnode( base ), &inner );
+	    compiler_begin_scope( compiler_cc, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -7903,9 +7903,9 @@ undelimited_type_declaration
       }
     undelimited_type_description
       {
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $7, px );
-	snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $7, px );
+	compiler_cc->current_type = NULL;
       }
 
   | struct_declaration
@@ -7916,7 +7916,7 @@ undelimited_type_declaration
 struct_declaration
   : opt_null_type_designator _STRUCT __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler_cc->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
@@ -7924,7 +7924,7 @@ struct_declaration
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-	    snail_typetab_insert( snail_cc, tnode, px );
+	    compiler_typetab_insert( compiler_cc, tnode, px );
 	} else {
             if( tnode_is_non_null_reference( old_tnode ) !=
                 ($1 ? 1 : 0 )) {
@@ -7932,23 +7932,23 @@ struct_declaration
                           "has different non-null flag", $3 );
             }
         }
-	tnode = typetab_lookup( snail_cc->typetab, $3 );
-	assert( !snail_cc->current_type );
-	snail_cc->current_type = tnode;
-	snail_begin_scope( snail_cc, px );
+	tnode = typetab_lookup( compiler_cc->typetab, $3 );
+	assert( !compiler_cc->current_type );
+	compiler_cc->current_type = tnode;
+	compiler_begin_scope( compiler_cc, px );
     }
     struct_or_class_declaration_body
     {
 	tnode_finish_struct( $5, px );
-	snail_end_scope( snail_cc, px );
-	snail_typetab_insert( snail_cc, $5, px );
-        snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_typetab_insert( compiler_cc, $5, px );
+        compiler_cc->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _STRUCT
     {
-	assert( snail_cc->current_type );
-	tnode_set_flags( snail_cc->current_type, TF_IS_REF );
-        tnode_set_kind( snail_cc->current_type, TK_STRUCT );
+	assert( compiler_cc->current_type );
+	tnode_set_flags( compiler_cc->current_type, TF_IS_REF );
+        tnode_set_kind( compiler_cc->current_type, TK_STRUCT );
     }
     struct_or_class_declaration_body
     {
@@ -7956,14 +7956,14 @@ struct_declaration
             tnode_set_flags( $6, TF_NON_NULL );
         }
 	tnode_finish_struct( $6, px );
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $6, px );
-        snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $6, px );
+        compiler_cc->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator
     {
-	assert( snail_cc->current_type );
-	// tnode_set_flags( snail_cc->current_type, TF_IS_REF );
+	assert( compiler_cc->current_type );
+	// tnode_set_flags( compiler_cc->current_type, TF_IS_REF );
     }
     struct_or_class_declaration_body
     {
@@ -7971,9 +7971,9 @@ struct_declaration
             tnode_set_flags( $5, TF_NON_NULL );
         }
 	// tnode_finish_struct( $5, px );
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $5, px );
-        snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $5, px );
+        compiler_cc->current_type = NULL;
     }
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
       {
@@ -7981,17 +7981,17 @@ struct_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// snail_begin_scope( snail_cc, px );
+	// compiler_begin_scope( compiler_cc, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    snail_typetab_insert( snail_cc, tnode, &inner );
-	    tnode = typetab_lookup( snail_cc->typetab, $2 );
-	    snail_cc->current_type = tnode;
-	    snail_typetab_insert( snail_cc, share_tnode( base ), &inner );
-	    snail_begin_scope( snail_cc, &inner );
+	    compiler_typetab_insert( compiler_cc, tnode, &inner );
+	    tnode = typetab_lookup( compiler_cc->typetab, $2 );
+	    compiler_cc->current_type = tnode;
+	    compiler_typetab_insert( compiler_cc, share_tnode( base ), &inner );
+	    compiler_begin_scope( compiler_cc, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -8004,9 +8004,9 @@ struct_declaration
         if( $6 ) {
             tnode_set_flags( $9, TF_NON_NULL );
         }
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $9, px );
-	snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $9, px );
+	compiler_cc->current_type = NULL;
       }
 
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator
@@ -8015,17 +8015,17 @@ struct_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// snail_begin_scope( snail_cc, px );
+	// compiler_begin_scope( compiler_cc, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    snail_typetab_insert( snail_cc, tnode, &inner );
-	    tnode = typetab_lookup( snail_cc->typetab, $2 );
-	    snail_cc->current_type = tnode;
-	    snail_typetab_insert( snail_cc, share_tnode( base ), &inner );
-	    snail_begin_scope( snail_cc, &inner );
+	    compiler_typetab_insert( compiler_cc, tnode, &inner );
+	    tnode = typetab_lookup( compiler_cc->typetab, $2 );
+	    compiler_cc->current_type = tnode;
+	    compiler_typetab_insert( compiler_cc, share_tnode( base ), &inner );
+	    compiler_begin_scope( compiler_cc, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -8038,9 +8038,9 @@ struct_declaration
         if( $6 ) {
             tnode_set_flags( $8, TF_NON_NULL );
         }
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $8, px );
-	snail_cc->current_type = NULL;
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $8, px );
+	compiler_cc->current_type = NULL;
       }
 
 ;
@@ -8048,7 +8048,7 @@ struct_declaration
 class_declaration
   : opt_null_type_designator _CLASS __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler_cc->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
@@ -8056,26 +8056,26 @@ class_declaration
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-	    snail_typetab_insert( snail_cc, tnode, px );
+	    compiler_typetab_insert( compiler_cc, tnode, px );
 	}
-	tnode = typetab_lookup( snail_cc->typetab, $3 );
-	assert( !snail_cc->current_type );
-	snail_cc->current_type = tnode;
-	snail_begin_scope( snail_cc, px );
+	tnode = typetab_lookup( compiler_cc->typetab, $3 );
+	assert( !compiler_cc->current_type );
+	compiler_cc->current_type = tnode;
+	compiler_begin_scope( compiler_cc, px );
     }
     struct_or_class_declaration_body
     {
  	tnode_finish_class( $5, px );
-	compiler_finish_virtual_method_table( snail_cc, $5, px );
-	snail_end_scope( snail_cc, px );
-	snail_typetab_insert( snail_cc, $5, px );
-	snail_cc->current_type = NULL;
+	compiler_finish_virtual_method_table( compiler_cc, $5, px );
+	compiler_end_scope( compiler_cc, px );
+	compiler_typetab_insert( compiler_cc, $5, px );
+	compiler_cc->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _CLASS
     {
-	assert( snail_cc->current_type );
-	tnode_set_flags( snail_cc->current_type, TF_IS_REF );
-        tnode_set_kind( snail_cc->current_type, TK_CLASS );
+	assert( compiler_cc->current_type );
+	tnode_set_flags( compiler_cc->current_type, TF_IS_REF );
+        tnode_set_kind( compiler_cc->current_type, TK_CLASS );
     }
     struct_or_class_declaration_body
     {
@@ -8083,17 +8083,17 @@ class_declaration
             tnode_set_flags( $6, TF_NON_NULL );
         }
  	tnode_finish_class( $6, px );
-	compiler_finish_virtual_method_table( snail_cc, $6, px );
-	snail_end_scope( snail_cc, px );
-	snail_compile_type_declaration( snail_cc, $6, px );
-	snail_cc->current_type = NULL;
+	compiler_finish_virtual_method_table( compiler_cc, $6, px );
+	compiler_end_scope( compiler_cc, px );
+	compiler_compile_type_declaration( compiler_cc, $6, px );
+	compiler_cc->current_type = NULL;
     }
 ;
 
 interface_declaration
   : opt_null_type_designator _INTERFACE __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( snail_cc->typetab, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler_cc->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
@@ -8101,19 +8101,19 @@ interface_declaration
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-	    snail_typetab_insert( snail_cc, tnode, px );
+	    compiler_typetab_insert( compiler_cc, tnode, px );
 	}
-	tnode = typetab_lookup( snail_cc->typetab, $3 );
-	assert( !snail_cc->current_type );
-	snail_cc->current_type = tnode;
-	snail_begin_scope( snail_cc, px );
+	tnode = typetab_lookup( compiler_cc->typetab, $3 );
+	assert( !compiler_cc->current_type );
+	compiler_cc->current_type = tnode;
+	compiler_begin_scope( compiler_cc, px );
     }
     interface_declaration_body
     {
- 	tnode_finish_interface( $5, ++snail_cc->last_interface_number, px );
-	snail_end_scope( snail_cc, px );
-	snail_typetab_insert( snail_cc, $5, px );
-	snail_cc->current_type = NULL;
+ 	tnode_finish_interface( $5, ++compiler_cc->last_interface_number, px );
+	compiler_end_scope( compiler_cc, px );
+	compiler_typetab_insert( compiler_cc, $5, px );
+	compiler_cc->current_type = NULL;
     }
 ;
 
@@ -8124,7 +8124,7 @@ forward_struct_declaration
           if( $1 ) {
               tnode_set_flags( tnode, TF_NON_NULL );
           }
-	  snail_typetab_insert( snail_cc, tnode, px );
+	  compiler_typetab_insert( compiler_cc, tnode, px );
       }
 ;
 
@@ -8135,7 +8135,7 @@ forward_class_declaration
           if( $1 ) {
               tnode_set_flags( tnode, TF_NON_NULL );
           }
-	  snail_typetab_insert( snail_cc, tnode, px );
+	  compiler_typetab_insert( compiler_cc, tnode, px );
       }
 ;
 
@@ -8165,24 +8165,24 @@ a[i] = b + c;
 lvalue_list
 : lvalue
       {
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_thrcode( compiler_cc, px );
 	  $$ = 1;
       }
 | __IDENTIFIER
       {
-	  snail_push_varaddr_expr( snail_cc, $1, px );
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_varaddr_expr( compiler_cc, $1, px );
+	  compiler_push_thrcode( compiler_cc, px );
 	  $$ = 1;
       }
 | lvalue_list ',' lvalue
       {
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_thrcode( compiler_cc, px );
 	  $$ = $1 + 1;
       }
 | lvalue_list ',' __IDENTIFIER
       {
-	  snail_push_varaddr_expr( snail_cc, $3, px );
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_varaddr_expr( compiler_cc, $3, px );
+	  compiler_push_thrcode( compiler_cc, px );
 	  $$ = $1 + 1;
       }
 ;
@@ -8190,135 +8190,135 @@ lvalue_list
 assignment_statement
   : variable_access_identifier '=' expression
       {
-	  snail_compile_store_variable( snail_cc, $1, px );
+	  compiler_compile_store_variable( compiler_cc, $1, px );
       }
   | lvalue '=' expression
       {
-	  snail_compile_sti( snail_cc, px );
+	  compiler_compile_sti( compiler_cc, px );
       }
   | '('
       {
 	  /* Values must be emmitted first in the code. */
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_thrcode( compiler_cc, px );
       }
     lvalue_list ')' '=' multivalue_expression_list
       {
-	  snail_compile_multiple_assignment( snail_cc, $3, $3, $6, px );
+	  compiler_compile_multiple_assignment( compiler_cc, $3, $3, $6, px );
       }
 
   | lvalue ',' 
       {
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_thrcode( compiler_cc, px );
       }
     lvalue_list '=' multivalue_expression_list
       {
-	  snail_compile_multiple_assignment( snail_cc, $4+1, $4, $6, px );
-	  snail_compile_sti( snail_cc, px );
+	  compiler_compile_multiple_assignment( compiler_cc, $4+1, $4, $6, px );
+	  compiler_compile_sti( compiler_cc, px );
       }
 
   | __IDENTIFIER ',' 
       {
-	  snail_push_varaddr_expr( snail_cc, $1, px );
-	  snail_push_thrcode( snail_cc, px );
+	  compiler_push_varaddr_expr( compiler_cc, $1, px );
+	  compiler_push_thrcode( compiler_cc, px );
       }
     lvalue_list '=' multivalue_expression_list
       {
-	  snail_compile_multiple_assignment( snail_cc, $4+1, $4, $6, px );
+	  compiler_compile_multiple_assignment( compiler_cc, $4+1, $4, $6, px );
 
 	  {
 	      DNODE *var;
 
-	      compiler_swap_top_expressions( snail_cc );
-	      var = enode_variable( snail_cc->e_stack );
+	      compiler_swap_top_expressions( compiler_cc );
+	      var = enode_variable( compiler_cc->e_stack );
 
 	      share_dnode( var );
-	      compiler_drop_top_expression( snail_cc );
-	      snail_compile_variable_assignment( snail_cc, var, px );
+	      compiler_drop_top_expression( compiler_cc );
+	      compiler_compile_variable_assignment( compiler_cc, var, px );
 	      delete_dnode( var );
 	  }
       }
 
   | variable_access_identifier
       {
-	  snail_compile_load_variable_value( snail_cc, $1, px );
+	  compiler_compile_load_variable_value( compiler_cc, $1, px );
       }
     __ARITHM_ASSIGN expression
       { 
-	snail_compile_binop( snail_cc, $3, px );
-	snail_compile_store_variable( snail_cc, $1, px );
+	compiler_compile_binop( compiler_cc, $3, px );
+	compiler_compile_store_variable( compiler_cc, $1, px );
       }
   | lvalue
       {
-	  snail_compile_dup( snail_cc, px );
-	  snail_compile_ldi( snail_cc, px );
+	  compiler_compile_dup( compiler_cc, px );
+	  compiler_compile_ldi( compiler_cc, px );
       }
     __ARITHM_ASSIGN expression
       { 
-	  snail_compile_binop( snail_cc, $3, px );
-	  snail_compile_sti( snail_cc, px );
+	  compiler_compile_binop( compiler_cc, $3, px );
+	  compiler_compile_sti( compiler_cc, px );
       }
 
   | lvalue
       {
-	  snail_compile_ldi( snail_cc, px );
+	  compiler_compile_ldi( compiler_cc, px );
       }
      __ASSIGN expression
       {
 	  int err = 0;
-	  if( !snail_test_top_types_are_assignment_compatible(
-	           snail_cc, px )) {
+	  if( !compiler_test_top_types_are_assignment_compatible(
+	           compiler_cc, px )) {
 	      yyerrorf( "incopatible types for value-copy assignment ':='" );
 	  }
-	  snail_emit( snail_cc, px, "\tc\n", COPY );
-	  if( !err && !snail_stack_top_is_reference( snail_cc )) {
+	  compiler_emit( compiler_cc, px, "\tc\n", COPY );
+	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
 	  if( !err &&
-	      !snail_test_top_types_are_readonly_compatible_for_copy(
-	           snail_cc, px )) {
+	      !compiler_test_top_types_are_readonly_compatible_for_copy(
+	           compiler_cc, px )) {
 	      yyerrorf( "can not copy into the readonly value "
                         "in the value-copy assignment ':='" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( snail_cc );
-	  if( !err && !snail_stack_top_is_reference( snail_cc )) {
+	  compiler_drop_top_expression( compiler_cc );
+	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( snail_cc );
+	  compiler_drop_top_expression( compiler_cc );
       }
 
   | variable_access_identifier
       {
-	  snail_compile_load_variable_value( snail_cc, $1, px );
+	  compiler_compile_load_variable_value( compiler_cc, $1, px );
       }
     __ASSIGN expression
       {
 	  int err = 0;
-	  if( !snail_test_top_types_are_assignment_compatible(
-	           snail_cc, px )) {
+	  if( !compiler_test_top_types_are_assignment_compatible(
+	           compiler_cc, px )) {
 	      yyerrorf( "incopatible types for value-copy assignment ':='" );
 	      err = 1;
 	  }
-	  snail_emit( snail_cc, px, "\tc\n", COPY );
-	  if( !err && !snail_stack_top_is_reference( snail_cc )) {
+	  compiler_emit( compiler_cc, px, "\tc\n", COPY );
+	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
 	  if( !err &&
-	      !snail_test_top_types_are_readonly_compatible_for_copy(
-	           snail_cc, px )) {
+	      !compiler_test_top_types_are_readonly_compatible_for_copy(
+	           compiler_cc, px )) {
 	      yyerrorf( "can not copy into the readonly value in "
                         "the value-copy assignment ':='" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( snail_cc );
-	  if( !err && !snail_stack_top_is_reference( snail_cc )) {
+	  compiler_drop_top_expression( compiler_cc );
+	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( snail_cc );
+	  compiler_drop_top_expression( compiler_cc );
       }
   ;
 
@@ -8339,18 +8339,18 @@ bytecode_item
 
 opcode
   : __IDENTIFIER
-      { snail_emit( snail_cc, px, "\tC\n", $1 ); }
+      { compiler_emit( compiler_cc, px, "\tC\n", $1 ); }
   | module_list __COLON_COLON __IDENTIFIER
-      { snail_emit( snail_cc, px, "\tMC\n", $1, $3 ); }
+      { compiler_emit( compiler_cc, px, "\tMC\n", $1, $3 ); }
   ;
 
 variable_reference
   : '%' __IDENTIFIER
       { 
-         DNODE *varnode = vartab_lookup( snail_cc->vartab, $2 );
+         DNODE *varnode = vartab_lookup( compiler_cc->vartab, $2 );
 	 if( varnode ) {
 	     ssize_t var_offset = dnode_offset( varnode );
-             snail_emit( snail_cc, px, "\teN\n", &var_offset, $2 );
+             compiler_emit( compiler_cc, px, "\teN\n", &var_offset, $2 );
 	 } else {
 	     yyerrorf( "name '%s' not declared in the current scope", $2 );
 	 }
@@ -8361,47 +8361,47 @@ bytecode_constant
   : __INTEGER_CONST
       {
 	  ssize_t val = atol( $1 );
-	  snail_emit( snail_cc, px, "\te\n", &val );
+	  compiler_emit( compiler_cc, px, "\te\n", &val );
       }
   | '+' __INTEGER_CONST
       {
 	  ssize_t val = atol( $2 );
-	  snail_emit( snail_cc, px, "\te\n", &val );
+	  compiler_emit( compiler_cc, px, "\te\n", &val );
       }
   | '-' __INTEGER_CONST
       {
 	  ssize_t val = -atol( $2 );
-	  snail_emit( snail_cc, px, "\te\n", &val );
+	  compiler_emit( compiler_cc, px, "\te\n", &val );
       }
   | __REAL_CONST
       {
 	double val;
 	sscanf( $1, "%lf", &val );
-        snail_emit( snail_cc, px, "\tf\n", val );
+        compiler_emit( compiler_cc, px, "\tf\n", val );
       }
   | __STRING_CONST
       {
 	ssize_t string_offset;
-	string_offset = compiler_assemble_static_string( snail_cc, $1, px );
-        snail_emit( snail_cc, px, "\te\n", &string_offset );
+	string_offset = compiler_assemble_static_string( compiler_cc, $1, px );
+        compiler_emit( compiler_cc, px, "\te\n", &string_offset );
       }
 
   | __DOUBLE_PERCENT __IDENTIFIER
       {
 	static const ssize_t zero = 0;
-	if( !snail_cc->current_function ) {
+	if( !compiler_cc->current_function ) {
 	    yyerrorf( "type attribute '%%%%%s' is not available here "
 		      "(are you compiling a function or operator?)", $2 );
 	} else {
             if( implementation_has_attribute( $2 )) {
-                snail_emit( snail_cc, px, "\te\n", &zero );
+                compiler_emit( compiler_cc, px, "\te\n", &zero );
                 
                 FIXUP *type_attribute_fixup =
                     new_fixup_absolute
-                    ( $2, thrcode_length( snail_cc->thrcode ) - 1,
+                    ( $2, thrcode_length( compiler_cc->thrcode ) - 1,
                       NULL /* next */, px );
 
-                dnode_insert_code_fixup( snail_cc->current_function,
+                dnode_insert_code_fixup( compiler_cc->current_function,
                                          type_attribute_fixup );
             }
 	}
@@ -8414,12 +8414,12 @@ bytecode_constant
 	  switch( const_expr.value_type ) {
 	  case VT_INT: {
 	      ssize_t val = const_expr.value.i;
-	      snail_emit( snail_cc, px, "\te\n", &val );
+	      compiler_emit( compiler_cc, px, "\te\n", &val );
 	      }
 	      break;
 	  case VT_FLOAT: {
 	      double val = const_expr.value.f;
-	      snail_emit( snail_cc, px, "\tf\n", &val );
+	      compiler_emit( compiler_cc, px, "\tf\n", &val );
 	      }
 	      break;
 	  default:
@@ -8433,11 +8433,11 @@ bytecode_constant
 function_identifier
   : __IDENTIFIER
 	{
-	    snail_check_and_push_function_name( snail_cc, NULL, $1, px );
+	    compiler_check_and_push_function_name( compiler_cc, NULL, $1, px );
 	}
   | module_list __COLON_COLON __IDENTIFIER
 	{
-	    snail_check_and_push_function_name( snail_cc, $1, $3, px );
+	    compiler_check_and_push_function_name( compiler_cc, $1, $3, px );
 	}
   ;
 
@@ -8447,23 +8447,23 @@ multivalue_function_call
 	  TNODE *fn_tnode;
           type_kind_t fn_kind;
 
-	  fn_tnode = snail_cc->current_call ?
-	      dnode_type( snail_cc->current_call ) : NULL;
+	  fn_tnode = compiler_cc->current_call ?
+	      dnode_type( compiler_cc->current_call ) : NULL;
 
-	  snail_cc->current_arg = fn_tnode ?
+	  compiler_cc->current_arg = fn_tnode ?
 	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
 
           fn_kind= fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
           if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
-              snail_push_type( snail_cc, share_tnode(fn_tnode), px );
+              compiler_push_type( compiler_cc, share_tnode(fn_tnode), px );
           }
 
-	  snail_push_guarding_arg( snail_cc, px );
+	  compiler_push_guarding_arg( compiler_cc, px );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    DNODE *function = snail_cc->current_call;
+	    DNODE *function = compiler_cc->current_call;
 	    TNODE *fn_tnode = function ? dnode_type( function ) : NULL;
             type_kind_t fn_kind = fn_tnode ?
                 tnode_kind( fn_tnode ) : TK_NONE;
@@ -8471,46 +8471,46 @@ multivalue_function_call
 	    if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
 		char *fn_name = dnode_name( function );
 		ssize_t offset = dnode_offset( function );
-		snail_emit( snail_cc, px, "\tceN\n", PLD, &offset, fn_name );
+		compiler_emit( compiler_cc, px, "\tceN\n", PLD, &offset, fn_name );
 	    }
 
-	    $$ = snail_compile_multivalue_function_call( snail_cc, px );
+	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
 	}
   | lvalue 
         {
 	  TNODE *fn_tnode = NULL;
 
-	  snail_compile_ldi( snail_cc, px );
+	  compiler_compile_ldi( compiler_cc, px );
 
-	  snail_emit( snail_cc, px, "\tc\n", RTOR );
+	  compiler_emit( compiler_cc, px, "\tc\n", RTOR );
 
-	  fn_tnode = snail_cc->e_stack ?
-	      enode_type( snail_cc->e_stack ) : NULL;
+	  fn_tnode = compiler_cc->e_stack ?
+	      enode_type( compiler_cc->e_stack ) : NULL;
 
-	  dlist_push_dnode( &snail_cc->current_call_stack,
-			    &snail_cc->current_call, px );
+	  dlist_push_dnode( &compiler_cc->current_call_stack,
+			    &compiler_cc->current_call, px );
 
-	  dlist_push_dnode( &snail_cc->current_arg_stack,
-			    &snail_cc->current_arg, px );
+	  dlist_push_dnode( &compiler_cc->current_arg_stack,
+			    &compiler_cc->current_arg, px );
 
-	  snail_cc->current_call = new_dnode( px );
+	  compiler_cc->current_call = new_dnode( px );
 	  if( fn_tnode ) {
-	      dnode_insert_type( snail_cc->current_call,
+	      dnode_insert_type( compiler_cc->current_call,
 				 share_tnode( fn_tnode ));
 	  }
 	  if( fn_tnode && tnode_kind( fn_tnode ) != TK_FUNCTION_REF ) {
 	      yyerrorf( "called object is not a function pointer" );
 	  }
 
-	  snail_cc->current_arg = fn_tnode ?
+	  compiler_cc->current_arg = fn_tnode ?
 	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
 
-	  snail_push_guarding_arg( snail_cc, px );
+	  compiler_push_guarding_arg( compiler_cc, px );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    snail_emit( snail_cc, px, "\tc\n", RFROMR );
-	    $$ = snail_compile_multivalue_function_call( snail_cc, px );
+	    compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
 	}
   | variable_access_identifier
     __ARROW __IDENTIFIER
@@ -8524,17 +8524,17 @@ multivalue_function_call
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-                dlist_push_dnode( &snail_cc->current_call_stack,
-                                  &snail_cc->current_call, px );
+                dlist_push_dnode( &compiler_cc->current_call_stack,
+                                  &compiler_cc->current_call, px );
 
-                dlist_push_dnode( &snail_cc->current_arg_stack,
-                                  &snail_cc->current_arg, px );
+                dlist_push_dnode( &compiler_cc->current_arg_stack,
+                                  &compiler_cc->current_arg, px );
 
 		if( fn_tnode && tnode_kind( fn_tnode ) != TK_METHOD ) {
 		    yyerrorf( "called field is not a method" );
-                    snail_cc->current_call = NULL;
+                    compiler_cc->current_call = NULL;
 		} else {
-                    snail_cc->current_call = share_dnode( method );
+                    compiler_cc->current_call = share_dnode( method );
                 }
 
                 last_arg = fn_tnode ?
@@ -8543,7 +8543,7 @@ multivalue_function_call
                 last_arg = last_arg ?
                     dnode_list_last( last_arg ) : NULL;
 
-		snail_cc->current_arg = last_arg ?
+		compiler_cc->current_arg = last_arg ?
 		    dnode_prev( last_arg ) : NULL;
 	    } else if( object ) {
 		char *object_name = object ? dnode_name( object ) : NULL;
@@ -8561,26 +8561,26 @@ multivalue_function_call
 		    yyerrorf( "can not locate method '%s'", method_name );
 		}
 	    }
-	    snail_push_guarding_arg( snail_cc, px );
-	    snail_compile_load_variable_value( snail_cc, object, px );
+	    compiler_push_guarding_arg( compiler_cc, px );
+	    compiler_compile_load_variable_value( compiler_cc, object, px );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    snail_compile_load_variable_value( snail_cc, $1, px );
-	    compiler_drop_top_expression( snail_cc );
-	    $$ = snail_compile_multivalue_function_call( snail_cc, px );
+	    compiler_compile_load_variable_value( compiler_cc, $1, px );
+	    compiler_drop_top_expression( compiler_cc );
+	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
 	}
 
   | lvalue 
         {
-	    snail_compile_ldi( snail_cc, px );
-            snail_compile_dup( snail_cc, px );
-            snail_emit( snail_cc, px, "\tc\n", RTOR );
-	    compiler_drop_top_expression( snail_cc );
+	    compiler_compile_ldi( compiler_cc, px );
+            compiler_compile_dup( compiler_cc, px );
+            compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+	    compiler_drop_top_expression( compiler_cc );
 	}
     __ARROW __IDENTIFIER
         {
-            ENODE *object_expr = snail_cc->e_stack;;
+            ENODE *object_expr = compiler_cc->e_stack;;
             TNODE *object_type =
 		object_expr ? enode_type( object_expr ) : NULL;
             DNODE *method =
@@ -8589,29 +8589,29 @@ multivalue_function_call
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-		dlist_push_dnode( &snail_cc->current_call_stack,
-				  &snail_cc->current_call, px );
+		dlist_push_dnode( &compiler_cc->current_call_stack,
+				  &compiler_cc->current_call, px );
 
-		dlist_push_dnode( &snail_cc->current_arg_stack,
-				  &snail_cc->current_arg, px );
+		dlist_push_dnode( &compiler_cc->current_arg_stack,
+				  &compiler_cc->current_arg, px );
 
-		snail_cc->current_call = share_dnode( method );
+		compiler_cc->current_call = share_dnode( method );
 
 		if( fn_tnode && tnode_kind( fn_tnode ) != TK_METHOD ) {
 		    yyerrorf( "called field is not a method" );
 		}
 
-		snail_cc->current_arg = fn_tnode ?
+		compiler_cc->current_arg = fn_tnode ?
 		    dnode_prev( dnode_list_last( tnode_args( fn_tnode ))) :
 		    NULL;
 	    }
-            snail_push_guarding_arg( snail_cc, px );
-            compiler_swap_top_expressions( snail_cc );
+            compiler_push_guarding_arg( compiler_cc, px );
+            compiler_swap_top_expressions( compiler_cc );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    snail_emit( snail_cc, px, "\tc\n", RFROMR );
-	    $$ = snail_compile_multivalue_function_call( snail_cc, px );
+	    compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
 	}
 
   ;
@@ -8620,13 +8620,13 @@ function_call
   : multivalue_function_call
     {
 	if( $1 > 0 ) {
-	    snail_emit_drop_returned_values( snail_cc, $1 - 1, px );
+	    compiler_emit_drop_returned_values( compiler_cc, $1 - 1, px );
 	} else {
 	    yyerrorf( "functions called in exressions must return "
 		      "at least one value" );
 	    /* Push NULL value to maintain stack value balance and
 	       avoid segfaults or asserts in the downstream code: */
-	    snail_push_type( snail_cc, new_tnode_nullref( px ), px );
+	    compiler_push_type( compiler_cc, new_tnode_nullref( px ), px );
 	}
     }
   ;
@@ -8639,27 +8639,27 @@ opt_actual_argument_list
 actual_argument_list
   : expression
       {
-	snail_convert_function_argument( snail_cc, px );
+	compiler_convert_function_argument( compiler_cc, px );
       }
   | __IDENTIFIER 
       {
-	  snail_emit_default_arguments( snail_cc, $1, px );
+	  compiler_emit_default_arguments( compiler_cc, $1, px );
       }
    __THICK_ARROW expression
       {
-	snail_convert_function_argument( snail_cc, px );
+	compiler_convert_function_argument( compiler_cc, px );
       }
   | actual_argument_list ',' expression
       {
-	snail_convert_function_argument( snail_cc, px );
+	compiler_convert_function_argument( compiler_cc, px );
       }
   | actual_argument_list ',' __IDENTIFIER
       {
-	  snail_emit_default_arguments( snail_cc, $3, px );
+	  compiler_emit_default_arguments( compiler_cc, $3, px );
       }
     __THICK_ARROW expression
       {
-	  snail_convert_function_argument( snail_cc, px );
+	  compiler_convert_function_argument( compiler_cc, px );
       }
   ;
 
@@ -8674,25 +8674,25 @@ stdio_inpupt_condition
 : '<' '>'
 {
     cexception_t inner;
-    TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+    TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
     DNODE *default_var = NULL;
     ssize_t default_var_offset = 0;
 
     cexception_guard( inner ) {
         default_var = new_dnode_typed( "$_", type_tnode, &inner );
         share_tnode( type_tnode );
-        snail_vartab_insert_named_vars( snail_cc, default_var, &inner );
+        compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
         default_var_offset = dnode_offset( default_var );
 
-        snail_cc->local_offset ++;
+        compiler_cc->local_offset ++;
         default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
         share_tnode( type_tnode );
-        snail_vartab_insert_named_vars( snail_cc, default_var, &inner );
+        compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
 
-        snail_push_type( snail_cc, type_tnode, &inner );
-        snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
-        snail_emit( snail_cc, &inner, "\tc\n", DUP );
-        snail_emit( snail_cc, &inner, "\tce\n", PST, &default_var_offset );        
+        compiler_push_type( compiler_cc, type_tnode, &inner );
+        compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
+        compiler_emit( compiler_cc, &inner, "\tc\n", DUP );
+        compiler_emit( compiler_cc, &inner, "\tce\n", PST, &default_var_offset );        
     }
     cexception_catch {
         delete_tnode( type_tnode );
@@ -8734,11 +8734,11 @@ io_expression
   | '<' '>'
   {
     cexception_t inner;
-    TNODE *type_tnode = typetab_lookup( snail_cc->typetab, "string" );
+    TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
 
     cexception_guard( inner ) {
-        snail_push_type( snail_cc, type_tnode, &inner );
-        snail_emit( snail_cc, &inner, "\tc\n", STDREAD );
+        compiler_push_type( compiler_cc, type_tnode, &inner );
+        compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
     }
     cexception_catch {
         delete_tnode( type_tnode );
@@ -8761,8 +8761,8 @@ null_expression
   : _NULL
       {
 	  TNODE *tnode = new_tnode_nullref( px );
-	  snail_push_type( snail_cc, tnode, px );
-	  snail_emit( snail_cc, px, "\tc\n", PLDZ );
+	  compiler_push_type( compiler_cc, tnode, px );
+	  compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
       }
   ;
 
@@ -8861,7 +8861,7 @@ closure_var_list_declaration
 closure_initialisation
 : closure_var_declaration
 {
-    ENODE *top_expr = snail_cc->e_stack;
+    ENODE *top_expr = compiler_cc->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var = $1;
     TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
@@ -8872,20 +8872,20 @@ closure_initialisation
 
     tnode_insert_fields( closure_tnode, closure_var );
     offset = dnode_offset( closure_var );
-    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-    snail_push_type( snail_cc,
+    compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
+    compiler_push_type( compiler_cc,
                      new_tnode_addressof( share_tnode( var_type ), px ), 
                      px );
 }
  '=' expression
 {
-    snail_compile_sti( snail_cc, px );
-    snail_emit( snail_cc, px, "\tc\n", DUP );
+    compiler_compile_sti( compiler_cc, px );
+    compiler_emit( compiler_cc, px, "\tc\n", DUP );
 }
 
 | closure_var_list_declaration
 {
-    ENODE *top_expr = snail_cc->e_stack;
+    ENODE *top_expr = compiler_cc->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var_list = $1;
     DNODE *closure_var;
@@ -8902,9 +8902,9 @@ closure_initialisation
             share_tnode( closure_tnode );
         }
         offset = dnode_offset( closure_var );
-        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-        snail_emit( snail_cc, px, "\tc\n", RTOR );
-        snail_emit( snail_cc, px, "\tc\n", DUP );
+        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
+        compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+        compiler_emit( compiler_cc, px, "\tc\n", DUP );
         first_variable = 0;
     }
 }
@@ -8921,9 +8921,9 @@ closure_initialisation
     } else {
         if( variable_count < value_count ) {
             if( variable_count == value_count - 1 ) {
-                snail_compile_drop( snail_cc, px );
+                compiler_compile_drop( compiler_cc, px );
             } else {
-                snail_compile_dropn( snail_cc, value_count - variable_count,
+                compiler_compile_dropn( compiler_cc, value_count - variable_count,
                                      px );
             }
         }
@@ -8937,13 +8937,13 @@ closure_initialisation
 
             assert( var_type );
 
-            snail_emit( snail_cc, px, "\tc\n", RFROMR );
-            snail_push_type( snail_cc,
+            compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+            compiler_push_type( compiler_cc,
                              new_tnode_addressof( share_tnode( var_type ),
                                                   px ), 
                              px );
-            snail_compile_swap( snail_cc, px );
-            snail_compile_sti( snail_cc, px );
+            compiler_compile_swap( compiler_cc, px );
+            compiler_compile_sti( compiler_cc, px );
         }
     }
 }
@@ -8959,9 +8959,9 @@ closure_initialisation
 }
  '=' expression
 {
-    ENODE *top_expr = snail_cc->e_stack;
+    ENODE *top_expr = compiler_cc->e_stack;
     TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
-    ENODE *second_expr = enode_next( snail_cc->e_stack );
+    ENODE *second_expr = enode_next( compiler_cc->e_stack );
     TNODE *closure_tnode = second_expr ? enode_type( second_expr ) : NULL;
     DNODE *closure_var = $2;
     ssize_t offset = 0;
@@ -8972,18 +8972,18 @@ closure_initialisation
     dnode_insert_type( closure_var, share_tnode( top_type ));
     tnode_insert_fields( closure_tnode, closure_var );
     offset = dnode_offset( closure_var );
-    snail_emit( snail_cc, px, "\tc\n", SWAP );
-    snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-    snail_emit( snail_cc, px, "\tc\n", SWAP );
+    compiler_emit( compiler_cc, px, "\tc\n", SWAP );
+    compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
+    compiler_emit( compiler_cc, px, "\tc\n", SWAP );
 
-    snail_push_type( snail_cc,
+    compiler_push_type( compiler_cc,
                      new_tnode_addressof( share_tnode( top_type ), px ), 
                      px );
 
-    compiler_swap_top_expressions( snail_cc );
+    compiler_swap_top_expressions( compiler_cc );
 
-    snail_compile_sti( snail_cc, px );
-    snail_emit( snail_cc, px, "\tc\n", DUP );
+    compiler_compile_sti( compiler_cc, px );
+    compiler_emit( compiler_cc, px, "\tc\n", DUP );
 }
 
 | opt_variable_declaration_keyword variable_identifier ','
@@ -8996,11 +8996,11 @@ closure_initialisation
         dnode_list_set_flags( closure_var_list, DF_IS_READONLY );
     }
 
-    snail_emit( snail_cc, px, "\tc\n", RTOR );
+    compiler_emit( compiler_cc, px, "\tc\n", RTOR );
 }
  '=' multivalue_expression_list
 {
-    ENODE *top_expr = snail_cc->e_stack;
+    ENODE *top_expr = compiler_cc->e_stack;
     ENODE *current_expr, *closure_expr;
     TNODE *closure_tnode;
     DNODE *closure_var_list = $2;
@@ -9029,7 +9029,7 @@ closure_initialisation
         if( expr_type_kind == TK_FUNCTION ||
             expr_type_kind == TK_OPERATOR ||
                  expr_type_kind == TK_METHOD ) {
-            TNODE *base_type = typetab_lookup( snail_cc->typetab, "procedure" );
+            TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
             expr_type = new_tnode_function_or_proc_ref
                 ( share_dnode( tnode_args( expr_type )),
                   share_dnode( tnode_retvals( expr_type )),
@@ -9051,9 +9051,9 @@ closure_initialisation
 
     if( expr_nr > len ) {
         if( expr_nr == len + 1 ) {
-            snail_compile_drop( snail_cc, px );
+            compiler_compile_drop( compiler_cc, px );
         } else {
-            snail_compile_dropn( snail_cc, expr_nr - len, px );
+            compiler_compile_dropn( compiler_cc, expr_nr - len, px );
         }
     }
 
@@ -9066,23 +9066,23 @@ closure_initialisation
 
             assert( var_type );
 
-            snail_push_type( snail_cc,
+            compiler_push_type( compiler_cc,
                              new_tnode_addressof( share_tnode( var_type ),
                                                   px ), 
                              px );
 
-            snail_emit( snail_cc, px, "\tc\n", RFROMR );
-            snail_emit( snail_cc, px, "\tc\n", DUP );
-            snail_emit( snail_cc, px, "\tc\n", RTOR );
+            compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+            compiler_emit( compiler_cc, px, "\tc\n", DUP );
+            compiler_emit( compiler_cc, px, "\tc\n", RTOR );
             offset = dnode_offset( var );
-            snail_emit( snail_cc, px, "\tce\n", OFFSET, &offset );
-            snail_compile_swap( snail_cc, px );
-            snail_compile_sti( snail_cc, px );
+            compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
+            compiler_compile_swap( compiler_cc, px );
+            compiler_compile_sti( compiler_cc, px );
         }
     }
     closure_var_list = dnode_list_invert( closure_var_list );
 
-    snail_emit( snail_cc, px, "\tc\n", RFROMR );
+    compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
 }
 
 ;
@@ -9091,7 +9091,7 @@ function_expression_header
 :   function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
-        dlist_push_dnode( &snail_cc->loop_stack, &snail_cc->loops, px );
+        dlist_push_dnode( &compiler_cc->loop_stack, &compiler_cc->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
                                  /* parameters = */ $3,
                                  /* return_values = */ $5,
@@ -9114,24 +9114,24 @@ closure_header
           DNODE *closure_fn_ref = NULL;
           ssize_t zero = 0;
           /* Allocate the closure structure: */
-          snail_push_absolute_fixup( snail_cc, px );
-          snail_emit( snail_cc, px, "\tc", ALLOC );
-          snail_push_absolute_fixup( snail_cc, px );
-          snail_emit( snail_cc, px, "ee\n", &zero, &zero );
-          snail_emit( snail_cc, px, "\tc\n", DUP );
+          compiler_push_absolute_fixup( compiler_cc, px );
+          compiler_emit( compiler_cc, px, "\tc", ALLOC );
+          compiler_push_absolute_fixup( compiler_cc, px );
+          compiler_emit( compiler_cc, px, "ee\n", &zero, &zero );
+          compiler_emit( compiler_cc, px, "\tc\n", DUP );
           tnode_set_kind( closure_tnode, TK_STRUCT );
           /* reserve one stackcell for a function pointer of the
              closure: */
           closure_fn_ref = new_dnode_typed( "",  new_tnode_ref( px ), px );
           tnode_insert_fields( closure_tnode, closure_fn_ref );
-          snail_push_type( snail_cc, closure_tnode, px );
+          compiler_push_type( compiler_cc, closure_tnode, px );
       }
       opt_closure_initialisation_list
       {
           DNODE *parameters = $4;
           DNODE *return_values = $6;
           DNODE *self_dnode = new_dnode_name( $8, px );
-          ENODE *closure_expr = snail_cc->e_stack;
+          ENODE *closure_expr = compiler_cc->e_stack;
           TNODE *closure_type = enode_type( closure_expr );
 
           ssize_t nref, size;
@@ -9139,15 +9139,15 @@ closure_header
           nref = tnode_number_of_references( closure_type );
           size = tnode_size( closure_type );
 
-          snail_fixup( snail_cc, nref );
-          snail_fixup( snail_cc, size );
+          compiler_fixup( compiler_cc, nref );
+          compiler_fixup( compiler_cc, size );
 
           dnode_insert_type( self_dnode, share_tnode( closure_type ));
 
           parameters = dnode_append( self_dnode, parameters );
           self_dnode = NULL;
         
-          dlist_push_dnode( &snail_cc->loop_stack, &snail_cc->loops, px );
+          dlist_push_dnode( &compiler_cc->loop_stack, &compiler_cc->loops, px );
 
           $$ = new_dnode_function( /* name = */ NULL, 
                                    parameters, return_values, px );
@@ -9161,8 +9161,8 @@ function_expression
     function_or_operator_body
     function_or_operator_end
     {
-        snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
-        snail_compile_load_function_address( snail_cc, $1, px );
+        compiler_cc->loops = dlist_pop_data( &compiler_cc->loop_stack );
+        compiler_compile_load_function_address( compiler_cc, $1, px );
     }
 
 | closure_header
@@ -9170,17 +9170,17 @@ function_expression
   function_or_operator_body
   function_or_operator_end
     {
-        ENODE *closure_expr = enode_list_pop( &snail_cc->e_stack );
+        ENODE *closure_expr = enode_list_pop( &compiler_cc->e_stack );
         TNODE *closure_type = enode_type( closure_expr );
         DNODE *fields = tnode_fields( closure_type );
         ssize_t offs = dnode_offset( fields );
 
         /* assert( offs == -sizeof(alloccell_t)-sizeof(void*) ); */
 
-        snail_cc->loops = dlist_pop_data( &snail_cc->loop_stack );
-        snail_emit( snail_cc, px, "\tce\n", OFFSET, &offs );
-        snail_compile_load_function_address( snail_cc, $1, px );
-        snail_emit( snail_cc, px, "\tc\n", PSTI );
+        compiler_cc->loops = dlist_pop_data( &compiler_cc->loop_stack );
+        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offs );
+        compiler_compile_load_function_address( compiler_cc, $1, px );
+        compiler_emit( compiler_cc, px, "\tc\n", PSTI );
         delete_enode( closure_expr );
     }
 ;
@@ -9190,12 +9190,12 @@ simple_expression
   | variable
   | field_access
       {
-	snail_compile_ldi( snail_cc, px );
+	compiler_compile_ldi( compiler_cc, px );
       }
   | indexed_rvalue
   | _BYTECODE ':' var_type_description '{' bytecode_sequence '}'
       {
-	snail_push_type( snail_cc, $3, px );
+	compiler_push_type( compiler_cc, $3, px );
       }
   | generator_new
   | array_expression
@@ -9205,13 +9205,13 @@ simple_expression
   | _TYPE type_identifier
       {
           TNODE *tnode = $2;
-          snail_compile_type_descriptor_loader( snail_cc, tnode, px );
+          compiler_compile_type_descriptor_loader( compiler_cc, tnode, px );
       }
   | _TYPE _OF variable_access_identifier
       {
           DNODE *var_dnode = $3;
           TNODE *var_type = dnode_type( var_dnode );
-          snail_compile_type_descriptor_loader( snail_cc, var_type, px );
+          compiler_compile_type_descriptor_loader( compiler_cc, var_type, px );
       }
   ;
 
@@ -9229,26 +9229,26 @@ unpack_expression
   {
       TNODE *type = $2;
       if( tnode_kind( type ) == TK_ARRAY ) {
-	  snail_check_and_compile_operator( snail_cc,
+	  compiler_check_and_compile_operator( compiler_cc,
 					    tnode_element_type( type ),
 					    "unpackarray", 3 /* arity */,
 					    NULL /* fixup_values */, px );
       } else {
-	  snail_check_and_compile_operator( snail_cc, type,
+	  compiler_check_and_compile_operator( compiler_cc, type,
 					    "unpack", 3 /* arity */,
 					    NULL /* fixup_values */, px );
       }
-      snail_emit( snail_cc, px, "\n" );
+      compiler_emit( compiler_cc, px, "\n" );
   }
   | _UNPACK compact_type_description '[' ']'
     '(' expression ',' expression ',' expression ')'
   {
       TNODE *element_type = $2;
-      snail_check_and_compile_operator( snail_cc, element_type,
+      compiler_check_and_compile_operator( compiler_cc, element_type,
 					"unpackarray", 3 /* arity */,
 					NULL /* fixup_values */, px );
 
-      snail_emit( snail_cc, px, "\n" );
+      compiler_emit( compiler_cc, px, "\n" );
   }
   | _UNPACK compact_type_description md_array_allocator '[' ']' 
     /*  blob,          offset,        format_and_size */
@@ -9260,13 +9260,13 @@ unpack_expression
       int level = $3;
       TNODE *element_type = $2;
       TNODE *array_tnode =
-	  new_tnode_array_snail( NULL, snail_cc->typetab, px );
+	  new_tnode_array_snail( NULL, compiler_cc->typetab, px );
 
-      if( compiler_lookup_operator( snail_cc, element_type, operator_name,
+      if( compiler_lookup_operator( compiler_cc, element_type, operator_name,
                                     arity, px )) {
           key_value_t *fixup_values =
               make_mdalloc_key_value_list( element_type, level );
-	  snail_check_and_compile_operator( snail_cc, element_type,
+	  compiler_check_and_compile_operator( compiler_cc, element_type,
 					    operator_name,
 					    arity, fixup_values,
 					    px );
@@ -9274,25 +9274,25 @@ unpack_expression
 	     be dropped, since it only describes return value as having
 	     type 'array'. The caller of the current function will push
 	     a correct return value 'array of proper_element_type' */
-	  compiler_drop_top_expression( snail_cc );
-	  if( snail_stack_top_is_array( snail_cc )) {
-	      snail_append_expression_type( snail_cc, array_tnode );
-	      snail_append_expression_type( snail_cc, share_tnode( element_type ));
+	  compiler_drop_top_expression( compiler_cc );
+	  if( compiler_stack_top_is_array( compiler_cc )) {
+	      compiler_append_expression_type( compiler_cc, array_tnode );
+	      compiler_append_expression_type( compiler_cc, share_tnode( element_type ));
 	  }
       } else {
-	  compiler_drop_top_expression( snail_cc );
-	  compiler_drop_top_expression( snail_cc );
-	  compiler_drop_top_expression( snail_cc );
+	  compiler_drop_top_expression( compiler_cc );
+	  compiler_drop_top_expression( compiler_cc );
+	  compiler_drop_top_expression( compiler_cc );
 	  tnode_report_missing_operator( element_type, operator_name, arity );
       }
-      snail_emit( snail_cc, px, "\n" );
+      compiler_emit( compiler_cc, px, "\n" );
   }
   ;
 
 array_expression
   : '[' expression_list opt_comma ']'
      {
-	 snail_compile_array_expression( snail_cc, $2, px );
+	 compiler_compile_array_expression( compiler_cc, $2, px );
      }
 /*
   Expression never used and unnecessary duplication:
@@ -9303,8 +9303,8 @@ array_expression
 struct_expression
   : opt_null_type_designator _STRUCT type_identifier
      {
-	 snail_compile_alloc( snail_cc, share_tnode( $3 ), px );
-         compiler_push_initialised_ref_tables( snail_cc, px );
+	 compiler_compile_alloc( compiler_cc, share_tnode( $3 ), px );
+         compiler_push_initialised_ref_tables( compiler_cc, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
@@ -9315,7 +9315,7 @@ struct_expression
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
             if( tnode_is_non_null_reference( field_type ) &&
-                !vartab_lookup( snail_cc->initialised_references,
+                !vartab_lookup( compiler_cc->initialised_references,
                                 field_name )) {
                 char *field_type_name = $3 ? tnode_name( $3 ) : NULL;
                 if( field_type_name ) {
@@ -9329,7 +9329,7 @@ struct_expression
             }
         }
 
-        compiler_pop_initialised_ref_tables( snail_cc );
+        compiler_pop_initialised_ref_tables( compiler_cc );
     }
 
   | _TYPE type_identifier _OF delimited_type_description
@@ -9338,8 +9338,8 @@ struct_expression
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
-	 snail_compile_alloc( snail_cc, share_tnode( composite ), px );
-         compiler_push_initialised_ref_tables( snail_cc, px );
+	 compiler_compile_alloc( compiler_cc, share_tnode( composite ), px );
+         compiler_push_initialised_ref_tables( compiler_cc, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
@@ -9350,7 +9350,7 @@ struct_expression
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
             if( tnode_is_non_null_reference( field_type ) &&
-                !vartab_lookup( snail_cc->initialised_references,
+                !vartab_lookup( compiler_cc->initialised_references,
                                 field_name )) {
                 char *field_type_name = $2 ? tnode_name( $2 ) : NULL;
                 if( field_type_name ) {
@@ -9364,7 +9364,7 @@ struct_expression
             }
         }
 
-        compiler_pop_initialised_ref_tables( snail_cc );
+        compiler_pop_initialised_ref_tables( compiler_cc );
     }
 
   ;
@@ -9385,138 +9385,138 @@ field_initialiser
 	 DNODE *field;
          TNODE *field_type;
 
-	 snail_compile_dup( snail_cc, px );
-	 field = snail_make_stack_top_field_type( snail_cc, $1 );
+	 compiler_compile_dup( compiler_cc, px );
+	 field = compiler_make_stack_top_field_type( compiler_cc, $1 );
          field_type = field ? dnode_type( field ) : NULL;
-	 snail_make_stack_top_addressof( snail_cc, px );
+	 compiler_make_stack_top_addressof( compiler_cc, px );
 
-         if( !vartab_lookup( snail_cc->initialised_references, $1 ) &&
+         if( !vartab_lookup( compiler_cc->initialised_references, $1 ) &&
              field_type && tnode_is_non_null_reference( field_type )) {
-             vartab_insert_named( snail_cc->initialised_references,
+             vartab_insert_named( compiler_cc->initialised_references,
                                   share_dnode( field ), px );
          }
 
 	 if( field && dnode_offset( field ) != 0 ) {
 	     ssize_t field_offset = dnode_offset( field );
-	     snail_emit( snail_cc, px, "\tce\n", OFFSET, &field_offset );
+	     compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &field_offset );
 	 }
      }
     field_initialiser_separator expression
      {
-	 snail_compile_sti( snail_cc, px );
+	 compiler_compile_sti( compiler_cc, px );
      }
   ;
 
 arithmetic_expression
   : expression '+' expression
       {
-       snail_compile_binop( snail_cc, "+", px );
+       compiler_compile_binop( compiler_cc, "+", px );
       }
   | expression '-' expression
       {
-       snail_compile_binop( snail_cc, "-", px );
+       compiler_compile_binop( compiler_cc, "-", px );
       }
   | expression '*' expression
       {
-       snail_compile_binop( snail_cc, "*", px );
+       compiler_compile_binop( compiler_cc, "*", px );
       }
   | expression '/' expression
       {
-       snail_compile_binop( snail_cc, "/", px );
+       compiler_compile_binop( compiler_cc, "/", px );
       }
   | expression '&' expression
       {
-       snail_compile_binop( snail_cc, "&", px );
+       compiler_compile_binop( compiler_cc, "&", px );
       }
   | expression '|' expression
       {
-       snail_compile_binop( snail_cc, "|", px );
+       compiler_compile_binop( compiler_cc, "|", px );
       }
   | expression __RIGHT_TO_LEFT expression /* << */
       {
-       snail_compile_binop( snail_cc, "shl", px );
+       compiler_compile_binop( compiler_cc, "shl", px );
       }
   | expression __LEFT_TO_RIGHT expression /* >> */
       {
-       snail_compile_binop( snail_cc, "shr", px );
+       compiler_compile_binop( compiler_cc, "shr", px );
       }
   | expression _SHL expression
       {
-       snail_compile_binop( snail_cc, "shl", px );
+       compiler_compile_binop( compiler_cc, "shl", px );
       }
   | expression _SHR expression
       {
-       snail_compile_binop( snail_cc, "shr", px );
+       compiler_compile_binop( compiler_cc, "shr", px );
       }
   | expression '^' expression
       {
-       snail_compile_binop( snail_cc, "^", px );
+       compiler_compile_binop( compiler_cc, "^", px );
       }
   | expression '%' expression
       {
-       snail_compile_binop( snail_cc, "%", px );
+       compiler_compile_binop( compiler_cc, "%", px );
       }
   | expression __STAR_STAR expression
       {
-       snail_compile_binop( snail_cc, "**", px );
+       compiler_compile_binop( compiler_cc, "**", px );
       }
   | expression '_' expression
       {
-       snail_compile_binop( snail_cc, "_", px );
+       compiler_compile_binop( compiler_cc, "_", px );
       }
 
   | '+' expression %prec __UNARY
       {
-       snail_compile_unop( snail_cc, "+", px );
+       compiler_compile_unop( compiler_cc, "+", px );
       }
   | '-' expression %prec __UNARY
       {
-       snail_compile_unop( snail_cc, "-", px );
+       compiler_compile_unop( compiler_cc, "-", px );
       }
   | '~' expression %prec __UNARY
       {
-       snail_compile_unop( snail_cc, "~", px );
+       compiler_compile_unop( compiler_cc, "~", px );
       }
 
   | expression __DOUBLE_PERCENT expression
       {
-       snail_compile_binop( snail_cc, "%%", px );
+       compiler_compile_binop( compiler_cc, "%%", px );
       }
 
 /*
   | '<' __IDENTIFIER '>' expression %prec __UNARY
       {
-       snail_compile_type_conversion( snail_cc, /*target_name* /$2, px );
+       compiler_compile_type_conversion( compiler_cc, /*target_name* /$2, px );
       }
 */
 
   | expression '@' __IDENTIFIER
       {
-       snail_compile_type_conversion( snail_cc, /*target_name*/$3, px );
+       compiler_compile_type_conversion( compiler_cc, /*target_name*/$3, px );
       }
 
   | expression '@' '(' var_type_description ')'
       {
-       snail_compile_type_conversion( snail_cc, NULL, px );
+       compiler_compile_type_conversion( compiler_cc, NULL, px );
       }
 
   | expression '?'
       {
-        snail_push_relative_fixup( snail_cc, px );
-	snail_compile_jz( snail_cc, 0, px );
+        compiler_push_relative_fixup( compiler_cc, px );
+	compiler_compile_jz( compiler_cc, 0, px );
       }
     expression ':'
       {
 	ssize_t zero = 0;
-        snail_push_relative_fixup( snail_cc, px );
-        snail_emit( snail_cc, px, "\tce\n", JMP, &zero );
-        snail_swap_fixups( snail_cc );
-        snail_fixup_here( snail_cc );
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler_cc );
+        compiler_fixup_here( compiler_cc );
       }
     expression
       {
-	compiler_check_top_2_expressions_and_drop( snail_cc, "?:", px );
-        snail_fixup_here( snail_cc );
+	compiler_check_top_2_expressions_and_drop( compiler_cc, "?:", px );
+        compiler_fixup_here( compiler_cc );
       }
 /*
   | expression _AS __IDENTIFIER
@@ -9526,7 +9526,7 @@ arithmetic_expression
 
   | __QQ expression  %prec __UNARY
   {
-      ENODE *top = snail_cc->e_stack;
+      ENODE *top = compiler_cc->e_stack;
       TNODE *top_type = top ? enode_type( top ) : NULL;
 
       if( top && top_type &&
@@ -9536,7 +9536,7 @@ arithmetic_expression
           tnode_set_flags( converted, TF_NON_NULL );
           enode_replace_type( top, converted );
           /* top_type no longer valid here! */
-          snail_emit( snail_cc, px, "\tc\n", CHECKREF );
+          compiler_emit( compiler_cc, px, "\tc\n", CHECKREF );
       }
   }
 
@@ -9545,57 +9545,57 @@ arithmetic_expression
 boolean_expression
   : expression '<' expression
       {
-       snail_compile_binop( snail_cc, "<", px );
+       compiler_compile_binop( compiler_cc, "<", px );
       }
   | expression '>' expression
       {
-       snail_compile_binop( snail_cc, ">", px );
+       compiler_compile_binop( compiler_cc, ">", px );
       }
   | expression __LE expression
       {
-       snail_compile_binop( snail_cc, "<=", px );
+       compiler_compile_binop( compiler_cc, "<=", px );
       }
   | expression __GE expression
       {
-       snail_compile_binop( snail_cc, ">=", px );
+       compiler_compile_binop( compiler_cc, ">=", px );
       }
   | expression __EQ expression
       {
-       snail_compile_binop( snail_cc, "==", px );
+       compiler_compile_binop( compiler_cc, "==", px );
       }
   | expression __NE expression
       {
-       snail_compile_binop( snail_cc, "!=", px );
+       compiler_compile_binop( compiler_cc, "!=", px );
       }
   | expression _AND
       {
-	snail_compile_dup( snail_cc, px );
-        snail_push_relative_fixup( snail_cc, px );
-	snail_compile_jz( snail_cc, 0, px );
-	compiler_duplicate_top_expression( snail_cc, px );
-	snail_compile_drop( snail_cc, px );
+	compiler_compile_dup( compiler_cc, px );
+        compiler_push_relative_fixup( compiler_cc, px );
+	compiler_compile_jz( compiler_cc, 0, px );
+	compiler_duplicate_top_expression( compiler_cc, px );
+	compiler_compile_drop( compiler_cc, px );
       }
     expression
       {
-	compiler_check_top_2_expressions_and_drop( snail_cc, "and", px );
-        snail_fixup_here( snail_cc );
+	compiler_check_top_2_expressions_and_drop( compiler_cc, "and", px );
+        compiler_fixup_here( compiler_cc );
       }
   | expression _OR
       {
-	snail_compile_dup( snail_cc, px );
-        snail_push_relative_fixup( snail_cc, px );
-	snail_compile_jnz( snail_cc, 0, px );
-	compiler_duplicate_top_expression( snail_cc, px );
-	snail_compile_drop( snail_cc, px );
+	compiler_compile_dup( compiler_cc, px );
+        compiler_push_relative_fixup( compiler_cc, px );
+	compiler_compile_jnz( compiler_cc, 0, px );
+	compiler_duplicate_top_expression( compiler_cc, px );
+	compiler_compile_drop( compiler_cc, px );
       }
     expression
       {
-	compiler_check_top_2_expressions_and_drop( snail_cc, "or", px );
-	snail_fixup_here( snail_cc );
+	compiler_check_top_2_expressions_and_drop( compiler_cc, "or", px );
+	compiler_fixup_here( compiler_cc );
       }
   | '!' expression %prec __UNARY
       {
-       snail_compile_unop( snail_cc, "!", px );
+       compiler_compile_unop( compiler_cc, "!", px );
       }
 
   | '(' boolean_expression ')'
@@ -9604,8 +9604,8 @@ boolean_expression
 generator_new
   : _NEW compact_type_description
       {
-          snail_check_type_contains_non_null_ref( $2 );
-          snail_compile_alloc( snail_cc, $2, px );
+          compiler_check_type_contains_non_null_ref( $2 );
+          compiler_compile_alloc( compiler_cc, $2, px );
       }
 
   | _NEW type_identifier
@@ -9614,16 +9614,16 @@ generator_new
           TNODE *constructor_tnode;
           TNODE *type_tnode = $2;
 
-          snail_check_type_contains_non_null_ref( type_tnode );
-          snail_compile_alloc( snail_cc, type_tnode, px );
+          compiler_check_type_contains_non_null_ref( type_tnode );
+          compiler_compile_alloc( compiler_cc, type_tnode, px );
 
           /* --- function call generations starts here: */
 
-          dlist_push_dnode( &snail_cc->current_call_stack,
-                            &snail_cc->current_call, px );
+          dlist_push_dnode( &compiler_cc->current_call_stack,
+                            &compiler_cc->current_call, px );
 
-          dlist_push_dnode( &snail_cc->current_arg_stack,
-                            &snail_cc->current_arg, px );
+          dlist_push_dnode( &compiler_cc->current_arg_stack,
+                            &compiler_cc->current_arg, px );
 
           constructor_dnode = type_tnode ?
               tnode_constructor( type_tnode ) : NULL;
@@ -9631,26 +9631,26 @@ generator_new
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
 
-          snail_cc->current_call = share_dnode( constructor_dnode );
+          compiler_cc->current_call = share_dnode( constructor_dnode );
           
-          snail_cc->current_arg = constructor_tnode ?
+          compiler_cc->current_arg = constructor_tnode ?
               dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
               NULL;
 
-          snail_compile_dup( snail_cc, px );
-	  snail_push_guarding_arg( snail_cc, px );
-          compiler_swap_top_expressions( snail_cc );
+          compiler_compile_dup( compiler_cc, px );
+	  compiler_push_guarding_arg( compiler_cc, px );
+          compiler_swap_top_expressions( compiler_cc );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    DNODE *constructor_dnode = snail_cc->current_call;
+	    DNODE *constructor_dnode = compiler_cc->current_call;
 	    TNODE *constructor_tnode = constructor_dnode ?
                 dnode_type( constructor_dnode ) : NULL;
             int nretvals;
             char *constructor_name = constructor_tnode ?
                 tnode_name( constructor_tnode ) : NULL;
 
-	    nretvals = snail_compile_multivalue_function_call( snail_cc, px );
+	    nretvals = compiler_compile_multivalue_function_call( compiler_cc, px );
 
             if( nretvals > 0 ) {
                 yyerrorf( "constructor '%s()' should not return a value",
@@ -9660,50 +9660,50 @@ generator_new
 
   | _NEW compact_type_description '[' expression ']'
       {
-          snail_check_array_component_is_not_null( $2 );
-          snail_compile_array_alloc( snail_cc, $2, px );
+          compiler_check_array_component_is_not_null( $2 );
+          compiler_compile_array_alloc( compiler_cc, $2, px );
       }
   | _NEW compact_type_description md_array_allocator '[' expression ']'
       {
-          snail_check_array_component_is_not_null( $2 );
-          snail_compile_mdalloc( snail_cc, $2, $3, px );
+          compiler_check_array_component_is_not_null( $2 );
+          compiler_compile_mdalloc( compiler_cc, $2, $3, px );
       }
   | _NEW _ARRAY '[' expression ']' _OF var_type_description
       {
-          snail_check_array_component_is_not_null( $7 );
-          snail_compile_array_alloc( snail_cc, $7, px );
+          compiler_check_array_component_is_not_null( $7 );
+          compiler_compile_array_alloc( compiler_cc, $7, px );
       }
   | _NEW _ARRAY md_array_allocator '[' expression ']' _OF var_type_description
       {
-          snail_check_array_component_is_not_null( $8 );
-          snail_compile_mdalloc( snail_cc, $8, $3, px );
+          compiler_check_array_component_is_not_null( $8 );
+          compiler_compile_mdalloc( compiler_cc, $8, $3, px );
       }
   | _NEW compact_type_description '[' expression ']' _OF var_type_description
       {
-          snail_check_array_component_is_not_null( $7 );
-          snail_compile_composite_alloc( snail_cc, $2, $7, px );
+          compiler_check_array_component_is_not_null( $7 );
+          compiler_compile_composite_alloc( compiler_cc, $2, $7, px );
       }
   | _NEW _BLOB '(' expression ')'
       {
-	snail_compile_blob_alloc( snail_cc, px );
+	compiler_compile_blob_alloc( compiler_cc, px );
       }
   | expression '*' _NEW '[' expression ']'
       {
-          ENODE *top_expr = snail_cc->e_stack;
+          ENODE *top_expr = compiler_cc->e_stack;
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next_expr ) : NULL;
-          snail_compile_array_alloc( snail_cc, element_type, px );
-          snail_emit( snail_cc, px, "\tc\n", FILLARRAY );
+          compiler_compile_array_alloc( compiler_cc, element_type, px );
+          compiler_emit( compiler_cc, px, "\tc\n", FILLARRAY );
       }
   | expression '*' _NEW md_array_allocator '[' expression ']'
       {
           ssize_t level = $4;
-          ENODE *top_expr = snail_cc->e_stack;
+          ENODE *top_expr = compiler_cc->e_stack;
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
-          snail_compile_mdalloc( snail_cc, element_type, level, px );
-          snail_emit( snail_cc, px, "\tce\n", FILLMDARRAY, &level );
+          compiler_compile_mdalloc( compiler_cc, element_type, level, px );
+          compiler_emit( compiler_cc, px, "\tce\n", FILLMDARRAY, &level );
       }
   | _NEW type_identifier _OF '(' _TYPE type_identifier ',' opt_actual_argument_list ')'
   ;
@@ -9712,13 +9712,13 @@ md_array_allocator
   : '[' expression ']'
       {
 	int level = 0;
-	snail_compile_mdalloc( snail_cc, NULL, level, px );
+	compiler_compile_mdalloc( compiler_cc, NULL, level, px );
 	$$ = level + 1;
       }
   | md_array_allocator '[' expression ']'
       {
 	int level = $1;
-	snail_compile_mdalloc( snail_cc, NULL, level, px );
+	compiler_compile_mdalloc( compiler_cc, NULL, level, px );
 	$$ = level + 1;
       }
   ;
@@ -9731,7 +9731,7 @@ lvalue
 
 lvariable
   : variable_access_identifier
-      { snail_compile_load_variable_address( snail_cc, $1, px ); }
+      { compiler_compile_load_variable_address( compiler_cc, $1, px ); }
   | lvalue
   ;
 
@@ -9744,12 +9744,12 @@ variable
 	  if( variable_type && tnode_kind( variable_type ) == TK_FUNCTION ) {
               if( variable && dnode_offset( variable ) == 0 ) {
                   thrcode_push_forward_function
-                      ( snail_cc->thrcode, dnode_name( variable ),
-                        thrcode_length( snail_cc->thrcode ) + 1, px );
+                      ( compiler_cc->thrcode, dnode_name( variable ),
+                        thrcode_length( compiler_cc->thrcode ) + 1, px );
               }
-	      snail_compile_load_function_address( snail_cc, variable, px );
+	      compiler_compile_load_function_address( compiler_cc, variable, px );
 	  } else {
-	      snail_compile_load_variable_value( snail_cc, variable, px );
+	      compiler_compile_load_variable_value( compiler_cc, variable, px );
 	  }
       }
   ;
@@ -9774,10 +9774,10 @@ index_expression
 variable_access_for_indexing
   : variable_access_identifier
       {
-       if( snail_dnode_is_reference( snail_cc, $1 )) {
-           snail_compile_load_variable_value( snail_cc, $1, px );
+       if( compiler_dnode_is_reference( compiler_cc, $1 )) {
+           compiler_compile_load_variable_value( compiler_cc, $1, px );
        } else {
-           snail_compile_load_variable_address( snail_cc, $1, px );
+           compiler_compile_load_variable_address( compiler_cc, $1, px );
        }
        $$ = $1;
       }
@@ -9786,8 +9786,8 @@ variable_access_for_indexing
 lvalue_for_indexing
   : lvalue
       {
-       if( snail_stack_top_base_is_reference( snail_cc )) {
-	   snail_compile_ldi( snail_cc, px );
+       if( compiler_stack_top_base_is_reference( compiler_cc )) {
+	   compiler_compile_ldi( compiler_cc, px );
        }
       }
   ;
@@ -9806,23 +9806,23 @@ indexed_rvalue
 	  } else {
 	      operator_name = "ldx";
 	  }
-	  if( snail_stack_top_has_operator( snail_cc, operator_name, 2, px ) ||
- 	      snail_nth_stack_value_has_operator( snail_cc, 1,
+	  if( compiler_stack_top_has_operator( compiler_cc, operator_name, 2, px ) ||
+ 	      compiler_nth_stack_value_has_operator( compiler_cc, 1,
 						  operator_name, 2, px )) {
-	      snail_check_and_compile_top_2_operator( snail_cc,
+	      compiler_check_and_compile_top_2_operator( compiler_cc,
 						      operator_name, 2, px );
 	  } else {
-	      if( snail_dnode_is_reference( snail_cc, var_dnode )) {
-		  snail_compile_indexing( snail_cc, 1, $3, px );
+	      if( compiler_dnode_is_reference( compiler_cc, var_dnode )) {
+		  compiler_compile_indexing( compiler_cc, 1, $3, px );
 	      } else {
-		  snail_compile_indexing( snail_cc, 0, $3, px );
+		  compiler_compile_indexing( compiler_cc, 0, $3, px );
 	      }
-	      snail_compile_ldi( snail_cc, px );
+	      compiler_compile_ldi( compiler_cc, px );
 	  }
       }
   | lvalue_for_indexing '[' index_expression ']'
       {
-	  ENODE *top_expr = snail_cc->e_stack;
+	  ENODE *top_expr = compiler_cc->e_stack;
 	  ENODE *top2_expr = top_expr ? enode_next( top_expr ) : NULL;
 	  TNODE *top2_tnode = top2_expr ? enode_type( top2_expr ) : NULL;
 	  TNODE *element_type = top2_tnode ?
@@ -9834,18 +9834,18 @@ indexed_rvalue
 	  } else {
 	      operator_name = "ldx";
 	  }
-	  if( snail_stack_top_has_operator( snail_cc, operator_name, 2, px ) ||
- 	      snail_nth_stack_value_has_operator( snail_cc, 1,
+	  if( compiler_stack_top_has_operator( compiler_cc, operator_name, 2, px ) ||
+ 	      compiler_nth_stack_value_has_operator( compiler_cc, 1,
                                                   operator_name, 2, px )) {
-	      snail_check_and_compile_top_2_operator( snail_cc, operator_name,
+	      compiler_check_and_compile_top_2_operator( compiler_cc, operator_name,
                                                       2, px );
 	  } else {
-	      if( snail_stack_top_is_reference( snail_cc )) {
-		  snail_compile_indexing( snail_cc, 1, $3, px );
+	      if( compiler_stack_top_is_reference( compiler_cc )) {
+		  compiler_compile_indexing( compiler_cc, 1, $3, px );
 	      } else {
-		  snail_compile_indexing( snail_cc, 0, $3, px );
+		  compiler_compile_indexing( compiler_cc, 0, $3, px );
 	      }
-	      snail_compile_ldi( snail_cc, px );
+	      compiler_compile_ldi( compiler_cc, px );
 	  }
       }
   ;
@@ -9853,19 +9853,19 @@ indexed_rvalue
 indexed_lvalue
   : variable_access_for_indexing '[' index_expression ']'
       {
-	  if( snail_dnode_is_reference( snail_cc, $1 )) {
-	      snail_compile_indexing( snail_cc, 1, $3, px );
+	  if( compiler_dnode_is_reference( compiler_cc, $1 )) {
+	      compiler_compile_indexing( compiler_cc, 1, $3, px );
 	  } else {
-	      snail_compile_indexing( snail_cc, 0, $3, px );
+	      compiler_compile_indexing( compiler_cc, 0, $3, px );
 	  }
       }
 
   | lvalue_for_indexing '[' index_expression ']'
       {
-	  if( snail_stack_top_is_reference( snail_cc )) {
-	      snail_compile_indexing( snail_cc, 1, $3, px );
+	  if( compiler_stack_top_is_reference( compiler_cc )) {
+	      compiler_compile_indexing( compiler_cc, 1, $3, px );
 	  } else {
-	      snail_compile_indexing( snail_cc, 0, $3, px );
+	      compiler_compile_indexing( compiler_cc, 0, $3, px );
 	  }
       }
   ;
@@ -9875,30 +9875,30 @@ field_access
       {
        DNODE *field;
 
-       if( snail_dnode_is_reference( snail_cc, $1 )) {
-	   snail_compile_load_variable_value( snail_cc, $1, px );
+       if( compiler_dnode_is_reference( compiler_cc, $1 )) {
+	   compiler_compile_load_variable_value( compiler_cc, $1, px );
        } else {
-           snail_compile_load_variable_address( snail_cc, $1, px );
+           compiler_compile_load_variable_address( compiler_cc, $1, px );
        }
-       field = snail_make_stack_top_field_type( snail_cc, $3 );
-       snail_make_stack_top_addressof( snail_cc, px );
+       field = compiler_make_stack_top_field_type( compiler_cc, $3 );
+       compiler_make_stack_top_addressof( compiler_cc, px );
        if( field && dnode_offset( field ) != 0 ) {
 	   ssize_t field_offset = dnode_offset( field );
-	   snail_emit( snail_cc, px, "\tce\n", OFFSET, &field_offset );
+	   compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &field_offset );
        }
       }
   | lvalue '.' __IDENTIFIER
       {
        DNODE *field;
 
-       if( snail_stack_top_base_is_reference( snail_cc )) {
-	   snail_compile_ldi( snail_cc, px );
+       if( compiler_stack_top_base_is_reference( compiler_cc )) {
+	   compiler_compile_ldi( compiler_cc, px );
        }
-       field = snail_make_stack_top_field_type( snail_cc, $3 );
-       snail_make_stack_top_addressof( snail_cc, px );
+       field = compiler_make_stack_top_field_type( compiler_cc, $3 );
+       compiler_make_stack_top_addressof( compiler_cc, px );
        if( field && dnode_offset( field ) != 0 ) {
 	   ssize_t field_offset = dnode_offset( field );
-	   snail_emit( snail_cc, px, "\tce\n", OFFSET, &field_offset );
+	   compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &field_offset );
        }
       }
   ;
@@ -9906,15 +9906,15 @@ field_access
 assignment_expression
   : lvalue '=' expression
       {
-       snail_compile_swap( snail_cc, px );
-       snail_compile_over( snail_cc, px );
-       snail_compile_sti( snail_cc, px );
+       compiler_compile_swap( compiler_cc, px );
+       compiler_compile_over( compiler_cc, px );
+       compiler_compile_sti( compiler_cc, px );
       }
 
   | variable_access_identifier '=' expression
       {
-       snail_compile_dup( snail_cc, px );
-       snail_compile_store_variable( snail_cc, $1, px );
+       compiler_compile_dup( compiler_cc, px );
+       compiler_compile_store_variable( compiler_cc, $1, px );
       }
 
   | '(' assignment_expression ')'
@@ -9923,101 +9923,101 @@ assignment_expression
 constant
   : __INTEGER_CONST
       {
-       snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
 			       NULL, NULL, "integer", $1, px );
       }
   | __INTEGER_CONST __IDENTIFIER
       {
-       snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
 			       NULL, $2, "integer", $1, px );
       }
   | __INTEGER_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
 			       $2, $4, "integer", $1, px );
       }
   | __REAL_CONST
       {
-       snail_compile_constant( snail_cc, TS_FLOAT_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_FLOAT_SUFFIX,
 			       NULL, NULL, "real", $1, px );
       }
   | __REAL_CONST __IDENTIFIER
       {
-       snail_compile_constant( snail_cc, TS_FLOAT_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_FLOAT_SUFFIX,
 			       NULL, $2, "real", $1, px );
       }
   | __REAL_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       snail_compile_constant( snail_cc, TS_FLOAT_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_FLOAT_SUFFIX,
 			       $2, $4, "real", $1, px );
       }
   | __STRING_CONST
       {
-       snail_compile_constant( snail_cc, TS_STRING_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_STRING_SUFFIX,
 			       NULL, NULL, "string", $1, px );
       }
   | __STRING_CONST __IDENTIFIER
       {
-       snail_compile_constant( snail_cc, TS_STRING_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_STRING_SUFFIX,
 			       NULL, $2, "string", $1, px );
       }
   | __STRING_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       snail_compile_constant( snail_cc, TS_STRING_SUFFIX,
+       compiler_compile_constant( compiler_cc, TS_STRING_SUFFIX,
 			       $2, $4, "string", $1, px );
       }
   | __IDENTIFIER  __IDENTIFIER
       {
-       snail_compile_enumeration_constant( snail_cc, NULL, $1, $2, px );
+       compiler_compile_enumeration_constant( compiler_cc, NULL, $1, $2, px );
       }
 
   | __IDENTIFIER module_list __COLON_COLON __IDENTIFIER
       {
-       snail_compile_enumeration_constant( snail_cc, $2, $1, $4, px );
+       compiler_compile_enumeration_constant( compiler_cc, $2, $1, $4, px );
       }
 
   | _CONST __IDENTIFIER
       {
-	DNODE *const_dnode = snail_lookup_constant( snail_cc, NULL, $2,
+	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, NULL, $2,
 						    "constant" );
 	if( const_dnode ) {
 	    char pad[80];
 
 	    snprintf( pad, sizeof(pad), "%ld",
 		      (long)dnode_ssize_value( const_dnode ));
-	    snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
+	    compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
 				    NULL, NULL, "integer", pad, px );
 	}
       }
 
   | _CONST module_list __COLON_COLON __IDENTIFIER
       {
-	DNODE *const_dnode = snail_lookup_constant( snail_cc, $2, $4,
+	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, $2, $4,
 						    "constant" );
 	if( const_dnode ) {
 	    char pad[80];
 
 	    snprintf( pad, sizeof(pad), "%ld",
 		      (long)dnode_ssize_value( const_dnode ));
-	    snail_compile_constant( snail_cc, TS_INTEGER_SUFFIX,
+	    compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
 				    NULL, NULL, "integer", pad, px );
 	}
       }
 
   | _CONST '(' constant_expression ')'
       {
-	  snail_compile_multitype_const_value( snail_cc, &$3, NULL, NULL, px );
+	  compiler_compile_multitype_const_value( compiler_cc, &$3, NULL, NULL, px );
       }
 
   | _CONST '(' constant_expression ')' __IDENTIFIER
       {
-	  snail_compile_multitype_const_value( snail_cc, &$3, NULL, $5, px );
+	  compiler_compile_multitype_const_value( compiler_cc, &$3, NULL, $5, px );
       }
 
   | _CONST '(' constant_expression ')'
     module_list __COLON_COLON __IDENTIFIER
       {
-	  snail_compile_multitype_const_value( snail_cc, &$3, $5, $7, px );
+	  compiler_compile_multitype_const_value( compiler_cc, &$3, $5, $7, px );
       }
 
   ;
@@ -10058,7 +10058,7 @@ argument
 	foreach_dnode( arg, $2 ) {
 	    const_value_t val = make_zero_const_value();
 	    const_value_copy( &val, &$6, px );
-	    snail_check_default_value_compatibility( arg, &val );
+	    compiler_check_default_value_compatibility( arg, &val );
 	    dnode_set_value( arg, &val );
 	    dnode_set_flags( arg, DF_HAS_INITIALISER );
 	    if( $1 ) {
@@ -10079,7 +10079,7 @@ argument
         '=' constant_expression
       {
         $$ = dnode_list_append_type( $3, $2 );
-	snail_check_default_value_compatibility( $3, &$5 );
+	compiler_check_default_value_compatibility( $3, &$5 );
 	dnode_set_value( $3, &$5 );
 	dnode_set_flags( $3, DF_HAS_INITIALISER );
 	if( $1 ) {
@@ -10102,7 +10102,7 @@ argument
       {
 	tnode_append_element_type( $3, $2 );
 	$$ = dnode_list_append_type( $4, $3 );
-	snail_check_default_value_compatibility( $4, &$6 );
+	compiler_check_default_value_compatibility( $4, &$6 );
 	dnode_set_value( $4, &$6 );
 	dnode_set_flags( $4, DF_HAS_INITIALISER );
 	if( $1 ) {
@@ -10135,33 +10135,33 @@ function_or_operator_start
           TNODE *fn_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
 
-          dlist_push_dnode( &snail_cc->current_function_stack,
-                            &snail_cc->current_function, px );
+          dlist_push_dnode( &compiler_cc->current_function_stack,
+                            &compiler_cc->current_function, px );
 
-	  snail_cc->current_function = funct;
+	  compiler_cc->current_function = funct;
 	  dnode_reset_flags( funct, DF_FNPROTO );
 
-          snail_push_thrcode( snail_cc, px );
+          compiler_push_thrcode( compiler_cc, px );
 
     	  cexception_guard( inner ) {
-	      snail_push_current_address( snail_cc, px );
+	      compiler_push_current_address( compiler_cc, px );
 
 	      if( !is_bytecode ) {
 		  ssize_t zero = 0;
-		  snail_push_absolute_fixup( snail_cc, px );
-		  snail_emit( snail_cc, px, "\tce\n", ENTER, &zero );
+		  compiler_push_absolute_fixup( compiler_cc, px );
+		  compiler_emit( compiler_cc, px, "\tce\n", ENTER, &zero );
 	      }
 
-              snail_begin_scope( snail_cc, &inner );
+              compiler_begin_scope( compiler_cc, &inner );
 	  }
 	  cexception_catch {
 	      delete_dnode( funct );
-	      snail_cc->current_function =
-                  dlist_pop_data( &snail_cc->current_function_stack );
+	      compiler_cc->current_function =
+                  dlist_pop_data( &compiler_cc->current_function_stack );
 	      cexception_reraise( inner, px );
 	  }
 	  if( !is_bytecode ) {
-	      snail_emit_function_arguments( funct, snail_cc, px );
+	      compiler_emit_function_arguments( funct, compiler_cc, px );
 	  }
           if( fn_tnode && tnode_kind( fn_tnode ) == TK_CLOSURE ) {
               tnode_drop_first_argument( fn_tnode );
@@ -10172,14 +10172,14 @@ function_or_operator_start
 function_or_operator_end
   :
         {
-	  DNODE *funct = snail_cc->current_function;
+	  DNODE *funct = compiler_cc->current_function;
           TNODE *funct_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
-          ssize_t function_entry_address = thrcode_length( snail_cc->function_thrcode );
+          ssize_t function_entry_address = thrcode_length( compiler_cc->function_thrcode );
 
 	  if( !is_bytecode ) {
 	      /* patch ENTER command: */
-	      snail_fixup( snail_cc, -snail_cc->local_offset );
+	      compiler_fixup( compiler_cc, -compiler_cc->local_offset );
 	  }
           
           if( funct_tnode && tnode_kind( funct_tnode ) == TK_METHOD ) {
@@ -10188,21 +10188,21 @@ function_or_operator_end
               dnode_set_offset( funct, function_entry_address );
           }
 
-	  snail_get_inline_code( snail_cc, funct, px );
+	  compiler_get_inline_code( compiler_cc, funct, px );
 
-	  if( thrcode_last_opcode( snail_cc->thrcode ).fn != RET ) {
-	      snail_emit( snail_cc, px, "\tc\n", RET );
+	  if( thrcode_last_opcode( compiler_cc->thrcode ).fn != RET ) {
+	      compiler_emit( compiler_cc, px, "\tc\n", RET );
 	  }
 
-          snail_merge_functions_and_top( snail_cc, px );
-          if( !snail_cc->thrcode ) {
-              snail_cc->thrcode = snail_cc->main_thrcode;
+          compiler_merge_functions_and_top( compiler_cc, px );
+          if( !compiler_cc->thrcode ) {
+              compiler_cc->thrcode = compiler_cc->main_thrcode;
           }
-          compiler_fixup_function_calls( snail_cc->function_thrcode, funct );
-          compiler_fixup_function_calls( snail_cc->main_thrcode, funct );
-	  snail_end_scope( snail_cc, px );
-	  snail_cc->current_function = 
-              dlist_pop_data( &snail_cc->current_function_stack );
+          compiler_fixup_function_calls( compiler_cc->function_thrcode, funct );
+          compiler_fixup_function_calls( compiler_cc->main_thrcode, funct );
+	  compiler_end_scope( compiler_cc, px );
+	  compiler_cc->current_function = 
+              dlist_pop_data( &compiler_cc->current_function_stack );
 	}
 ;
 
@@ -10275,14 +10275,14 @@ function_code_start
   :
     {
       if( thrcode_debug_is_on()) {
-	  const char *currentLine = snail_flex_current_line();
+	  const char *currentLine = compiler_flex_current_line();
 	  const char *first_nonblank = currentLine;
 	  while( isspace( *first_nonblank )) first_nonblank++;
 	  if( *first_nonblank == '#' ) {
-              thrcode_printf( snail_cc->function_thrcode, px,
+              thrcode_printf( compiler_cc->function_thrcode, px,
                               "%s\n", currentLine );
 	  } else {
-              thrcode_printf( snail_cc->function_thrcode, px,
+              thrcode_printf( compiler_cc->function_thrcode, px,
                               "#\n# %s\n#\n", currentLine );
 	  }
       }
@@ -10299,7 +10299,7 @@ function_or_procedure_keyword
 function_header
   : opt_function_attributes function_or_procedure_keyword
         {
-	    //snail_begin_scope( snail_cc, px );
+	    //compiler_begin_scope( compiler_cc, px );
         }
              __IDENTIFIER '(' argument_list ')'
             opt_retval_description_list
@@ -10318,9 +10318,9 @@ function_header
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      funct = $$ =
-		  snail_check_and_set_fn_proto( snail_cc, funct, px );
+		  compiler_check_and_set_fn_proto( compiler_cc, funct, px );
 	      if( is_function ) {
-		  snail_set_function_arguments_readonly( dnode_type( funct ));
+		  compiler_set_function_arguments_readonly( dnode_type( funct ));
 	      }
 	  }
 	  cexception_catch {
@@ -10434,7 +10434,7 @@ opt_implements_method
 method_header
   : opt_function_attributes function_code_start _METHOD
         {
-	    //snail_begin_scope( snail_cc, px );
+	    //compiler_begin_scope( compiler_cc, px );
 	}
     __IDENTIFIER opt_implements_method '(' argument_list ')'
             opt_retval_description_list
@@ -10494,13 +10494,13 @@ method_header
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
-              dnode_set_scope( funct, snail_current_scope( snail_cc ));
+              dnode_set_scope( funct, compiler_current_scope( compiler_cc ));
 	      funct = $$ =
-		  snail_check_and_set_fn_proto( snail_cc, funct, px );
+		  compiler_check_and_set_fn_proto( compiler_cc, funct, px );
 	      share_dnode( funct );
               tnode_insert_single_method( current_class, share_dnode( funct ));
 	      if( is_function ) {
-		  snail_set_function_arguments_readonly( dnode_type( funct ));
+		  compiler_set_function_arguments_readonly( dnode_type( funct ));
 	      }
 	  }
 	  cexception_catch {
@@ -10528,13 +10528,13 @@ opt_base_class_initialisation
         TNODE *constructor_tnode;
         DNODE *self_dnode;
 
-        snail_emit( snail_cc, px, "T\n", "# Initialising base class:" );
+        compiler_emit( compiler_cc, px, "T\n", "# Initialising base class:" );
 
-        dlist_push_dnode( &snail_cc->current_call_stack,
-                          &snail_cc->current_call, px );
+        dlist_push_dnode( &compiler_cc->current_call_stack,
+                          &compiler_cc->current_call, px );
 
-        dlist_push_dnode( &snail_cc->current_arg_stack,
-                          &snail_cc->current_arg, px );
+        dlist_push_dnode( &compiler_cc->current_arg_stack,
+                          &compiler_cc->current_arg, px );
 
         constructor_dnode = base_type_tnode ?
             tnode_constructor( base_type_tnode ) : NULL;
@@ -10542,20 +10542,20 @@ opt_base_class_initialisation
         constructor_tnode = constructor_dnode ?
             dnode_type( constructor_dnode ) : NULL;
 
-        snail_cc->current_call = share_dnode( constructor_dnode );
+        compiler_cc->current_call = share_dnode( constructor_dnode );
           
-        snail_cc->current_arg = constructor_tnode ?
+        compiler_cc->current_arg = constructor_tnode ?
             dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
             NULL;
 
-        self_dnode = snail_lookup_dnode( snail_cc, NULL, "self", "variable" );
-        snail_push_guarding_arg( snail_cc, px );
-        snail_compile_load_variable_value( snail_cc, self_dnode, px );
+        self_dnode = compiler_lookup_dnode( compiler_cc, NULL, "self", "variable" );
+        compiler_push_guarding_arg( compiler_cc, px );
+        compiler_compile_load_variable_value( compiler_cc, self_dnode, px );
     }
 '(' opt_actual_argument_list ')' opt_semicolon
     {
         ssize_t nretval;
-        nretval = snail_compile_multivalue_function_call( snail_cc, px );
+        nretval = compiler_compile_multivalue_function_call( compiler_cc, px );
         assert( nretval == 0 );
     }
 | /* empty */
@@ -10564,7 +10564,7 @@ opt_base_class_initialisation
 constructor_header
   : opt_function_attributes function_code_start _CONSTRUCTOR
         {
-	    //snail_begin_scope( snail_cc, px );
+	    //compiler_begin_scope( compiler_cc, px );
 	}
     __IDENTIFIER '(' argument_list ')'
         {
@@ -10596,7 +10596,7 @@ constructor_header
 	      parameter_list = NULL;
 	      // return_dnode = NULL;
 
-              dnode_set_scope( funct, snail_current_scope( snail_cc ));
+              dnode_set_scope( funct, compiler_current_scope( compiler_cc ));
 
               tnode_insert_constructor( class_tnode, share_dnode( funct ));
               
@@ -10606,11 +10606,11 @@ constructor_header
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      funct = $$ =
-		  snail_check_and_set_fn_proto( snail_cc, funct, px );
+		  compiler_check_and_set_fn_proto( compiler_cc, funct, px );
               share_dnode( funct );
 
               /* Constructors are always functions (?): */
-              /* snail_set_function_arguments_readonly( dnode_type( funct )); */
+              /* compiler_set_function_arguments_readonly( dnode_type( funct )); */
 	  }
 	  cexception_catch {
 	      delete_dnode( parameter_list );
@@ -10629,7 +10629,7 @@ operator_keyword
 operator_header
   : opt_function_attributes operator_keyword
         {
-	    //snail_begin_scope( snail_cc, px );
+	    //compiler_begin_scope( compiler_cc, px );
 	}
             __STRING_CONST '(' argument_list ')'
             opt_retval_description_list
@@ -10646,7 +10646,7 @@ operator_header
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      $$ = funct;
-              snail_set_function_arguments_readonly( dnode_type( funct ));
+              compiler_set_function_arguments_readonly( dnode_type( funct ));
 	  }
 	  cexception_catch {
 	      delete_dnode( $6 );
@@ -10669,7 +10669,7 @@ constant_declaration
   : _CONST __IDENTIFIER '=' constant_expression
     {
       DNODE *const_dnode = new_dnode_constant( $2, &$4, px );
-      snail_consttab_insert_consts( snail_cc, const_dnode, px );
+      compiler_consttab_insert_consts( compiler_cc, const_dnode, px );
     }
 ;
 
@@ -10687,7 +10687,7 @@ constant_integer_expression
 field_designator
   : __IDENTIFIER '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_type_field( snail_cc, NULL, $1, $3 );
+	$$ = compiler_lookup_type_field( compiler_cc, NULL, $1, $3 );
     }
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
@@ -10696,11 +10696,11 @@ field_designator
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
-	$$ = compiler_lookup_tnode_field( snail_cc, composite, $7 );
+	$$ = compiler_lookup_tnode_field( compiler_cc, composite, $7 );
     }
   | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_type_field( snail_cc, $1, $3, $5 );
+	$$ = compiler_lookup_type_field( compiler_cc, $1, $3, $5 );
     }
   | field_designator '.' __IDENTIFIER
     {
@@ -10736,7 +10736,7 @@ constant_expression
 
   | __IDENTIFIER
       {
-	DNODE *const_dnode = snail_lookup_constant( snail_cc, NULL, $1,
+	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, NULL, $1,
 						    "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
@@ -10748,7 +10748,7 @@ constant_expression
 
   | module_list __COLON_COLON __IDENTIFIER
       {
-	DNODE *const_dnode = snail_lookup_constant( snail_cc, $1, $3,
+	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, $1, $3,
 						    "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
@@ -10765,12 +10765,12 @@ constant_expression
 
   | __IDENTIFIER '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compile_time_value( snail_cc, NULL, $1, $3, px );
+	  $$ = compiler_make_compile_time_value( compiler_cc, NULL, $1, $3, px );
       }
 
   | module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compile_time_value( snail_cc, $1, $3, $5, px );
+	  $$ = compiler_make_compile_time_value( compiler_cc, $1, $3, $5, px );
       }
 
   | '.' __IDENTIFIER
@@ -10794,23 +10794,23 @@ constant_expression
 
 %%
 
-static void snail_compile_file( char *filename, cexception_t *ex )
+static void compiler_compile_file( char *filename, cexception_t *ex )
 {
     cexception_t inner;
 
     cexception_guard( inner ) {
         yyin = fopenx( filename, "r", ex );
 	if( yyparse() != 0 ) {
-	    int errcount = snail_yy_error_number();
-	    cexception_raise( &inner, SNAIL_UNRECOVERABLE_ERROR,
+	    int errcount = compiler_yy_error_number();
+	    cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
 			      cxprintf( "compiler could not recover "
 					"from errors, quitting now\n"
 					"%d error(s) detected\n",
 					errcount ));
 	} else {
-	    int errcount = snail_yy_error_number();
+	    int errcount = compiler_yy_error_number();
 	    if( errcount != 0 ) {
-	        cexception_raise( &inner, SNAIL_COMPILATION_ERROR,
+	        cexception_raise( &inner, COMPILER_COMPILATION_ERROR,
 				  cxprintf( "%d error(s) detected\n",
 					    errcount ));
 	    }
@@ -10823,49 +10823,49 @@ static void snail_compile_file( char *filename, cexception_t *ex )
     fclosex( yyin, ex );
 }
 
-THRCODE *new_thrcode_from_snail_file( char *filename, char **include_paths,
-				      cexception_t *ex )
+THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
+                                cexception_t *ex )
 {
     THRCODE *code;
 
-    assert( !snail_cc );
-    snail_cc = new_compiler( filename, include_paths, ex );
+    assert( !compiler_cc );
+    compiler_cc = new_compiler( filename, include_paths, ex );
 
-    snail_compile_file( filename, ex );
+    compiler_compile_file( filename, ex );
 
-    thrcode_flush_lines( snail_cc->thrcode );
-    code = snail_cc->thrcode;
-    if( snail_cc->thrcode == snail_cc->function_thrcode ) {
-	snail_cc->function_thrcode = NULL;
+    thrcode_flush_lines( compiler_cc->thrcode );
+    code = compiler_cc->thrcode;
+    if( compiler_cc->thrcode == compiler_cc->function_thrcode ) {
+	compiler_cc->function_thrcode = NULL;
     } else
-    if( snail_cc->thrcode == snail_cc->main_thrcode ) {
-	snail_cc->main_thrcode = NULL;
+    if( compiler_cc->thrcode == compiler_cc->main_thrcode ) {
+	compiler_cc->main_thrcode = NULL;
     } else {
 	assert( 0 );
     }
-    snail_cc->thrcode = NULL;
+    compiler_cc->thrcode = NULL;
 
-    thrcode_insert_static_data( code, snail_cc->static_data,
-				snail_cc->static_data_size );
-    snail_cc->static_data = NULL;
-    delete_compiler( snail_cc );
-    snail_cc = NULL;
+    thrcode_insert_static_data( code, compiler_cc->static_data,
+				compiler_cc->static_data_size );
+    compiler_cc->static_data = NULL;
+    delete_compiler( compiler_cc );
+    compiler_cc = NULL;
 
     return code;
 }
 
-void snail_printf( cexception_t *ex, char *format, ... )
+void compiler_printf( cexception_t *ex, char *format, ... )
 {
     cexception_t inner;
     va_list ap;
 
     va_start( ap, format );
     assert( format );
-    assert( snail_cc );
-    assert( snail_cc->thrcode );
+    assert( compiler_cc );
+    assert( compiler_cc->thrcode );
 
     cexception_guard( inner ) {
-	thrcode_printf_va( snail_cc->thrcode, &inner, format, ap );
+	thrcode_printf_va( compiler_cc->thrcode, &inner, format, ap );
     }
     cexception_catch {
 	va_end( ap );
@@ -10876,12 +10876,12 @@ void snail_printf( cexception_t *ex, char *format, ... )
 
 static int errcount = 0;
 
-int snail_yy_error_number( void )
+int compiler_yy_error_number( void )
 {
     return errcount;
 }
 
-void snail_yy_reset_error_count( void )
+void compiler_yy_reset_error_count( void )
 {
     errcount = 0;
 }
@@ -10896,34 +10896,34 @@ int yyerror( char *message )
 	message = "incorrect syntax";
     }
     fprintf(stderr, "%s: %s(%d,%d): ERROR, %s\n", 
-	    progname, snail_cc->filename,
-	    snail_flex_current_line_number(),
-	    snail_flex_current_position(),
+	    progname, compiler_cc->filename,
+	    compiler_flex_current_line_number(),
+	    compiler_flex_current_position(),
 	    message );
-    fprintf(stderr, "%s\n", snail_flex_current_line() );
-    fprintf(stderr, "%*s\n", snail_flex_current_position(), "^" );
+    fprintf(stderr, "%s\n", compiler_flex_current_line() );
+    fprintf(stderr, "%*s\n", compiler_flex_current_position(), "^" );
     fflush(NULL);
     return 0;
 }
 
 int yywrap()
 {
-    if( snail_cc->include_files ) {
-	compiler_close_include_file( snail_cc, px );
+    if( compiler_cc->include_files ) {
+	compiler_close_include_file( compiler_cc, px );
 	return 0;
     } else {
 	return 1;
     }
 }
 
-void snail_yy_debug_on( void )
+void compiler_yy_debug_on( void )
 {
 #ifdef YYDEBUG
     yydebug = 1;
 #endif
 }
 
-void snail_yy_debug_off( void )
+void compiler_yy_debug_off( void )
 {
 #ifdef YYDEBUG
     yydebug = 0;
