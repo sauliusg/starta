@@ -201,11 +201,11 @@ typedef struct {
     VARTAB *initialised_references;
     STLIST *initialised_ref_symtab_stack;
 
-} SNAIL_COMPILER;
+} COMPILER;
 
-static void compiler_drop_include_file( SNAIL_COMPILER *c );
+static void compiler_drop_include_file( COMPILER *c );
 
-static void delete_snail_compiler( SNAIL_COMPILER *c )
+static void delete_compiler( COMPILER *c )
 {
     if( c ) {
 	while( c->include_files ) {
@@ -261,12 +261,12 @@ static void delete_snail_compiler( SNAIL_COMPILER *c )
     }
 }
 
-static SNAIL_COMPILER *new_snail_compiler( char *filename,
+static COMPILER *new_compiler( char *filename,
 					   char **include_paths,
 					   cexception_t *ex )
 {
     cexception_t inner;
-    SNAIL_COMPILER *cc = callocx( 1, sizeof(SNAIL_COMPILER), ex );
+    COMPILER *cc = callocx( 1, sizeof(COMPILER), ex );
 
     cexception_guard( inner ) {
 	cc->filename = strdupx( filename, &inner );
@@ -289,13 +289,13 @@ static SNAIL_COMPILER *new_snail_compiler( char *filename,
 	cc->include_paths = include_paths;
     }
     cexception_catch {
-        delete_snail_compiler( cc );
+        delete_compiler( cc );
         cexception_reraise( inner, ex );
     }
     return cc;
 }
 
-static void compiler_save_flex_stream( SNAIL_COMPILER *c, char *filename,
+static void compiler_save_flex_stream( COMPILER *c, char *filename,
 				       cexception_t *ex  )
 {
     assert( !c->filename );
@@ -307,7 +307,7 @@ static void compiler_save_flex_stream( SNAIL_COMPILER *c, char *filename,
     snail_flex_set_current_position( 1 );
 }
 
-static void compiler_restore_flex_stream( SNAIL_COMPILER *c )
+static void compiler_restore_flex_stream( COMPILER *c )
 {
     COMPILER_STATE *top;
 
@@ -324,7 +324,7 @@ static void compiler_restore_flex_stream( SNAIL_COMPILER *c )
     snail_flex_pop_state();
 }
 
-static void compiler_push_compiler_state( SNAIL_COMPILER *c,
+static void compiler_push_compiler_state( COMPILER *c,
 					  cexception_t *ex )
 {
     COMPILER_STATE *cstate;
@@ -339,7 +339,7 @@ static void compiler_push_compiler_state( SNAIL_COMPILER *c,
     c->include_files = cstate;
 }
 
-void compiler_pop_compiler_state( SNAIL_COMPILER *c )
+void compiler_pop_compiler_state( COMPILER *c )
 {
     COMPILER_STATE *top;
 
@@ -398,7 +398,7 @@ static char *make_full_file_name( char *filename, char *path,
     }
 }
 
-static char *compiler_find_include_file( SNAIL_COMPILER *c, char *filename,
+static char *compiler_find_include_file( COMPILER *c, char *filename,
 					 cexception_t *ex )
 {
     char **path;
@@ -438,7 +438,7 @@ static char *compiler_find_include_file( SNAIL_COMPILER *c, char *filename,
     }
 }
 
-static void compiler_open_include_file( SNAIL_COMPILER *c, char *filename,
+static void compiler_open_include_file( COMPILER *c, char *filename,
 					cexception_t *ex )
 {
     char *full_name = compiler_find_include_file( c, filename, ex);
@@ -446,7 +446,7 @@ static void compiler_open_include_file( SNAIL_COMPILER *c, char *filename,
     compiler_save_flex_stream( c, full_name, ex );
 }
 
-static void compiler_push_symbol_tables( SNAIL_COMPILER *c,
+static void compiler_push_symbol_tables( COMPILER *c,
 					 cexception_t *ex )
 {
     SYMTAB *symtab = new_symtab( c->vartab, c->consts, c->typetab,
@@ -459,7 +459,7 @@ static void compiler_push_symbol_tables( SNAIL_COMPILER *c,
     c->operators = new_vartab( ex );
 }
 
-static void compiler_use_exported_package_names( SNAIL_COMPILER *c,
+static void compiler_use_exported_package_names( COMPILER *c,
 						 DNODE *module,
 						 cexception_t *ex )
 {
@@ -473,7 +473,7 @@ static void compiler_use_exported_package_names( SNAIL_COMPILER *c,
     vartab_copy_table( c->operators, dnode_operator_vartab( module ), ex );
 }
 
-static void compiler_pop_symbol_tables( SNAIL_COMPILER *c )
+static void compiler_pop_symbol_tables( COMPILER *c )
 {
     SYMTAB *symtab = stlist_pop_data( &c->symtab_stack );
 
@@ -490,7 +490,7 @@ static void compiler_pop_symbol_tables( SNAIL_COMPILER *c )
     }
 }
 
-static void compiler_push_initialised_ref_tables( SNAIL_COMPILER *c,
+static void compiler_push_initialised_ref_tables( COMPILER *c,
                                                   cexception_t *ex )
 {
     SYMTAB *symtab = new_symtab( c->initialised_references, NULL, NULL, NULL, ex );
@@ -499,7 +499,7 @@ static void compiler_push_initialised_ref_tables( SNAIL_COMPILER *c,
     c->initialised_references = new_vartab( ex );
 }
 
-static void compiler_pop_initialised_ref_tables( SNAIL_COMPILER *c )
+static void compiler_pop_initialised_ref_tables( COMPILER *c )
 {
     SYMTAB *symtab = stlist_pop_data( &c->initialised_ref_symtab_stack );
     VARTAB *dummy_v = NULL;
@@ -516,13 +516,13 @@ static void compiler_pop_initialised_ref_tables( SNAIL_COMPILER *c )
     }
 }
 
-static void compiler_drop_include_file( SNAIL_COMPILER *c )
+static void compiler_drop_include_file( COMPILER *c )
 {
     compiler_restore_flex_stream( c );
     compiler_pop_compiler_state( c );
 }
 
-static void compiler_close_include_file( SNAIL_COMPILER *c,
+static void compiler_close_include_file( COMPILER *c,
 					 cexception_t *ex )
 {
     compiler_restore_flex_stream( c );
@@ -562,7 +562,7 @@ static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
     (*size) ++;
 }
 
-static void snail_push_current_address( SNAIL_COMPILER *c, cexception_t *ex )
+static void snail_push_current_address( COMPILER *c, cexception_t *ex )
 {
     push_ssize_t( &c->addr_stack, &c->addr_stack_size,
 		  thrcode_length(c->thrcode), ex );
@@ -574,43 +574,43 @@ static ssize_t pop_ssize_t( ssize_t **array, int *size, cexception_t *ex )
     return (*array)[*size];
 }
 
-static ssize_t snail_pop_address( SNAIL_COMPILER *c, cexception_t *ex )
+static ssize_t snail_pop_address( COMPILER *c, cexception_t *ex )
 {
     return pop_ssize_t( &c->addr_stack, &c->addr_stack_size, ex );
 }
 
-static ssize_t snail_pop_offset( SNAIL_COMPILER *c, cexception_t *ex )
+static ssize_t snail_pop_offset( COMPILER *c, cexception_t *ex )
 {
     return pop_ssize_t( &c->addr_stack, &c->addr_stack_size, ex )
            - thrcode_length( c->thrcode );
 }
 
-static ssize_t snail_code_length( SNAIL_COMPILER *c )
+static ssize_t snail_code_length( COMPILER *c )
 {
     return thrcode_length( c->thrcode );
 }
 
-static void snail_push_relative_fixup( SNAIL_COMPILER *c, cexception_t *ex )
+static void snail_push_relative_fixup( COMPILER *c, cexception_t *ex )
 {
     thrcode_push_relative_fixup_here( c->thrcode, "", ex );
 }
 
-static void snail_push_absolute_fixup( SNAIL_COMPILER *c, cexception_t *ex )
+static void snail_push_absolute_fixup( COMPILER *c, cexception_t *ex )
 {
     thrcode_push_absolute_fixup_here( c->thrcode, "", ex );
 }
 
-static void snail_fixup_here( SNAIL_COMPILER *c )
+static void snail_fixup_here( COMPILER *c )
 {
     thrcode_internal_fixup_here( c->thrcode );
 }
 
-static void snail_fixup( SNAIL_COMPILER *c, ssize_t value )
+static void snail_fixup( COMPILER *c, ssize_t value )
 {
     thrcode_internal_fixup( c->thrcode, value );
 }
 
-static void snail_swap_fixups( SNAIL_COMPILER *c )
+static void snail_swap_fixups( COMPILER *c )
 {
     thrcode_internal_fixup_swap( c->thrcode );
 }
@@ -634,7 +634,7 @@ static void compiler_check_enum_basetypes( TNODE *lookup_tnode, TNODE *tnode )
     }
 }
 
-static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
+static TNODE *snail_typetab_insert_msg( COMPILER *cc,
 					char *name,
 					type_suffix_t suffix_type,
 					TNODE *tnode,
@@ -680,12 +680,12 @@ static TNODE *snail_typetab_insert_msg( SNAIL_COMPILER *cc,
     }
 }
 
-static int snail_current_scope( SNAIL_COMPILER *cc )
+static int snail_current_scope( COMPILER *cc )
 {
     return vartab_current_scope( cc->vartab );
 }
 
-static void snail_typetab_insert( SNAIL_COMPILER *cc,
+static void snail_typetab_insert( COMPILER *cc,
 				  TNODE *tnode,
 				  cexception_t *ex )
 {
@@ -700,7 +700,7 @@ static void snail_typetab_insert( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_vartab_insert_named_vars( SNAIL_COMPILER *cc,
+static void snail_vartab_insert_named_vars( COMPILER *cc,
 					    DNODE *vars,
 					    cexception_t *ex )
 {
@@ -711,7 +711,7 @@ static void snail_vartab_insert_named_vars( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_vartab_insert_single_named_var( SNAIL_COMPILER *cc,
+static void snail_vartab_insert_single_named_var( COMPILER *cc,
                                                   DNODE *var,
                                                   cexception_t *ex )
 {
@@ -725,7 +725,7 @@ static void snail_vartab_insert_single_named_var( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_consttab_insert_consts( SNAIL_COMPILER *cc, DNODE *consts,
+static void snail_consttab_insert_consts( COMPILER *cc, DNODE *consts,
 					  cexception_t *ex )
 {
     vartab_insert_named_vars( cc->consts, consts, ex );
@@ -735,7 +735,7 @@ static void snail_consttab_insert_consts( SNAIL_COMPILER *cc, DNODE *consts,
     }
 }
 
-static void snail_insert_tnode_into_suffix_list( SNAIL_COMPILER *cc,
+static void snail_insert_tnode_into_suffix_list( COMPILER *cc,
 						 TNODE *tnode,
 						 cexception_t *ex )
 {
@@ -841,7 +841,7 @@ static void snail_insert_tnode_into_suffix_list( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_push_type( SNAIL_COMPILER *c, TNODE *tnode,
+static void snail_push_type( COMPILER *c, TNODE *tnode,
 			     cexception_t *ex )
 {
     ENODE *expr_enode = NULL;
@@ -850,7 +850,7 @@ static void snail_push_type( SNAIL_COMPILER *c, TNODE *tnode,
     enode_list_push( &c->e_stack, expr_enode );
 }
 
-static void snail_push_error_type( SNAIL_COMPILER *c,
+static void snail_push_error_type( COMPILER *c,
 				   cexception_t *ex )
 {
     ENODE *expr_enode = NULL;
@@ -860,7 +860,7 @@ static void snail_push_error_type( SNAIL_COMPILER *c,
     enode_list_push( &c->e_stack, expr_enode );
 }
 
-static void snail_append_expression_type( SNAIL_COMPILER *c,
+static void snail_append_expression_type( COMPILER *c,
 					  TNODE *base_tnode )
 {
     assert( c->e_stack );
@@ -881,7 +881,7 @@ static TNODE *new_tnode_blob_snail( TYPETAB *typetab, cexception_t *ex )
     return new_tnode_blob( base_type, ex );
 }
 
-static void snail_compile_exception( SNAIL_COMPILER *c,
+static void snail_compile_exception( COMPILER *c,
 				     char *exception_name,
 				     ssize_t exception_nr,
 				     cexception_t *ex )
@@ -908,14 +908,14 @@ static void snail_compile_exception( SNAIL_COMPILER *c,
     }
 }
 
-static void snail_compile_next_exception( SNAIL_COMPILER *c,
+static void snail_compile_next_exception( COMPILER *c,
 					  char *exception_name,
 					  cexception_t *ex )
 {
     snail_compile_exception( c, exception_name, ++c->latest_exception_nr, ex );
 }
 
-static void snail_push_array_of_type( SNAIL_COMPILER *c, TNODE *tnode,
+static void snail_push_array_of_type( COMPILER *c, TNODE *tnode,
 				      cexception_t *ex )
 {
     cexception_t inner;
@@ -934,13 +934,13 @@ static void snail_push_array_of_type( SNAIL_COMPILER *c, TNODE *tnode,
     }
 }
 
-static void compiler_drop_top_expression( SNAIL_COMPILER *cc )
+static void compiler_drop_top_expression( COMPILER *cc )
 {
     assert( cc->e_stack );
     enode_list_drop( &cc->e_stack );
 }
 
-static void compiler_swap_top_expressions( SNAIL_COMPILER *cc )
+static void compiler_swap_top_expressions( COMPILER *cc )
 {
     ENODE *e1 = enode_list_pop( &cc->e_stack );
     ENODE *e2 = enode_list_pop( &cc->e_stack );
@@ -949,7 +949,7 @@ static void compiler_swap_top_expressions( SNAIL_COMPILER *cc )
     enode_list_push( &cc->e_stack, e2 );    
 }
 
-static void snail_check_and_remove_index_type( SNAIL_COMPILER *cc )
+static void snail_check_and_remove_index_type( COMPILER *cc )
 {
     ENODE *idx_enode;
 
@@ -991,7 +991,7 @@ static void tnode_report_missing_operator( TNODE *tnode,
     }
 }
 
-static void snail_emit( SNAIL_COMPILER *cc,
+static void snail_emit( COMPILER *cc,
 			cexception_t *ex,
 			const char *format, ... )
 {
@@ -1103,7 +1103,7 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
     return list;
 }
 
-static void snail_fixup_inlined_function( SNAIL_COMPILER *cc,
+static void snail_fixup_inlined_function( COMPILER *cc,
 					  DNODE *function,
 					  key_value_t *fixup_values,
 					  ssize_t code_start )
@@ -1120,7 +1120,7 @@ static void snail_fixup_inlined_function( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_emit_function_call( SNAIL_COMPILER *cc,
+static void snail_emit_function_call( COMPILER *cc,
 				      DNODE *function,
 				      key_value_t *fixup_values,
 				      char *trailer,
@@ -1187,7 +1187,7 @@ static void snail_emit_function_call( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_push_function_retvals( SNAIL_COMPILER *cc, DNODE *function,
+static void snail_push_function_retvals( COMPILER *cc, DNODE *function,
                                          TYPETAB *generic_types,
 					 cexception_t *ex )
 {
@@ -1217,7 +1217,7 @@ static void snail_push_function_retvals( SNAIL_COMPILER *cc, DNODE *function,
     }
 }
 
-static void snail_compile_type_conversion( SNAIL_COMPILER *cc,
+static void snail_compile_type_conversion( COMPILER *cc,
 					   char *target_name,
 					   cexception_t *ex )
 {
@@ -1287,7 +1287,7 @@ static void snail_compile_type_conversion( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_return( SNAIL_COMPILER *cc,
+static void snail_compile_return( COMPILER *cc,
 				  int nretvals,
 				  cexception_t *ex )
 {
@@ -1389,7 +1389,7 @@ static void snail_compile_return( SNAIL_COMPILER *cc,
 }
 
 static DNODE *
-compiler_lookup_optab_operator( SNAIL_COMPILER *cc,
+compiler_lookup_optab_operator( COMPILER *cc,
                                 char *operator_name,
                                 TNODE *argument_tnode,
                                 int arity,
@@ -1447,7 +1447,7 @@ compiler_lookup_optab_operator( SNAIL_COMPILER *cc,
     return operator_dnode;
 }
 
-static DNODE* compiler_lookup_operator( SNAIL_COMPILER *cc,
+static DNODE* compiler_lookup_operator( COMPILER *cc,
                                         TNODE *tnode,
                                         char *operator_name,
                                         int arity,
@@ -1483,7 +1483,7 @@ typedef struct {
 } operator_description_t;
 
 static void snail_init_operator_description( operator_description_t *od,
-                                             SNAIL_COMPILER *cc,
+                                             COMPILER *cc,
 					     TNODE *op_type,
 					     char *op_name,
 					     int arity,
@@ -1518,7 +1518,7 @@ static void snail_init_operator_description( operator_description_t *od,
     od->retval_nr = dnode_list_length( od->retvals );
 }
 
-static void snail_check_operator_args( SNAIL_COMPILER *cc,
+static void snail_check_operator_args( COMPILER *cc,
 				       operator_description_t *od,
 				       TYPETAB *generic_types,
                                        cexception_t *ex )
@@ -1591,7 +1591,7 @@ static void snail_check_operator_args( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_drop_operator_args( SNAIL_COMPILER *cc,
+static void snail_drop_operator_args( COMPILER *cc,
 				      operator_description_t *od )
 {
     DNODE *op_args;
@@ -1610,7 +1610,7 @@ static void snail_drop_operator_args( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_push_operator_retvals( SNAIL_COMPILER *cc,
+static void snail_push_operator_retvals( COMPILER *cc,
 					 operator_description_t *od,
 					 ENODE * volatile *on_error_expr,
                                          TYPETAB *generic_types,
@@ -1659,7 +1659,7 @@ static void snail_push_operator_retvals( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_emit_operator_or_report_missing( SNAIL_COMPILER *cc,
+static void snail_emit_operator_or_report_missing( COMPILER *cc,
 						   operator_description_t *od,
 						   key_value_t *fixup_values,
 						   char *trailer,
@@ -1676,7 +1676,7 @@ static void snail_emit_operator_or_report_missing( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_check_operator_retvals( SNAIL_COMPILER *cc,
+static void snail_check_operator_retvals( COMPILER *cc,
 					  operator_description_t *od,
 					  int minvals,
 					  int maxvals )
@@ -1714,7 +1714,7 @@ static void snail_check_operator_retvals( SNAIL_COMPILER *cc,
     }
 }
 
-static int compiler_test_top_types_are_identical( SNAIL_COMPILER *cc,
+static int compiler_test_top_types_are_identical( COMPILER *cc,
 						  cexception_t *ex )
 {
     ENODE * expr1 = NULL, * expr2 = NULL;
@@ -1739,7 +1739,7 @@ static int compiler_test_top_types_are_identical( SNAIL_COMPILER *cc,
 }
 
 static int snail_test_top_types_are_assignment_compatible(
-    SNAIL_COMPILER *cc,
+    COMPILER *cc,
     cexception_t *ex )
 {
     ENODE * expr1 = NULL, * expr2 = NULL;
@@ -1765,7 +1765,7 @@ static int snail_test_top_types_are_assignment_compatible(
 }
 
 static int snail_test_top_types_are_readonly_compatible_for_copy(
-    SNAIL_COMPILER *cc,
+    COMPILER *cc,
     cexception_t *ex )
 {
     ENODE * expr1 = NULL, * expr2 = NULL;
@@ -1788,7 +1788,7 @@ static int snail_test_top_types_are_readonly_compatible_for_copy(
     }
 }
 
-static int compiler_check_top_2_expressions_are_identical( SNAIL_COMPILER *cc,
+static int compiler_check_top_2_expressions_are_identical( COMPILER *cc,
 							   char *binop_name,
 							   cexception_t *ex )
 {
@@ -1821,7 +1821,7 @@ static int compiler_check_top_2_expressions_are_identical( SNAIL_COMPILER *cc,
     }
 }
 
-static void compiler_check_top_2_expressions_and_drop( SNAIL_COMPILER *cc,
+static void compiler_check_top_2_expressions_and_drop( COMPILER *cc,
 						       char *binop_name,
 						       cexception_t *ex )
 {
@@ -1844,7 +1844,7 @@ static void compiler_check_top_2_expressions_and_drop( SNAIL_COMPILER *cc,
 
 */
 
-static void snail_compile_binop( SNAIL_COMPILER *cc,
+static void snail_compile_binop( COMPILER *cc,
 				 char *binop_name,
 				 cexception_t *ex )
 {
@@ -1908,7 +1908,7 @@ static key_value_t *make_array_element_key_value_list( TNODE *array )
     return make_tnode_key_value_list( element_type );
 }
 
-static void snail_compile_unop( SNAIL_COMPILER *cc,
+static void snail_compile_unop( COMPILER *cc,
 				char *unop_name,
 				cexception_t *ex )
 {
@@ -1949,7 +1949,7 @@ static void snail_compile_unop( SNAIL_COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_emit_st( SNAIL_COMPILER *cc,
+static void snail_emit_st( COMPILER *cc,
 			   TNODE *expr_type,
 			   char *var_name,
 			   ssize_t var_offset,
@@ -1998,7 +1998,7 @@ static void snail_emit_st( SNAIL_COMPILER *cc,
 }
 
 static void snail_compile_variable_assignment_or_init(
-    SNAIL_COMPILER *cc,
+    COMPILER *cc,
     DNODE *variable,
     int (*enode_is_readonly_compatible)( ENODE *, DNODE * ),
     cexception_t *ex )
@@ -2064,7 +2064,7 @@ static void snail_compile_variable_assignment_or_init(
     }
 }
 
-static void snail_compile_variable_assignment( SNAIL_COMPILER *cc,
+static void snail_compile_variable_assignment( COMPILER *cc,
 					       DNODE *variable,
 					       cexception_t *ex )
 {
@@ -2072,7 +2072,7 @@ static void snail_compile_variable_assignment( SNAIL_COMPILER *cc,
         cc, variable, enode_is_readonly_compatible_with_var, ex );
 }
 
-static void snail_compile_variable_initialisation( SNAIL_COMPILER *cc,
+static void snail_compile_variable_initialisation( COMPILER *cc,
 						   DNODE *variable,
 						   cexception_t *ex )
 {
@@ -2080,7 +2080,7 @@ static void snail_compile_variable_initialisation( SNAIL_COMPILER *cc,
         cc, variable, enode_is_readonly_compatible_for_init, ex );
 }
 
-static void snail_compile_store_variable( SNAIL_COMPILER *cc,
+static void snail_compile_store_variable( COMPILER *cc,
 					  DNODE *varnode,
 					  cexception_t *ex )
 {
@@ -2091,7 +2091,7 @@ static void snail_compile_store_variable( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_initialise_variable( SNAIL_COMPILER *cc,
+static void snail_compile_initialise_variable( COMPILER *cc,
 					       DNODE *varnode,
 					       cexception_t *ex )
 {
@@ -2102,7 +2102,7 @@ static void snail_compile_initialise_variable( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_stack_top_dereference( SNAIL_COMPILER *cc )
+static void snail_stack_top_dereference( COMPILER *cc )
 {
     if( cc->e_stack ) {
 	TNODE *expr_type = enode_type( cc->e_stack );
@@ -2116,7 +2116,7 @@ static void snail_stack_top_dereference( SNAIL_COMPILER *cc )
     }    
 }
 
-static int snail_stack_top_is_addressof( SNAIL_COMPILER *cc )
+static int snail_stack_top_is_addressof( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
@@ -2127,7 +2127,7 @@ static int snail_stack_top_is_addressof( SNAIL_COMPILER *cc )
 #endif
 }
 
-static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_compile_ldi( COMPILER *cc, cexception_t *ex )
 {
     ENODE * volatile expr;
 
@@ -2203,7 +2203,7 @@ static void snail_compile_ldi( SNAIL_COMPILER *cc, cexception_t *ex )
     }
 }
 
-static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_compile_sti( COMPILER *cc, cexception_t *ex )
 {
     cexception_t inner;
     ENODE *expr = NULL;
@@ -2286,7 +2286,7 @@ static void snail_compile_sti( SNAIL_COMPILER *cc, cexception_t *ex )
     delete_enode( top2 );
 }
 
-static void compiler_duplicate_top_expression( SNAIL_COMPILER *cc,
+static void compiler_duplicate_top_expression( COMPILER *cc,
 					       cexception_t *ex )
 {
     ENODE *expr;
@@ -2302,7 +2302,7 @@ static void compiler_duplicate_top_expression( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_operator( SNAIL_COMPILER *cc,
+static void snail_compile_operator( COMPILER *cc,
 				    TNODE *tnode,
 				    char *operator_name,
 				    int arity,
@@ -2316,7 +2316,7 @@ static void snail_compile_operator( SNAIL_COMPILER *cc,
     snail_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, ex );
 }
 
-static void snail_check_and_compile_operator( SNAIL_COMPILER *cc,
+static void snail_check_and_compile_operator( COMPILER *cc,
 					      TNODE *tnode,
 					      char *operator_name,
 					      int arity,
@@ -2344,7 +2344,7 @@ static void snail_check_and_compile_operator( SNAIL_COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_check_and_compile_top_operator( SNAIL_COMPILER *cc,
+static void snail_check_and_compile_top_operator( COMPILER *cc,
 						  char *operator,
 						  int arity,
 						  cexception_t *ex )
@@ -2375,7 +2375,7 @@ static void snail_check_and_compile_top_operator( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_check_and_compile_top_2_operator( SNAIL_COMPILER *cc,
+static void snail_check_and_compile_top_2_operator( COMPILER *cc,
 						    char * operator,
 						    int arity,
 						    cexception_t *ex )
@@ -2411,7 +2411,7 @@ static void snail_check_and_compile_top_2_operator( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_dup( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_compile_dup( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr;
 
@@ -2443,26 +2443,26 @@ static void snail_compile_dup( SNAIL_COMPILER *cc, cexception_t *ex )
     }
 }
 
-static int snail_dnode_is_reference( SNAIL_COMPILER *cc, DNODE *dnode )
+static int snail_dnode_is_reference( COMPILER *cc, DNODE *dnode )
 {
     return dnode ? dnode_type_is_reference( dnode ) : 0;
 }
 
-static int snail_stack_top_is_integer( SNAIL_COMPILER *cc )
+static int snail_stack_top_is_integer( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
     return etype ? tnode_is_integer( etype ) : 0;
 }
 
-static int snail_stack_top_is_reference( SNAIL_COMPILER *cc )
+static int snail_stack_top_is_reference( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
     return etype ? tnode_is_reference( etype ) : 0;
 }
 
-static int snail_stack_top_base_is_reference( SNAIL_COMPILER *cc )
+static int snail_stack_top_base_is_reference( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
@@ -2470,14 +2470,14 @@ static int snail_stack_top_base_is_reference( SNAIL_COMPILER *cc )
     return ebase ? tnode_is_reference( ebase ) : 0;
 }
  
-static int snail_stack_top_is_array( SNAIL_COMPILER *cc )
+static int snail_stack_top_is_array( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
     return etype ? tnode_kind( etype ) == TK_ARRAY : 0;
 }
 
-static int snail_stack_top_has_references( SNAIL_COMPILER *cc,
+static int snail_stack_top_has_references( COMPILER *cc,
 					   ssize_t drop_retvals )
 {
     ssize_t i;
@@ -2495,7 +2495,7 @@ static int snail_stack_top_has_references( SNAIL_COMPILER *cc,
     return 0;
 }
 
-static void snail_compile_drop( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_compile_drop( COMPILER *cc, cexception_t *ex )
 {
     if( snail_stack_top_is_reference( cc )) {
 	snail_emit( cc, ex, "\tc\n", PDROP );
@@ -2505,7 +2505,7 @@ static void snail_compile_drop( SNAIL_COMPILER *cc, cexception_t *ex )
     compiler_drop_top_expression( cc );
 }
 
-static void snail_compile_dropn( SNAIL_COMPILER *cc,
+static void snail_compile_dropn( COMPILER *cc,
 				 ssize_t drop_values,
 				 cexception_t *ex )
 {
@@ -2521,7 +2521,7 @@ static void snail_compile_dropn( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_swap( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_compile_swap( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr1 = enode_list_pop( &cc->e_stack );
     ENODE *expr2 = enode_list_pop( &cc->e_stack );
@@ -2536,7 +2536,7 @@ static void snail_compile_swap( SNAIL_COMPILER *cc, cexception_t *ex )
     snail_emit( cc, ex, "\tc\n", SWAP );
 }
 
-static void snail_compile_over( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_compile_over( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr1 = cc->e_stack;
     ENODE *expr2 = expr1 ? enode_next( expr1 ) : NULL;
@@ -2580,7 +2580,7 @@ static void snail_compile_over( SNAIL_COMPILER *cc, cexception_t *ex )
     delete_typetab( generic_types );
 }
 
-static int snail_stack_top_has_operator( SNAIL_COMPILER *c,
+static int snail_stack_top_has_operator( COMPILER *c,
 					 char *operator_name,
 					 int arity,
                                          cexception_t *ex )
@@ -2599,7 +2599,7 @@ static int snail_stack_top_has_operator( SNAIL_COMPILER *c,
     return 1;
 }
 
-static int snail_nth_stack_value_has_operator( SNAIL_COMPILER *c,
+static int snail_nth_stack_value_has_operator( COMPILER *c,
 					       int number_from_top,
 					       char *operator_name,
 					       int arity,
@@ -2630,7 +2630,7 @@ static int snail_nth_stack_value_has_operator( SNAIL_COMPILER *c,
     return 1;
 }
 
-static int snail_variable_has_operator( SNAIL_COMPILER *c,
+static int snail_variable_has_operator( COMPILER *c,
                                         DNODE *var_dnode,
 					char *operator_name,
 					int arity,
@@ -2655,7 +2655,7 @@ static int snail_variable_has_operator( SNAIL_COMPILER *c,
     return 1;
 }
 
-static void snail_compile_jnz_or_jz( SNAIL_COMPILER *c,
+static void snail_compile_jnz_or_jz( COMPILER *c,
 				     ssize_t offset,
 				     char *operator_name,
 				     void *pointer_opcode,
@@ -2684,21 +2684,21 @@ static void snail_compile_jnz_or_jz( SNAIL_COMPILER *c,
     }
 }
 
-static void snail_compile_jnz( SNAIL_COMPILER *c,
+static void snail_compile_jnz( COMPILER *c,
 			       ssize_t offset,
 			       cexception_t *ex )
 {
     snail_compile_jnz_or_jz( c, offset, "jnz", PJNZ, JNZ, ex );
 }
 
-static void snail_compile_jz( SNAIL_COMPILER *c,
+static void snail_compile_jz( COMPILER *c,
 			      ssize_t offset,
 			      cexception_t *ex )
 {
     snail_compile_jnz_or_jz( c, offset, "jz", PJZ, JZ, ex );
 }
 
-static void snail_compile_loop( SNAIL_COMPILER *c,
+static void snail_compile_loop( COMPILER *c,
 				ssize_t offset,
 				cexception_t *ex )
 {
@@ -2736,7 +2736,7 @@ static void snail_compile_loop( SNAIL_COMPILER *c,
     }
 }
 
-static void snail_compile_alloc( SNAIL_COMPILER *cc,
+static void snail_compile_alloc( COMPILER *cc,
 				 TNODE *alloc_type,
 				 cexception_t *ex )
 {
@@ -2819,7 +2819,7 @@ static char* snail_indexing_operator_name( TNODE *index_type,
     return snail_make_typed_operator_name( index_type, NULL, "[%s]", ex );
 }
 
-static void snail_compile_composite_alloc_operator( SNAIL_COMPILER *cc,
+static void snail_compile_composite_alloc_operator( COMPILER *cc,
 						    TNODE *composite_type,
 						    key_value_t *fixup_values,
 						    cexception_t *ex )
@@ -2847,7 +2847,7 @@ static void snail_compile_composite_alloc_operator( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_composite_alloc( SNAIL_COMPILER *cc,
+static void snail_compile_composite_alloc( COMPILER *cc,
 					   TNODE *composite_type,
 					   TNODE *element_type,
 					   cexception_t *ex )
@@ -2865,7 +2865,7 @@ static void snail_compile_composite_alloc( SNAIL_COMPILER *cc,
     /* snail_push_composite_of_type( cc, composite_type, element_type, ex ); */
 }
 
-static void snail_compile_array_alloc_operator( SNAIL_COMPILER *cc,
+static void snail_compile_array_alloc_operator( COMPILER *cc,
 						char *operator_name,
 						key_value_t *fixup_values,
 						cexception_t *ex )
@@ -2889,7 +2889,7 @@ static void snail_compile_array_alloc_operator( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_array_alloc( SNAIL_COMPILER *cc,
+static void snail_compile_array_alloc( COMPILER *cc,
 				       TNODE *element_type,
 				       cexception_t *ex )
 {
@@ -2904,7 +2904,7 @@ static void snail_compile_array_alloc( SNAIL_COMPILER *cc,
     snail_push_array_of_type( cc, element_type, ex );
 }
 
-static void snail_compile_blob_alloc( SNAIL_COMPILER *cc,
+static void snail_compile_blob_alloc( COMPILER *cc,
 				      cexception_t *ex )
 {
     static key_value_t fixup_values[] = {
@@ -2917,7 +2917,7 @@ static void snail_compile_blob_alloc( SNAIL_COMPILER *cc,
     snail_push_type( cc, new_tnode_blob_snail( cc->typetab, ex ), ex );
 }
 
-static void snail_compile_mdalloc( SNAIL_COMPILER *cc,
+static void snail_compile_mdalloc( COMPILER *cc,
 				   TNODE *element_type,
 				   int level,
 				   cexception_t *ex )
@@ -2950,7 +2950,7 @@ static void snail_compile_mdalloc( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_begin_scope( SNAIL_COMPILER *c,
+static void snail_begin_scope( COMPILER *c,
 			       cexception_t *ex )
 {
     assert( c );
@@ -2966,7 +2966,7 @@ static void snail_begin_scope( SNAIL_COMPILER *c,
     typetab_begin_scope( c->typetab, ex );
 }
 
-static void snail_end_scope( SNAIL_COMPILER *c, cexception_t *ex )
+static void snail_end_scope( COMPILER *c, cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -2980,7 +2980,7 @@ static void snail_end_scope( SNAIL_COMPILER *c, cexception_t *ex )
     typetab_end_scope( c->typetab, ex );
 }
 
-static void snail_begin_subscope( SNAIL_COMPILER *c,
+static void snail_begin_subscope( COMPILER *c,
 				  cexception_t *ex )
 {
     assert( c );
@@ -2992,7 +2992,7 @@ static void snail_begin_subscope( SNAIL_COMPILER *c,
     typetab_begin_subscope( c->typetab, ex );
 }
 
-static void snail_end_subscope( SNAIL_COMPILER *c, cexception_t *ex )
+static void snail_end_subscope( COMPILER *c, cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -3003,20 +3003,20 @@ static void snail_end_subscope( SNAIL_COMPILER *c, cexception_t *ex )
     typetab_end_subscope( c->typetab, ex );
 }
 
-static void snail_push_guarding_arg( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_push_guarding_arg( COMPILER *cc, cexception_t *ex )
 {
     ENODE *arg = new_enode_guarding_arg( ex );
     enode_list_push( &cc->e_stack, arg );
 }
 
-static void snail_push_guarding_retval( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_push_guarding_retval( COMPILER *cc, cexception_t *ex )
 {
     ENODE *arg = new_enode_guarding_arg( ex );
     enode_set_flags( arg, EF_RETURN_VALUE );
     enode_list_push( &cc->e_stack, arg );
 }
 
-static DNODE* snail_lookup_dnode_silently( SNAIL_COMPILER *cc,
+static DNODE* snail_lookup_dnode_silently( COMPILER *cc,
 					   char *module_name,
 					   char *identifier )
 {
@@ -3036,7 +3036,7 @@ static DNODE* snail_lookup_dnode_silently( SNAIL_COMPILER *cc,
     }
 }
 
-static DNODE* snail_lookup_dnode( SNAIL_COMPILER *cc,
+static DNODE* snail_lookup_dnode( COMPILER *cc,
 				  char *module_name,
 				  char *identifier,
 				  char *message )
@@ -3070,7 +3070,7 @@ static DNODE* snail_lookup_dnode( SNAIL_COMPILER *cc,
   %variable'.
 */
 
-static void snail_push_varaddr_expr( SNAIL_COMPILER *cc,
+static void snail_push_varaddr_expr( COMPILER *cc,
 				     char *variable_name,
 				     cexception_t *ex )
 {
@@ -3086,7 +3086,7 @@ static void snail_push_varaddr_expr( SNAIL_COMPILER *cc,
     }
 }
 
-static type_kind_t snail_stack_top_type_kind( SNAIL_COMPILER *cc )
+static type_kind_t snail_stack_top_type_kind( COMPILER *cc )
 {
     ENODE *top_expr = cc->e_stack;
     TNODE *top_type = top_expr ? enode_type( cc->e_stack ) : NULL;
@@ -3098,7 +3098,7 @@ static type_kind_t snail_stack_top_type_kind( SNAIL_COMPILER *cc )
     }
 }
 
-static void snail_make_stack_top_element_type( SNAIL_COMPILER *cc )
+static void snail_make_stack_top_element_type( COMPILER *cc )
 {
     if( cc->e_stack ) {
 	enode_make_type_to_element_type( cc->e_stack );
@@ -3108,7 +3108,7 @@ static void snail_make_stack_top_element_type( SNAIL_COMPILER *cc )
     }
 }
 
-static DNODE* snail_make_stack_top_field_type( SNAIL_COMPILER *cc,
+static DNODE* snail_make_stack_top_field_type( COMPILER *cc,
 					       char *field_name )
 {
     if( cc->e_stack ) {
@@ -3145,7 +3145,7 @@ static DNODE* snail_make_stack_top_field_type( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_make_stack_top_addressof( SNAIL_COMPILER *cc,
+static void snail_make_stack_top_addressof( COMPILER *cc,
 					    cexception_t *ex )
 {
     if( cc->e_stack ) {
@@ -3156,7 +3156,7 @@ static void snail_make_stack_top_addressof( SNAIL_COMPILER *cc,
     }    
 }
 
-static void snail_check_and_drop_function_args( SNAIL_COMPILER *cc,
+static void snail_check_and_drop_function_args( COMPILER *cc,
 						DNODE *function,
                                                 TYPETAB *generic_types,
                                                 cexception_t *ex )
@@ -3212,7 +3212,7 @@ static void snail_check_and_drop_function_args( SNAIL_COMPILER *cc,
     enode_list_drop( &cc->e_stack );
 }
 
-static DNODE *snail_check_and_set_fn_proto( SNAIL_COMPILER *cc,
+static DNODE *snail_check_and_set_fn_proto( COMPILER *cc,
 					    DNODE *fn_proto,
 					    cexception_t *ex )
 {
@@ -3245,7 +3245,7 @@ static DNODE *snail_check_and_set_fn_proto( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_emit_argument_list( SNAIL_COMPILER *cc,
+static void snail_emit_argument_list( COMPILER *cc,
                                       DNODE *argument_list,
 				      cexception_t *ex )
 {
@@ -3263,14 +3263,14 @@ static void snail_emit_argument_list( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_emit_function_arguments( DNODE *function, SNAIL_COMPILER *cc,
+static void snail_emit_function_arguments( DNODE *function, COMPILER *cc,
 					   cexception_t *ex )
 {
     assert( function );
     snail_emit_argument_list( cc, dnode_function_args( function ), ex );
 }
 
-static void snail_emit_drop_returned_values( SNAIL_COMPILER *cc,
+static void snail_emit_drop_returned_values( COMPILER *cc,
 					     ssize_t drop_retvals,
 					     cexception_t *ex  )
 {
@@ -3281,7 +3281,7 @@ static void snail_emit_drop_returned_values( SNAIL_COMPILER *cc,
     }    
 }
 
-static ssize_t compiler_assemble_static_data( SNAIL_COMPILER *cc,
+static ssize_t compiler_assemble_static_data( COMPILER *cc,
 					      void *data,
 					      ssize_t data_size,
 					      cexception_t *ex )
@@ -3305,7 +3305,7 @@ static ssize_t compiler_assemble_static_data( SNAIL_COMPILER *cc,
 
 #define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((ssize_t)(N)) % (lim)) % (lim) )
 
-static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
+static void compiler_assemble_static_alloc_hdr( COMPILER *cc,
                                                 ssize_t element_size,
 						ssize_t len,
 						cexception_t *ex )
@@ -3324,14 +3324,14 @@ static void compiler_assemble_static_alloc_hdr( SNAIL_COMPILER *cc,
     alloccell_set_values( hdr, element_size, len );
 }
 
-static ssize_t compiler_assemble_static_ssize_t( SNAIL_COMPILER *cc,
+static ssize_t compiler_assemble_static_ssize_t( COMPILER *cc,
 						 ssize_t size,
 						 cexception_t *ex )
 {
     return compiler_assemble_static_data( cc, &size, sizeof(size), ex );
 }
 
-static ssize_t compiler_assemble_static_string( SNAIL_COMPILER *cc,
+static ssize_t compiler_assemble_static_string( COMPILER *cc,
 						char *str,
 						cexception_t *ex )
 {
@@ -3339,7 +3339,7 @@ static ssize_t compiler_assemble_static_string( SNAIL_COMPILER *cc,
     return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
 }
 
-static TNODE *snail_lookup_suffix_tnode( SNAIL_COMPILER *cc,
+static TNODE *snail_lookup_suffix_tnode( COMPILER *cc,
 					 type_suffix_t suffix_type,
 					 char *module_name,
 					 char *suffix,
@@ -3387,7 +3387,7 @@ static TNODE *snail_lookup_suffix_tnode( SNAIL_COMPILER *cc,
     return const_type;
 }
 
-static void snail_compile_enum_const_from_tnode( SNAIL_COMPILER *cc,
+static void snail_compile_enum_const_from_tnode( COMPILER *cc,
 						 char *value_name,
 						 TNODE *const_type,
 						 cexception_t *ex )
@@ -3428,7 +3428,7 @@ static void snail_compile_enum_const_from_tnode( SNAIL_COMPILER *cc,
     snail_emit( cc, ex, "e\n", &string_offset );
 }
 
-static TNODE* snail_lookup_tnode_with_function( SNAIL_COMPILER *cc,
+static TNODE* snail_lookup_tnode_with_function( COMPILER *cc,
                                                 char *module_name,
                                                 char *identifier,
                                                 TNODE* (*typetab_lookup_fn)
@@ -3448,7 +3448,7 @@ static TNODE* snail_lookup_tnode_with_function( SNAIL_COMPILER *cc,
     }
 }
 
-static TNODE* snail_lookup_tnode_silently( SNAIL_COMPILER *cc,
+static TNODE* snail_lookup_tnode_silently( COMPILER *cc,
 					   char *module_name,
 					   char *identifier )
 {
@@ -3457,7 +3457,7 @@ static TNODE* snail_lookup_tnode_silently( SNAIL_COMPILER *cc,
                                              typetab_lookup_silently );
 }
 
-static TNODE* snail_lookup_tnode( SNAIL_COMPILER *cc,
+static TNODE* snail_lookup_tnode( COMPILER *cc,
 				  char *module_name,
 				  char *identifier,
 				  char *message )
@@ -3480,7 +3480,7 @@ static TNODE* snail_lookup_tnode( SNAIL_COMPILER *cc,
     return typenode;
 }
 
-static void snail_compile_enumeration_constant( SNAIL_COMPILER *cc,
+static void snail_compile_enumeration_constant( COMPILER *cc,
 						char *module_name,
 						char *value_name,
 						char *type_name,
@@ -3492,7 +3492,7 @@ static void snail_compile_enumeration_constant( SNAIL_COMPILER *cc,
     return snail_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
 }
 
-static void snail_compile_typed_constant( SNAIL_COMPILER *cc,
+static void snail_compile_typed_constant( COMPILER *cc,
 					  TNODE *const_type,
 					  char *value,
 					  cexception_t *ex )
@@ -3536,7 +3536,7 @@ static void snail_compile_typed_constant( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_constant( SNAIL_COMPILER *cc,
+static void snail_compile_constant( COMPILER *cc,
 				    type_suffix_t suffix_type,
 				    char *module_name,
 				    char *suffix, char *constant_kind_name,
@@ -3550,7 +3550,7 @@ static void snail_compile_constant( SNAIL_COMPILER *cc,
     snail_compile_typed_constant( cc, const_type, value, ex );
 }
 
-static DNODE* snail_lookup_constant( SNAIL_COMPILER *cc,
+static DNODE* snail_lookup_constant( COMPILER *cc,
 				     char *module_name,
 				     char *identifier,
 				     char *message )
@@ -3584,7 +3584,7 @@ static DNODE* snail_lookup_constant( SNAIL_COMPILER *cc,
     return constnode;
 }
 
-static void snail_compile_ld( SNAIL_COMPILER *cc,
+static void snail_compile_ld( COMPILER *cc,
 			      DNODE *varnode,
 			      char *operator_name,
 			      void *fallback_opcode,
@@ -3692,21 +3692,21 @@ static void snail_compile_ld( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_load_variable_value( SNAIL_COMPILER *cc,
+static void snail_compile_load_variable_value( COMPILER *cc,
 					       DNODE *varnode,
 					       cexception_t *ex )
 {
     snail_compile_ld( cc, varnode, "ld", LD, NULL, ex );
 }
 
-static void snail_compile_load_function_address( SNAIL_COMPILER *cc,
+static void snail_compile_load_function_address( COMPILER *cc,
 						 DNODE *varnode,
 						 cexception_t *ex )
 {
     snail_compile_ld( cc, varnode, "ldfn", LDFN, NULL, ex );
 }
 
-static void snail_compile_load_variable_address( SNAIL_COMPILER *cc,
+static void snail_compile_load_variable_address( COMPILER *cc,
 						 DNODE *varnode,
 						 cexception_t *ex )
 {
@@ -3725,21 +3725,21 @@ static void compiler_fixup_function_calls( THRCODE *tc, DNODE *funct )
     thrcode_fixup_function_calls( tc, name, address );
 }
 
-static void snail_compile_function_thrcode( SNAIL_COMPILER *cc )
+static void snail_compile_function_thrcode( COMPILER *cc )
 {
     assert( cc );
     assert( cc->thrcode != cc->function_thrcode );
     cc->thrcode = cc->function_thrcode;
 }
 
-static void snail_compile_main_thrcode( SNAIL_COMPILER *cc )
+static void snail_compile_main_thrcode( COMPILER *cc )
 {
     assert( cc );
     assert( cc->thrcode != cc->main_thrcode );
     cc->thrcode = cc->main_thrcode;
 }
 
-static void snail_merge_functions_and_main( SNAIL_COMPILER *cc,
+static void snail_merge_functions_and_main( COMPILER *cc,
 					    cexception_t *ex  )
 {
     assert( cc );
@@ -3750,7 +3750,7 @@ static void snail_merge_functions_and_main( SNAIL_COMPILER *cc,
     cc->thrcode = cc->main_thrcode;
 }
 
-static void snail_push_thrcode( SNAIL_COMPILER *sc,
+static void snail_push_thrcode( COMPILER *sc,
 			 cexception_t *ex )
 {
     thrlist_push_data( &sc->thrstack, &sc->thrcode, delete_thrcode, NULL, ex );
@@ -3759,7 +3759,7 @@ static void snail_push_thrcode( SNAIL_COMPILER *sc,
     sc->e_stack = NULL;
 }
 
-static void snail_swap_thrcodes( SNAIL_COMPILER *sc )
+static void snail_swap_thrcodes( COMPILER *sc )
 {
     THRCODE *code1 = thrlist_extract_data( sc->thrstack );
     ENODE *enode1 = elist_extract_data( sc->saved_estacks );
@@ -3773,7 +3773,7 @@ static void snail_swap_thrcodes( SNAIL_COMPILER *sc )
     sc->e_stack = enode1;
 }
 
-static void snail_merge_top_thrcodes( SNAIL_COMPILER *sc, cexception_t *ex )
+static void snail_merge_top_thrcodes( COMPILER *sc, cexception_t *ex )
 {
     thrcode_merge( sc->thrcode, thrlist_data( sc->thrstack ), ex );
     thrlist_drop( &sc->thrstack );
@@ -3781,7 +3781,7 @@ static void snail_merge_top_thrcodes( SNAIL_COMPILER *sc, cexception_t *ex )
 	enode_append( elist_pop_data( &sc->saved_estacks ), sc->e_stack );
 }
 
-static void snail_merge_functions_and_top( SNAIL_COMPILER *cc,
+static void snail_merge_functions_and_top( COMPILER *cc,
                                            cexception_t *ex )
 {
     assert( cc );
@@ -3801,7 +3801,7 @@ static void snail_merge_functions_and_top( SNAIL_COMPILER *cc,
 	enode_append( elist_pop_data( &cc->saved_estacks ), cc->e_stack );
 }
 
-static void snail_get_inline_code( SNAIL_COMPILER *cc,
+static void snail_get_inline_code( COMPILER *cc,
 					    DNODE *function,
 					    cexception_t *ex )
 {
@@ -3826,7 +3826,7 @@ static int snail_count_return_values( DNODE *funct )
     return dnode_list_length( retvals );
 }
 
-static void snail_compile_address_of_indexed_element( SNAIL_COMPILER *cc,
+static void snail_compile_address_of_indexed_element( COMPILER *cc,
 						      cexception_t *ex )
 {
     cexception_t inner;
@@ -3925,7 +3925,7 @@ static void snail_compile_address_of_indexed_element( SNAIL_COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_compile_subarray( SNAIL_COMPILER *cc,
+static void snail_compile_subarray( COMPILER *cc,
                                     cexception_t *ex )
 {
     cexception_t inner;
@@ -4037,7 +4037,7 @@ static void snail_compile_subarray( SNAIL_COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void snail_compile_indexing( SNAIL_COMPILER *cc,
+static void snail_compile_indexing( COMPILER *cc,
 				    int array_is_reference,
 				    int expr_count,
 				    cexception_t *ex )
@@ -4057,7 +4057,7 @@ static void snail_compile_indexing( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_type_declaration( SNAIL_COMPILER *cc,
+static void snail_compile_type_declaration( COMPILER *cc,
 					    TNODE *type_descr,
 					    cexception_t *ex )
 {
@@ -4171,7 +4171,7 @@ static ssize_t compiler_native_type_nreferences( const char *name )
     } 
 }
 
-static int compiler_check_and_emit_program_arguments( SNAIL_COMPILER *cc,
+static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 						      DNODE *args,
 						      cexception_t *ex )
 {
@@ -4216,7 +4216,7 @@ static int compiler_check_and_emit_program_arguments( SNAIL_COMPILER *cc,
     return retval;
 }
 
-static void compiler_compile_program_args( SNAIL_COMPILER *cc,
+static void compiler_compile_program_args( COMPILER *cc,
 					   char *program_name,
 					   DNODE *argument_list,
 					   cexception_t *ex )
@@ -4226,7 +4226,7 @@ static void compiler_compile_program_args( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_emit_catch_comparison( SNAIL_COMPILER *cc,
+static void snail_emit_catch_comparison( COMPILER *cc,
 					 char *module_name,
 					 char *exception_name,
 					 cexception_t *ex )
@@ -4261,7 +4261,7 @@ static void snail_emit_catch_comparison( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_finish_catch_comparisons( SNAIL_COMPILER *cc,
+static void snail_finish_catch_comparisons( COMPILER *cc,
 					    int nfixups,
 					    cexception_t *ex )
 {
@@ -4278,7 +4278,7 @@ static void snail_finish_catch_comparisons( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_finish_catch_block( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_finish_catch_block( COMPILER *cc, cexception_t *ex )
 {
     ssize_t zero = 0;
 
@@ -4307,7 +4307,7 @@ static void compiler_check_enum_attributes( TNODE *tnode )
     }
 }
 
-static void snail_convert_function_argument( SNAIL_COMPILER *cc,
+static void snail_convert_function_argument( COMPILER *cc,
 					     cexception_t *ex )
 {
     TNODE *arg_type = cc->current_arg ? dnode_type( cc->current_arg ) : NULL;
@@ -4325,7 +4325,7 @@ static void snail_convert_function_argument( SNAIL_COMPILER *cc,
     cc->current_arg = cc->current_arg ? dnode_prev( cc->current_arg ) : NULL;
 }
 
-static void snail_compile_typed_const_value( SNAIL_COMPILER *cc,
+static void snail_compile_typed_const_value( COMPILER *cc,
 					     TNODE *const_type,
 					     const_value_t *v,
 					     cexception_t *ex )
@@ -4379,7 +4379,7 @@ static void snail_compile_typed_const_value( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_multitype_const_value( SNAIL_COMPILER *cc,
+static void snail_compile_multitype_const_value( COMPILER *cc,
                                                  const_value_t *v,
                                                  char *module_name,
                                                  char *suffix_name,
@@ -4445,7 +4445,7 @@ static void snail_compile_multitype_const_value( SNAIL_COMPILER *cc,
     snail_compile_typed_const_value( cc, const_type, v, ex );
 }
 
-static void snail_emit_default_arguments( SNAIL_COMPILER *cc,
+static void snail_emit_default_arguments( COMPILER *cc,
 					  char *arg_name,
 					  cexception_t *ex )
 {
@@ -4481,7 +4481,7 @@ static void snail_emit_default_arguments( SNAIL_COMPILER *cc,
     cc->current_arg = arg;
 }
 
-static void compiler_check_forward_functions( SNAIL_COMPILER *c )
+static void compiler_check_forward_functions( COMPILER *c )
 {
     FIXUP *f;
     FIXUP *forward_calls = thrcode_forward_functions( c->thrcode );
@@ -4492,7 +4492,7 @@ static void compiler_check_forward_functions( SNAIL_COMPILER *c )
     }
 }
 
-static void compiler_check_raise_expression( SNAIL_COMPILER *c,
+static void compiler_check_raise_expression( COMPILER *c,
 					     char *exception_name,
 					     cexception_t *ex )
 {
@@ -4532,7 +4532,7 @@ static struct {
     { NULL, SL_EXCEPTION_NULL }
 };
 
-static void snail_insert_default_exceptions( SNAIL_COMPILER *c,
+static void snail_insert_default_exceptions( COMPILER *c,
 					     cexception_t *ex )
 {
     int i;
@@ -4547,7 +4547,7 @@ static void snail_insert_default_exceptions( SNAIL_COMPILER *c,
     }
 }
 
-static void snail_compile_file_input_operator( SNAIL_COMPILER *cc,
+static void snail_compile_file_input_operator( COMPILER *cc,
 					       cexception_t *ex )
 {
     ENODE *top_expr = cc->e_stack;
@@ -4597,7 +4597,7 @@ static void snail_check_non_null_variables( DNODE *dnode_list )
     }
 }
 
-static void snail_compile_variable_initialisations( SNAIL_COMPILER *cc,
+static void snail_compile_variable_initialisations( COMPILER *cc,
 						    DNODE *lst,
 						    cexception_t *ex )
 {
@@ -4612,7 +4612,7 @@ static void snail_compile_variable_initialisations( SNAIL_COMPILER *cc,
     }
 }
 
-static void snail_compile_zero_out_stackcells( SNAIL_COMPILER *cc,
+static void snail_compile_zero_out_stackcells( COMPILER *cc,
 					       DNODE *variables,
 					       cexception_t *ex )
 {
@@ -4637,7 +4637,7 @@ static void snail_compile_zero_out_stackcells( SNAIL_COMPILER *cc,
     }
 }
 
-static void compiler_begin_package( SNAIL_COMPILER *c,
+static void compiler_begin_package( COMPILER *c,
 				    DNODE *package,
 				    cexception_t *ex )
 {
@@ -4648,13 +4648,13 @@ static void compiler_begin_package( SNAIL_COMPILER *c,
     c->current_package = package;
 }
 
-static void compiler_end_package( SNAIL_COMPILER *c, cexception_t *ex )
+static void compiler_end_package( COMPILER *c, cexception_t *ex )
 {
     compiler_pop_symbol_tables( c );
     c->current_package = dlist_pop_data( &c->current_package_stack );
 }
 
-static char *compiler_find_package( SNAIL_COMPILER *c,
+static char *compiler_find_package( COMPILER *c,
 				    const char *package_name,
 				    cexception_t *ex )
 {
@@ -4668,7 +4668,7 @@ static char *compiler_find_package( SNAIL_COMPILER *c,
     return buffer;
 }
 
-static int compiler_can_compile_use_statement( SNAIL_COMPILER *cc,
+static int compiler_can_compile_use_statement( COMPILER *cc,
 					       char *statement )
 {
     assert( cc );
@@ -4685,7 +4685,7 @@ static int compiler_can_compile_use_statement( SNAIL_COMPILER *cc,
     return 1;
 }
 
-static void compiler_import_package( SNAIL_COMPILER *c,
+static void compiler_import_package( COMPILER *c,
 				     char *package_name,
 				     cexception_t *ex )
 {
@@ -4704,7 +4704,7 @@ static void compiler_import_package( SNAIL_COMPILER *c,
     }
 }
 
-static void compiler_use_package( SNAIL_COMPILER *c,
+static void compiler_use_package( COMPILER *c,
 				  char *package_name,
 				  cexception_t *ex )
 {
@@ -4739,7 +4739,7 @@ static void compiler_debug()
 	    snail_flex_current_line_number() );
 }
 
-static void snail_compile_multiple_assignment( SNAIL_COMPILER *cc,
+static void snail_compile_multiple_assignment( COMPILER *cc,
 					       ssize_t nvars,
 					       ssize_t nvars_left,
 					       ssize_t nvalues,
@@ -4773,7 +4773,7 @@ static void snail_compile_multiple_assignment( SNAIL_COMPILER *cc,
     snail_merge_top_thrcodes( cc, ex );
 }
 
-static void snail_compile_array_expression( SNAIL_COMPILER* cc,
+static void snail_compile_array_expression( COMPILER* cc,
 					    ssize_t nexpr,
 					    cexception_t *ex )
 {
@@ -4804,7 +4804,7 @@ static void snail_compile_array_expression( SNAIL_COMPILER* cc,
     }
 }
 
-static void snail_push_loop( SNAIL_COMPILER *cc, char *loop_label,
+static void snail_push_loop( COMPILER *cc, char *loop_label,
 			     cexception_t *ex )
 {
     char label[200];
@@ -4817,7 +4817,7 @@ static void snail_push_loop( SNAIL_COMPILER *cc, char *loop_label,
     }
 }
 
-static void snail_pop_loop( SNAIL_COMPILER *cc )
+static void snail_pop_loop( COMPILER *cc )
 {
     DNODE *top_loop = cc->loops;
 
@@ -4828,7 +4828,7 @@ static void snail_pop_loop( SNAIL_COMPILER *cc )
     delete_dnode( top_loop );
 }
 
-static void snail_fixup_op_continue( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_fixup_op_continue( COMPILER *cc, cexception_t *ex )
 {
     DNODE *loop = cc->loops;
 
@@ -4838,7 +4838,7 @@ static void snail_fixup_op_continue( SNAIL_COMPILER *cc, cexception_t *ex )
 			       thrcode_length( cc->thrcode ));
 }
 
-static void snail_fixup_op_break( SNAIL_COMPILER *cc, cexception_t *ex )
+static void snail_fixup_op_break( COMPILER *cc, cexception_t *ex )
 {
     DNODE *loop = cc->loops;
 
@@ -4848,7 +4848,7 @@ static void snail_fixup_op_break( SNAIL_COMPILER *cc, cexception_t *ex )
 			    thrcode_length( cc->thrcode ));
 }
 
-static char *snail_get_loop_name( SNAIL_COMPILER *cc, char *label )
+static char *snail_get_loop_name( COMPILER *cc, char *label )
 {
     if( !label ) {
 	DNODE *latest_loop = cc->loops;
@@ -4873,7 +4873,7 @@ static char *snail_get_loop_name( SNAIL_COMPILER *cc, char *label )
     }
 }
 
-static ssize_t check_loop_types( SNAIL_COMPILER *cc, char *label )
+static ssize_t check_loop_types( COMPILER *cc, char *label )
 {
     DNODE *loop;
     int found = 0;
@@ -4894,7 +4894,7 @@ static ssize_t check_loop_types( SNAIL_COMPILER *cc, char *label )
     return count;
 }
 
-static int snail_check_break_and_cont_statements( SNAIL_COMPILER *cc )
+static int snail_check_break_and_cont_statements( COMPILER *cc )
 {
     assert( cc );
     if( !cc->loops ) {
@@ -4905,7 +4905,7 @@ static int snail_check_break_and_cont_statements( SNAIL_COMPILER *cc )
     return 1;
 }
 
-static void snail_drop_loop_counters( SNAIL_COMPILER *cc, char *name,
+static void snail_drop_loop_counters( COMPILER *cc, char *name,
 				      int delta,
 				      cexception_t *ex )
 {
@@ -4917,7 +4917,7 @@ static void snail_drop_loop_counters( SNAIL_COMPILER *cc, char *name,
     }
 }
 
-static void snail_compile_break( SNAIL_COMPILER *cc, char *label,
+static void snail_compile_break( COMPILER *cc, char *label,
 				 cexception_t *ex )
 {
     ssize_t zero = 0;
@@ -4934,7 +4934,7 @@ static void snail_compile_break( SNAIL_COMPILER *cc, char *label,
     }
 }
 
-static void snail_compile_continue( SNAIL_COMPILER *cc, char *label,
+static void snail_compile_continue( COMPILER *cc, char *label,
 				    cexception_t *ex )
 {
     ssize_t zero = 0;
@@ -5060,7 +5060,7 @@ const_value_t compiler_get_dnode_compile_time_attribute( DNODE *dnode,
     }
 }
 
-static const_value_t compiler_make_compile_time_value( SNAIL_COMPILER *cc,
+static const_value_t compiler_make_compile_time_value( COMPILER *cc,
 						       char *package_name,
 						       char *identifier,
 						       char *attribute_name,
@@ -5091,7 +5091,7 @@ static const_value_t compiler_make_compile_time_value( SNAIL_COMPILER *cc,
     }
 }
 
-static DNODE* compiler_lookup_type_field( SNAIL_COMPILER *cc,
+static DNODE* compiler_lookup_type_field( COMPILER *cc,
 					  char *package_name,
 					  char *identifier,
 					  char *field_identifier )
@@ -5130,7 +5130,7 @@ static DNODE* compiler_lookup_type_field( SNAIL_COMPILER *cc,
     }
 }
 
-static DNODE* compiler_lookup_tnode_field( SNAIL_COMPILER *cc,
+static DNODE* compiler_lookup_tnode_field( COMPILER *cc,
                                            TNODE *tnode,
                                            char *field_identifier )
 {
@@ -5169,7 +5169,7 @@ static char *extension( char *filename )
 
 typedef void DL_HANDLE;
 
-static void compiler_load_library( SNAIL_COMPILER *snail_cc,
+static void compiler_load_library( COMPILER *snail_cc,
 				   char *library_filename,
 				   char *opcode_array_name,
 				   cexception_t *ex )
@@ -5226,7 +5226,7 @@ static void compiler_load_library( SNAIL_COMPILER *snail_cc,
     freex( library_name );
 }
 
-static void snail_check_and_push_function_name( SNAIL_COMPILER *cc,
+static void snail_check_and_push_function_name( COMPILER *cc,
 						char *module_name,
 						char *function_name,
 						cexception_t *ex )
@@ -5264,7 +5264,7 @@ static void snail_check_and_push_function_name( SNAIL_COMPILER *cc,
     }
 }
 
-static ssize_t snail_compile_multivalue_function_call( SNAIL_COMPILER *cc,
+static ssize_t snail_compile_multivalue_function_call( COMPILER *cc,
 						       cexception_t *ex )
 {
     cexception_t inner;
@@ -5365,7 +5365,7 @@ i-face 1 VMT offs.:             |
 
 */
 
-static void compiler_start_virtual_method_table( SNAIL_COMPILER *cc,
+static void compiler_start_virtual_method_table( COMPILER *cc,
                                                  TNODE *class_descr,
                                                  cexception_t *ex )
 {
@@ -5406,7 +5406,7 @@ static void compiler_start_virtual_method_table( SNAIL_COMPILER *cc,
 
 }
 
-static void compiler_finish_virtual_method_table( SNAIL_COMPILER *cc,
+static void compiler_finish_virtual_method_table( COMPILER *cc,
                                                   TNODE *class_descr,
                                                   cexception_t *ex )
 {
@@ -5577,7 +5577,7 @@ static void snail_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
-static void snail_compile_type_descriptor_loader( SNAIL_COMPILER *cc,
+static void snail_compile_type_descriptor_loader( COMPILER *cc,
                                                   TNODE *tnode,
                                                   cexception_t *ex )
 {
@@ -5600,7 +5600,7 @@ static void snail_compile_type_descriptor_loader( SNAIL_COMPILER *cc,
     snail_push_type( cc, type_descriptor_type, ex );
 }
 
-static SNAIL_COMPILER * volatile snail_cc;
+static COMPILER * volatile snail_cc;
 
 static cexception_t *px; /* parser exception */
 
@@ -10829,7 +10829,7 @@ THRCODE *new_thrcode_from_snail_file( char *filename, char **include_paths,
     THRCODE *code;
 
     assert( !snail_cc );
-    snail_cc = new_snail_compiler( filename, include_paths, ex );
+    snail_cc = new_compiler( filename, include_paths, ex );
 
     snail_compile_file( filename, ex );
 
@@ -10848,7 +10848,7 @@ THRCODE *new_thrcode_from_snail_file( char *filename, char **include_paths,
     thrcode_insert_static_data( code, snail_cc->static_data,
 				snail_cc->static_data_size );
     snail_cc->static_data = NULL;
-    delete_snail_compiler( snail_cc );
+    delete_compiler( snail_cc );
     snail_cc = NULL;
 
     return code;
