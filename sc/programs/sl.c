@@ -16,8 +16,8 @@
 #include <string.h>
 #include <getoptions.h>
 #include <thrcode.h>
-#include <snail_y.h>
-#include <snail_flex.h>
+#include <grammar_y.h>
+#include <lexer_flex.h>
 #include <run.h>
 #include <bcalloc.h>
 #include <allocx.h>
