@@ -5645,11 +5645,13 @@ static cexception_t *px; /* parser exception */
 %token _ENUM
 %token _EXCEPTION
 %token _FOR
+%token _FOREACH
 %token _FORWARD
 %token _FUNCTION
 %token _IF
 %token _IMPLEMENTS
 %token _IMPORT
+%token _IN
 %token _INCLUDE
 %token _INLINE
 %token _INTERFACE
@@ -7036,6 +7038,102 @@ control_statement
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
 	compiler_end_subscope( compiler_cc, px );
+      }
+
+  | opt_label _FOREACH variable_declaration_keyword
+      {
+#warning _FOREACH rules are not yet implemented!
+          ssize_t current_line_no = compiler_flex_current_line_number();
+          ssize_t file_name_offset = compiler_assemble_static_string
+              ( compiler_cc, compiler_cc->filename, px );
+          ssize_t current_line_offset = compiler_assemble_static_string
+              ( compiler_cc, (char*)compiler_flex_current_line(), px );
+          compiler_emit( compiler_cc, px, "\tcI\n", LDC, 0 );
+          compiler_emit( compiler_cc, px, "\tceee\n", ASSERT,
+                         &current_line_no, &file_name_offset, &current_line_offset );
+
+          compiler_begin_subscope( compiler_cc, px );
+      }
+    for_variable_declaration
+      {
+	int readonly = $3;
+	if( readonly ) {
+	    dnode_set_flags( $5, DF_IS_READONLY );
+	}
+	compiler_push_loop( compiler_cc, $1, px );
+	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
+      }
+    _IN expression
+      {
+	DNODE *loop_counter_var = $5;
+        TNODE *aggregate_expression_type = enode_type( compiler_cc->e_stack );
+
+	if( dnode_type( loop_counter_var ) == NULL ) {
+	    dnode_append_type( loop_counter_var,
+			       share_tnode( enode_type( compiler_cc->e_stack )));
+	    dnode_assign_offset( loop_counter_var, &compiler_cc->local_offset );
+	}
+	compiler_vartab_insert_named_vars( compiler_cc, loop_counter_var, px );
+        compiler_compile_store_variable( compiler_cc, loop_counter_var, px );
+	compiler_compile_load_variable_address( compiler_cc, loop_counter_var, px );
+
+	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
+	    compiler_compile_binop( compiler_cc, ">", px );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_compile_jnz( compiler_cc, 0, px );
+	} else {
+	    ssize_t zero = 0;
+	    //compiler_drop_top_expression( compiler_cc );
+	    //compiler_drop_top_expression( compiler_cc );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	}
+
+        compiler_push_current_address( compiler_cc, px );
+      }
+     loop_body
+      {
+	compiler_fixup_here( compiler_cc );
+	compiler_fixup_op_continue( compiler_cc, px );
+	//compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_fixup_op_break( compiler_cc, px );
+	compiler_pop_loop( compiler_cc );
+	compiler_end_subscope( compiler_cc, px );
+      }
+
+  | opt_label _FOREACH lvariable
+      {
+	compiler_push_loop( compiler_cc, $1, px );
+	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
+	compiler_compile_dup( compiler_cc, px );
+        compiler_compile_sti( compiler_cc, px );
+      }
+    _IN expression
+      {
+	compiler_compile_over( compiler_cc, px );
+	compiler_compile_ldi( compiler_cc, px );
+	compiler_compile_over( compiler_cc, px );
+	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
+	    compiler_compile_binop( compiler_cc, ">", px );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_compile_jnz( compiler_cc, 0, px );
+	} else {
+	    ssize_t zero = 0;
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_push_relative_fixup( compiler_cc, px );
+	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	}
+
+        compiler_push_current_address( compiler_cc, px );
+      }
+     loop_body
+      {
+	compiler_fixup_here( compiler_cc );
+	compiler_fixup_op_continue( compiler_cc, px );
+	compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_fixup_op_break( compiler_cc, px );
+	compiler_pop_loop( compiler_cc );
       }
 
   | _TRY

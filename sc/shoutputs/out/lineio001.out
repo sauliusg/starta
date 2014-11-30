@@ -13,18 +13,18 @@ shtests/programs/lineio.snl
 12 	 >>> for var i = 1 to last(args) do <<<
 13 	 >>>     . args[i]; <<<
 14 	 >>>  <<<
-15 	 >>>     var file in = fopen( args[i], "r" ); <<<
+15 	 >>>     var file inp = fopen( args[i], "r" ); <<<
 16 	 >>>      <<<
 17 	 >>>     var int n = 1; <<<
 18 	 >>>     var line : string; <<<
 19 	 >>>      <<<
-20 	 >>>     while( !feof( in )) { <<<
-21 	 >>>         <in> >> line; <<<
+20 	 >>>     while( !feof( inp )) { <<<
+21 	 >>>         <inp> >> line; <<<
 22 	 >>>         do break if line == null; <<<
 23 	 >>>         . n, "\t", ">>>", line, "<<<"; <<<
 24 	 >>>     	n++; <<<
 25 	 >>>     } <<<
 26 	 >>>      <<<
-27 	 >>>     fclose( in ); <<<
+27 	 >>>     fclose( inp ); <<<
 28 	 >>> enddo; <<<
 29 	 >>> } <<<
