@@ -7042,15 +7042,17 @@ control_statement
 
   | opt_label _FOREACH variable_declaration_keyword
       {
+          {
 #warning _FOREACH rules are not yet implemented!
-          ssize_t current_line_no = compiler_flex_current_line_number();
-          ssize_t file_name_offset = compiler_assemble_static_string
-              ( compiler_cc, compiler_cc->filename, px );
-          ssize_t current_line_offset = compiler_assemble_static_string
-              ( compiler_cc, (char*)compiler_flex_current_line(), px );
-          compiler_emit( compiler_cc, px, "\tcI\n", LDC, 0 );
-          compiler_emit( compiler_cc, px, "\tceee\n", ASSERT,
-                         &current_line_no, &file_name_offset, &current_line_offset );
+              ssize_t current_line_no = compiler_flex_current_line_number();
+              ssize_t file_name_offset = compiler_assemble_static_string
+                  ( compiler_cc, compiler_cc->filename, px );
+              ssize_t current_line_offset = compiler_assemble_static_string
+                  ( compiler_cc, (char*)compiler_flex_current_line(), px );
+              compiler_emit( compiler_cc, px, "\tcI\n", LDC, 0 );
+              compiler_emit( compiler_cc, px, "\tceee\n", ASSERT,
+                             &current_line_no, &file_name_offset, &current_line_offset );
+          }
 
           compiler_begin_subscope( compiler_cc, px );
       }
@@ -7067,16 +7069,27 @@ control_statement
       {
 	DNODE *loop_counter_var = $5;
         TNODE *aggregate_expression_type = enode_type( compiler_cc->e_stack );
+        TNODE *element_type = 
+            aggregate_expression_type ?
+            tnode_element_type( aggregate_expression_type ) : NULL;
 
-	if( dnode_type( loop_counter_var ) == NULL ) {
-	    dnode_append_type( loop_counter_var,
-			       share_tnode( enode_type( compiler_cc->e_stack )));
-	    dnode_assign_offset( loop_counter_var, &compiler_cc->local_offset );
-	}
+        if( element_type ) {
+            if( dnode_type( loop_counter_var ) == NULL ) {
+                dnode_append_type( loop_counter_var,
+                                   share_tnode( element_type ));
+            }
+            dnode_assign_offset( loop_counter_var,
+                                 &compiler_cc->local_offset );
+        }
+
 	compiler_vartab_insert_named_vars( compiler_cc, loop_counter_var, px );
+        compiler_compile_dup( compiler_cc, px );
+        compiler_make_stack_top_element_type( compiler_cc );
+        compiler_make_stack_top_addressof( compiler_cc, px );
+        compiler_compile_ldi( compiler_cc, px );
         compiler_compile_store_variable( compiler_cc, loop_counter_var, px );
-	compiler_compile_load_variable_address( compiler_cc, loop_counter_var, px );
 
+#if 0
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
 	    compiler_compile_binop( compiler_cc, ">", px );
 	    compiler_push_relative_fixup( compiler_cc, px );
@@ -7088,6 +7101,7 @@ control_statement
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
+#endif
 
         compiler_push_current_address( compiler_cc, px );
       }
