@@ -7081,17 +7081,27 @@ control_statement
         /* Load array limit onto the stack, for compiling the loop operator: */
         compiler_compile_dup( compiler_cc, px );
         compiler_compile_dup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tc\n", LENGTH );
+        compiler_emit( compiler_cc, px, "\tc\n", LLENGTH );
+        compiler_emit( compiler_cc, px, "\tc\n", LINDEX );
         compiler_drop_top_expression( compiler_cc );
-        TNODE *tnode_integer =
-            share_tnode( typetab_lookup( compiler_cc->typetab, "int" ));
-        compiler_push_type( compiler_cc, tnode_integer, px );
+        compiler_compile_swap( compiler_cc, px );
 
-#if 1
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
-	    compiler_compile_binop( compiler_cc, ">", px );
+            cexception_t inner;
+            TNODE *volatile bool_tnode =
+                share_tnode( typetab_lookup( compiler_cc->typetab, "bool" ));
+            cexception_guard( inner ) {
+                compiler_push_type( compiler_cc, bool_tnode, &inner );
+            }
+            cexception_catch {
+                delete_tnode( bool_tnode );
+                cexception_reraise( inner, px );
+            }
+	    compiler_drop_top_expression( compiler_cc );
+	    compiler_drop_top_expression( compiler_cc );
+            compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
 	    compiler_push_relative_fixup( compiler_cc, px );
-	    compiler_compile_jnz( compiler_cc, 0, px );
+	    compiler_compile_jz( compiler_cc, 0, px );
 	} else {
 	    ssize_t zero = 0;
 	    compiler_drop_top_expression( compiler_cc );
@@ -7099,7 +7109,6 @@ control_statement
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
-#endif
 
         compiler_push_current_address( compiler_cc, px );
       }
