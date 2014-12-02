@@ -2736,6 +2736,58 @@ static void compiler_compile_loop( COMPILER *c,
     }
 }
 
+static void compiler_compile_next( COMPILER *c,
+                                   cexception_t *ex )
+{
+    ssize_t offset = 0;
+    ENODE * volatile limit_enode = c->e_stack;
+    TNODE * volatile limit_tnode = limit_enode ?
+	enode_type( limit_enode ) : NULL;
+
+    TNODE * volatile limit_base = limit_tnode ?
+	tnode_element_type( limit_tnode ) : NULL;
+
+    ENODE * volatile counter_enode = limit_enode ?
+	enode_next( limit_enode ) : NULL;
+    TNODE * volatile counter_tnode = counter_enode ?
+	enode_type( counter_enode ) : NULL;
+
+    TNODE * volatile counter_base = counter_tnode ?
+	tnode_element_type( counter_tnode ) : NULL;
+
+    if( !counter_enode ) {
+	yyerrorf( "too little values on the eval stack for LOOP operator" );
+    }
+
+    if( counter_base && limit_base &&
+	!tnode_types_are_compatible( counter_base, limit_base, NULL, ex )) {
+	yyerrorf( "incompatible types in counter and limit of 'foreach' "
+		  "operator" );
+    }
+
+#if 0
+    if( limit_tnode ) {
+	if( compiler_lookup_operator( c, limit_tnode, "next", 2, ex )) {
+	    compiler_check_and_compile_operator( c, limit_tnode, "next",
+					      /*arity:*/ 2,
+					      /*fixup_values:*/ NULL, ex );
+	    compiler_emit( c, ex, "e\n", &offset );
+	} else {
+	    tnode_report_missing_operator( limit_tnode, "loop", 2 );
+	}
+    }
+#else
+    compiler_emit( c, ex, "\tcI\n", LDC, 1 );
+    compiler_emit( c, ex, "\tc\n", INDEX );    
+
+    compiler_compile_over( c, ex );
+    compiler_compile_over( c, ex );
+    compiler_emit( c, ex, "\tc\n", PEQBOOL );
+    offset = compiler_pop_offset( c, ex );
+    compiler_compile_jz( c, offset, ex );
+#endif
+}
+
 static void compiler_compile_alloc( COMPILER *cc,
 				 TNODE *alloc_type,
 				 cexception_t *ex )
@@ -7115,9 +7167,10 @@ control_statement
       }
      loop_body
       {
-	compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_continue( compiler_cc, px );
-	// compiler_compile_next( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_compile_next( compiler_cc, px );
+        
+        compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
 	compiler_end_subscope( compiler_cc, px );
