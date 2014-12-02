@@ -3622,6 +3622,7 @@ int PEQBOOL( INSTRUCTION_FN_ARGS )
     istate.ep[1].num.b =
 	STACKCELL_PTR( istate.ep[1] ) == STACKCELL_PTR( istate.ep[0] );
     istate.ep ++;
+    STACKCELL_ZERO_PTR( istate.ep[0] );
 
     return 1;
 }
@@ -3633,6 +3634,7 @@ int PNEBOOL( INSTRUCTION_FN_ARGS )
     istate.ep[1].num.b =
 	STACKCELL_PTR( istate.ep[1] ) != STACKCELL_PTR( istate.ep[0] );
     istate.ep ++;
+    STACKCELL_ZERO_PTR( istate.ep[0] );
 
     return 1;
 }
