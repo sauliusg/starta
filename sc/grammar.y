@@ -7070,20 +7070,13 @@ control_statement
                                  &compiler_cc->local_offset );
         }
 
-        /* Store the first array element into the loop variable: */
 	compiler_vartab_insert_named_vars( compiler_cc, loop_counter_var, px );
-        compiler_compile_dup( compiler_cc, px );
-        compiler_make_stack_top_element_type( compiler_cc );
-        compiler_make_stack_top_addressof( compiler_cc, px );
-        compiler_compile_ldi( compiler_cc, px );
-        compiler_compile_store_variable( compiler_cc, loop_counter_var, px );
 
         /* Load array limit onto the stack, for compiling the loop operator: */
         compiler_compile_dup( compiler_cc, px );
         compiler_compile_dup( compiler_cc, px );
         compiler_emit( compiler_cc, px, "\tc\n", LLENGTH );
         compiler_emit( compiler_cc, px, "\tc\n", LINDEX );
-        compiler_drop_top_expression( compiler_cc );
         compiler_compile_swap( compiler_cc, px );
 
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
@@ -7097,26 +7090,34 @@ control_statement
                 delete_tnode( bool_tnode );
                 cexception_reraise( inner, px );
             }
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_drop_top_expression( compiler_cc );
+            compiler_compile_over( compiler_cc, px );
+            compiler_compile_over( compiler_cc, px );
             compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
 	    compiler_push_relative_fixup( compiler_cc, px );
-	    compiler_compile_jz( compiler_cc, 0, px );
+	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
 	    ssize_t zero = 0;
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_drop_top_expression( compiler_cc );
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
 
         compiler_push_current_address( compiler_cc, px );
+
+        /* Store the current array element into the loop variable: */
+        compiler_compile_dup( compiler_cc, px );
+        compiler_make_stack_top_element_type( compiler_cc );
+        compiler_make_stack_top_addressof( compiler_cc, px );
+        compiler_compile_ldi( compiler_cc, px );
+        compiler_compile_store_variable( compiler_cc, loop_counter_var, px );
+
+        compiler_drop_top_expression( compiler_cc );
+        compiler_drop_top_expression( compiler_cc );
       }
      loop_body
       {
 	compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_continue( compiler_cc, px );
-	//compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	// compiler_compile_next( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
 	compiler_end_subscope( compiler_cc, px );
