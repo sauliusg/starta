@@ -1,7 +1,7 @@
 
 use std;
 
-var a = [ 1, 3, 12, 74 ];
+var a = [ 11, 3, 12, 74 ];
 var i = 1;
 
 foreach var m in a do
