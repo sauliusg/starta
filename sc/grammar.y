@@ -7042,19 +7042,7 @@ control_statement
 
   | opt_label _FOREACH variable_declaration_keyword
       {
-          {
-#warning _FOREACH rules are not yet implemented!
-              ssize_t current_line_no = compiler_flex_current_line_number();
-              ssize_t file_name_offset = compiler_assemble_static_string
-                  ( compiler_cc, compiler_cc->filename, px );
-              ssize_t current_line_offset = compiler_assemble_static_string
-                  ( compiler_cc, (char*)compiler_flex_current_line(), px );
-              compiler_emit( compiler_cc, px, "\tcI\n", LDC, 0 );
-              compiler_emit( compiler_cc, px, "\tceee\n", ASSERT,
-                             &current_line_no, &file_name_offset, &current_line_offset );
-          }
-
-          compiler_begin_subscope( compiler_cc, px );
+        compiler_begin_subscope( compiler_cc, px );
       }
     for_variable_declaration
       {
@@ -7094,6 +7082,11 @@ control_statement
         compiler_compile_dup( compiler_cc, px );
         compiler_compile_dup( compiler_cc, px );
         compiler_emit( compiler_cc, px, "\tc\n", LENGTH );
+        compiler_drop_top_expression( compiler_cc );
+        TNODE *tnode_integer =
+            share_tnode( typetab_lookup( compiler_cc->typetab, "int" ));
+        compiler_push_type( compiler_cc, tnode_integer, px );
+
 #if 1
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
 	    compiler_compile_binop( compiler_cc, ">", px );
