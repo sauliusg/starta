@@ -7178,13 +7178,17 @@ control_statement
       }
      loop_body
       {
+	int readonly = $3;
 	DNODE *loop_counter_var = $5;
         /* Store the current array element into the loop variable: */
-        compiler_compile_dup( compiler_cc, px );
-        compiler_make_stack_top_element_type( compiler_cc );
-        compiler_make_stack_top_addressof( compiler_cc, px );
-        compiler_compile_load_variable_value( compiler_cc, loop_counter_var, px );
-        compiler_compile_sti( compiler_cc, px );
+        if( !readonly ) {
+            compiler_compile_dup( compiler_cc, px );
+            compiler_make_stack_top_element_type( compiler_cc );
+            compiler_make_stack_top_addressof( compiler_cc, px );
+            compiler_compile_load_variable_value( compiler_cc, 
+                                                  loop_counter_var, px );
+            compiler_compile_sti( compiler_cc, px );
+        }
 
 	compiler_fixup_op_continue( compiler_cc, px );
 	compiler_compile_next( compiler_cc, px );
