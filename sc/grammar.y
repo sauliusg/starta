@@ -6357,31 +6357,41 @@ variable_access_identifier
 incdec_statement
   : variable_access_identifier __INC
       {
-	  if( compiler_variable_has_operator( compiler_cc, $1, "incvar", 0, px )) {
-	      TNODE *var_type = dnode_type( $1 );
-	      ssize_t var_offset = dnode_offset( $1 );
+          if( dnode_has_flags( $1, DF_IS_READONLY )) {
+              yyerrorf( "may not increment readonly variable '%s'",
+                        dnode_name( $1 ));
+          } else {
+              if( compiler_variable_has_operator( compiler_cc, $1, "incvar", 0, px )) {
+                  TNODE *var_type = dnode_type( $1 );
+                  ssize_t var_offset = dnode_offset( $1 );
 
-	      compiler_compile_operator( compiler_cc, var_type, "incvar", 0, px );
-	      compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
-	  } else {
-	      compiler_compile_load_variable_value( compiler_cc, $1, px );
-	      compiler_compile_unop( compiler_cc, "++", px );
-	      compiler_compile_store_variable( compiler_cc, $1, px );
-	  }
+                  compiler_compile_operator( compiler_cc, var_type, "incvar", 0, px );
+                  compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
+              } else {
+                  compiler_compile_load_variable_value( compiler_cc, $1, px );
+                  compiler_compile_unop( compiler_cc, "++", px );
+                  compiler_compile_store_variable( compiler_cc, $1, px );
+              }
+          }
       }
   | variable_access_identifier __DEC
       {
-	  if( compiler_variable_has_operator( compiler_cc, $1, "decvar", 0, px )) {
-	      TNODE *var_type = dnode_type( $1 );
-	      ssize_t var_offset = dnode_offset( $1 );
+          if( dnode_has_flags( $1, DF_IS_READONLY )) {
+              yyerrorf( "may not decrement readonly variable '%s'",
+                        dnode_name( $1 ));
+          } else {
+              if( compiler_variable_has_operator( compiler_cc, $1, "decvar", 0, px )) {
+                  TNODE *var_type = dnode_type( $1 );
+                  ssize_t var_offset = dnode_offset( $1 );
 
-	      compiler_compile_operator( compiler_cc, var_type, "decvar", 0, px );
-	      compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
-	  } else {
-	      compiler_compile_load_variable_value( compiler_cc, $1, px );
-	      compiler_compile_unop( compiler_cc, "--", px );
-	      compiler_compile_store_variable( compiler_cc, $1, px );
-	  }
+                  compiler_compile_operator( compiler_cc, var_type, "decvar", 0, px );
+                  compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
+              } else {
+                  compiler_compile_load_variable_value( compiler_cc, $1, px );
+                  compiler_compile_unop( compiler_cc, "--", px );
+                  compiler_compile_store_variable( compiler_cc, $1, px );
+              }
+          }
       }
   | lvalue __INC
       {

@@ -1,0 +1,8 @@
+./sl: inputs/readonly011.snl(11,2): ERROR, may not increment readonly variable 'x'
+x++;
+ ^
+./sl: inputs/readonly011.snl(12,2): ERROR, may not decrement readonly variable 'x'
+x--;
+ ^
+./sl: 2 error(s) detected
+
