@@ -1,0 +1,13 @@
+# Compiler tests.
+#
+# Test diagnostics of readonly variable increments.
+#
+
+use std;
+
+readonly x = 1;
+
+. x;
+x++;
+x--;
+. x;
