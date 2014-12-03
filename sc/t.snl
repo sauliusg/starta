@@ -7,8 +7,10 @@ use std;
 
 var a = [ 11, 3, 12, 74 ];
 var i = 0;
+var m = a[0];
+var s : null struct { int counter; int i; string name };
 
-foreach readonly m in a do
-    . i, m;
+foreach s.counter in a do
+    . i, s.counter;
     i ++;
 enddo
