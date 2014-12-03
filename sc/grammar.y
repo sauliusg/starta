@@ -7160,7 +7160,8 @@ control_statement
         compiler_make_stack_top_element_type( compiler_cc );
         compiler_make_stack_top_addressof( compiler_cc, px );
         compiler_compile_ldi( compiler_cc, px );
-        compiler_compile_store_variable( compiler_cc, loop_counter_var, px );
+        compiler_compile_variable_initialisation
+            ( compiler_cc, loop_counter_var, px );
 
         compiler_drop_top_expression( compiler_cc );
         compiler_drop_top_expression( compiler_cc );
