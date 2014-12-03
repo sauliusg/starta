@@ -7180,7 +7180,7 @@ control_statement
       {
 	int readonly = $3;
 	DNODE *loop_counter_var = $5;
-        /* Store the current array element into the loop variable: */
+        /* Store the the loop variable back into the current array element: */
         if( !readonly ) {
             compiler_compile_dup( compiler_cc, px );
             compiler_make_stack_top_element_type( compiler_cc );
