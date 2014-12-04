@@ -7225,6 +7225,11 @@ control_statement
             cexception_t inner;
             TNODE *volatile bool_tnode =
                 share_tnode( typetab_lookup( compiler_cc->typetab, "bool" ));
+            compiler_compile_over( compiler_cc, px );
+            compiler_compile_over( compiler_cc, px );
+            compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
+            compiler_drop_top_expression( compiler_cc );
+            compiler_drop_top_expression( compiler_cc );
             cexception_guard( inner ) {
                 compiler_push_type( compiler_cc, bool_tnode, &inner );
             }
@@ -7232,11 +7237,6 @@ control_statement
                 delete_tnode( bool_tnode );
                 cexception_reraise( inner, px );
             }
-            compiler_compile_over( compiler_cc, px );
-            compiler_compile_over( compiler_cc, px );
-            compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
-            compiler_drop_top_expression( compiler_cc );
-            compiler_drop_top_expression( compiler_cc );
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
