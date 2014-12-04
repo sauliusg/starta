@@ -60,7 +60,8 @@ struct DNODE {
     ssize_t value;         /* value of a constant or enumerator type,
 			      or an offset into the code area
 			      (i.e. code address) of the virtual
-			      method implementation. */
+			      method implementation. Also used for the
+			      number of loop counters. */
     const_value_t cvalue;  /* computed value of constant expressions;
 			      should replace the above 'value' field
 			      in the future. */
@@ -169,11 +170,18 @@ DNODE* new_dnode_typed( char *name, TNODE *tnode,
     return ret;
 }
 
-DNODE* new_dnode_loop( char *name, DNODE *next, cexception_t *ex )
+DNODE* new_dnode_loop( char *name, int ncounters,
+                       DNODE *next, cexception_t *ex )
 {
     DNODE *dnode = new_dnode_name( name, ex );
     dnode->next = next;
+    dnode->value = ncounters;
     return dnode;
+}
+
+int dnode_loop_counters( DNODE *dnode )
+{
+    return dnode ? dnode->value : 0;
 }
 
 DNODE *new_dnode_exception( char *exception_name,
