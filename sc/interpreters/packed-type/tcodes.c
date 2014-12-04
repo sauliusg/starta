@@ -1264,6 +1264,48 @@ int RFROMR( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ TOR (transfer a stackcell TO the Return stack)
+
+ bytecode:
+ TOR
+
+ stack:
+ value --> ; rertun stack: --> value
+ 
+ */
+
+int TOR( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    --istate.sp;
+    istate.sp[0] = istate.ep[0];
+    istate.ep++;
+    return 1;
+}
+
+/*
+ FROMR (transfer FROM the Return stack)
+
+ bytecode:
+ FROMR
+
+ stack:
+ --> value ; rertun stack: value -->
+ 
+ */
+
+int FROMR( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    --istate.ep;
+    istate.ep[0] = istate.sp[0];
+    istate.sp++;
+    return 1;
+}
+
+/*
  LDFN (LoaD FunctioN address)
 
  bytecode:
