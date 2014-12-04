@@ -7207,33 +7207,74 @@ control_statement
       {
         compiler_push_loop( compiler_cc, $1, 3, px );
 	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
-	compiler_compile_dup( compiler_cc, px );
-        compiler_compile_sti( compiler_cc, px );
       }
     _IN expression
       {
-	compiler_compile_over( compiler_cc, px );
-	compiler_compile_ldi( compiler_cc, px );
-	compiler_compile_over( compiler_cc, px );
+        /* Load array limit onto the stack, for compiling the loop operator: */
+        compiler_compile_dup( compiler_cc, px );
+        compiler_compile_dup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tc\n", LLENGTH );
+        compiler_emit( compiler_cc, px, "\tc\n", LINDEX );
+        compiler_drop_top_expression( compiler_cc );
+        compiler_drop_top_expression( compiler_cc );
+        compiler_compile_swap( compiler_cc, px );
+        /* stack now:
+           ..., lvariable_address, array_last_ptr, array_current_ptr */
+
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
-	    compiler_compile_binop( compiler_cc, ">", px );
+            cexception_t inner;
+            TNODE *volatile bool_tnode =
+                share_tnode( typetab_lookup( compiler_cc->typetab, "bool" ));
+            cexception_guard( inner ) {
+                compiler_push_type( compiler_cc, bool_tnode, &inner );
+            }
+            cexception_catch {
+                delete_tnode( bool_tnode );
+                cexception_reraise( inner, px );
+            }
+            compiler_compile_over( compiler_cc, px );
+            compiler_compile_over( compiler_cc, px );
+            compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
+            compiler_drop_top_expression( compiler_cc );
+            compiler_drop_top_expression( compiler_cc );
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
 	    ssize_t zero = 0;
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_drop_top_expression( compiler_cc );
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
 
+        /* The execution flow should return here after each iteration: */
         compiler_push_current_address( compiler_cc, px );
+
+        /* Store the current array element into the loop variable: */
+        /* stack now:
+           ..., lvariable_address, array_last_ptr, array_current_ptr */
+        compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+        ENODE *top_enode = enode_list_pop( &compiler_cc->e_stack );
+        /* stack now:
+           ..., lvariable_address, array_last_ptr */
+        compiler_compile_over( compiler_cc, px );
+        compiler_compile_over( compiler_cc, px );
+        compiler_make_stack_top_element_type( compiler_cc );
+        compiler_make_stack_top_addressof( compiler_cc, px );
+        compiler_compile_ldi( compiler_cc, px );
+        compiler_compile_sti( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+        enode_list_push( &compiler_cc->e_stack, top_enode );
+        /* stack now:
+           ..., lvariable_address, array_last_ptr, array_current_ptr */
+
+        compiler_drop_top_expression( compiler_cc );
+        compiler_drop_top_expression( compiler_cc );
       }
      loop_body
       {
 	compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_continue( compiler_cc, px );
-	compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
+	compiler_compile_next( compiler_cc, px );
+
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
       }
