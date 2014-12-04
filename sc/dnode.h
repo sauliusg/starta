@@ -42,7 +42,10 @@ DNODE *new_dnode_name( char *name, cexception_t *ex );
 
 DNODE* new_dnode_typed( char *name, TNODE *tnode, cexception_t *ex );
 
-DNODE* new_dnode_loop( char *name, DNODE *next, cexception_t *ex );
+DNODE* new_dnode_loop( char *name, int ncounters,
+                       DNODE *next, cexception_t *ex );
+
+int dnode_loop_counters( DNODE *dnode );
 
 DNODE *new_dnode_exception( char *exception_name,
 			    TNODE *exception_type,

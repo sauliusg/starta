@@ -4857,11 +4857,12 @@ static void compiler_compile_array_expression( COMPILER* cc,
 }
 
 static void compiler_push_loop( COMPILER *cc, char *loop_label,
-			     cexception_t *ex )
+                                int ncounters,
+                                cexception_t *ex )
 {
     char label[200];
     cc->loops =
-	new_dnode_loop( loop_label, cc->loops, ex );
+	new_dnode_loop( loop_label, ncounters, cc->loops, ex );
 
     if( !loop_label ) {
 	snprintf( label, sizeof(label), "@%p", cc->loops );
@@ -4925,15 +4926,18 @@ static char *compiler_get_loop_name( COMPILER *cc, char *label )
     }
 }
 
-static ssize_t check_loop_types( COMPILER *cc, char *label )
+static ssize_t check_loop_types( COMPILER *cc, int omit_last_loop,
+                                 char *label )
 {
     DNODE *loop;
     int found = 0;
+    ssize_t prev_count = 0;
     ssize_t count = 0;
 
     foreach_dnode( loop, cc->loops ) {
 	if( dnode_has_flags( loop, DF_LOOP_HAS_VAL )) {
-	    count ++;
+            prev_count = count;
+	    count += dnode_loop_counters( loop );
 	}
 	if( strcmp( dnode_name(loop), label ) == 0 ) {
 	    found = 1;
@@ -4943,7 +4947,7 @@ static ssize_t check_loop_types( COMPILER *cc, char *label )
     if( !found ) {
 	yyerrorf( "label '%s' is not defined in the current scope", label );
     }
-    return count;
+    return omit_last_loop ? prev_count : count;
 }
 
 static int compiler_check_break_and_cont_statements( COMPILER *cc )
@@ -4958,14 +4962,13 @@ static int compiler_check_break_and_cont_statements( COMPILER *cc )
 }
 
 static void compiler_drop_loop_counters( COMPILER *cc, char *name,
-				      int delta,
-				      cexception_t *ex )
+                                         int delta,
+                                         cexception_t *ex )
 {
-    ssize_t loop_values = check_loop_types( cc, name );
+    ssize_t loop_counters = check_loop_types( cc, delta, name );
 
-    if( loop_values > 0 ) {
-	ssize_t nvalues = ( loop_values - delta ) * 2;
-	compiler_emit( cc, ex, "\tce\n", PDROPN, &nvalues );
+    if( loop_counters > 0 ) {
+        compiler_emit( cc, ex, "\tce\n", PDROPN, &loop_counters );
     }
 }
 
@@ -6066,7 +6069,8 @@ do_prefix
 repeat_prefix
   : _REPEAT
     {
-      compiler_push_loop( compiler_cc, /* loop label = */ NULL, px );
+      compiler_push_loop( compiler_cc, /* loop label = */ NULL,
+                          /* ncounters = */ 0, px );
       compiler_push_current_address( compiler_cc, px );
     }
   ;
@@ -6951,7 +6955,7 @@ control_statement
       {
 	  ssize_t zero = 0;
           compiler_begin_subscope( compiler_cc, px );
-	  compiler_push_loop( compiler_cc, $1, px );
+	  compiler_push_loop( compiler_cc, $1, 0, px );
           compiler_push_relative_fixup( compiler_cc, px );
 	  compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	  compiler_push_current_address( compiler_cc, px );
@@ -6978,7 +6982,7 @@ control_statement
       } 
     '(' statement ';'
       {
-	compiler_push_loop( compiler_cc, $1, px );
+        compiler_push_loop( compiler_cc, $1, 0, px );
 	compiler_push_thrcode( compiler_cc, px );
       }
     condition ';'
@@ -7011,7 +7015,7 @@ control_statement
 
   | opt_label _FOR lvariable
       {
-	compiler_push_loop( compiler_cc, $1, px );
+        compiler_push_loop( compiler_cc, $1, 2, px );
 	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
 	compiler_compile_dup( compiler_cc, px );
       }
@@ -7057,7 +7061,7 @@ control_statement
 	if( readonly ) {
 	    dnode_set_flags( $5, DF_IS_READONLY );
 	}
-	compiler_push_loop( compiler_cc, $1, px );
+	compiler_push_loop( compiler_cc, $1, 2, px );
 	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
       }
     '=' expression
@@ -7112,7 +7116,7 @@ control_statement
 	if( readonly ) {
 	    dnode_set_flags( $5, DF_IS_READONLY );
 	}
-	compiler_push_loop( compiler_cc, $1, px );
+	compiler_push_loop( compiler_cc, $1, 2, px );
 	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
       }
     _IN expression
@@ -7201,7 +7205,7 @@ control_statement
 
   | opt_label _FOREACH lvariable
       {
-	compiler_push_loop( compiler_cc, $1, px );
+        compiler_push_loop( compiler_cc, $1, 3, px );
 	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
 	compiler_compile_dup( compiler_cc, px );
         compiler_compile_sti( compiler_cc, px );
