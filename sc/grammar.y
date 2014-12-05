@@ -2740,6 +2740,8 @@ static void compiler_compile_next( COMPILER *c,
                                    cexception_t *ex )
 {
     ssize_t offset = 0;
+    ssize_t ncounters, i;
+
     ENODE * volatile limit_enode = c->e_stack;
     TNODE * volatile limit_tnode = limit_enode ?
 	enode_type( limit_enode ) : NULL;
@@ -2785,6 +2787,15 @@ static void compiler_compile_next( COMPILER *c,
     compiler_emit( c, ex, "\tc\n", PEQBOOL );
     offset = compiler_pop_offset( c, ex );
     compiler_compile_jz( c, offset, ex );
+
+
+    ncounters = dnode_loop_counters( c->loops );
+    if( ncounters > 0 ) {
+        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+    }
+    for( i = 0; i < ncounters; i ++ ) {
+        compiler_drop_top_expression( c );
+    }
 #endif
 }
 
