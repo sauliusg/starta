@@ -2775,7 +2775,7 @@ static void compiler_compile_next( COMPILER *c,
 					      /*fixup_values:*/ NULL, ex );
 	    compiler_emit( c, ex, "e\n", &offset );
 	} else {
-	    tnode_report_missing_operator( limit_tnode, "loop", 2 );
+	    tnode_report_missing_operator( limit_tnode, "next", 2 );
 	}
     }
 #else
