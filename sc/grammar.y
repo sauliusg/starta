@@ -7154,6 +7154,7 @@ control_statement
         compiler_compile_dup( compiler_cc, px );
         compiler_emit( compiler_cc, px, "\tc\n", LLENGTH );
         compiler_emit( compiler_cc, px, "\tc\n", LINDEX );
+        compiler_drop_top_expression( compiler_cc );
         compiler_compile_swap( compiler_cc, px );
 
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
@@ -7170,6 +7171,8 @@ control_statement
             compiler_compile_over( compiler_cc, px );
             compiler_compile_over( compiler_cc, px );
             compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
+            compiler_drop_top_expression( compiler_cc );
+            compiler_drop_top_expression( compiler_cc );
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
@@ -7187,9 +7190,6 @@ control_statement
         compiler_compile_ldi( compiler_cc, px );
         compiler_compile_variable_initialisation
             ( compiler_cc, loop_counter_var, px );
-
-        compiler_drop_top_expression( compiler_cc );
-        compiler_drop_top_expression( compiler_cc );
       }
      loop_body
       {
