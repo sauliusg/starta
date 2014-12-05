@@ -7267,7 +7267,7 @@ control_statement
         /* stack now:
            ..., lvariable_address, array_last_ptr, array_current_ptr */
         compiler_compile_swap( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+        compiler_emit( compiler_cc, px, "\tc\n", TOR );
         ENODE *top_enode = enode_list_pop( &compiler_cc->e_stack );
         /* stack now:
            ..., lvariable_address, array_current_ptr */
@@ -7277,7 +7277,7 @@ control_statement
         compiler_make_stack_top_addressof( compiler_cc, px );
         compiler_compile_ldi( compiler_cc, px );
         compiler_compile_sti( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+        compiler_emit( compiler_cc, px, "\tc\n", FROMR );
         enode_list_push( &compiler_cc->e_stack, top_enode );
         compiler_compile_swap( compiler_cc, px );
         /* stack now:
