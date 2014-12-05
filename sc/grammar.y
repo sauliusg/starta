@@ -156,7 +156,7 @@ typedef struct {
 
     /* The enodes in the e_stack mimick the evaluation stack of an
        expression or statement under compilation and hold types of all
-       intermediate values. First enode in the list is top of the
+       intermediate values. First enode in the list is the top of the
        stack. */
     ENODE *e_stack;
 
