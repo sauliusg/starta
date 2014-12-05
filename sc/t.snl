@@ -34,3 +34,6 @@ foreach j in a do
     . i, j;
     i ++;
 enddo
+. "";
+
+bytecode { IPRINT NEWLINE }
