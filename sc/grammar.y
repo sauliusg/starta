@@ -7173,19 +7173,20 @@ control_statement
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
             cexception_t inner;
             TNODE *volatile bool_tnode =
-                share_tnode( typetab_lookup( compiler_cc->typetab, "bool" ));
-            cexception_guard( inner ) {
-                compiler_push_type( compiler_cc, bool_tnode, &inner );
-            }
-            cexception_catch {
-                delete_tnode( bool_tnode );
-                cexception_reraise( inner, px );
-            }
+                typetab_lookup( compiler_cc->typetab, "bool" );
             compiler_compile_over( compiler_cc, px );
             compiler_compile_over( compiler_cc, px );
             compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
             compiler_drop_top_expression( compiler_cc );
             compiler_drop_top_expression( compiler_cc );
+            cexception_guard( inner ) {
+                compiler_push_type( compiler_cc, share_tnode( bool_tnode ),
+                                    &inner );
+            }
+            cexception_catch {
+                delete_tnode( bool_tnode );
+                cexception_reraise( inner, px );
+            }
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_compile_jnz( compiler_cc, 0, px );
 	} else {
@@ -7252,14 +7253,15 @@ control_statement
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
             cexception_t inner;
             TNODE *volatile bool_tnode =
-                share_tnode( typetab_lookup( compiler_cc->typetab, "bool" ));
+                typetab_lookup( compiler_cc->typetab, "bool" );
             compiler_compile_over( compiler_cc, px );
             compiler_compile_over( compiler_cc, px );
             compiler_emit( compiler_cc, px, "\tc\n", PEQBOOL );
             compiler_drop_top_expression( compiler_cc );
             compiler_drop_top_expression( compiler_cc );
             cexception_guard( inner ) {
-                compiler_push_type( compiler_cc, bool_tnode, &inner );
+                compiler_push_type( compiler_cc, share_tnode( bool_tnode ),
+                                    &inner );
             }
             cexception_catch {
                 delete_tnode( bool_tnode );
