@@ -2786,8 +2786,21 @@ static void compiler_compile_next( COMPILER *c,
     compiler_compile_over( c, ex );
     compiler_emit( c, ex, "\tc\n", PEQBOOL );
     offset = compiler_pop_offset( c, ex );
+    compiler_drop_top_expression( c );
+    compiler_drop_top_expression( c );
+    {
+        cexception_t inner;
+        TNODE *volatile bool_tnode =
+            share_tnode( typetab_lookup( c->typetab, "bool" ));
+        cexception_guard( inner ) {
+            compiler_push_type( c, bool_tnode, &inner );
+        }
+        cexception_catch {
+            delete_tnode( bool_tnode );
+            cexception_reraise( inner, ex );
+        }
+    }
     compiler_compile_jz( c, offset, ex );
-
 
     ncounters = dnode_loop_counters( c->loops );
     if( ncounters > 0 ) {
@@ -7207,7 +7220,7 @@ control_statement
 
 	compiler_fixup_op_continue( compiler_cc, px );
 	compiler_compile_next( compiler_cc, px );
-        
+
         compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
@@ -7291,8 +7304,6 @@ control_statement
 
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
-
-        compiler_drop_top_expression( compiler_cc );
       }
 
   | _TRY
