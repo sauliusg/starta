@@ -2228,7 +2228,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		/* if( !tnode_types_are_identical( element_type, expr_type )) {
 		 */
 		if( !tnode_types_are_assignment_compatible
-                    ( element_type, expr_type, NULL /* generic_typ_table*/, ex )) {
+                    ( element_type, expr_type, NULL /* generic_type_table*/, ex )) {
 		    char *src_name = tnode_name( expr_type );
 		    char *dst_name = tnode_name( element_type );
 		    if( src_name && dst_name &&
@@ -7214,7 +7214,7 @@ control_statement
             compiler_compile_dup( compiler_cc, px );
             compiler_make_stack_top_element_type( compiler_cc );
             compiler_make_stack_top_addressof( compiler_cc, px );
-            compiler_compile_load_variable_value( compiler_cc, 
+            compiler_compile_load_variable_value( compiler_cc,
                                                   loop_counter_var, px );
             compiler_compile_sti( compiler_cc, px );
         }
@@ -7300,6 +7300,33 @@ control_statement
       }
      loop_body
       {
+        ENODE *loop_var = compiler_cc->e_stack; /* array_current_ptr */
+        loop_var = loop_var ? enode_next( loop_var ) : NULL; /* array_last_ptr */
+        loop_var = loop_var ? enode_next( loop_var ) : NULL; /* lvariable_address */
+        
+        if( loop_var && !enode_has_flags( loop_var, EF_IS_READONLY )) {
+            /* Store the current array element into the loop variable: */
+            /* stack now:
+               ..., lvariable_address, array_last_ptr, array_current_ptr */
+            compiler_compile_swap( compiler_cc, px );
+            compiler_emit( compiler_cc, px, "\tc\n", TOR );
+            ENODE *top_enode = enode_list_pop( &compiler_cc->e_stack );
+            /* stack now:
+               ..., lvariable_address, array_current_ptr */
+            compiler_compile_over( compiler_cc, px );
+            compiler_compile_over( compiler_cc, px );
+            compiler_make_stack_top_element_type( compiler_cc );
+            compiler_make_stack_top_addressof( compiler_cc, px );
+            compiler_compile_swap( compiler_cc, px );
+            compiler_compile_ldi( compiler_cc, px );
+            compiler_compile_sti( compiler_cc, px );
+            compiler_emit( compiler_cc, px, "\tc\n", FROMR );
+            enode_list_push( &compiler_cc->e_stack, top_enode );
+            compiler_compile_swap( compiler_cc, px );
+            /* stack now:
+               ..., lvariable_address, array_last_ptr, array_current_ptr */
+        }
+
 	compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_continue( compiler_cc, px );
 	compiler_compile_next( compiler_cc, px );
