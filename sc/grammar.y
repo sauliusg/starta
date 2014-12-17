@@ -2566,6 +2566,9 @@ static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 	    if( expr2_type ) {
 		compiler_push_type( cc, expr2_type, ex );
 		share_tnode( expr2_type );
+                if( enode_has_flags( expr2, EF_IS_READONLY )) {
+                    enode_set_flags( cc->e_stack, EF_IS_READONLY );
+                }
 	    } else {
 		yyerrorf( "when generating OVER, second expression from the "
 			  "stack top has no type (?!)" );
