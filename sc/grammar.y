@@ -9007,7 +9007,19 @@ condition
   | simple_expression
   | '<' expression '>'
   {
-      assert( "'<>' simple expression is not implemented yet" );
+      cexception_t inner;
+      TNODE *string_type = typetab_lookup( compiler_cc->typetab, "string" );
+      compiler_drop_top_expression( compiler_cc );
+      compiler_emit( compiler_cc, px, "\tcI\n", LDC, '\n' );
+      compiler_emit( compiler_cc, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
+      cexception_guard( inner ) {
+          share_tnode( string_type );
+          compiler_push_type( compiler_cc, string_type, &inner );
+      }
+      cexception_catch {
+          delete_tnode( string_type );
+          cexception_reraise( inner, px );
+      }
   }
   | stdio_inpupt_condition
   | '(' stdio_inpupt_condition ')'
@@ -9029,7 +9041,19 @@ multivalue_expression_list
 io_expression
   : '<' expression '>'
   {
-      assert( "'<>' simple expression is not implemented yet" );
+      cexception_t inner;
+      TNODE *string_type = typetab_lookup( compiler_cc->typetab, "string" );
+      compiler_drop_top_expression( compiler_cc );
+      compiler_emit( compiler_cc, px, "\tcI\n", LDC, '\n' );
+      compiler_emit( compiler_cc, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
+      cexception_guard( inner ) {
+          share_tnode( string_type );
+          compiler_push_type( compiler_cc, string_type, &inner );
+      }
+      cexception_catch {
+          delete_tnode( string_type );
+          cexception_reraise( inner, px );
+      }
   }
   | '<' '>'
   {
