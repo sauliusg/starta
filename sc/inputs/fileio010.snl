@@ -7,7 +7,7 @@ use std;
 
 var line : string;
 
-var inp = fopen( "t.snl", "r" );
+var inp = fopen( "inputs/fileio010.snl", "r" );
 
 var i = 1;
 while((line = <inp>) != null) {
