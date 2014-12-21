@@ -3,7 +3,7 @@
 ++ Add diagnostics of unimplemented class methods.
 ++ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
 -- Implement run-time null-pointer and array bound checks
--- Implement 'foreach ... in'
++- Implement 'foreach ... in'
 ++ Implement a separate operator table.
 -- Implement generation of standalone executable files.
 -- Think about convenient interface to use modules in my language in other languages.
@@ -29,7 +29,7 @@ xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 ?? Make it possible to use 'float[]' as type designators of return values.
 ++ Implement functions 'argument(i)' and 'argumentnr()'
 -- Implement pragma to skip included files from '--debug code' listing.
--- describe all options in --help (also all --debug arguments).
+++ describe all options in --help (also all --debug arguments).
 xx Implement 'unaliased' values
 -- Implement checks of uncaught exceptions (exceptions cheched by module, not by function)!
 xx Think about 'print/println/prints/printsln' operators
@@ -56,12 +56,12 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 -- Tests, tests, tests ...
 -- Perform all strength reducing optimisations in 'bytecode_emit_...()' f-ns.
 -- Make stacks relocatable.
--- Implement type-declared methods (functions).
+?? Implement type-declared methods (functions).
 ++ Implement reporting of source file name in error messages.
 -- Implement regular expressions.
 -- Implement readonly structure members.
--- Implement readline() opcode and function
--- Implement push and pop to the arrays.
+++ Implement readline() opcode and function
+?? Implement push and pop to the arrays (or use lists instead?).
 -- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
 -+ Implement objects.
 -- Implement dynamic, runtime-bound messages to objects.
