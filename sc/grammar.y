@@ -8974,22 +8974,28 @@ stdio_inpupt_condition
 : '<' '>'
 {
     cexception_t inner;
-    TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
+    TNODE *string_tnode = typetab_lookup( compiler_cc->typetab, "string" );
+    TNODE *type_tnode = string_tnode;
     DNODE *default_var = NULL;
     ssize_t default_var_offset = 0;
 
     cexception_guard( inner ) {
-        default_var = new_dnode_typed( "$_", type_tnode, &inner );
         share_tnode( type_tnode );
+        default_var = new_dnode_typed( "$_", type_tnode, &inner );
+        type_tnode = NULL;
         compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
         default_var_offset = dnode_offset( default_var );
+        default_var = NULL;
 
         compiler_cc->local_offset ++;
+        type_tnode = share_tnode( string_tnode );
         default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
-        share_tnode( type_tnode );
+        type_tnode = NULL;
         compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+        default_var = NULL;
 
-        compiler_push_type( compiler_cc, type_tnode, &inner );
+        share_tnode( string_tnode );
+        compiler_push_type( compiler_cc, string_tnode, &inner );
         compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
         compiler_emit( compiler_cc, &inner, "\tc\n", DUP );
         compiler_emit( compiler_cc, &inner, "\tce\n", PST, &default_var_offset );        
@@ -9002,25 +9008,51 @@ stdio_inpupt_condition
 }
 ;
 
-condition
-  : function_call
-  | simple_expression
-  | '<' expression '>'
+file_input_condition
+:'<' expression '>'
   {
       cexception_t inner;
       TNODE *string_type = typetab_lookup( compiler_cc->typetab, "string" );
-      compiler_drop_top_expression( compiler_cc );
-      compiler_emit( compiler_cc, px, "\tcI\n", LDC, '\n' );
-      compiler_emit( compiler_cc, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
+      TNODE *type_tnode = string_type;
+      DNODE *default_var = NULL;
+      ssize_t default_var_offset = 0;
+
       cexception_guard( inner ) {
-          share_tnode( string_type );
+          share_tnode( type_tnode );
+          default_var = new_dnode_typed( "$_", type_tnode, &inner );
+          type_tnode = NULL;
+          compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+          default_var_offset = dnode_offset( default_var );
+          default_var = NULL;
+
+          compiler_cc->local_offset ++;
+          type_tnode = share_tnode( string_type );
+          default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
+          type_tnode = NULL;
+          compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+          default_var = NULL;
+
+          compiler_drop_top_expression( compiler_cc );
+          type_tnode = share_tnode( string_type );
           compiler_push_type( compiler_cc, string_type, &inner );
       }
       cexception_catch {
-          delete_tnode( string_type );
+          delete_tnode( type_tnode );
           cexception_reraise( inner, px );
       }
+
+      compiler_emit( compiler_cc, px, "\tcI\n", LDC, '\n' );
+      compiler_emit( compiler_cc, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
+      compiler_emit( compiler_cc, px, "\tc\n", DUP );
+      compiler_emit( compiler_cc, px, "\tce\n", PST, &default_var_offset );        
   }
+;
+
+condition
+  : function_call
+  | simple_expression
+  | file_input_condition
+  | '(' file_input_condition ')'
   | stdio_inpupt_condition
   | '(' stdio_inpupt_condition ')'
 /*
