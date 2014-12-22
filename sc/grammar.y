@@ -4295,16 +4295,6 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
     return retval;
 }
 
-static void compiler_compile_program_args( COMPILER *cc,
-					   char *program_name,
-					   DNODE *argument_list,
-					   cexception_t *ex )
-{
-    if( compiler_check_and_emit_program_arguments( cc, argument_list, ex )) {
-	compiler_emit_argument_list( cc, argument_list, ex );
-    }
-}
-
 static void compiler_emit_catch_comparison( COMPILER *cc,
 					 char *module_name,
 					 char *exception_name,
