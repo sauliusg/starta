@@ -64,4 +64,7 @@ typedef struct alloccell_t {
 				 stackcell_t forces alignment */
 } alloccell_t;
 
+void alloccell_set_values( alloccell_t *hdr, ssize_t element_size,
+                           ssize_t len );
+
 #endif
