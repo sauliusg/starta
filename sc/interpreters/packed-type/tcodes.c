@@ -5232,3 +5232,29 @@ int RTTIDUMP( INSTRUCTION_FN_ARGS )
     istate.ep ++;
     return 1;
 }
+
+/*
+ * ADVANCE Advance array pointer on the top of the stack to the next
+ *         array element; jump to the provided address if there is the
+ *         next element, otherwise remove the array pointer from the
+ *         stack and proceed to the next opcode.
+ *
+ * bytecode:
+ * ADVANCE offset
+ * 
+ * stack:
+ * array_ref -> 
+ */
+
+int ADVANCE( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array_ref = istate.ep[0].PTR;
+    ssize_t jmp_offset = istate.code[istate.ip+1].ssizeval;
+    ssize_t length = array_ref ? array_ref[-1].length : -1;
+
+    TRACE_FUNCTION();
+
+    istate.ip += jmp_offset;
+
+    return 0;
+}

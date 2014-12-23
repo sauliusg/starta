@@ -7144,6 +7144,8 @@ control_statement
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
 
+        /* stack now:
+           ..., array_current_ptr */
         if( element_type ) {
             if( dnode_type( loop_counter_var ) == NULL ) {
                 dnode_append_type( loop_counter_var,
@@ -7162,6 +7164,8 @@ control_statement
         compiler_emit( compiler_cc, px, "\tc\n", LINDEX );
         compiler_drop_top_expression( compiler_cc );
         compiler_compile_swap( compiler_cc, px );
+        /* stack now:
+           ..., array_last_ptr, array_current_ptr */
 
 	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
             cexception_t inner;
@@ -7324,6 +7328,8 @@ control_statement
 	compiler_fixup_op_continue( compiler_cc, px );
 	compiler_compile_next( compiler_cc, px );
 
+        /* stack now:
+           ..., lvariable_address, array_last_ptr, array_current_ptr */
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
       }
