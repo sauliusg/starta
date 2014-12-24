@@ -2782,6 +2782,7 @@ static void compiler_compile_next( COMPILER *c,
 	}
     }
 #else
+#if 1
     compiler_emit( c, ex, "\tcI\n", LDC, 1 );
     compiler_emit( c, ex, "\tc\n", INDEX );    
 
@@ -2812,6 +2813,17 @@ static void compiler_compile_next( COMPILER *c,
     for( i = 0; i < ncounters; i ++ ) {
         compiler_drop_top_expression( c );
     }
+#else
+    compiler_emit( c, ex, "\tc\n", ADVANCE );
+    
+    ncounters = dnode_loop_counters( c->loops );
+    if( ncounters > 0 ) {
+        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+    }
+    for( i = 0; i < ncounters; i ++ ) {
+        compiler_drop_top_expression( c );
+    }
+#endif
 #endif
 }
 
@@ -7206,6 +7218,9 @@ control_statement
       {
 	int readonly = $3;
 	DNODE *loop_counter_var = $5;
+        /* stack now:
+           ..., array_last_ptr, array_current_ptr */
+
         /* Store the the loop variable back into the current array element: */
         if( !readonly ) {
             compiler_compile_dup( compiler_cc, px );
