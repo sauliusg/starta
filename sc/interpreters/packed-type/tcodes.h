@@ -309,4 +309,7 @@ int ASSERT( INSTRUCTION_FN_ARGS );
 int DEBUG( INSTRUCTION_FN_ARGS );
 int RTTIDUMP( INSTRUCTION_FN_ARGS );
 
+/* Opcode used to implement 'foreach' loops on arrays: */
+int ADVANCE( INSTRUCTION_FN_ARGS );
+
 #endif

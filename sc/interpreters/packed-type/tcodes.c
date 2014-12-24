@@ -5240,21 +5240,36 @@ int RTTIDUMP( INSTRUCTION_FN_ARGS )
  *         stack and proceed to the next opcode.
  *
  * bytecode:
- * ADVANCE offset
+ * ADVANCE jmp_offset
  * 
  * stack:
- * array_ref -> 
+ * if no jump: array_ref -> 
+ * if    jump: array_ref -> advanced_array_ref
  */
 
 int ADVANCE( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *array_ref = istate.ep[0].PTR;
+    ssize_t element_offset = istate.ep[0].num.offs;
     ssize_t jmp_offset = istate.code[istate.ip+1].ssizeval;
-    ssize_t length = array_ref ? array_ref[-1].length : -1;
+    ssize_t length = array_ref ? array_ref[-1].length : 0;
+    ssize_t element_size = array_ref ? array_ref[-1].element_size : 0;
+    ssize_t array_size = length * element_size;
 
     TRACE_FUNCTION();
 
-    istate.ip += jmp_offset;
+    element_offset += element_size;
+    if( element_offset >= array_size ) {
+        STACKCELL_ZERO_PTR( istate.ep[0] );
+        array_ref = NULL;
+    }
 
-    return 0;
+    if( !array_ref ) {
+        /* No areay ponter -- go over to the next opcode, no jump: */
+        istate.ep ++;
+        return 2;
+    } else {
+        istate.ip += jmp_offset;
+        return 0;
+    }
 }
