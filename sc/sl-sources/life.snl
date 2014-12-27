@@ -85,7 +85,7 @@ procedure sleep( length : long )
     for( i = 0L; i < length; i++ ) { }   
 }
 
-inline bytecode function readln( file in ) : string
+inline bytecode function readln( file inp ) : string
 {
     BLDC 10 SFILEREADLN
 }
@@ -133,15 +133,6 @@ function load_field( string filename ) : array [][] of Cell
     return field;
 }
 
-program life( string argv[] );
-
-if length( argv ) < 2 then
-
-    . argv[0], ": please supply one file with Life " _
-               "configuration as an argument"
-
-else
-
 function isdigit( c : char ) : bool
 {
     return c == '0'c || c == '1'c || c == '2'c ||
@@ -166,6 +157,16 @@ function atoi( s : string ) : int
 
     return val;
 }
+
+program life( string argv[] )
+begin
+
+if length( argv ) < 2 then
+
+    . argv[0], ": please supply one file with Life " _
+               "configuration as an argument"
+
+else
 
 var generations = 1000;
 
@@ -211,3 +212,5 @@ while( gen <= generations ) {
 writestr( "\033[?25h" );
 
 endif
+
+end (*program*);
