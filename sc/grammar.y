@@ -2745,48 +2745,14 @@ static void compiler_compile_next( COMPILER *c,
     ssize_t offset = 0;
     ssize_t ncounters, i;
 
-#if 0
-    /* stack: ..., limit_ptr, current_ptr */
-    /* The variable names in the code below are in the wrong order: */
-    ENODE * volatile limit_enode = c->e_stack;
-    TNODE * volatile limit_tnode = limit_enode ?
-	enode_type( limit_enode ) : NULL;
-
-    TNODE * volatile limit_base = limit_tnode ?
-	tnode_element_type( limit_tnode ) : NULL;
-
-    ENODE * volatile counter_enode = limit_enode ?
-	enode_next( limit_enode ) : NULL;
-    TNODE * volatile counter_tnode = counter_enode ?
-	enode_type( counter_enode ) : NULL;
-
-    TNODE * volatile counter_base = counter_tnode ?
-	tnode_element_type( counter_tnode ) : NULL;
-
-    if( !counter_enode ) {
-	yyerrorf( "too little values on the eval stack for NEXT operator" );
-    }
-
-    if( counter_base && limit_base &&
-	!tnode_types_are_compatible( counter_base, limit_base, NULL, ex )) {
-	yyerrorf( "incompatible types in counter and limit of 'foreach' "
-		  "operator" );
-    }
-#else
     /* stack: ..., current_ptr */
     ENODE * volatile counter_enode = c->e_stack;
     TNODE * volatile counter_tnode = counter_enode ?
 	enode_type( counter_enode ) : NULL;
 
-#if 0
-    TNODE * volatile counter_base = counter_tnode ?
-	tnode_element_type( counter_tnode ) : NULL;
-#endif
-
     if( !counter_enode ) {
 	yyerrorf( "too little values on the eval stack for NEXT operator" );
     }
-#endif
 
 #if 0
     if( limit_tnode ) {
@@ -2800,38 +2766,6 @@ static void compiler_compile_next( COMPILER *c,
 	}
     }
 #else
-#if 0
-    compiler_emit( c, ex, "\tcI\n", LDC, 1 );
-    compiler_emit( c, ex, "\tc\n", INDEX );    
-
-    compiler_compile_over( c, ex );
-    compiler_compile_over( c, ex );
-    compiler_emit( c, ex, "\tc\n", PEQBOOL );
-    offset = compiler_pop_offset( c, ex );
-    compiler_drop_top_expression( c );
-    compiler_drop_top_expression( c );
-    {
-        cexception_t inner;
-        TNODE *volatile bool_tnode =
-            share_tnode( typetab_lookup( c->typetab, "bool" ));
-        cexception_guard( inner ) {
-            compiler_push_type( c, bool_tnode, &inner );
-        }
-        cexception_catch {
-            delete_tnode( bool_tnode );
-            cexception_reraise( inner, ex );
-        }
-    }
-    compiler_compile_jz( c, offset, ex );
-
-    ncounters = dnode_loop_counters( c->loops );
-    if( ncounters > 0 ) {
-        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
-    }
-    for( i = 0; i < ncounters; i ++ ) {
-        compiler_drop_top_expression( c );
-    }
-#else
     offset = compiler_pop_offset( c, ex );
     compiler_emit( c, ex, "\tce\n", ADVANCE, &offset );
     
@@ -2842,7 +2776,6 @@ static void compiler_compile_next( COMPILER *c,
     for( i = 0; i < ncounters; i ++ ) {
         compiler_drop_top_expression( c );
     }
-#endif
 #endif
 }
 
