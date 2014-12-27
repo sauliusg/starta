@@ -5262,10 +5262,12 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
     if( element_offset >= array_size ) {
         STACKCELL_ZERO_PTR( istate.ep[0] );
         array_ref = NULL;
+    } else {
+        istate.ep[0].num.offs = element_offset;
     }
 
     if( !array_ref ) {
-        /* No areay ponter -- go over to the next opcode, no jump: */
+        /* No array pointer -- go over to the next opcode, no jump: */
         istate.ep ++;
         return 2;
     } else {

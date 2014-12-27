@@ -2745,6 +2745,9 @@ static void compiler_compile_next( COMPILER *c,
     ssize_t offset = 0;
     ssize_t ncounters, i;
 
+#if 0
+    /* stack: ..., limit_ptr, current_ptr */
+    /* The variable names in the code below are in the wrong order: */
     ENODE * volatile limit_enode = c->e_stack;
     TNODE * volatile limit_tnode = limit_enode ?
 	enode_type( limit_enode ) : NULL;
@@ -2769,6 +2772,21 @@ static void compiler_compile_next( COMPILER *c,
 	yyerrorf( "incompatible types in counter and limit of 'foreach' "
 		  "operator" );
     }
+#else
+    /* stack: ..., current_ptr */
+    ENODE * volatile counter_enode = c->e_stack;
+    TNODE * volatile counter_tnode = counter_enode ?
+	enode_type( counter_enode ) : NULL;
+
+#if 0
+    TNODE * volatile counter_base = counter_tnode ?
+	tnode_element_type( counter_tnode ) : NULL;
+#endif
+
+    if( !counter_enode ) {
+	yyerrorf( "too little values on the eval stack for NEXT operator" );
+    }
+#endif
 
 #if 0
     if( limit_tnode ) {
@@ -2782,7 +2800,7 @@ static void compiler_compile_next( COMPILER *c,
 	}
     }
 #else
-#if 1
+#if 0
     compiler_emit( c, ex, "\tcI\n", LDC, 1 );
     compiler_emit( c, ex, "\tc\n", INDEX );    
 
@@ -2814,7 +2832,8 @@ static void compiler_compile_next( COMPILER *c,
         compiler_drop_top_expression( c );
     }
 #else
-    compiler_emit( c, ex, "\tc\n", ADVANCE );
+    offset = compiler_pop_offset( c, ex );
+    compiler_emit( c, ex, "\tce\n", ADVANCE, &offset );
     
     ncounters = dnode_loop_counters( c->loops );
     if( ncounters > 0 ) {
@@ -7145,7 +7164,8 @@ control_statement
 	if( readonly ) {
 	    dnode_set_flags( $5, DF_IS_READONLY );
 	}
-	compiler_push_loop( compiler_cc, $1, 2, px );
+	compiler_push_loop( compiler_cc, /* loop_label = */ $1,
+                            /* ncounters = */ 0, px );
 	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
       }
     _IN expression
@@ -7155,9 +7175,10 @@ control_statement
         TNODE *element_type = 
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
+        ssize_t neg_element_size = -tnode_size( element_type );
+        ssize_t zero = 0;
 
-        /* stack now:
-           ..., array_current_ptr */
+        /* stack now: ..., array_current_ptr */
         if( element_type ) {
             if( dnode_type( loop_counter_var ) == NULL ) {
                 dnode_append_type( loop_counter_var,
@@ -7169,6 +7190,7 @@ control_statement
 
 	compiler_vartab_insert_named_vars( compiler_cc, loop_counter_var, px );
 
+#if 0
         /* Load array limit onto the stack, for compiling the loop operator: */
         compiler_compile_dup( compiler_cc, px );
         compiler_compile_dup( compiler_cc, px );
@@ -7203,9 +7225,16 @@ control_statement
 	    compiler_push_relative_fixup( compiler_cc, px );
 	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 	}
+#endif
+
+        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &neg_element_size );
+
+        compiler_push_relative_fixup( compiler_cc, px );
+        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
 
         compiler_push_current_address( compiler_cc, px );
 
+        /* stack now: ..., array_current_ptr */
         /* Store the current array element into the loop variable: */
         compiler_compile_dup( compiler_cc, px );
         compiler_make_stack_top_element_type( compiler_cc );
@@ -7219,7 +7248,7 @@ control_statement
 	int readonly = $3;
 	DNODE *loop_counter_var = $5;
         /* stack now:
-           ..., array_last_ptr, array_current_ptr */
+           ..., array_current_ptr */
 
         /* Store the the loop variable back into the current array element: */
         if( !readonly ) {
@@ -7232,9 +7261,9 @@ control_statement
         }
 
 	compiler_fixup_op_continue( compiler_cc, px );
+        compiler_fixup_here( compiler_cc );
 	compiler_compile_next( compiler_cc, px );
 
-        compiler_fixup_here( compiler_cc );
 	compiler_fixup_op_break( compiler_cc, px );
 	compiler_pop_loop( compiler_cc );
 	compiler_end_subscope( compiler_cc, px );
