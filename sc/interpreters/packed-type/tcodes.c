@@ -5275,3 +5275,59 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
         return 0;
     }
 }
+
+/*
+ * NEXT Advance a linked list pointer on the top of the stack to the
+ *      next list element; jump to the provided address if there is
+ *      the next element, otherwise remove the array pointer from the
+ *      stack and proceed to the next opcode.
+ *
+ * bytecode:
+ * NEXT next_offset value_offset jmp_offset
+ * 
+ * stack:
+ * if no jump: list_node_ref -> 
+ * if    jump: list_node_ref -> next_list_node_ref
+ */
+
+int NEXT( INSTRUCTION_FN_ARGS )
+{
+    ssize_t next_offset = istate.code[istate.ip+1].ssizeval;
+    ssize_t value_offset = istate.code[istate.ip+2].ssizeval;
+    ssize_t jmp_offset = istate.code[istate.ip+3].ssizeval;
+    ssize_t current_value_offset = istate.ep[0].num.offs;
+    void **node_ref = (void**)istate.ep[0].PTR;
+    void **next_ref = NULL;
+
+    TRACE_FUNCTION();
+
+    if( node_ref ) {
+        if( current_value_offset != value_offset ) {
+            /* We land here when we advance the pointer for the first
+               time -- set the correct value offset, process the
+               current node (jump)  */
+            istate.ep[0].num.offs = value_offset;
+            next_ref = node_ref;
+        } else {
+            /* Advance to the next list node: */
+            next_ref = *(void**)((char*)node_ref + next_offset);
+            if( !next_ref ) {
+                /* List iteration finished: */
+                STACKCELL_ZERO_PTR( istate.ep[0] );
+            } else {
+                /* Set the next node address: */
+                istate.ep[0].PTR = next_ref;
+            }
+        }
+    }
+
+    if( next_ref ) {
+        istate.ip += jmp_offset;
+        return 0;
+    } else {
+        /* No next node pointer -- go over to the next opcode, no
+           jump: */
+        istate.ep ++;
+        return 4;
+    }
+}
