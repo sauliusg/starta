@@ -1,4 +1,5 @@
 -- !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
+-+ Implement check of measurement units at the compile time.
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
 ++ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
