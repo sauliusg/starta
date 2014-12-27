@@ -2737,9 +2737,9 @@ static void compiler_compile_loop( COMPILER *c,
 }
 
 static void compiler_compile_next( COMPILER *c,
+                                   ssize_t offset,
                                    cexception_t *ex )
 {
-    ssize_t offset = 0;
     ssize_t ncounters, i;
 
     /* stack: ..., current_ptr */
@@ -2754,7 +2754,6 @@ static void compiler_compile_next( COMPILER *c,
 #if 1
     if( counter_tnode ) {
 	if( compiler_lookup_operator( c, counter_tnode, "next", 1, ex )) {
-            offset = compiler_pop_offset( c, ex );
 	    compiler_check_and_compile_operator( c, counter_tnode, "next",
                                                  /*arity:*/ 1,
                                                  /*fixup_values:*/ NULL, ex );
@@ -7163,7 +7162,8 @@ control_statement
 
 	compiler_fixup_op_continue( compiler, px );
         compiler_fixup_here( compiler );
-	compiler_compile_next( compiler, px );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
 
 	compiler_fixup_op_break( compiler, px );
 	compiler_pop_loop( compiler );
@@ -7229,7 +7229,8 @@ control_statement
 
 	compiler_fixup_op_continue( compiler, px );
 	compiler_fixup_here( compiler );
-	compiler_compile_next( compiler, px );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
 
 	compiler_fixup_op_break( compiler, px );
 	compiler_pop_loop( compiler );
