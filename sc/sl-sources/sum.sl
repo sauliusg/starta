@@ -1,4 +1,4 @@
-include "inputs/stdtypes.slib";
+include "stdtypes.slib";
 
 var a : llong = 1;
 var i : llong;
