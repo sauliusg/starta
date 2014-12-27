@@ -258,6 +258,7 @@ then        { MARK; return _THEN; }
 to          { MARK; return _TO; }
 try         { MARK; return _TRY; }
 type        { MARK; return _TYPE; }
+units       { MARK; return _UNITS; }
 unpack      { MARK; return _UNPACK; }
 use         { MARK; return _USE; }
 var         { MARK; return _VAR; }

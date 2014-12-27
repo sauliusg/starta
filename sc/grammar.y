@@ -5711,6 +5711,7 @@ static cexception_t *px; /* parser exception */
 %token _TO
 %token _TRY
 %token _TYPE
+%token _UNITS
 %token _UNPACK
 %token _USE
 %token _VAR
@@ -7471,7 +7472,15 @@ type_identifier
      {
 	 $$ = compiler_lookup_tnode( compiler, NULL, $1, "type" );
      }
+  | __IDENTIFIER _UNITS ':' __STRING_CONST
+     {
+	 $$ = compiler_lookup_tnode( compiler, NULL, $1, "type" );
+     }
   | module_list __COLON_COLON __IDENTIFIER
+     {
+	 $$ = compiler_lookup_tnode( compiler, $1, $3, "type" );
+     }
+  | module_list __COLON_COLON __IDENTIFIER _UNITS ':' __STRING_CONST
      {
 	 $$ = compiler_lookup_tnode( compiler, $1, $3, "type" );
      }
