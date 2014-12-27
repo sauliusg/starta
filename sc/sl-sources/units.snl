@@ -1,11 +1,13 @@
 
 use std;
 
-var x : float units: cm;
-var y : float units: cm;
+var x : float units: "cm" = 3;
+var y : float units: "cm" = 7;
 
-var a : float units: cm**2;
+var a : float units: "cm**2";
 
 a = x * y;
 
 x = x * y;
+
+. a, x;
