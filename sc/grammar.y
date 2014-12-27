@@ -1179,7 +1179,7 @@ static void compiler_emit_function_call( COMPILER *cc,
 					       ex );
 		compiler_emit( cc, ex, "\tceN\n", CALL, &zero, fn_name );
 	    } else {
-		/* ssize_t code_length = thrcode_length( compiler_cc->thrcode ); */
+		/* ssize_t code_length = thrcode_length( compiler->thrcode ); */
 		/* fn_address -= code_length; */
 		compiler_emit( cc, ex, "\tceN\n", CALL, &fn_address, fn_name );
 	    }
@@ -5202,7 +5202,7 @@ static char *extension( char *filename )
 
 typedef void DL_HANDLE;
 
-static void compiler_load_library( COMPILER *compiler_cc,
+static void compiler_load_library( COMPILER *compiler,
 				   char *library_filename,
 				   char *opcode_array_name,
 				   cexception_t *ex )
@@ -5214,7 +5214,7 @@ static void compiler_load_library( COMPILER *compiler_cc,
     char *library_name = callocx( 1, library_name_length + 1, ex );
 
     char *library_path =
-        compiler_find_include_file( compiler_cc, library_filename, ex );
+        compiler_find_include_file( compiler, library_filename, ex );
 
     strncpy( library_name, library_name_start, library_name_length );
 
@@ -5633,7 +5633,7 @@ static void compiler_compile_type_descriptor_loader( COMPILER *cc,
     compiler_push_type( cc, type_descriptor_type, ex );
 }
 
-static COMPILER * volatile compiler_cc;
+static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
 
@@ -5858,23 +5858,23 @@ static cexception_t *px; /* parser exception */
 Program
   :   {
         ssize_t zero = 0;
-        assert( compiler_cc );
-        compiler_insert_default_exceptions( compiler_cc, px );
-        compiler_compile_function_thrcode( compiler_cc );
-	compiler_push_absolute_fixup( compiler_cc, px );
-	compiler_emit( compiler_cc, px, "\tce\n", ENTER, &zero );
-	compiler_push_relative_fixup( compiler_cc, px );
-	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_compile_main_thrcode( compiler_cc );
+        assert( compiler );
+        compiler_insert_default_exceptions( compiler, px );
+        compiler_compile_function_thrcode( compiler );
+	compiler_push_absolute_fixup( compiler, px );
+	compiler_emit( compiler, px, "\tce\n", ENTER, &zero );
+	compiler_push_relative_fixup( compiler, px );
+	compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_compile_main_thrcode( compiler );
       }
     statement_list
       {
-	compiler_compile_function_thrcode( compiler_cc );
-	compiler_fixup_here( compiler_cc );
-	compiler_fixup( compiler_cc, -compiler_cc->local_offset );
-	compiler_merge_functions_and_main( compiler_cc, px );
-	compiler_check_forward_functions( compiler_cc );
-	compiler_emit( compiler_cc, px, "\tc\n", NULL );
+	compiler_compile_function_thrcode( compiler );
+	compiler_fixup_here( compiler );
+	compiler_fixup( compiler, -compiler->local_offset );
+	compiler_merge_functions_and_main( compiler, px );
+	compiler_check_forward_functions( compiler );
+	compiler_emit( compiler, px, "\tc\n", NULL );
       }
   ;
 
@@ -5897,7 +5897,7 @@ statement
 
 delimited_statement
   : multivalue_function_call
-    { compiler_emit_drop_returned_values( compiler_cc, $1, px ); }
+    { compiler_emit_drop_returned_values( compiler, $1, px ); }
   | assignment_statement
   | variable_declaration
   | constant_declaration
@@ -5924,12 +5924,12 @@ assert_statement
     ssize_t current_line_no = compiler_flex_current_line_number();
 
     ssize_t file_name_offset = compiler_assemble_static_string
-        ( compiler_cc, compiler_cc->filename, px );
+        ( compiler, compiler->filename, px );
 
     ssize_t current_line_offset = compiler_assemble_static_string
-        ( compiler_cc, (char*)compiler_flex_current_line(), px );
+        ( compiler, (char*)compiler_flex_current_line(), px );
 
-    compiler_emit( compiler_cc, px, "\tceee\n", ASSERT,
+    compiler_emit( compiler, px, "\tceee\n", ASSERT,
                 &current_line_no, &file_name_offset, &current_line_offset );
   }
   ;
@@ -5940,7 +5940,7 @@ assert_statement
 pack_statement
 : _PACK expression ',' expression ',' expression ',' expression
 {
-    TNODE *type_to_pack = enode_type( compiler_cc->e_stack );
+    TNODE *type_to_pack = enode_type( compiler->e_stack );
 
     if( type_to_pack ) {
 	if( tnode_kind( type_to_pack ) == TK_ARRAY ) {
@@ -5954,20 +5954,20 @@ pack_statement
 		} while( element_type && tnode_kind( element_type ) == TK_ARRAY );
 		fixup_values =
 		    make_mdalloc_key_value_list( element_type, level );
-		compiler_check_and_compile_operator( compiler_cc, element_type,
+		compiler_check_and_compile_operator( compiler, element_type,
 						  "packmdarray", 4 /* arity */,
 						  fixup_values, px );
 	    } else {
-		compiler_check_and_compile_operator( compiler_cc, element_type,
+		compiler_check_and_compile_operator( compiler, element_type,
 						  "packarray", 4 /* arity */,
 						  NULL /* fixup_values */, px );
 	    }
 	} else {
-	    compiler_check_and_compile_operator( compiler_cc, type_to_pack,
+	    compiler_check_and_compile_operator( compiler, type_to_pack,
 					      "pack", 4 /* arity */,
 					  NULL /* fixup_values */, px );
 	}
-	compiler_emit( compiler_cc, px, "\n" );
+	compiler_emit( compiler, px, "\n" );
     } else {
 	yyerrorf( "top expression has no type???" );
     }
@@ -5976,22 +5976,22 @@ pack_statement
 
 break_or_continue_statement
   : _BREAK
-    { compiler_compile_break( compiler_cc, NULL, px ); }
+    { compiler_compile_break( compiler, NULL, px ); }
   | _BREAK __IDENTIFIER
-    { compiler_compile_break( compiler_cc, $2, px ); }
+    { compiler_compile_break( compiler, $2, px ); }
   | _CONTINUE
-    { compiler_compile_continue( compiler_cc, NULL, px ); }
+    { compiler_compile_continue( compiler, NULL, px ); }
   | _CONTINUE __IDENTIFIER
-    { compiler_compile_continue( compiler_cc, $2, px ); }
+    { compiler_compile_continue( compiler, $2, px ); }
   ;
 
 undelimited_simple_statement
   : include_statement
-       { compiler_open_include_file( compiler_cc, $1, px ); }
+       { compiler_open_include_file( compiler, $1, px ); }
   | import_statement
-       { compiler_import_package( compiler_cc, $1, px ); }
+       { compiler_import_package( compiler, $1, px ); }
   | use_statement
-       { compiler_use_package( compiler_cc, $1, px ); }
+       { compiler_use_package( compiler, $1, px ); }
   | load_library_statement
   | pragma_statement
   | bytecode_statement
@@ -6007,9 +6007,9 @@ undelimited_simple_statement
 	   same module as the type. */
 	tnode_insert_single_operator( arg1_type, $1 );
 #else
-        vartab_insert_named_operator( compiler_cc->operators, $1, px );
-        if( compiler_cc->current_package && dnode_scope( $1 ) == 0 ) {
-            dnode_optab_insert_named_operator( compiler_cc->current_package,
+        vartab_insert_named_operator( compiler->operators, $1, px );
+        if( compiler->current_package && dnode_scope( $1 ) == 0 ) {
+            dnode_optab_insert_named_operator( compiler->current_package,
                                                share_dnode( $1 ), px );
         }
 
@@ -6040,16 +6040,16 @@ debug_statement
 do_prefix
   : _DO
     {
-      compiler_push_thrcode( compiler_cc, px );
+      compiler_push_thrcode( compiler, px );
     }
   ;
 
 repeat_prefix
   : _REPEAT
     {
-      compiler_push_loop( compiler_cc, /* loop label = */ NULL,
+      compiler_push_loop( compiler, /* loop label = */ NULL,
                           /* ncounters = */ 0, px );
-      compiler_push_current_address( compiler_cc, px );
+      compiler_push_current_address( compiler, px );
     }
   ;
 
@@ -6061,34 +6061,34 @@ non_control_statement_list
 delimited_control_statement
   : do_prefix non_control_statement_list
       {
-	compiler_swap_thrcodes( compiler_cc );
+	compiler_swap_thrcodes( compiler );
       }
     if_condition
       {
-	compiler_merge_top_thrcodes( compiler_cc, px );
-        compiler_fixup_here( compiler_cc );
+	compiler_merge_top_thrcodes( compiler, px );
+        compiler_fixup_here( compiler );
       }
 
   | repeat_prefix non_control_statement_list _WHILE 
       {
-	compiler_fixup_op_continue( compiler_cc, px );
+	compiler_fixup_op_continue( compiler, px );
       }
     expression
       {
-	compiler_compile_jnz( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
-	compiler_fixup_op_break( compiler_cc, px );
-        compiler_pop_loop( compiler_cc );
+	compiler_compile_jnz( compiler, compiler_pop_offset( compiler, px ), px );
+	compiler_fixup_op_break( compiler, px );
+        compiler_pop_loop( compiler );
       }
   ;
 
 raised_exception_identifier
   : __IDENTIFIER
       {
-          $$ = vartab_lookup( compiler_cc->vartab, $1 );
+          $$ = vartab_lookup( compiler->vartab, $1 );
       }
   | module_list __COLON_COLON __IDENTIFIER
       {
-          $$ = compiler_lookup_dnode( compiler_cc, $1, $3, "exception" );
+          $$ = compiler_lookup_dnode( compiler, $1, $3, "exception" );
       }
   ;
 
@@ -6097,9 +6097,9 @@ raise_statement
     {
 	ssize_t zero = 0;
 	ssize_t minus_one = -1;
-	compiler_emit( compiler_cc, px, "\tce\n", LDC, &minus_one );
-	compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
-	compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &zero );
+	compiler_emit( compiler, px, "\tce\n", LDC, &minus_one );
+	compiler_emit( compiler, px, "\tc\n", PLDZ );
+	compiler_emit( compiler, px, "\tcee\n", RAISE, &zero, &zero );
     }
 
   | _RAISE raised_exception_identifier
@@ -6110,13 +6110,13 @@ raise_statement
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
         if( exception ) {
-            compiler_check_raise_expression( compiler_cc, dnode_name( exception ),
+            compiler_check_raise_expression( compiler, dnode_name( exception ),
                                              px );
         }
 
-	compiler_emit( compiler_cc, px, "\tce\n", LDC, &minus_one );
-	compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
-	compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
+	compiler_emit( compiler, px, "\tce\n", LDC, &minus_one );
+	compiler_emit( compiler, px, "\tc\n", PLDZ );
+	compiler_emit( compiler, px, "\tcee\n", RAISE, &zero, &exception_val );
     }
   | _RAISE raised_exception_identifier '(' expression ')'
     {
@@ -6125,19 +6125,19 @@ raise_statement
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
         if( exception ) {
-            compiler_check_raise_expression( compiler_cc, dnode_name(exception),
+            compiler_check_raise_expression( compiler, dnode_name(exception),
                                              px );
         }
 
-        if( tnode_is_reference( enode_type( compiler_cc->e_stack ))) {
-            compiler_emit( compiler_cc, px, "\tce\n", LLDC, &zero );
-            compiler_emit( compiler_cc, px, "\tc\n", SWAP );            
+        if( tnode_is_reference( enode_type( compiler->e_stack ))) {
+            compiler_emit( compiler, px, "\tce\n", LLDC, &zero );
+            compiler_emit( compiler, px, "\tc\n", SWAP );            
         } else {
-            compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
+            compiler_emit( compiler, px, "\tc\n", PLDZ );
         }
-        compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
+        compiler_emit( compiler, px, "\tcee\n", RAISE, &zero, &exception_val );
 
-	compiler_drop_top_expression( compiler_cc );
+	compiler_drop_top_expression( compiler );
     }
 
   | _RAISE raised_exception_identifier '(' expression ','
@@ -6145,10 +6145,10 @@ raise_statement
         DNODE *exception = $2;
 
         if( exception ) {
-            compiler_check_raise_expression( compiler_cc, dnode_name(exception),
+            compiler_check_raise_expression( compiler, dnode_name(exception),
                                              px );
         }
-	if( !compiler_stack_top_is_integer( compiler_cc )) {
+	if( !compiler_stack_top_is_integer( compiler )) {
 	    yyerrorf( "The first expression in 'raise' operator "
 		      "must be of integer type" );
 	}
@@ -6159,33 +6159,33 @@ raise_statement
 	DNODE *exception = $2;
 	ssize_t exception_val = exception ? dnode_ssize_value( exception ) : 0;
 
-	if( !compiler_stack_top_is_reference( compiler_cc )) {
+	if( !compiler_stack_top_is_reference( compiler )) {
 	    yyerrorf( "The second expression in 'raise' operator "
 		      "must be of string type" );
 	}
 
-	compiler_drop_top_expression( compiler_cc );
-	compiler_drop_top_expression( compiler_cc );
-	compiler_emit( compiler_cc, px, "\tcee\n", RAISE, &zero, &exception_val );
+	compiler_drop_top_expression( compiler );
+	compiler_drop_top_expression( compiler );
+	compiler_emit( compiler, px, "\tcee\n", RAISE, &zero, &exception_val );
     }
 
   | _RERAISE
     {
-	if( !compiler_cc->try_variable_stack || compiler_cc->try_block_level < 1 ) {
+	if( !compiler->try_variable_stack || compiler->try_block_level < 1 ) {
 	    yyerror( "'reraise' operator can only be used after "
 		     "a try block" );
 	} else {
-	    ssize_t try_var_offset = compiler_cc->try_variable_stack ?
-		compiler_cc->try_variable_stack[compiler_cc->try_block_level-1] : 0;
+	    ssize_t try_var_offset = compiler->try_variable_stack ?
+		compiler->try_variable_stack[compiler->try_block_level-1] : 0;
 
-	    compiler_emit( compiler_cc, px, "\tce\n", RERAISE, &try_var_offset );
+	    compiler_emit( compiler, px, "\tce\n", RERAISE, &try_var_offset );
 	}
     }
 ;
 
 exception_declaration
   : _EXCEPTION __IDENTIFIER
-    { compiler_compile_next_exception( compiler_cc, $2, px ); }
+    { compiler_compile_next_exception( compiler, $2, px ); }
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -6204,21 +6204,21 @@ package_keyword : _PACKAGE | _MODULE;
 package_statement
   : package_keyword package_name
       {
-	  vartab_insert_named( compiler_cc->vartab, $2, px );
-	  compiler_begin_package( compiler_cc, share_dnode( $2 ), px );
+	  vartab_insert_named( compiler->vartab, $2, px );
+	  compiler_begin_package( compiler, share_dnode( $2 ), px );
       }
     statement_list
     '}' package_keyword __IDENTIFIER
       {
 	  char *name;
-	  if( compiler_cc->current_package &&
-	      (name = dnode_name( compiler_cc->current_package )) != NULL ) {
+	  if( compiler->current_package &&
+	      (name = dnode_name( compiler->current_package )) != NULL ) {
 	      if( strcmp( $7, name ) != 0 ) {
 		  yyerrorf( "package '%s' ends with 'end package %s'",
 			    name, $7 );
 	      }
 	  }
-	  compiler_end_package( compiler_cc, px );
+	  compiler_end_package( compiler, px );
       }
   ;
 
@@ -6235,7 +6235,7 @@ use_statement
 load_library_statement
    : _LOAD __STRING_CONST
        {
-	   compiler_load_library( compiler_cc, $2, "SL_OPCODES", px );
+	   compiler_load_library( compiler, $2, "SL_OPCODES", px );
        }
    ;
 
@@ -6250,12 +6250,12 @@ pragma_statement
        TNODE *default_type = $2;
 
        if( default_type ) {
-           typetab_override_suffix( compiler_cc->typetab, /*name*/ "",
+           typetab_override_suffix( compiler->typetab, /*name*/ "",
                                     TS_INTEGER_SUFFIX,
                                     share_tnode( default_type ),
                                     px );
 
-           typetab_override_suffix( compiler_cc->typetab, /*name*/ "",
+           typetab_override_suffix( compiler->typetab, /*name*/ "",
                                     TS_FLOAT_SUFFIX, 
                                     share_tnode( default_type ),
                                     px );
@@ -6280,27 +6280,27 @@ program_header
     	  cexception_guard( inner ) {
 	      $$ = funct = new_dnode_function( $2, $4, $6, &inner );
 	      funct = $$ =
-		  compiler_check_and_set_fn_proto( compiler_cc, funct, &inner );
+		  compiler_check_and_set_fn_proto( compiler, funct, &inner );
 
-              compiler_check_and_emit_program_arguments( compiler_cc, $4,
+              compiler_check_and_emit_program_arguments( compiler, $4,
                                                          &inner );
-              program_addr = thrcode_length( compiler_cc->function_thrcode );
-              compiler_emit( compiler_cc, &inner, "\tce\n", CALL, &program_addr );
+              program_addr = thrcode_length( compiler->function_thrcode );
+              compiler_emit( compiler, &inner, "\tce\n", CALL, &program_addr );
               /* Chech program return value; exit if the value is not zero: */
               if( retvals ) {
                   assert( retval_type );
-                  compiler_emit( compiler_cc, px, "\tc\n", DUP );
-                  compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
+                  compiler_emit( compiler, px, "\tc\n", DUP );
+                  compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
                                           NULL, tnode_suffix( retval_type ), 
                                           "function return value", "0", px );
-                  compiler_compile_operator( compiler_cc, retval_type, "==", 2, px );
-                  compiler_emit( compiler_cc, px, "\n" );
-                  compiler_emit( compiler_cc, px, "\tcI\n", BJNZ, 6 );
-                  compiler_emit( compiler_cc, px, "\tcI\n", LDC, 0 );
-                  compiler_compile_operator( compiler_cc, retval_type,
+                  compiler_compile_operator( compiler, retval_type, "==", 2, px );
+                  compiler_emit( compiler, px, "\n" );
+                  compiler_emit( compiler, px, "\tcI\n", BJNZ, 6 );
+                  compiler_emit( compiler, px, "\tcI\n", LDC, 0 );
+                  compiler_compile_operator( compiler, retval_type,
                                           "nth-byte", 2, px );
-                  compiler_emit( compiler_cc, px, "\tc\n", EXIT );
-                  compiler_emit( compiler_cc, px, "\tc\n", DROP );
+                  compiler_emit( compiler, px, "\tc\n", EXIT );
+                  compiler_emit( compiler, px, "\tc\n", DROP );
               }
 	  }
 	  cexception_catch {
@@ -6328,11 +6328,11 @@ module_list
 variable_access_identifier
   : __IDENTIFIER
      {
-	 $$ = compiler_lookup_dnode( compiler_cc, NULL, $1, "variable" );
+	 $$ = compiler_lookup_dnode( compiler, NULL, $1, "variable" );
      }
   | module_list __COLON_COLON __IDENTIFIER
      {
-	 $$ = compiler_lookup_dnode( compiler_cc, $1, $3, "variable" );
+	 $$ = compiler_lookup_dnode( compiler, $1, $3, "variable" );
      }
   ;
 
@@ -6343,16 +6343,16 @@ incdec_statement
               yyerrorf( "may not increment readonly variable '%s'",
                         dnode_name( $1 ));
           } else {
-              if( compiler_variable_has_operator( compiler_cc, $1, "incvar", 0, px )) {
+              if( compiler_variable_has_operator( compiler, $1, "incvar", 0, px )) {
                   TNODE *var_type = dnode_type( $1 );
                   ssize_t var_offset = dnode_offset( $1 );
 
-                  compiler_compile_operator( compiler_cc, var_type, "incvar", 0, px );
-                  compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
+                  compiler_compile_operator( compiler, var_type, "incvar", 0, px );
+                  compiler_emit( compiler, px, "eN\n", &var_offset, dnode_name( $1 ));
               } else {
-                  compiler_compile_load_variable_value( compiler_cc, $1, px );
-                  compiler_compile_unop( compiler_cc, "++", px );
-                  compiler_compile_store_variable( compiler_cc, $1, px );
+                  compiler_compile_load_variable_value( compiler, $1, px );
+                  compiler_compile_unop( compiler, "++", px );
+                  compiler_compile_store_variable( compiler, $1, px );
               }
           }
       }
@@ -6362,86 +6362,86 @@ incdec_statement
               yyerrorf( "may not decrement readonly variable '%s'",
                         dnode_name( $1 ));
           } else {
-              if( compiler_variable_has_operator( compiler_cc, $1, "decvar", 0, px )) {
+              if( compiler_variable_has_operator( compiler, $1, "decvar", 0, px )) {
                   TNODE *var_type = dnode_type( $1 );
                   ssize_t var_offset = dnode_offset( $1 );
 
-                  compiler_compile_operator( compiler_cc, var_type, "decvar", 0, px );
-                  compiler_emit( compiler_cc, px, "eN\n", &var_offset, dnode_name( $1 ));
+                  compiler_compile_operator( compiler, var_type, "decvar", 0, px );
+                  compiler_emit( compiler, px, "eN\n", &var_offset, dnode_name( $1 ));
               } else {
-                  compiler_compile_load_variable_value( compiler_cc, $1, px );
-                  compiler_compile_unop( compiler_cc, "--", px );
-                  compiler_compile_store_variable( compiler_cc, $1, px );
+                  compiler_compile_load_variable_value( compiler, $1, px );
+                  compiler_compile_unop( compiler, "--", px );
+                  compiler_compile_store_variable( compiler, $1, px );
               }
           }
       }
   | lvalue __INC
       {
-	  compiler_compile_dup( compiler_cc, px );
-	  compiler_compile_ldi( compiler_cc, px );
-	  compiler_compile_unop( compiler_cc, "++", px );
-	  compiler_compile_sti( compiler_cc, px );
+	  compiler_compile_dup( compiler, px );
+	  compiler_compile_ldi( compiler, px );
+	  compiler_compile_unop( compiler, "++", px );
+	  compiler_compile_sti( compiler, px );
       }
   | lvalue __DEC
       {
-	  compiler_compile_dup( compiler_cc, px );
-	  compiler_compile_ldi( compiler_cc, px );
-	  compiler_compile_unop( compiler_cc, "--", px );
-	  compiler_compile_sti( compiler_cc, px );
+	  compiler_compile_dup( compiler, px );
+	  compiler_compile_ldi( compiler, px );
+	  compiler_compile_unop( compiler, "--", px );
+	  compiler_compile_sti( compiler, px );
       }
   ;
 
 print_expression_list
   : expression
       {
-	  compiler_compile_unop( compiler_cc, ".", px );
+	  compiler_compile_unop( compiler, ".", px );
       }
   | print_expression_list ',' expression
       {
-	  compiler_emit( compiler_cc, px, "\tc\n", SPACE );
-	  compiler_compile_unop( compiler_cc, ".", px );
+	  compiler_emit( compiler, px, "\tc\n", SPACE );
+	  compiler_compile_unop( compiler, ".", px );
       }
 ; 
 
 output_expression_list
   : expression
       {
-	  compiler_compile_unop( compiler_cc, "<", px );
+	  compiler_compile_unop( compiler, "<", px );
       }
   | output_expression_list ',' expression
       {
-	  compiler_emit( compiler_cc, px, "\tc\n", SPACE );
-	  compiler_compile_unop( compiler_cc, "<", px );
+	  compiler_emit( compiler, px, "\tc\n", SPACE );
+	  compiler_compile_unop( compiler, "<", px );
       }
 ; 
 
 io_statement
   : '.' print_expression_list
      {
-	 compiler_emit( compiler_cc, px, "\tc\n", NEWLINE );
+	 compiler_emit( compiler, px, "\tc\n", NEWLINE );
      }
 
   | '<' output_expression_list
 
   | '>' lvariable
      {
-	 compiler_compile_unop( compiler_cc, ">", px );
+	 compiler_compile_unop( compiler, ">", px );
      }
 
   | __RIGHT_TO_LEFT expression
      {
-	 compiler_compile_unop( compiler_cc, "<<", px );
+	 compiler_compile_unop( compiler, "<<", px );
      }
 
   | __LEFT_TO_RIGHT lvariable
      {
-	 compiler_compile_unop( compiler_cc, ">>", px );
+	 compiler_compile_unop( compiler, ">>", px );
      }
 
   | file_io_statement
     {
-	compiler_emit( compiler_cc, px, "\tc\n", PDROP );
-	compiler_drop_top_expression( compiler_cc );
+	compiler_emit( compiler, px, "\tc\n", PDROP );
+	compiler_drop_top_expression( compiler );
     }
 
   | stdread_io_statement
@@ -6451,33 +6451,33 @@ stdread_io_statement
 : '<' '>' __LEFT_TO_RIGHT variable_access_identifier
       {
           cexception_t inner;
-          TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
+          TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
 
           cexception_guard( inner ) {
-              compiler_push_type( compiler_cc, type_tnode, &inner );
-              compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
+              compiler_push_type( compiler, type_tnode, &inner );
+              compiler_emit( compiler, &inner, "\tc\n", STDREAD );
           }
           cexception_catch {
               delete_tnode( type_tnode );
               cexception_reraise( inner, px );
           }
-          compiler_compile_store_variable( compiler_cc, $4, px );
+          compiler_compile_store_variable( compiler, $4, px );
       }
 
   | '<' '>' __LEFT_TO_RIGHT lvalue
       {
           cexception_t inner;
-          TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
+          TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
 
           cexception_guard( inner ) {
-              compiler_push_type( compiler_cc, type_tnode, &inner );
-              compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
+              compiler_push_type( compiler, type_tnode, &inner );
+              compiler_emit( compiler, &inner, "\tc\n", STDREAD );
           }
           cexception_catch {
               delete_tnode( type_tnode );
               cexception_reraise( inner, px );
           }
-          compiler_compile_sti( compiler_cc, px );
+          compiler_compile_sti( compiler, px );
       }
 ;
 
@@ -6485,32 +6485,32 @@ file_io_statement
 
   : '<' expression '>' __RIGHT_TO_LEFT expression
       {
-       compiler_check_and_compile_top_operator( compiler_cc, "<<", 2, px );
-       compiler_emit( compiler_cc, px, "\n" );
+       compiler_check_and_compile_top_operator( compiler, "<<", 2, px );
+       compiler_emit( compiler, px, "\n" );
       }
 
   | '<' expression '>'
       {
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_thrcode( compiler, px );
       } 
     __LEFT_TO_RIGHT lvariable
       {
-	  compiler_compile_file_input_operator( compiler_cc, px );
+	  compiler_compile_file_input_operator( compiler, px );
       }
 
   | file_io_statement __RIGHT_TO_LEFT expression
       {
-        compiler_check_and_compile_top_operator( compiler_cc, "<<", 2, px );
-        compiler_emit( compiler_cc, px, "\n" );
+        compiler_check_and_compile_top_operator( compiler, "<<", 2, px );
+        compiler_emit( compiler, px, "\n" );
       }
 
   | file_io_statement __LEFT_TO_RIGHT
       {
-        compiler_push_thrcode( compiler_cc, px );
+        compiler_push_thrcode( compiler, px );
       }
     lvariable
       {
-	compiler_compile_file_input_operator( compiler_cc, px );
+	compiler_compile_file_input_operator( compiler, px );
       }
   ;
 
@@ -6532,13 +6532,13 @@ variable_declaration
      int readonly = $1;
 
      dnode_list_append_type( $2, $4 );
-     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
-     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler->local_offset );
+     compiler_vartab_insert_named_vars( compiler, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
-     if( compiler_cc->loops ) {
-	 compiler_compile_zero_out_stackcells( compiler_cc, $2, px );
+     if( compiler->loops ) {
+	 compiler_compile_zero_out_stackcells( compiler, $2, px );
      }
      compiler_check_non_null_variables( $2 );
     }
@@ -6549,13 +6549,13 @@ variable_declaration
 
      $2 = dnode_append( $2, $4 );
      dnode_list_append_type( $2, $6 );
-     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
-     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler->local_offset );
+     compiler_vartab_insert_named_vars( compiler, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
-     if( compiler_cc->loops ) {
-	 compiler_compile_zero_out_stackcells( compiler_cc, $2, px );
+     if( compiler->loops ) {
+	 compiler_compile_zero_out_stackcells( compiler, $2, px );
      }
      compiler_check_non_null_variables( $2 );
     }
@@ -6566,12 +6566,12 @@ variable_declaration
      DNODE *var = $2;
 
      dnode_list_append_type( var, $4 );
-     dnode_list_assign_offsets( var, &compiler_cc->local_offset );
-     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
+     dnode_list_assign_offsets( var, &compiler->local_offset );
+     compiler_vartab_insert_named_vars( compiler, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( var, DF_IS_READONLY );
      }
-     compiler_compile_initialise_variable( compiler_cc, var, px );
+     compiler_compile_initialise_variable( compiler, var, px );
     }
 
   | variable_declaration_keyword variable_identifier ','
@@ -6582,8 +6582,8 @@ variable_declaration
 
      $2 = dnode_list_invert( dnode_append( $2, $4 ));
      dnode_list_append_type( $2, $6 );
-     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
-     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler->local_offset );
+     compiler_vartab_insert_named_vars( compiler, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
@@ -6599,9 +6599,9 @@ variable_declaration
 
          if( expr_nr > len ) {
              if( expr_nr == len + 1 ) {
-                 compiler_compile_drop( compiler_cc, px );
+                 compiler_compile_drop( compiler, px );
              } else {
-                 compiler_compile_dropn( compiler_cc, expr_nr - len, px );
+                 compiler_compile_dropn( compiler, expr_nr - len, px );
              }
          }
 
@@ -6609,7 +6609,7 @@ variable_declaration
          foreach_dnode( var, lst ) {
              len ++;
              if( len <= expr_nr )
-                 compiler_compile_initialise_variable( compiler_cc, var, px );
+                 compiler_compile_initialise_variable( compiler, var, px );
          }
      }
     }
@@ -6622,8 +6622,8 @@ variable_declaration
 
         $2 = dnode_list_invert( dnode_append( $2, $4 ));
         dnode_list_append_type( $2, $6 );
-        dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
-        compiler_vartab_insert_named_vars( compiler_cc, $2, px );
+        dnode_list_assign_offsets( $2, &compiler->local_offset );
+        compiler_vartab_insert_named_vars( compiler, $2, px );
     }
 
   | variable_declaration_keyword var_type_description variable_declarator_list
@@ -6631,15 +6631,15 @@ variable_declaration
         int readonly = $1;
 
 	dnode_list_append_type( $3, $2 );
-	dnode_list_assign_offsets( $3, &compiler_cc->local_offset );
-	compiler_vartab_insert_named_vars( compiler_cc, $3, px );
+	dnode_list_assign_offsets( $3, &compiler->local_offset );
+	compiler_vartab_insert_named_vars( compiler, $3, px );
 	if( readonly ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
 	}
-	if( compiler_cc->loops ) {
-	    compiler_compile_zero_out_stackcells( compiler_cc, $3, px );
+	if( compiler->loops ) {
+	    compiler_compile_zero_out_stackcells( compiler, $3, px );
 	}
-	compiler_compile_variable_initialisations( compiler_cc, $3, px );
+	compiler_compile_variable_initialisations( compiler, $3, px );
       }
 
   | variable_declaration_keyword 
@@ -6649,21 +6649,21 @@ variable_declaration
 
 	tnode_append_element_type( $3, $2 );
 	dnode_list_append_type( $4, $3 );
-	dnode_list_assign_offsets( $4, &compiler_cc->local_offset );
-	compiler_vartab_insert_named_vars( compiler_cc, $4, px );
+	dnode_list_assign_offsets( $4, &compiler->local_offset );
+	compiler_vartab_insert_named_vars( compiler, $4, px );
 	if( readonly ) {
 	    dnode_list_set_flags( $4, DF_IS_READONLY );
 	}
-	if( compiler_cc->loops ) {
-	    compiler_compile_zero_out_stackcells( compiler_cc, $4, px );
+	if( compiler->loops ) {
+	    compiler_compile_zero_out_stackcells( compiler, $4, px );
 	}
-	compiler_compile_variable_initialisations( compiler_cc, $4, px );
+	compiler_compile_variable_initialisations( compiler, $4, px );
       }
 
   | variable_declaration_keyword variable_identifier initialiser
     {
-     TNODE *expr_type = compiler_cc->e_stack ?
-	 share_tnode( enode_type( compiler_cc->e_stack )) : NULL;
+     TNODE *expr_type = compiler->e_stack ?
+	 share_tnode( enode_type( compiler->e_stack )) : NULL;
      int readonly = $1;
      DNODE *var = $2;
 
@@ -6673,7 +6673,7 @@ variable_declaration
      if( expr_type_kind == TK_FUNCTION ||
          expr_type_kind == TK_OPERATOR ||
          expr_type_kind == TK_METHOD ) {
-         TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
+         TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
          expr_type = new_tnode_function_or_proc_ref
              ( share_dnode( tnode_args( expr_type )),
                share_dnode( tnode_retvals( expr_type )),
@@ -6682,12 +6682,12 @@ variable_declaration
      }
 
      dnode_list_append_type( var, expr_type );
-     dnode_list_assign_offsets( var, &compiler_cc->local_offset );
-     compiler_vartab_insert_named_vars( compiler_cc, var, px );
+     dnode_list_assign_offsets( var, &compiler->local_offset );
+     compiler_vartab_insert_named_vars( compiler, var, px );
      if( readonly ) {
 	 dnode_list_set_flags( var, DF_IS_READONLY );
      }
-     compiler_compile_initialise_variable( compiler_cc, var, px );
+     compiler_compile_initialise_variable( compiler, var, px );
     }
  
  | variable_declaration_keyword variable_identifier ','
@@ -6696,8 +6696,8 @@ variable_declaration
      int readonly = $1;
 
      $2 = dnode_list_invert( dnode_append( $2, $4 ));
-     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );
-     compiler_vartab_insert_named_vars( compiler_cc, $2, px );
+     dnode_list_assign_offsets( $2, &compiler->local_offset );
+     compiler_vartab_insert_named_vars( compiler, $2, px );
      if( readonly ) {
 	 dnode_list_set_flags( $2, DF_IS_READONLY );
      }
@@ -6715,23 +6715,23 @@ variable_declaration
 
          if( expr_nr > len ) {
              if( expr_nr == len + 1 ) {
-                 compiler_compile_drop( compiler_cc, px );
+                 compiler_compile_drop( compiler, px );
              } else {
-                 compiler_compile_dropn( compiler_cc, expr_nr - len, px );
+                 compiler_compile_dropn( compiler, expr_nr - len, px );
              }
          }
 
          len = 0;
 	 foreach_dnode( var, lst ) {
              len ++;
-             TNODE *expr_type = compiler_cc->e_stack ?
-                 share_tnode( enode_type( compiler_cc->e_stack )) : NULL;
+             TNODE *expr_type = compiler->e_stack ?
+                 share_tnode( enode_type( compiler->e_stack )) : NULL;
              type_kind_t expr_type_kind = expr_type ?
                  tnode_kind( expr_type ) : TK_NONE;
              if( expr_type_kind == TK_FUNCTION ||
                  expr_type_kind == TK_OPERATOR ||
                  expr_type_kind == TK_METHOD ) {
-                 TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
+                 TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
                  expr_type = new_tnode_function_or_proc_ref
                      ( share_dnode( tnode_args( expr_type )),
                        share_dnode( tnode_retvals( expr_type )),
@@ -6740,7 +6740,7 @@ variable_declaration
              }
              dnode_append_type( var, expr_type );
              if( len <= expr_nr )
-                 compiler_compile_initialise_variable( compiler_cc, var, px );
+                 compiler_compile_initialise_variable( compiler, var, px );
 	 }
      }
     }
@@ -6782,19 +6782,19 @@ variable_identifier_list
 return_statement
   : _RETURN
       {
-	compiler_push_guarding_retval( compiler_cc, px );
-	compiler_compile_return( compiler_cc, 0, px );
+	compiler_push_guarding_retval( compiler, px );
+	compiler_compile_return( compiler, 0, px );
       }
   | _RETURN 
       {
-	if( compiler_cc->loops ) {
-            char *name = dnode_name( compiler_cc->loops );
-	    compiler_drop_loop_counters( compiler_cc, name, 0, px );
+	if( compiler->loops ) {
+            char *name = dnode_name( compiler->loops );
+	    compiler_drop_loop_counters( compiler, name, 0, px );
 	}
-        compiler_push_guarding_retval( compiler_cc, px );
+        compiler_push_guarding_retval( compiler, px );
       }
     expression_list
-      { compiler_compile_return( compiler_cc, $3, px ); }
+      { compiler_compile_return( compiler, $3, px ); }
   ;
 
 variable_identifier
@@ -6814,8 +6814,8 @@ opt_label
 if_condition
   : _IF /* expression */ {} condition
       {
-        compiler_push_relative_fixup( compiler_cc, px );
-	compiler_compile_jz( compiler_cc, 0, px );
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jz( compiler, 0, px );
       }
   ;
 
@@ -6823,13 +6823,13 @@ for_variable_declaration
   : variable_identifier ':' var_type_description
       {
 	  dnode_append_type( $1, $3 );
-	  dnode_assign_offset( $1, &compiler_cc->local_offset );
+	  dnode_assign_offset( $1, &compiler->local_offset );
 	  $$ = $1;
       }
   | var_type_description variable_identifier
       {
 	  dnode_append_type( $2, $1 );
-	  dnode_assign_offset( $2, &compiler_cc->local_offset );
+	  dnode_assign_offset( $2, &compiler->local_offset );
 	  $$ = $2;
       }
   | variable_identifier
@@ -6841,197 +6841,197 @@ for_variable_declaration
 elsif_condition
   : _ELSIF /* expression */ {} condition
       {
-        compiler_push_relative_fixup( compiler_cc, px );
-	compiler_compile_jz( compiler_cc, 0, px );
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jz( compiler, 0, px );
       }
   ;
 
 elsif_statement
   : elsif_condition _THEN statement_list _ENDIF
     {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
     }
 
   | elsif_condition _THEN statement_list
     {
 	ssize_t zero = 0;
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_swap_fixups( compiler_cc );
-        compiler_fixup_here( compiler_cc );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
     }
     elsif_statement
     {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
     }
 
   | elsif_condition _THEN statement_list
     {
 	ssize_t zero = 0;
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_swap_fixups( compiler_cc );
-        compiler_fixup_here( compiler_cc );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
     }
     _ELSE statement_list _ENDIF
     {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
     }
 ;
 
 control_statement
   : if_condition _THEN statement_list _ENDIF
       {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
       }
 
   | if_condition _THEN statement_list
       {
 	ssize_t zero = 0;
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_swap_fixups( compiler_cc );
-        compiler_fixup_here( compiler_cc );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
       }
     _ELSE statement_list _ENDIF
       {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
       }
 
   | if_condition _THEN statement_list
       {
 	ssize_t zero = 0;
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_swap_fixups( compiler_cc );
-        compiler_fixup_here( compiler_cc );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
       }
     elsif_statement
       {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
       }
 
   | if_condition compound_statement
       {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
       }
 
   | if_condition compound_statement _ELSE 
       {
 	ssize_t zero = 0;
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_swap_fixups( compiler_cc );
-        compiler_fixup_here( compiler_cc );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
       }
     compound_statement
       {
-        compiler_fixup_here( compiler_cc );
+        compiler_fixup_here( compiler );
       }
 
   | opt_label _WHILE
       {
 	  ssize_t zero = 0;
-          compiler_begin_subscope( compiler_cc, px );
-	  compiler_push_loop( compiler_cc, $1, 0, px );
-          compiler_push_relative_fixup( compiler_cc, px );
-	  compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-	  compiler_push_current_address( compiler_cc, px );
-	  compiler_push_thrcode( compiler_cc, px );
+          compiler_begin_subscope( compiler, px );
+	  compiler_push_loop( compiler, $1, 0, px );
+          compiler_push_relative_fixup( compiler, px );
+	  compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+	  compiler_push_current_address( compiler, px );
+	  compiler_push_thrcode( compiler, px );
       }
     condition
       {
-	compiler_swap_thrcodes( compiler_cc );
+	compiler_swap_thrcodes( compiler );
       }
     loop_body
       {
-        compiler_fixup_here( compiler_cc );
-	compiler_fixup_op_continue( compiler_cc, px );
-	compiler_merge_top_thrcodes( compiler_cc, px );
-	compiler_compile_jnz( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
-	compiler_fixup_op_break( compiler_cc, px );
-	compiler_pop_loop( compiler_cc );
-        compiler_end_subscope( compiler_cc, px );
+        compiler_fixup_here( compiler );
+	compiler_fixup_op_continue( compiler, px );
+	compiler_merge_top_thrcodes( compiler, px );
+	compiler_compile_jnz( compiler, compiler_pop_offset( compiler, px ), px );
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
       }
 
   | opt_label _FOR
       {
-	compiler_begin_subscope( compiler_cc, px );
+	compiler_begin_subscope( compiler, px );
       } 
     '(' statement ';'
       {
-        compiler_push_loop( compiler_cc, $1, 0, px );
-	compiler_push_thrcode( compiler_cc, px );
+        compiler_push_loop( compiler, $1, 0, px );
+	compiler_push_thrcode( compiler, px );
       }
     condition ';'
       {
-	compiler_push_thrcode( compiler_cc, px );
+	compiler_push_thrcode( compiler, px );
       }
     statement ')'
       {
         ssize_t zero = 0;
-	compiler_push_thrcode( compiler_cc, px );
-        compiler_push_relative_fixup( compiler_cc, px );
-	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	compiler_push_thrcode( compiler, px );
+        compiler_push_relative_fixup( compiler, px );
+	compiler_emit( compiler, px, "\tce\n", JMP, &zero );
       }
     loop_body
       {
-	compiler_fixup_op_continue( compiler_cc, px );
-	compiler_merge_top_thrcodes( compiler_cc, px );
+	compiler_fixup_op_continue( compiler, px );
+	compiler_merge_top_thrcodes( compiler, px );
 
-        compiler_fixup_here( compiler_cc );
-	compiler_merge_top_thrcodes( compiler_cc, px );
+        compiler_fixup_here( compiler );
+	compiler_merge_top_thrcodes( compiler, px );
 
-	compiler_compile_jnz( compiler_cc, -compiler_code_length( compiler_cc ) + 2, px );
+	compiler_compile_jnz( compiler, -compiler_code_length( compiler ) + 2, px );
 
-	compiler_swap_thrcodes( compiler_cc );
-	compiler_merge_top_thrcodes( compiler_cc, px );
-	compiler_fixup_op_break( compiler_cc, px );
-	compiler_pop_loop( compiler_cc );
-	compiler_end_subscope( compiler_cc, px );
+	compiler_swap_thrcodes( compiler );
+	compiler_merge_top_thrcodes( compiler, px );
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
+	compiler_end_subscope( compiler, px );
       }
 
   | opt_label _FOR lvariable
       {
-        compiler_push_loop( compiler_cc, $1, 2, px );
-	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
-	compiler_compile_dup( compiler_cc, px );
+        compiler_push_loop( compiler, $1, 2, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+	compiler_compile_dup( compiler, px );
       }
     '=' expression
       {
-        compiler_compile_sti( compiler_cc, px );
+        compiler_compile_sti( compiler, px );
       }
     _TO expression
       {
-	compiler_compile_over( compiler_cc, px );
-	compiler_compile_ldi( compiler_cc, px );
-	compiler_compile_over( compiler_cc, px );
-	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
-	    compiler_compile_binop( compiler_cc, ">", px );
-	    compiler_push_relative_fixup( compiler_cc, px );
-	    compiler_compile_jnz( compiler_cc, 0, px );
+	compiler_compile_over( compiler, px );
+	compiler_compile_ldi( compiler, px );
+	compiler_compile_over( compiler, px );
+	if( compiler_test_top_types_are_identical( compiler, px )) {
+	    compiler_compile_binop( compiler, ">", px );
+	    compiler_push_relative_fixup( compiler, px );
+	    compiler_compile_jnz( compiler, 0, px );
 	} else {
 	    ssize_t zero = 0;
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_push_relative_fixup( compiler_cc, px );
-	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	    compiler_drop_top_expression( compiler );
+	    compiler_drop_top_expression( compiler );
+	    compiler_push_relative_fixup( compiler, px );
+	    compiler_emit( compiler, px, "\tce\n", JMP, &zero );
 	}
 
-        compiler_push_current_address( compiler_cc, px );
+        compiler_push_current_address( compiler, px );
       }
      loop_body
       {
-	compiler_fixup_here( compiler_cc );
-	compiler_fixup_op_continue( compiler_cc, px );
-	compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
-	compiler_fixup_op_break( compiler_cc, px );
-	compiler_pop_loop( compiler_cc );
+	compiler_fixup_here( compiler );
+	compiler_fixup_op_continue( compiler, px );
+	compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
       }
 
   | opt_label _FOR variable_declaration_keyword
       {
-	compiler_begin_subscope( compiler_cc, px );
+	compiler_begin_subscope( compiler, px );
       }
     for_variable_declaration
       {
@@ -7039,8 +7039,8 @@ control_statement
 	if( readonly ) {
 	    dnode_set_flags( $5, DF_IS_READONLY );
 	}
-	compiler_push_loop( compiler_cc, $1, 2, px );
-	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
+	compiler_push_loop( compiler, $1, 2, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     '=' expression
       {
@@ -7048,45 +7048,45 @@ control_statement
 
 	if( dnode_type( loop_counter ) == NULL ) {
 	    dnode_append_type( loop_counter,
-			       share_tnode( enode_type( compiler_cc->e_stack )));
-	    dnode_assign_offset( loop_counter, &compiler_cc->local_offset );
+			       share_tnode( enode_type( compiler->e_stack )));
+	    dnode_assign_offset( loop_counter, &compiler->local_offset );
 	}
-	compiler_vartab_insert_named_vars( compiler_cc, loop_counter, px );
-        compiler_compile_store_variable( compiler_cc, loop_counter, px );
-	compiler_compile_load_variable_address( compiler_cc, loop_counter, px );
+	compiler_vartab_insert_named_vars( compiler, loop_counter, px );
+        compiler_compile_store_variable( compiler, loop_counter, px );
+	compiler_compile_load_variable_address( compiler, loop_counter, px );
       }
     _TO expression
       {
-	compiler_compile_over( compiler_cc, px );
-	compiler_compile_ldi( compiler_cc, px );
-	compiler_compile_over( compiler_cc, px );
-	if( compiler_test_top_types_are_identical( compiler_cc, px )) {
-	    compiler_compile_binop( compiler_cc, ">", px );
-	    compiler_push_relative_fixup( compiler_cc, px );
-	    compiler_compile_jnz( compiler_cc, 0, px );
+	compiler_compile_over( compiler, px );
+	compiler_compile_ldi( compiler, px );
+	compiler_compile_over( compiler, px );
+	if( compiler_test_top_types_are_identical( compiler, px )) {
+	    compiler_compile_binop( compiler, ">", px );
+	    compiler_push_relative_fixup( compiler, px );
+	    compiler_compile_jnz( compiler, 0, px );
 	} else {
 	    ssize_t zero = 0;
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_drop_top_expression( compiler_cc );
-	    compiler_push_relative_fixup( compiler_cc, px );
-	    compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	    compiler_drop_top_expression( compiler );
+	    compiler_drop_top_expression( compiler );
+	    compiler_push_relative_fixup( compiler, px );
+	    compiler_emit( compiler, px, "\tce\n", JMP, &zero );
 	}
 
-        compiler_push_current_address( compiler_cc, px );
+        compiler_push_current_address( compiler, px );
       }
      loop_body
       {
-	compiler_fixup_here( compiler_cc );
-	compiler_fixup_op_continue( compiler_cc, px );
-	compiler_compile_loop( compiler_cc, compiler_pop_offset( compiler_cc, px ), px );
-	compiler_fixup_op_break( compiler_cc, px );
-	compiler_pop_loop( compiler_cc );
-	compiler_end_subscope( compiler_cc, px );
+	compiler_fixup_here( compiler );
+	compiler_fixup_op_continue( compiler, px );
+	compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
+	compiler_end_subscope( compiler, px );
       }
 
   | opt_label _FOREACH variable_declaration_keyword
       {
-        compiler_begin_subscope( compiler_cc, px );
+        compiler_begin_subscope( compiler, px );
       }
     for_variable_declaration
       {
@@ -7094,14 +7094,14 @@ control_statement
 	if( readonly ) {
 	    dnode_set_flags( $5, DF_IS_READONLY );
 	}
-	compiler_push_loop( compiler_cc, /* loop_label = */ $1,
+	compiler_push_loop( compiler, /* loop_label = */ $1,
                             /* ncounters = */ 0, px );
-	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     _IN expression
       {
 	DNODE *loop_counter_var = $5;
-        TNODE *aggregate_expression_type = enode_type( compiler_cc->e_stack );
+        TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
         TNODE *element_type = 
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
@@ -7115,26 +7115,26 @@ control_statement
                                    share_tnode( element_type ));
             }
             dnode_assign_offset( loop_counter_var,
-                                 &compiler_cc->local_offset );
+                                 &compiler->local_offset );
         }
 
-	compiler_vartab_insert_named_vars( compiler_cc, loop_counter_var, px );
+	compiler_vartab_insert_named_vars( compiler, loop_counter_var, px );
 
-        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &neg_element_size );
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &neg_element_size );
 
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
 
-        compiler_push_current_address( compiler_cc, px );
+        compiler_push_current_address( compiler, px );
 
         /* stack now: ..., array_current_ptr */
         /* Store the current array element into the loop variable: */
-        compiler_compile_dup( compiler_cc, px );
-        compiler_make_stack_top_element_type( compiler_cc );
-        compiler_make_stack_top_addressof( compiler_cc, px );
-        compiler_compile_ldi( compiler_cc, px );
+        compiler_compile_dup( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_ldi( compiler, px );
         compiler_compile_variable_initialisation
-            ( compiler_cc, loop_counter_var, px );
+            ( compiler, loop_counter_var, px );
       }
      loop_body
       {
@@ -7144,35 +7144,35 @@ control_statement
 
         /* Store the the loop variable back into the current array element: */
         if( !readonly ) {
-            compiler_compile_dup( compiler_cc, px );
-            compiler_make_stack_top_element_type( compiler_cc );
-            compiler_make_stack_top_addressof( compiler_cc, px );
-            compiler_compile_load_variable_value( compiler_cc,
+            compiler_compile_dup( compiler, px );
+            compiler_make_stack_top_element_type( compiler );
+            compiler_make_stack_top_addressof( compiler, px );
+            compiler_compile_load_variable_value( compiler,
                                                   loop_counter_var, px );
-            compiler_compile_sti( compiler_cc, px );
+            compiler_compile_sti( compiler, px );
         }
 
-	compiler_fixup_op_continue( compiler_cc, px );
-        compiler_fixup_here( compiler_cc );
-	compiler_compile_next( compiler_cc, px );
+	compiler_fixup_op_continue( compiler, px );
+        compiler_fixup_here( compiler );
+	compiler_compile_next( compiler, px );
 
-	compiler_fixup_op_break( compiler_cc, px );
-	compiler_pop_loop( compiler_cc );
-	compiler_end_subscope( compiler_cc, px );
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
+	compiler_end_subscope( compiler, px );
       }
 
   | opt_label _FOREACH lvariable
       {
-        compiler_push_loop( compiler_cc, /* loop_label = */ $1,
+        compiler_push_loop( compiler, /* loop_label = */ $1,
                             /* ncounters = */ 1, px );
-	dnode_set_flags( compiler_cc->loops, DF_LOOP_HAS_VAL );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
         /* stack now: ..., lvariable_address */
       }
     _IN expression
       {
         /* stack now:
            ..., lvariable_address, array_last_ptr */
-        TNODE *aggregate_expression_type = enode_type( compiler_cc->e_stack );
+        TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
         TNODE *element_type = 
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
@@ -7181,69 +7181,69 @@ control_statement
 
         /* stack now: ..., lvariable_address, array_current_ptr */
 
-        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &neg_element_size );
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &neg_element_size );
 
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
 
         /* The execution flow should return here after each iteration: */
-        compiler_push_current_address( compiler_cc, px );
+        compiler_push_current_address( compiler, px );
 
         /* stack now: ..., lvariable_address, array_current_ptr */
         /* Store the current array element into the loop variable: */
-        compiler_compile_over( compiler_cc, px );
-        compiler_compile_over( compiler_cc, px );
-        compiler_make_stack_top_element_type( compiler_cc );
-        compiler_make_stack_top_addressof( compiler_cc, px );
-        compiler_compile_ldi( compiler_cc, px );
-        compiler_compile_sti( compiler_cc, px );
+        compiler_compile_over( compiler, px );
+        compiler_compile_over( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_ldi( compiler, px );
+        compiler_compile_sti( compiler, px );
       }
      loop_body
       {
         /* stack now:
            ..., lvariable_address, array_current_ptr */
-        ENODE *loop_var = compiler_cc->e_stack; /* array_current_ptr */
+        ENODE *loop_var = compiler->e_stack; /* array_current_ptr */
         loop_var = loop_var ? enode_next( loop_var ) : NULL; /* lvariable_address */
         
         if( loop_var && !enode_has_flags( loop_var, EF_IS_READONLY )) {
             /* Store the current array element into the loop variable: */
             /* stack now:
                ..., lvariable_address, array_current_ptr */
-            compiler_compile_over( compiler_cc, px );
-            compiler_compile_over( compiler_cc, px );
-            compiler_make_stack_top_element_type( compiler_cc );
-            compiler_make_stack_top_addressof( compiler_cc, px );
-            compiler_compile_swap( compiler_cc, px );
-            compiler_compile_ldi( compiler_cc, px );
-            compiler_compile_sti( compiler_cc, px );
+            compiler_compile_over( compiler, px );
+            compiler_compile_over( compiler, px );
+            compiler_make_stack_top_element_type( compiler );
+            compiler_make_stack_top_addressof( compiler, px );
+            compiler_compile_swap( compiler, px );
+            compiler_compile_ldi( compiler, px );
+            compiler_compile_sti( compiler, px );
         }
 
-	compiler_fixup_op_continue( compiler_cc, px );
-	compiler_fixup_here( compiler_cc );
-	compiler_compile_next( compiler_cc, px );
+	compiler_fixup_op_continue( compiler, px );
+	compiler_fixup_here( compiler );
+	compiler_compile_next( compiler, px );
 
-	compiler_fixup_op_break( compiler_cc, px );
-	compiler_pop_loop( compiler_cc );
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
       }
 
   | _TRY
       {
 	cexception_t inner;
 	ssize_t zero = 0;
-	ssize_t try_var_offset = compiler_cc->local_offset--;
+	ssize_t try_var_offset = compiler->local_offset--;
 
-	push_ssize_t( &compiler_cc->try_variable_stack, &compiler_cc->try_block_level,
+	push_ssize_t( &compiler->try_variable_stack, &compiler->try_block_level,
 		      try_var_offset, px );
 
-	push_ssize_t( &compiler_cc->catch_jumpover_stack,
-		      &compiler_cc->catch_jumpover_stack_length,
-		      compiler_cc->catch_jumpover_nr, px );
+	push_ssize_t( &compiler->catch_jumpover_stack,
+		      &compiler->catch_jumpover_stack_length,
+		      compiler->catch_jumpover_nr, px );
 
-	compiler_cc->catch_jumpover_nr = 0;
+	compiler->catch_jumpover_nr = 0;
 
 	cexception_guard( inner ) {
-	    compiler_push_relative_fixup( compiler_cc, &inner );
-	    compiler_emit( compiler_cc, px, "\tcee\n", TRY, &zero, &try_var_offset );
+	    compiler_push_relative_fixup( compiler, &inner );
+	    compiler_emit( compiler, px, "\tcee\n", TRY, &zero, &try_var_offset );
 	}
 	cexception_catch {
 	    cexception_reraise( inner, px );
@@ -7252,27 +7252,27 @@ control_statement
     compound_statement
       {
 	ssize_t zero = 0;
-	compiler_emit( compiler_cc, px, "\tc\n", RESTORE );
-	compiler_push_relative_fixup( compiler_cc, px );
-	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-	compiler_swap_fixups( compiler_cc );
-	compiler_fixup_here( compiler_cc );
+	compiler_emit( compiler, px, "\tc\n", RESTORE );
+	compiler_push_relative_fixup( compiler, px );
+	compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+	compiler_swap_fixups( compiler );
+	compiler_fixup_here( compiler );
       }
     opt_catch_list
       {
 	int i;
 
-	for( i = 0; i < compiler_cc->catch_jumpover_nr; i ++ ) { 
-	    compiler_fixup_here( compiler_cc );
+	for( i = 0; i < compiler->catch_jumpover_nr; i ++ ) { 
+	    compiler_fixup_here( compiler );
 	}
 	
-	compiler_cc->catch_jumpover_nr = 
-	    pop_ssize_t( &compiler_cc->catch_jumpover_stack, 
-			 &compiler_cc->catch_jumpover_stack_length, px );
+	compiler->catch_jumpover_nr = 
+	    pop_ssize_t( &compiler->catch_jumpover_stack, 
+			 &compiler->catch_jumpover_stack_length, px );
 
-	compiler_fixup_here( compiler_cc );
-	pop_ssize_t( &compiler_cc->try_variable_stack,
-		     &compiler_cc->try_block_level, px );
+	compiler_fixup_here( compiler );
+	pop_ssize_t( &compiler->try_variable_stack,
+		     &compiler->try_block_level, px );
       }
 
   ;
@@ -7280,22 +7280,22 @@ control_statement
 compound_statement
   : '{'
       {
-	compiler_begin_subscope( compiler_cc, px );
+	compiler_begin_subscope( compiler, px );
       }
     statement_list '}'
       {
-	compiler_end_subscope( compiler_cc, px );
+	compiler_end_subscope( compiler, px );
       }
   ;
 
 loop_body
   : _DO
       {
-	compiler_begin_subscope( compiler_cc, px );
+	compiler_begin_subscope( compiler, px );
       }
     statement_list
       {
-	compiler_end_subscope( compiler_cc, px );
+	compiler_end_subscope( compiler, px );
       }
     _ENDDO
   | compound_statement
@@ -7315,24 +7315,24 @@ catch_var_identifier
   : __IDENTIFIER
     {
      char *opname = "exceptionval";
-     ssize_t try_var_offset = compiler_cc->try_variable_stack ?
-	 compiler_cc->try_variable_stack[compiler_cc->try_block_level-1] : 0;
-     DNODE *catch_var = vartab_lookup( compiler_cc->vartab, $1 );
+     ssize_t try_var_offset = compiler->try_variable_stack ?
+	 compiler->try_variable_stack[compiler->try_block_level-1] : 0;
+     DNODE *catch_var = vartab_lookup( compiler->vartab, $1 );
      TNODE *catch_var_type = catch_var ? dnode_type( catch_var ) : NULL;
 
      if( !catch_var_type ||
-         !compiler_lookup_operator( compiler_cc, catch_var_type, opname, 1, px )) {
+         !compiler_lookup_operator( compiler, catch_var_type, opname, 1, px )) {
 	 yyerrorf( "type of variable in a 'catch' clause must "
 		   "have unary '%s' operator", opname );
      } else {
-	 compiler_emit( compiler_cc, px, "\n\tce\n", PLD, &try_var_offset );
-	 compiler_push_type( compiler_cc, new_tnode_ref( px ), px );
-	 compiler_check_and_compile_operator( compiler_cc, catch_var_type,
+	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
+	 compiler_push_type( compiler, new_tnode_ref( px ), px );
+	 compiler_check_and_compile_operator( compiler, catch_var_type,
 					   opname, /*arity:*/1,
 					   /*fixup_values:*/ NULL,
 					   px );
-	 compiler_emit( compiler_cc, px, "\n" );
-	 compiler_compile_variable_assignment( compiler_cc, catch_var, px );
+	 compiler_emit( compiler, px, "\n" );
+	 compiler_compile_variable_assignment( compiler, catch_var, px );
      }
     }
   ;
@@ -7341,27 +7341,27 @@ catch_variable_declaration
   : _VAR variable_identifier_list ':' var_type_description
     {
      char *opname = "exceptionval";
-     ssize_t try_var_offset = compiler_cc->try_variable_stack ?
-	 compiler_cc->try_variable_stack[compiler_cc->try_block_level-1] : 0;
+     ssize_t try_var_offset = compiler->try_variable_stack ?
+	 compiler->try_variable_stack[compiler->try_block_level-1] : 0;
 
      dnode_list_append_type( $2, $4 );
-     dnode_list_assign_offsets( $2, &compiler_cc->local_offset );     
+     dnode_list_assign_offsets( $2, &compiler->local_offset );     
      if( $2 && dnode_list_length( $2 ) > 1 ) {
 	 yyerrorf( "only one variable may be declared in the 'catch' clause" );
      }
-     if( !$4 || !compiler_lookup_operator( compiler_cc, $4, opname, 1, px )) {
+     if( !$4 || !compiler_lookup_operator( compiler, $4, opname, 1, px )) {
 	 yyerrorf( "type of variable declared in a 'catch' clause must "
 		   "have unary '%s' operator", opname );
      } else {
-	 compiler_emit( compiler_cc, px, "\n\tce\n", PLD, &try_var_offset );
-	 compiler_push_type( compiler_cc, new_tnode_ref( px ), px );
-	 compiler_check_and_compile_operator( compiler_cc, $4, opname,
+	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
+	 compiler_push_type( compiler, new_tnode_ref( px ), px );
+	 compiler_check_and_compile_operator( compiler, $4, opname,
 					   /*arity:*/1,
 					   /*fixup_values:*/ NULL, px );
-	 compiler_emit( compiler_cc, px, "\n" );
-	 compiler_compile_variable_assignment( compiler_cc, $2, px );	 
+	 compiler_emit( compiler, px, "\n" );
+	 compiler_compile_variable_assignment( compiler, $2, px );	 
      }
-     vartab_insert_named_vars( compiler_cc->vartab, $2, px );
+     vartab_insert_named_vars( compiler->vartab, $2, px );
     }
   ;
 
@@ -7375,28 +7375,28 @@ catch_variable_list
 exception_identifier_list
   : __IDENTIFIER
     {
-      compiler_emit_catch_comparison( compiler_cc, NULL, $1, px );
+      compiler_emit_catch_comparison( compiler, NULL, $1, px );
       $$ = 0;
     }
   | module_list __COLON_COLON __IDENTIFIER
     {
-      compiler_emit_catch_comparison( compiler_cc, $1, $3, px );
+      compiler_emit_catch_comparison( compiler, $1, $3, px );
       $$ = 0;
     }
   | exception_identifier_list ',' __IDENTIFIER
     {
       ssize_t zero = 0;
-      compiler_push_relative_fixup( compiler_cc, px );
-      compiler_emit( compiler_cc, px, "\tce\n", BJNZ, &zero );
-      compiler_emit_catch_comparison( compiler_cc, NULL, $3, px );
+      compiler_push_relative_fixup( compiler, px );
+      compiler_emit( compiler, px, "\tce\n", BJNZ, &zero );
+      compiler_emit_catch_comparison( compiler, NULL, $3, px );
       $$ = $1 + 1;
     }
   | exception_identifier_list ',' module_list __COLON_COLON __IDENTIFIER
     {
       ssize_t zero = 0;
-      compiler_push_relative_fixup( compiler_cc, px );
-      compiler_emit( compiler_cc, px, "\tce\n", BJNZ, &zero );
-      compiler_emit_catch_comparison( compiler_cc, $3, $5, px );
+      compiler_push_relative_fixup( compiler, px );
+      compiler_emit( compiler, px, "\tce\n", BJNZ, &zero );
+      compiler_emit_catch_comparison( compiler, $3, $5, px );
       $$ = $1 + 1;
     }
   ;
@@ -7406,44 +7406,44 @@ catch_statement
     compound_statement
       {
 	ssize_t zero = 0;
-	compiler_cc->catch_jumpover_nr ++;
-	compiler_push_relative_fixup( compiler_cc, px );
-	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
+	compiler->catch_jumpover_nr ++;
+	compiler_push_relative_fixup( compiler, px );
+	compiler_emit( compiler, px, "\tce\n", JMP, &zero );
       }
 
   | _CATCH
       {
-	compiler_begin_subscope( compiler_cc,  px );
+	compiler_begin_subscope( compiler,  px );
       }
     '(' catch_variable_list ')'
     compound_statement
       {
 	ssize_t zero = 0;
-	compiler_cc->catch_jumpover_nr ++;
-	compiler_push_relative_fixup( compiler_cc, px );
-	compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-	compiler_end_subscope( compiler_cc, px );
+	compiler->catch_jumpover_nr ++;
+	compiler_push_relative_fixup( compiler, px );
+	compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+	compiler_end_subscope( compiler, px );
       }
 
   | _CATCH exception_identifier_list
       {
-	compiler_finish_catch_comparisons( compiler_cc, $2, px );
-	compiler_begin_subscope( compiler_cc,  px );
+	compiler_finish_catch_comparisons( compiler, $2, px );
+	compiler_begin_subscope( compiler,  px );
       }
     '(' catch_variable_list ')'  
     compound_statement
       {
-	compiler_end_subscope( compiler_cc, px );
-	compiler_finish_catch_block( compiler_cc, px );
+	compiler_end_subscope( compiler, px );
+	compiler_finish_catch_block( compiler, px );
       }
 
   | _CATCH exception_identifier_list
       {
-	compiler_finish_catch_comparisons( compiler_cc, $2, px );
+	compiler_finish_catch_comparisons( compiler, $2, px );
       }
     compound_statement
       {
-	compiler_finish_catch_block( compiler_cc, px );
+	compiler_finish_catch_block( compiler, px );
       }
 
 ;
@@ -7459,7 +7459,7 @@ var_type_description
   : delimited_type_description
   | undelimited_or_structure_description
   | _ARRAY
-    { $$ = new_tnode_array_snail( NULL, compiler_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
   ;
 
 undelimited_or_structure_description
@@ -7472,11 +7472,11 @@ undelimited_or_structure_description
 type_identifier
   : __IDENTIFIER
      {
-	 $$ = compiler_lookup_tnode( compiler_cc, NULL, $1, "type" );
+	 $$ = compiler_lookup_tnode( compiler, NULL, $1, "type" );
      }
   | module_list __COLON_COLON __IDENTIFIER
      {
-	 $$ = compiler_lookup_tnode( compiler_cc, $1, $3, "type" );
+	 $$ = compiler_lookup_tnode( compiler, $1, $3, "type" );
      }
   ;
 
@@ -7505,8 +7505,8 @@ delimited_type_description
 	$$ = tnode_move_operators( $$, $3 );
 	delete_tnode( $3 );
 	$3 = NULL;
-	assert( compiler_cc->current_type );
-	tnode_set_suffix( $$, tnode_name( compiler_cc->current_type ), px );
+	assert( compiler->current_type );
+	tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
     }
 
   | type_identifier _OF delimited_type_description
@@ -7520,7 +7520,7 @@ delimited_type_description
     { $$ = new_tnode_addressof( NULL, px ); }
 
   | _ARRAY _OF delimited_type_description
-    { $$ = new_tnode_array_snail( $3, compiler_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( $3, compiler->typetab, px ); }
 
   | _ARRAY dimension_list _OF delimited_type_description
     { $$ = tnode_append_element_type( $2, $4 ); }
@@ -7528,11 +7528,11 @@ delimited_type_description
   | _TYPE __IDENTIFIER
     {
 	char *type_name = $2;
-	TNODE *tnode = typetab_lookup( compiler_cc->typetab, type_name );
+	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
 	if( !tnode ) {
 	    tnode = new_tnode_placeholder( type_name, px );
 	    tnode_set_size( tnode, 1 );
-	    typetab_insert( compiler_cc->typetab, type_name, tnode, px );
+	    typetab_insert( compiler->typetab, type_name, tnode, px );
 	}
 	$$ = share_tnode( tnode );
     }
@@ -7540,7 +7540,7 @@ delimited_type_description
   | function_or_procedure_type_keyword '(' argument_list ')'
     {
 	int is_function = $1;
-	TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
+	TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
 
 	share_tnode( base_type );
 	$$ = new_tnode_function_or_proc_ref( $3, NULL, base_type, px );
@@ -7552,7 +7552,7 @@ delimited_type_description
     __ARROW '(' retval_description_list ')'
     {
 	int is_function = $1;
-	TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
+	TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
 
 	share_tnode( base_type );
 	$$ = new_tnode_function_or_proc_ref( $3, $7, base_type, px );
@@ -7562,7 +7562,7 @@ delimited_type_description
     }
 
   | _BLOB
-    { $$ = new_tnode_blob_snail( compiler_cc->typetab, px ); }
+    { $$ = new_tnode_blob_snail( compiler->typetab, px ); }
 
   | _TYPE _OF _VAR
     { $$ = new_tnode_type_descriptor( px ); }
@@ -7623,22 +7623,22 @@ struct_description
 class_description
   : opt_null_type_designator _CLASS 
     {
-        compiler_begin_subscope( compiler_cc, px );
+        compiler_begin_subscope( compiler, px );
     }
     struct_or_class_description_body
     {
-        compiler_finish_virtual_method_table( compiler_cc, $4, px );
+        compiler_finish_virtual_method_table( compiler, $4, px );
         $$ = tnode_finish_class( $4, px );
         if( $1 ) {
             tnode_set_flags( $$, TF_NON_NULL );
         }
-        compiler_end_subscope( compiler_cc, px );
+        compiler_end_subscope( compiler, px );
     }
 ;
 
 undelimited_type_description
   : _ARRAY _OF undelimited_or_structure_description
-    { $$ = new_tnode_array_snail( $3, compiler_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( $3, compiler->typetab, px ); }
 
   | _ARRAY dimension_list _OF undelimited_or_structure_description
     { $$ = tnode_append_element_type( $2, $4 ); }
@@ -7655,14 +7655,14 @@ undelimited_type_description
 
   | _ENUM __IDENTIFIER '(' enum_member_list ')'
     {
-      TNODE *enum_implementing_type = typetab_lookup( compiler_cc->typetab, $2 );
+      TNODE *enum_implementing_type = typetab_lookup( compiler->typetab, $2 );
       ssize_t tsize = enum_implementing_type ?
 	  tnode_size( enum_implementing_type ) : 0;
 
-      if( compiler_cc->current_type &&
-	      tnode_is_forward( compiler_cc->current_type )) {
-	  tnode_set_kind( compiler_cc->current_type, TK_ENUM );
-	  tnode_set_size( compiler_cc->current_type, tsize );
+      if( compiler->current_type &&
+	      tnode_is_forward( compiler->current_type )) {
+	  tnode_set_kind( compiler->current_type, TK_ENUM );
+	  tnode_set_size( compiler->current_type, tsize );
       }
       $$ = tnode_finish_enum( $4, NULL, enum_implementing_type, px );
       compiler_check_enum_attributes( $$ );
@@ -7670,8 +7670,8 @@ undelimited_type_description
 
   | '(' __THREE_DOTS ',' enum_member_list ')'
     {
-      if( !compiler_cc->current_type ||
-	  tnode_is_forward( compiler_cc->current_type )) {
+      if( !compiler->current_type ||
+	  tnode_is_forward( compiler->current_type )) {
 	  yyerror( "one can only extend previously defined enumeration types" );
 	  tnode_set_size( $4, 1 );
       }
@@ -7684,8 +7684,8 @@ enum_member_list
      {
        $$ = new_tnode( px );
        tnode_set_kind( $$, TK_ENUM );
-       if( compiler_cc->current_type ) {
-	   tnode_merge_field_lists( $$, compiler_cc->current_type );
+       if( compiler->current_type ) {
+	   tnode_merge_field_lists( $$, compiler->current_type );
        }
        tnode_insert_enum_value( $$, $1 );
      }
@@ -7732,14 +7732,14 @@ finish_fields
       TNODE *current_class = $<tnode>0;
       TLIST *interfaces = $<tlist>-2;
       TNODE *base_type = $<tnode>-3 ?
-          $<tnode>-3 : typetab_lookup( compiler_cc->typetab, "struct" );
+          $<tnode>-3 : typetab_lookup( compiler->typetab, "struct" );
 
       if( current_class != base_type ) {
 	  tnode_insert_base_type( current_class, share_tnode( base_type ));
           tnode_insert_interfaces( current_class, interfaces );
       }
 
-      compiler_start_virtual_method_table( compiler_cc, current_class, px );
+      compiler_start_virtual_method_table( compiler, current_class, px );
 
       $$ = current_class;
   }
@@ -7748,8 +7748,8 @@ finish_fields
 struct_declaration_field_list
   : struct_field
      {
-	 assert( compiler_cc->current_type );
-	 $$ = share_tnode( compiler_cc->current_type );
+	 assert( compiler->current_type );
+	 $$ = share_tnode( compiler->current_type );
          tnode_insert_type_member( $$, $1 );
      }
   | type_attribute
@@ -7757,8 +7757,8 @@ struct_declaration_field_list
        cexception_t inner;
 
        cexception_guard( inner ) {
-	   assert( compiler_cc->current_type );
-	   $$ = share_tnode( compiler_cc->current_type );
+	   assert( compiler->current_type );
+	   $$ = share_tnode( compiler->current_type );
 	   tnode_set_attribute( $$, $1, &inner );
        }
        cexception_catch {
@@ -7876,8 +7876,8 @@ struct_operator
 interface_type_placeholder
   : /* empty */
      {
-         assert( compiler_cc->current_type );
-	 $$ = share_tnode( compiler_cc->current_type );
+         assert( compiler->current_type );
+	 $$ = share_tnode( compiler->current_type );
      }
   ;
 
@@ -7895,7 +7895,7 @@ interface_declaration_body
 interface_operator_list
   : interface_operator
     {
-	TNODE *struct_type = compiler_cc->current_type;
+	TNODE *struct_type = compiler->current_type;
 	tnode_insert_type_member( struct_type, $1 );
 	$$ = struct_type;
     }
@@ -7983,10 +7983,10 @@ type_attribute
 
 dimension_list
   : '[' ']'
-    { $$ = new_tnode_array_snail( NULL, compiler_cc->typetab, px ); }
+    { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
   | dimension_list '[' ']'
     {
-      TNODE *array_type = new_tnode_array_snail( NULL, compiler_cc->typetab, px );
+      TNODE *array_type = new_tnode_array_snail( NULL, compiler->typetab, px );
       $$ = tnode_append_element_type( $1, array_type );
     }
   ;
@@ -8015,36 +8015,36 @@ type_declaration_name
 type_declaration_start
   : _TYPE type_declaration_name
       {
-	TNODE *old_tnode = typetab_lookup_silently( compiler_cc->typetab, $2 );
+	TNODE *old_tnode = typetab_lookup_silently( compiler->typetab, $2 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
 	    TNODE *tnode = new_tnode_forward( $2, px );
-	    compiler_typetab_insert( compiler_cc, tnode, px );
+	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup_silently( compiler_cc->typetab, $2 );
-	assert( !compiler_cc->current_type );
-	compiler_cc->current_type = tnode;
-	compiler_begin_scope( compiler_cc, px );
+	tnode = typetab_lookup_silently( compiler->typetab, $2 );
+	assert( !compiler->current_type );
+	compiler->current_type = tnode;
+	compiler_begin_scope( compiler, px );
       }
 ;
 
 delimited_type_declaration
   : type_declaration_start '=' delimited_type_description
       {
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $3, px );
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $3, px );
       }
   | type_declaration_start '=' delimited_type_description /*type_*/initialiser
       {
-        compiler_compile_drop( compiler_cc, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $3, px );
+        compiler_compile_drop( compiler, px );
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $3, px );
       }
   | type_declaration_start
       {
-	compiler_end_scope( compiler_cc, px );
-	compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler->current_type = NULL;
       }
   | forward_struct_declaration
   | forward_class_declaration
@@ -8053,16 +8053,16 @@ delimited_type_declaration
 undelimited_type_declaration
   : type_declaration_start '=' undelimited_type_description
       {
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $3, px );
-	compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $3, px );
+	compiler->current_type = NULL;
       }
 
   | type_declaration_start '=' undelimited_type_description type_initialiser
       {
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $3, px );
-	compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $3, px );
+	compiler->current_type = NULL;
       }
 
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '='
@@ -8071,17 +8071,17 @@ undelimited_type_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// compiler_begin_scope( compiler_cc, px );
+	// compiler_begin_scope( compiler, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    compiler_typetab_insert( compiler_cc, tnode, &inner );
-	    tnode = typetab_lookup( compiler_cc->typetab, $2 );
-	    compiler_cc->current_type = tnode;
-	    compiler_typetab_insert( compiler_cc, share_tnode( base ), &inner );
-	    compiler_begin_scope( compiler_cc, &inner );
+	    compiler_typetab_insert( compiler, tnode, &inner );
+	    tnode = typetab_lookup( compiler->typetab, $2 );
+	    compiler->current_type = tnode;
+	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
+	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -8091,9 +8091,9 @@ undelimited_type_declaration
       }
     undelimited_type_description
       {
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $7, px );
-	compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $7, px );
+	compiler->current_type = NULL;
       }
 
   | struct_declaration
@@ -8104,7 +8104,7 @@ undelimited_type_declaration
 struct_declaration
   : opt_null_type_designator _STRUCT __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( compiler_cc->typetab, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
@@ -8112,7 +8112,7 @@ struct_declaration
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-	    compiler_typetab_insert( compiler_cc, tnode, px );
+	    compiler_typetab_insert( compiler, tnode, px );
 	} else {
             if( tnode_is_non_null_reference( old_tnode ) !=
                 ($1 ? 1 : 0 )) {
@@ -8120,23 +8120,23 @@ struct_declaration
                           "has different non-null flag", $3 );
             }
         }
-	tnode = typetab_lookup( compiler_cc->typetab, $3 );
-	assert( !compiler_cc->current_type );
-	compiler_cc->current_type = tnode;
-	compiler_begin_scope( compiler_cc, px );
+	tnode = typetab_lookup( compiler->typetab, $3 );
+	assert( !compiler->current_type );
+	compiler->current_type = tnode;
+	compiler_begin_scope( compiler, px );
     }
     struct_or_class_declaration_body
     {
 	tnode_finish_struct( $5, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_typetab_insert( compiler_cc, $5, px );
-        compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_typetab_insert( compiler, $5, px );
+        compiler->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _STRUCT
     {
-	assert( compiler_cc->current_type );
-	tnode_set_flags( compiler_cc->current_type, TF_IS_REF );
-        tnode_set_kind( compiler_cc->current_type, TK_STRUCT );
+	assert( compiler->current_type );
+	tnode_set_flags( compiler->current_type, TF_IS_REF );
+        tnode_set_kind( compiler->current_type, TK_STRUCT );
     }
     struct_or_class_declaration_body
     {
@@ -8144,14 +8144,14 @@ struct_declaration
             tnode_set_flags( $6, TF_NON_NULL );
         }
 	tnode_finish_struct( $6, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $6, px );
-        compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $6, px );
+        compiler->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator
     {
-	assert( compiler_cc->current_type );
-	// tnode_set_flags( compiler_cc->current_type, TF_IS_REF );
+	assert( compiler->current_type );
+	// tnode_set_flags( compiler->current_type, TF_IS_REF );
     }
     struct_or_class_declaration_body
     {
@@ -8159,9 +8159,9 @@ struct_declaration
             tnode_set_flags( $5, TF_NON_NULL );
         }
 	// tnode_finish_struct( $5, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $5, px );
-        compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $5, px );
+        compiler->current_type = NULL;
     }
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
       {
@@ -8169,17 +8169,17 @@ struct_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// compiler_begin_scope( compiler_cc, px );
+	// compiler_begin_scope( compiler, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    compiler_typetab_insert( compiler_cc, tnode, &inner );
-	    tnode = typetab_lookup( compiler_cc->typetab, $2 );
-	    compiler_cc->current_type = tnode;
-	    compiler_typetab_insert( compiler_cc, share_tnode( base ), &inner );
-	    compiler_begin_scope( compiler_cc, &inner );
+	    compiler_typetab_insert( compiler, tnode, &inner );
+	    tnode = typetab_lookup( compiler->typetab, $2 );
+	    compiler->current_type = tnode;
+	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
+	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -8192,9 +8192,9 @@ struct_declaration
         if( $6 ) {
             tnode_set_flags( $9, TF_NON_NULL );
         }
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $9, px );
-	compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $9, px );
+	compiler->current_type = NULL;
       }
 
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator
@@ -8203,17 +8203,17 @@ struct_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// compiler_begin_scope( compiler_cc, px );
+	// compiler_begin_scope( compiler, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    compiler_typetab_insert( compiler_cc, tnode, &inner );
-	    tnode = typetab_lookup( compiler_cc->typetab, $2 );
-	    compiler_cc->current_type = tnode;
-	    compiler_typetab_insert( compiler_cc, share_tnode( base ), &inner );
-	    compiler_begin_scope( compiler_cc, &inner );
+	    compiler_typetab_insert( compiler, tnode, &inner );
+	    tnode = typetab_lookup( compiler->typetab, $2 );
+	    compiler->current_type = tnode;
+	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
+	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -8226,9 +8226,9 @@ struct_declaration
         if( $6 ) {
             tnode_set_flags( $8, TF_NON_NULL );
         }
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $8, px );
-	compiler_cc->current_type = NULL;
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $8, px );
+	compiler->current_type = NULL;
       }
 
 ;
@@ -8236,7 +8236,7 @@ struct_declaration
 class_declaration
   : opt_null_type_designator _CLASS __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( compiler_cc->typetab, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
@@ -8244,26 +8244,26 @@ class_declaration
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-	    compiler_typetab_insert( compiler_cc, tnode, px );
+	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup( compiler_cc->typetab, $3 );
-	assert( !compiler_cc->current_type );
-	compiler_cc->current_type = tnode;
-	compiler_begin_scope( compiler_cc, px );
+	tnode = typetab_lookup( compiler->typetab, $3 );
+	assert( !compiler->current_type );
+	compiler->current_type = tnode;
+	compiler_begin_scope( compiler, px );
     }
     struct_or_class_declaration_body
     {
  	tnode_finish_class( $5, px );
-	compiler_finish_virtual_method_table( compiler_cc, $5, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_typetab_insert( compiler_cc, $5, px );
-	compiler_cc->current_type = NULL;
+	compiler_finish_virtual_method_table( compiler, $5, px );
+	compiler_end_scope( compiler, px );
+	compiler_typetab_insert( compiler, $5, px );
+	compiler->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _CLASS
     {
-	assert( compiler_cc->current_type );
-	tnode_set_flags( compiler_cc->current_type, TF_IS_REF );
-        tnode_set_kind( compiler_cc->current_type, TK_CLASS );
+	assert( compiler->current_type );
+	tnode_set_flags( compiler->current_type, TF_IS_REF );
+        tnode_set_kind( compiler->current_type, TK_CLASS );
     }
     struct_or_class_declaration_body
     {
@@ -8271,17 +8271,17 @@ class_declaration
             tnode_set_flags( $6, TF_NON_NULL );
         }
  	tnode_finish_class( $6, px );
-	compiler_finish_virtual_method_table( compiler_cc, $6, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_compile_type_declaration( compiler_cc, $6, px );
-	compiler_cc->current_type = NULL;
+	compiler_finish_virtual_method_table( compiler, $6, px );
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $6, px );
+	compiler->current_type = NULL;
     }
 ;
 
 interface_declaration
   : opt_null_type_designator _INTERFACE __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( compiler_cc->typetab, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
@@ -8289,19 +8289,19 @@ interface_declaration
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-	    compiler_typetab_insert( compiler_cc, tnode, px );
+	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup( compiler_cc->typetab, $3 );
-	assert( !compiler_cc->current_type );
-	compiler_cc->current_type = tnode;
-	compiler_begin_scope( compiler_cc, px );
+	tnode = typetab_lookup( compiler->typetab, $3 );
+	assert( !compiler->current_type );
+	compiler->current_type = tnode;
+	compiler_begin_scope( compiler, px );
     }
     interface_declaration_body
     {
- 	tnode_finish_interface( $5, ++compiler_cc->last_interface_number, px );
-	compiler_end_scope( compiler_cc, px );
-	compiler_typetab_insert( compiler_cc, $5, px );
-	compiler_cc->current_type = NULL;
+ 	tnode_finish_interface( $5, ++compiler->last_interface_number, px );
+	compiler_end_scope( compiler, px );
+	compiler_typetab_insert( compiler, $5, px );
+	compiler->current_type = NULL;
     }
 ;
 
@@ -8312,7 +8312,7 @@ forward_struct_declaration
           if( $1 ) {
               tnode_set_flags( tnode, TF_NON_NULL );
           }
-	  compiler_typetab_insert( compiler_cc, tnode, px );
+	  compiler_typetab_insert( compiler, tnode, px );
       }
 ;
 
@@ -8323,7 +8323,7 @@ forward_class_declaration
           if( $1 ) {
               tnode_set_flags( tnode, TF_NON_NULL );
           }
-	  compiler_typetab_insert( compiler_cc, tnode, px );
+	  compiler_typetab_insert( compiler, tnode, px );
       }
 ;
 
@@ -8353,24 +8353,24 @@ a[i] = b + c;
 lvalue_list
 : lvalue
       {
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_thrcode( compiler, px );
 	  $$ = 1;
       }
 | __IDENTIFIER
       {
-	  compiler_push_varaddr_expr( compiler_cc, $1, px );
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_varaddr_expr( compiler, $1, px );
+	  compiler_push_thrcode( compiler, px );
 	  $$ = 1;
       }
 | lvalue_list ',' lvalue
       {
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_thrcode( compiler, px );
 	  $$ = $1 + 1;
       }
 | lvalue_list ',' __IDENTIFIER
       {
-	  compiler_push_varaddr_expr( compiler_cc, $3, px );
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_varaddr_expr( compiler, $3, px );
+	  compiler_push_thrcode( compiler, px );
 	  $$ = $1 + 1;
       }
 ;
@@ -8378,135 +8378,135 @@ lvalue_list
 assignment_statement
   : variable_access_identifier '=' expression
       {
-	  compiler_compile_store_variable( compiler_cc, $1, px );
+	  compiler_compile_store_variable( compiler, $1, px );
       }
   | lvalue '=' expression
       {
-	  compiler_compile_sti( compiler_cc, px );
+	  compiler_compile_sti( compiler, px );
       }
   | '('
       {
 	  /* Values must be emmitted first in the code. */
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_thrcode( compiler, px );
       }
     lvalue_list ')' '=' multivalue_expression_list
       {
-	  compiler_compile_multiple_assignment( compiler_cc, $3, $3, $6, px );
+	  compiler_compile_multiple_assignment( compiler, $3, $3, $6, px );
       }
 
   | lvalue ',' 
       {
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_thrcode( compiler, px );
       }
     lvalue_list '=' multivalue_expression_list
       {
-	  compiler_compile_multiple_assignment( compiler_cc, $4+1, $4, $6, px );
-	  compiler_compile_sti( compiler_cc, px );
+	  compiler_compile_multiple_assignment( compiler, $4+1, $4, $6, px );
+	  compiler_compile_sti( compiler, px );
       }
 
   | __IDENTIFIER ',' 
       {
-	  compiler_push_varaddr_expr( compiler_cc, $1, px );
-	  compiler_push_thrcode( compiler_cc, px );
+	  compiler_push_varaddr_expr( compiler, $1, px );
+	  compiler_push_thrcode( compiler, px );
       }
     lvalue_list '=' multivalue_expression_list
       {
-	  compiler_compile_multiple_assignment( compiler_cc, $4+1, $4, $6, px );
+	  compiler_compile_multiple_assignment( compiler, $4+1, $4, $6, px );
 
 	  {
 	      DNODE *var;
 
-	      compiler_swap_top_expressions( compiler_cc );
-	      var = enode_variable( compiler_cc->e_stack );
+	      compiler_swap_top_expressions( compiler );
+	      var = enode_variable( compiler->e_stack );
 
 	      share_dnode( var );
-	      compiler_drop_top_expression( compiler_cc );
-	      compiler_compile_variable_assignment( compiler_cc, var, px );
+	      compiler_drop_top_expression( compiler );
+	      compiler_compile_variable_assignment( compiler, var, px );
 	      delete_dnode( var );
 	  }
       }
 
   | variable_access_identifier
       {
-	  compiler_compile_load_variable_value( compiler_cc, $1, px );
+	  compiler_compile_load_variable_value( compiler, $1, px );
       }
     __ARITHM_ASSIGN expression
       { 
-	compiler_compile_binop( compiler_cc, $3, px );
-	compiler_compile_store_variable( compiler_cc, $1, px );
+	compiler_compile_binop( compiler, $3, px );
+	compiler_compile_store_variable( compiler, $1, px );
       }
   | lvalue
       {
-	  compiler_compile_dup( compiler_cc, px );
-	  compiler_compile_ldi( compiler_cc, px );
+	  compiler_compile_dup( compiler, px );
+	  compiler_compile_ldi( compiler, px );
       }
     __ARITHM_ASSIGN expression
       { 
-	  compiler_compile_binop( compiler_cc, $3, px );
-	  compiler_compile_sti( compiler_cc, px );
+	  compiler_compile_binop( compiler, $3, px );
+	  compiler_compile_sti( compiler, px );
       }
 
   | lvalue
       {
-	  compiler_compile_ldi( compiler_cc, px );
+	  compiler_compile_ldi( compiler, px );
       }
      __ASSIGN expression
       {
 	  int err = 0;
 	  if( !compiler_test_top_types_are_assignment_compatible(
-	           compiler_cc, px )) {
+	           compiler, px )) {
 	      yyerrorf( "incopatible types for value-copy assignment ':='" );
 	  }
-	  compiler_emit( compiler_cc, px, "\tc\n", COPY );
-	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
+	  compiler_emit( compiler, px, "\tc\n", COPY );
+	  if( !err && !compiler_stack_top_is_reference( compiler )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
 	  if( !err &&
 	      !compiler_test_top_types_are_readonly_compatible_for_copy(
-	           compiler_cc, px )) {
+	           compiler, px )) {
 	      yyerrorf( "can not copy into the readonly value "
                         "in the value-copy assignment ':='" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( compiler_cc );
-	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
+	  compiler_drop_top_expression( compiler );
+	  if( !err && !compiler_stack_top_is_reference( compiler )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( compiler_cc );
+	  compiler_drop_top_expression( compiler );
       }
 
   | variable_access_identifier
       {
-	  compiler_compile_load_variable_value( compiler_cc, $1, px );
+	  compiler_compile_load_variable_value( compiler, $1, px );
       }
     __ASSIGN expression
       {
 	  int err = 0;
 	  if( !compiler_test_top_types_are_assignment_compatible(
-	           compiler_cc, px )) {
+	           compiler, px )) {
 	      yyerrorf( "incopatible types for value-copy assignment ':='" );
 	      err = 1;
 	  }
-	  compiler_emit( compiler_cc, px, "\tc\n", COPY );
-	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
+	  compiler_emit( compiler, px, "\tc\n", COPY );
+	  if( !err && !compiler_stack_top_is_reference( compiler )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
 	  if( !err &&
 	      !compiler_test_top_types_are_readonly_compatible_for_copy(
-	           compiler_cc, px )) {
+	           compiler, px )) {
 	      yyerrorf( "can not copy into the readonly value in "
                         "the value-copy assignment ':='" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( compiler_cc );
-	  if( !err && !compiler_stack_top_is_reference( compiler_cc )) {
+	  compiler_drop_top_expression( compiler );
+	  if( !err && !compiler_stack_top_is_reference( compiler )) {
 	      yyerrorf( "value assignemnt := works only for references" );
 	      err = 1;
 	  }
-	  compiler_drop_top_expression( compiler_cc );
+	  compiler_drop_top_expression( compiler );
       }
   ;
 
@@ -8527,18 +8527,18 @@ bytecode_item
 
 opcode
   : __IDENTIFIER
-      { compiler_emit( compiler_cc, px, "\tC\n", $1 ); }
+      { compiler_emit( compiler, px, "\tC\n", $1 ); }
   | module_list __COLON_COLON __IDENTIFIER
-      { compiler_emit( compiler_cc, px, "\tMC\n", $1, $3 ); }
+      { compiler_emit( compiler, px, "\tMC\n", $1, $3 ); }
   ;
 
 variable_reference
   : '%' __IDENTIFIER
       { 
-         DNODE *varnode = vartab_lookup( compiler_cc->vartab, $2 );
+         DNODE *varnode = vartab_lookup( compiler->vartab, $2 );
 	 if( varnode ) {
 	     ssize_t var_offset = dnode_offset( varnode );
-             compiler_emit( compiler_cc, px, "\teN\n", &var_offset, $2 );
+             compiler_emit( compiler, px, "\teN\n", &var_offset, $2 );
 	 } else {
 	     yyerrorf( "name '%s' not declared in the current scope", $2 );
 	 }
@@ -8549,47 +8549,47 @@ bytecode_constant
   : __INTEGER_CONST
       {
 	  ssize_t val = atol( $1 );
-	  compiler_emit( compiler_cc, px, "\te\n", &val );
+	  compiler_emit( compiler, px, "\te\n", &val );
       }
   | '+' __INTEGER_CONST
       {
 	  ssize_t val = atol( $2 );
-	  compiler_emit( compiler_cc, px, "\te\n", &val );
+	  compiler_emit( compiler, px, "\te\n", &val );
       }
   | '-' __INTEGER_CONST
       {
 	  ssize_t val = -atol( $2 );
-	  compiler_emit( compiler_cc, px, "\te\n", &val );
+	  compiler_emit( compiler, px, "\te\n", &val );
       }
   | __REAL_CONST
       {
 	double val;
 	sscanf( $1, "%lf", &val );
-        compiler_emit( compiler_cc, px, "\tf\n", val );
+        compiler_emit( compiler, px, "\tf\n", val );
       }
   | __STRING_CONST
       {
 	ssize_t string_offset;
-	string_offset = compiler_assemble_static_string( compiler_cc, $1, px );
-        compiler_emit( compiler_cc, px, "\te\n", &string_offset );
+	string_offset = compiler_assemble_static_string( compiler, $1, px );
+        compiler_emit( compiler, px, "\te\n", &string_offset );
       }
 
   | __DOUBLE_PERCENT __IDENTIFIER
       {
 	static const ssize_t zero = 0;
-	if( !compiler_cc->current_function ) {
+	if( !compiler->current_function ) {
 	    yyerrorf( "type attribute '%%%%%s' is not available here "
 		      "(are you compiling a function or operator?)", $2 );
 	} else {
             if( implementation_has_attribute( $2 )) {
-                compiler_emit( compiler_cc, px, "\te\n", &zero );
+                compiler_emit( compiler, px, "\te\n", &zero );
                 
                 FIXUP *type_attribute_fixup =
                     new_fixup_absolute
-                    ( $2, thrcode_length( compiler_cc->thrcode ) - 1,
+                    ( $2, thrcode_length( compiler->thrcode ) - 1,
                       NULL /* next */, px );
 
-                dnode_insert_code_fixup( compiler_cc->current_function,
+                dnode_insert_code_fixup( compiler->current_function,
                                          type_attribute_fixup );
             }
 	}
@@ -8602,12 +8602,12 @@ bytecode_constant
 	  switch( const_expr.value_type ) {
 	  case VT_INT: {
 	      ssize_t val = const_expr.value.i;
-	      compiler_emit( compiler_cc, px, "\te\n", &val );
+	      compiler_emit( compiler, px, "\te\n", &val );
 	      }
 	      break;
 	  case VT_FLOAT: {
 	      double val = const_expr.value.f;
-	      compiler_emit( compiler_cc, px, "\tf\n", &val );
+	      compiler_emit( compiler, px, "\tf\n", &val );
 	      }
 	      break;
 	  default:
@@ -8621,11 +8621,11 @@ bytecode_constant
 function_identifier
   : __IDENTIFIER
 	{
-	    compiler_check_and_push_function_name( compiler_cc, NULL, $1, px );
+	    compiler_check_and_push_function_name( compiler, NULL, $1, px );
 	}
   | module_list __COLON_COLON __IDENTIFIER
 	{
-	    compiler_check_and_push_function_name( compiler_cc, $1, $3, px );
+	    compiler_check_and_push_function_name( compiler, $1, $3, px );
 	}
   ;
 
@@ -8635,23 +8635,23 @@ multivalue_function_call
 	  TNODE *fn_tnode;
           type_kind_t fn_kind;
 
-	  fn_tnode = compiler_cc->current_call ?
-	      dnode_type( compiler_cc->current_call ) : NULL;
+	  fn_tnode = compiler->current_call ?
+	      dnode_type( compiler->current_call ) : NULL;
 
-	  compiler_cc->current_arg = fn_tnode ?
+	  compiler->current_arg = fn_tnode ?
 	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
 
           fn_kind= fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
           if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
-              compiler_push_type( compiler_cc, share_tnode(fn_tnode), px );
+              compiler_push_type( compiler, share_tnode(fn_tnode), px );
           }
 
-	  compiler_push_guarding_arg( compiler_cc, px );
+	  compiler_push_guarding_arg( compiler, px );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    DNODE *function = compiler_cc->current_call;
+	    DNODE *function = compiler->current_call;
 	    TNODE *fn_tnode = function ? dnode_type( function ) : NULL;
             type_kind_t fn_kind = fn_tnode ?
                 tnode_kind( fn_tnode ) : TK_NONE;
@@ -8659,46 +8659,46 @@ multivalue_function_call
 	    if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
 		char *fn_name = dnode_name( function );
 		ssize_t offset = dnode_offset( function );
-		compiler_emit( compiler_cc, px, "\tceN\n", PLD, &offset, fn_name );
+		compiler_emit( compiler, px, "\tceN\n", PLD, &offset, fn_name );
 	    }
 
-	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
+	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 	}
   | lvalue 
         {
 	  TNODE *fn_tnode = NULL;
 
-	  compiler_compile_ldi( compiler_cc, px );
+	  compiler_compile_ldi( compiler, px );
 
-	  compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+	  compiler_emit( compiler, px, "\tc\n", RTOR );
 
-	  fn_tnode = compiler_cc->e_stack ?
-	      enode_type( compiler_cc->e_stack ) : NULL;
+	  fn_tnode = compiler->e_stack ?
+	      enode_type( compiler->e_stack ) : NULL;
 
-	  dlist_push_dnode( &compiler_cc->current_call_stack,
-			    &compiler_cc->current_call, px );
+	  dlist_push_dnode( &compiler->current_call_stack,
+			    &compiler->current_call, px );
 
-	  dlist_push_dnode( &compiler_cc->current_arg_stack,
-			    &compiler_cc->current_arg, px );
+	  dlist_push_dnode( &compiler->current_arg_stack,
+			    &compiler->current_arg, px );
 
-	  compiler_cc->current_call = new_dnode( px );
+	  compiler->current_call = new_dnode( px );
 	  if( fn_tnode ) {
-	      dnode_insert_type( compiler_cc->current_call,
+	      dnode_insert_type( compiler->current_call,
 				 share_tnode( fn_tnode ));
 	  }
 	  if( fn_tnode && tnode_kind( fn_tnode ) != TK_FUNCTION_REF ) {
 	      yyerrorf( "called object is not a function pointer" );
 	  }
 
-	  compiler_cc->current_arg = fn_tnode ?
+	  compiler->current_arg = fn_tnode ?
 	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
 
-	  compiler_push_guarding_arg( compiler_cc, px );
+	  compiler_push_guarding_arg( compiler, px );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
-	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
+	    compiler_emit( compiler, px, "\tc\n", RFROMR );
+	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 	}
   | variable_access_identifier
     __ARROW __IDENTIFIER
@@ -8712,17 +8712,17 @@ multivalue_function_call
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-                dlist_push_dnode( &compiler_cc->current_call_stack,
-                                  &compiler_cc->current_call, px );
+                dlist_push_dnode( &compiler->current_call_stack,
+                                  &compiler->current_call, px );
 
-                dlist_push_dnode( &compiler_cc->current_arg_stack,
-                                  &compiler_cc->current_arg, px );
+                dlist_push_dnode( &compiler->current_arg_stack,
+                                  &compiler->current_arg, px );
 
 		if( fn_tnode && tnode_kind( fn_tnode ) != TK_METHOD ) {
 		    yyerrorf( "called field is not a method" );
-                    compiler_cc->current_call = NULL;
+                    compiler->current_call = NULL;
 		} else {
-                    compiler_cc->current_call = share_dnode( method );
+                    compiler->current_call = share_dnode( method );
                 }
 
                 last_arg = fn_tnode ?
@@ -8731,7 +8731,7 @@ multivalue_function_call
                 last_arg = last_arg ?
                     dnode_list_last( last_arg ) : NULL;
 
-		compiler_cc->current_arg = last_arg ?
+		compiler->current_arg = last_arg ?
 		    dnode_prev( last_arg ) : NULL;
 	    } else if( object ) {
 		char *object_name = object ? dnode_name( object ) : NULL;
@@ -8749,26 +8749,26 @@ multivalue_function_call
 		    yyerrorf( "can not locate method '%s'", method_name );
 		}
 	    }
-	    compiler_push_guarding_arg( compiler_cc, px );
-	    compiler_compile_load_variable_value( compiler_cc, object, px );
+	    compiler_push_guarding_arg( compiler, px );
+	    compiler_compile_load_variable_value( compiler, object, px );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    compiler_compile_load_variable_value( compiler_cc, $1, px );
-	    compiler_drop_top_expression( compiler_cc );
-	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
+	    compiler_compile_load_variable_value( compiler, $1, px );
+	    compiler_drop_top_expression( compiler );
+	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 	}
 
   | lvalue 
         {
-	    compiler_compile_ldi( compiler_cc, px );
-            compiler_compile_dup( compiler_cc, px );
-            compiler_emit( compiler_cc, px, "\tc\n", RTOR );
-	    compiler_drop_top_expression( compiler_cc );
+	    compiler_compile_ldi( compiler, px );
+            compiler_compile_dup( compiler, px );
+            compiler_emit( compiler, px, "\tc\n", RTOR );
+	    compiler_drop_top_expression( compiler );
 	}
     __ARROW __IDENTIFIER
         {
-            ENODE *object_expr = compiler_cc->e_stack;;
+            ENODE *object_expr = compiler->e_stack;;
             TNODE *object_type =
 		object_expr ? enode_type( object_expr ) : NULL;
             DNODE *method =
@@ -8777,29 +8777,29 @@ multivalue_function_call
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-		dlist_push_dnode( &compiler_cc->current_call_stack,
-				  &compiler_cc->current_call, px );
+		dlist_push_dnode( &compiler->current_call_stack,
+				  &compiler->current_call, px );
 
-		dlist_push_dnode( &compiler_cc->current_arg_stack,
-				  &compiler_cc->current_arg, px );
+		dlist_push_dnode( &compiler->current_arg_stack,
+				  &compiler->current_arg, px );
 
-		compiler_cc->current_call = share_dnode( method );
+		compiler->current_call = share_dnode( method );
 
 		if( fn_tnode && tnode_kind( fn_tnode ) != TK_METHOD ) {
 		    yyerrorf( "called field is not a method" );
 		}
 
-		compiler_cc->current_arg = fn_tnode ?
+		compiler->current_arg = fn_tnode ?
 		    dnode_prev( dnode_list_last( tnode_args( fn_tnode ))) :
 		    NULL;
 	    }
-            compiler_push_guarding_arg( compiler_cc, px );
-            compiler_swap_top_expressions( compiler_cc );
+            compiler_push_guarding_arg( compiler, px );
+            compiler_swap_top_expressions( compiler );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
-	    $$ = compiler_compile_multivalue_function_call( compiler_cc, px );
+	    compiler_emit( compiler, px, "\tc\n", RFROMR );
+	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 	}
 
   ;
@@ -8808,13 +8808,13 @@ function_call
   : multivalue_function_call
     {
 	if( $1 > 0 ) {
-	    compiler_emit_drop_returned_values( compiler_cc, $1 - 1, px );
+	    compiler_emit_drop_returned_values( compiler, $1 - 1, px );
 	} else {
 	    yyerrorf( "functions called in exressions must return "
 		      "at least one value" );
 	    /* Push NULL value to maintain stack value balance and
 	       avoid segfaults or asserts in the downstream code: */
-	    compiler_push_type( compiler_cc, new_tnode_nullref( px ), px );
+	    compiler_push_type( compiler, new_tnode_nullref( px ), px );
 	}
     }
   ;
@@ -8827,27 +8827,27 @@ opt_actual_argument_list
 actual_argument_list
   : expression
       {
-	compiler_convert_function_argument( compiler_cc, px );
+	compiler_convert_function_argument( compiler, px );
       }
   | __IDENTIFIER 
       {
-	  compiler_emit_default_arguments( compiler_cc, $1, px );
+	  compiler_emit_default_arguments( compiler, $1, px );
       }
    __THICK_ARROW expression
       {
-	compiler_convert_function_argument( compiler_cc, px );
+	compiler_convert_function_argument( compiler, px );
       }
   | actual_argument_list ',' expression
       {
-	compiler_convert_function_argument( compiler_cc, px );
+	compiler_convert_function_argument( compiler, px );
       }
   | actual_argument_list ',' __IDENTIFIER
       {
-	  compiler_emit_default_arguments( compiler_cc, $3, px );
+	  compiler_emit_default_arguments( compiler, $3, px );
       }
     __THICK_ARROW expression
       {
-	  compiler_convert_function_argument( compiler_cc, px );
+	  compiler_convert_function_argument( compiler, px );
       }
   ;
 
@@ -8862,7 +8862,7 @@ stdio_inpupt_condition
 : '<' '>'
 {
     cexception_t inner;
-    TNODE *string_tnode = typetab_lookup( compiler_cc->typetab, "string" );
+    TNODE *string_tnode = typetab_lookup( compiler->typetab, "string" );
     TNODE *type_tnode = string_tnode;
     DNODE *default_var = NULL;
     ssize_t default_var_offset = 0;
@@ -8871,22 +8871,22 @@ stdio_inpupt_condition
         share_tnode( type_tnode );
         default_var = new_dnode_typed( "$_", type_tnode, &inner );
         type_tnode = NULL;
-        compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+        compiler_vartab_insert_named_vars( compiler, default_var, &inner );
         default_var_offset = dnode_offset( default_var );
         default_var = NULL;
 
-        compiler_cc->local_offset ++;
+        compiler->local_offset ++;
         type_tnode = share_tnode( string_tnode );
         default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
         type_tnode = NULL;
-        compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+        compiler_vartab_insert_named_vars( compiler, default_var, &inner );
         default_var = NULL;
 
         share_tnode( string_tnode );
-        compiler_push_type( compiler_cc, string_tnode, &inner );
-        compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
-        compiler_emit( compiler_cc, &inner, "\tc\n", DUP );
-        compiler_emit( compiler_cc, &inner, "\tce\n", PST, &default_var_offset );        
+        compiler_push_type( compiler, string_tnode, &inner );
+        compiler_emit( compiler, &inner, "\tc\n", STDREAD );
+        compiler_emit( compiler, &inner, "\tc\n", DUP );
+        compiler_emit( compiler, &inner, "\tce\n", PST, &default_var_offset );        
     }
     cexception_catch {
         delete_tnode( type_tnode );
@@ -8900,7 +8900,7 @@ file_input_condition
 :'<' expression '>'
   {
       cexception_t inner;
-      TNODE *string_type = typetab_lookup( compiler_cc->typetab, "string" );
+      TNODE *string_type = typetab_lookup( compiler->typetab, "string" );
       TNODE *type_tnode = string_type;
       DNODE *default_var = NULL;
       ssize_t default_var_offset = 0;
@@ -8909,30 +8909,30 @@ file_input_condition
           share_tnode( type_tnode );
           default_var = new_dnode_typed( "$_", type_tnode, &inner );
           type_tnode = NULL;
-          compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+          compiler_vartab_insert_named_vars( compiler, default_var, &inner );
           default_var_offset = dnode_offset( default_var );
           default_var = NULL;
 
-          compiler_cc->local_offset ++;
+          compiler->local_offset ++;
           type_tnode = share_tnode( string_type );
           default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
           type_tnode = NULL;
-          compiler_vartab_insert_named_vars( compiler_cc, default_var, &inner );
+          compiler_vartab_insert_named_vars( compiler, default_var, &inner );
           default_var = NULL;
 
-          compiler_drop_top_expression( compiler_cc );
+          compiler_drop_top_expression( compiler );
           type_tnode = share_tnode( string_type );
-          compiler_push_type( compiler_cc, string_type, &inner );
+          compiler_push_type( compiler, string_type, &inner );
       }
       cexception_catch {
           delete_tnode( type_tnode );
           cexception_reraise( inner, px );
       }
 
-      compiler_emit( compiler_cc, px, "\tcI\n", LDC, '\n' );
-      compiler_emit( compiler_cc, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
-      compiler_emit( compiler_cc, px, "\tc\n", DUP );
-      compiler_emit( compiler_cc, px, "\tce\n", PST, &default_var_offset );        
+      compiler_emit( compiler, px, "\tcI\n", LDC, '\n' );
+      compiler_emit( compiler, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
+      compiler_emit( compiler, px, "\tc\n", DUP );
+      compiler_emit( compiler, px, "\tce\n", PST, &default_var_offset );        
   }
 ;
 
@@ -8962,13 +8962,13 @@ io_expression
   : '<' expression '>'
   {
       cexception_t inner;
-      TNODE *string_type = typetab_lookup( compiler_cc->typetab, "string" );
-      compiler_drop_top_expression( compiler_cc );
-      compiler_emit( compiler_cc, px, "\tcI\n", LDC, '\n' );
-      compiler_emit( compiler_cc, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
+      TNODE *string_type = typetab_lookup( compiler->typetab, "string" );
+      compiler_drop_top_expression( compiler );
+      compiler_emit( compiler, px, "\tcI\n", LDC, '\n' );
+      compiler_emit( compiler, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
       cexception_guard( inner ) {
           share_tnode( string_type );
-          compiler_push_type( compiler_cc, string_type, &inner );
+          compiler_push_type( compiler, string_type, &inner );
       }
       cexception_catch {
           delete_tnode( string_type );
@@ -8978,11 +8978,11 @@ io_expression
   | '<' '>'
   {
     cexception_t inner;
-    TNODE *type_tnode = typetab_lookup( compiler_cc->typetab, "string" );
+    TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
 
     cexception_guard( inner ) {
-        compiler_push_type( compiler_cc, type_tnode, &inner );
-        compiler_emit( compiler_cc, &inner, "\tc\n", STDREAD );
+        compiler_push_type( compiler, type_tnode, &inner );
+        compiler_emit( compiler, &inner, "\tc\n", STDREAD );
     }
     cexception_catch {
         delete_tnode( type_tnode );
@@ -9005,8 +9005,8 @@ null_expression
   : _NULL
       {
 	  TNODE *tnode = new_tnode_nullref( px );
-	  compiler_push_type( compiler_cc, tnode, px );
-	  compiler_emit( compiler_cc, px, "\tc\n", PLDZ );
+	  compiler_push_type( compiler, tnode, px );
+	  compiler_emit( compiler, px, "\tc\n", PLDZ );
       }
   ;
 
@@ -9105,7 +9105,7 @@ closure_var_list_declaration
 closure_initialisation
 : closure_var_declaration
 {
-    ENODE *top_expr = compiler_cc->e_stack;
+    ENODE *top_expr = compiler->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var = $1;
     TNODE *var_type = closure_var ? dnode_type( closure_var ) : NULL;
@@ -9116,20 +9116,20 @@ closure_initialisation
 
     tnode_insert_fields( closure_tnode, closure_var );
     offset = dnode_offset( closure_var );
-    compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
-    compiler_push_type( compiler_cc,
+    compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
+    compiler_push_type( compiler,
                      new_tnode_addressof( share_tnode( var_type ), px ), 
                      px );
 }
  '=' expression
 {
-    compiler_compile_sti( compiler_cc, px );
-    compiler_emit( compiler_cc, px, "\tc\n", DUP );
+    compiler_compile_sti( compiler, px );
+    compiler_emit( compiler, px, "\tc\n", DUP );
 }
 
 | closure_var_list_declaration
 {
-    ENODE *top_expr = compiler_cc->e_stack;
+    ENODE *top_expr = compiler->e_stack;
     TNODE *closure_tnode = top_expr ? enode_type( top_expr ) : NULL;
     DNODE *closure_var_list = $1;
     DNODE *closure_var;
@@ -9146,9 +9146,9 @@ closure_initialisation
             share_tnode( closure_tnode );
         }
         offset = dnode_offset( closure_var );
-        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
-        compiler_emit( compiler_cc, px, "\tc\n", RTOR );
-        compiler_emit( compiler_cc, px, "\tc\n", DUP );
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
+        compiler_emit( compiler, px, "\tc\n", RTOR );
+        compiler_emit( compiler, px, "\tc\n", DUP );
         first_variable = 0;
     }
 }
@@ -9165,9 +9165,9 @@ closure_initialisation
     } else {
         if( variable_count < value_count ) {
             if( variable_count == value_count - 1 ) {
-                compiler_compile_drop( compiler_cc, px );
+                compiler_compile_drop( compiler, px );
             } else {
-                compiler_compile_dropn( compiler_cc, value_count - variable_count,
+                compiler_compile_dropn( compiler, value_count - variable_count,
                                      px );
             }
         }
@@ -9181,13 +9181,13 @@ closure_initialisation
 
             assert( var_type );
 
-            compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
-            compiler_push_type( compiler_cc,
+            compiler_emit( compiler, px, "\tc\n", RFROMR );
+            compiler_push_type( compiler,
                              new_tnode_addressof( share_tnode( var_type ),
                                                   px ), 
                              px );
-            compiler_compile_swap( compiler_cc, px );
-            compiler_compile_sti( compiler_cc, px );
+            compiler_compile_swap( compiler, px );
+            compiler_compile_sti( compiler, px );
         }
     }
 }
@@ -9203,9 +9203,9 @@ closure_initialisation
 }
  '=' expression
 {
-    ENODE *top_expr = compiler_cc->e_stack;
+    ENODE *top_expr = compiler->e_stack;
     TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
-    ENODE *second_expr = enode_next( compiler_cc->e_stack );
+    ENODE *second_expr = enode_next( compiler->e_stack );
     TNODE *closure_tnode = second_expr ? enode_type( second_expr ) : NULL;
     DNODE *closure_var = $2;
     ssize_t offset = 0;
@@ -9216,18 +9216,18 @@ closure_initialisation
     dnode_insert_type( closure_var, share_tnode( top_type ));
     tnode_insert_fields( closure_tnode, closure_var );
     offset = dnode_offset( closure_var );
-    compiler_emit( compiler_cc, px, "\tc\n", SWAP );
-    compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
-    compiler_emit( compiler_cc, px, "\tc\n", SWAP );
+    compiler_emit( compiler, px, "\tc\n", SWAP );
+    compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
+    compiler_emit( compiler, px, "\tc\n", SWAP );
 
-    compiler_push_type( compiler_cc,
+    compiler_push_type( compiler,
                      new_tnode_addressof( share_tnode( top_type ), px ), 
                      px );
 
-    compiler_swap_top_expressions( compiler_cc );
+    compiler_swap_top_expressions( compiler );
 
-    compiler_compile_sti( compiler_cc, px );
-    compiler_emit( compiler_cc, px, "\tc\n", DUP );
+    compiler_compile_sti( compiler, px );
+    compiler_emit( compiler, px, "\tc\n", DUP );
 }
 
 | opt_variable_declaration_keyword variable_identifier ','
@@ -9240,11 +9240,11 @@ closure_initialisation
         dnode_list_set_flags( closure_var_list, DF_IS_READONLY );
     }
 
-    compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+    compiler_emit( compiler, px, "\tc\n", RTOR );
 }
  '=' multivalue_expression_list
 {
-    ENODE *top_expr = compiler_cc->e_stack;
+    ENODE *top_expr = compiler->e_stack;
     ENODE *current_expr, *closure_expr;
     TNODE *closure_tnode;
     DNODE *closure_var_list = $2;
@@ -9273,7 +9273,7 @@ closure_initialisation
         if( expr_type_kind == TK_FUNCTION ||
             expr_type_kind == TK_OPERATOR ||
                  expr_type_kind == TK_METHOD ) {
-            TNODE *base_type = typetab_lookup( compiler_cc->typetab, "procedure" );
+            TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
             expr_type = new_tnode_function_or_proc_ref
                 ( share_dnode( tnode_args( expr_type )),
                   share_dnode( tnode_retvals( expr_type )),
@@ -9295,9 +9295,9 @@ closure_initialisation
 
     if( expr_nr > len ) {
         if( expr_nr == len + 1 ) {
-            compiler_compile_drop( compiler_cc, px );
+            compiler_compile_drop( compiler, px );
         } else {
-            compiler_compile_dropn( compiler_cc, expr_nr - len, px );
+            compiler_compile_dropn( compiler, expr_nr - len, px );
         }
     }
 
@@ -9310,23 +9310,23 @@ closure_initialisation
 
             assert( var_type );
 
-            compiler_push_type( compiler_cc,
+            compiler_push_type( compiler,
                              new_tnode_addressof( share_tnode( var_type ),
                                                   px ), 
                              px );
 
-            compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
-            compiler_emit( compiler_cc, px, "\tc\n", DUP );
-            compiler_emit( compiler_cc, px, "\tc\n", RTOR );
+            compiler_emit( compiler, px, "\tc\n", RFROMR );
+            compiler_emit( compiler, px, "\tc\n", DUP );
+            compiler_emit( compiler, px, "\tc\n", RTOR );
             offset = dnode_offset( var );
-            compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offset );
-            compiler_compile_swap( compiler_cc, px );
-            compiler_compile_sti( compiler_cc, px );
+            compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
+            compiler_compile_swap( compiler, px );
+            compiler_compile_sti( compiler, px );
         }
     }
     closure_var_list = dnode_list_invert( closure_var_list );
 
-    compiler_emit( compiler_cc, px, "\tc\n", RFROMR );
+    compiler_emit( compiler, px, "\tc\n", RFROMR );
 }
 
 ;
@@ -9335,7 +9335,7 @@ function_expression_header
 :   function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
-        dlist_push_dnode( &compiler_cc->loop_stack, &compiler_cc->loops, px );
+        dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
                                  /* parameters = */ $3,
                                  /* return_values = */ $5,
@@ -9358,24 +9358,24 @@ closure_header
           DNODE *closure_fn_ref = NULL;
           ssize_t zero = 0;
           /* Allocate the closure structure: */
-          compiler_push_absolute_fixup( compiler_cc, px );
-          compiler_emit( compiler_cc, px, "\tc", ALLOC );
-          compiler_push_absolute_fixup( compiler_cc, px );
-          compiler_emit( compiler_cc, px, "ee\n", &zero, &zero );
-          compiler_emit( compiler_cc, px, "\tc\n", DUP );
+          compiler_push_absolute_fixup( compiler, px );
+          compiler_emit( compiler, px, "\tc", ALLOC );
+          compiler_push_absolute_fixup( compiler, px );
+          compiler_emit( compiler, px, "ee\n", &zero, &zero );
+          compiler_emit( compiler, px, "\tc\n", DUP );
           tnode_set_kind( closure_tnode, TK_STRUCT );
           /* reserve one stackcell for a function pointer of the
              closure: */
           closure_fn_ref = new_dnode_typed( "",  new_tnode_ref( px ), px );
           tnode_insert_fields( closure_tnode, closure_fn_ref );
-          compiler_push_type( compiler_cc, closure_tnode, px );
+          compiler_push_type( compiler, closure_tnode, px );
       }
       opt_closure_initialisation_list
       {
           DNODE *parameters = $4;
           DNODE *return_values = $6;
           DNODE *self_dnode = new_dnode_name( $8, px );
-          ENODE *closure_expr = compiler_cc->e_stack;
+          ENODE *closure_expr = compiler->e_stack;
           TNODE *closure_type = enode_type( closure_expr );
 
           ssize_t nref, size;
@@ -9383,15 +9383,15 @@ closure_header
           nref = tnode_number_of_references( closure_type );
           size = tnode_size( closure_type );
 
-          compiler_fixup( compiler_cc, nref );
-          compiler_fixup( compiler_cc, size );
+          compiler_fixup( compiler, nref );
+          compiler_fixup( compiler, size );
 
           dnode_insert_type( self_dnode, share_tnode( closure_type ));
 
           parameters = dnode_append( self_dnode, parameters );
           self_dnode = NULL;
         
-          dlist_push_dnode( &compiler_cc->loop_stack, &compiler_cc->loops, px );
+          dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
 
           $$ = new_dnode_function( /* name = */ NULL, 
                                    parameters, return_values, px );
@@ -9405,8 +9405,8 @@ function_expression
     function_or_operator_body
     function_or_operator_end
     {
-        compiler_cc->loops = dlist_pop_data( &compiler_cc->loop_stack );
-        compiler_compile_load_function_address( compiler_cc, $1, px );
+        compiler->loops = dlist_pop_data( &compiler->loop_stack );
+        compiler_compile_load_function_address( compiler, $1, px );
     }
 
 | closure_header
@@ -9414,17 +9414,17 @@ function_expression
   function_or_operator_body
   function_or_operator_end
     {
-        ENODE *closure_expr = enode_list_pop( &compiler_cc->e_stack );
+        ENODE *closure_expr = enode_list_pop( &compiler->e_stack );
         TNODE *closure_type = enode_type( closure_expr );
         DNODE *fields = tnode_fields( closure_type );
         ssize_t offs = dnode_offset( fields );
 
         /* assert( offs == -sizeof(alloccell_t)-sizeof(void*) ); */
 
-        compiler_cc->loops = dlist_pop_data( &compiler_cc->loop_stack );
-        compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &offs );
-        compiler_compile_load_function_address( compiler_cc, $1, px );
-        compiler_emit( compiler_cc, px, "\tc\n", PSTI );
+        compiler->loops = dlist_pop_data( &compiler->loop_stack );
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &offs );
+        compiler_compile_load_function_address( compiler, $1, px );
+        compiler_emit( compiler, px, "\tc\n", PSTI );
         delete_enode( closure_expr );
     }
 ;
@@ -9434,12 +9434,12 @@ simple_expression
   | variable
   | field_access
       {
-	compiler_compile_ldi( compiler_cc, px );
+	compiler_compile_ldi( compiler, px );
       }
   | indexed_rvalue
   | _BYTECODE ':' var_type_description '{' bytecode_sequence '}'
       {
-	compiler_push_type( compiler_cc, $3, px );
+	compiler_push_type( compiler, $3, px );
       }
   | generator_new
   | array_expression
@@ -9449,13 +9449,13 @@ simple_expression
   | _TYPE type_identifier
       {
           TNODE *tnode = $2;
-          compiler_compile_type_descriptor_loader( compiler_cc, tnode, px );
+          compiler_compile_type_descriptor_loader( compiler, tnode, px );
       }
   | _TYPE _OF variable_access_identifier
       {
           DNODE *var_dnode = $3;
           TNODE *var_type = dnode_type( var_dnode );
-          compiler_compile_type_descriptor_loader( compiler_cc, var_type, px );
+          compiler_compile_type_descriptor_loader( compiler, var_type, px );
       }
   ;
 
@@ -9473,26 +9473,26 @@ unpack_expression
   {
       TNODE *type = $2;
       if( tnode_kind( type ) == TK_ARRAY ) {
-	  compiler_check_and_compile_operator( compiler_cc,
+	  compiler_check_and_compile_operator( compiler,
 					    tnode_element_type( type ),
 					    "unpackarray", 3 /* arity */,
 					    NULL /* fixup_values */, px );
       } else {
-	  compiler_check_and_compile_operator( compiler_cc, type,
+	  compiler_check_and_compile_operator( compiler, type,
 					    "unpack", 3 /* arity */,
 					    NULL /* fixup_values */, px );
       }
-      compiler_emit( compiler_cc, px, "\n" );
+      compiler_emit( compiler, px, "\n" );
   }
   | _UNPACK compact_type_description '[' ']'
     '(' expression ',' expression ',' expression ')'
   {
       TNODE *element_type = $2;
-      compiler_check_and_compile_operator( compiler_cc, element_type,
+      compiler_check_and_compile_operator( compiler, element_type,
 					"unpackarray", 3 /* arity */,
 					NULL /* fixup_values */, px );
 
-      compiler_emit( compiler_cc, px, "\n" );
+      compiler_emit( compiler, px, "\n" );
   }
   | _UNPACK compact_type_description md_array_allocator '[' ']' 
     /*  blob,          offset,        format_and_size */
@@ -9504,13 +9504,13 @@ unpack_expression
       int level = $3;
       TNODE *element_type = $2;
       TNODE *array_tnode =
-	  new_tnode_array_snail( NULL, compiler_cc->typetab, px );
+	  new_tnode_array_snail( NULL, compiler->typetab, px );
 
-      if( compiler_lookup_operator( compiler_cc, element_type, operator_name,
+      if( compiler_lookup_operator( compiler, element_type, operator_name,
                                     arity, px )) {
           key_value_t *fixup_values =
               make_mdalloc_key_value_list( element_type, level );
-	  compiler_check_and_compile_operator( compiler_cc, element_type,
+	  compiler_check_and_compile_operator( compiler, element_type,
 					    operator_name,
 					    arity, fixup_values,
 					    px );
@@ -9518,25 +9518,25 @@ unpack_expression
 	     be dropped, since it only describes return value as having
 	     type 'array'. The caller of the current function will push
 	     a correct return value 'array of proper_element_type' */
-	  compiler_drop_top_expression( compiler_cc );
-	  if( compiler_stack_top_is_array( compiler_cc )) {
-	      compiler_append_expression_type( compiler_cc, array_tnode );
-	      compiler_append_expression_type( compiler_cc, share_tnode( element_type ));
+	  compiler_drop_top_expression( compiler );
+	  if( compiler_stack_top_is_array( compiler )) {
+	      compiler_append_expression_type( compiler, array_tnode );
+	      compiler_append_expression_type( compiler, share_tnode( element_type ));
 	  }
       } else {
-	  compiler_drop_top_expression( compiler_cc );
-	  compiler_drop_top_expression( compiler_cc );
-	  compiler_drop_top_expression( compiler_cc );
+	  compiler_drop_top_expression( compiler );
+	  compiler_drop_top_expression( compiler );
+	  compiler_drop_top_expression( compiler );
 	  tnode_report_missing_operator( element_type, operator_name, arity );
       }
-      compiler_emit( compiler_cc, px, "\n" );
+      compiler_emit( compiler, px, "\n" );
   }
   ;
 
 array_expression
   : '[' expression_list opt_comma ']'
      {
-	 compiler_compile_array_expression( compiler_cc, $2, px );
+	 compiler_compile_array_expression( compiler, $2, px );
      }
 /*
   Expression never used and unnecessary duplication:
@@ -9547,8 +9547,8 @@ array_expression
 struct_expression
   : opt_null_type_designator _STRUCT type_identifier
      {
-	 compiler_compile_alloc( compiler_cc, share_tnode( $3 ), px );
-         compiler_push_initialised_ref_tables( compiler_cc, px );
+	 compiler_compile_alloc( compiler, share_tnode( $3 ), px );
+         compiler_push_initialised_ref_tables( compiler, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
@@ -9559,7 +9559,7 @@ struct_expression
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
             if( tnode_is_non_null_reference( field_type ) &&
-                !vartab_lookup( compiler_cc->initialised_references,
+                !vartab_lookup( compiler->initialised_references,
                                 field_name )) {
                 char *field_type_name = $3 ? tnode_name( $3 ) : NULL;
                 if( field_type_name ) {
@@ -9573,7 +9573,7 @@ struct_expression
             }
         }
 
-        compiler_pop_initialised_ref_tables( compiler_cc );
+        compiler_pop_initialised_ref_tables( compiler );
     }
 
   | _TYPE type_identifier _OF delimited_type_description
@@ -9582,8 +9582,8 @@ struct_expression
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
-	 compiler_compile_alloc( compiler_cc, share_tnode( composite ), px );
-         compiler_push_initialised_ref_tables( compiler_cc, px );
+	 compiler_compile_alloc( compiler, share_tnode( composite ), px );
+         compiler_push_initialised_ref_tables( compiler, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
@@ -9594,7 +9594,7 @@ struct_expression
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
             if( tnode_is_non_null_reference( field_type ) &&
-                !vartab_lookup( compiler_cc->initialised_references,
+                !vartab_lookup( compiler->initialised_references,
                                 field_name )) {
                 char *field_type_name = $2 ? tnode_name( $2 ) : NULL;
                 if( field_type_name ) {
@@ -9608,7 +9608,7 @@ struct_expression
             }
         }
 
-        compiler_pop_initialised_ref_tables( compiler_cc );
+        compiler_pop_initialised_ref_tables( compiler );
     }
 
   ;
@@ -9629,138 +9629,138 @@ field_initialiser
 	 DNODE *field;
          TNODE *field_type;
 
-	 compiler_compile_dup( compiler_cc, px );
-	 field = compiler_make_stack_top_field_type( compiler_cc, $1 );
+	 compiler_compile_dup( compiler, px );
+	 field = compiler_make_stack_top_field_type( compiler, $1 );
          field_type = field ? dnode_type( field ) : NULL;
-	 compiler_make_stack_top_addressof( compiler_cc, px );
+	 compiler_make_stack_top_addressof( compiler, px );
 
-         if( !vartab_lookup( compiler_cc->initialised_references, $1 ) &&
+         if( !vartab_lookup( compiler->initialised_references, $1 ) &&
              field_type && tnode_is_non_null_reference( field_type )) {
-             vartab_insert_named( compiler_cc->initialised_references,
+             vartab_insert_named( compiler->initialised_references,
                                   share_dnode( field ), px );
          }
 
 	 if( field && dnode_offset( field ) != 0 ) {
 	     ssize_t field_offset = dnode_offset( field );
-	     compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &field_offset );
+	     compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
 	 }
      }
     field_initialiser_separator expression
      {
-	 compiler_compile_sti( compiler_cc, px );
+	 compiler_compile_sti( compiler, px );
      }
   ;
 
 arithmetic_expression
   : expression '+' expression
       {
-       compiler_compile_binop( compiler_cc, "+", px );
+       compiler_compile_binop( compiler, "+", px );
       }
   | expression '-' expression
       {
-       compiler_compile_binop( compiler_cc, "-", px );
+       compiler_compile_binop( compiler, "-", px );
       }
   | expression '*' expression
       {
-       compiler_compile_binop( compiler_cc, "*", px );
+       compiler_compile_binop( compiler, "*", px );
       }
   | expression '/' expression
       {
-       compiler_compile_binop( compiler_cc, "/", px );
+       compiler_compile_binop( compiler, "/", px );
       }
   | expression '&' expression
       {
-       compiler_compile_binop( compiler_cc, "&", px );
+       compiler_compile_binop( compiler, "&", px );
       }
   | expression '|' expression
       {
-       compiler_compile_binop( compiler_cc, "|", px );
+       compiler_compile_binop( compiler, "|", px );
       }
   | expression __RIGHT_TO_LEFT expression /* << */
       {
-       compiler_compile_binop( compiler_cc, "shl", px );
+       compiler_compile_binop( compiler, "shl", px );
       }
   | expression __LEFT_TO_RIGHT expression /* >> */
       {
-       compiler_compile_binop( compiler_cc, "shr", px );
+       compiler_compile_binop( compiler, "shr", px );
       }
   | expression _SHL expression
       {
-       compiler_compile_binop( compiler_cc, "shl", px );
+       compiler_compile_binop( compiler, "shl", px );
       }
   | expression _SHR expression
       {
-       compiler_compile_binop( compiler_cc, "shr", px );
+       compiler_compile_binop( compiler, "shr", px );
       }
   | expression '^' expression
       {
-       compiler_compile_binop( compiler_cc, "^", px );
+       compiler_compile_binop( compiler, "^", px );
       }
   | expression '%' expression
       {
-       compiler_compile_binop( compiler_cc, "%", px );
+       compiler_compile_binop( compiler, "%", px );
       }
   | expression __STAR_STAR expression
       {
-       compiler_compile_binop( compiler_cc, "**", px );
+       compiler_compile_binop( compiler, "**", px );
       }
   | expression '_' expression
       {
-       compiler_compile_binop( compiler_cc, "_", px );
+       compiler_compile_binop( compiler, "_", px );
       }
 
   | '+' expression %prec __UNARY
       {
-       compiler_compile_unop( compiler_cc, "+", px );
+       compiler_compile_unop( compiler, "+", px );
       }
   | '-' expression %prec __UNARY
       {
-       compiler_compile_unop( compiler_cc, "-", px );
+       compiler_compile_unop( compiler, "-", px );
       }
   | '~' expression %prec __UNARY
       {
-       compiler_compile_unop( compiler_cc, "~", px );
+       compiler_compile_unop( compiler, "~", px );
       }
 
   | expression __DOUBLE_PERCENT expression
       {
-       compiler_compile_binop( compiler_cc, "%%", px );
+       compiler_compile_binop( compiler, "%%", px );
       }
 
 /*
   | '<' __IDENTIFIER '>' expression %prec __UNARY
       {
-       compiler_compile_type_conversion( compiler_cc, /*target_name* /$2, px );
+       compiler_compile_type_conversion( compiler, /*target_name* /$2, px );
       }
 */
 
   | expression '@' __IDENTIFIER
       {
-       compiler_compile_type_conversion( compiler_cc, /*target_name*/$3, px );
+       compiler_compile_type_conversion( compiler, /*target_name*/$3, px );
       }
 
   | expression '@' '(' var_type_description ')'
       {
-       compiler_compile_type_conversion( compiler_cc, NULL, px );
+       compiler_compile_type_conversion( compiler, NULL, px );
       }
 
   | expression '?'
       {
-        compiler_push_relative_fixup( compiler_cc, px );
-	compiler_compile_jz( compiler_cc, 0, px );
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jz( compiler, 0, px );
       }
     expression ':'
       {
 	ssize_t zero = 0;
-        compiler_push_relative_fixup( compiler_cc, px );
-        compiler_emit( compiler_cc, px, "\tce\n", JMP, &zero );
-        compiler_swap_fixups( compiler_cc );
-        compiler_fixup_here( compiler_cc );
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
       }
     expression
       {
-	compiler_check_top_2_expressions_and_drop( compiler_cc, "?:", px );
-        compiler_fixup_here( compiler_cc );
+	compiler_check_top_2_expressions_and_drop( compiler, "?:", px );
+        compiler_fixup_here( compiler );
       }
 /*
   | expression _AS __IDENTIFIER
@@ -9770,7 +9770,7 @@ arithmetic_expression
 
   | __QQ expression  %prec __UNARY
   {
-      ENODE *top = compiler_cc->e_stack;
+      ENODE *top = compiler->e_stack;
       TNODE *top_type = top ? enode_type( top ) : NULL;
 
       if( top && top_type &&
@@ -9780,7 +9780,7 @@ arithmetic_expression
           tnode_set_flags( converted, TF_NON_NULL );
           enode_replace_type( top, converted );
           /* top_type no longer valid here! */
-          compiler_emit( compiler_cc, px, "\tc\n", CHECKREF );
+          compiler_emit( compiler, px, "\tc\n", CHECKREF );
       }
   }
 
@@ -9789,57 +9789,57 @@ arithmetic_expression
 boolean_expression
   : expression '<' expression
       {
-       compiler_compile_binop( compiler_cc, "<", px );
+       compiler_compile_binop( compiler, "<", px );
       }
   | expression '>' expression
       {
-       compiler_compile_binop( compiler_cc, ">", px );
+       compiler_compile_binop( compiler, ">", px );
       }
   | expression __LE expression
       {
-       compiler_compile_binop( compiler_cc, "<=", px );
+       compiler_compile_binop( compiler, "<=", px );
       }
   | expression __GE expression
       {
-       compiler_compile_binop( compiler_cc, ">=", px );
+       compiler_compile_binop( compiler, ">=", px );
       }
   | expression __EQ expression
       {
-       compiler_compile_binop( compiler_cc, "==", px );
+       compiler_compile_binop( compiler, "==", px );
       }
   | expression __NE expression
       {
-       compiler_compile_binop( compiler_cc, "!=", px );
+       compiler_compile_binop( compiler, "!=", px );
       }
   | expression _AND
       {
-	compiler_compile_dup( compiler_cc, px );
-        compiler_push_relative_fixup( compiler_cc, px );
-	compiler_compile_jz( compiler_cc, 0, px );
-	compiler_duplicate_top_expression( compiler_cc, px );
-	compiler_compile_drop( compiler_cc, px );
+	compiler_compile_dup( compiler, px );
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jz( compiler, 0, px );
+	compiler_duplicate_top_expression( compiler, px );
+	compiler_compile_drop( compiler, px );
       }
     expression
       {
-	compiler_check_top_2_expressions_and_drop( compiler_cc, "and", px );
-        compiler_fixup_here( compiler_cc );
+	compiler_check_top_2_expressions_and_drop( compiler, "and", px );
+        compiler_fixup_here( compiler );
       }
   | expression _OR
       {
-	compiler_compile_dup( compiler_cc, px );
-        compiler_push_relative_fixup( compiler_cc, px );
-	compiler_compile_jnz( compiler_cc, 0, px );
-	compiler_duplicate_top_expression( compiler_cc, px );
-	compiler_compile_drop( compiler_cc, px );
+	compiler_compile_dup( compiler, px );
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jnz( compiler, 0, px );
+	compiler_duplicate_top_expression( compiler, px );
+	compiler_compile_drop( compiler, px );
       }
     expression
       {
-	compiler_check_top_2_expressions_and_drop( compiler_cc, "or", px );
-	compiler_fixup_here( compiler_cc );
+	compiler_check_top_2_expressions_and_drop( compiler, "or", px );
+	compiler_fixup_here( compiler );
       }
   | '!' expression %prec __UNARY
       {
-       compiler_compile_unop( compiler_cc, "!", px );
+       compiler_compile_unop( compiler, "!", px );
       }
 
   | '(' boolean_expression ')'
@@ -9849,7 +9849,7 @@ generator_new
   : _NEW compact_type_description
       {
           compiler_check_type_contains_non_null_ref( $2 );
-          compiler_compile_alloc( compiler_cc, $2, px );
+          compiler_compile_alloc( compiler, $2, px );
       }
 
   | _NEW type_identifier
@@ -9859,15 +9859,15 @@ generator_new
           TNODE *type_tnode = $2;
 
           compiler_check_type_contains_non_null_ref( type_tnode );
-          compiler_compile_alloc( compiler_cc, type_tnode, px );
+          compiler_compile_alloc( compiler, type_tnode, px );
 
           /* --- function call generations starts here: */
 
-          dlist_push_dnode( &compiler_cc->current_call_stack,
-                            &compiler_cc->current_call, px );
+          dlist_push_dnode( &compiler->current_call_stack,
+                            &compiler->current_call, px );
 
-          dlist_push_dnode( &compiler_cc->current_arg_stack,
-                            &compiler_cc->current_arg, px );
+          dlist_push_dnode( &compiler->current_arg_stack,
+                            &compiler->current_arg, px );
 
           constructor_dnode = type_tnode ?
               tnode_constructor( type_tnode ) : NULL;
@@ -9875,26 +9875,26 @@ generator_new
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
 
-          compiler_cc->current_call = share_dnode( constructor_dnode );
+          compiler->current_call = share_dnode( constructor_dnode );
           
-          compiler_cc->current_arg = constructor_tnode ?
+          compiler->current_arg = constructor_tnode ?
               dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
               NULL;
 
-          compiler_compile_dup( compiler_cc, px );
-	  compiler_push_guarding_arg( compiler_cc, px );
-          compiler_swap_top_expressions( compiler_cc );
+          compiler_compile_dup( compiler, px );
+	  compiler_push_guarding_arg( compiler, px );
+          compiler_swap_top_expressions( compiler );
 	}
     '(' opt_actual_argument_list ')'
         {
-	    DNODE *constructor_dnode = compiler_cc->current_call;
+	    DNODE *constructor_dnode = compiler->current_call;
 	    TNODE *constructor_tnode = constructor_dnode ?
                 dnode_type( constructor_dnode ) : NULL;
             int nretvals;
             char *constructor_name = constructor_tnode ?
                 tnode_name( constructor_tnode ) : NULL;
 
-	    nretvals = compiler_compile_multivalue_function_call( compiler_cc, px );
+	    nretvals = compiler_compile_multivalue_function_call( compiler, px );
 
             if( nretvals > 0 ) {
                 yyerrorf( "constructor '%s()' should not return a value",
@@ -9905,49 +9905,49 @@ generator_new
   | _NEW compact_type_description '[' expression ']'
       {
           compiler_check_array_component_is_not_null( $2 );
-          compiler_compile_array_alloc( compiler_cc, $2, px );
+          compiler_compile_array_alloc( compiler, $2, px );
       }
   | _NEW compact_type_description md_array_allocator '[' expression ']'
       {
           compiler_check_array_component_is_not_null( $2 );
-          compiler_compile_mdalloc( compiler_cc, $2, $3, px );
+          compiler_compile_mdalloc( compiler, $2, $3, px );
       }
   | _NEW _ARRAY '[' expression ']' _OF var_type_description
       {
           compiler_check_array_component_is_not_null( $7 );
-          compiler_compile_array_alloc( compiler_cc, $7, px );
+          compiler_compile_array_alloc( compiler, $7, px );
       }
   | _NEW _ARRAY md_array_allocator '[' expression ']' _OF var_type_description
       {
           compiler_check_array_component_is_not_null( $8 );
-          compiler_compile_mdalloc( compiler_cc, $8, $3, px );
+          compiler_compile_mdalloc( compiler, $8, $3, px );
       }
   | _NEW compact_type_description '[' expression ']' _OF var_type_description
       {
           compiler_check_array_component_is_not_null( $7 );
-          compiler_compile_composite_alloc( compiler_cc, $2, $7, px );
+          compiler_compile_composite_alloc( compiler, $2, $7, px );
       }
   | _NEW _BLOB '(' expression ')'
       {
-	compiler_compile_blob_alloc( compiler_cc, px );
+	compiler_compile_blob_alloc( compiler, px );
       }
   | expression '*' _NEW '[' expression ']'
       {
-          ENODE *top_expr = compiler_cc->e_stack;
+          ENODE *top_expr = compiler->e_stack;
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next_expr ) : NULL;
-          compiler_compile_array_alloc( compiler_cc, element_type, px );
-          compiler_emit( compiler_cc, px, "\tc\n", FILLARRAY );
+          compiler_compile_array_alloc( compiler, element_type, px );
+          compiler_emit( compiler, px, "\tc\n", FILLARRAY );
       }
   | expression '*' _NEW md_array_allocator '[' expression ']'
       {
           ssize_t level = $4;
-          ENODE *top_expr = compiler_cc->e_stack;
+          ENODE *top_expr = compiler->e_stack;
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
-          compiler_compile_mdalloc( compiler_cc, element_type, level, px );
-          compiler_emit( compiler_cc, px, "\tce\n", FILLMDARRAY, &level );
+          compiler_compile_mdalloc( compiler, element_type, level, px );
+          compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
       }
   | _NEW type_identifier _OF '(' _TYPE type_identifier ',' opt_actual_argument_list ')'
   ;
@@ -9956,13 +9956,13 @@ md_array_allocator
   : '[' expression ']'
       {
 	int level = 0;
-	compiler_compile_mdalloc( compiler_cc, NULL, level, px );
+	compiler_compile_mdalloc( compiler, NULL, level, px );
 	$$ = level + 1;
       }
   | md_array_allocator '[' expression ']'
       {
 	int level = $1;
-	compiler_compile_mdalloc( compiler_cc, NULL, level, px );
+	compiler_compile_mdalloc( compiler, NULL, level, px );
 	$$ = level + 1;
       }
   ;
@@ -9975,7 +9975,7 @@ lvalue
 
 lvariable
   : variable_access_identifier
-      { compiler_compile_load_variable_address( compiler_cc, $1, px ); }
+      { compiler_compile_load_variable_address( compiler, $1, px ); }
   | lvalue
   ;
 
@@ -9988,12 +9988,12 @@ variable
 	  if( variable_type && tnode_kind( variable_type ) == TK_FUNCTION ) {
               if( variable && dnode_offset( variable ) == 0 ) {
                   thrcode_push_forward_function
-                      ( compiler_cc->thrcode, dnode_name( variable ),
-                        thrcode_length( compiler_cc->thrcode ) + 1, px );
+                      ( compiler->thrcode, dnode_name( variable ),
+                        thrcode_length( compiler->thrcode ) + 1, px );
               }
-	      compiler_compile_load_function_address( compiler_cc, variable, px );
+	      compiler_compile_load_function_address( compiler, variable, px );
 	  } else {
-	      compiler_compile_load_variable_value( compiler_cc, variable, px );
+	      compiler_compile_load_variable_value( compiler, variable, px );
 	  }
       }
   ;
@@ -10018,10 +10018,10 @@ index_expression
 variable_access_for_indexing
   : variable_access_identifier
       {
-       if( compiler_dnode_is_reference( compiler_cc, $1 )) {
-           compiler_compile_load_variable_value( compiler_cc, $1, px );
+       if( compiler_dnode_is_reference( compiler, $1 )) {
+           compiler_compile_load_variable_value( compiler, $1, px );
        } else {
-           compiler_compile_load_variable_address( compiler_cc, $1, px );
+           compiler_compile_load_variable_address( compiler, $1, px );
        }
        $$ = $1;
       }
@@ -10030,8 +10030,8 @@ variable_access_for_indexing
 lvalue_for_indexing
   : lvalue
       {
-       if( compiler_stack_top_base_is_reference( compiler_cc )) {
-	   compiler_compile_ldi( compiler_cc, px );
+       if( compiler_stack_top_base_is_reference( compiler )) {
+	   compiler_compile_ldi( compiler, px );
        }
       }
   ;
@@ -10050,23 +10050,23 @@ indexed_rvalue
 	  } else {
 	      operator_name = "ldx";
 	  }
-	  if( compiler_stack_top_has_operator( compiler_cc, operator_name, 2, px ) ||
- 	      compiler_nth_stack_value_has_operator( compiler_cc, 1,
+	  if( compiler_stack_top_has_operator( compiler, operator_name, 2, px ) ||
+ 	      compiler_nth_stack_value_has_operator( compiler, 1,
 						  operator_name, 2, px )) {
-	      compiler_check_and_compile_top_2_operator( compiler_cc,
+	      compiler_check_and_compile_top_2_operator( compiler,
 						      operator_name, 2, px );
 	  } else {
-	      if( compiler_dnode_is_reference( compiler_cc, var_dnode )) {
-		  compiler_compile_indexing( compiler_cc, 1, $3, px );
+	      if( compiler_dnode_is_reference( compiler, var_dnode )) {
+		  compiler_compile_indexing( compiler, 1, $3, px );
 	      } else {
-		  compiler_compile_indexing( compiler_cc, 0, $3, px );
+		  compiler_compile_indexing( compiler, 0, $3, px );
 	      }
-	      compiler_compile_ldi( compiler_cc, px );
+	      compiler_compile_ldi( compiler, px );
 	  }
       }
   | lvalue_for_indexing '[' index_expression ']'
       {
-	  ENODE *top_expr = compiler_cc->e_stack;
+	  ENODE *top_expr = compiler->e_stack;
 	  ENODE *top2_expr = top_expr ? enode_next( top_expr ) : NULL;
 	  TNODE *top2_tnode = top2_expr ? enode_type( top2_expr ) : NULL;
 	  TNODE *element_type = top2_tnode ?
@@ -10078,18 +10078,18 @@ indexed_rvalue
 	  } else {
 	      operator_name = "ldx";
 	  }
-	  if( compiler_stack_top_has_operator( compiler_cc, operator_name, 2, px ) ||
- 	      compiler_nth_stack_value_has_operator( compiler_cc, 1,
+	  if( compiler_stack_top_has_operator( compiler, operator_name, 2, px ) ||
+ 	      compiler_nth_stack_value_has_operator( compiler, 1,
                                                   operator_name, 2, px )) {
-	      compiler_check_and_compile_top_2_operator( compiler_cc, operator_name,
+	      compiler_check_and_compile_top_2_operator( compiler, operator_name,
                                                       2, px );
 	  } else {
-	      if( compiler_stack_top_is_reference( compiler_cc )) {
-		  compiler_compile_indexing( compiler_cc, 1, $3, px );
+	      if( compiler_stack_top_is_reference( compiler )) {
+		  compiler_compile_indexing( compiler, 1, $3, px );
 	      } else {
-		  compiler_compile_indexing( compiler_cc, 0, $3, px );
+		  compiler_compile_indexing( compiler, 0, $3, px );
 	      }
-	      compiler_compile_ldi( compiler_cc, px );
+	      compiler_compile_ldi( compiler, px );
 	  }
       }
   ;
@@ -10097,19 +10097,19 @@ indexed_rvalue
 indexed_lvalue
   : variable_access_for_indexing '[' index_expression ']'
       {
-	  if( compiler_dnode_is_reference( compiler_cc, $1 )) {
-	      compiler_compile_indexing( compiler_cc, 1, $3, px );
+	  if( compiler_dnode_is_reference( compiler, $1 )) {
+	      compiler_compile_indexing( compiler, 1, $3, px );
 	  } else {
-	      compiler_compile_indexing( compiler_cc, 0, $3, px );
+	      compiler_compile_indexing( compiler, 0, $3, px );
 	  }
       }
 
   | lvalue_for_indexing '[' index_expression ']'
       {
-	  if( compiler_stack_top_is_reference( compiler_cc )) {
-	      compiler_compile_indexing( compiler_cc, 1, $3, px );
+	  if( compiler_stack_top_is_reference( compiler )) {
+	      compiler_compile_indexing( compiler, 1, $3, px );
 	  } else {
-	      compiler_compile_indexing( compiler_cc, 0, $3, px );
+	      compiler_compile_indexing( compiler, 0, $3, px );
 	  }
       }
   ;
@@ -10119,30 +10119,30 @@ field_access
       {
        DNODE *field;
 
-       if( compiler_dnode_is_reference( compiler_cc, $1 )) {
-	   compiler_compile_load_variable_value( compiler_cc, $1, px );
+       if( compiler_dnode_is_reference( compiler, $1 )) {
+	   compiler_compile_load_variable_value( compiler, $1, px );
        } else {
-           compiler_compile_load_variable_address( compiler_cc, $1, px );
+           compiler_compile_load_variable_address( compiler, $1, px );
        }
-       field = compiler_make_stack_top_field_type( compiler_cc, $3 );
-       compiler_make_stack_top_addressof( compiler_cc, px );
+       field = compiler_make_stack_top_field_type( compiler, $3 );
+       compiler_make_stack_top_addressof( compiler, px );
        if( field && dnode_offset( field ) != 0 ) {
 	   ssize_t field_offset = dnode_offset( field );
-	   compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &field_offset );
+	   compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
        }
       }
   | lvalue '.' __IDENTIFIER
       {
        DNODE *field;
 
-       if( compiler_stack_top_base_is_reference( compiler_cc )) {
-	   compiler_compile_ldi( compiler_cc, px );
+       if( compiler_stack_top_base_is_reference( compiler )) {
+	   compiler_compile_ldi( compiler, px );
        }
-       field = compiler_make_stack_top_field_type( compiler_cc, $3 );
-       compiler_make_stack_top_addressof( compiler_cc, px );
+       field = compiler_make_stack_top_field_type( compiler, $3 );
+       compiler_make_stack_top_addressof( compiler, px );
        if( field && dnode_offset( field ) != 0 ) {
 	   ssize_t field_offset = dnode_offset( field );
-	   compiler_emit( compiler_cc, px, "\tce\n", OFFSET, &field_offset );
+	   compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
        }
       }
   ;
@@ -10150,15 +10150,15 @@ field_access
 assignment_expression
   : lvalue '=' expression
       {
-       compiler_compile_swap( compiler_cc, px );
-       compiler_compile_over( compiler_cc, px );
-       compiler_compile_sti( compiler_cc, px );
+       compiler_compile_swap( compiler, px );
+       compiler_compile_over( compiler, px );
+       compiler_compile_sti( compiler, px );
       }
 
   | variable_access_identifier '=' expression
       {
-       compiler_compile_dup( compiler_cc, px );
-       compiler_compile_store_variable( compiler_cc, $1, px );
+       compiler_compile_dup( compiler, px );
+       compiler_compile_store_variable( compiler, $1, px );
       }
 
   | '(' assignment_expression ')'
@@ -10167,101 +10167,101 @@ assignment_expression
 constant
   : __INTEGER_CONST
       {
-       compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
+       compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
 			       NULL, NULL, "integer", $1, px );
       }
   | __INTEGER_CONST __IDENTIFIER
       {
-       compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
+       compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
 			       NULL, $2, "integer", $1, px );
       }
   | __INTEGER_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
+       compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
 			       $2, $4, "integer", $1, px );
       }
   | __REAL_CONST
       {
-       compiler_compile_constant( compiler_cc, TS_FLOAT_SUFFIX,
+       compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
 			       NULL, NULL, "real", $1, px );
       }
   | __REAL_CONST __IDENTIFIER
       {
-       compiler_compile_constant( compiler_cc, TS_FLOAT_SUFFIX,
+       compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
 			       NULL, $2, "real", $1, px );
       }
   | __REAL_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_constant( compiler_cc, TS_FLOAT_SUFFIX,
+       compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
 			       $2, $4, "real", $1, px );
       }
   | __STRING_CONST
       {
-       compiler_compile_constant( compiler_cc, TS_STRING_SUFFIX,
+       compiler_compile_constant( compiler, TS_STRING_SUFFIX,
 			       NULL, NULL, "string", $1, px );
       }
   | __STRING_CONST __IDENTIFIER
       {
-       compiler_compile_constant( compiler_cc, TS_STRING_SUFFIX,
+       compiler_compile_constant( compiler, TS_STRING_SUFFIX,
 			       NULL, $2, "string", $1, px );
       }
   | __STRING_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_constant( compiler_cc, TS_STRING_SUFFIX,
+       compiler_compile_constant( compiler, TS_STRING_SUFFIX,
 			       $2, $4, "string", $1, px );
       }
   | __IDENTIFIER  __IDENTIFIER
       {
-       compiler_compile_enumeration_constant( compiler_cc, NULL, $1, $2, px );
+       compiler_compile_enumeration_constant( compiler, NULL, $1, $2, px );
       }
 
   | __IDENTIFIER module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_enumeration_constant( compiler_cc, $2, $1, $4, px );
+       compiler_compile_enumeration_constant( compiler, $2, $1, $4, px );
       }
 
   | _CONST __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, NULL, $2,
+	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $2,
 						    "constant" );
 	if( const_dnode ) {
 	    char pad[80];
 
 	    snprintf( pad, sizeof(pad), "%ld",
 		      (long)dnode_ssize_value( const_dnode ));
-	    compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
+	    compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
 				    NULL, NULL, "integer", pad, px );
 	}
       }
 
   | _CONST module_list __COLON_COLON __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, $2, $4,
+	DNODE *const_dnode = compiler_lookup_constant( compiler, $2, $4,
 						    "constant" );
 	if( const_dnode ) {
 	    char pad[80];
 
 	    snprintf( pad, sizeof(pad), "%ld",
 		      (long)dnode_ssize_value( const_dnode ));
-	    compiler_compile_constant( compiler_cc, TS_INTEGER_SUFFIX,
+	    compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
 				    NULL, NULL, "integer", pad, px );
 	}
       }
 
   | _CONST '(' constant_expression ')'
       {
-	  compiler_compile_multitype_const_value( compiler_cc, &$3, NULL, NULL, px );
+	  compiler_compile_multitype_const_value( compiler, &$3, NULL, NULL, px );
       }
 
   | _CONST '(' constant_expression ')' __IDENTIFIER
       {
-	  compiler_compile_multitype_const_value( compiler_cc, &$3, NULL, $5, px );
+	  compiler_compile_multitype_const_value( compiler, &$3, NULL, $5, px );
       }
 
   | _CONST '(' constant_expression ')'
     module_list __COLON_COLON __IDENTIFIER
       {
-	  compiler_compile_multitype_const_value( compiler_cc, &$3, $5, $7, px );
+	  compiler_compile_multitype_const_value( compiler, &$3, $5, $7, px );
       }
 
   ;
@@ -10379,33 +10379,33 @@ function_or_operator_start
           TNODE *fn_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
 
-          dlist_push_dnode( &compiler_cc->current_function_stack,
-                            &compiler_cc->current_function, px );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
 
-	  compiler_cc->current_function = funct;
+	  compiler->current_function = funct;
 	  dnode_reset_flags( funct, DF_FNPROTO );
 
-          compiler_push_thrcode( compiler_cc, px );
+          compiler_push_thrcode( compiler, px );
 
     	  cexception_guard( inner ) {
-	      compiler_push_current_address( compiler_cc, px );
+	      compiler_push_current_address( compiler, px );
 
 	      if( !is_bytecode ) {
 		  ssize_t zero = 0;
-		  compiler_push_absolute_fixup( compiler_cc, px );
-		  compiler_emit( compiler_cc, px, "\tce\n", ENTER, &zero );
+		  compiler_push_absolute_fixup( compiler, px );
+		  compiler_emit( compiler, px, "\tce\n", ENTER, &zero );
 	      }
 
-              compiler_begin_scope( compiler_cc, &inner );
+              compiler_begin_scope( compiler, &inner );
 	  }
 	  cexception_catch {
 	      delete_dnode( funct );
-	      compiler_cc->current_function =
-                  dlist_pop_data( &compiler_cc->current_function_stack );
+	      compiler->current_function =
+                  dlist_pop_data( &compiler->current_function_stack );
 	      cexception_reraise( inner, px );
 	  }
 	  if( !is_bytecode ) {
-	      compiler_emit_function_arguments( funct, compiler_cc, px );
+	      compiler_emit_function_arguments( funct, compiler, px );
 	  }
           if( fn_tnode && tnode_kind( fn_tnode ) == TK_CLOSURE ) {
               tnode_drop_first_argument( fn_tnode );
@@ -10416,14 +10416,14 @@ function_or_operator_start
 function_or_operator_end
   :
         {
-	  DNODE *funct = compiler_cc->current_function;
+	  DNODE *funct = compiler->current_function;
           TNODE *funct_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
-          ssize_t function_entry_address = thrcode_length( compiler_cc->function_thrcode );
+          ssize_t function_entry_address = thrcode_length( compiler->function_thrcode );
 
 	  if( !is_bytecode ) {
 	      /* patch ENTER command: */
-	      compiler_fixup( compiler_cc, -compiler_cc->local_offset );
+	      compiler_fixup( compiler, -compiler->local_offset );
 	  }
           
           if( funct_tnode && tnode_kind( funct_tnode ) == TK_METHOD ) {
@@ -10432,21 +10432,21 @@ function_or_operator_end
               dnode_set_offset( funct, function_entry_address );
           }
 
-	  compiler_get_inline_code( compiler_cc, funct, px );
+	  compiler_get_inline_code( compiler, funct, px );
 
-	  if( thrcode_last_opcode( compiler_cc->thrcode ).fn != RET ) {
-	      compiler_emit( compiler_cc, px, "\tc\n", RET );
+	  if( thrcode_last_opcode( compiler->thrcode ).fn != RET ) {
+	      compiler_emit( compiler, px, "\tc\n", RET );
 	  }
 
-          compiler_merge_functions_and_top( compiler_cc, px );
-          if( !compiler_cc->thrcode ) {
-              compiler_cc->thrcode = compiler_cc->main_thrcode;
+          compiler_merge_functions_and_top( compiler, px );
+          if( !compiler->thrcode ) {
+              compiler->thrcode = compiler->main_thrcode;
           }
-          compiler_fixup_function_calls( compiler_cc->function_thrcode, funct );
-          compiler_fixup_function_calls( compiler_cc->main_thrcode, funct );
-	  compiler_end_scope( compiler_cc, px );
-	  compiler_cc->current_function = 
-              dlist_pop_data( &compiler_cc->current_function_stack );
+          compiler_fixup_function_calls( compiler->function_thrcode, funct );
+          compiler_fixup_function_calls( compiler->main_thrcode, funct );
+	  compiler_end_scope( compiler, px );
+	  compiler->current_function = 
+              dlist_pop_data( &compiler->current_function_stack );
 	}
 ;
 
@@ -10523,10 +10523,10 @@ function_code_start
 	  const char *first_nonblank = currentLine;
 	  while( isspace( *first_nonblank )) first_nonblank++;
 	  if( *first_nonblank == '#' ) {
-              thrcode_printf( compiler_cc->function_thrcode, px,
+              thrcode_printf( compiler->function_thrcode, px,
                               "%s\n", currentLine );
 	  } else {
-              thrcode_printf( compiler_cc->function_thrcode, px,
+              thrcode_printf( compiler->function_thrcode, px,
                               "#\n# %s\n#\n", currentLine );
 	  }
       }
@@ -10543,7 +10543,7 @@ function_or_procedure_keyword
 function_header
   : opt_function_attributes function_or_procedure_keyword
         {
-	    //compiler_begin_scope( compiler_cc, px );
+	    //compiler_begin_scope( compiler, px );
         }
              __IDENTIFIER '(' argument_list ')'
             opt_retval_description_list
@@ -10562,7 +10562,7 @@ function_header
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      funct = $$ =
-		  compiler_check_and_set_fn_proto( compiler_cc, funct, px );
+		  compiler_check_and_set_fn_proto( compiler, funct, px );
 	      if( is_function ) {
 		  compiler_set_function_arguments_readonly( dnode_type( funct ));
 	      }
@@ -10678,7 +10678,7 @@ opt_implements_method
 method_header
   : opt_function_attributes function_code_start _METHOD
         {
-	    //compiler_begin_scope( compiler_cc, px );
+	    //compiler_begin_scope( compiler, px );
 	}
     __IDENTIFIER opt_implements_method '(' argument_list ')'
             opt_retval_description_list
@@ -10738,9 +10738,9 @@ method_header
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
-              dnode_set_scope( funct, compiler_current_scope( compiler_cc ));
+              dnode_set_scope( funct, compiler_current_scope( compiler ));
 	      funct = $$ =
-		  compiler_check_and_set_fn_proto( compiler_cc, funct, px );
+		  compiler_check_and_set_fn_proto( compiler, funct, px );
 	      share_dnode( funct );
               tnode_insert_single_method( current_class, share_dnode( funct ));
 	      if( is_function ) {
@@ -10772,13 +10772,13 @@ opt_base_class_initialisation
         TNODE *constructor_tnode;
         DNODE *self_dnode;
 
-        compiler_emit( compiler_cc, px, "T\n", "# Initialising base class:" );
+        compiler_emit( compiler, px, "T\n", "# Initialising base class:" );
 
-        dlist_push_dnode( &compiler_cc->current_call_stack,
-                          &compiler_cc->current_call, px );
+        dlist_push_dnode( &compiler->current_call_stack,
+                          &compiler->current_call, px );
 
-        dlist_push_dnode( &compiler_cc->current_arg_stack,
-                          &compiler_cc->current_arg, px );
+        dlist_push_dnode( &compiler->current_arg_stack,
+                          &compiler->current_arg, px );
 
         constructor_dnode = base_type_tnode ?
             tnode_constructor( base_type_tnode ) : NULL;
@@ -10786,20 +10786,20 @@ opt_base_class_initialisation
         constructor_tnode = constructor_dnode ?
             dnode_type( constructor_dnode ) : NULL;
 
-        compiler_cc->current_call = share_dnode( constructor_dnode );
+        compiler->current_call = share_dnode( constructor_dnode );
           
-        compiler_cc->current_arg = constructor_tnode ?
+        compiler->current_arg = constructor_tnode ?
             dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
             NULL;
 
-        self_dnode = compiler_lookup_dnode( compiler_cc, NULL, "self", "variable" );
-        compiler_push_guarding_arg( compiler_cc, px );
-        compiler_compile_load_variable_value( compiler_cc, self_dnode, px );
+        self_dnode = compiler_lookup_dnode( compiler, NULL, "self", "variable" );
+        compiler_push_guarding_arg( compiler, px );
+        compiler_compile_load_variable_value( compiler, self_dnode, px );
     }
 '(' opt_actual_argument_list ')' opt_semicolon
     {
         ssize_t nretval;
-        nretval = compiler_compile_multivalue_function_call( compiler_cc, px );
+        nretval = compiler_compile_multivalue_function_call( compiler, px );
         assert( nretval == 0 );
     }
 | /* empty */
@@ -10808,7 +10808,7 @@ opt_base_class_initialisation
 constructor_header
   : opt_function_attributes function_code_start _CONSTRUCTOR
         {
-	    //compiler_begin_scope( compiler_cc, px );
+	    //compiler_begin_scope( compiler, px );
 	}
     __IDENTIFIER '(' argument_list ')'
         {
@@ -10840,7 +10840,7 @@ constructor_header
 	      parameter_list = NULL;
 	      // return_dnode = NULL;
 
-              dnode_set_scope( funct, compiler_current_scope( compiler_cc ));
+              dnode_set_scope( funct, compiler_current_scope( compiler ));
 
               tnode_insert_constructor( class_tnode, share_dnode( funct ));
               
@@ -10850,7 +10850,7 @@ constructor_header
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      funct = $$ =
-		  compiler_check_and_set_fn_proto( compiler_cc, funct, px );
+		  compiler_check_and_set_fn_proto( compiler, funct, px );
               share_dnode( funct );
 
               /* Constructors are always functions (?): */
@@ -10873,7 +10873,7 @@ operator_keyword
 operator_header
   : opt_function_attributes operator_keyword
         {
-	    //compiler_begin_scope( compiler_cc, px );
+	    //compiler_begin_scope( compiler, px );
 	}
             __STRING_CONST '(' argument_list ')'
             opt_retval_description_list
@@ -10913,7 +10913,7 @@ constant_declaration
   : _CONST __IDENTIFIER '=' constant_expression
     {
       DNODE *const_dnode = new_dnode_constant( $2, &$4, px );
-      compiler_consttab_insert_consts( compiler_cc, const_dnode, px );
+      compiler_consttab_insert_consts( compiler, const_dnode, px );
     }
 ;
 
@@ -10931,7 +10931,7 @@ constant_integer_expression
 field_designator
   : __IDENTIFIER '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_type_field( compiler_cc, NULL, $1, $3 );
+	$$ = compiler_lookup_type_field( compiler, NULL, $1, $3 );
     }
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
@@ -10940,11 +10940,11 @@ field_designator
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
-	$$ = compiler_lookup_tnode_field( compiler_cc, composite, $7 );
+	$$ = compiler_lookup_tnode_field( compiler, composite, $7 );
     }
   | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_type_field( compiler_cc, $1, $3, $5 );
+	$$ = compiler_lookup_type_field( compiler, $1, $3, $5 );
     }
   | field_designator '.' __IDENTIFIER
     {
@@ -10980,7 +10980,7 @@ constant_expression
 
   | __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, NULL, $1,
+	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $1,
 						    "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
@@ -10992,7 +10992,7 @@ constant_expression
 
   | module_list __COLON_COLON __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler_cc, $1, $3,
+	DNODE *const_dnode = compiler_lookup_constant( compiler, $1, $3,
 						    "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
@@ -11009,12 +11009,12 @@ constant_expression
 
   | __IDENTIFIER '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compile_time_value( compiler_cc, NULL, $1, $3, px );
+	  $$ = compiler_make_compile_time_value( compiler, NULL, $1, $3, px );
       }
 
   | module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compile_time_value( compiler_cc, $1, $3, $5, px );
+	  $$ = compiler_make_compile_time_value( compiler, $1, $3, $5, px );
       }
 
   | '.' __IDENTIFIER
@@ -11072,28 +11072,28 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
 {
     THRCODE *code;
 
-    assert( !compiler_cc );
-    compiler_cc = new_compiler( filename, include_paths, ex );
+    assert( !compiler );
+    compiler = new_compiler( filename, include_paths, ex );
 
     compiler_compile_file( filename, ex );
 
-    thrcode_flush_lines( compiler_cc->thrcode );
-    code = compiler_cc->thrcode;
-    if( compiler_cc->thrcode == compiler_cc->function_thrcode ) {
-	compiler_cc->function_thrcode = NULL;
+    thrcode_flush_lines( compiler->thrcode );
+    code = compiler->thrcode;
+    if( compiler->thrcode == compiler->function_thrcode ) {
+	compiler->function_thrcode = NULL;
     } else
-    if( compiler_cc->thrcode == compiler_cc->main_thrcode ) {
-	compiler_cc->main_thrcode = NULL;
+    if( compiler->thrcode == compiler->main_thrcode ) {
+	compiler->main_thrcode = NULL;
     } else {
 	assert( 0 );
     }
-    compiler_cc->thrcode = NULL;
+    compiler->thrcode = NULL;
 
-    thrcode_insert_static_data( code, compiler_cc->static_data,
-				compiler_cc->static_data_size );
-    compiler_cc->static_data = NULL;
-    delete_compiler( compiler_cc );
-    compiler_cc = NULL;
+    thrcode_insert_static_data( code, compiler->static_data,
+				compiler->static_data_size );
+    compiler->static_data = NULL;
+    delete_compiler( compiler );
+    compiler = NULL;
 
     return code;
 }
@@ -11105,11 +11105,11 @@ void compiler_printf( cexception_t *ex, char *format, ... )
 
     va_start( ap, format );
     assert( format );
-    assert( compiler_cc );
-    assert( compiler_cc->thrcode );
+    assert( compiler );
+    assert( compiler->thrcode );
 
     cexception_guard( inner ) {
-	thrcode_printf_va( compiler_cc->thrcode, &inner, format, ap );
+	thrcode_printf_va( compiler->thrcode, &inner, format, ap );
     }
     cexception_catch {
 	va_end( ap );
@@ -11140,7 +11140,7 @@ int yyerror( char *message )
 	message = "incorrect syntax";
     }
     fprintf(stderr, "%s: %s(%d,%d): ERROR, %s\n", 
-	    progname, compiler_cc->filename,
+	    progname, compiler->filename,
 	    compiler_flex_current_line_number(),
 	    compiler_flex_current_position(),
 	    message );
@@ -11152,8 +11152,8 @@ int yyerror( char *message )
 
 int yywrap()
 {
-    if( compiler_cc->include_files ) {
-	compiler_close_include_file( compiler_cc, px );
+    if( compiler->include_files ) {
+	compiler_close_include_file( compiler, px );
 	return 0;
     } else {
 	return 1;
