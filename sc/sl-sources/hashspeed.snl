@@ -3,7 +3,6 @@ use std;
 
 type hash of T = {
     reference;
-    nref = 1;
 
     inline bytecode operator "new[int]" ( i : int ) : hash of T
     { HASHALLOC %%element_size %%element_nref %%element_align };
