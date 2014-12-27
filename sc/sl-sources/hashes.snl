@@ -1,9 +1,8 @@
 
 use std;
 
-type hash of T = {
+type hash of T = ?{
     reference;
-    nref = 1;
 
     inline bytecode operator "new[int]" ( i : int ) : hash of T
     { HASHALLOC %%element_size %%element_nref %%element_align };
@@ -40,7 +39,7 @@ var d1 = new hash [20] of string;
 
 dd = new hash [241] of string;
 
-. "hash alocated size =\t", const(hash.allocsize);
+. "hash alocated size =\t", const(hash.size);
 . dd["one"];
 
 var s = new S;
