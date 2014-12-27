@@ -131,6 +131,8 @@ type array = {
 	{ PNEBOOL };
     bytecode inline operator "!" ( x : array ) : bool
 	{ PZBOOL };
+    bytecode inline operator "next" ( x : array )
+	{ ADVANCE };
 };
 
 type struct = {

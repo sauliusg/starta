@@ -2751,16 +2751,25 @@ static void compiler_compile_next( COMPILER *c,
 	yyerrorf( "too little values on the eval stack for NEXT operator" );
     }
 
-#if 0
+#if 1
     if( counter_tnode ) {
-	if( compiler_lookup_operator( c, counter_tnode, "next", 2, ex )) {
+	if( compiler_lookup_operator( c, counter_tnode, "next", 1, ex )) {
+            offset = compiler_pop_offset( c, ex );
 	    compiler_check_and_compile_operator( c, counter_tnode, "next",
-					      /*arity:*/ 2,
-					      /*fixup_values:*/ NULL, ex );
+                                                 /*arity:*/ 1,
+                                                 /*fixup_values:*/ NULL, ex );
 	    compiler_emit( c, ex, "e\n", &offset );
 	} else {
-	    tnode_report_missing_operator( counter_tnode, "next", 2 );
+	    tnode_report_missing_operator( counter_tnode, "next", 1 );
 	}
+    }
+    
+    ncounters = dnode_loop_counters( c->loops );
+    if( ncounters > 0 ) {
+        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+    }
+    for( i = 0; i < ncounters; i ++ ) {
+        compiler_drop_top_expression( c );
     }
 #else
     offset = compiler_pop_offset( c, ex );
