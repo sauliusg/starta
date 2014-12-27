@@ -2360,12 +2360,9 @@ static void compiler_check_and_compile_top_operator( COMPILER *cc,
 	yyerrorf( "stack top expression has no type in '%s' operator",
 		  operator );
     } else {
-	TNODE *left_type = NULL;	
 	ENODE *left_expr = expr ? enode_next( expr ) : NULL;
 	if( arity > 1 ) {
-	    if( left_expr ) {
-		left_type = enode_type( left_expr );
-	    } else {
+	    if( !left_expr ) {
 		yyerrorf( "no left operand for binary operator '%s'?",
 			  operator );
 	    }
@@ -2755,14 +2752,14 @@ static void compiler_compile_next( COMPILER *c,
     }
 
 #if 0
-    if( limit_tnode ) {
-	if( compiler_lookup_operator( c, limit_tnode, "next", 2, ex )) {
-	    compiler_check_and_compile_operator( c, limit_tnode, "next",
+    if( counter_tnode ) {
+	if( compiler_lookup_operator( c, counter_tnode, "next", 2, ex )) {
+	    compiler_check_and_compile_operator( c, counter_tnode, "next",
 					      /*arity:*/ 2,
 					      /*fixup_values:*/ NULL, ex );
 	    compiler_emit( c, ex, "e\n", &offset );
 	} else {
-	    tnode_report_missing_operator( limit_tnode, "next", 2 );
+	    tnode_report_missing_operator( counter_tnode, "next", 2 );
 	}
     }
 #else
@@ -9254,7 +9251,7 @@ closure_initialisation
     ssize_t len = dnode_list_length( closure_var_list );
     ssize_t expr_nr = $7;
     ssize_t offset = 0;
-    int i, first_variable = 1;
+    int i;
     DNODE *var;
 
     closure_expr = top_expr;
