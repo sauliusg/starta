@@ -2751,7 +2751,6 @@ static void compiler_compile_next( COMPILER *c,
 	yyerrorf( "too little values on the eval stack for NEXT operator" );
     }
 
-#if 1
     if( counter_tnode ) {
 	if( compiler_lookup_operator( c, counter_tnode, "next", 1, ex )) {
 	    compiler_check_and_compile_operator( c, counter_tnode, "next",
@@ -2770,23 +2769,11 @@ static void compiler_compile_next( COMPILER *c,
     for( i = 0; i < ncounters; i ++ ) {
         compiler_drop_top_expression( c );
     }
-#else
-    offset = compiler_pop_offset( c, ex );
-    compiler_emit( c, ex, "\tce\n", ADVANCE, &offset );
-    
-    ncounters = dnode_loop_counters( c->loops );
-    if( ncounters > 0 ) {
-        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
-    }
-    for( i = 0; i < ncounters; i ++ ) {
-        compiler_drop_top_expression( c );
-    }
-#endif
 }
 
 static void compiler_compile_alloc( COMPILER *cc,
-				 TNODE *alloc_type,
-				 cexception_t *ex )
+                                    TNODE *alloc_type,
+                                    cexception_t *ex )
 {
     compiler_push_type( cc, alloc_type, ex );
     if( !tnode_is_reference( alloc_type )) {
