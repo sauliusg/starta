@@ -1,37 +1,33 @@
 # Compiler tests.
 #
-# Test 'foreach X in ARRAY' loops.
+# Test 'foreach var X in ARRAY' loops.
 #
 
 use std;
 
 var a = [ 11, 3, 12, 74 ];
 var i = 0;
-var m = [ 3, 2, 1 ];
-var s = new struct { int counter; int i; string name };
 
-foreach s.counter in a do
-    . i, s.counter;
+foreach var m in a do
+    . i, m;
+    m ++;
+    . i, m;
     i ++;
 enddo
-. "";
 
-foreach s.counter in a do
-    . i, s.counter;
+. "=======================";
+i = 0;
+foreach var m in a do
+    . i, m;
+    m ++;
+    . i, m;
     i ++;
 enddo
-. "";
 
-foreach m[0] in a do
-    . i, m[0];
-    i ++;
-enddo
-. "";
-
-var int j;
-
-foreach j in a do
-    . i, j;
+. "=======================";
+i = 0;
+foreach var m in [ 1.1, 2.3, 4.8, 5 float ] do
+    . i, m;
     i ++;
 enddo
 
