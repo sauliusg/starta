@@ -1729,7 +1729,7 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS )
 
 /*
  * Standard input management bytecode operators -- to implement
- * 'whil(<>) { ... }' a-la Perl.
+ * 'while(<>) { ... }' a-la Perl.
  */
 
 /*
@@ -1751,6 +1751,10 @@ int STDREAD( INSTRUCTION_FN_ARGS )
     char *buff = NULL;
     ssize_t length = 0, delta_length = 20, char_count = 0;
     FILE *in = NULL;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
 
     /* Decide which file to read from; prepare the input stream: */
 
@@ -1810,12 +1814,10 @@ int STDREAD( INSTRUCTION_FN_ARGS )
                 istate.argnr ++;
             }
             if( istate.argnr > istate.argc ) {
-                istate.ep --;
                 STACKCELL_SET_ADDR( istate.ep[0], NULL );
                 return 1;
             }
         } else {
-            istate.ep --;
             STACKCELL_SET_ADDR( istate.ep[0], NULL );
             return 1;
         }
@@ -1862,7 +1864,6 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 	}
     }
 
-    istate.ep --;
     STACKCELL_SET_ADDR( istate.ep[0], buff );
 
     return 1;
