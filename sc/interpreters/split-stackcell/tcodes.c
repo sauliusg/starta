@@ -5199,3 +5199,112 @@ int DEBUG( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
     return 1;
 }
+
+/*
+ * ADVANCE Advance array pointer on the top of the stack to the next
+ *         array element; jump to the provided address if there is the
+ *         next element, otherwise remove the array pointer from the
+ *         stack and proceed to the next opcode.
+ *
+ * bytecode:
+ * ADVANCE jmp_offset
+ * 
+ * stack:
+ * if no jump: array_ref -> 
+ * if    jump: array_ref -> advanced_array_ref
+ */
+
+int ADVANCE( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array_ref = istate.ep[0].PTR;
+    ssize_t element_offset = istate.ep[0].num.offs;
+    ssize_t jmp_offset = istate.code[istate.ip+1].ssizeval;
+    ssize_t length = array_ref ? array_ref[-1].length : 0;
+    ssize_t array_size = array_ref ? array_ref[-1].size : 0;
+    ssize_t nref = array_ref ? array_ref[-1].nref : 0;
+    ssize_t element_size = nref == 0 ? sizeof(stackunion_t) : REF_SIZE;
+    int nref_sign = nref < 0 ? -1 : 1;
+
+    TRACE_FUNCTION();
+
+    assert( element_size * length == array_size );
+
+    /* Reset the element offset on the very first iteration: */
+    if( element_offset < 0 &&
+        element_offset >= -(element_size + sizeof(alloccell_t))) {
+        element_offset = -element_size;
+    }
+
+    element_offset += nref_sign * element_size;
+    if( element_offset >= array_size ) {
+        STACKCELL_ZERO_PTR( istate.ep[0] );
+        array_ref = NULL;
+    } else {
+        istate.ep[0].num.offs = element_offset;
+    }
+
+    if( !array_ref ) {
+        /* No array pointer -- go over to the next opcode, no jump: */
+        istate.ep ++;
+        return 2;
+    } else {
+        istate.ip += jmp_offset;
+        return 0;
+    }
+}
+
+/*
+ * NEXT Advance a linked list pointer on the top of the stack to the
+ *      next list element; jump to the provided address if there is
+ *      the next element, otherwise remove the array pointer from the
+ *      stack and proceed to the next opcode.
+ *
+ * bytecode:
+ * NEXT next_offset value_offset jmp_offset
+ * 
+ * stack:
+ * if no jump: list_node_ref -> 
+ * if    jump: list_node_ref -> next_list_node_ref
+ */
+
+int NEXT( INSTRUCTION_FN_ARGS )
+{
+    ssize_t next_offset = istate.code[istate.ip+1].ssizeval;
+    ssize_t value_offset = istate.code[istate.ip+2].ssizeval;
+    ssize_t jmp_offset = istate.code[istate.ip+3].ssizeval;
+    ssize_t current_value_offset = istate.ep[0].num.offs;
+    void **node_ref = (void**)istate.ep[0].PTR;
+    void **next_ref = NULL;
+
+    TRACE_FUNCTION();
+
+    if( node_ref ) {
+        if( current_value_offset != value_offset ) {
+            /* We land here when we advance the pointer for the first
+               time -- set the correct value offset, process the
+               current node (jump)  */
+            istate.ep[0].num.offs = value_offset;
+            next_ref = node_ref;
+        } else {
+            /* Advance to the next list node: */
+            next_ref = *(void**)((char*)node_ref + next_offset);
+            if( !next_ref ) {
+                /* List iteration finished: */
+                STACKCELL_ZERO_PTR( istate.ep[0] );
+            } else {
+                /* Set the next node address: */
+                istate.ep[0].PTR = next_ref;
+            }
+        }
+    }
+
+    if( next_ref ) {
+        istate.ip += jmp_offset;
+        return 0;
+    } else {
+        /* No next node pointer -- go over to the next opcode, no
+           jump: */
+        istate.ep ++;
+        return 4;
+    }
+}

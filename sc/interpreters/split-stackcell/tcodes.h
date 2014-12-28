@@ -312,4 +312,9 @@ int ASSERT( INSTRUCTION_FN_ARGS );
 
 int DEBUG( INSTRUCTION_FN_ARGS );
 
+/* Opcode used to implement 'foreach' loops on arrays and linked
+   lists: */
+int ADVANCE( INSTRUCTION_FN_ARGS );
+int NEXT( INSTRUCTION_FN_ARGS );
+
 #endif
