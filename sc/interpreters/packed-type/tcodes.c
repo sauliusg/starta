@@ -1725,6 +1725,8 @@ int STDREAD( INSTRUCTION_FN_ARGS )
     ssize_t length = 0, delta_length = 20, char_count = 0;
     FILE *in = NULL;
 
+    TRACE_FUNCTION();
+
     istate.ep --;
 
     /* Decide which file to read from; prepare the input stream: */
