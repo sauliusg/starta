@@ -31,21 +31,53 @@ istate_t istate;
 
 int trace = 0;
 
+static size_t default_rstack_length;
+static size_t default_estack_length;
+
 static int gc_debug = 0;
 
 static void thrcode_print_stack( void );
 
-static void make_istate( istate_t *new_istate, THRCODE *code,
-                         int argc, char *argv[], char *env[] )
+size_t interpret_rstack_length( size_t length )
 {
-    static stackcell_t call_stack[2000];
-    static stackcell_t eval_stack[2000];
-    const int call_stack_size = sizeof(call_stack); /* stack size in bytes */
-    const int call_stack_length = call_stack_size/sizeof(stackcell_t);
+    ssize_t old_length = default_rstack_length;
+    default_rstack_length = length;
+    return old_length;
+}
+
+size_t interpret_estack_length( size_t length )
+{
+    ssize_t old_length = default_estack_length;
+    default_estack_length = length;
+    return old_length;
+}
+
+static void make_istate( istate_t *new_istate, THRCODE *code,
+                         int argc, char *argv[], char *env[],
+                         cexception_t *ex )
+{
+    static stackcell_t call_stack_body[2000];
+    static stackcell_t eval_stack_body[2000];
+    static stackcell_t *call_stack = call_stack_body;
+    static stackcell_t *eval_stack = eval_stack_body;
+    int call_stack_size = sizeof(call_stack_body); /* stack size in bytes */
+    int call_stack_length = call_stack_size/sizeof(stackcell_t);
                                           /* stack lenght, i.e. number
 					     of the available stack cells */
-    const int eval_stack_size = sizeof(eval_stack);
-    const int eval_stack_length = eval_stack_size/sizeof(stackcell_t);
+    int eval_stack_size = sizeof(eval_stack_body);
+    int eval_stack_length = eval_stack_size/sizeof(stackcell_t);
+
+    if( default_rstack_length > 0 ) {
+        call_stack = callocx( sizeof(call_stack[0]), default_rstack_length, ex );
+        call_stack_length = default_rstack_length;
+        call_stack_size = call_stack_length * sizeof(call_stack[0]);
+    }
+
+    if( default_estack_length > 0 ) {
+        eval_stack = callocx( sizeof(eval_stack[0]), default_estack_length, ex );
+        eval_stack_length = default_estack_length;
+        eval_stack_size = eval_stack_length * sizeof(eval_stack[0]);
+    }
 
     new_istate->thrcode = code;
 
@@ -82,7 +114,7 @@ void *interpret_alloc( istate_t *is, ssize_t size )
 void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 		cexception_t *ex )
 {
-    make_istate( &istate, code, argc, argv, env );
+    make_istate( &istate, code, argc, argv, env, ex );
     run( ex );
 }
 

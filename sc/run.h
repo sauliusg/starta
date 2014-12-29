@@ -160,6 +160,9 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 
 void run( cexception_t *ex );
 
+size_t interpret_rstack_length( size_t length );
+size_t interpret_estack_length( size_t length );
+
 void *interpret_alloc( istate_t *is, ssize_t size );
 
 void thrcode_trace_on( void );
