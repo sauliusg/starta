@@ -113,6 +113,12 @@ static char *usage_text[2] = {
 "  -q-,--verbose       Print file name and 'OK' on successful compilation.\n"
 "\n"
 
+"  -S, --stack-length  2000\n"
+"      Set return (function call) stack length.\n"
+"  -E, --evaluation-stack-length  2000\n"
+"      Set evaluation (expression evaluation) stack length.\n"
+"\n"
+
 "  -G, --gc-always\n"
 "      Invoke garbage collector (GC) before every allocation\n"
 "      (slow, for debugging).\n"
@@ -187,8 +193,12 @@ static option_value_t verbose;
 static option_value_t debug;
 static option_value_t only_compile;
 static option_value_t use_environment;
+static option_value_t rstack_length;
+static option_value_t estack_length;
 
 static option_t options[] = {
+  { "-S", "--stack-length",            OT_INT, &rstack_length },
+  { "-E", "--evaluation-stack-length", OT_INT, &estack_length },
   { "-d", "--debug",        OT_STRING,        &debug },
   { "-c", "--compile-only", OT_BOOLEAN_TRUE,  &only_compile },
   { "-q", "--quiet",        OT_BOOLEAN_FALSE, &verbose },
@@ -275,6 +285,14 @@ int main( int argc, char *argv[], char *env[] )
 	  compiler_flex_debug_lines();
 	  thrcode_debug_on();
       }
+  }
+
+  if( rstack_length.present ) {
+      interpret_rstack_length( rstack_length.value.i );
+  }
+
+  if( estack_length.present ) {
+      interpret_estack_length( estack_length.value.i );
   }
 
   cexception_guard( inner ) {
