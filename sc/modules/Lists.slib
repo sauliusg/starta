@@ -42,6 +42,12 @@ procedure cons( s : type T; l : list of type T = null ) : list of type T
     return type list of T { value => s, next => l };
 }
 
+procedure cat( l1, l2 : list of T ) : list of T
+{
+    l1.next = l2;
+    return l1
+}
+
 exception NullPointerException;
 
 procedure head( l : list of type T ) : type T
