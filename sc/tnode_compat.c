@@ -251,7 +251,8 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 	return 1;
     }
 
-    if( tnode_is_non_null_reference( t1 ) !=
+    if( t1->kind != TK_PLACEHOLDER &&
+        tnode_is_non_null_reference( t1 ) !=
         tnode_is_non_null_reference( t2 )) {
         return 0;
     }

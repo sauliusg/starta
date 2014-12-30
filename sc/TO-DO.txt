@@ -1,3 +1,4 @@
+-- !!! 'new S' does not call a constructor or produce error message.
 -- !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
 -+ Implement check of measurement units at the compile time.
 ++ Implement constructors for classes.
