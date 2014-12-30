@@ -6065,7 +6065,11 @@ delimited_control_statement
         compiler_fixup_here( compiler );
       }
 
-  | repeat_prefix non_control_statement_list _WHILE 
+  | repeat_prefix 
+      {
+          compiler_begin_subscope( compiler, px );
+      }
+    non_control_statement_list _WHILE 
       {
 	compiler_fixup_op_continue( compiler, px );
       }
@@ -6074,6 +6078,7 @@ delimited_control_statement
 	compiler_compile_jnz( compiler, compiler_pop_offset( compiler, px ), px );
 	compiler_fixup_op_break( compiler, px );
         compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
       }
   ;
 
@@ -8880,6 +8885,7 @@ stdio_inpupt_condition
     cexception_guard( inner ) {
         share_tnode( type_tnode );
         default_var = new_dnode_typed( "$_", type_tnode, &inner );
+        dnode_assign_offset( default_var, &compiler->local_offset );
         type_tnode = NULL;
         compiler_vartab_insert_named_vars( compiler, default_var, &inner );
         default_var_offset = dnode_offset( default_var );
@@ -8888,6 +8894,7 @@ stdio_inpupt_condition
         compiler->local_offset ++;
         type_tnode = share_tnode( string_tnode );
         default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
+        dnode_assign_offset( default_var, &compiler->local_offset );
         type_tnode = NULL;
         compiler_vartab_insert_named_vars( compiler, default_var, &inner );
         default_var = NULL;
@@ -8918,6 +8925,7 @@ file_input_condition
       cexception_guard( inner ) {
           share_tnode( type_tnode );
           default_var = new_dnode_typed( "$_", type_tnode, &inner );
+          dnode_assign_offset( default_var, &compiler->local_offset );
           type_tnode = NULL;
           compiler_vartab_insert_named_vars( compiler, default_var, &inner );
           default_var_offset = dnode_offset( default_var );
@@ -8926,6 +8934,7 @@ file_input_condition
           compiler->local_offset ++;
           type_tnode = share_tnode( string_type );
           default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
+          dnode_assign_offset( default_var, &compiler->local_offset );
           type_tnode = NULL;
           compiler_vartab_insert_named_vars( compiler, default_var, &inner );
           default_var = NULL;

@@ -1,0 +1,19 @@
+#
+# Regression test:
+#
+# Check that the scopes of the 'while(<>)' loops are handled
+# correctly.
+#
+
+use std;
+
+var i = 567;
+
+while(<>) {
+    . i;
+}
+
+var j = 234;
+
+. i;
+. j;
