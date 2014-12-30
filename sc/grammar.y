@@ -9867,8 +9867,47 @@ boolean_expression
 generator_new
   : _NEW compact_type_description
       {
+          TNODE *constructor_tnode;
+          DNODE *constructor_dnode;
+
           compiler_check_type_contains_non_null_ref( $2 );
           compiler_compile_alloc( compiler, $2, px );
+
+          constructor_dnode = $2 ? tnode_constructor( $2 ) : NULL;
+
+          if( constructor_dnode ) {
+              /* --- function (constructir) call generation starts here: */
+
+              dlist_push_dnode( &compiler->current_call_stack,
+                                &compiler->current_call, px );
+
+              dlist_push_dnode( &compiler->current_arg_stack,
+                                &compiler->current_arg, px );
+
+              constructor_tnode = constructor_dnode ?
+                  dnode_type( constructor_dnode ) : NULL;
+
+              compiler->current_call = share_dnode( constructor_dnode );
+          
+              compiler->current_arg = constructor_tnode ?
+                  dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+                  NULL;
+
+              compiler_compile_dup( compiler, px );
+              compiler_push_guarding_arg( compiler, px );
+              compiler_swap_top_expressions( compiler );
+              
+              int nretvals;
+              char *constructor_name = constructor_tnode ?
+                  tnode_name( constructor_tnode ) : NULL;
+
+              nretvals = compiler_compile_multivalue_function_call( compiler, px );
+
+              if( nretvals > 0 ) {
+                  yyerrorf( "constructor '%s()' should not return a value",
+                            constructor_name ? constructor_name : "???" );
+              }
+          }
       }
 
   | _NEW type_identifier
@@ -9880,7 +9919,7 @@ generator_new
           compiler_check_type_contains_non_null_ref( type_tnode );
           compiler_compile_alloc( compiler, type_tnode, px );
 
-          /* --- function call generations starts here: */
+          /* --- function call generation starts here: */
 
           dlist_push_dnode( &compiler->current_call_stack,
                             &compiler->current_call, px );
