@@ -7101,7 +7101,9 @@ control_statement
         TNODE *element_type = 
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
-        ssize_t neg_element_size = -tnode_size( element_type );
+        ssize_t neg_element_size =
+            -( tnode_is_reference( element_type ) ? 
+               REF_SIZE : tnode_size( element_type ) );
         ssize_t zero = 0;
 
         /* stack now: ..., array_current_ptr */
@@ -7173,7 +7175,9 @@ control_statement
         TNODE *element_type = 
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
-        ssize_t neg_element_size = -tnode_size( element_type );
+        ssize_t neg_element_size =
+            -( tnode_is_reference( element_type ) ? 
+               REF_SIZE : tnode_size( element_type ) );
         ssize_t zero = 0;
 
         /* stack now: ..., lvariable_address, array_current_ptr */
