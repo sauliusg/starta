@@ -315,11 +315,13 @@ shtest shtests: ${SHELL_DIFFS}
 
 ${SHELL_OUTDIR}/%.out: ${SHELL_TSTDIR}/%.sh ${TARGET}
 	-@test -f $@ || echo "$@:"
-	-@test -f $@ || $< ./${TARGET} 2>&1 | tee $@
+	-@unset SL_INCLUDE_PATHS; \
+	test -f $@ || $< ./${TARGET} 2>&1 | tee $@
 	-@touch $@
 
 ${SHELL_DIFDIR}/%.diff: ${SHELL_TSTDIR}/%.sh ${TARGET}
 	-@printf "%-30s " "$*:" ; \
+	unset SL_INCLUDE_PATHS; \
 	$< ./${TARGET} 2>&1 | diff ${SHELL_OUTDIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
