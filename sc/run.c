@@ -18,6 +18,7 @@
 #include <bcalloc.h>
 #include <assert.h>
 #include <bctraverse.h>
+#include <allocx.h>
 
 void *interpret_subsystem = &interpret_subsystem;
 
@@ -94,7 +95,7 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
     memset( new_istate->fp, 0, ( new_istate->bottom - new_istate->fp ) *
 	    sizeof( *new_istate->fp ) );
 
-    memset( eval_stack, 0x00, sizeof(eval_stack) );
+    memset( eval_stack, 0x00, eval_stack_size );
 
     new_istate->ep_bottom = eval_stack + eval_stack_length -
         STACK_SAFETY_MARGIN;
