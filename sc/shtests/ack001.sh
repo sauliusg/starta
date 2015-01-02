@@ -9,4 +9,4 @@ PRG=${DIR}/programs/${PRG}.snl
 
 test $# -gt 0 && sl="$1"
 
-${sl} -S 40000 -E 3000 -- ${PRG} 3 8
+${sl} -I modules -I . -S 40000 -E 3000 -- ${PRG} 3 8
