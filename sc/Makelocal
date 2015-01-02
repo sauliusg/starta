@@ -1,3 +1,4 @@
+#--*- Makefile -*--
 
 .PHONY: libraries
 
@@ -9,7 +10,7 @@ outputs: libraries
 
 .PHONY: cleanlibraries
 
-cleanAll: cleanlibraries
+cleanAll distclean: cleanlibraries
 
 cleanlibraries:
 	${MAKE} -C libraries cleanAll
