@@ -400,3 +400,4 @@ cleanAll distclean: clean ${LOCAL_CLEAN_TARGETS}
 
 alltests testall:
 	./tools/testall 2>&1 | tee testall.log
+	${MAKE}
