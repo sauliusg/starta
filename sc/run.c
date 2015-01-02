@@ -31,8 +31,8 @@ istate_t istate;
 
 int trace = 0;
 
-static size_t default_rstack_length;
-static size_t default_estack_length;
+static size_t default_call_stack_length = 2000;
+static size_t default_eval_stack_length = 2000;
 
 static int gc_debug = 0;
 
@@ -40,15 +40,15 @@ static void thrcode_print_stack( void );
 
 size_t interpret_rstack_length( size_t length )
 {
-    ssize_t old_length = default_rstack_length;
-    default_rstack_length = length;
+    ssize_t old_length = default_call_stack_length;
+    default_call_stack_length = length;
     return old_length;
 }
 
 size_t interpret_estack_length( size_t length )
 {
-    ssize_t old_length = default_estack_length;
-    default_estack_length = length;
+    ssize_t old_length = default_eval_stack_length;
+    default_eval_stack_length = length;
     return old_length;
 }
 
@@ -56,26 +56,31 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
                          int argc, char *argv[], char *env[],
                          cexception_t *ex )
 {
-    static stackcell_t call_stack_body[2000];
-    static stackcell_t eval_stack_body[2000];
-    static stackcell_t *call_stack = call_stack_body;
-    static stackcell_t *eval_stack = eval_stack_body;
-    int call_stack_size = sizeof(call_stack_body); /* stack size in bytes */
-    int call_stack_length = call_stack_size/sizeof(stackcell_t);
-                                          /* stack lenght, i.e. number
-					     of the available stack cells */
-    int eval_stack_size = sizeof(eval_stack_body);
-    int eval_stack_length = eval_stack_size/sizeof(stackcell_t);
+    static stackcell_t *call_stack;
+    static stackcell_t *eval_stack;
+    static int call_stack_length; /* stack lenght, i.e. number
+                                     of the available stack cells */
+    static int call_stack_size;   /* stack size in bytes */
+    static int eval_stack_length;
+    static int eval_stack_size;
 
-    if( default_rstack_length > 0 ) {
-        call_stack = callocx( sizeof(call_stack[0]), default_rstack_length, ex );
-        call_stack_length = default_rstack_length;
+    if( call_stack_length != default_call_stack_length ) {
+        freex( call_stack );
+        call_stack = NULL;
+        call_stack_size = call_stack_length = 0;
+        call_stack =
+            callocx( sizeof(call_stack[0]), default_call_stack_length, ex );
+        call_stack_length = default_call_stack_length;
         call_stack_size = call_stack_length * sizeof(call_stack[0]);
     }
 
-    if( default_estack_length > 0 ) {
-        eval_stack = callocx( sizeof(eval_stack[0]), default_estack_length, ex );
-        eval_stack_length = default_estack_length;
+    if( eval_stack_length != default_eval_stack_length ) {
+        freex( eval_stack );
+        eval_stack = NULL;
+        eval_stack_size = eval_stack_length = 0;
+        eval_stack =
+            callocx( sizeof(eval_stack[0]), default_eval_stack_length, ex );
+        eval_stack_length = default_eval_stack_length;
         eval_stack_size = eval_stack_length * sizeof(eval_stack[0]);
     }
 
