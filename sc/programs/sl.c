@@ -287,14 +287,6 @@ int main( int argc, char *argv[], char *env[] )
       }
   }
 
-  if( rstack_length.present ) {
-      interpret_rstack_length( rstack_length.value.i );
-  }
-
-  if( estack_length.present ) {
-      interpret_estack_length( estack_length.value.i );
-  }
-
   cexception_guard( inner ) {
       if( !use_environment.present || use_environment.value.bool == 1 ) {
           push_environment_paths( &include_paths, "SL_INCLUDE_PATHS", &inner );
@@ -305,6 +297,14 @@ int main( int argc, char *argv[], char *env[] )
 	      i++;
 	  }
 	  code = new_thrcode_from_file( files[0], include_paths, &inner );
+
+          if( rstack_length.present ) {
+              interpret_rstack_length( rstack_length.value.i );
+          }
+
+          if( estack_length.present ) {
+              interpret_estack_length( estack_length.value.i );
+          }
 
 	  if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
 	      thrcode_dump( code );
@@ -320,6 +320,14 @@ int main( int argc, char *argv[], char *env[] )
 	  for( i = 0; files[i] != NULL; i++ ) {
 	      code = new_thrcode_from_file( files[i], include_paths,
                                             &inner );
+
+              if( rstack_length.present ) {
+                  interpret_rstack_length( rstack_length.value.i );
+              }
+
+              if( estack_length.present ) {
+                  interpret_estack_length( estack_length.value.i );
+              }
 
 	      if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
 		  thrcode_dump( code );
