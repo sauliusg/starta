@@ -124,6 +124,16 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
     run( ex );
 }
 
+static int stack_realloc_delta = 1000; /* in stackcells */
+
+static int realloc_eval_stack( cexception_t * ex )
+{
+    /* The 'eval' stack should not have any references from the
+       garbage-collected blocks, so it can be safelu reallocated. */
+
+    
+}
+
 static void check_runtime_stacks( cexception_t * ex )
 {
     if( istate.ep < istate.ep_top ) {
