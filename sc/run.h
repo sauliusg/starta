@@ -124,6 +124,11 @@ typedef struct {
     size_t code_length;   /* length of the vector *code */
     char *static_data;    /* static data used by some commands */
     ssize_t static_data_size;
+
+    stackcell_t *eval_stack;   /* Evaluation stack, allocated on the heap. */
+    ssize_t eval_stack_length; /* Number of stackcells allocated at
+                                  'eval_stack'. */
+
     stackcell_t *sp, *fp; /* stack pointer, frame pointer */
     stackcell_t *ep;      /* evaluation stack pointer */
     ssize_t ip;           /* bytecode instruction pointer: */
