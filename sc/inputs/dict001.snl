@@ -50,7 +50,7 @@ type dictionary of X = null struct {
       HASHADDR %%element_size
     };
 
-    inline bytecode operator "ldx" ( d : ref; key : string ) : T
+    inline bytecode operator "ldx" ( d : ref; key : string ) : X
     {
       SWAP
       OFFSET const((dictionary of X).h.offset)
@@ -59,7 +59,7 @@ type dictionary of X = null struct {
       HASHVAL %%element_size
     };
 
-    inline bytecode operator "pldx" ( d : ref /*addressof*/; key : string ) : T
+    inline bytecode operator "pldx" ( d : ref /*addressof*/; key : string ) : X
     { 
       SWAP
       OFFSET const((dictionary of X).h.offset) 
