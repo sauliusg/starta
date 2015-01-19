@@ -8080,7 +8080,13 @@ undelimited_type_declaration
 	compiler->current_type = NULL;
       }
 
-  | _TYPE __IDENTIFIER _OF __IDENTIFIER '='
+  | struct_declaration
+  | class_declaration
+  | interface_declaration
+  ;
+
+type_of_type_declaration
+  : _TYPE __IDENTIFIER _OF __IDENTIFIER '='
       {
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
@@ -8111,74 +8117,7 @@ undelimited_type_declaration
 	compiler->current_type = NULL;
       }
 
-  | struct_declaration
-  | class_declaration
-  | interface_declaration
-  ;
-
-struct_declaration
-  : opt_null_type_designator _STRUCT __IDENTIFIER
-    {
-	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
-	TNODE *tnode = NULL;
-
-	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_struct( $3, px );
-            if( $1 ) {
-                tnode_set_flags( tnode, TF_NON_NULL );
-            }
-	    compiler_typetab_insert( compiler, tnode, px );
-	} else {
-            if( tnode_is_non_null_reference( old_tnode ) !=
-                ($1 ? 1 : 0 )) {
-                yyerrorf( "definition of forward structure '%s' "
-                          "has different non-null flag", $3 );
-            }
-        }
-	tnode = typetab_lookup( compiler->typetab, $3 );
-	assert( !compiler->current_type );
-	compiler->current_type = tnode;
-	compiler_begin_scope( compiler, px );
-    }
-    struct_or_class_declaration_body
-    {
-	tnode_finish_struct( $5, px );
-	compiler_end_scope( compiler, px );
-	compiler_typetab_insert( compiler, $5, px );
-        compiler->current_type = NULL;
-    }
-  | type_declaration_start '=' opt_null_type_designator _STRUCT
-    {
-	assert( compiler->current_type );
-	tnode_set_flags( compiler->current_type, TF_IS_REF );
-        tnode_set_kind( compiler->current_type, TK_STRUCT );
-    }
-    struct_or_class_declaration_body
-    {
-        if( $3 ) {
-            tnode_set_flags( $6, TF_NON_NULL );
-        }
-	tnode_finish_struct( $6, px );
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $6, px );
-        compiler->current_type = NULL;
-    }
-  | type_declaration_start '=' opt_null_type_designator
-    {
-	assert( compiler->current_type );
-	// tnode_set_flags( compiler->current_type, TF_IS_REF );
-    }
-    struct_or_class_declaration_body
-    {
-        if( $3 ) {
-            tnode_set_flags( $5, TF_NON_NULL );
-        }
-	// tnode_finish_struct( $5, px );
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $5, px );
-        compiler->current_type = NULL;
-    }
-  | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
+  |  _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
       {
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
@@ -8245,7 +8184,72 @@ struct_declaration
 	compiler_compile_type_declaration( compiler, $8, px );
 	compiler->current_type = NULL;
       }
+;
 
+struct_declaration
+  : opt_null_type_designator _STRUCT __IDENTIFIER
+    {
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
+	TNODE *tnode = NULL;
+
+	if( !old_tnode ) {
+	    TNODE *tnode = new_tnode_forward_struct( $3, px );
+            if( $1 ) {
+                tnode_set_flags( tnode, TF_NON_NULL );
+            }
+	    compiler_typetab_insert( compiler, tnode, px );
+	} else {
+            if( tnode_is_non_null_reference( old_tnode ) !=
+                ($1 ? 1 : 0 )) {
+                yyerrorf( "definition of forward structure '%s' "
+                          "has different non-null flag", $3 );
+            }
+        }
+	tnode = typetab_lookup( compiler->typetab, $3 );
+	assert( !compiler->current_type );
+	compiler->current_type = tnode;
+	compiler_begin_scope( compiler, px );
+    }
+    struct_or_class_declaration_body
+    {
+	tnode_finish_struct( $5, px );
+	compiler_end_scope( compiler, px );
+	compiler_typetab_insert( compiler, $5, px );
+        compiler->current_type = NULL;
+    }
+  | type_declaration_start '=' opt_null_type_designator _STRUCT
+    {
+	assert( compiler->current_type );
+	tnode_set_flags( compiler->current_type, TF_IS_REF );
+        tnode_set_kind( compiler->current_type, TK_STRUCT );
+    }
+    struct_or_class_declaration_body
+    {
+        if( $3 ) {
+            tnode_set_flags( $6, TF_NON_NULL );
+        }
+	tnode_finish_struct( $6, px );
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $6, px );
+        compiler->current_type = NULL;
+    }
+  | type_declaration_start '=' opt_null_type_designator
+    {
+	assert( compiler->current_type );
+	// tnode_set_flags( compiler->current_type, TF_IS_REF );
+    }
+    struct_or_class_declaration_body
+    {
+        if( $3 ) {
+            tnode_set_flags( $5, TF_NON_NULL );
+        }
+	// tnode_finish_struct( $5, px );
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $5, px );
+        compiler->current_type = NULL;
+    }
+
+  | type_of_type_declaration
 ;
 
 class_declaration
