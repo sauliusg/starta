@@ -1,24 +1,30 @@
 # Compiler tests.
 #
-# Test the '<filehandle>' file read condition.
+# Test s module name that is the same as a class name.
 #
+
+module Atom;
 
 use std;
 
-var inp = fopen( "inputs/fileio011.snl", "r" );
+class Atom {
+    float x, y, z;
 
-var i = 1;
-while( <inp> ) {
-    . i, $_; i++
+    constructor Atom( float xyz[] )
+    {
+        self.x = xyz[0];
+        self.y = xyz[1];
+        self.z = xyz[2];
+    }
+
+    method print()
+    {
+        . "(", self.x, self.y, self.z, ")"
+    }
 }
 
-fclose( inp );
+var a = new Atom( [0.12, 0.17, 0.38] );
 
-inp = fopen( "inputs/fileio011.snl", "r" );
+a->print();
 
-i = 1;
-while <inp> {
-    . i, $_; i++
-}
-
-fclose( inp );
+end module Atom;
