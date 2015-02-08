@@ -4,4 +4,4 @@
 # Test diagnosrics of unknown "pragma" values.
 #
 
-pragma bad_bad_bad 20
+pragma bad_bad_bad = 20
