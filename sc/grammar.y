@@ -5965,6 +5965,7 @@ delimited_statement
   | break_or_continue_statement
   | pack_statement
   | assert_statement
+  | pragma_statement
 
   | /* empty statement */
   ;
@@ -6044,7 +6045,6 @@ undelimited_simple_statement
   | use_statement
        { compiler_use_package( compiler, $1, px ); }
   | load_library_statement
-  | pragma_statement
   | bytecode_statement
   | function_definition
   | operator_definition
@@ -6317,13 +6317,9 @@ pragma_statement
                                     px );
        }
    }
-| _PRAGMA __IDENTIFIER '=' __INTEGER_CONST
+| _PRAGMA __IDENTIFIER constant_integer_expression
    {
-       compiler_set_pragma( compiler, $2, atol( $4 ));
-   }
-| _PRAGMA __IDENTIFIER '=' '(' constant_integer_expression ')'
-   {
-       compiler_set_pragma( compiler, $2, $5 );
+       compiler_set_pragma( compiler, $2, $3 );
    }
 ;
 

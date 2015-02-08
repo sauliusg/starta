@@ -11,11 +11,11 @@ function ack( m, n : int ) : int
     return ack( m - 1, ack( m, n - 1 ));
 };
 
-pragma stacksize=(15 * 1000)
+pragma stacksize (15 * 1000);
 
 # Pragmas should never decrease the stack size, so the following
 # statement shoulf have not effect and the program should still work:
 
-pragma stacksize = ( 20 * 10 )
+pragma stacksize ( 20 * 10 );
 
 . ack(3,8);
