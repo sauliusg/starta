@@ -5664,11 +5664,19 @@ static void compiler_compile_type_descriptor_loader( COMPILER *cc,
     compiler_push_type( cc, type_descriptor_type, ex );
 }
 
-static void compiler_set_pragma( COMPILER *c, char *pragma_name, int value )
+static void compiler_set_pragma( COMPILER *c, char *pragma_name, ssize_t value )
 {
+    ssize_t old_value;
+
     if( strcmp( pragma_name, "stacksize" ) == 0 ) {
-        interpret_rstack_length( value );
-        interpret_estack_length( value );
+        old_value = interpret_rstack_length( value );
+        if( old_value > value ) {
+            interpret_rstack_length( old_value );
+        }
+        old_value = interpret_estack_length( value );
+        if( old_value > value ) {
+            interpret_estack_length( old_value );
+        }
     } else {
         yyerrorf( "unknown pragma '%s'", pragma_name );
     }
