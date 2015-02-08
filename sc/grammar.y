@@ -6317,11 +6317,15 @@ pragma_statement
                                     px );
        }
    }
-| _PRAGMA __IDENTIFIER constant_integer_expression
+| _PRAGMA __IDENTIFIER '=' __INTEGER_CONST
    {
-       compiler_set_pragma( compiler, $2, $3 );
+       compiler_set_pragma( compiler, $2, atol( $4 ));
    }
-   ;
+| _PRAGMA __IDENTIFIER '=' '(' constant_integer_expression ')'
+   {
+       compiler_set_pragma( compiler, $2, $5 );
+   }
+;
 
 opt_identifier
 : __IDENTIFIER
