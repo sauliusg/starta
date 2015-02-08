@@ -1,0 +1,7 @@
+#
+# Compiler tests
+#
+# Test diagnosrics of unknown "pragma" values.
+#
+
+pragma bad_bad_bad 20
