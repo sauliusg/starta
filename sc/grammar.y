@@ -3280,6 +3280,42 @@ static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
     }
 }
 
+static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
+                                                  DNODE *fn_proto,
+                                                  cexception_t *ex )
+{
+    DNODE *fn_dnode = NULL;
+    TNODE *fn_tnode = NULL;
+    char msg[100];
+
+    assert( class_tnode );
+
+    fn_dnode = tnode_constructor( class_tnode );
+
+    if( fn_dnode ) {
+	fn_tnode = dnode_type( fn_dnode );
+	if( !dnode_is_function_prototype( fn_dnode )) {
+	    yyerrorf( "constructor '%s' is already declared in this scope",
+		      dnode_name( fn_proto ));
+	} else
+	if( !tnode_function_prototypes_match_msg( fn_tnode,
+					          dnode_type( fn_proto ),
+					          msg, sizeof( msg ))) {
+	    yyerrorf( "prototype of constructir %s() does not match "
+		      "previous definition - %s", dnode_name( fn_proto ),
+		      msg );
+	}
+        if( fn_dnode != fn_proto ) {
+            dnode_shallow_copy( fn_dnode, fn_proto, ex );
+        }
+	delete_dnode( fn_proto );
+	return fn_dnode;
+    } else {
+	tnode_insert_constructor( class_tnode, share_dnode( fn_proto ));
+	return fn_proto;
+    }
+}
+
 static void compiler_emit_argument_list( COMPILER *cc,
                                       DNODE *argument_list,
 				      cexception_t *ex )
@@ -10912,7 +10948,7 @@ constructor_header
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      funct = $$ =
-		  compiler_check_and_set_fn_proto( compiler, funct, px );
+		  compiler_check_and_set_constructor( class_tnode, funct, px );
               share_dnode( funct );
 
               /* Constructors are always functions (?): */

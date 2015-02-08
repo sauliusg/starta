@@ -1,0 +1,30 @@
+# Compiler tests.
+#
+# Test s module name that is the same as a class name.
+#
+
+module Atom;
+
+use std;
+
+class Atom {
+    float x, y, z;
+
+    constructor Atom( float xyz[] )
+    {
+        self.x = xyz[0];
+        self.y = xyz[1];
+        self.z = xyz[2];
+    }
+
+    method print()
+    {
+        . "(", self.x, self.y, self.z, ")"
+    }
+}
+
+var a = new Atom( [0.12, 0.17, 0.38] );
+
+a->print();
+
+end module Atom;
