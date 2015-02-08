@@ -5218,7 +5218,12 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    element_offset += element_size;
+    if( element_offset < 0 ) {
+        /* We arrive here when we process the first loop iteration: */
+        element_offset = 0;
+    } else {
+        element_offset += element_size;
+    }
     if( element_offset >= array_size ) {
         STACKCELL_ZERO_PTR( istate.ep[0] );
         array_ref = NULL;
