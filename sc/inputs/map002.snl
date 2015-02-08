@@ -1,0 +1,24 @@
+#
+# Test 'map' function
+#
+
+use std;
+
+function map( p: function (x:type T)->(type T); m: array of type T ): array of type T
+{
+    var n = m[];
+
+    for var i = 0L to llast(m) do
+        n[i] = p(m[i]);
+    enddo
+
+    return n;
+}
+
+var m = [1,2,3];
+
+var n = map( function (i:int)->(int) { return i+1 }, m );
+
+foreach var k in n do
+    . k;
+enddo
