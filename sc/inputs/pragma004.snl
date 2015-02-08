@@ -1,0 +1,21 @@
+#
+# Ackermann function
+#
+
+use std;
+
+function ack( m, n : int ) : int
+{
+    if m == 0 then return n + 1 endif;
+    if n == 0 then return ack( m - 1, 1 ) endif;
+    return ack( m - 1, ack( m, n - 1 ));
+};
+
+pragma stacksize 15000
+
+# Pragmas should never decrease the stack size, so the following
+# statement shoulf have not effect and the program should still work:
+
+pragma stacksize 200
+
+. ack(3,8);
