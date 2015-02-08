@@ -5664,6 +5664,17 @@ static void compiler_compile_type_descriptor_loader( COMPILER *cc,
     compiler_push_type( cc, type_descriptor_type, ex );
 }
 
+static void compiler_set_pragma( COMPILER *c, char *pragma_name, int value )
+{
+    if( strcmp( pragma_name, "stacksize" ) == 0 ) {
+        interpret_rstack_length( value );
+        interpret_estack_length( value );
+    } else {
+        yyerrorf( "unknown pragma '%s'", pragma_name );
+    }
+}
+
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -6282,7 +6293,7 @@ include_statement
    ;
 
 pragma_statement
-   : _PRAGMA type_identifier
+: _PRAGMA type_identifier
    {
        TNODE *default_type = $2;
 
@@ -6297,6 +6308,10 @@ pragma_statement
                                     share_tnode( default_type ),
                                     px );
        }
+   }
+| _PRAGMA __IDENTIFIER constant_integer_expression
+   {
+       compiler_set_pragma( compiler, $2, $3 );
    }
    ;
 
