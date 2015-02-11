@@ -13,6 +13,7 @@
 /* uses: */
 #include <string.h> /* for strcmp() */
 #include <dnode.h>
+#include <tnode_compat.h>
 #include <cexceptions.h>
 #include <allocx.h>
 #include <stringx.h>
