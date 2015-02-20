@@ -25,7 +25,7 @@ void *interpret_subsystem = &interpret_subsystem;
 /* leave some stack cells unused at the begining and at the end of the
    stack -- to minimise segfaults and facilitate stack under/overflow
    diagnostics: */
-#define STACK_SAFETY_MARGIN 4
+#define STACK_SAFETY_MARGIN 5
 
 /* internal state of the interpreter */
 istate_t istate;
