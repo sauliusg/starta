@@ -117,6 +117,9 @@ static char *usage_text[2] = {
 "      Set return (function call) stack length.\n"
 "  -E, --evaluation-stack-length  2000\n"
 "      Set evaluation (expression evaluation) stack length.\n"
+"  -D, --stack-delta  1000\n"
+"      Set stack length increment for reallocation for all stacks.\n"
+"      Value 0 prevents stack reallocation.\n"
 "\n"
 
 "  -G, --gc-always\n"
@@ -195,10 +198,12 @@ static option_value_t only_compile;
 static option_value_t use_environment;
 static option_value_t rstack_length;
 static option_value_t estack_length;
+static option_value_t stack_delta;
 
 static option_t options[] = {
   { "-S", "--stack-length",            OT_INT, &rstack_length },
   { "-E", "--evaluation-stack-length", OT_INT, &estack_length },
+  { "-D", "--stack-delta",  OT_INT,           &stack_delta },
   { "-d", "--debug",        OT_STRING,        &debug },
   { "-c", "--compile-only", OT_BOOLEAN_TRUE,  &only_compile },
   { "-q", "--quiet",        OT_BOOLEAN_FALSE, &verbose },
@@ -306,6 +311,10 @@ int main( int argc, char *argv[], char *env[] )
               interpret_estack_length( estack_length.value.i );
           }
 
+          if( stack_delta.present ) {
+              interpret_stack_delta( stack_delta.value.i );
+          }
+
 	  if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
 	      thrcode_dump( code );
 	  }
@@ -327,6 +336,10 @@ int main( int argc, char *argv[], char *env[] )
 
               if( estack_length.present ) {
                   interpret_estack_length( estack_length.value.i );
+              }
+
+              if( stack_delta.present ) {
+                  interpret_stack_delta( stack_delta.value.i );
               }
 
 	      if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
