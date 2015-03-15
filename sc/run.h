@@ -129,6 +129,10 @@ typedef struct {
     ssize_t eval_stack_length; /* Number of stackcells allocated at
                                   'eval_stack'. */
 
+    stackcell_t *call_stack;   /* Call/return stack, allocated on the heap. */
+    ssize_t call_stack_length; /* Number of stackcells allocated at
+                                  'call_stack'. */
+
     stackcell_t *sp, *fp; /* stack pointer, frame pointer */
     stackcell_t *ep;      /* evaluation stack pointer */
     ssize_t ip;           /* bytecode instruction pointer: */
@@ -167,6 +171,7 @@ void run( cexception_t *ex );
 
 size_t interpret_rstack_length( size_t length );
 size_t interpret_estack_length( size_t length );
+size_t interpret_stack_delta( size_t length );
 
 void *interpret_alloc( istate_t *is, ssize_t size );
 

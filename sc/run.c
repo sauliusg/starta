@@ -35,6 +35,8 @@ int trace = 0;
 static size_t default_call_stack_length = 2000;
 static size_t default_eval_stack_length = 2000;
 
+static int stack_realloc_delta = 1000; /* in stackcells */
+
 static int gc_debug = 0;
 
 static void thrcode_print_stack( void );
@@ -53,55 +55,60 @@ size_t interpret_estack_length( size_t length )
     return old_length;
 }
 
+size_t interpret_stack_delta( size_t length )
+{
+    ssize_t old_length = stack_realloc_delta;
+    stack_realloc_delta = length;
+    return old_length;
+}
+
 static void make_istate( istate_t *new_istate, THRCODE *code,
                          int argc, char *argv[], char *env[],
                          cexception_t *ex )
 {
-    static stackcell_t *call_stack;
-    static stackcell_t *eval_stack;
-    static int call_stack_length; /* stack lenght, i.e. number
-                                     of the available stack cells */
-    static int call_stack_size;   /* stack size in bytes */
-    static int eval_stack_length;
+    static int call_stack_size; /* stack size in bytes */
     static int eval_stack_size;
 
-    if( call_stack_length != default_call_stack_length ) {
-        freex( call_stack );
-        call_stack = NULL;
-        call_stack_size = call_stack_length = 0;
-        call_stack =
-            callocx( sizeof(call_stack[0]), default_call_stack_length, ex );
-        call_stack_length = default_call_stack_length;
-        call_stack_size = call_stack_length * sizeof(call_stack[0]);
-    }
+    freex( new_istate->call_stack );
+    new_istate->call_stack = NULL;
+    new_istate->call_stack_length = 0;
+    new_istate->call_stack =
+        callocx( sizeof(new_istate->call_stack[0]),
+                 default_call_stack_length, ex );
+    new_istate->call_stack_length = default_call_stack_length;
+    call_stack_size =
+        new_istate->call_stack_length * sizeof(new_istate->call_stack[0]);
 
-    if( eval_stack_length != default_eval_stack_length ) {
-        freex( eval_stack );
-        eval_stack = NULL;
-        eval_stack_size = eval_stack_length = 0;
-        eval_stack =
-            callocx( sizeof(eval_stack[0]), default_eval_stack_length, ex );
-        eval_stack_length = default_eval_stack_length;
-        eval_stack_size = eval_stack_length * sizeof(eval_stack[0]);
-    }
+    freex( new_istate->eval_stack );
+    new_istate->eval_stack = NULL;
+    new_istate->eval_stack_length = 0;
+    new_istate->eval_stack =
+        callocx( sizeof(new_istate->eval_stack[0]),
+                 default_eval_stack_length, ex );
+    new_istate->eval_stack_length = default_eval_stack_length;
+    eval_stack_size =
+        new_istate->eval_stack_length * sizeof(new_istate->eval_stack[0]);
 
     new_istate->thrcode = code;
 
-    new_istate->bottom = call_stack + call_stack_length - STACK_SAFETY_MARGIN;
+    new_istate->bottom =
+        new_istate->call_stack + new_istate->call_stack_length - 
+        STACK_SAFETY_MARGIN;
     new_istate->fp = new_istate->gp = new_istate->sp = new_istate->bottom - 1;
-    new_istate->top = call_stack + STACK_SAFETY_MARGIN;
+    new_istate->top = new_istate->call_stack + STACK_SAFETY_MARGIN;
 
-    memset( call_stack, 0x55, call_stack_size );
+    memset( new_istate->call_stack, 0x55, call_stack_size );
     memset( new_istate->fp, 0, ( new_istate->bottom - new_istate->fp ) *
 	    sizeof( *new_istate->fp ) );
 
-    memset( eval_stack, 0x00, eval_stack_size );
+    memset( new_istate->eval_stack, 0x00, eval_stack_size );
 
-    new_istate->ep_bottom = eval_stack + eval_stack_length -
+    new_istate->ep_bottom =
+        new_istate->eval_stack + new_istate->eval_stack_length -
         STACK_SAFETY_MARGIN;
 
     new_istate->ep = new_istate->ep_bottom - 1;
-    new_istate->ep_top = eval_stack + STACK_SAFETY_MARGIN;
+    new_istate->ep_top = new_istate->eval_stack + STACK_SAFETY_MARGIN;
 
     new_istate->argc = argc;
     new_istate->argv = argv;
@@ -124,14 +131,136 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
     run( ex );
 }
 
+static int realloc_eval_stack( cexception_t * ex )
+{
+    /* The 'eval' stack should not have any references from the
+       garbage-collected blocks, so it can be safely reallocated. */
+
+    if( stack_realloc_delta <= 0 ) {
+        return 0;
+    } else {
+        stackcell_t *old_eval_stack = istate.eval_stack;
+        ssize_t old_eval_stack_length = istate.eval_stack_length;
+        ssize_t delta, offset, full_offset;
+
+        istate.eval_stack =
+            reallocx( istate.eval_stack, sizeof(istate.eval_stack[0]) *
+                      (istate.eval_stack_length + stack_realloc_delta), ex );
+
+        istate.eval_stack_length += stack_realloc_delta;
+
+        delta = (char*)istate.eval_stack - (char*)old_eval_stack;
+
+        offset = stack_realloc_delta * sizeof(istate.eval_stack[0]);
+
+        full_offset = offset + delta;
+
+        /* We must use memmove() since the source and the destination
+           overlap: */
+        memmove( ((char*)istate.eval_stack) + offset, istate.eval_stack,
+                 old_eval_stack_length * sizeof(istate.eval_stack[0]));
+
+        istate.ep_bottom =
+            (stackcell_t*)(((char*)istate.ep_bottom) + full_offset);
+        istate.ep = (stackcell_t*)(((char*)istate.ep) + full_offset);
+        istate.ep_top = istate.eval_stack + STACK_SAFETY_MARGIN;
+
+#if 0
+        memset( istate.eval_stack, 0xAA,
+                stack_realloc_delta * sizeof(istate.eval_stack[0]));
+#endif
+
+        return 1;
+    }
+}
+
+static int realloc_call_stack( cexception_t * ex )
+{
+    /* The 'call' can be pointed to from the evaluation stack,
+       therefore references on the evaluation stack must be adjusted
+       after the reallocation. */
+
+    if( stack_realloc_delta <= 0 ) {
+        return 0;
+    } else {
+        stackcell_t *old_call_stack = istate.call_stack;
+        stackcell_t *old_call_limit =
+            istate.call_stack + istate.call_stack_length;
+        stackcell_t *ep, *ep_limit, *sp, *sp_limit;
+        ssize_t old_call_stack_length = istate.call_stack_length;
+        ssize_t delta, offset, full_offset;
+
+        istate.call_stack =
+            reallocx( istate.call_stack, sizeof(istate.call_stack[0]) *
+                      (istate.call_stack_length + stack_realloc_delta), ex );
+
+        istate.call_stack_length += stack_realloc_delta;
+
+        offset = stack_realloc_delta * sizeof(istate.call_stack[0]);
+
+        /* We must use memmove() since the source and the destination
+           overlap: */
+        memmove( ((char*)istate.call_stack) + offset, istate.call_stack,
+                 old_call_stack_length * sizeof(istate.call_stack[0]));
+
+        delta = (char*)istate.call_stack - (char*)old_call_stack;
+
+        full_offset = offset + delta;
+
+        /* Adjust pointers on the evaluation stack so that they point
+           to the moved elements on the newly reallocated call
+           stack: */
+        if( full_offset != 0 ) {
+            ep_limit = istate.eval_stack + istate.eval_stack_length;
+            for( ep = istate.eval_stack; ep < ep_limit; ep++ ) {
+                if( ep->PTR >= (void*)old_call_stack &&
+                    ep->PTR < (void*)old_call_limit ) {
+                    ep->PTR = (char*)(ep->PTR) + full_offset;
+                    //printf( "<<<< Moving on eval: %p -> %p\n", ep->PTR-full_offset, ep->PTR );
+                }
+            }
+            sp_limit = istate.call_stack + istate.call_stack_length;
+            for( sp = istate.call_stack; sp < sp_limit; sp++ ) {
+                //printf( ">>> checking call stack %p, PTR = %p\n", sp, sp->PTR );
+                if( sp->PTR >= (void*)old_call_stack &&
+                    sp->PTR < (void*)old_call_limit ) {
+                    sp->PTR = (char*)(sp->PTR) + full_offset;
+                    //printf( ">>> Moving on call: %p -> %p\n", sp->PTR-full_offset, sp->PTR );
+                }
+            }
+        }
+
+#if 0
+        printf( "reallocating call stack, length = %d, delta = %d, full_offset = %d\n",
+                istate.call_stack_length, delta, full_offset );
+        printf( "old call stack = %p, new call stack = %p\n",
+                old_call_stack, istate.call_stack );
+#endif
+
+        istate.bottom = (stackcell_t*)((char*)(istate.bottom) + full_offset);
+        istate.fp = (stackcell_t*)((char*)(istate.fp) + full_offset);
+        istate.sp = (stackcell_t*)((char*)(istate.sp) + full_offset);
+        istate.gp = (stackcell_t*)((char*)(istate.gp) + full_offset);
+        istate.top = istate.call_stack + STACK_SAFETY_MARGIN;
+#if 1
+        memset( istate.call_stack, 0x55,
+                stack_realloc_delta * sizeof(istate.call_stack[0]));
+#endif
+
+        return 1;
+    }
+}
+
 static void check_runtime_stacks( cexception_t * ex )
 {
     if( istate.ep < istate.ep_top ) {
-	interpret_raise_exception_with_static_message(
-	    INTERPRET_ESTACK_OVERFLOW,
-	    "evaluation stack overflow",
-	    /* module = */ NULL,
-	    SL_EXCEPTION_INTERPRETER_ERROR, ex );
+        if( ! realloc_eval_stack( ex )) {
+            interpret_raise_exception_with_static_message
+                ( INTERPRET_ESTACK_OVERFLOW,
+                  "evaluation stack overflow",
+                  /* module = */ NULL,
+                  SL_EXCEPTION_INTERPRETER_ERROR, ex );
+        }
     }
     if( istate.ep > istate.ep_bottom - 1 ) {
 	interpret_raise_exception_with_static_message(
@@ -142,11 +271,13 @@ static void check_runtime_stacks( cexception_t * ex )
     }
 
     if( istate.sp < istate.top ) {
-	interpret_raise_exception_with_static_message(
-	    INTERPRET_RSTACK_OVERFLOW,
-	    "return stack overflow",
-	    /* module = */ NULL,
-	    SL_EXCEPTION_INTERPRETER_ERROR, ex );
+        if( ! realloc_call_stack( ex )) {
+            interpret_raise_exception_with_static_message
+                ( INTERPRET_RSTACK_OVERFLOW,
+                  "return stack overflow",
+                  /* module = */ NULL,
+                  SL_EXCEPTION_INTERPRETER_ERROR, ex );
+        }
     }
     if( istate.sp > istate.bottom - 1 ) {
 	interpret_raise_exception_with_static_message(

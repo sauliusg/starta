@@ -1109,10 +1109,10 @@ int CALL( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     (--istate.sp)->num.ssize = istate.ip + 2; /* push the return address */
-    (--istate.sp)->num.ptr = istate.fp;       /* push old frame pointer */
+    (--istate.sp)->ptr = istate.fp;           /* push old frame pointer */
     istate.fp = istate.sp;                    /* set the frame pointer for the
 						 called procedure */
-    STACKCELL_ZERO_PTR( istate.sp[0] );
+    /* STACKCELL_ZERO_PTR( istate.sp[0] ); */
     STACKCELL_ZERO_PTR( istate.sp[1] );
 #if 0
     istate.ip += offset;
@@ -1141,10 +1141,10 @@ int ICALL( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     (--istate.sp)->num.ssize = istate.ip + 1; /* push the return address */
-    (--istate.sp)->num.ptr = istate.fp;       /* push old frame pointer */
+    (--istate.sp)->ptr = istate.fp;           /* push old frame pointer */
     istate.fp = istate.sp;                    /* set the frame pointer
 						 for the called procedure */
-    STACKCELL_ZERO_PTR( istate.sp[0] );
+    /* STACKCELL_ZERO_PTR( istate.sp[0] ); */
     STACKCELL_ZERO_PTR( istate.sp[1] );
 
     if( fn_ptr < istate.code || fn_ptr > istate.code + istate.code_length ) {
@@ -1191,10 +1191,10 @@ int VCALL( INSTRUCTION_FN_ARGS )
     istate.ep ++;
 
     (--istate.sp)->num.ssize = istate.ip + 3; /* push the return address */
-    (--istate.sp)->num.ptr = istate.fp;       /* push old frame pointer */
+    (--istate.sp)->ptr = istate.fp;           /* push old frame pointer */
     istate.fp = istate.sp;                    /* set the frame pointer for the
 						 called procedure */
-    STACKCELL_ZERO_PTR( istate.sp[0] );
+    /* STACKCELL_ZERO_PTR( istate.sp[0] ); */
     STACKCELL_ZERO_PTR( istate.sp[1] );
 
     istate.ip = virtual_function_offset;
@@ -1328,7 +1328,7 @@ int RET( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.sp = istate.fp;
-    istate.fp = (istate.sp++)->num.ptr;
+    istate.fp = (istate.sp++)->ptr;
     istate.ip = (istate.sp++)->num.ssize;
 
     return 0;

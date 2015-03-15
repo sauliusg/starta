@@ -5677,6 +5677,11 @@ static void compiler_set_pragma( COMPILER *c, char *pragma_name, ssize_t value )
         if( old_value > value ) {
             interpret_estack_length( old_value );
         }
+    } else if( strcmp( pragma_name, "stackdelta" ) == 0 ) {
+        old_value = interpret_stack_delta( value );
+        if( old_value > value ) {
+            interpret_stack_delta( old_value );
+        }
     } else {
         yyerrorf( "unknown pragma '%s'", pragma_name );
     }
