@@ -2344,6 +2344,26 @@ int FEOF( INSTRUCTION_FN_ARGS )
 */
 
 /*
+ * BEXTEND converts byte value on the top of the stack to short integer
+ * 
+ * bytecode:
+ * BEXTEND
+ * 
+ * stack:
+ * byte -> short
+ * 
+ */
+
+int BEXTEND( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.s = istate.ep[0].num.b;
+
+    return 1;
+}
+
+/*
  * EXTEND converts integer value on the top of the stack to long integer 
  * 
  * bytecode:
