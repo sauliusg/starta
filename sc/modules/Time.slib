@@ -1,0 +1,12 @@
+package Time;
+
+use std;
+
+load "libraries/Time/libTime.so.0.01";
+
+inline bytecode function time(): long
+{
+    libTime::TIME
+}
+
+end package Time;
