@@ -1,0 +1,43 @@
+
+IFUNCTION_DIR = ifunctions
+GEN_DIR = locally-generated
+
+#-----------------------------------------------------------------------------
+
+${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
+	awk '/^ *int /{print $$2}' $< \
+	| sed -e 's/(//' \
+	| awk '{print "\""$$1"\","}' > $@
+
+#-----------------------------------------------------------------------------
+
+${GEN_DIR}/%_common.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/common.hin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_integer.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/integer.hin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_intfloat.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intfloat.hin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_float.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/float.hin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_common.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/common.cin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_integer.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/integer.cin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_intfloat.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intfloat.cin
+	sed -f $^ > $@
+
+${GEN_DIR}/%_float.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/float.cin
+	sed -f $^ > $@
+
+#-----------------------------------------------------------------------------
+
+cleanlocal:
+	rm -f ${GEN_DIR}/*
+
+LOCAL_CLEAN_TARGETS += cleanlocal

@@ -70,6 +70,10 @@ function make_Life_rule( depth: int ) : array of byte
 inline bytecode function NOT( i: byte ): byte { BNOT };
 
 use GNUrand48;
+use Time;
+
+GNUrand48::srand48(time());
+
 function make_random_rule( depth: int ) : array of byte
 {
     var states = depth/4;
