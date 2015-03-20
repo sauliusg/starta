@@ -284,6 +284,9 @@ var gen : int = 1;
 
 var nchanges: int;
 
+. "Generation:0";
+printfield( field );
+
 while( gen <= generations ) {
     nchanges = generation( newfield, field, rules );
     field, newfield = newfield, field;
