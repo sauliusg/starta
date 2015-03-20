@@ -262,9 +262,6 @@ var rules : array [][][] of byte = new (array of byte)[width][height];
 
 // rules[0][0] = make_Life_rule( states );
 rules[0][0] = make_random_rule( states );
-rules[0][0] = make_random_rule( states );
-rules[0][0] = make_random_rule( states );
-rules[0][0] = make_random_rule( states );
 for var i = 0 to last(rules) do
     for var j = 0 to last(rules[i]) do
         rules[i][j] = rules[0][0];
