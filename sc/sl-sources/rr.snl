@@ -1,0 +1,306 @@
+#
+# Rampant Randomness
+#
+
+use std;
+
+function make_Life_rule( depth: int ) : array of byte
+{
+    var states = depth/4;
+    var rule = new byte[states];
+
+    var n = new int[8];
+
+    for n[0] = 0 to 1 do
+    for n[1] = 0 to 1 do
+    for n[2] = 0 to 1 do
+    for n[3] = 0 to 1 do
+    for n[4] = 0 to 1 do
+    for n[5] = 0 to 1 do
+    for n[6] = 0 to 1 do
+    for n[7] = 0 to 1 do
+
+        var ruleval: int;
+
+        var sum: int;
+        for var i = 0 to last(n) do
+            sum += n[i]
+        enddo
+
+        for var c = 0 to 1 do
+
+            var newval: int;
+            if( sum < 2 or sum > 3 ) then
+                newval = 0
+            else
+                if( sum == 3 ) then
+                    newval = 1
+                else
+                    newval = c;
+                endif
+            endif
+
+            ruleval |= (newval shl (2*c));
+
+        enddo
+
+        var idx = n[0] shl 14 | 
+                  n[1] shl 12 |
+                  n[2] shl 10 |
+                  n[3] shl  8 |
+                  n[4] shl  6 |
+                  n[5] shl  4 |
+                  n[6] shl  2 |
+                  n[7];
+
+        rule[idx] = lowbyte(lowshort(ruleval));
+
+    enddo
+    enddo
+    enddo
+    enddo
+    enddo
+    enddo
+    enddo
+    enddo
+
+    return rule;
+}
+
+inline bytecode function NOT( i: byte ): byte { BNOT };
+
+use GNUrand48;
+function make_random_rule( depth: int ) : array of byte
+{
+    var states = depth/4;
+    var rule = new byte[states];
+
+    for var i = 0 to last(rule) do
+        rule[i] = lowbyte(lowshort(lowint(GNUrand48::lrand48() & 255L)));
+        if( i == 0 ) {
+            rule[i] &= NOT(3 byte);
+        }
+    enddo
+
+    return rule
+}
+
+procedure generation( newfield, field : array [][] of byte;
+                      rule: array [][][] of byte ) : int
+begin
+    var i, j : int;
+    var sum : int;
+    var max_i : int = last( field );
+    var max_j : int = last( field[0] );
+    var i1, i2 : int;
+    var j1, j2 : int;
+    var nchanges: int;
+
+    for i = 0 to last( field ) do
+        for j = 0 to last( field[i] ) do
+
+	    i1 = i > 0 ? i - 1 : max_i;
+	    i2 = i < max_i ? i + 1 : 0;
+	    j1 = j > 0 ? j - 1 : max_j;
+	    j2 = j < max_j ? j + 1 : 0;
+
+            sum = field[i1][j1] @int shl 14 |
+                  field[i1][j]  @int shl 12 |
+                  field[i1][j2] @int shl 10 |
+                  field[i][j1]  @int shl  8 |
+                  field[i][j2]  @int shl  6 |
+                  field[i2][j1] @int shl  4 |
+                  field[i2][j]  @int shl  2 |
+                  field[i2][j2] @int;
+
+            var rem = field[i][j];
+
+            newfield[i][j] = (rule[i][j][sum] & (3 byte shl (2 byte * rem))) 
+                             shr (2 byte * rem);
+
+	    if( newfield[i][j] != field[i][j] ) then
+		nchanges ++;
+	    endif
+
+        enddo
+    enddo
+
+    return nchanges;
+end
+
+procedure printfield( f : array [][] of byte )
+{
+    var i, j : int;
+
+    for i = 0 to last(f) {
+        for j = 0 to last(f[i]) {
+            if f[i][j] == 0 byte then
+                < "."
+            elsif f[i][j] == 1 byte then
+                < "o"
+            elsif f[i][j] == 2 byte then
+                < "*"
+            else
+                < "O"
+            endif
+        }
+        . "";
+    }
+    . "";
+}
+
+procedure sleep( length : long )
+{
+    var i : long;
+    for( i = 0L; i < length; i++ ) { }   
+}
+
+inline bytecode function readln( file inp ) : string
+{
+    BLDC 10 SFILEREADLN
+}
+
+function load_field( string filename ) : array [][] of byte
+{
+    var input = fopen( filename, "r" );
+    var line : string;
+    var field, new_field : array [][] of byte;
+
+    var i : int = 0;
+
+    while( (line=readln(input)) != null ) {
+	new_field = new (array of byte)[i+1];
+	if field {
+	    new_field := field;
+	}
+	field = new_field;
+	field[i] = new byte[length(line)-1];
+	for var j = 0 to last(field[i]) {
+	    if( line[j] != '.'c and line[j] != ' 'c ) {
+		field[i][j] = 1 byte;
+	    }
+	}
+	i ++;
+    }
+
+    var max = 0;
+
+    for i = 0 to last(field) {
+	var len = length( field[i] );
+	if max < len then max = len endif
+    }
+
+    for i = 0 to last(field) {
+	var len = length( field[i] );
+	if( len < max ) {
+	    var new_line = new byte[max];
+	    new_line := field[i];
+	    field[i] = new_line;
+	}
+    }
+
+    fclose( input );
+    return field;
+}
+
+function isdigit( c : char ) : bool
+{
+    return c == '0'c || c == '1'c || c == '2'c ||
+           c == '3'c || c == '4'c || c == '5'c ||
+           c == '6'c || c == '7'c || c == '8'c ||
+           c == '9'c;
+}
+
+inline bytecode function digit( c : char ) : int
+{
+    SLDC '0' BLDI SUB HEXTEND EXTEND
+}
+
+function atoi( s : string ) : int
+{
+    var val = 0;
+
+    for var i = 0 to last(s) do
+	if( !isdigit( s[i] )) { break };
+	val = val * 10 + digit( s[i] );
+    enddo
+
+    return val;
+}
+
+program life( string argv[] )
+begin
+
+if length( argv ) < 2 then
+
+    . argv[0], ": please supply one file with Life " _
+               "configuration as an argument"
+
+else
+
+var generations = 1000;
+
+var field: array [][] of byte;
+
+if( length(argv) > 2 ) then
+    generations = atoi( argv[1] );
+    field = load_field( argv[2] );
+else
+    field = load_field( argv[1] );
+endif
+
+var width = length(field);
+var height = length(field[0]);
+
+var newfield : array [][] of byte = new byte[width][height];
+
+var states = 1 shl 18;
+. states;
+
+// var rules : array [][][] of byte = new byte[width][height][states/4];
+var rules : array [][][] of byte = new (array of byte)[width][height];
+
+// rules[0][0] = make_Life_rule( states );
+rules[0][0] = make_random_rule( states );
+rules[0][0] = make_random_rule( states );
+rules[0][0] = make_random_rule( states );
+rules[0][0] = make_random_rule( states );
+for var i = 0 to last(rules) do
+    for var j = 0 to last(rules[i]) do
+        rules[i][j] = rules[0][0];
+        // rules[i][j] = make_random_rule( states );
+    enddo
+enddo
+
+printfield( field );
+
+var gen : int = 1;
+
+< "\033[H\033[2J";
+//< "\033[H";
+//< "\033[2J";
+< "\033[?25l";
+
+var nchanges: int;
+
+while( gen <= generations ) {
+    nchanges = generation( newfield, field, rules );
+    field, newfield = newfield, field;
+    < "\033[H";
+    < "Generation:";
+    < gen;
+    . "";
+    printfield( field );
+    if( nchanges == 0 ) then
+        . "Stable configuration reached.";
+	break;
+    endif
+    sleep( 800000 );
+    gen ++;
+}
+
+< "\033[?25h";
+
+endif
+
+end (*program*);
