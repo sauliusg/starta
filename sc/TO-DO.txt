@@ -35,14 +35,14 @@ xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 xx Implement 'unaliased' values
 -- Implement checks of uncaught exceptions (exceptions cheched by module, not by function)!
 xx Think about 'print/println/prints/printsln' operators
--- Think about the transfer oprators to a common operator table, with the possibility to overload types.
+++ Think about the transfer oprators to a common operator table, with the possibility to overload types.
 -- Implement possibility to define operators like 'operator "." ( array of int )'
 -- Implement possibility to use constants with type suffixes as default function parameter values.
 +- Implement 'list of T'.
 +- Implement 'hash of T' (or 'dictionary of T').
 -- print out nice labels in human-readable code (produced by '-d code')
 -- move COMPILER object and compiler_...() functions from 'snail.y' into a separate compiler.c file (and comiler.h header).
--- implement stack reference types.
+xx implement stack reference types.
 ++ implement pointers to functions.
 ++ implement non-null reference types.
 ++ implement 'p = ? q' assignment for save conversion of regular references into non-null references (the assignment should raise a runtime exception if the reference to be converted is null).
@@ -57,7 +57,7 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 -- Think about 'var x;' declarations of safe untyped variables (a special "value" type?).
 -- Tests, tests, tests ...
 -- Perform all strength reducing optimisations in 'bytecode_emit_...()' f-ns.
--- Make stacks relocatable.
+++ Make stacks relocatable.
 ?? Implement type-declared methods (functions).
 ++ Implement reporting of source file name in error messages.
 -- Implement regular expressions.
@@ -71,9 +71,9 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 -- Implement named exception groups.
 -- Implement multi-line strings between << >> pseudo-quotes.
 -- Implement merging of equal strings into one in static data.
--- Implement map operator.
+-+ Implement map operator.
 -- Implement i/o to strings.
--- Implement functions to narrow numbers.
++- Implement functions to narrow numbers.
 -- Implement array concatenation operators.
 -- Implement array "stringification".
 -- Implement AND ALSO and OR ALSO.
@@ -85,8 +85,8 @@ xx Implement "square" multidimensional arrays.
 -- Check share_xxx() usage.
 -- Allow NULL dimension pointer in new_tnode_array().
 -+ Write thorough tests for stdio operators (also for input!)
--+ Think about the possibility to introduce 'xxx of T' types.
--+ Think about the possibility of "generic" functions with type "placeholders"
++- Think about the possibility to introduce 'xxx of T' types.
++- Think about the possibility of "generic" functions with type "placeholders"
 ++ Implement garbage collector invocation policy.
 -+ Implement anonymous array and struct compatibility.
 ++ Implement multivalue assignment to closure variables.
@@ -97,9 +97,9 @@ xx Implement "square" multidimensional arrays.
 ++ Implement string concatenation (implemented as '_' and '+' operators).
 ++ Implement string comparisons.
 +- Implement label printouts in the bytecode emitter functions.
-+- Implement array length() functions in 'stdtypes.slib'.
+++ Implement array length() functions in 'stdtypes.slib'.
 +- Implement advanced arithmetics and function calls for constant arithmetics
-+- Correct compiler so that it can compile multiple files.
+++ Correct compiler so that it can compile multiple files.
 +- Check and correct shortcut boolean implementation.
 ++ Correct printf() arguments so that they always match format.
 ++ Implement formating operator (maybe %% ?).
