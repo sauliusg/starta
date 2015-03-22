@@ -113,6 +113,8 @@ TNODE *dnode_type( DNODE *dnode );
 
 DNODE *dnode_set_offset( DNODE *dnode, int offset );
 
+DNODE *dnode_update_offset( DNODE *dnode, int offset );
+
 void dnode_assign_offset( DNODE *dnode, int *offset );
 
 void dnode_list_assign_offsets( DNODE *dnode_list, int *offset );

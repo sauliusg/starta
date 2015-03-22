@@ -23,7 +23,7 @@ function toupper( s: string ): string
 {
     var m = new char[length(s)];
 
-    for var i = 0 to last(s) {
+    for var i = 0 to last(s)-1 {
         m[i] = chr( ord(s[i]) - 32B );
     }
 

@@ -5,13 +5,12 @@
 # Check that lists of reference variables are looped correctly:
 
 use std;
-use Lists;
 
-class S { int x }
+type Bag of X = {
+     //X value;
+     string name;
+     int x;
+}
 
-var a : list of S;
-
-foreach var e in a
-do
-    . e.x
-enddo
+. const((Bag of X).name.offset);
+//. const((Bag of X).value.offset);

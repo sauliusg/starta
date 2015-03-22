@@ -1,0 +1,64 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use std;
+
+struct A {
+    int ii;
+    float xx;
+    string nn;
+    string nm;
+}
+
+struct C : A {
+    int a;
+    string name;
+    string nn;
+}
+
+## . "C.ii.offset =", const(C.ii.offset/C.ii.size);
+## . "C.xx.offset =", const(C.xx.offset/C.ii.size);
+## . "C.a.offset  =", const(C.a.offset/C.ii.size);
+## . "C.nn.offset =", const(C.nn.offset/C.ii.size);
+## . "C.nm.offset =", const(C.nm.offset/C.ii.size);
+## . "C.name.offset =", const(C.name.offset/C.ii.size);
+## 
+## .""
+
+var c = new C;
+
+c.a = 123;
+c.name = "C specific name";
+c.nn = "C nn name";
+c.nm = "A nm name";
+c.ii = 456;
+c.xx = 1.98;
+
+. c.a;
+. c.name;
+. c.nn;
+. c.nm;
+. c.ii;
+. c.xx;
+
+procedure set_A_name( a: A; name: string )
+{
+    a.nn = name
+}
+
+function print_A( a : A )
+{
+    . a.nm;
+    . a.nn;
+    . a.ii;
+    . a.xx;
+}
+
+set_A_name( c, "A nn name" );
+
+. "";
+print_A( c );

@@ -1,11 +1,8 @@
 ./sl: inputs/foreach007.snl(11,26): ERROR, incompatible types for assignment to variable 'm'
 foreach var short m in a do
                          ^
-./sl: inputs/foreach007.snl(25,1): ERROR, incompatible types for assignment
-enddo
-^
 ./sl: inputs/foreach007.snl(29,51): ERROR, incompatible types for assignment to variable 'm'
 foreach var m : int in [ 1.1, 2.3, 4.8, 5 float ] do
                                                   ^
-./sl: 3 error(s) detected
+./sl: 2 error(s) detected
 

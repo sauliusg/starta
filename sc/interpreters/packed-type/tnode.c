@@ -14,6 +14,7 @@
 
 /* uses: */
 #include <string.h> /* for memset() */
+#include <limits.h> /* for CHAR_BIT */
 #include <alloccell.h>
 #include <stackcell.h>
 #include <tcodes.h>
@@ -1165,88 +1166,62 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             ( field_type ? tnode_size( field_type ) : 0 );
         field_align = field_type ? tnode_align( field_type ) : 0;
 
-	if( field_size != 0 && field_kind != TK_FUNCTION &&
-            field_kind != TK_PLACEHOLDER ) {
-            if( tnode_is_reference( field_type )) {
-                int direction = -1;
-                /* If no references are seen so far, let's choose
-                   which direction references will run. For generic
-                   types, they will be allocated with positive
-                   offsets; for all other types (structures, classes,
-                   closure variable blocks) they will run in negative
-                   diretion.
-
-                   FIXME: the above described policy must be changed
-                   (relaxed) in the final version of this
-                   compiler/runtime. */
-                if( tnode->nrefs == 0 ) {
-                    if( tnode_kind( tnode ) == TK_COMPOSITE ) {
-                        if( tnode->nextnumoffs != 0 ) {
-                            yyerrorf( "For composite types, all reference "
-                                      "fields must be declared before "
-                                      "non-reference fields." );
-                        } else {
-                            direction = -1;
-                            tnode->nextrefoffs = -sizeof(alloccell_t) - REF_SIZE;
-                        }
-                    } else {
-                        direction = -1;
-                        tnode->nextrefoffs = -sizeof(alloccell_t) - REF_SIZE;
-                    }
-                } else {
-                    direction = tnode->nrefs > 0 ? 1 : -1;
-                }
-                dnode_set_offset( current, tnode->nextrefoffs );
-                tnode->nrefs += direction;
+	if( field_kind != TK_FUNCTION ) {
+            if( tnode_is_reference( field_type ) ||
+                field_kind == TK_PLACEHOLDER ) {
+                dnode_set_offset( current, tnode->nextrefoffs -
+                                  sizeof(alloccell_t) - REF_SIZE );
+                tnode->nextrefoffs -= REF_SIZE;
+                tnode->nrefs -= 1;
                 tnode->size += REF_SIZE;
-                tnode->nextrefoffs += REF_SIZE * direction;
             } else {
-                ssize_t old_offset = tnode->nextnumoffs;
-                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
-                dnode_set_offset( current, tnode->nextnumoffs );
-                tnode->nextnumoffs += field_size;
-                tnode->size += tnode->nextnumoffs - old_offset;
-                if( tnode->align < field_align )
-                    tnode->align = field_align;
-            }
-	} else {
-            if( field_kind == TK_PLACEHOLDER ) {
-                int direction = -1;
-                ssize_t old_offset = tnode->nextnumoffs;
-                field_size = sizeof(union stackunion);
-                //printf( ">>>>(2) inserting TK_PLACEHOLDER\n" );
-                /* When we allocate a placeholder variable, we must
-                   make sure that we can store any value from a stack
-                   cell there. For this, we allocate both memory
-                   negative offset for references and at the same
-                   positive offset for numeric values. */
-
-                /* Make sure we have allocated space for both numeric
-                   and pointer part of the generic type field: */
-                if( abs(tnode->nextnumoffs) > abs(tnode->nextrefoffs)) {
-                    ALIGN_NUMBER( tnode->nextnumoffs, REF_SIZE );
-                    tnode->nextrefoffs = -tnode->nextnumoffs;
-                } else {
-                    tnode->nextnumoffs = abs(tnode->nextrefoffs);
+                if( field_size != 0 ) {
+                    ssize_t old_offset = tnode->nextnumoffs;
+                    ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+                    dnode_set_offset( current, tnode->nextnumoffs );
+                    tnode->nextnumoffs += field_size;
+                    tnode->size += tnode->nextnumoffs - old_offset;
+                    if( tnode->align < field_align )
+                        tnode->align = field_align;
                 }
-
-                dnode_set_offset( current, tnode->nextrefoffs );
-
-                /* !!! FIXME: the assignemnt below is most probably
-                       wrong -- the nrefs field might be advanced more
-                       than one reference if numeric field offset is
-                       much higher than reference offset: */
-                tnode->nrefs += direction; /* <<< FIXME! */
-
-                tnode->nextrefoffs += REF_SIZE * direction;
-                tnode->nextnumoffs += field_size;
-
-                tnode->size += tnode->nextnumoffs - old_offset;
             }
-            if( field_type && field_kind != TK_FUNCTION &&
-                field_kind != TK_PLACEHOLDER ) {
-		yyerrorf( "field '%s' has zero size", dnode_name( current ));
-	    }
+	}
+        if( field_kind == TK_PLACEHOLDER ) {
+            /* For generic type value placeholders, we must allocte
+               also memory at a positive structure field offset to
+               hold numeric value of the future type, in addition to
+               the reference value for which the memory at the
+               negative offset has just been allocated before: */
+            int bytes = sizeof(ssize_t);
+            int bits = (CHAR_BIT * bytes)/2;
+            int max_size = 1 << bits;
+            ssize_t old_offset = tnode->nextnumoffs;
+            field_size = sizeof(union stackunion);
+            field_align = sizeof(double);
+            ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+            /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
+            if( dnode_offset( current ) >= max_size ||
+                tnode->nextnumoffs >= max_size ) {
+                yyerrorf( "placeholder field '%s' has offset %d "
+                          "which is larger than the size %d which we can "
+                          "handle in this implementation",
+                          dnode_name( current ), max_size );
+            }
+#if 0
+            ssize_t combined_offset = (dnode_offset( current ) << bits) |
+                tnode->nextnumoffs;
+            printf( ">>> pos offset = %d, neg offset = %d, combined offset = %d\n",
+                    tnode->nextnumoffs, dnode_offset( current ), combined_offset );
+#endif
+            dnode_update_offset( current, 
+                                 (dnode_offset( current ) << bits) |
+                                 tnode->nextnumoffs );
+            tnode->nextnumoffs += field_size;
+            tnode->size += tnode->nextnumoffs - old_offset;
+        }
+        if( field_size == 0 && field_type && field_kind != TK_FUNCTION &&
+            field_kind != TK_PLACEHOLDER ) {
+            yyerrorf( "field '%s' has zero size", dnode_name( current ));
 	}
     }
 

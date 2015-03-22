@@ -15,6 +15,7 @@
 
 /* uses: */
 #include <stdio.h>
+#include <limits.h> /* for CHAR_BIT */
 #include <errno.h>
 #define __USE_GNU
 #include <string.h>
@@ -560,38 +561,17 @@ int STG( INSTRUCTION_FN_ARGS )
 int LDI( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
+#if 0
     alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
     ssize_t size = src_header->size;
     ssize_t length = src_header->length;
+#endif
 
     TRACE_FUNCTION();
 
-    if( offset >= 0 ) {
-        istate.ep[0].num = *((stackunion_t*)STACKCELL_PTR(istate.ep[0]));
-        STACKCELL_ZERO_PTR( istate.ep[0] );
-    } else {
-#if 0
-        STACKCELL_SET_ADDR( istate.ep[0],
-                            *((void**)STACKCELL_PTR(istate.ep[0])));
-#else
-        void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
-        ssize_t numoffset =
-            ((-offset - sizeof(alloccell_t) - REF_SIZE)/REF_SIZE) * 
-            sizeof(stackunion_t);
-
-        if( length == -1
-            && size >= numoffset + sizeof(istate.ep[0].num) ) {
-            /* NB.: offset < 0 */
-            /* We have a field of generic type, and need to load the
-               numeric stackcell at the positive offset: */
-            char* num_src = (char*)istate.ep[0].PTR + numoffset;
-            istate.ep[0].num = *(stackunion_t*)num_src;
-        } else {
-            istate.ep[0].num.offs = 0;
-        }
-        istate.ep[0].PTR = *ref_src;
-#endif
-    }
+    assert( offset >= 0 );
+    istate.ep[0].num = *((stackunion_t*)STACKCELL_PTR(istate.ep[0]));
+    STACKCELL_ZERO_PTR( istate.ep[0] );
 
     return 1;
 }
@@ -606,32 +586,18 @@ int LDI( INSTRUCTION_FN_ARGS )
 int STI( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
+#if 0
     alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
     ssize_t size = dst_header->size;
     ssize_t length = dst_header->length;
+#endif
 
     TRACE_FUNCTION();
 
-    if( offset >= 0 ) {
-        memcpy( (char*)STACKCELL_PTR(istate.ep[1]),
-                &istate.ep[0].num, sizeof(stackunion_t) );
-    } else {
-        *((void**)STACKCELL_PTR(istate.ep[1])) = istate.ep[0].PTR;
-        /* The numeric part will have to be stored for generic
-           types at the same positive offset: */
-        ssize_t numoffset =
-            ((-offset - sizeof(alloccell_t) - REF_SIZE)/REF_SIZE) * 
-            sizeof(stackunion_t);
+    assert( offset >= 0 );
+    memcpy( (char*)STACKCELL_PTR(istate.ep[1]),
+            &istate.ep[0].num, sizeof(stackunion_t) );
 
-        if( length == -1
-            && size >= numoffset + sizeof(istate.ep[0].num) ) {
-            /* offset < 0 here */
-            /* We have a field of generic type, and need to store the
-               numeric stackcell at the positive offset: */
-            void* dst = (char*)istate.ep[1].PTR + numoffset;
-            memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
-        }
-    }
     STACKCELL_ZERO_PTR( istate.ep[1] );
     STACKCELL_ZERO_PTR( istate.ep[0] );
 
@@ -650,10 +616,18 @@ int STI( INSTRUCTION_FN_ARGS )
 int GLDI( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
+    ssize_t bytes = sizeof(ssize_t);
+    ssize_t bits = (bytes * CHAR_BIT)/2;
+    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t neg_offset = offset >> bits;
+    void** ref_ptr;
+    void* num_ptr;
     void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
     alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
+#if 0
     ssize_t size = src_header->size;
     ssize_t length = src_header->length;
+#endif
 
     TRACE_FUNCTION();
 
@@ -665,26 +639,17 @@ int GLDI( INSTRUCTION_FN_ARGS )
             STACKCELL_SET_ADDR( istate.ep[0], *ref_src );
         }
     } else {
-#if 0
-        STACKCELL_SET_ADDR( istate.ep[0],
-                            *((void**)STACKCELL_PTR(istate.ep[0])));
-#else
-        ssize_t numoffset =
-            ((-offset - sizeof(alloccell_t) - REF_SIZE)/REF_SIZE) * 
-            sizeof(stackunion_t);
 
-        if( length == -1
-            && size >= numoffset + sizeof(istate.ep[0].num) ) {
-            /* NB.: offset < 0 */
-            /* We have a field of generic type, and need to load the
-               numeric stackcell at the positive offset: */
-            char* num_src = (char*)istate.ep[0].PTR + numoffset;
-            istate.ep[0].num = *(stackunion_t*)num_src;
-        } else {
-            istate.ep[0].num.offs = 0;
+        num_ptr = (char*)istate.ep[0].PTR + pos_offset;
+        ref_ptr = (void**)((char*)istate.ep[0].PTR + neg_offset);
+
+        istate.ep[0].num.offs = 0;
+
+        memcpy( &istate.ep[0].num, num_ptr, sizeof(istate.ep[0].num));
+
+        if( neg_offset < 0 ) {
+            istate.ep[0].PTR = *ref_ptr;
         }
-        istate.ep[0].PTR = *ref_src;
-#endif
     }
 
     return 1;
@@ -701,8 +666,16 @@ int GSTI( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
     alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
+    ssize_t bytes = sizeof(ssize_t);
+    ssize_t bits = (bytes * CHAR_BIT)/2;
+    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t neg_offset = offset >> bits;
+    void** ref_ptr;
+    void* num_ptr;
+#if 0
     ssize_t size = dst_header->size;
     ssize_t length = dst_header->length;
+#endif
 
     TRACE_FUNCTION();
 
@@ -715,22 +688,18 @@ int GSTI( INSTRUCTION_FN_ARGS )
                 STACKCELL_PTR( istate.ep[0] );
         }
     } else {
-        *((void**)STACKCELL_PTR(istate.ep[1])) = istate.ep[0].PTR;
-        /* The numeric part will have to be stored for generic
-           types at the same positive offset: */
-        ssize_t numoffset =
-            ((-offset - sizeof(alloccell_t) - REF_SIZE)/REF_SIZE) * 
-            sizeof(stackunion_t);
 
-        if( length == -1
-            && size >= numoffset + sizeof(istate.ep[0].num) ) {
-            /* offset < 0 here */
-            /* We have a field of generic type, and need to store the
-               numeric stackcell at the positive offset: */
-            void* dst = (char*)istate.ep[1].PTR + numoffset;
-            memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
+        num_ptr = (char*)istate.ep[1].PTR + pos_offset;
+        ref_ptr = (void**)((char*)istate.ep[1].PTR + neg_offset);
+
+        memcpy( num_ptr, &istate.ep[0].num, sizeof(istate.ep[0].num) );
+
+        if( neg_offset < 0 ) {
+            *ref_ptr = istate.ep[0].PTR;
         }
+
     }
+
     STACKCELL_ZERO_PTR( istate.ep[1] );
     STACKCELL_ZERO_PTR( istate.ep[0] );
 

@@ -741,6 +741,13 @@ DNODE *dnode_set_offset( DNODE *dnode, int offset )
     return dnode;
 }
 
+DNODE *dnode_update_offset( DNODE *dnode, int offset )
+{
+    assert( dnode );
+    dnode->offset = offset;
+    return dnode;
+}
+
 DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex )
 {
     assert( dnode );
