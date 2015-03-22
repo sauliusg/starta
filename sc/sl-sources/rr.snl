@@ -119,8 +119,8 @@ begin
 
             var rem = field[i][j];
 
-            newfield[i][j] = (rule[i][j][sum] & (3 byte shl (2 byte * rem))) 
-                             shr (2 byte * rem);
+            newfield[i][j] = ((rule[i][j][sum] & (3 byte shl (2 byte * rem))) 
+                             shr (2 byte * rem)) & 3 byte;
 
 	    if( newfield[i][j] != field[i][j] ) then
 		nchanges ++;
