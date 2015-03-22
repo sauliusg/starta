@@ -5988,6 +5988,8 @@ assert_statement
 
     compiler_emit( compiler, px, "\tceee\n", ASSERT,
                 &current_line_no, &file_name_offset, &current_line_offset );
+
+    compiler_drop_top_expression( compiler );
   }
   ;
 
