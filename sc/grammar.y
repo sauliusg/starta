@@ -2192,7 +2192,7 @@ static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
 	    }
 
             if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
-		compiler_emit( cc, ex, "\tcs\n", GLDI, &element_size );
+		compiler_emit( cc, ex, "\tc\n", GLDI );
 	    } else if( element_type && tnode_is_reference( element_type )) {
 		compiler_emit( cc, ex, "\tc\n", PLDI );
 	    } else {
@@ -2268,7 +2268,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 	    } else {
                 ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
 		if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
-		    compiler_emit( cc, &inner, "\tcs\n", GSTI, &expr_size );
+		    compiler_emit( cc, &inner, "\tc\n", GSTI );
                 } else if( expr_type && tnode_is_reference( expr_type )) {
 		    compiler_emit( cc, &inner, "\tc\n", PSTI );
 		} else {
@@ -7170,9 +7170,7 @@ control_statement
         TNODE *element_type = 
             aggregate_expression_type ?
             tnode_element_type( aggregate_expression_type ) : NULL;
-        ssize_t neg_element_size =
-            -( tnode_is_reference( element_type ) ? 
-               REF_SIZE : tnode_size( element_type ) );
+        ssize_t neg_element_size = -1;
         ssize_t zero = 0;
 
         /* stack now: ..., array_current_ptr */
@@ -7199,7 +7197,9 @@ control_statement
         compiler_compile_dup( compiler, px );
         compiler_make_stack_top_element_type( compiler );
         compiler_make_stack_top_addressof( compiler, px );
-        compiler_compile_ldi( compiler, px );
+        /* compiler_compile_ldi( compiler, px ); */
+        compiler_emit( compiler, px, "\tc\n", GLDI );
+        compiler_stack_top_dereference( compiler );
         compiler_compile_variable_initialisation
             ( compiler, loop_counter_var, px );
       }
@@ -7216,7 +7216,10 @@ control_statement
             compiler_make_stack_top_addressof( compiler, px );
             compiler_compile_load_variable_value( compiler,
                                                   loop_counter_var, px );
-            compiler_compile_sti( compiler, px );
+            /* compiler_compile_sti( compiler, px ); */
+            compiler_emit( compiler, px, "\tc\n", GSTI );
+	    compiler_drop_top_expression( compiler );
+	    compiler_drop_top_expression( compiler );
         }
 
 	compiler_fixup_op_continue( compiler, px );
@@ -7240,13 +7243,7 @@ control_statement
       {
         /* stack now:
            ..., lvariable_address, array_last_ptr */
-        TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
-        TNODE *element_type = 
-            aggregate_expression_type ?
-            tnode_element_type( aggregate_expression_type ) : NULL;
-        ssize_t neg_element_size =
-            -( tnode_is_reference( element_type ) ? 
-               REF_SIZE : tnode_size( element_type ) );
+        ssize_t neg_element_size = -1;
         ssize_t zero = 0;
 
         /* stack now: ..., lvariable_address, array_current_ptr */
@@ -7610,7 +7607,6 @@ delimited_type_description
 	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
 	if( !tnode ) {
 	    tnode = new_tnode_placeholder( type_name, px );
-	    tnode_set_size( tnode, 1 );
 	    typetab_insert( compiler->typetab, type_name, tnode, px );
 	}
 	$$ = share_tnode( tnode );
@@ -7752,7 +7748,6 @@ undelimited_type_description
       if( !compiler->current_type ||
 	  tnode_is_forward( compiler->current_type )) {
 	  yyerror( "one can only extend previously defined enumeration types" );
-	  tnode_set_size( $4, 1 );
       }
       $$ = $4;
     }

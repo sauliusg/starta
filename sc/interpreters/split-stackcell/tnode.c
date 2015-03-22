@@ -14,6 +14,7 @@
 
 /* uses: */
 #include <string.h> /* for memset() */
+#include <limits.h> /* for CHAR_BIT */
 #include <alloccell.h>
 #include <tcodes.h>
 #include <tlist.h>
@@ -1161,42 +1162,44 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 	field_type = dnode_type( current );
 	field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
 
-	if( field_kind != TK_FUNCTION  &&
-            field_kind != TK_PLACEHOLDER ) {
-            if( tnode_is_reference( field_type )) {
-                int direction = -1;
-                if( tnode->nrefs == 0 ) {
-                    tnode->nextrefoffs = -sizeof(alloccell_t) - REF_SIZE;
-                }
-                dnode_set_offset( current, tnode->nextrefoffs );
-                tnode->nrefs += direction;
-                tnode->nextrefoffs += REF_SIZE * direction;
+	if( field_kind != TK_FUNCTION ) {
+            if( tnode_is_reference( field_type ) ||
+                field_kind == TK_PLACEHOLDER ) {
+                dnode_set_offset( current, tnode->nextrefoffs -
+                                  sizeof(alloccell_t) - REF_SIZE );
+                tnode->nrefs -= 1;
+                tnode->nextrefoffs -= REF_SIZE;
                 tnode->size += REF_SIZE;
             } else {
                 dnode_set_offset( current, tnode->nextnumoffs );
                 tnode->nextnumoffs += sizeof(stackunion_t);
                 tnode->size += sizeof(stackunion_t);
             }
-	} else {
-            if( field_kind == TK_PLACEHOLDER ) {
-                assert( tnode->nrefs <= 0 );
-                ssize_t ref_count = abs( tnode->nrefs );
-                ssize_t num_count = tnode->size/sizeof(stackunion_t);
-                ssize_t limit = ref_count > num_count ?
-                    ref_count : num_count;
+	}
+        if( field_kind == TK_PLACEHOLDER ) {
+            /* For generic type value placeholders, we must allocte
+               also memory at a positive structure field offset to
+               hold numeric value of the future type, in addition to
+               the reference value for which the memory at the
+               negative offset has just been allocated before: */
+            int bytes = sizeof(ssize_t);
+            int bits = (CHAR_BIT * bytes)/2;
+            int max_size = 1 << bits;
+            ssize_t field_size = sizeof(union stackunion);
 
-                tnode->nextrefoffs =
-                    -sizeof(alloccell_t) - REF_SIZE - limit * REF_SIZE;
-                
-                dnode_set_offset( current, tnode->nextrefoffs );
-
-                tnode->nrefs = -(limit + 1);
-                tnode->size =
-                    (limit + 1) * sizeof(stackunion_t) +
-                    (ref_count + 1) * REF_SIZE;
-                tnode->nextnumoffs = tnode->size;
-                tnode->nextrefoffs -= REF_SIZE;
+            if( dnode_offset( current ) >= max_size ||
+                tnode->nextnumoffs >= max_size ) {
+                yyerrorf( "placeholder field '%s' has offset %d "
+                          "which is larger than the size %d which we can "
+                          "handle in this implementation",
+                          dnode_name( current ), max_size );
             }
+
+            dnode_update_offset( current, 
+                                 (dnode_offset( current ) << bits) |
+                                 tnode->nextnumoffs );
+            tnode->nextnumoffs += field_size;
+            tnode->size += field_size;
         }
     }
 

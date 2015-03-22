@@ -15,6 +15,7 @@
 
 /* uses: */
 #include <stdio.h>
+#include <limits.h> /* for CHAR_BIT */
 #include <errno.h>
 #define __USE_GNU
 #include <string.h>
@@ -572,33 +573,17 @@ int LDI( INSTRUCTION_FN_ARGS )
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
     alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
+#if 0
     ssize_t element_size = src_header->element_size;
     ssize_t length = src_header->length;
+#endif
 
     TRACE_FUNCTION();
 
-    if( offset >= 0 ) {
-        memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
-        STACKCELL_ZERO_PTR( istate.ep[0] );
-    } else {
-#if 0
-        istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
-        istate.ep[0].num.offs = 0;
-#else
-        void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
-        if( length == -1 && element_size > -offset ) {
-            /* NB.: offset < 0 */
-            /* We have a field of generic type, and need to store the
-               numeric stackcell at the positive offset: */
-            void* num_src = (char*)istate.ep[0].PTR - offset;
-            memcpy( &istate.ep[0].num, num_src, sizeof(istate.ep[0].num));
-            // printf( ">>> loaded positive part as well: %d\n", *(int*)num_src );
-        } else {
-            istate.ep[0].num.offs = 0;
-        }
-        istate.ep[0].PTR = *ref_src;
-#endif
-    }
+    assert( offset >= 0 );
+    assert( src_header->nref * (ssize_t)REF_SIZE <= offset );
+    memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
 
     return 2;
 }
@@ -618,25 +603,17 @@ int STI( INSTRUCTION_FN_ARGS )
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
     alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
+#if 0
     ssize_t element_size = dst_header->element_size;
     ssize_t length = dst_header->length;
+#endif
 
     TRACE_FUNCTION();
 
-    if( offset >= 0 ) {
-        memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num, size );
-    } else {
-        *(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
-        //*((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
-        if( length == -1 && element_size > -offset ) {
-            /* offset < 0 here */
-            /* We have a field of generic type, and need to store the
-               numeric stackcell at the positive offset: */
-            // printf( ">>> storing positive part as well: %d\n", istate.ep[0].num.i );
-            void* dst = (char*)istate.ep[1].PTR - offset;
-            memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
-        }
-    }
+    assert( offset >= 0 );
+    assert( dst_header->nref * (ssize_t)REF_SIZE <= offset );
+
+    memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num, size );
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
     STACKCELL_ZERO_PTR( istate.ep[1] );
@@ -650,7 +627,7 @@ int STI( INSTRUCTION_FN_ARGS )
  * GLDI (load indirect)
  *
  * bytecode:
- * GLDI size
+ * GLDI
  * 
  * address --> value
  *
@@ -658,49 +635,49 @@ int STI( INSTRUCTION_FN_ARGS )
 
 int GLDI( INSTRUCTION_FN_ARGS )
 {
-    ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
+    ssize_t bytes = sizeof(ssize_t);
+    ssize_t bits = (bytes * CHAR_BIT)/2;
+    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t neg_offset = offset >> bits;
+    void** ref_ptr;
+    void* num_ptr;
     void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
     alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
     ssize_t element_size = src_header->element_size;
-    ssize_t length = src_header->length;
 
     TRACE_FUNCTION();
 
     if( offset >= 0 ) {
         if( src_header->nref <= 0 ) {
-            memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
+            memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]),
+                    element_size );
             STACKCELL_ZERO_PTR( istate.ep[0] );
         } else {
             STACKCELL_SET_ADDR( istate.ep[0], *ref_src );
         }
     } else {
-#if 0
-        istate.ep[0].PTR = *(void**)STACKCELL_PTR(istate.ep[0]);
+
+        num_ptr = (char*)istate.ep[0].PTR + pos_offset;
+        ref_ptr = (void**)((char*)istate.ep[0].PTR + neg_offset);
+
         istate.ep[0].num.offs = 0;
-#else
-        if( length == -1 && element_size > -offset ) {
-            /* NB.: offset < 0 */
-            /* We have a field of generic type, and need to store the
-               numeric stackcell at the positive offset: */
-            void* num_src = (char*)istate.ep[0].PTR - offset;
-            memcpy( &istate.ep[0].num, num_src, sizeof(istate.ep[0].num));
-            // printf( ">>> loaded positive part as well: %d\n", *(int*)num_src );
-        } else {
-            istate.ep[0].num.offs = 0;
+
+        memcpy( &istate.ep[0].num, num_ptr, sizeof(istate.ep[0].num));
+
+        if( neg_offset < 0 ) {
+            istate.ep[0].PTR = *ref_ptr;
         }
-        istate.ep[0].PTR = *ref_src;
-#endif
     }
 
-    return 2;
+    return 1;
 }
 
 /*
  * GSTI (generic store indirect)
  *
  * bytecode:
- * GSTI size
+ * GSTI
  * 
  * ..., address, value --> 
  *
@@ -708,31 +685,39 @@ int GLDI( INSTRUCTION_FN_ARGS )
 
 int GSTI( INSTRUCTION_FN_ARGS )
 {
-    ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
+    ssize_t bytes = sizeof(ssize_t);
+    ssize_t bits = (bytes * CHAR_BIT)/2;
+    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t neg_offset = offset >> bits;
+    void** ref_ptr;
+    void* num_ptr;
     alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
     ssize_t element_size = dst_header->element_size;
-    ssize_t length = dst_header->length;
 
     TRACE_FUNCTION();
 
     if( offset >= 0 ) {
+        /* offset after INDEX into a generic type array */
         if( dst_header->nref <= 0 ) {
-            memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num, size );
+            memcpy( STACKCELL_PTR(istate.ep[1]), &istate.ep[0].num,
+                    element_size );
         } else {
             *(void**)STACKCELL_PTR(istate.ep[1]) =
                 STACKCELL_PTR( istate.ep[0] );
         }
     } else {
-        *(void**)STACKCELL_PTR(istate.ep[1]) = istate.ep[0].PTR;
-        //*((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
-        if( length == -1 && element_size > -offset ) {
-            /* offset < 0 here */
-            /* We have a field of generic type, and need to store the
-               numeric stackcell at the positive offset: */
-            // printf( ">>> storing positive part as well: %d\n", istate.ep[0].num.i );
-            void* dst = (char*)istate.ep[1].PTR - offset;
-            memcpy( dst, &istate.ep[0].num, sizeof(istate.ep[0].num));
+
+        /* printf( ">>> pos = %d, neg = %d\n", pos_offset, neg_offset ); */
+        /* exit(0); */
+
+        num_ptr = (char*)istate.ep[1].PTR + pos_offset;
+        ref_ptr = (void**)((char*)istate.ep[1].PTR + neg_offset);
+
+        memcpy( num_ptr, &istate.ep[0].num, sizeof(istate.ep[0].num) );
+
+        if( neg_offset < 0 ) {
+            *ref_ptr = istate.ep[0].PTR;
         }
     }
 
@@ -741,7 +726,7 @@ int GSTI( INSTRUCTION_FN_ARGS )
 
     istate.ep += 2;
 
-    return 2;
+    return 1;
 }
 
 /*
@@ -1236,7 +1221,8 @@ int RTOR( INSTRUCTION_FN_ARGS )
 
     // (--istate.sp)->ssize = (istate.ep++)->ssize;
     --istate.sp;
-    STACKCELL_SET_ADDR( istate.sp[0], STACKCELL_PTR( istate.ep[0] ));
+    // STACKCELL_SET_ADDR( istate.sp[0], STACKCELL_PTR( istate.ep[0] ));
+    istate.sp[0] = istate.ep[0];
     istate.ep++;
     return 1;
 }
@@ -1258,7 +1244,8 @@ int RFROMR( INSTRUCTION_FN_ARGS )
 
     // (--istate.ep)->ssize = (istate.sp++)->ssize ;
     --istate.ep;
-    STACKCELL_SET_ADDR( istate.ep[0], STACKCELL_PTR( istate.sp[0] ));
+    // STACKCELL_SET_ADDR( istate.ep[0], STACKCELL_PTR( istate.sp[0] ));
+    istate.ep[0] = istate.sp[0];
     istate.sp++;
     return 1;
 }
@@ -1702,7 +1689,7 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS )
 
 /*
  * Standard input management bytecode operators -- to implement
- * 'whil(<>) { ... }' a-la Perl.
+ * 'while(<>) { ... }' a-la Perl.
  */
 
 /*
@@ -5239,9 +5226,9 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     if( element_offset < 0 ) {
-        /* We arrive here when we process the first loop iteration: */
         element_offset = 0;
     } else {
+        /* We arrive here before the first loop iteration: */
         element_offset += element_size;
     }
     if( element_offset >= array_size ) {
@@ -5264,8 +5251,8 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
 /*
  * NEXT Advance a linked list pointer on the top of the stack to the
  *      next list element; jump to the provided address if there is
- *      the next element, otherwise remove the array pointer from the
- *      stack and proceed to the next opcode.
+ *      the next element, otherwise remove the list pointer node from
+ *      the stack and proceed to the next opcode.
  *
  * bytecode:
  * NEXT next_offset value_offset jmp_offset
