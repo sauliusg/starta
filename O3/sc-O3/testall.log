@@ -1,5 +1,5 @@
 + make distclean
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 rm -f *~
 rm -f ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o ./obj/common.o ./obj/formats.o ./obj/typecode.o ./obj/sllist.o ./obj/alloccell.o ./obj/bcalloc.o ./obj/bctraverse.o ./obj/bytecode_file.o ./obj/implementation.o ./obj/pack.o ./obj/tcodes.o ./obj/tnode.o lexer.lex.o grammar.tab.o
 rm -f *.tab.c lex.yy.c *.lex.c *.tab.h *.output
@@ -7,48 +7,54 @@ rm -f ./outputs/diff/ack001.diff ./outputs/diff/ack002.diff ./outputs/diff/aling
 rm -f ./shoutputs/diff/2nd-readstdinscopes001.diff ./shoutputs/diff/ack001.diff ./shoutputs/diff/args001.diff ./shoutputs/diff/args002.diff ./shoutputs/diff/env001.diff ./shoutputs/diff/exit001.diff ./shoutputs/diff/libpath001.diff ./shoutputs/diff/libpath002.diff ./shoutputs/diff/libpath003.diff ./shoutputs/diff/libpath004.diff ./shoutputs/diff/libpath005.diff ./shoutputs/diff/lineio001.diff ./shoutputs/diff/progenv001.diff ./shoutputs/diff/program001.diff ./shoutputs/diff/readline001.diff ./shoutputs/diff/readmtz001.diff ./shoutputs/diff/readstdin001.diff ./shoutputs/diff/readstdin002.diff ./shoutputs/diff/readstdin003.diff ./shoutputs/diff/readstdin004.diff ./shoutputs/diff/readstdin005.diff ./shoutputs/diff/readstdin006.diff ./shoutputs/diff/readstdin007.diff ./shoutputs/diff/readstdin008.diff ./shoutputs/diff/readstdin009.diff ./shoutputs/diff/readstdin2op001.diff ./shoutputs/diff/readstdin3op001.diff ./shoutputs/diff/readstdinop001.diff ./shoutputs/diff/readstdinscopes001.diff ./shoutputs/diff/readword001.diff
 rm -f ./generated/*
 make -C libraries cleanAll
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libarraymath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libGNUrand48.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 rm -f just-so.o
 rm -f libjust-so.so.0.01
 rm -f .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libmath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 rm -f opcodes.o
 rm -f libtest.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+rm -f opcodes.o
+rm -f locally-generated/*
+rm -f libTime.so.0.01
+rm -f .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libvectors.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 rm -f  sl 
 rm -f .anode.d .cvalue_t.d .dlist.d .dnode.d .elist.d .enode.d .fixup.d .run.d .stlist.d .symtab.d .thrcode.d .thrlist.d .tlist.d .tnode_compat.d .typetab.d .vartab.d .yy.d .common.d .formats.d .typecode.d .sllist.d .alloccell.d .bcalloc.d .bctraverse.d .bytecode_file.d .implementation.d .pack.d .tcodes.d .tnode.d ./programs/.sl.d 
 rm -f libsc-O3.a
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/packed-type
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 Makefile:208: .anode.d: No such file or directory
 Makefile:208: .cvalue_t.d: No such file or directory
 Makefile:208: .dlist.d: No such file or directory
@@ -79,68 +85,68 @@ Makefile:208: .pack.d: No such file or directory
 Makefile:208: .tcodes.d: No such file or directory
 Makefile:208: .tnode.d: No such file or directory
 Makefile:208: programs/.sl.d: No such file or directory
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/packed-type/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/typecode.c | sed -e 's,^typecode.o:,./obj/typecode.o:,' > .typecode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -M -MG \
 	anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 sed -f interpreters/packed-type/ifunctions/byte.sed interpreters/packed-type/ifunctions/integer.hin > generated/byte_integer.h
 sed -f interpreters/packed-type/ifunctions/short.sed interpreters/packed-type/ifunctions/integer.hin > generated/short_integer.h
 sed -f interpreters/packed-type/ifunctions/int.sed interpreters/packed-type/ifunctions/integer.hin > generated/int_integer.h
@@ -157,40 +163,40 @@ sed -f interpreters/packed-type/ifunctions/llong.sed interpreters/packed-type/if
 sed -f interpreters/packed-type/ifunctions/float.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/packed-type/ifunctions/double.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/packed-type/ifunctions/ldouble.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c anode.c -o obj/anode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c dnode.c -o obj/dnode.o
 dnode.c: In function ‘dnode_list_lookup_proto_by_tnodes’:
 dnode.c:574:7: warning: implicit declaration of function ‘tnode_types_are_compatible’ [-Wimplicit-function-declaration]
 dnode.c: In function ‘dnode_lists_are_type_identical’:
 dnode.c:639:6: warning: implicit declaration of function ‘tnode_types_are_identical’ [-Wimplicit-function-declaration]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c enode.c -o obj/enode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c run.c -o obj/run.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c run.c -o obj/run.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c vartab.c -o obj/vartab.o
 vartab.c: In function ‘vartab_insert_operator’:
 vartab.c:126:25: warning: unused variable ‘node’ [-Wunused-variable]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c yy.c -o obj/yy.o
 ar cr libsc-O3.a ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c ../../common/common.c -o obj/common.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c ../../common/formats.c -o obj/formats.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c ../../common/typecode.c -o obj/typecode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c ../../lists/sllist.c -o obj/sllist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/bctraverse.c -o obj/bctraverse.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/implementation.c -o obj/implementation.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/pack.c -o obj/pack.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c ../../common/common.c -o obj/common.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c ../../common/formats.c -o obj/formats.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c ../../common/typecode.c -o obj/typecode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c ../../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/implementation.c -o obj/implementation.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/pack.c -o obj/pack.o
 interpreters/packed-type/pack.c: In function ‘unpack_array_values’:
 interpreters/packed-type/pack.c:252:23: warning: ignoring return value of ‘strtol’, declared with attribute warn_unused_result [-Wunused-result]
 awk '/^ *int /{print $2}' generated/byte_integer.h \
@@ -260,7 +266,7 @@ sed -f interpreters/packed-type/ifunctions/llong.sed interpreters/packed-type/if
 sed -f interpreters/packed-type/ifunctions/float.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/packed-type/ifunctions/double.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/packed-type/ifunctions/ldouble.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/tcodes.c -o obj/tcodes.o
 interpreters/packed-type/tcodes.c: In function ‘LDFILESCAN’:
 ./generated/ldouble_float.c:144:11: warning: ignoring return value of ‘fscanf’, declared with attribute warn_unused_result [-Wunused-result]
 interpreters/packed-type/tcodes.c: In function ‘DFILESCAN’:
@@ -286,27 +292,27 @@ In file included from interpreters/packed-type/tcodes.c:232:0:
 In file included from interpreters/packed-type/tcodes.c:231:0:
 ./generated/float_float.c: In function ‘unpack_f’:
 ./generated/float_float.c:418:24: warning: ‘fvalue’ may be used uninitialized in this function [-Wuninitialized]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\"" -c interpreters/packed-type/tnode.c -o obj/tnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\"" -c interpreters/packed-type/tnode.c -o obj/tnode.o
 interpreters/packed-type/tnode.c:1074:12: warning: ‘tnode_retval_nr’ defined but not used [-Wunused-function]
 bison -y -v -d grammar.y
 conflicts: 1 shift/reduce
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\""   -c -o grammar.tab.o grammar.tab.c
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2610:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2660:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2828M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"2831M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
 make -C libraries CC=gcc LD=ld
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 sed -f ../../interpreters/packed-type/arrays.sed ifunctions/arrays.hin \
 	| sed -f ifunctions/float.sed > locally-generated/float_arrays.h
 awk '/^ *int /{print $2}' locally-generated/float_arrays.h \
@@ -331,28 +337,28 @@ sed -f ../../interpreters/packed-type/arrays.sed ifunctions/arrays.cin \
 gcc -c -I. -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libarraymath.so.0 -o libarraymath.so.0.01 opcodes.o -lm
 rm locally-generated/float_arrays.h locally-generated/ldouble_arrays.h locally-generated/double_arrays.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 gcc -c -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libGNUrand48.so.0 -o libGNUrand48.so.0.01 opcodes.o 
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 Makefile:42: .just-so.d: No such file or directory
 gcc -I. -I../../ -fPIC -M -MG just-so.c > .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 gcc -c -I. -I../../ -fPIC -o just-so.o just-so.c
 ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 sed -f ifunctions/float.sed ifunctions/float.hin > locally-generated/float_float.h
 awk '/^ *int /{print $2}' locally-generated/float_float.h \
 	| sed -e 's/(//' \
@@ -371,20 +377,28 @@ sed -f ifunctions/ldouble.sed ifunctions/float.cin > locally-generated/ldouble_f
 gcc -c -I. -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libmath.so.0 -o libmath.so.0.01 opcodes.o -lm
 rm locally-generated/float_float.h locally-generated/ldouble_float.h locally-generated/double_float.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 gcc -c -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libtest.so.0 -o libtest.so.0.01 opcodes.o 
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+Makefile:42: .opcodes.d: No such file or directory
+gcc -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+gcc -c -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
+ld -shared -soname libTime.so.0 -o libTime.so.0.01 opcodes.o 
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 sed -f ifunctions/byte.sed ifunctions/vectors.hin > locally-generated/byte_vectors.h
 awk '/^ *int /{print $2}' locally-generated/byte_vectors.h \
 	| sed -e 's/(//' \
@@ -468,32 +482,35 @@ sed -f ifunctions/ldouble.sed ifunctions/floatvect.cin > locally-generated/ldoub
 gcc -c -I. -I../.. -I../../interpreters/packed-type -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libvectors.so.0 -o libvectors.so.0.01 opcodes.o -lm
 rm locally-generated/short_intvect.h locally-generated/llong_vectors.h locally-generated/ldouble_floatvect.h locally-generated/float_vectors.h locally-generated/byte_vectors.h locally-generated/long_vectors.h locally-generated/int_vectors.h locally-generated/llong_intvect.h locally-generated/byte_intvect.h locally-generated/long_intvect.h locally-generated/ldouble_vectors.h locally-generated/double_floatvect.h locally-generated/double_vectors.h locally-generated/float_floatvect.h locally-generated/short_vectors.h locally-generated/int_intvect.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/packed-type tests
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 make -C libraries CC=gcc LD=ld
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 ack001:                        OK
 ack002:                        OK
 alingn001:                     OK
@@ -1295,9 +1312,9 @@ readstdin3op001:               OK
 readstdinop001:                OK
 readstdinscopes001:            OK
 readword001:                   OK
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/packed-type distclean
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 rm -f *~
 rm -f ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o ./obj/common.o ./obj/formats.o ./obj/typecode.o ./obj/sllist.o ./obj/alloccell.o ./obj/bcalloc.o ./obj/bctraverse.o ./obj/bytecode_file.o ./obj/implementation.o ./obj/pack.o ./obj/tcodes.o ./obj/tnode.o lexer.lex.o grammar.tab.o
 rm -f *.tab.c lex.yy.c *.lex.c *.tab.h *.output
@@ -1305,48 +1322,54 @@ rm -f ./outputs/diff/ack001.diff ./outputs/diff/ack002.diff ./outputs/diff/aling
 rm -f ./shoutputs/diff/2nd-readstdinscopes001.diff ./shoutputs/diff/ack001.diff ./shoutputs/diff/args001.diff ./shoutputs/diff/args002.diff ./shoutputs/diff/env001.diff ./shoutputs/diff/exit001.diff ./shoutputs/diff/libpath001.diff ./shoutputs/diff/libpath002.diff ./shoutputs/diff/libpath003.diff ./shoutputs/diff/libpath004.diff ./shoutputs/diff/libpath005.diff ./shoutputs/diff/lineio001.diff ./shoutputs/diff/progenv001.diff ./shoutputs/diff/program001.diff ./shoutputs/diff/readline001.diff ./shoutputs/diff/readmtz001.diff ./shoutputs/diff/readstdin001.diff ./shoutputs/diff/readstdin002.diff ./shoutputs/diff/readstdin003.diff ./shoutputs/diff/readstdin004.diff ./shoutputs/diff/readstdin005.diff ./shoutputs/diff/readstdin006.diff ./shoutputs/diff/readstdin007.diff ./shoutputs/diff/readstdin008.diff ./shoutputs/diff/readstdin009.diff ./shoutputs/diff/readstdin2op001.diff ./shoutputs/diff/readstdin3op001.diff ./shoutputs/diff/readstdinop001.diff ./shoutputs/diff/readstdinscopes001.diff ./shoutputs/diff/readword001.diff
 rm -f ./generated/*
 make -C libraries cleanAll
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libarraymath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libGNUrand48.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 rm -f just-so.o
 rm -f libjust-so.so.0.01
 rm -f .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libmath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 rm -f opcodes.o
 rm -f libtest.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+rm -f opcodes.o
+rm -f locally-generated/*
+rm -f libTime.so.0.01
+rm -f .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libvectors.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 rm -f  sl 
 rm -f .anode.d .cvalue_t.d .dlist.d .dnode.d .elist.d .enode.d .fixup.d .run.d .stlist.d .symtab.d .thrcode.d .thrlist.d .tlist.d .tnode_compat.d .typetab.d .vartab.d .yy.d .common.d .formats.d .typecode.d .sllist.d .alloccell.d .bcalloc.d .bctraverse.d .bytecode_file.d .implementation.d .pack.d .tcodes.d .tnode.d ./programs/.sl.d 
 rm -f libsc-O3.a
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/full-stackcell
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 Makefile:208: .anode.d: No such file or directory
 Makefile:208: .cvalue_t.d: No such file or directory
 Makefile:208: .dlist.d: No such file or directory
@@ -1377,68 +1400,68 @@ Makefile:208: .pack.d: No such file or directory
 Makefile:208: .tcodes.d: No such file or directory
 Makefile:208: .tnode.d: No such file or directory
 Makefile:208: programs/.sl.d: No such file or directory
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/full-stackcell/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/typecode.c | sed -e 's,^typecode.o:,./obj/typecode.o:,' > .typecode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 sed -f interpreters/full-stackcell/ifunctions/byte.sed interpreters/full-stackcell/ifunctions/integer.hin > generated/byte_integer.h
 sed -f interpreters/full-stackcell/ifunctions/short.sed interpreters/full-stackcell/ifunctions/integer.hin > generated/short_integer.h
 sed -f interpreters/full-stackcell/ifunctions/int.sed interpreters/full-stackcell/ifunctions/integer.hin > generated/int_integer.h
@@ -1455,40 +1478,40 @@ sed -f interpreters/full-stackcell/ifunctions/llong.sed interpreters/full-stackc
 sed -f interpreters/full-stackcell/ifunctions/float.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/full-stackcell/ifunctions/double.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/full-stackcell/ifunctions/ldouble.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c anode.c -o obj/anode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c dnode.c -o obj/dnode.o
 dnode.c: In function ‘dnode_list_lookup_proto_by_tnodes’:
 dnode.c:574:7: warning: implicit declaration of function ‘tnode_types_are_compatible’ [-Wimplicit-function-declaration]
 dnode.c: In function ‘dnode_lists_are_type_identical’:
 dnode.c:639:6: warning: implicit declaration of function ‘tnode_types_are_identical’ [-Wimplicit-function-declaration]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c enode.c -o obj/enode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c run.c -o obj/run.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c run.c -o obj/run.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c vartab.c -o obj/vartab.o
 vartab.c: In function ‘vartab_insert_operator’:
 vartab.c:126:25: warning: unused variable ‘node’ [-Wunused-variable]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c yy.c -o obj/yy.o
 ar cr libsc-O3.a ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c ../../common/common.c -o obj/common.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c ../../common/formats.c -o obj/formats.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c ../../common/typecode.c -o obj/typecode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c ../../lists/sllist.c -o obj/sllist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/bctraverse.c -o obj/bctraverse.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/implementation.c -o obj/implementation.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/pack.c -o obj/pack.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c ../../common/common.c -o obj/common.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c ../../common/formats.c -o obj/formats.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c ../../common/typecode.c -o obj/typecode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c ../../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/implementation.c -o obj/implementation.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/pack.c -o obj/pack.o
 interpreters/full-stackcell/pack.c: In function ‘unpack_array_values’:
 interpreters/full-stackcell/pack.c:239:23: warning: ignoring return value of ‘strtol’, declared with attribute warn_unused_result [-Wunused-result]
 awk '/^ *int /{print $2}' generated/byte_integer.h \
@@ -1558,7 +1581,7 @@ sed -f interpreters/full-stackcell/ifunctions/llong.sed interpreters/full-stackc
 sed -f interpreters/full-stackcell/ifunctions/float.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/full-stackcell/ifunctions/double.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/full-stackcell/ifunctions/ldouble.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/tcodes.c -o obj/tcodes.o
 In file included from interpreters/full-stackcell/tcodes.c:224:0:
 ./generated/byte_integer.c: In function ‘BHASHALLOC’:
 ./generated/byte_integer.c:373:13: warning: variable ‘alloc_size’ set but not used [-Wunused-but-set-variable]
@@ -1604,7 +1627,7 @@ In file included from interpreters/full-stackcell/tcodes.c:231:0:
 In file included from interpreters/full-stackcell/tcodes.c:230:0:
 ./generated/float_float.c: In function ‘unpack_f’:
 ./generated/float_float.c:418:19: warning: ‘fvalue’ may be used uninitialized in this function [-Wuninitialized]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/full-stackcell/tnode.c -o obj/tnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/full-stackcell/tnode.c -o obj/tnode.o
 interpreters/full-stackcell/tnode.c: In function ‘tnode_insert_fields’:
 interpreters/full-stackcell/tnode.c:1150:12: warning: variable ‘field_size’ set but not used [-Wunused-but-set-variable]
 interpreters/full-stackcell/tnode.c:1149:11: warning: variable ‘name’ set but not used [-Wunused-but-set-variable]
@@ -1613,20 +1636,20 @@ conflicts: 1 shift/reduce
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\""   -c -o grammar.tab.o grammar.tab.c
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2610:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2660:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2828M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"2831M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
 make -C libraries CC=gcc LD=ld
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 sed -f ../../interpreters/full-stackcell/arrays.sed ifunctions/arrays.hin \
 	| sed -f ifunctions/float.sed > locally-generated/float_arrays.h
 awk '/^ *int /{print $2}' locally-generated/float_arrays.h \
@@ -1651,28 +1674,28 @@ sed -f ../../interpreters/full-stackcell/arrays.sed ifunctions/arrays.cin \
 gcc -c -I. -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libarraymath.so.0 -o libarraymath.so.0.01 opcodes.o -lm
 rm locally-generated/float_arrays.h locally-generated/ldouble_arrays.h locally-generated/double_arrays.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 gcc -c -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libGNUrand48.so.0 -o libGNUrand48.so.0.01 opcodes.o 
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 Makefile:42: .just-so.d: No such file or directory
 gcc -I. -I../../ -fPIC -M -MG just-so.c > .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 gcc -c -I. -I../../ -fPIC -o just-so.o just-so.c
 ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 sed -f ifunctions/float.sed ifunctions/float.hin > locally-generated/float_float.h
 awk '/^ *int /{print $2}' locally-generated/float_float.h \
 	| sed -e 's/(//' \
@@ -1691,20 +1714,28 @@ sed -f ifunctions/ldouble.sed ifunctions/float.cin > locally-generated/ldouble_f
 gcc -c -I. -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libmath.so.0 -o libmath.so.0.01 opcodes.o -lm
 rm locally-generated/float_float.h locally-generated/ldouble_float.h locally-generated/double_float.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 gcc -c -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libtest.so.0 -o libtest.so.0.01 opcodes.o 
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+Makefile:42: .opcodes.d: No such file or directory
+gcc -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+gcc -c -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
+ld -shared -soname libTime.so.0 -o libTime.so.0.01 opcodes.o 
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 sed -f ifunctions/byte.sed ifunctions/vectors.hin > locally-generated/byte_vectors.h
 awk '/^ *int /{print $2}' locally-generated/byte_vectors.h \
 	| sed -e 's/(//' \
@@ -1788,32 +1819,35 @@ sed -f ifunctions/ldouble.sed ifunctions/floatvect.cin > locally-generated/ldoub
 gcc -c -I. -I../.. -I../../interpreters/full-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libvectors.so.0 -o libvectors.so.0.01 opcodes.o -lm
 rm locally-generated/short_intvect.h locally-generated/llong_vectors.h locally-generated/ldouble_floatvect.h locally-generated/float_vectors.h locally-generated/byte_vectors.h locally-generated/long_vectors.h locally-generated/llong_intvect.h locally-generated/byte_intvect.h locally-generated/long_intvect.h locally-generated/ldouble_vectors.h locally-generated/double_floatvect.h locally-generated/double_vectors.h locally-generated/float_floatvect.h locally-generated/int_vectors.h locally-generated/short_vectors.h locally-generated/int_intvect.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/full-stackcell tests
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 make -C libraries CC=gcc LD=ld
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 ack001:                        OK
 ack002:                        OK
 alingn001:                     OK
@@ -2615,9 +2649,9 @@ readstdin3op001:               OK
 readstdinop001:                OK
 readstdinscopes001:            OK
 readword001:                   OK
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/full-stackcell distclean
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 rm -f *~
 rm -f ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o ./obj/common.o ./obj/formats.o ./obj/typecode.o ./obj/sllist.o ./obj/alloccell.o ./obj/bcalloc.o ./obj/bctraverse.o ./obj/bytecode_file.o ./obj/implementation.o ./obj/pack.o ./obj/tcodes.o ./obj/tnode.o lexer.lex.o grammar.tab.o
 rm -f *.tab.c lex.yy.c *.lex.c *.tab.h *.output
@@ -2625,48 +2659,54 @@ rm -f ./outputs/diff/ack001.diff ./outputs/diff/ack002.diff ./outputs/diff/aling
 rm -f ./shoutputs/diff/2nd-readstdinscopes001.diff ./shoutputs/diff/ack001.diff ./shoutputs/diff/args001.diff ./shoutputs/diff/args002.diff ./shoutputs/diff/env001.diff ./shoutputs/diff/exit001.diff ./shoutputs/diff/libpath001.diff ./shoutputs/diff/libpath002.diff ./shoutputs/diff/libpath003.diff ./shoutputs/diff/libpath004.diff ./shoutputs/diff/libpath005.diff ./shoutputs/diff/lineio001.diff ./shoutputs/diff/progenv001.diff ./shoutputs/diff/program001.diff ./shoutputs/diff/readline001.diff ./shoutputs/diff/readmtz001.diff ./shoutputs/diff/readstdin001.diff ./shoutputs/diff/readstdin002.diff ./shoutputs/diff/readstdin003.diff ./shoutputs/diff/readstdin004.diff ./shoutputs/diff/readstdin005.diff ./shoutputs/diff/readstdin006.diff ./shoutputs/diff/readstdin007.diff ./shoutputs/diff/readstdin008.diff ./shoutputs/diff/readstdin009.diff ./shoutputs/diff/readstdin2op001.diff ./shoutputs/diff/readstdin3op001.diff ./shoutputs/diff/readstdinop001.diff ./shoutputs/diff/readstdinscopes001.diff ./shoutputs/diff/readword001.diff
 rm -f ./generated/*
 make -C libraries cleanAll
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libarraymath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libGNUrand48.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 rm -f just-so.o
 rm -f libjust-so.so.0.01
 rm -f .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libmath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 rm -f opcodes.o
 rm -f libtest.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+rm -f opcodes.o
+rm -f locally-generated/*
+rm -f libTime.so.0.01
+rm -f .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libvectors.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 rm -f  sl 
 rm -f .anode.d .cvalue_t.d .dlist.d .dnode.d .elist.d .enode.d .fixup.d .run.d .stlist.d .symtab.d .thrcode.d .thrlist.d .tlist.d .tnode_compat.d .typetab.d .vartab.d .yy.d .common.d .formats.d .typecode.d .sllist.d .alloccell.d .bcalloc.d .bctraverse.d .bytecode_file.d .implementation.d .pack.d .tcodes.d .tnode.d ./programs/.sl.d 
 rm -f libsc-O3.a
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/split-stackcell
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 Makefile:208: .anode.d: No such file or directory
 Makefile:208: .cvalue_t.d: No such file or directory
 Makefile:208: .dlist.d: No such file or directory
@@ -2697,68 +2737,68 @@ Makefile:208: .pack.d: No such file or directory
 Makefile:208: .tcodes.d: No such file or directory
 Makefile:208: .tnode.d: No such file or directory
 Makefile:208: programs/.sl.d: No such file or directory
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	interpreters/split-stackcell/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/typecode.c | sed -e 's,^typecode.o:,./obj/typecode.o:,' > .typecode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	../../common/common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -M -MG \
 	anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 sed -f interpreters/split-stackcell/ifunctions/byte.sed interpreters/split-stackcell/ifunctions/integer.hin > generated/byte_integer.h
 sed -f interpreters/split-stackcell/ifunctions/short.sed interpreters/split-stackcell/ifunctions/integer.hin > generated/short_integer.h
 sed -f interpreters/split-stackcell/ifunctions/int.sed interpreters/split-stackcell/ifunctions/integer.hin > generated/int_integer.h
@@ -2775,40 +2815,40 @@ sed -f interpreters/split-stackcell/ifunctions/llong.sed interpreters/split-stac
 sed -f interpreters/split-stackcell/ifunctions/float.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/split-stackcell/ifunctions/double.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/split-stackcell/ifunctions/ldouble.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c anode.c -o obj/anode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c dnode.c -o obj/dnode.o
 dnode.c: In function ‘dnode_list_lookup_proto_by_tnodes’:
 dnode.c:574:7: warning: implicit declaration of function ‘tnode_types_are_compatible’ [-Wimplicit-function-declaration]
 dnode.c: In function ‘dnode_lists_are_type_identical’:
 dnode.c:639:6: warning: implicit declaration of function ‘tnode_types_are_identical’ [-Wimplicit-function-declaration]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c enode.c -o obj/enode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c run.c -o obj/run.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c run.c -o obj/run.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c vartab.c -o obj/vartab.o
 vartab.c: In function ‘vartab_insert_operator’:
 vartab.c:126:25: warning: unused variable ‘node’ [-Wunused-variable]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c yy.c -o obj/yy.o
 ar cr libsc-O3.a ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c ../../common/common.c -o obj/common.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c ../../common/formats.c -o obj/formats.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c ../../common/typecode.c -o obj/typecode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c ../../lists/sllist.c -o obj/sllist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/bctraverse.c -o obj/bctraverse.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/implementation.c -o obj/implementation.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/pack.c -o obj/pack.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c ../../common/common.c -o obj/common.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c ../../common/formats.c -o obj/formats.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c ../../common/typecode.c -o obj/typecode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c ../../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/implementation.c -o obj/implementation.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/pack.c -o obj/pack.o
 interpreters/split-stackcell/pack.c: In function ‘unpack_array_values’:
 interpreters/split-stackcell/pack.c:249:23: warning: ignoring return value of ‘strtol’, declared with attribute warn_unused_result [-Wunused-result]
 awk '/^ *int /{print $2}' generated/byte_integer.h \
@@ -2878,7 +2918,7 @@ sed -f interpreters/split-stackcell/ifunctions/llong.sed interpreters/split-stac
 sed -f interpreters/split-stackcell/ifunctions/float.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/split-stackcell/ifunctions/double.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/split-stackcell/ifunctions/ldouble.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/tcodes.c -o obj/tcodes.o
 interpreters/split-stackcell/tcodes.c: In function ‘LDFILESCAN’:
 ./generated/ldouble_float.c:144:11: warning: ignoring return value of ‘fscanf’, declared with attribute warn_unused_result [-Wunused-result]
 interpreters/split-stackcell/tcodes.c: In function ‘DFILESCAN’:
@@ -2904,27 +2944,27 @@ In file included from interpreters/split-stackcell/tcodes.c:230:0:
 In file included from interpreters/split-stackcell/tcodes.c:229:0:
 ./generated/float_float.c: In function ‘unpack_f’:
 ./generated/float_float.c:418:35: warning: ‘fvalue’ may be used uninitialized in this function [-Wuninitialized]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\"" -c interpreters/split-stackcell/tnode.c -o obj/tnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\"" -c interpreters/split-stackcell/tnode.c -o obj/tnode.o
 interpreters/split-stackcell/tnode.c:1074:12: warning: ‘tnode_retval_nr’ defined but not used [-Wunused-function]
 bison -y -v -d grammar.y
 conflicts: 1 shift/reduce
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\""   -c -o grammar.tab.o grammar.tab.c
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2610:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2660:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2828M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"2831M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
 make -C libraries CC=gcc LD=ld
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 sed -f ../../interpreters/split-stackcell/arrays.sed ifunctions/arrays.hin \
 	| sed -f ifunctions/float.sed > locally-generated/float_arrays.h
 awk '/^ *int /{print $2}' locally-generated/float_arrays.h \
@@ -2949,28 +2989,28 @@ sed -f ../../interpreters/split-stackcell/arrays.sed ifunctions/arrays.cin \
 gcc -c -I. -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libarraymath.so.0 -o libarraymath.so.0.01 opcodes.o -lm
 rm locally-generated/float_arrays.h locally-generated/ldouble_arrays.h locally-generated/double_arrays.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 gcc -c -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libGNUrand48.so.0 -o libGNUrand48.so.0.01 opcodes.o 
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 Makefile:42: .just-so.d: No such file or directory
 gcc -I. -I../../ -fPIC -M -MG just-so.c > .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 gcc -c -I. -I../../ -fPIC -o just-so.o just-so.c
 ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 sed -f ifunctions/float.sed ifunctions/float.hin > locally-generated/float_float.h
 awk '/^ *int /{print $2}' locally-generated/float_float.h \
 	| sed -e 's/(//' \
@@ -2989,20 +3029,28 @@ sed -f ifunctions/ldouble.sed ifunctions/float.cin > locally-generated/ldouble_f
 gcc -c -I. -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libmath.so.0 -o libmath.so.0.01 opcodes.o -lm
 rm locally-generated/float_float.h locally-generated/ldouble_float.h locally-generated/double_float.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 gcc -c -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libtest.so.0 -o libtest.so.0.01 opcodes.o 
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+Makefile:42: .opcodes.d: No such file or directory
+gcc -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+gcc -c -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
+ld -shared -soname libTime.so.0 -o libTime.so.0.01 opcodes.o 
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 Makefile:42: .opcodes.d: No such file or directory
 gcc -I. -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -M -MG opcodes.c > .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 sed -f ifunctions/byte.sed ifunctions/vectors.hin > locally-generated/byte_vectors.h
 awk '/^ *int /{print $2}' locally-generated/byte_vectors.h \
 	| sed -e 's/(//' \
@@ -3086,32 +3134,35 @@ sed -f ifunctions/ldouble.sed ifunctions/floatvect.cin > locally-generated/ldoub
 gcc -c -I. -I../.. -I../../interpreters/split-stackcell -I../../../cexceptions -fPIC -o opcodes.o opcodes.c
 ld -shared -soname libvectors.so.0 -o libvectors.so.0.01 opcodes.o -lm
 rm locally-generated/short_intvect.h locally-generated/llong_vectors.h locally-generated/ldouble_floatvect.h locally-generated/float_vectors.h locally-generated/byte_vectors.h locally-generated/long_vectors.h locally-generated/llong_intvect.h locally-generated/byte_intvect.h locally-generated/long_intvect.h locally-generated/ldouble_vectors.h locally-generated/double_floatvect.h locally-generated/double_vectors.h locally-generated/float_floatvect.h locally-generated/int_vectors.h locally-generated/short_vectors.h locally-generated/int_intvect.h
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/split-stackcell tests
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 make -C libraries CC=gcc LD=ld
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
 make[3]: Nothing to be done for `all'.
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 ack001:                        OK
 ack002:                        OK
 alingn001:                     OK
@@ -3895,9 +3946,9 @@ readstdin3op001:               OK
 readstdinop001:                OK
 readstdinscopes001:            OK
 readword001:                   OK
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 + make INTERPRETER_DIR=interpreters/split-stackcell distclean
-make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Entering directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
 rm -f *~
 rm -f ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o ./obj/common.o ./obj/formats.o ./obj/typecode.o ./obj/sllist.o ./obj/alloccell.o ./obj/bcalloc.o ./obj/bctraverse.o ./obj/bytecode_file.o ./obj/implementation.o ./obj/pack.o ./obj/tcodes.o ./obj/tnode.o lexer.lex.o grammar.tab.o
 rm -f *.tab.c lex.yy.c *.lex.c *.tab.h *.output
@@ -3905,43 +3956,49 @@ rm -f ./outputs/diff/ack001.diff ./outputs/diff/ack002.diff ./outputs/diff/aling
 rm -f ./shoutputs/diff/2nd-readstdinscopes001.diff ./shoutputs/diff/ack001.diff ./shoutputs/diff/args001.diff ./shoutputs/diff/args002.diff ./shoutputs/diff/env001.diff ./shoutputs/diff/exit001.diff ./shoutputs/diff/libpath001.diff ./shoutputs/diff/libpath002.diff ./shoutputs/diff/libpath003.diff ./shoutputs/diff/libpath004.diff ./shoutputs/diff/libpath005.diff ./shoutputs/diff/lineio001.diff ./shoutputs/diff/progenv001.diff ./shoutputs/diff/program001.diff ./shoutputs/diff/readline001.diff ./shoutputs/diff/readmtz001.diff ./shoutputs/diff/readstdin001.diff ./shoutputs/diff/readstdin002.diff ./shoutputs/diff/readstdin003.diff ./shoutputs/diff/readstdin004.diff ./shoutputs/diff/readstdin005.diff ./shoutputs/diff/readstdin006.diff ./shoutputs/diff/readstdin007.diff ./shoutputs/diff/readstdin008.diff ./shoutputs/diff/readstdin009.diff ./shoutputs/diff/readstdin2op001.diff ./shoutputs/diff/readstdin3op001.diff ./shoutputs/diff/readstdinop001.diff ./shoutputs/diff/readstdinscopes001.diff ./shoutputs/diff/readword001.diff
 rm -f ./generated/*
 make -C libraries cleanAll
-make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
+make[2]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libarraymath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/arraymath'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/arraymath'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libGNUrand48.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/GNUrand48'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/GNUrand48'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
 rm -f just-so.o
 rm -f libjust-so.so.0.01
 rm -f .just-so.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/just-so'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/just-so'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libmath.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/math'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/math'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
 rm -f opcodes.o
 rm -f libtest.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/test'
-make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/test'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+rm -f opcodes.o
+rm -f locally-generated/*
+rm -f libTime.so.0.01
+rm -f .opcodes.d
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/Time'
+make[3]: Entering directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
 rm -f opcodes.o
 rm -f locally-generated/*
 rm -f libvectors.so.0.01
 rm -f .opcodes.d
-make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries/vectors'
-make[2]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/sc/libraries'
+make[3]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries/vectors'
+make[2]: Leaving directory `/home/saulius/src/compilers/trunk/sc/libraries'
 rm -f  sl 
 rm -f .anode.d .cvalue_t.d .dlist.d .dnode.d .elist.d .enode.d .fixup.d .run.d .stlist.d .symtab.d .thrcode.d .thrlist.d .tlist.d .tnode_compat.d .typetab.d .vartab.d .yy.d .common.d .formats.d .typecode.d .sllist.d .alloccell.d .bcalloc.d .bctraverse.d .bytecode_file.d .implementation.d .pack.d .tcodes.d .tnode.d ./programs/.sl.d 
 rm -f libsc-O3.a
-make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-double-generic-offsets/O3/sc-O3'
+make[1]: Leaving directory `/home/saulius/src/compilers/trunk/O3/sc-O3'
