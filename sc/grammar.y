@@ -7199,9 +7199,14 @@ control_statement
         compiler_compile_dup( compiler, px );
         compiler_make_stack_top_element_type( compiler );
         compiler_make_stack_top_addressof( compiler, px );
-        /* compiler_compile_ldi( compiler, px ); */
-        compiler_emit( compiler, px, "\tc\n", GLDI );
-        compiler_stack_top_dereference( compiler );
+        if( aggregate_expression_type &&
+            tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+            tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+            compiler_compile_ldi( compiler, px );
+        } else {
+            compiler_emit( compiler, px, "\tc\n", GLDI );
+            compiler_stack_top_dereference( compiler );
+        }
         compiler_compile_variable_initialisation
             ( compiler, loop_counter_var, px );
       }
