@@ -7218,15 +7218,25 @@ control_statement
 
         /* Store the the loop variable back into the current array element: */
         if( !readonly ) {
+            TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
+            TNODE *element_type = 
+                aggregate_expression_type ?
+                tnode_element_type( aggregate_expression_type ) : NULL;
+
             compiler_compile_dup( compiler, px );
             compiler_make_stack_top_element_type( compiler );
             compiler_make_stack_top_addressof( compiler, px );
             compiler_compile_load_variable_value( compiler,
                                                   loop_counter_var, px );
-            /* compiler_compile_sti( compiler, px ); */
-            compiler_emit( compiler, px, "\tc\n", GSTI );
-	    compiler_drop_top_expression( compiler );
-	    compiler_drop_top_expression( compiler );
+            if( aggregate_expression_type &&
+                tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+                tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+                compiler_compile_sti( compiler, px );
+            } else {
+                compiler_emit( compiler, px, "\tc\n", GSTI );
+                compiler_drop_top_expression( compiler );
+                compiler_drop_top_expression( compiler );
+            }
         }
 
 	compiler_fixup_op_continue( compiler, px );
