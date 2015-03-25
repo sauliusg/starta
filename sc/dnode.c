@@ -244,7 +244,6 @@ static DNODE* new_dnode_function_or_operator( char *name,
 
     cexception_guard( inner ) {
 	ret->tnode = tnode_creator( name, parameters, return_values, &inner );
-        ret->name = strdupx( name, &inner );
     }
     cexception_catch {
         delete_dnode( ret );
