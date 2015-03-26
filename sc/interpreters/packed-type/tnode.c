@@ -928,12 +928,10 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type )
 	dnode_list_lookup( tnode->conversions, src_type_name ) :
 	NULL;
 
-#if 0
-    if( !conversion && tnode && tnode->base_type &&
-	( tnode->kind == TK_DERIVED || tnode->kind == TK_ENUM )) {
-	conversion = tnode_lookup_conversion( tnode->base_type, src_type_name );
+    if( !conversion && tnode && src_type->base_type &&
+	( src_type->kind == TK_DERIVED || src_type->kind == TK_ENUM )) {
+	conversion = tnode_lookup_conversion( tnode, src_type->base_type );
     }
-#endif
 
     return conversion;
 }
