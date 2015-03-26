@@ -1,16 +1,18 @@
 #
-# Ackermann function
+# Compiler tests
+#
+#
+# Test type conversions
 #
 
 use std;
 
-function ack( m, n : int ) : int
-{
-    if m == 0 then return n + 1 endif;
-    if n == 0 then return ack( m - 1, 1 ) endif;
-    return ack( m - 1, ack( m, n - 1 ));
-};
+type Cell = byte;
 
-pragma stacksize 150;
+inline bytecode function cell2int( b : Cell ) : int { BEXTEND HEXTEND };
 
-. ack(3,8);
+var Cell c = 1 Cell;
+
+. c;
+
+. cell2int( c ) << 10;

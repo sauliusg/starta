@@ -152,7 +152,7 @@ DNODE *tnode_lookup_operator( TNODE *tnode, char *operator_name, int arity );
 
 DNODE *tnode_lookup_operator_nonrecursive( TNODE *tnode, char *operator_name, int arity );
 
-DNODE *tnode_lookup_conversion( TNODE *tnode, char *src_type_name );
+DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type );
 
 TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name );
 
