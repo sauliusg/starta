@@ -1236,8 +1236,8 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 		typetab_lookup( cc->typetab, target_name );
 	    DNODE *conversion =
 		target_type ?
-		    tnode_lookup_conversion( target_type, source_name ) :
-		    NULL;
+                tnode_lookup_conversion( target_type, expr_type ) :
+                NULL;
 	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
 	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
 	    int retval_nr = dnode_list_length( retvals );
@@ -1319,14 +1319,12 @@ static void compiler_compile_return( COMPILER *cc,
             ( returned_type, available_type, NULL /* generic type table */,
               ex )) {
 #if 1
-            char *available_type_name = available_type ?
-                tnode_name( available_type ) : NULL;
             char *returned_type_name = returned_type ?
                 tnode_name( returned_type ) : NULL;
-            if( available_type_name && returned_type_name && 
+            if( available_type && returned_type_name && 
                 i == 0 &&
                 tnode_lookup_conversion( returned_type,
-                                         available_type_name  )) {
+                                         available_type  )) {
                 compiler_compile_type_conversion( cc, returned_type_name, ex );
                 expr = cc->e_stack;
                 if( expr ) {
@@ -2020,15 +2018,14 @@ static void compiler_compile_variable_assignment_or_init(
         TYPETAB *generic_types = NULL;
         if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
                                                     generic_types, ex )) {
-	    char *src_name = expr_type ? tnode_name( expr_type ) : NULL;
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
-	    if( src_name && dst_name &&
-		tnode_lookup_conversion( var_type, src_name )) {
+	    if( expr_type && dst_name &&
+		tnode_lookup_conversion( var_type, expr_type )) {
 		compiler_compile_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
 		compiler_emit_st( cc, expr_type, var_name, var_offset,
-			       var_scope, ex );
+                                  var_scope, ex );
 	    } else {
 		if( var_name ) {
 		    yyerrorf( "incompatible types for assignment to variable "
@@ -2229,10 +2226,9 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		 */
 		if( !tnode_types_are_assignment_compatible
                     ( element_type, expr_type, NULL /* generic_type_table*/, ex )) {
-		    char *src_name = tnode_name( expr_type );
 		    char *dst_name = tnode_name( element_type );
-		    if( src_name && dst_name &&
-			tnode_lookup_conversion( element_type, src_name )) {
+		    if( expr_type && dst_name &&
+			tnode_lookup_conversion( element_type, expr_type )) {
 			compiler_compile_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
 		    } else {

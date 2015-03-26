@@ -919,9 +919,13 @@ DNODE *tnode_lookup_operator_nonrecursive( TNODE *tnode, char *operator_name, in
     return operator;
 }
 
-DNODE *tnode_lookup_conversion( TNODE *tnode, char *src_type_name )
+DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type )
 {
     DNODE *conversion = NULL;
+    char *src_type_name = src_type ? tnode_name( src_type ) : NULL;
+
+    if( !src_type_name )
+        return NULL;
 
     conversion = tnode ?
 	dnode_list_lookup( tnode->conversions, src_type_name ) :
