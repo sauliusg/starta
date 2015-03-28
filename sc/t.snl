@@ -15,3 +15,16 @@ var Cell c = 1 Cell;
 
 . c << 10 Cell;
 . c@int << 10;
+
+var b : byte;
+
+b = c; // OK? Conversion happens automatically...
+b = c@byte; // OK, conversion to the same type should work
+
+// Below is a dirty hack to convert bytes back to Cell:
+
+// inline bytecode function byte2Cell( byte b ): Cell {};
+
+c = b; // OK...
+
+. c

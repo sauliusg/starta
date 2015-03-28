@@ -89,7 +89,9 @@ function make_random_rule( depth: int ) : array of byte
     return rule
 }
 
-procedure generation( newfield, field : array [][] of byte;
+type Cell = byte;
+
+procedure generation( newfield, field : array [][] of Cell;
                       rule: array [][][] of byte ) : int
 begin
     var i, j : int;
@@ -117,10 +119,11 @@ begin
                   field[i2][j]  @int shl  2 |
                   field[i2][j2] @int;
 
-            var rem = field[i][j];
+            var rem : byte = field[i][j];
 
-            newfield[i][j] = ((rule[i][j][sum] & (3 byte shl (2 byte * rem))) 
-                             shr (2 byte * rem)) & 3 byte;
+            newfield[i][j] =
+                ((rule[i][j][sum] & (3 byte shl (2 byte * rem)))
+                  shr (2 byte * rem)) & 3 byte;
 
 	    if( newfield[i][j] != field[i][j] ) then
 		nchanges ++;
@@ -132,17 +135,17 @@ begin
     return nchanges;
 end
 
-procedure printfield( f : array [][] of byte )
+procedure printfield( f : array [][] of Cell )
 {
     var i, j : int;
 
     for i = 0 to last(f) {
         for j = 0 to last(f[i]) {
-            if f[i][j] == 0 byte then
+            if f[i][j] == 0 Cell then
                 < "."
-            elsif f[i][j] == 1 byte then
+            elsif f[i][j] == 1 Cell then
                 < "o"
-            elsif f[i][j] == 2 byte then
+            elsif f[i][j] == 2 Cell then
                 < "*"
             else
                 < "O"
@@ -164,24 +167,24 @@ inline bytecode function readln( file inp ) : string
     BLDC 10 SFILEREADLN
 }
 
-function load_field( string filename ) : array [][] of byte
+function load_field( string filename ) : array [][] of Cell
 {
     var input = fopen( filename, "r" );
     var line : string;
-    var field, new_field : array [][] of byte;
+    var field, new_field : array [][] of Cell;
 
     var i : int = 0;
 
     while( (line=readln(input)) != null ) {
-	new_field = new (array of byte)[i+1];
+	new_field = new (array of Cell)[i+1];
 	if field {
 	    new_field := field;
 	}
 	field = new_field;
-	field[i] = new byte[length(line)-1];
+	field[i] = new Cell[length(line)-1];
 	for var j = 0 to last(field[i]) {
 	    if( line[j] != '.'c and line[j] != ' 'c ) {
-		field[i][j] = 1 byte;
+		field[i][j] = 1 Cell;
 	    }
 	}
 	i ++;
@@ -197,7 +200,7 @@ function load_field( string filename ) : array [][] of byte
     for i = 0 to last(field) {
 	var len = length( field[i] );
 	if( len < max ) {
-	    var new_line = new byte[max];
+	    var new_line = new Cell[max];
 	    new_line := field[i];
 	    field[i] = new_line;
 	}
@@ -244,7 +247,7 @@ else
 
 var generations = 1000;
 
-var field: array [][] of byte;
+var field: array [][] of Cell;
 
 if( length(argv) > 2 ) then
     generations = atoi( argv[1] );
@@ -256,7 +259,7 @@ endif
 var width = length(field);
 var height = length(field[0]);
 
-var newfield : array [][] of byte = new byte[width][height];
+var newfield = new Cell[width][height];
 
 var states = 1 shl 18;
 . states;

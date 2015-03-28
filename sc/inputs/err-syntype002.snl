@@ -17,21 +17,21 @@ var f, g, h : float;
 # All assignments that are not marked as OK produce type
 # incompatibility errors during compilation.
 
-c = f;
-f = c;
+c = f; // OK, derived type is compatible with the base type
+f = c; // ERROR if there is not conversion '@float', OK otherwise
 
-v = f;
-f = v;
+v = f; // OK, derived type is compatible with the base type
+f = v; // ERROR if there is not conversion '@float', OK otherwise
 
 c = a + b; # OK
-c = a + b + f;
+c = a + b + f; # ERROR, 'float' is not the same as 'cell'
 
 v = u + w; # OK
-v = u + g;
-v = u + f + c;
+v = u + g; # ERROR, 'voxel' and 'float' are different types
+v = u + f + c; # ERROR, 'float' and 'voxel' are different types
 
-c = a + v;
-v = b + w;
+c = a + v; // ERROR, 'cell' and 'voxel' are incompatible
+v = b + w; // ERROR, 'cell' and 'voxel' are incompatible
 
-## v = c;
-## c = v;
+v = c; // ERROR, 'voxel' and 'cell' are assignment-incompatible
+c = v; // ERROR, 'cell' and 'voxel' are assignment-incompatible

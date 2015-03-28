@@ -390,6 +390,11 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                                         NULL, 0, ex );
     }
 
+    if( t1->kind == TK_DERIVED ) {
+        return tnode_types_are_assignment_compatible
+            ( t1->base_type, t2, generic_types, ex );
+    }
+
     if( t1->name && t2->name ) return 0;
 
     if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {

@@ -14,11 +14,11 @@ var c : cell;
 var v : voxel;
 var f : float;
 
-c = f;
-f = c;
+c = f; // OK, derived type is compatible with the base type
+f = c; // ERROR if there is not conversion '@float', OK otherwise
 
-v = f;
-f = v;
+v = f; // OK, derived type is compatible with the base type
+f = v; // ERROR if there is not conversion '@float', OK otherwise
 
-v = c;
-c = v;
+v = c; // ERROR, two named derived types are incompatible
+c = v; // ERROR, two named derived types are incompatible
