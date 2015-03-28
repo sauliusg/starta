@@ -1,5 +1,0 @@
-./sl: inputs/err-typecompat007.snl(15,6): ERROR, incompatible types for assignment to variable 'b'
-b = a; // ERROR
-     ^
-./sl: 1 error(s) detected
-

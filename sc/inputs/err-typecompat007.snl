@@ -12,5 +12,5 @@ type R = ref;
 var a : ref;
 var b : R;
 
-b = a; // ERROR
+b = a; // OK
 a = b; // OK

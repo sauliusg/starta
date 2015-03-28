@@ -43,5 +43,5 @@ function q2( m, n : ref ) : array
 
 function q3( m, n : ref ) : GR
 {
-    return m; // ERROR
+    return m; // OK
 }
