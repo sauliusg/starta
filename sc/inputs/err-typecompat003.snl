@@ -27,7 +27,8 @@ function p2( m, n : array ) : array
 
 function p3( m, n : array ) : GR
 {
-    return m; // ERROR?
+    return m; // OK, since 'ref' is base-type for GR, 
+              // and is compatible with 'array'
 }
 
 function q1( m, n : ref ) : A

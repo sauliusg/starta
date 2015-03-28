@@ -229,6 +229,8 @@ type byte = {
     inline bytecode operator "<" ( i : byte )
         { BPRINT };
 
+    inline bytecode operator "@byte" ( i : byte ) : byte {};
+
     bytecode inline operator "jnz" ( x : byte )
         { BJNZ };
     bytecode inline operator "jz" ( x : byte )
@@ -808,6 +810,8 @@ type float = {
 
     inline bytecode operator "%%" ( format : string; x : float ) : string
         { FSPRINTF };
+
+    // inline bytecode operator "@float" ( i : float ) : float {};
 
     inline bytecode operator "@float" ( i : int ) : float
         { I2F };
