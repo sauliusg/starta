@@ -7,8 +7,5 @@
 ./sl: inputs/err-typecompat003.snl(41,13): ERROR, incompatible types of returned value 1 of function 'q2'
     return m; // ERROR
             ^
-./sl: inputs/err-typecompat003.snl(46,13): ERROR, incompatible types of returned value 1 of function 'q3'
-    return m; // ERROR
-            ^
-./sl: 4 error(s) detected
+./sl: 3 error(s) detected
 

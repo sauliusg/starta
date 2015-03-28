@@ -316,6 +316,11 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         return 0;
     }
 
+    if( t1->kind == TK_DERIVED ) {
+        return tnode_types_are_assignment_compatible
+            ( t1->base_type, t2, generic_types, ex );
+    }
+
     if( t1->kind == TK_TYPE_DESCR ) {
 	return t2->kind == TK_TYPE_DESCR;
     }
@@ -388,11 +393,6 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
 	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
                                                         NULL, 0, ex );
-    }
-
-    if( t1->kind == TK_DERIVED ) {
-        return tnode_types_are_assignment_compatible
-            ( t1->base_type, t2, generic_types, ex );
     }
 
     if( t1->name && t2->name ) return 0;
