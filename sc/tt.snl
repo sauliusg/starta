@@ -1,16 +1,44 @@
 #
-# Regression test:
+# Check implementation of interfaces with the same method names.
 #
 
 # Check that lists of reference variables are looped correctly:
 
 use std;
 
-type Bag of X = {
-     //X value;
-     string name;
-     int x;
+interface I1 {
+    method add( int i );
+    method sub( int i );
+    method get(): int;
 }
 
-. const((Bag of X).name.offset);
-//. const((Bag of X).value.offset);
+interface I2 {
+    method add( int i );
+    method remove( int i );
+    method get(): int;
+}
+
+class CC implements I1, I2 {
+    int i;
+
+    method add implements I1.add( int i )
+    {
+        self.i += i;
+    }
+
+    method get implements I1.get(): int { return self.i }
+}
+
+var c = new CC;
+
+c->add( 4 );
+c->add( 3 );
+. c->get();
+
+procedure g( I2 o )
+{
+   o->add( -o->get() );
+   . o->get();
+}
+
+g( c );
