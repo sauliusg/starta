@@ -5812,8 +5812,10 @@ static cexception_t *px; /* parser exception */
 %type <dnode> field_designator
 %type <dnode> function_expression_header
 %type <dnode> function_header
-%type <dnode> method_header
 %type <dnode> method_definition
+%type <dnode> method_header
+/* %type <dnode> method_identifier */
+%type <s>     method_identifier
 %type <s>     module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
@@ -8792,7 +8794,7 @@ multivalue_function_call
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 	}
   | variable_access_identifier
-    __ARROW __IDENTIFIER
+    __ARROW method_identifier
         {
             DNODE *object = $1;
             TNODE *object_type = dnode_type( object );
@@ -8857,7 +8859,7 @@ multivalue_function_call
             compiler_emit( compiler, px, "\tc\n", RTOR );
 	    compiler_drop_top_expression( compiler );
 	}
-    __ARROW __IDENTIFIER
+    __ARROW method_identifier
         {
             ENODE *object_expr = compiler->e_stack;;
             TNODE *object_type =
@@ -10807,14 +10809,23 @@ opt_implements_method
   }
   | /* empty */
   { $$ = NULL; }
-  ;
+;
+
+method_identifier
+: __IDENTIFIER
+    { $$ = $1; }
+| __IDENTIFIER '.' __IDENTIFIER
+    { $$ = $3; }
+| module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
+    { $$ = $5; }
+;
 
 method_header
   : opt_function_attributes function_code_start _METHOD
         {
 	    //compiler_begin_scope( compiler, px );
 	}
-    __IDENTIFIER opt_implements_method '(' argument_list ')'
+    method_identifier opt_implements_method '(' argument_list ')'
             opt_retval_description_list
         {
 	  cexception_t inner;
