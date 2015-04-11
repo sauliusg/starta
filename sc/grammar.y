@@ -1805,10 +1805,6 @@ static int compiler_check_top_2_expressions_are_identical( COMPILER *cc,
 	TNODE *type2 = enode_type( expr2 );
 
 	if( strcmp( binop_name, "%%" ) != 0 && 
-#if 0
-            strcmp( binop_name, "!=" ) != 0 &&
-            strcmp( binop_name, "==" ) != 0 &&
-#endif
 	    !tnode_types_are_identical( type1, type2, NULL, ex )) {
 	    yyerrorf( "incompatible types for binary operator '%s'",
 		      binop_name );
@@ -4911,20 +4907,6 @@ static char *compiler_get_loop_name( COMPILER *cc, char *label )
 	char *name = latest_loop ? dnode_name( latest_loop ) : NULL;
 	return name;
     } else {
-#if 0
-	DNODE *loop;
-	int found = 0;
-	foreach_dnode( loop, cc->loops ) {
-	    if( strcmp( dnode_name(loop), label ) == 0 ) {
-		found = 1;
-		break;
-	    }
-	}
-	if( !found ) {
-	    yyerrorf( "label '%s' is not defined in the current scope",
-		      label );
-	}
-#endif
 	return label;
     }
 }
@@ -5438,13 +5420,6 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
 
     interface_nr = tnode_max_interface( class_descr );
 
-#if 0
-    printf( ">>> interface_nr = %d\n", interface_nr );
-#endif
-#if 0
-    printf( ">>> class name = %s\n", tnode_name(class_descr) );
-#endif
-
     compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t),
                                         sizeof(ssize_t), ex );
 
@@ -5452,16 +5427,8 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
 
     tnode_set_vmt_offset( class_descr, vmt_address );
 
-#if 0
-    compiler_assemble_static_ssize_t( cc, vmt_address +
-                                      (2+interface_nr) * sizeof(ssize_t), ex );
-    compiler_assemble_static_data( cc, NULL,
-				   interface_nr * sizeof(ssize_t), ex );
-#else
     compiler_assemble_static_data( cc, NULL,
 				   (1+interface_nr) * sizeof(ssize_t), ex );
-#endif
-
 }
 
 static void compiler_finish_virtual_method_table( COMPILER *cc,
@@ -5483,21 +5450,11 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     max_vmt_entry = tnode_max_vmt_offset( class_descr );
     interface_nr = tnode_max_interface( class_descr );
 
-#if 0
-    printf( ">>> interface_nr = %d\n", interface_nr );
-#endif
-
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
 
     itable = (ssize_t*)(cc->static_data + vmt_address);
     itable[1] = vmt_start;
-
-#if 0
-    printf( ">>> class '%s', interface table starts at %d, vmt[1] starts at %d\n",
-            tnode_name( class_descr ),
-            vmt_address, vmt_start );
-#endif
 
     /* allocate the main class VMT: */
     compiler_assemble_static_data( cc, NULL,
@@ -5527,10 +5484,6 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
        entries with table offsets: */
     for( i = 2; i <= interface_nr+1; i++ ) {
         ssize_t method_count = itable[i];
-#if 0
-        printf( ">>> class '%s', interface %d, method count  %d\n",
-                tnode_name( base ), i, method_count );
-#endif
         itable[i] = compiler_assemble_static_data( cc, NULL,
                                                    (method_count + 1) *
                                                    sizeof(ssize_t), ex );
@@ -5548,36 +5501,10 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
             TNODE *method_type = dnode_type( method );
             ssize_t method_interface = method_type ?
                 tnode_interface_number( method_type ) : -1;
-#if 0
-	    ssize_t compiled_addr;
-	    printf( ">>> class '%s', interface %d, method '%s', offset %d, address %d\n",
-		    tnode_name( base ), method_interface, dnode_name( method ),
-		    dnode_offset( method ), dnode_ssize_value( method ));
-#endif
-
-#if 1
             vtable = (ssize_t*)(cc->static_data + itable[method_interface+1]);
             if( vtable[method_index] == 0 ) {
                 vtable[method_index] = method_address;
             }
-#endif
-
-#if 0
-            if( method_interface == 0 ) {
-                compiled_addr =
-                    *(ssize_t*)
-                    (&cc->static_data[vmt_start + method_index * sizeof(ssize_t)]);
-                if( method_index != 0 && method_address != 0 && compiled_addr == 0 ) {
-                    compiler_patch_static_data( cc, /* void *data: */ &method_address,
-                                                /* ssize_t data_size: */
-                                                sizeof(method_address),
-                                                /* ssize_t offset: */
-                                                vmt_start +
-                                                method_index * sizeof(ssize_t),
-                                                ex );
-                }
-            }
-#endif
 	}
     }
 
