@@ -14,6 +14,7 @@
 
 /* uses: */
 #include <cexceptions.h>
+#include <tnode_compat.h>
 #include <vartab.h>
 #include <typetab.h>
 #include <cvalue_t.h>
