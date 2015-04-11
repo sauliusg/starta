@@ -41,7 +41,6 @@
 #include <lexer_flex.h>
 #include <yy.h>
 #include <alloccell.h>
-#include <rtti.h>
 #include <implementation.h>
 #include <assert.h>
 
@@ -5637,29 +5636,6 @@ static void compiler_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
-static void compiler_compile_type_descriptor_loader( COMPILER *cc,
-                                                  TNODE *tnode,
-                                                  cexception_t *ex )
-{
-    TNODE *type_descriptor_type;
-    rtti_t type_descriptor;
-    ssize_t offset;
-
-    type_descriptor.size = tnode_size( tnode );
-    type_descriptor.nref = tnode_number_of_references( tnode );
-
-    compiler_assemble_static_alloc_hdr( cc, sizeof(type_descriptor),
-                                        /* len */ -1, ex );
-
-    offset = compiler_assemble_static_data( cc, &type_descriptor,
-                                            sizeof(type_descriptor), ex );
-
-    compiler_emit( cc, ex, "\tce\n", SLDC, &offset );
-
-    type_descriptor_type = new_tnode_type_descriptor( ex );
-    compiler_push_type( cc, type_descriptor_type, ex );
-}
-
 static void compiler_set_pragma( COMPILER *c, char *pragma_name, ssize_t value )
 {
     ssize_t old_value;
@@ -7637,9 +7613,6 @@ delimited_type_description
 
   | _BLOB
     { $$ = new_tnode_blob_snail( compiler->typetab, px ); }
-
-  | _TYPE _OF _VAR
-    { $$ = new_tnode_type_descriptor( px ); }
   ;
 
 
@@ -9570,17 +9543,6 @@ simple_expression
   | struct_expression
   | unpack_expression
   | function_expression
-  | _TYPE type_identifier
-      {
-          TNODE *tnode = $2;
-          compiler_compile_type_descriptor_loader( compiler, tnode, px );
-      }
-  | _TYPE _OF variable_access_identifier
-      {
-          DNODE *var_dnode = $3;
-          TNODE *var_type = dnode_type( var_dnode );
-          compiler_compile_type_descriptor_loader( compiler, var_type, px );
-      }
   ;
 
 opt_comma
