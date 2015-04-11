@@ -1,8 +1,8 @@
-./sl: inputs/err-methods007.snl(33,8): ERROR, object 'a' does not have method 'setx'
+./sl: inputs/err-methods007.snl(33,4): ERROR, object 'a' does not have method 'setx'
 a->setx( 20 );
-       ^
-./sl: inputs/err-methods007.snl(34,10): ERROR, object 'a' does not have method 'getx'
+   ^
+./sl: inputs/err-methods007.snl(34,6): ERROR, object 'a' does not have method 'getx'
 . a->getx();
-         ^
+     ^
 ./sl: 2 error(s) detected
 

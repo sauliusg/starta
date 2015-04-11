@@ -1,5 +1,5 @@
-./sl: inputs/err-methods006.snl(17,5): ERROR, object 'a' does not have method 'm'
+./sl: inputs/err-methods006.snl(17,4): ERROR, object 'a' does not have method 'm'
 a->m( 20 );
-    ^
+   ^
 ./sl: 1 error(s) detected
 
