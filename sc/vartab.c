@@ -123,7 +123,6 @@ int vartab_current_scope( VARTAB *vartab )
 void vartab_insert_operator( VARTAB *table, const char *name,
                              DNODE *dnode, cexception_t *ex )
 {
-    VAR_NODE * volatile node = NULL;
     assert( table );
     table->node = new_var_node( dnode, name,
                                 table->current_scope,

@@ -1073,12 +1073,6 @@ DNODE *tnode_retval_next( TNODE* tnode, DNODE *retval )
     else          { return dnode_next(retval); }
 }
 
-static int tnode_retval_nr( TNODE *tnode )
-{
-    if( tnode->return_vals == NULL ) return 0;
-    else return dnode_list_length( tnode->return_vals );
-}
-
 TNODE *tnode_set_size( TNODE *tnode, int size )
 {
     assert( tnode );
