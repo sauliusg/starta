@@ -10799,10 +10799,6 @@ method_header
                             method_name ? method_name : "",
                             interface_name ? interface_name : "" );
 
-                  /* printf( ">>>> interface name = '%s'\n", interface_name ); */
-                  /* printf( ">>>> method name = '%s'\n", method_name ); */
-                  /* printf( ">>>> full method name = '%s'\n", full_method_name ); */
-                  /* printf( ">>>> full length = %d\n", length ); */
                   funct = new_dnode_method( full_method_name, parameter_list,
                                             return_values, &inner );
 
