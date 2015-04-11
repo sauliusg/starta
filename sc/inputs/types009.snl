@@ -2,7 +2,7 @@
 # Compiler tests
 #
 #
-# Test compatc type declarations (such like 'float[]'
+# Test compact type declarations (such like 'float[]')
 #
 
 use std;
