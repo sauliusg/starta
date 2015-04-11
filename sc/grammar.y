@@ -1313,7 +1313,6 @@ static void compiler_compile_return( COMPILER *cc,
 	if( !tnode_types_are_assignment_compatible
             ( returned_type, available_type, NULL /* generic type table */,
               ex )) {
-#if 1
             char *returned_type_name = returned_type ?
                 tnode_name( returned_type ) : NULL;
             if( available_type && returned_type_name && 
@@ -1326,13 +1325,10 @@ static void compiler_compile_return( COMPILER *cc,
                     available_type = enode_type( expr );
                 }
             } else {
-#endif
                 yyerrorf( "incompatible types of returned value %d "
                           "of function '%s'",
                           nretvals - i, dnode_name( cc->current_function ));
-#if 1
             }
-#endif
 	}
 
 	retval = dnode_next( retval );
@@ -1548,15 +1544,8 @@ static void compiler_check_operator_args( COMPILER *cc,
                 argument_type = dnode_type( arg );
                 expr_type = enode_type( expr );
 
-#if 1
                 if( !tnode_types_are_compatible( argument_type, expr_type,
                                                  generic_types, ex )) {
-#else
-                if( !tnode_types_are_assignment_compatible( argument_type,
-                                                            expr_type,
-                                                            generic_types,
-                                                            ex )) {
-#endif
                     yyerrorf( "incompatible type of argument %d "
                               "for operator '%s'",
                               nargs, dnode_name( od->operator ));
@@ -2093,11 +2082,7 @@ static int compiler_stack_top_is_addressof( COMPILER *cc )
 {
     ENODE *enode = cc ? cc->e_stack : NULL;
     TNODE *etype = enode ? enode_type( enode ) : NULL;
-#if 1
     return etype ? tnode_is_addressof( etype ) : 0;
-#else
-    return etype ? tnode_kind( etype ) == TK_ADDRESSOF : 0;
-#endif
 }
 
 static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
@@ -4203,13 +4188,7 @@ static ssize_t compiler_native_type_nreferences( const char *name )
     if( strcmp( name, "bytecode_file_hdr_t" ) == 0 ) {
 	return INTERPRET_FILE_PTRS;
     } else {
-#if 1
 	return 0;
-#else
-	yyerrorf( "number of references in type '%s' "
-		  "is not known to the compiler", name );
-	return -1;
-#endif
     } 
 }
 
