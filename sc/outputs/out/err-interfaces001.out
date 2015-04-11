@@ -10,8 +10,5 @@
 ./sl: inputs/err-interfaces001.snl(35,27): ERROR, interface 'Module::Ig' is not declared in the current scope
     method sg @ Module::Ig() -> (string)
                           ^
-./sl: inputs/err-interfaces001.snl(35,27): ERROR, class 'S' does not implement interface 'Ig'
-    method sg @ Module::Ig() -> (string)
-                          ^
-./sl: 5 error(s) detected
+./sl: 4 error(s) detected
 
