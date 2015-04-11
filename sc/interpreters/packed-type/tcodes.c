@@ -1141,10 +1141,23 @@ int VCALL( INSTRUCTION_FN_ARGS )
 
     header = (alloccell_t*)object_ptr;
     itable = header[-1].vmt_offset;
-    /* in future, test that the virtual function or interface index is
-       not outside the virtual function table. */
+
+    assert( itable );
+    assert( itable[0] >= interface_nr );
+
     vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
     virtual_function_offset = vtable[virtual_function_nr];
+
+    if( virtual_function_offset == 0 ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "calling unimplemented interface method",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_UNIMPLEMENTED_METHOD,
+	      EXCEPTION );
+	return 0;
+    }
 
     istate.ep ++;
 
