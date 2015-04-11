@@ -243,11 +243,7 @@ static void delete_compiler( COMPILER *c )
 	delete_dnode( c->current_call );
 
 	delete_dlist( c->current_call_stack );
-#if 0
-        delete_dlist( c->current_arg_stack );
-#else
         assert( !c->current_arg_stack );
-#endif
 
 	delete_dlist( c->current_package_stack );
 
@@ -1421,23 +1417,8 @@ compiler_lookup_optab_operator( COMPILER *cc,
         cexception_reraise( inner, ex );
     }
 
-#if 0
-    if( i < arity ) {
-        yyerrorf( "too little expressions (%d) for an operator '%s' "
-                  "of arity %d",
-                  i, operator_name, arity );
-    }
-#endif
-
     operator_dnode = vartab_lookup_operator( cc->operators, operator_name,
                                              expr_types );
-
-#if 0
-    if( !operator_dnode ) {
-        yyerrorf( "could not find matching operator '%s' of arity %d",
-                  operator_name, arity );
-    }
-#endif
 
     delete_tlist( expr_types );
 
@@ -5952,22 +5933,11 @@ undelimited_simple_statement
   | function_definition
   | operator_definition
     {
-#if 0
-	TNODE *operator = dnode_type( $1 );
-	DNODE *arg1 = tnode_args( operator );
-	TNODE *arg1_type = dnode_type( arg1 );
-
-	/* should probably check whether operator is declared in the
-	   same module as the type. */
-	tnode_insert_single_operator( arg1_type, $1 );
-#else
         vartab_insert_named_operator( compiler->operators, $1, px );
         if( compiler->current_package && dnode_scope( $1 ) == 0 ) {
             dnode_optab_insert_named_operator( compiler->current_package,
                                                share_dnode( $1 ), px );
         }
-
-#endif
     }
   | compound_statement
   | undelimited_type_declaration
