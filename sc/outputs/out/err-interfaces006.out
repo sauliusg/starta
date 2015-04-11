@@ -1,0 +1,5 @@
+./sl: inputs/err-interfaces006.snl(26,11): ERROR, the caller class 'C' does not implement interface 'I1'
+. c->m1@I1();
+          ^
+./sl: 1 error(s) detected
+
