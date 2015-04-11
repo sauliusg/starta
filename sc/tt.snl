@@ -2,7 +2,7 @@
 # Check implementation of interfaces with the same method names.
 #
 
-# Check that lists of reference variables are looped correctly:
+# Check that interfaces can be declared with the same method names.
 
 use std;
 

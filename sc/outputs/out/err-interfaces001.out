@@ -1,11 +1,17 @@
-./sl: inputs/err-interfaces001.snl(27,27): ERROR, interface 'If' does not implement method 'ff'
-    method f implements ff( x : int ) : int
+./sl: inputs/err-interfaces001.snl(28,5): ERROR, interface 'If' does not implement method 'ff'
+    {
+    ^
+./sl: inputs/err-interfaces001.snl(32,5): ERROR, interface 'If' does not implement method 'ss'
+    {
+    ^
+./sl: inputs/err-interfaces001.snl(35,27): ERROR, module 'Module' is not available in the current scope
+    method sg @ Module::Ig() -> (string)
                           ^
-./sl: inputs/err-interfaces001.snl(31,29): ERROR, interface 'If' does not declare method 'ss'
-    method sf implements If.ss() -> (string)
-                            ^
-./sl: inputs/err-interfaces001.snl(35,37): ERROR, interface 'Ig' does not declare method 'ss'
-    method sg implements Module::Ig.ss() -> (string)
-                                    ^
-./sl: 3 error(s) detected
+./sl: inputs/err-interfaces001.snl(35,27): ERROR, interface 'Module::Ig' is not declared in the current scope
+    method sg @ Module::Ig() -> (string)
+                          ^
+./sl: inputs/err-interfaces001.snl(35,27): ERROR, class 'S' does not implement interface 'Ig'
+    method sg @ Module::Ig() -> (string)
+                          ^
+./sl: 5 error(s) detected
 

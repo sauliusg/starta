@@ -20,19 +20,19 @@ null class S implements If, Ig {
     int i;
     float k;
 
-    method g implements Igg.g( x :  int ) : int
+    method g@Igg( x :  int ) : int
     {
         return x + 2
     }
-    method f implements f( x : int ) : int
+    method f@If( x : int ) : int
     {
         return x + 4;
     }
-    method sf implements Iff.ss() -> (string)
+    method sf@Iff() -> (string)
     {
         return "This is S implementtion of If.s()"
     }
-    method sg implements Module::Igg.ss() -> (string)
+    method sg@Module::Igg() -> (string)
     {
         return "This is S implementtion of Ig.s()"
     }
