@@ -6705,24 +6705,6 @@ variable_declaration
 	compiler_compile_variable_initialisations( compiler, $3, px );
       }
 
-  | variable_declaration_keyword 
-    compact_type_description dimension_list variable_declarator_list
-      {
-        int readonly = $1;
-
-	tnode_append_element_type( $3, $2 );
-	dnode_list_append_type( $4, $3 );
-	dnode_list_assign_offsets( $4, &compiler->local_offset );
-	compiler_vartab_insert_named_vars( compiler, $4, px );
-	if( readonly ) {
-	    dnode_list_set_flags( $4, DF_IS_READONLY );
-	}
-	if( compiler->loops ) {
-	    compiler_compile_zero_out_stackcells( compiler, $4, px );
-	}
-	compiler_compile_variable_initialisations( compiler, $4, px );
-      }
-
   | variable_declaration_keyword variable_identifier initialiser
     {
      TNODE *expr_type = compiler->e_stack ?
@@ -7541,6 +7523,10 @@ var_type_description
   | undelimited_or_structure_description
   | _ARRAY
     { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
+  | type_identifier dimension_list
+    {
+        $$ = tnode_append_element_type( $2, $1 );
+    }
   ;
 
 undelimited_or_structure_description
@@ -8007,6 +7993,7 @@ struct_var_declaration
       {
        $$ = dnode_list_append_type( $1, $3 );
       }
+
   | _VAR variable_identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $2, $4 );
@@ -8022,18 +8009,6 @@ struct_var_declaration
         $$ = dnode_list_append_type( $2, $1 );
       }
 
-  | _VAR compact_type_description dimension_list
-    uninitialised_var_declarator_list
-      {
-	tnode_append_element_type( $3, $2 );
-	$$ = dnode_list_append_type( $4, $3 );
-      }
-
-  | compact_type_description dimension_list uninitialised_var_declarator_list
-      {
-	tnode_append_element_type( $2, $1 );
-	$$ = dnode_list_append_type( $3, $2 );
-      }
   ;
 
 size_constant
@@ -9223,17 +9198,6 @@ closure_var_declaration
         $$ = dnode_list_append_type( $3, $2 );
       }
 
-  | opt_variable_declaration_keyword
-    compact_type_description dimension_list
-    variable_declarator
-      {
-        int readonly = $1;
-        if( readonly ) {
-            dnode_list_set_flags( $4, DF_IS_READONLY );
-        }
-        tnode_append_element_type( $3, $2 );
-        $$ = dnode_list_append_type( $4, $3 );
-      }
   ;
 
 closure_var_list_declaration
@@ -9260,18 +9224,6 @@ closure_var_list_declaration
         $$ = dnode_list_append_type( variables, $2 );
       }
 
-  | opt_variable_declaration_keyword
-    compact_type_description dimension_list
-    variable_declarator ',' uninitialised_var_declarator_list
-      {
-        int readonly = $1;
-        DNODE *variables = dnode_append( $4, $6 );
-        if( readonly ) {
-            dnode_list_set_flags( variables, DF_IS_READONLY );
-        }
-        tnode_append_element_type( $3, $2 );
-        $$ = dnode_list_append_type( variables, $3 );
-      }
   ;
 
 closure_initialisation
@@ -10539,29 +10491,6 @@ argument
 	dnode_set_flags( $3, DF_HAS_INITIALISER );
 	if( $1 ) {
 	    dnode_set_flags( $3, DF_IS_READONLY );
-	}
-      }
-
-  | opt_readonly
-    compact_type_description dimension_list uninitialised_var_declarator_list
-      {
-	tnode_append_element_type( $3, $2 );
-	$$ = dnode_list_append_type( dnode_list_invert( $4 ), $3 );
-	if( $1 ) {
-	    dnode_list_set_flags( $4, DF_IS_READONLY );
-	}
-      }
-
-  | opt_readonly compact_type_description dimension_list variable_declarator
-    '=' constant_expression
-      {
-	tnode_append_element_type( $3, $2 );
-	$$ = dnode_list_append_type( $4, $3 );
-	compiler_check_default_value_compatibility( $4, &$6 );
-	dnode_set_value( $4, &$6 );
-	dnode_set_flags( $4, DF_HAS_INITIALISER );
-	if( $1 ) {
-	    dnode_set_flags( $4, DF_IS_READONLY );
 	}
       }
 
