@@ -7654,7 +7654,9 @@ finish_fields
           $<tnode>-3 : typetab_lookup( compiler->typetab, "struct" );
 
       if( current_class != base_type ) {
-	  tnode_insert_base_type( current_class, share_tnode( base_type ));
+          if( !tnode_base_type( current_class )) {
+              tnode_insert_base_type( current_class, share_tnode( base_type ));
+          }
           tnode_insert_interfaces( current_class, interfaces );
       }
 
