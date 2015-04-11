@@ -21,6 +21,6 @@ class C implements I2 {
     method m1@I2() -> (string) { return "m1@I2()" }
 }
 
-var c = new C;
+var c = [ new C, new C, new C ];
 
-. c->m1@I3();
+. c[1]->m1@I1();

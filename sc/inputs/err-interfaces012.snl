@@ -23,4 +23,4 @@ class C implements I2 {
 
 var c = new C;
 
-. c->m1@I3();
+. c->mx@I3();

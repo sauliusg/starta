@@ -8855,7 +8855,6 @@ multivalue_function_call
 		    dnode_prev( last_arg ) : NULL;
 	    } else if( object && class_has_interface ) {
 		char *object_name = object ? dnode_name( object ) : NULL;
-		char *method_name = $3;
 		char *class_name =
 		    object_type ? tnode_name( object_type ) : NULL;
 
@@ -8894,9 +8893,34 @@ multivalue_function_call
             char  *method_name = $4;
             TNODE *interface_type = $5;
             DNODE *method = NULL;
+            int class_has_interface = 1;
+
+            if( !object_expr ) {
+                yyerrorf( "too little values on the evaluation stack "
+                          "to call a method" );
+            }
 
             if( interface_type ) {
-                method = tnode_lookup_field( interface_type, method_name );
+                char *interface_name = tnode_name( interface_type );
+                assert( interface_name );
+                class_has_interface =
+                    tnode_lookup_interface( object_type, interface_name )
+                    != NULL;
+                if( !class_has_interface ) {
+                    char *class_name =
+                        object_type ? tnode_name( object_type ) : NULL;
+                    if( class_name ) {
+                        yyerrorf( "the caller class '%s' does not "
+                                  "implement interface '%s'",
+                                  class_name, interface_name );
+                    } else {
+                        yyerrorf( "the caller class does not implement "
+                                  "interface '%s'",
+                                  interface_name );
+                    }
+                } else {
+                    method = tnode_lookup_field( interface_type, method_name );
+                }
             } else {
                 if( object_type ) {
                     method = tnode_lookup_field( object_type, method_name );
@@ -8921,6 +8945,21 @@ multivalue_function_call
 		compiler->current_arg = fn_tnode ?
 		    dnode_prev( dnode_list_last( tnode_args( fn_tnode ))) :
 		    NULL;
+	    } else if( object_expr && class_has_interface ) {
+                char *interface_name = interface_type ?
+                    tnode_name( interface_type ) : NULL;
+		char *class_name =
+		    object_type ? tnode_name( object_type ) : NULL;
+
+                if( interface_name ) {
+		    yyerrorf( "interface '%s' does not have method '%s'",
+			      interface_name, method_name );
+                } else if ( class_name && method_name ) {
+		    yyerrorf( "type/class '%s' does not have method '%s'",
+			      class_name, method_name );
+		} else {
+		    yyerrorf( "can not locate method '%s'", method_name );
+		}
 	    }
             compiler_push_guarding_arg( compiler, px );
             compiler_swap_top_expressions( compiler );
