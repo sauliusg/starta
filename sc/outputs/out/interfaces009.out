@@ -1,0 +1,17 @@
+./sl: inputs/interfaces009.snl(32,23): ERROR, interface 'X' is not declared in the current scope
+            method x@X() {}
+                      ^
+./sl: inputs/interfaces009.snl(37,16): ERROR, interface 'XX' is not declared in the current scope
+        a->d@XX();
+               ^
+./sl: inputs/interfaces009.snl(37,16): ERROR, object 'a' does not have method 'd'
+        a->d@XX();
+               ^
+./sl: inputs/interfaces009.snl(41,17): ERROR, interface 'I3' is not declared in the current scope
+        x->m1@I3();
+                ^
+./sl: inputs/interfaces009.snl(41,17): ERROR, object 'x' does not have method 'm1'
+        x->m1@I3();
+                ^
+./sl: 5 error(s) detected
+

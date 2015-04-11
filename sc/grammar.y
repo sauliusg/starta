@@ -10733,43 +10733,15 @@ opt_method_interface
   : '@' __IDENTIFIER
   {
       char *interface_name = $2;
-      TNODE *interface_type =
-          compiler_lookup_tnode( compiler, /*module_name =*/ NULL,
-                                 interface_name, "interface" );
-
-      if( !interface_type ) {
-          char *containing_class_name = compiler->current_type ?
-              tnode_name( compiler->current_type ) : NULL;
-          if( containing_class_name ) {
-              yyerrorf( "class '%s' does not implement interface '%s'",
-                        containing_class_name, interface_name );
-          } else {
-              yyerrorf( "this class does not implement interface '%s'",
-                        interface_name );
-          }
-      }
-      $$ = interface_type;
+      $$ = compiler_lookup_tnode( compiler, /*module_name =*/ NULL,
+                                  interface_name, "interface" );
   }
   | '@' module_list __COLON_COLON __IDENTIFIER
   {
       char *module_name = $2;
       char *interface_name = $4;
-      TNODE *interface_type =
-          compiler_lookup_tnode( compiler, module_name,
-                                 interface_name, "interface" );
-
-      if( !interface_type ) {
-          char *containing_class_name = compiler->current_type ?
-              tnode_name( compiler->current_type ) : NULL;
-          if( containing_class_name ) {
-              yyerrorf( "class '%s' does not implement interface '%s'",
-                        containing_class_name, interface_name );
-          } else {
-              yyerrorf( "this class does not implement interface '%s'",
-                        interface_name );
-          }
-      }
-      $$ = interface_type;
+      $$ = compiler_lookup_tnode( compiler, module_name,
+                                  interface_name, "interface" );
   }
   | /* empty */
   { $$ = NULL; }
