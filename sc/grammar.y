@@ -10112,7 +10112,6 @@ generator_new
           compiler_compile_mdalloc( compiler, element_type, level, px );
           compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
       }
-  | _NEW type_identifier _OF '(' _TYPE type_identifier ',' opt_actual_argument_list ')'
   ;
 
 md_array_allocator
