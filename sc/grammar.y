@@ -5826,7 +5826,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> operator_definition
 %type <dnode> operator_header
 %type <s>     opt_identifier
-%type <dnode> opt_implements_method
+%type <dnode> opt_method_interface
 %type <i>     function_attributes
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
@@ -10711,8 +10711,8 @@ function_header
 	}
   ;
 
-opt_implements_method
-  : _IMPLEMENTS __IDENTIFIER
+opt_method_interface
+  : '@' __IDENTIFIER
   {
       char *method_name = $2;
       TNODE *containing_class_type = $<tnode>-6;
@@ -10745,7 +10745,7 @@ opt_implements_method
       }
       $$ = method_dnode;
   }
-  | _IMPLEMENTS __IDENTIFIER '.' __IDENTIFIER
+  | '@' __IDENTIFIER '.' __IDENTIFIER
   {
       char *interface_name = $2;
       char *method_name = $4;
@@ -10775,7 +10775,7 @@ opt_implements_method
       }
       $$ = method_dnode;
   }
-  | _IMPLEMENTS module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
+  | '@' module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
   {
       char *interface_name = $4;
       char *method_name = $6;
@@ -10814,7 +10814,7 @@ method_header
         {
 	    //compiler_begin_scope( compiler, px );
 	}
-    __IDENTIFIER opt_implements_method '(' argument_list ')'
+    __IDENTIFIER opt_method_interface '(' argument_list ')'
             opt_retval_description_list
         {
 	  cexception_t inner;

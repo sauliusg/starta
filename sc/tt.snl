@@ -21,19 +21,19 @@ interface I2 {
 class CC implements I1, I2 {
     int i;
 
-    method I1.add implements I1.add( int i )
+    method add@I1( int i )
     {
         self.i += i;
     }
 
-    method I1.get implements I1.get(): int { return self.i }
+    method get@I1(): int { return self.i }
 }
 
 var c = new CC;
 
-c->I1.add( 4 );
-c->I1.add( 3 );
-. c->I1.get();
+c->add@I1( 4 );
+c->add@I1( 3 );
+. c->get@I1();
 
 procedure g( I1 o )
 {
