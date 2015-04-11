@@ -10764,7 +10764,7 @@ method_header
           DNODE *implements_method = NULL;
           DNODE *parameter_list = $8;
           DNODE *return_values = $10;
-	  int is_function = 0;
+	  int is_function = 0, class_has_interface = 1;
 
     	  cexception_guard( inner ) {
               self_dnode = new_dnode_name( "self", &inner );
@@ -10775,9 +10775,29 @@ method_header
               self_dnode = NULL;
 
               if( interface_type ) {
-                  implements_method = tnode_lookup_method( interface_type, method_name );
+                  char * interface_name = tnode_name( interface_type );
+                  assert( interface_name );
+                  if( current_class ) {
+                      class_has_interface =
+                          tnode_lookup_interface
+                          ( current_class, interface_name ) != NULL;
+                      if( !class_has_interface ) {
+                          char *class_name = tnode_name( current_class );
+                          if( class_name ) {
+                              yyerrorf( "class '%s' does not implement "
+                                        "interface '%s'",
+                                        class_name, interface_name );
+                          } else {
+                              yyerrorf( "current class does not implement "
+                                        "interface '%s'",
+                                        interface_name );
+                          }
+                      }
+                  }
+
+                  implements_method = tnode_lookup_method( interface_type,
+                                                           method_name );
                   if( !implements_method ) {
-                      char * interface_name = tnode_name( interface_type );
                       if( interface_name ) {
                           yyerrorf( "interface '%s' does not implement method "
                                     "'%s'", interface_name, method_name );
@@ -10816,12 +10836,14 @@ method_header
 
                   if( !tnode_function_prototypes_match_msg
                       ( implements_type, method_type, msg, sizeof( msg ))) {
-                      yyerrorf( "method %s() does not match "
-                                "method %s it should implement"
-                                " - %s",
-                                method_name,
-                                dnode_name( implements_method ),
-                                msg );
+                      if( class_has_interface ) {
+                          yyerrorf( "method %s() does not match "
+                                    "method %s it should implement"
+                                    " - %s",
+                                    method_name,
+                                    dnode_name( implements_method ),
+                                    msg );
+                      }
                   } else {
                       ssize_t method_offset = dnode_offset( implements_method );
                       TNODE *interface_method_type = dnode_type( implements_method );
