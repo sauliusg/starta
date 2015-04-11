@@ -4116,7 +4116,6 @@ static void compiler_compile_indexing( COMPILER *cc,
     } else if( expr_count == -1 ) {
 	assert( 0 );
     } else if( expr_count == 2 ) {
-	// assert( array_is_reference );
         compiler_compile_subarray( cc, ex );
     } else {
 	assert( 0 );
@@ -5490,8 +5489,6 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
 
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
-
-    // assert( vmt_start == vmt_address + (2+interface_nr) * sizeof(ssize_t) );
 
     itable = (ssize_t*)(cc->static_data + vmt_address);
     itable[1] = vmt_start;
@@ -8112,8 +8109,6 @@ type_of_type_declaration
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
-	// compiler_begin_scope( compiler, px );
-
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
 	    tnode = new_tnode_composite( $2, base, &inner );
@@ -8142,8 +8137,6 @@ type_of_type_declaration
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
-
-	// compiler_begin_scope( compiler, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
@@ -8176,8 +8169,6 @@ type_of_type_declaration
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
-
-	// compiler_begin_scope( compiler, px );
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( $4, &inner );
@@ -8256,14 +8247,12 @@ struct_declaration
   | type_declaration_start '=' opt_null_type_designator
     {
 	assert( compiler->current_type );
-	// tnode_set_flags( compiler->current_type, TF_IS_REF );
     }
     struct_or_class_declaration_body
     {
         if( $3 ) {
             tnode_set_flags( $5, TF_NON_NULL );
         }
-	// tnode_finish_struct( $5, px );
 	compiler_end_scope( compiler, px );
 	compiler_compile_type_declaration( compiler, $5, px );
         compiler->current_type = NULL;
@@ -10895,7 +10884,6 @@ constructor_header
           int function_attributes = $1;
           char *constructor_name = $5;
           DNODE *parameter_list = $7;
-          // DNODE *return_dnode = NULL;
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = $<tnode>-1;
@@ -10906,15 +10894,11 @@ constructor_header
               parameter_list = dnode_append( parameter_list, self_dnode );
               self_dnode = NULL;
 
-              // return_dnode = new_dnode( px );
-              // dnode_insert_type( return_dnode, share_tnode( class_tnode ));
-
 	      $$ = funct = new_dnode_constructor( constructor_name,
                                                   parameter_list,
                                                   /* return_dnode = */ NULL,
                                                   &inner );
 	      parameter_list = NULL;
-	      // return_dnode = NULL;
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
@@ -10934,7 +10918,6 @@ constructor_header
 	  }
 	  cexception_catch {
 	      delete_dnode( parameter_list );
-	      // delete_dnode( return_dnode );
 	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );
