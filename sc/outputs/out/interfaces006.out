@@ -1,11 +1,29 @@
 ./sl: inputs/interfaces006.snl(9,27): ERROR, type 'Ig' is not declared in the current scope
 class S implements If, Ig {
                           ^
-./sl: inputs/interfaces006.snl(28,28): ERROR, class 'S' does not implement interface 'Ig'
-    method g implements Ig.g( x, y, z :  int ) : int
-                           ^
-./sl: inputs/interfaces006.snl(40,37): ERROR, class 'S' does not implement interface 'Ig'
-    method sg implements Module::Ig.s() -> (string)
-                                    ^
-./sl: 3 error(s) detected
+./sl: inputs/interfaces006.snl(28,18): ERROR, interface 'Ig' is not declared in the current scope
+    method g @ Ig( x, y, z :  int ) : int
+                 ^
+./sl: inputs/interfaces006.snl(28,18): ERROR, class 'S' does not implement interface 'Ig'
+    method g @ Ig( x, y, z :  int ) : int
+                 ^
+./sl: inputs/interfaces006.snl(40,26): ERROR, module 'Module' is not available in the current scope
+    method s @ Module::Ig() -> (string)
+                         ^
+./sl: inputs/interfaces006.snl(40,26): ERROR, interface 'Module::Ig' is not declared in the current scope
+    method s @ Module::Ig() -> (string)
+                         ^
+./sl: inputs/interfaces006.snl(40,26): ERROR, class 'S' does not implement interface 'Ig'
+    method s @ Module::Ig() -> (string)
+                         ^
+./sl: inputs/interfaces006.snl(41,5): ERROR, function 's' is already declared in this scope
+    {
+    ^
+./sl: inputs/interfaces006.snl(51,10): ERROR, interface 'Ig' is not declared in the current scope
+. s->s@Ig();
+         ^
+./sl: inputs/interfaces006.snl(51,10): ERROR, this class does not implement interface 'Ig'
+. s->s@Ig();
+         ^
+./sl: 9 error(s) detected
 

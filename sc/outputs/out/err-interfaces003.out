@@ -1,5 +1,8 @@
-./sl: inputs/err-interfaces003.snl(8,27): ERROR, class 'S' does not implement any interfaces
-    method f implements ff( x : int ) : int
-                          ^
-./sl: 1 error(s) detected
+./sl: inputs/err-interfaces003.snl(8,18): ERROR, interface 'ff' is not declared in the current scope
+    method f @ ff( x : int ) : int
+                 ^
+./sl: inputs/err-interfaces003.snl(8,18): ERROR, class 'S' does not implement interface 'ff'
+    method f @ ff( x : int ) : int
+                 ^
+./sl: 2 error(s) detected
 

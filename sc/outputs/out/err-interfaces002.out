@@ -1,11 +1,23 @@
-./sl: inputs/err-interfaces002.snl(23,29): ERROR, class 'S' does not implement interface 'Igg'
-    method g implements Igg.g( x :  int ) : int
-                            ^
-./sl: inputs/err-interfaces002.snl(31,30): ERROR, class 'S' does not implement interface 'Iff'
-    method sf implements Iff.ss() -> (string)
-                             ^
-./sl: inputs/err-interfaces002.snl(35,38): ERROR, class 'S' does not implement interface 'Igg'
-    method sg implements Module::Igg.ss() -> (string)
-                                     ^
-./sl: 3 error(s) detected
+./sl: inputs/err-interfaces002.snl(23,17): ERROR, interface 'Igg' is not declared in the current scope
+    method g@Igg( x :  int ) : int
+                ^
+./sl: inputs/err-interfaces002.snl(23,17): ERROR, class 'S' does not implement interface 'Igg'
+    method g@Igg( x :  int ) : int
+                ^
+./sl: inputs/err-interfaces002.snl(31,18): ERROR, interface 'Iff' is not declared in the current scope
+    method sf@Iff() -> (string)
+                 ^
+./sl: inputs/err-interfaces002.snl(31,18): ERROR, class 'S' does not implement interface 'Iff'
+    method sf@Iff() -> (string)
+                 ^
+./sl: inputs/err-interfaces002.snl(35,26): ERROR, module 'Module' is not available in the current scope
+    method sg@Module::Igg() -> (string)
+                         ^
+./sl: inputs/err-interfaces002.snl(35,26): ERROR, interface 'Module::Igg' is not declared in the current scope
+    method sg@Module::Igg() -> (string)
+                         ^
+./sl: inputs/err-interfaces002.snl(35,26): ERROR, class 'S' does not implement interface 'Igg'
+    method sg@Module::Igg() -> (string)
+                         ^
+./sl: 7 error(s) detected
 

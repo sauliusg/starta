@@ -1,5 +1,5 @@
-./sl: inputs/err-methods008.snl(20,4): ERROR, called field is not a method
+./sl: inputs/err-methods008.snl(20,5): ERROR, called field is not a method
 c->i();
-   ^
+    ^
 ./sl: 1 error(s) detected
 

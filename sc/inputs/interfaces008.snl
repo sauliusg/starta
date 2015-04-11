@@ -2,7 +2,7 @@
 use std;
 
 interface UnDoable {
-    method undoable_do( x : int );
+    method doit( x : int );
     method undo() : int;
 }
 
@@ -15,7 +15,7 @@ class S implements UnDoable {
         return "This is name() of S"
     }
 
-    method undoable_do implements UnDoable.undoable_do( int x )
+    method doit @ UnDoable( int x )
     {
         var old_buffer = self.buffer;
         self.buffer = new int[length(self.buffer) + 1];
@@ -23,7 +23,7 @@ class S implements UnDoable {
         self.buffer[self.n] = x;
         self.n++;
     }
-    method undo implements UnDoable.undo() : int
+    method undo @ UnDoable() : int
     {
         self.n--;
         return self.buffer[self.n];
@@ -36,22 +36,22 @@ var i : UnDoable = s;
 
 . s->name();
 
-s->undoable_do( 10 );
-s->undoable_do( 12 );
-s->undoable_do( 17 );
+s->doit@UnDoable( 10 );
+s->doit@UnDoable( 12 );
+s->doit@UnDoable( 17 );
 
-. s->undo();
-. s->undo();
-. s->undo();
+. s->undo@UnDoable();
+. s->undo@UnDoable();
+. s->undo@UnDoable();
 
 procedure pp( UnDoable d )
 {
     . "";
 
-    d->undoable_do( 20 );
-    d->undoable_do( 21 );
-    d->undoable_do( 25 );
-    d->undoable_do( 26 );
+    d->doit( 20 );
+    d->doit( 21 );
+    d->doit( 25 );
+    d->doit( 26 );
 
     . d->undo();
     . d->undo();
