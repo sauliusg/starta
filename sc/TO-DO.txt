@@ -11,7 +11,7 @@
 -- Think about convenient interface to use modules in my language in other languages.
 -- Think about convenient use of modules written in other languages in my language programs.
 -- Think about modules to implement simple and convenient GUI.
--- Rethink the implmentation of names for interface method implementations.
+++ Rethink the implmentation of names for interface method implementations.
 -- Implement precondition and postconditions
 ++ Implement assert'ions.
 -- Implement pre-compiled modules.
@@ -65,13 +65,13 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 ++ Implement readline() opcode and function
 ?? Implement push and pop to the arrays (or use lists instead?).
 -- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
--+ Implement objects.
+++ Implement objects.
 -- Implement dynamic, runtime-bound messages to objects.
-++ Implement virtual functions?
+++ Implement virtual functions
 -- Implement named exception groups.
 -- Implement multi-line strings between << >> pseudo-quotes.
 -- Implement merging of equal strings into one in static data.
--+ Implement map operator.
++- Implement map operator/function.
 -- Implement i/o to strings.
 +- Implement functions to narrow numbers.
 -- Implement array concatenation operators.
@@ -100,7 +100,7 @@ xx Implement "square" multidimensional arrays.
 ++ Implement array length() functions in 'stdtypes.slib'.
 +- Implement advanced arithmetics and function calls for constant arithmetics
 ++ Correct compiler so that it can compile multiple files.
-+- Check and correct shortcut boolean implementation.
+++ Check and correct shortcut boolean implementation.
 ++ Correct printf() arguments so that they always match format.
 ++ Implement formating operator (maybe %% ?).
 ++ Implement double and long double in bytecode and compiler.
@@ -158,7 +158,7 @@ xx Implement "square" multidimensional arrays.
 ++ Implement garbage collector (port garbage collector).
 ++ Implement forward struct declarations.
 ++ Implement fixed arrays.
-++ Implement files.
+xx Implement files.
 ++ Implement field reordering in structures
 ++ Implement expression stack checks and dropping of extra expressions in multivalue assignments.
 ++ Implement exceptions.
