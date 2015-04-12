@@ -12,77 +12,24 @@ interface I1 {
     method get(): int;
 }
 
-interface I2 {
-    method add( int i );
-    method remove( int i );
-    method get(): array of int;
+interface I2: I1 {
+    method put( int i );
 }
 
-class CC implements I1, I2 {
-    int i;
-    int n; // the count in the array m[]
-    int m[];
+class C implements I1, I2 {
+    value : int;
 
-    method add@I1( int i )
-    {
-        self.i += i;
-    }
+    method add@I1( int i ) { self.value += i; . "This is add@I1()" }
+    method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
 
-    method get@I1(): int { return self.i }
+    method add@I2( int i ) { self.value += i; . "This is add@I2()" }
+    method sub@I2( int i ) { self.value -= i; . "This is sub@I2()" }
 
-    method add@I2( int i )
-    {
-        if( !self.m ) {
-            self.m = new int[10];
-        }
-        self.m[self.n] = i;
-        self.n ++;
-    }
-
-    method remove@I2( int i )
-    {
-        do self.n -= i if self.n >= i;
-    }
-
-    method get@I2() : array of int
-    {
-        return self.m;
-    }
+    method get@I2(): int { return self.value }
+    method put@I2( int i ) { self.value = i }
 }
 
-var c = new CC;
+var c = new C;
 
-c->add@I1( 4 );
-c->add@I1( 3 );
-. c->get@I1();
-
-procedure g( I1 o )
-{
-   o->add( -o->get() );
-   . o->get();
-}
-
-g( c );
-
-c->add@I2( 34 );
-c->add@I2( 33 );
-. c->get@I2()[0];
-
-foreach var m in c->get@I2()
-do
-    < m, " ";
-enddo
-. "";
-
-procedure hh( I2 o )
-begin
-    o->remove( 1 );
-    o->add( 78 );
-    foreach var m in c->get@I2()
-    do
-        < m, " ";
-    enddo
-    . ""    
-end;
-
-hh( c );
+c->add@I1( 10 );
+c->add@I2( 10 );
