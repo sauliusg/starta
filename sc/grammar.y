@@ -10640,7 +10640,8 @@ method_header
                   /* UNiquify the interface method name: */
                   TNODE *base_type = interface_type, *current;
                   for( current = interface_type;
-                       current && tnode_kind( current ) == TK_INTERFACE;
+                       current && tnode_kind( current ) == TK_INTERFACE &&
+                           tnode_lookup_method( current, method_name );
                        current = tnode_base_type( current )) {
                       base_type = current;
                   }
