@@ -1,0 +1,8 @@
+./sl: inputs/err-interfaces017.snl(25,28): ERROR, function 'add@I1' is already declared in this scope
+    method add@I2( int i ) { self.value += i; . "This is add@I2()" }
+                           ^
+./sl: inputs/err-interfaces017.snl(26,28): ERROR, function 'sub@I1' is already declared in this scope
+    method sub@I2( int i ) { self.value -= i; . "This is sub@I2()" }
+                           ^
+./sl: 2 error(s) detected
+
