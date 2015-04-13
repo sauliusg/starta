@@ -10637,7 +10637,14 @@ method_header
               }
 
               if( interface_type ) {
-                  char *interface_name = tnode_name( interface_type );
+                  /* UNiquify the interface method name: */
+                  TNODE *base_type = interface_type, *current;
+                  for( current = interface_type;
+                       current && tnode_kind( current ) == TK_INTERFACE;
+                       current = tnode_base_type( current )) {
+                      base_type = current;
+                  }
+                  char *interface_name = tnode_name( base_type );
                   char *volatile full_method_name = NULL;
                   ssize_t length;
                   length = (interface_name ? strlen( interface_name ) : 0)
