@@ -7811,6 +7811,10 @@ interface_declaration_body
             yyerrorf( "interface ('%s') can not implement other interfaces",
                       $4 ? tnode_name( $4 ) : "?" );
         }
+        if( $1 && tnode_kind( $1 ) != TK_INTERFACE ) {
+            yyerrorf( "interfaces ('%s') may only inherit from other interfaces",
+                      $4 ? tnode_name( $4 ) : "?");
+        }
         $$ = $4;
     }
   | opt_base_type opt_implemented_interfaces '{'
@@ -7820,6 +7824,10 @@ interface_declaration_body
         if( $2 != NULL ) {
             yyerrorf( "interface ('%s') can not implement other interfaces",
                       $4 ? tnode_name( $4 ) : "?" );
+        }
+        if( $1 && tnode_kind( $1 ) != TK_INTERFACE ) {
+            yyerrorf( "interfaces ('%s') may only inherit from other interfaces",
+                      $4 ? tnode_name( $4 ) : "?");
         }
         $$ = $4;
     }
