@@ -5486,6 +5486,19 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
                           method ? dnode_name( method ) : "???" );
             }
         }
+
+        /* Check whether all methods of all interfaces are defined: */
+        for( i = 2; i <= interface_nr + 1; i++ ) {
+            ssize_t j, method_count;
+            vtable = (ssize_t*)(cc->static_data + itable[i]);
+            method_count = vtable[0];
+            for( j = 1; j <= method_count; j++ ) {
+                if( vtable[j] == 0 ) {
+                    yyerrorf( "unimplemented method (interface %d, "
+                              "method %d)", i, j );
+                }
+            }
+        }
     }
 }
 
