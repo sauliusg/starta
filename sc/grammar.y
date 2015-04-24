@@ -5426,20 +5426,6 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
        number of methods (plus one entry for the method count), and
        replace the method counts here with the VMT offsets. */
     itable = (ssize_t*)(cc->static_data + vmt_address);
-    foreach_tnode_base_class( base, class_descr ) {
-	DNODE *methods = tnode_methods( base );
-	foreach_dnode( method, methods ) {
-            TNODE *method_type = dnode_type( method );
-	    ssize_t method_index = dnode_offset( method );
-            ssize_t method_interface = method_type ?
-                tnode_interface_number( method_type ) : 0;
-            if( method_interface > 0 &&
-                itable[method_interface+1] < method_index ) {
-                itable[method_interface+1] = method_index;
-            }
-        }
-    }
-
     TLIST *interface_list = tnode_interface_list( class_descr );
     TLIST *interface_node;
     foreach_tlist( interface_node, interface_list ) {

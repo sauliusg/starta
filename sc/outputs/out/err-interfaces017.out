@@ -7,11 +7,5 @@
 ./sl: inputs/err-interfaces017.snl(30,1): ERROR, unimplemented method (interface 3, method 1)
 }
 ^
-./sl: inputs/err-interfaces017.snl(30,1): ERROR, unimplemented method (interface 3, method 2)
-}
-^
-./sl: inputs/err-interfaces017.snl(30,1): ERROR, unimplemented method (interface 3, method 3)
-}
-^
-./sl: 5 error(s) detected
+./sl: 3 error(s) detected
 
