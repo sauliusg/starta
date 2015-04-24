@@ -5440,6 +5440,19 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
         }
     }
 
+    TLIST *interface_list = tnode_interface_list( class_descr );
+    TLIST *interface_node;
+    foreach_tlist( interface_node, interface_list ) {
+        TNODE *current_interface = tlist_data( interface_node );
+        ssize_t interface_nr = tnode_interface_number( current_interface );
+        ssize_t method_count =
+            dnode_list_length( tnode_methods( current_interface ));
+        if( interface_nr > 0 &&
+            itable[interface_nr+1] < method_count ) {
+            itable[interface_nr+1] = method_count;
+        }
+    }
+
     /* Now, let's allocate VMTs for methods and replace itable[]
        entries with table offsets: */
     for( i = 2; i <= interface_nr+1; i++ ) {

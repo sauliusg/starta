@@ -1,3 +1,11 @@
-./sl: Unhandled exception -1 in the bytecode interpreter: calling unimplemented interface method
-7
-0
+./sl: inputs/err-interfaces014.snl(41,1): ERROR, unimplemented method (interface 2, method 2)
+}
+^
+./sl: inputs/err-interfaces014.snl(41,1): ERROR, unimplemented method (interface 3, method 2)
+}
+^
+./sl: inputs/err-interfaces014.snl(41,1): ERROR, unimplemented method (interface 3, method 3)
+}
+^
+./sl: 3 error(s) detected
+

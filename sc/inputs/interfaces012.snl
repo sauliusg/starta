@@ -28,6 +28,11 @@ class CC implements I1, I2 {
         self.i += i;
     }
 
+    method sub@I1( int i )
+    {
+        self.i -= i;
+    }
+
     method get@I1(): int { return self.i }
 
     method add@I2( int i )

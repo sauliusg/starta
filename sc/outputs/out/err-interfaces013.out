@@ -1,8 +1,11 @@
+./sl: inputs/err-interfaces013.snl(22,1): ERROR, unimplemented method (interface 3, method 2)
+}
+^
 ./sl: inputs/err-interfaces013.snl(26,11): ERROR, interface 'I3' is not declared in the current scope
 . c->m1@I3();
           ^
 ./sl: inputs/err-interfaces013.snl(26,11): ERROR, object 'c' does not have method 'm1'
 . c->m1@I3();
           ^
-./sl: 2 error(s) detected
+./sl: 3 error(s) detected
 

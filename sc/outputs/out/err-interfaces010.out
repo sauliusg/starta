@@ -1,5 +1,8 @@
+./sl: inputs/err-interfaces010.snl(22,1): ERROR, unimplemented method (interface 3, method 2)
+}
+^
 ./sl: inputs/err-interfaces010.snl(26,14): ERROR, the caller class 'C' does not implement interface 'I1'
 . c[1]->mx@I1();
              ^
-./sl: 1 error(s) detected
+./sl: 2 error(s) detected
 

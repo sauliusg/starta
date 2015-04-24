@@ -1,0 +1,5 @@
+./sl: inputs/err-interfaces020.snl(28,1): ERROR, unimplemented method (interface 2, method 2)
+}
+^
+./sl: 1 error(s) detected
+

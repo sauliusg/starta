@@ -19,6 +19,7 @@ interface I2 {
 
 class C implements I2 {
     method m1@I2() -> (string) { return "m1@I2()" }
+    method m2@I2() -> (string) { return "m2@I2()" }
 }
 
 var c = [ new C, new C, new C ];
