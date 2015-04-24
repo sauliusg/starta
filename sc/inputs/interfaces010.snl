@@ -20,13 +20,38 @@ interface I2 {
 
 class CC implements I1, I2 {
     int i;
+    int n;
+    int[] m;
 
     method add@I1( int i )
     {
         self.i += i;
     }
 
-    method get@I1(): int { return self.i }
+    method sub@I1( int i )
+    {
+        self.i -= i;
+    }
+
+    method get@I1(): int
+    {
+        return self.i;
+    }
+
+
+    method add@I2( int i )
+    {
+        if( !self.m ) { self.m = new int[100] }
+        self.m[self.n] = i;
+        self.n++
+    }
+
+    method remove@I2( int i )
+    {
+        if( self.n > 0 ) { self.n-- }
+    }
+
+    method get@I2(): int { return self.m ? self.m[0] : -1 }
 }
 
 var c = new CC;

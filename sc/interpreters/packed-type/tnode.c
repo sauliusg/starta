@@ -1005,6 +1005,12 @@ ssize_t tnode_interface_number( TNODE *tnode )
     return tnode->interface_nr;
 }
 
+TLIST *tnode_interface_list( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->interfaces;
+}
+
 ssize_t tnode_max_interface( TNODE *class_descr )
 {
     ssize_t max_interface = 0;

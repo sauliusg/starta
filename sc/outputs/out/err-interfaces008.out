@@ -1,5 +1,8 @@
+./sl: inputs/err-interfaces008.snl(22,1): ERROR, unimplemented method (interface 3, method 2)
+}
+^
 ./sl: inputs/err-interfaces008.snl(26,14): ERROR, interface 'I2' does not have method 'mx'
 . c[1]->mx@I2();
              ^
-./sl: 1 error(s) detected
+./sl: 2 error(s) detected
 
