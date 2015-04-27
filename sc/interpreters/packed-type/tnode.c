@@ -795,11 +795,15 @@ TNODE *tnode_finish_interface( TNODE * volatile node,
 {
     DNODE *curr_method;
 
-    node->interface_nr = interface_nr;
+    if( node->base_type && node->base_type->kind == TK_INTERFACE ) {
+        node->interface_nr = node->base_type->interface_nr;
+    } else {
+        node->interface_nr = interface_nr;
+    }
 
     foreach_dnode( curr_method, node->methods ) {
         TNODE *curr_method_type = dnode_type( curr_method );
-        curr_method_type->interface_nr = interface_nr;
+        curr_method_type->interface_nr = node->interface_nr;
     }
 
     return 
@@ -1290,6 +1294,10 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	} else {
             if( method_interface_nr == 0 ) {
                 tnode->max_vmt_offset++;
+#if 0
+                printf( ">>> advancing VMT offset to %d for type '%s'\n",
+                        tnode->max_vmt_offset, tnode_name( tnode ));
+#endif
                 method_offset = tnode->max_vmt_offset;
             }
 	}
@@ -1297,6 +1305,10 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
         tnode_set_flags( tnode, TF_IS_REF );
 	tnode->methods = dnode_append( method, tnode->methods );
         if( method_interface_nr == 0 ) {
+#if 0
+            printf( ">>> setting offset %d for method '%s'\n",
+                    method_offset, dnode_name( method ));
+#endif
             dnode_set_offset( method, method_offset );
         }
     } else {
