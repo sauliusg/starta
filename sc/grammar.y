@@ -5431,8 +5431,11 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     foreach_tlist( interface_node, interface_list ) {
         TNODE *current_interface = tlist_data( interface_node );
         ssize_t interface_nr = tnode_interface_number( current_interface );
-        ssize_t method_count =
-            dnode_list_length( tnode_methods( current_interface ));
+        ssize_t method_count = 0;
+        TNODE *base;
+        for( base = current_interface; base; base = tnode_base_type(base)) {
+            method_count += dnode_list_length( tnode_methods( base ));
+        }
         if( interface_nr > 0 &&
             itable[interface_nr+1] < method_count ) {
             itable[interface_nr+1] = method_count;
@@ -8236,7 +8239,10 @@ interface_declaration
     }
     interface_declaration_body
     {
- 	tnode_finish_interface( $5, ++compiler->last_interface_number, px );
+ 	tnode_finish_interface( $5, compiler->last_interface_number + 1, px );
+        if( compiler->last_interface_number < tnode_interface_number( $5 ) ) {
+            compiler->last_interface_number = tnode_interface_number( $5 );
+        }
 	compiler_end_scope( compiler, px );
 	compiler_typetab_insert( compiler, $5, px );
 	compiler->current_type = NULL;
