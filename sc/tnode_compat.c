@@ -149,6 +149,14 @@ tnode_implements_interface( TNODE *class_tnode, TNODE *interface_tnode )
         TNODE *curr_tnode = tlist_data( curr );
         if( curr_tnode == interface_tnode ) {
             return 1;
+        } else if( curr_tnode->base_type ) {
+            TNODE *base;
+            for( base = curr_tnode->base_type; base;
+                 base = base->base_type ) {
+                if( base == interface_tnode ) {
+                    return 1;
+                }
+            }
         }
     }
     return 0;
