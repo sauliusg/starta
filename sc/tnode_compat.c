@@ -468,7 +468,7 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 	TNODE *f1_arg_type = dnode_type( f1_arg );
 	TNODE *f2_arg_type = dnode_type( f2_arg );
 
-        if( f1_arg_type->kind == TK_PLACEHOLDER ) {
+        if( f1_arg_type && f1_arg_type->kind == TK_PLACEHOLDER ) {
             f1_arg_type =
                 tnode_placeholder_implementation( f1_arg_type, f2_arg_type,
                                                   generic_types, ex );
@@ -478,11 +478,16 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 	if( !tnode_types_are_identical( f1_arg_type, f2_arg_type,
 					generic_types, ex )) {
 	    if( msg ) {
-		snprintf( msg, msglen, "old prototype argument %d has "
-			  "type %s, but new prototype has type %s", narg,
-			  tnode_name( f1_arg_type ),
-			  tnode_name( f2_arg_type ));
-	    }
+                if( f1_arg_type && f2_arg_type ) {
+                    snprintf( msg, msglen, "old prototype argument %d has "
+                              "type %s, but new prototype has type %s", narg,
+                              tnode_name( f1_arg_type ),
+                              tnode_name( f2_arg_type ));
+                } else {
+                    snprintf( msg, msglen, "old or new prototype has undefined "
+                              "argument %d", narg );
+                }
+            }
 	    return 0;
 	}
 	f1_arg = tnode_arg_prev( f1, f1_arg );
@@ -532,11 +537,16 @@ static int tnode_function_retvals_match_msg( TNODE *f1, TNODE *f2,
 		    retval_count1 : retval_count2;
 
 		snprintf( pad, sizeof(pad), " %d", nretval );
-		snprintf( msg, msglen, "old prototype return value%s has "
-			  "type %s, but new prototype has type %s",
-			  (retval_count < 2 ? "" : pad),
-			  tnode_name( f1_retval_type ),
-			  tnode_name( f2_retval_type ));
+                if( f1_retval_type && f2_retval_type ) {
+                    snprintf( msg, msglen, "old prototype return value%s has "
+                              "type %s, but new prototype has type %s",
+                              (retval_count < 2 ? "" : pad),
+                              tnode_name( f1_retval_type ),
+                              tnode_name( f2_retval_type ));
+                } else {
+                    snprintf( msg, msglen, "old or new prototype undefined "
+                              "return values" );
+                }
 	    }
 	    return 0;
 	}
