@@ -6153,14 +6153,20 @@ import_statement
 use_statement
    : _USE '*' _FROM __IDENTIFIER
        { $$ = $4; }
-   | _USE identifier_list _FROM __IDENTIFIER
-       { $$ = $4; }
+   | _USE _TYPE identifier_list _FROM __IDENTIFIER
+       { $$ = $5; }
+   | _USE _VAR identifier_list _FROM __IDENTIFIER
+       { $$ = $5; }
+   | _USE function_or_procedure identifier_list _FROM __IDENTIFIER
+       { $$ = $5; }
    ;
 
 identifier_list
    : __IDENTIFIER
    | identifier_list ',' __IDENTIFIER
    ;
+
+function_or_procedure: _FUNCTION | _PROCEDURE;
 
 load_library_statement
    : _LOAD __STRING_CONST
