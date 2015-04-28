@@ -12,7 +12,7 @@ package M3
 
 const X = 2000;
 
-from std use *;
+use * from std;
 
 var Y : int = const(X+1);
 
@@ -21,7 +21,7 @@ end package M3;
 M1::p1();
 M2::p2();
 
-from std use *;
+use * from std;
 
 . const(M3::X);
 . M3::Y;

@@ -2,10 +2,10 @@
 # Snail compiler tests
 #
 #
-# Test the from of use * enum values in compile-time constants.
+# Test the use * from of enum values in compile-time constants.
 #
 
-from std use *;
+use * from std;
 
 type color = enum byte ( white, red, green, blue );
 

@@ -6151,10 +6151,10 @@ import_statement
    ;
 
 use_statement
-   : _FROM __IDENTIFIER _USE '*'
-       { $$ = $2; }
-   | _FROM __IDENTIFIER _USE identifier_list 
-       { $$ = $2; }
+   : _USE '*' _FROM __IDENTIFIER
+       { $$ = $4; }
+   | _USE identifier_list _FROM __IDENTIFIER
+       { $$ = $4; }
    ;
 
 identifier_list

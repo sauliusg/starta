@@ -4,7 +4,7 @@
 # Test subarrays
 #
 
-from std use *;
+use * from std;
 
 procedure print_array( int[] n )
 {

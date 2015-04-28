@@ -2,7 +2,7 @@ package Mstrange
 
 const X = 4000;
 
-from std use *;
+use * from std;
 
 var string name = "package M4";
 

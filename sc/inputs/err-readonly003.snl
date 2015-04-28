@@ -5,7 +5,7 @@
 # Test readonly variables.
 #
 
-from std use *;
+use * from std;
 
 struct S {
     var i, j : int;

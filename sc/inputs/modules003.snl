@@ -7,7 +7,7 @@
 
 package M;
 
-from std use *;
+use * from std;
 
 type my_int = int;
 
@@ -20,7 +20,7 @@ end package M;
 
 //use M;
 
-from std use *;
+use * from std;
 
 var j : M::my_int;
 

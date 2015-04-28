@@ -4,11 +4,11 @@
 # Test exceptions with package names.
 #
 
-from std use *;
+use * from std;
 
 package Ex
 
-from std use *;
+use * from std;
 
 exception Ex1;
 exception Ex2;

@@ -5,7 +5,7 @@
 # Test line-wise file reading.
 #
 
-from std use *;
+use * from std;
 
 program lines( string args[] )
 {

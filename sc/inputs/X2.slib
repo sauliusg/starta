@@ -1,7 +1,7 @@
 
 package X2
 
-from std use *;
+use * from std;
 
 procedure p()
 begin

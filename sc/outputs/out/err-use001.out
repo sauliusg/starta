@@ -1,6 +1,6 @@
-./sl: inputs/err-use001.snl(14,23): ERROR, 'use' statement should not be used within subroutines
-    from testmath use *;
-                      ^
+./sl: inputs/err-use001.snl(14,16): ERROR, 'use' statement should not be used within subroutines
+    use * from testmath;
+               ^
 ./sl: inputs/err-use001.snl(16,25): ERROR, module 'testmath' is not available in the current scope
     return testmath::sqr( x ) / y
                         ^
@@ -10,9 +10,9 @@
 ./sl: inputs/err-use001.snl(17,1): ERROR, incompatible types for binary operator '/'
 }
 ^
-./sl: inputs/err-use001.snl(21,23): ERROR, 'use' statement should not be used within subroutines
-    from testmath use *;
-                      ^
+./sl: inputs/err-use001.snl(21,16): ERROR, 'use' statement should not be used within subroutines
+    use * from testmath;
+               ^
 ./sl: inputs/err-use001.snl(23,29): ERROR, module 'testmath' is not available in the current scope
     return x / testmath::sqr( y );
                             ^

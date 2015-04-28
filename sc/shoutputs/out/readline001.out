@@ -1,6 +1,6 @@
 shtests/programs/readline.snl
 >>>  <<<
->>> from std use *; <<<
+>>> use * from std; <<<
 >>>  <<<
 >>> var args : array of string = arguments(); <<<
 >>>  <<<

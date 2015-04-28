@@ -5,7 +5,7 @@
 # correctly.
 #
 
-from std use *;
+use * from std;
 
 var i = 567;
 

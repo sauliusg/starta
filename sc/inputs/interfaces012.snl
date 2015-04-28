@@ -4,7 +4,7 @@
 
 # Check that interfaces can be declared with the same method names.
 
-from std use *;
+use * from std;
 
 interface I1 {
     method add( int i );

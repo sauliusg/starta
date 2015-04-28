@@ -5,7 +5,7 @@
 # Test loops and posfixed conditions;
 #
 
-from std use *;
+use * from std;
 
 var i = 0;
 

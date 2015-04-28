@@ -5,7 +5,7 @@
 
 module Atom;
 
-from std use *;
+use * from std;
 
 class Atom {
     float x, y, z;

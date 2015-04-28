@@ -1,7 +1,7 @@
 
 module Y1;
 
-from std use *;
+use * from std;
 
 type T = int;
 

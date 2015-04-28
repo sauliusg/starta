@@ -5,7 +5,7 @@
 # Test generic array and ref indexing diagnostics
 #
 
-from std use *;
+use * from std;
 
 type A = array of float;
 type M = array [][] of int;

@@ -4,7 +4,7 @@
 # Test substrings
 #
 
-from std use *;
+use * from std;
 
 var s = [ "Abrakadabra", "monkey", "keyword", "something" ];
 

@@ -5,7 +5,7 @@
 # Test size diagnostics for primitive types.
 #
 
-from std use *;
+use * from std;
 
 type T = {
     size = 4;

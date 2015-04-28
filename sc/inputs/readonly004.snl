@@ -6,7 +6,7 @@
 # compiling the '=' assignment.
 #
 
-from std use *;
+use * from std;
 
 readonly int x = 20;
 

@@ -1,5 +1,5 @@
 
-from std use *;
+use * from std;
 
 function h( int x ): long, float
 {

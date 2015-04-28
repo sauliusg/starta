@@ -5,7 +5,7 @@
 # Test array indexing with chars.
 #
 
-from std use *;
+use * from std;
 
 var s : string = "some string";
 

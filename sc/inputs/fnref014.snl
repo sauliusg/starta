@@ -5,7 +5,7 @@
 # Test function references as subroutine parameters
 #
 
-from std use *;
+use * from std;
 
 procedure g( float x;
              mutator: function (float a) -> (float)

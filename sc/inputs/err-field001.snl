@@ -5,7 +5,7 @@
 # Regression test: segfault when 'std' is not used: 
 #
 
-// from std use *;
+// use * from std;
 
 struct CCP4MapHeader {
     int   columnNr;

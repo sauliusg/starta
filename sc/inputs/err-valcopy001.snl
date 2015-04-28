@@ -5,7 +5,7 @@
 # Test value-copy-assignment
 #
 
-from std use *;
+use * from std;
 
 var a : array of int = [ 1, 2, 3 ];
 var b : array of float = [ 4.0, 5.0, 6.0 ];

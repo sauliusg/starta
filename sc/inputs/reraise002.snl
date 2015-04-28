@@ -5,7 +5,7 @@
 # Test reraise statement
 #
 
-from std use *;
+use * from std;
 
 exception TestException1;
 

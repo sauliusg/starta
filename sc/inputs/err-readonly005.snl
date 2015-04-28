@@ -5,7 +5,7 @@
 # Test readonly variables.
 #
 
-from std use *;
+use * from std;
 
 program (args : array of string; io : array of file) {
 

@@ -5,7 +5,7 @@
 # Test generic array and ref indexing diagnostics
 #
 
-from std use *;
+use * from std;
 
 var m : array of int;
 
