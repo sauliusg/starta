@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 null class C {
     var i : int;

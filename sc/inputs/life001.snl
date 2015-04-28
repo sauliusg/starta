@@ -11,7 +11,7 @@
 
 ## include "stdtypes.slib"
 
-use std;
+use * from std;
 
 type Cell = int;
 

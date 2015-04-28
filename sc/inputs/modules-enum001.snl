@@ -7,7 +7,7 @@
 
 package M;
 
-use std;
+use * from std;
 
 type E = enum int ( nulis, vienas, du, trys );
 

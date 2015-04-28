@@ -5,7 +5,7 @@
 # Check bitwise logic operators.
 #
 
-use std;
+use * from std;
 
 var b : byte = 1B;
 var s : short = 2S;

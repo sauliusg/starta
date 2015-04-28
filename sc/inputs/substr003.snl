@@ -4,7 +4,7 @@
 # Test substrings
 #
 
-use std;
+use * from std;
 
 var s = "two";
 

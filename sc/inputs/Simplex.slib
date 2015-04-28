@@ -10,8 +10,8 @@
 
 package Simplex;
 
-use std;
-use Math;
+use * from std;
+use * from Math;
 
 exception SimplexNotConverged;
 

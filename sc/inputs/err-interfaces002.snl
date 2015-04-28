@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 null interface If {
     method f( x : int ): int;

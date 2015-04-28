@@ -4,8 +4,8 @@
 # Test rounding of floating point numbers
 #
 
-use std;
-use Math;
+use * from std;
+use * from Math;
 
 var ld : ldouble = 4.0LD * atan2l( 1, 1 );
 var d : double = 4.0D * atan2( 1, 1 );

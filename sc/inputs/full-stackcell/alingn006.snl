@@ -5,7 +5,7 @@
 # Test field alignment in records
 #
 
-use std;
+use * from std;
 
 struct A {
     name : array of char;

@@ -6,7 +6,7 @@
 #
 
 
-import M;
+use M;
 
 include "stdtypes.slib"
 include "stdio.slib"

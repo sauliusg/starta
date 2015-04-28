@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 type R = ?struct {
     string s1, s2, s2;

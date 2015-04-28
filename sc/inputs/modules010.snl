@@ -5,15 +5,15 @@
 # Test modules, module function and variable access.
 #
 
-import M1;
-import M2;
+use M1;
+use M2;
 
-use M4;
+use * from M4;
 
 M1::p1();
 M2::p2();
 
-use std;
+use * from std;
 
 . const(M4::X);
 . M4::Y;

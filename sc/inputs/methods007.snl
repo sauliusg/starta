@@ -5,7 +5,7 @@
 # Test struct and class methods
 #
 
-use std;
+use * from std;
 
 null class S {
     int i;

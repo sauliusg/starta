@@ -5,6 +5,6 @@
 # Test functions to access program arguments
 #
 
-use std
+use * from std
 
 . narguments();

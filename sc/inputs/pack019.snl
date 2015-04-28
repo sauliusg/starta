@@ -5,7 +5,7 @@
 # Test 
 #
 
-use std;
+use * from std;
 
 var b = new blob(4000);
 var l : llong;

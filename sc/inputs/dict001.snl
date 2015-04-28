@@ -5,7 +5,7 @@
 # Test 'dictionary of T', using the inline 'new' operator to pass
 # compile time parameters.
 
-use std;
+use * from std;
 
 type hash of T = ?{
     reference;

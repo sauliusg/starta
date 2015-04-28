@@ -5,7 +5,7 @@
 # Testing cloning of arrays.
 #
 
-use std;
+use * from std;
 
 var p = [ 12.0, 13.0, 14.0, 15.0, 16.0 ];
 

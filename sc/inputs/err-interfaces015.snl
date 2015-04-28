@@ -4,7 +4,7 @@
 
 # Check that lists of reference variables are looped correctly:
 
-use std;
+use * from std;
 
 interface I1 {
     method add( int i );

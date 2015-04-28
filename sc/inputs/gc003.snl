@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 var m : array of int;
 

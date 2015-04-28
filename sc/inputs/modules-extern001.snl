@@ -5,7 +5,7 @@
 # Test modules, module function and variable access.
 #
 
-import M;
+use M;
 
 include "stdtypes.slib"
 include "stdio.slib"

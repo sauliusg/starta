@@ -5,7 +5,7 @@
 # Testing classis, inheritance and polymorphism.
 #
 
-use std;
+use * from std;
 
 null struct S {
     name : string;

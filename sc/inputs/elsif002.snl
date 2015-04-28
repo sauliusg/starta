@@ -5,7 +5,7 @@
 # 'ELSIF' conditional operator test
 #
 
-use std;
+use * from std;
 
 var i : int;
 

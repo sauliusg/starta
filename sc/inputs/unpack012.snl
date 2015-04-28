@@ -5,7 +5,7 @@
 # Test multi-format value unpacking
 #
 
-use std;
+use * from std;
 
 procedure print_array( int m[] )
 {

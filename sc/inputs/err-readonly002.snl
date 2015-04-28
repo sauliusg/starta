@@ -5,7 +5,7 @@
 # Test readonly variables.
 #
 
-use std;
+use * from std;
 
 readonly m : array of int = new int [10]; // OK, initialisation of the readonly
 readonly n : array of int = m; // OK, initialisation of the readonly;

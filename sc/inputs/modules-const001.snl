@@ -7,7 +7,7 @@
 
 package M;
 
-use std;
+use * from std;
 
 const C = 10;
 const D = C + 1;
@@ -16,7 +16,7 @@ var i : int = const D;
 
 end package M;
 
-use std;
+use * from std;
 
 const C = 100;
 

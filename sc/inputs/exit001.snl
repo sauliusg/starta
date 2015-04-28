@@ -4,6 +4,6 @@
 # Test the exit() function
 #
 
-use std;
+use * from std;
 
 exit(0);

@@ -2,7 +2,7 @@
 # Test 'foreach' loops with references.
 #
 
-use std;
+use * from std;
 
 pragma float;
 var mm = [ [1, 0, 0], [0, 1, 0], [0, 0, 1] ];

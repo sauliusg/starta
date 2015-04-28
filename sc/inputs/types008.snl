@@ -5,7 +5,7 @@
 # Test undelimited type descriptions
 #
 
-use std;
+use * from std;
 
 type S = struct { a, b : int; x, y : float }
 

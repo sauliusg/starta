@@ -5,7 +5,7 @@
 # Test variable type inference
 #
 
-use std;
+use * from std;
 
 var xx = 2.34;
 var bb = 127B;

@@ -6,7 +6,7 @@
 # compiling array expressions.
 #
 
-use std;
+use * from std;
 
 readonly x = "constant name";
 
