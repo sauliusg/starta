@@ -3,7 +3,7 @@
 # Test the '<filehandle>' file read condition.
 #
 
-use * from std;
+from std use *;
 
 var inp = fopen( "inputs/fileio011.snl", "r" );
 

@@ -5,11 +5,11 @@
 # Test modules, module function and variable access.
 #
 
-use * from std;
+from std use *;
 
 package M;
 
-use * from std;
+from std use *;
 
 var j : int;
 var i : int;

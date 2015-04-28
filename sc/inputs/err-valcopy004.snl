@@ -6,7 +6,7 @@
 # compiling the ':=' assignemtn.
 #
 
-use * from std;
+from std use *;
 
 var string s1 = "first";
 var string s2 = "SECOND";

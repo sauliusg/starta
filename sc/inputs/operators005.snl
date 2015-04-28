@@ -5,7 +5,7 @@
 # Check operators declared outside of the types
 #
 
-use * from std;
+from std use *;
 
 type list_of_string = ?struct {
     next : list_of_string;

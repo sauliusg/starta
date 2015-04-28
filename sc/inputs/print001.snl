@@ -4,7 +4,7 @@
 # Test multi-expression output operators
 #
 
-use * from std;
+from std use *;
 
 < 1, 2, 3, " ";
 . 4, 5, 6;

@@ -1,8 +1,8 @@
 
-use * from std;
+from std use *;
 
-use * from Y1;
-use * from Y2;
+from Y1 use *;
+from Y2 use *;
 
 . Y1::t;
 . Y2::t;

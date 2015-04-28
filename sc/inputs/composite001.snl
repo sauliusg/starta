@@ -5,7 +5,7 @@
 # Test 
 #
 
-use * from std;
+from std use *;
 
 type collection of T = null {
     reference;

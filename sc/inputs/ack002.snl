@@ -2,7 +2,7 @@
 # Ackermann function
 #
 
-use * from std;
+from std use *;
 
 function ack( m, n : int ) : int
 {

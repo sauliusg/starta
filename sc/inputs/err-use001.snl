@@ -5,20 +5,20 @@
 # Test generic array and ref indexing diagnostics
 #
 
-use * from std;
+from std use *;
 
-//use * from testmath;
+//from testmath use *;
 
 function f( float x; float y ) : float
 {
-    use * from testmath;
+    from testmath use *;
 
     return testmath::sqr( x ) / y
 }
 
 function g( float x; float y ) : float
 {
-    use * from testmath;
+    from testmath use *;
 
     return x / testmath::sqr( y );
 }

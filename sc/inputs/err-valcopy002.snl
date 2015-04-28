@@ -5,7 +5,7 @@
 # Test value-copy-assignment
 #
 
-use * from std;
+from std use *;
 
 var i : int;
 var x : float;

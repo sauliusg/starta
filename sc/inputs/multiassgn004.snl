@@ -4,7 +4,7 @@
 # Test of the multiple assignment
 #
 
-use * from std;
+from std use *;
 
 type S = null struct { x : int; y : int };
 

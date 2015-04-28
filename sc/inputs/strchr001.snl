@@ -5,7 +5,7 @@
 # Test strchr() function
 #
 
-use * from std;
+from std use *;
 
 . strchr( "haystack", 'h'c );
 . strchr( "haystack", 'y'c );

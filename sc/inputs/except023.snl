@@ -3,7 +3,7 @@
 # an error code:
 #
 
-use * from std;
+from std use *;
 
 exception XXX;
 

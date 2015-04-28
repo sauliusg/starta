@@ -4,7 +4,7 @@
 # Test of boolean constants.
 #
 
-use * from std;
+from std use *;
 
 if 0B then
     . "This is TRUE branch";

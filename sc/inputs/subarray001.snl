@@ -4,7 +4,7 @@
 # Test subarrays
 #
 
-use * from std;
+from std use *;
 
 var m = [ 1, 2, 3, 4, 5, 6 ];
 

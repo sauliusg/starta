@@ -7,7 +7,7 @@
 
 package M;
 
-use * from std;
+from std use *;
 
 var i : int; // package M
 
@@ -15,7 +15,7 @@ i = 33;
 
 end package M;
 
-use * from std;
+from std use *;
 
 var i : int; // main program
 

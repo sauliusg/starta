@@ -5,7 +5,7 @@
 # Test constants and compile-time constant folding.
 #
 
-use * from std;
+from std use *;
 
 const X = 3.14;
 const Y = 2.17;

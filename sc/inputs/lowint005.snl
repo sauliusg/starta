@@ -5,7 +5,7 @@
 # Test truncation of integers to narrow values.
 #
 
-use * from std;
+from std use *;
 
 var b : byte;
 var l : llong = 100000LL * 100000LL;

@@ -2,7 +2,7 @@
 # Rampant Randomness
 #
 
-use * from std;
+from std use *;
 
 function make_Life_rule( depth: int ) : array of byte
 {
@@ -69,8 +69,8 @@ function make_Life_rule( depth: int ) : array of byte
 
 inline bytecode function NOT( i: byte ): byte { BNOT };
 
-use * from GNUrand48;
-use * from Time;
+from GNUrand48 use *;
+from Time use *;
 
 GNUrand48::srand48(time());
 

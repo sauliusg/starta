@@ -7,7 +7,7 @@
 
 package M;
 
-use * from std;
+from std use *;
 
 type integer = int;
 

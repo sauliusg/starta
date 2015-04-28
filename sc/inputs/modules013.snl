@@ -1,8 +1,8 @@
 
-use * from std;
+from std use *;
 
-use * from X1;
-use * from X2;
+from X1 use *;
+from X2 use *;
 
 // procedure p()
 // {

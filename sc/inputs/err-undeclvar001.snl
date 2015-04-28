@@ -5,7 +5,7 @@
 # Test the 'strend()' string suffix comparison function.
 #
 
-use * from std;
+from std use *;
 
 var s1, s2, s3 : string;
 

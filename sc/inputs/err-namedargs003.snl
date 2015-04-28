@@ -5,7 +5,7 @@
 # Test function arument type compatibility
 #
 
-use * from std;
+from std use *;
 
 function g( x, y : int = 1; z, t : int; int u = 3 ) : int
 {

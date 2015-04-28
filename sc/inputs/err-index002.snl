@@ -5,7 +5,7 @@
 # variable is undefined).
 #
 
-use * from std;
+from std use *;
 
 var b = new int[10];
 

@@ -5,7 +5,7 @@
 # Test ato*() functions
 #
 
-use * from std;
+from std use *;
 
 var i : int   = atoi( "123" );
 var l : llong = atoll( "12345678901234" );

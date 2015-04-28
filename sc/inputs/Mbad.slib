@@ -2,7 +2,7 @@ package Mgood
 
 const X = 4000;
 
-use * from std;
+from std use *;
 
 var string name = "package M4";
 

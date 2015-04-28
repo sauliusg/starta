@@ -5,7 +5,7 @@
 # Test the "stringification" operators.
 #
 
-use * from std;
+from std use *;
 
 var i = 123;
 

@@ -5,7 +5,7 @@
 # Testing reading into structures with references.
 #
 
-use * from std;
+from std use *;
 
 type S = struct {
     string name;

@@ -5,7 +5,7 @@
 # Test named function arguments
 #
 
-use * from std;
+from std use *;
 
 function ff( x : int = 100; y : long = 200 ) : long
 {

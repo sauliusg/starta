@@ -1,11 +1,11 @@
 
-use * from std;
+from std use *;
 
-use * from Y1;
+from Y1 use *;
 
 type T = long;
 
-use * from Y2;
+from Y2 use *;
 
 var a : T = 10T;
 . a;

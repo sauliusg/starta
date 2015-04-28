@@ -4,4 +4,4 @@
 # Test module disgnostics
 #
 
-use * from Mbad;
+from Mbad use *;

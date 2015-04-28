@@ -4,8 +4,8 @@
 
 # Check that lists of reference variables are looped correctly:
 
-use * from std;
-use * from Lists;
+from std use *;
+from Lists use *;
 
 class S
 { 

@@ -5,7 +5,7 @@
 # Test field alignment in structures
 #
 
-use * from std;
+from std use *;
 
 struct A {
     name : string;

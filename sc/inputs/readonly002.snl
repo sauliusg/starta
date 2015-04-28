@@ -5,7 +5,7 @@
 # Test readonly variables.
 #
 
-use * from std;
+from std use *;
 
 readonly var int x = 12; // OK;
 readonly string s = "something"; // OK, immutable ref.

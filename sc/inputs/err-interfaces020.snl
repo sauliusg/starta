@@ -5,7 +5,7 @@
 # Test interfaces
 #
 
-use * from std;
+from std use *;
 
 interface I1 {
     method mm() : int;

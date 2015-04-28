@@ -2,6 +2,6 @@
 # Test whether the SL compiler works
 #
 
-use * from std;
+from std use *;
 
 . "Hellow, world!"

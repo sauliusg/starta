@@ -2,10 +2,10 @@
 # Snail compiler tests
 #
 #
-# Test the use * from of negative default values for function arguments
+# Test the from of use * negative default values for function arguments
 #
 
-use * from std;
+from std use *;
 
 function f( parameter : int = -2 ) : int
 {

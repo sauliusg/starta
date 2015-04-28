@@ -5,7 +5,7 @@
 # Test string indexing.
 #
 
-use * from std;
+from std use *;
 
 var s : string = "some string";
 
