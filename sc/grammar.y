@@ -5606,10 +5606,10 @@ static cexception_t *px; /* parser exception */
 %token _FOR
 %token _FOREACH
 %token _FORWARD
+%token _FROM
 %token _FUNCTION
 %token _IF
 %token _IMPLEMENTS
-%token _IMPORT
 %token _IN
 %token _INCLUDE
 %token _INLINE
@@ -6146,13 +6146,13 @@ package_statement
   ;
 
 import_statement
-   : _IMPORT __IDENTIFIER
+   : _USE __IDENTIFIER
        { $$ = $2; }
    ;
 
 use_statement
-   : _USE __IDENTIFIER
-       { $$ = $2; }
+   : _USE '*' _FROM __IDENTIFIER
+       { $$ = $4; }
    ;
 
 load_library_statement

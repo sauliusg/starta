@@ -5,7 +5,7 @@
 # Test ato*() functions
 #
 
-use std;
+use * from std;
 
 . atoi( "123" );
 . atoll( "12345678901234" );

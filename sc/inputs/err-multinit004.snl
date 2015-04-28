@@ -4,7 +4,7 @@
 # Test multiple variable initialisation.
 #
 
-use std;
+use * from std;
 
 function multi( int i ) : int, int, int
 {

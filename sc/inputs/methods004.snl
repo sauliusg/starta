@@ -14,6 +14,6 @@ type C = class { x, y : L; method f( i : I ) { self.x = i@L }}
 
 var c = new C;
 
-use std;
+use * from std;
 
 . "variable 'c' of class \"C\" created successfully";

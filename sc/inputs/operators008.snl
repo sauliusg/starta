@@ -1,5 +1,5 @@
 
-// use std;
+// use * from std;
 
 module N
 
@@ -20,7 +20,7 @@ module N
 
 end module N;
 
-use N;
+use * from N;
 
 var i = 12 I;
 
@@ -28,7 +28,7 @@ var i = 12 I;
 
 module M
 
-    use N;
+    use * from N;
 
     inline bytecode operator "*"  ( a, b : myint ): myint
     { SLDC "This is the module M definition of \"*\": " SPRINT MUL }
@@ -37,25 +37,25 @@ end module M;
 
 module P
 
-    use N;
+    use * from N;
 
     inline bytecode operator "*"  ( a, b : myint ): myint
     { SLDC "This is an alternartive, module P definition of \"*\": " SPRINT MUL }
 
 end module P;
 
-use M;
+use * from M;
 
 . i * i;
 
-use P;
+use * from P;
 
 . i * i;
 
-use M;
+use * from M;
 
 . i * i;
 
-use P;
+use * from P;
 
 . i * i;

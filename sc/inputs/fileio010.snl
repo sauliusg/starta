@@ -3,7 +3,7 @@
 # Test the '<filehandle>' file read operator.
 #
 
-use std;
+use * from std;
 
 var line : string;
 

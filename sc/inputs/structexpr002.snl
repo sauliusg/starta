@@ -5,7 +5,7 @@
 # Test struct expressions
 #
 
-use std;
+use * from std;
 
 null struct S {
     name : string;

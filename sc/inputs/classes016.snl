@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 class S {
     var m: null class {

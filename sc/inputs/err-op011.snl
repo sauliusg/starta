@@ -1,5 +1,5 @@
 
-// use std;
+// use * from std;
 
 module N
 
@@ -20,7 +20,7 @@ module N
 
 end module N;
 
-use N;
+use * from N;
 
 var i = 12 I;
 
@@ -28,13 +28,13 @@ var i = 12 I;
 
 module M
 
-    use N;
+    use * from N;
 
     inline bytecode operator "*"  ( a, b : myint ): myint
     { MUL }
 
 end module M;
 
-// use M;
+// use * from M;
 
 . i * i;

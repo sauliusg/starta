@@ -7,7 +7,7 @@
 
 package M;
 
-use std;
+use * from std;
 
 type my_int = int;
 
@@ -18,9 +18,9 @@ i = 33 my_int;
 
 end package M;
 
-//import M;
+//use M;
 
-use std;
+use * from std;
 
 var j : M::my_int;
 

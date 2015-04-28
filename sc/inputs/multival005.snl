@@ -5,7 +5,7 @@
 # Test modules, module function and variable access.
 #
 
-use std;
+use * from std;
 
 function multi( int i ): int, int #, int
 {

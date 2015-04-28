@@ -5,6 +5,6 @@
 # Test formatting operators and their precedense.
 #
 
-use std;
+use * from std;
 
 . "This is a" _ "%6.3f" %% 5.0/2.54 _ " %s " %% "inch" _ "pipe";

@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 // The followinf function should compile without errors:
 

@@ -5,7 +5,7 @@
 # Test functions to access program arguments
 #
 
-use std
+use * from std
 
 var a = arguments();
 

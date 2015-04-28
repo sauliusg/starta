@@ -5,7 +5,7 @@
 # Test value-copy-assignment
 #
 
-use std;
+use * from std;
 
 var a : array of int = [ 1, 2, 3 ];
 var b : array of int = [ 4, 5, 6 ];

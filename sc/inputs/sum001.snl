@@ -4,8 +4,8 @@
 # Test of array sumation
 #
 
-use ArrayMath;
-use std;
+use * from ArrayMath;
+use * from std;
 
 var m = [ 1.0, 2.0, 3.0 ];
 

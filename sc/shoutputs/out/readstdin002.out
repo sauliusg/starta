@@ -1,7 +1,7 @@
 
 
-use std;
-use std;
+use * from std;
+use * from std;
 
 
 while(<>) {

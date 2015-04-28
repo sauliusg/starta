@@ -5,7 +5,7 @@
 # Test generic array and ref indexing diagnostics
 #
 
-use std;
+use * from std;
 
 var m : array of llong;
 

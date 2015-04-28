@@ -1,5 +1,5 @@
 
-use std;
+use * from std;
 
 program mano( string argv[]; file stdio[]; string env[] )
 begin

@@ -5,7 +5,7 @@
 # Check ref and synonim compatibility:
 #
 
-use std;
+use * from std;
 
 inline function abs( float x ) : float
 {

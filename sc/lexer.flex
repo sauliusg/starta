@@ -220,10 +220,10 @@ exception   { MARK; return _EXCEPTION; }
 for         { MARK; return _FOR; }
 foreach     { MARK; return _FOREACH; }
 forward     { MARK; return _FORWARD; }
+from        { MARK; return _FROM; }
 function    { MARK; return _FUNCTION; }
 if          { MARK; return _IF; }
 implements  { MARK; return _IMPLEMENTS; }
-import      { MARK; return _IMPORT; }
 in          { MARK; return _IN; }
 include     { MARK; return _INCLUDE; }
 inline      { MARK; return _INLINE; }

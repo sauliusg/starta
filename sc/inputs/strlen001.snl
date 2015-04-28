@@ -5,7 +5,7 @@
 # Test strlen() function
 #
 
-use std;
+use * from std;
 
 . strlen( "" );
 . strlen( "o" );

@@ -4,9 +4,9 @@
 # Test exceptions with package names.
 #
 
-use Ex;
+use * from Ex;
 
-use std;
+use * from std;
 
 try {
     raise Ex1( "raising exception from a package" )

@@ -9,11 +9,11 @@
 // arrays are handled in "real life" situations"
 //**
 
-use std;
-use Math;
+use * from std;
+use * from Math;
 
-import Simplex;
-use FloatSimplexFns;
+use Simplex;
+use * from FloatSimplexFns;
 
 function energy( float x[] ): float
 {

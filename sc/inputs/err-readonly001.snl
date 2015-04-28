@@ -5,7 +5,7 @@
 # Test readonly variables.
 #
 
-use std;
+use * from std;
 
 readonly int x = 12;
 var int y;

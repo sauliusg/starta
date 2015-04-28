@@ -9,7 +9,7 @@
 # Saulius Grazulis, Orenburg, 2006.08.18
 #
 
-use std;
+use * from std;
 
 type Cell = int;
 

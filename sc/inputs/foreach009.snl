@@ -3,7 +3,7 @@
 # Test 'foreach X in ARRAY' loops.
 #
 
-use std;
+use * from std;
 
 var a = [ 11, 3, 12, 74 ];
 var i = 0;

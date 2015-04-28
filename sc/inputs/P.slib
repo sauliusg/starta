@@ -1,7 +1,7 @@
 
 package P;
 
-use std;
+use * from std;
 
 const X = 100;
 

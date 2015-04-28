@@ -5,7 +5,7 @@
 # Test structures...
 #
 
-use std;
+use * from std;
 
 type A = class {
      next : A;

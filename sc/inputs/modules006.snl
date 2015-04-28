@@ -7,7 +7,7 @@
 
 package M;
 
-use std;
+use * from std;
 
 type integer = int;
 
@@ -17,7 +17,7 @@ i = 33 integer;
 
 end package M;
 
-import std;
+use std;
 
 var i : std::int; // main program
 

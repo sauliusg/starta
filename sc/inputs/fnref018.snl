@@ -6,7 +6,7 @@
 # pointers.
 #
 
-use std;
+use * from std;
 
 function f() : string;
 

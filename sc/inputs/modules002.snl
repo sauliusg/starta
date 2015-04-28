@@ -5,11 +5,11 @@
 # Test modules, module function and variable access.
 #
 
-use std;
+use * from std;
 
 package M;
 
-use std;
+use * from std;
 
 var j : int;
 var i : int;
@@ -28,7 +28,7 @@ function get_i() : int
 
 end package M;
 
-//import M;
+//use M;
 
 . M::get_i();
 

@@ -2,7 +2,7 @@
 # Test 'map' function
 #
 
-use std;
+use * from std;
 
 procedure map( p: function (x:type T)->(type T); m: array of type T ): 
     array of type T

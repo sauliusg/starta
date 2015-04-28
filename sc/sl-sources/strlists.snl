@@ -5,7 +5,7 @@
 # Manually created lists.
 #
 
-use std;
+use * from std;
 
 type list_of_string = ? struct {
     next : list_of_string;

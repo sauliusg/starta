@@ -5,9 +5,9 @@
 # Testing classis, inheritance and polymorphism.
 #
 
-use std;
+use * from std;
 
-import P;
+use P;
 
 . const(P::X);
 

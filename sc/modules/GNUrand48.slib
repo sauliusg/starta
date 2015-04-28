@@ -1,6 +1,6 @@
 package GNUrand48;
 
-use std;
+use * from std;
 
 load "libraries/GNUrand48/libGNUrand48.so.0.01";
 

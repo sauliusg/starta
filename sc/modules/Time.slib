@@ -1,6 +1,6 @@
 package Time;
 
-use std;
+use * from std;
 
 load "libraries/Time/libTime.so.0.01";
 

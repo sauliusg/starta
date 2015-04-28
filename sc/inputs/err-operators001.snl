@@ -5,7 +5,7 @@
 # Regression test to catch double-free when compiling && and || operators.
 #
 
-use std;
+use * from std;
 
 procedure g( int i; readonly array of int m ) : int
 {

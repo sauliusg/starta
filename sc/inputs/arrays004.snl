@@ -5,7 +5,7 @@
 # Testing cloning of arrays.
 #
 
-use std;
+use * from std;
 
 procedure print_array( int[] m )
 {

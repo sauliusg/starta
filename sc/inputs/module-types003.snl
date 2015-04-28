@@ -1,8 +1,8 @@
 
-use std;
+use * from std;
 
-use Y1;
-use Y2;
+use * from Y1;
+use * from Y2;
 
 type T = long;
 
