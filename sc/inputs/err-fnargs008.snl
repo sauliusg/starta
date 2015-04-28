@@ -5,7 +5,7 @@
 # Test readonlyness of function parameters.
 #
 
-from std use *;
+use * from std;
 
 procedure g( int i; array of int m )
 {

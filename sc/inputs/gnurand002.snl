@@ -5,9 +5,9 @@
 # Test GNU random number generator interface package
 #
 
-from std use *;
-from Math use *;
-from GNUrand48 use *;
+use * from std;
+use * from Math;
+use * from GNUrand48;
 
 srand48( 10367 );
 

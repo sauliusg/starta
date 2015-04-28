@@ -21,7 +21,7 @@ end package M3;
 M1::p1();
 M2::p2();
 
-//from std use *;
+//use * from std;
 use std;
 
 . const(M3::X) std::int;

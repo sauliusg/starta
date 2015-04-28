@@ -5,8 +5,8 @@
 # Test Math library.
 #
 
-from std use *;
-from Math use *;
+use * from std;
+use * from Math;
 
 readonly Pi = 3.14159265358979;
 readonly PI = 3.14159265358979D;

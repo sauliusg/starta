@@ -1,7 +1,7 @@
 
 package testmath;
 
-from std use *;
+use * from std;
 
 function sqr( float x ) : float
 begin

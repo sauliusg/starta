@@ -5,7 +5,7 @@
 # Test FOR loops with locally declared loop counters
 #
 
-from std use *;
+use * from std;
 
 var nn = [ "name1", "name2", "name3", "name4" ];
 

@@ -1,5 +1,5 @@
 
-from std use *;
+use * from std;
 
 var s1 = "";
 var s2 : string;

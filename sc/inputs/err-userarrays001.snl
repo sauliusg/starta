@@ -5,7 +5,7 @@
 # Test 
 #
 
-from std use *;
+use * from std;
 
 type collection of T = null {
     size = sizeof native "void*";

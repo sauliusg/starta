@@ -5,7 +5,7 @@
 # Testing classis, inheritance and polymorphism.
 #
 
-from std use *;
+use * from std;
 
 use P;
 

@@ -5,7 +5,7 @@
 # Test how loop-declared 
 #
 
-from std use *;
+use * from std;
 
 . "You will not believe it, but";
 . 2, "plus", 2, "is", 2 + 2;

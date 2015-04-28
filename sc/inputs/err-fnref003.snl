@@ -5,7 +5,7 @@
 # Test function and procedure references
 #
 
-from std use *;
+use * from std;
 
 struct S {
     int i;

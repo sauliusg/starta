@@ -1,6 +1,6 @@
 
-from std use *;
-from Math use *;
+use * from std;
+use * from Math;
 
 pragma float;
 

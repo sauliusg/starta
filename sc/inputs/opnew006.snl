@@ -5,7 +5,7 @@
 # Test array allocators using more Pascal-like syntax:
 #
 
-from std use *;
+use * from std;
 
 var a = new array [22] of int;
 

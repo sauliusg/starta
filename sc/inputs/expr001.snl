@@ -5,7 +5,7 @@
 # Testing expressions.
 #
 
-from std use *;
+use * from std;
 
 . 1;
 . (1);

@@ -1,8 +1,8 @@
 shtests/programs/readword.snl
->>> from <<<
->>> std <<<
 >>> use <<<
->>> *; <<<
+>>> * <<<
+>>> from <<<
+>>> std; <<<
 >>> var <<<
 >>> args <<<
 >>> : <<<

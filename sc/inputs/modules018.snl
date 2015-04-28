@@ -1,7 +1,7 @@
 
 module F2C;
 
-from std use *;
+use * from std;
 
 type F = float;
 type C = float;
@@ -17,8 +17,8 @@ procedure C_from_F( t : F ): C
 
 end module F2C;
 
-// from std use *;
-from F2C use *;
+// use * from std;
+use * from F2C;
 
 . C_from_F(  32 F );
 . C_from_F(  80 F );

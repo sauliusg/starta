@@ -1,9 +1,9 @@
 
-from std use *;
+use * from std;
 
-from X1 use *;
-from X2 use *;
-from X3 use *;
+use * from X1;
+use * from X2;
+use * from X3;
 
 X1::p();
 X2::p();

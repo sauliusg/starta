@@ -5,7 +5,7 @@
 # Test loop 'break' and 'continue' statements.
 #
 
-from std use *;
+use * from std;
 
 const N = 10;
 

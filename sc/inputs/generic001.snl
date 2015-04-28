@@ -5,7 +5,7 @@
 # Test struct and class methods
 #
 
-from std use *;
+use * from std;
 
 procedure printmax( a, b : type T;
                     gt : function( x, y : type T ) -> (bool);

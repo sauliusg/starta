@@ -4,7 +4,7 @@
 # Test multiple variable initialisation.
 #
 
-from std use *;
+use * from std;
 
 function multitype( int i ) : int, long, double
 {

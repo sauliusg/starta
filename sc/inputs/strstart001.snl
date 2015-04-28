@@ -5,7 +5,7 @@
 # Test the 'strstart()' string prefix comparison function.
 #
 
-from std use *;
+use * from std;
 
 var s1, s2, s3 : string;
 

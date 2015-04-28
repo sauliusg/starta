@@ -5,7 +5,7 @@
 # Test array indexing and creation with ints of different sizes.
 #
 
-from std use *;
+use * from std;
 
 var m : array of short;
 

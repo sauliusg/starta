@@ -5,7 +5,7 @@
 # Test structures...
 #
 
-from std use *;
+use * from std;
 
 class C {
         xxx : int;
