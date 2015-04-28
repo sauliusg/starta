@@ -6153,6 +6153,13 @@ import_statement
 use_statement
    : _USE '*' _FROM __IDENTIFIER
        { $$ = $4; }
+   | _USE identifier_list _FROM __IDENTIFIER
+       { $$ = $4; }
+   ;
+
+identifier_list
+   : __IDENTIFIER
+   | identifier_list ',' __IDENTIFIER
    ;
 
 load_library_statement
