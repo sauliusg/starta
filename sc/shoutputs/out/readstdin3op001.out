@@ -1,5 +1,5 @@
 1 
-2 use * from std;
+2 from std use *;
 3 
 4 var line = new struct { s: string; nr: int };
 5 

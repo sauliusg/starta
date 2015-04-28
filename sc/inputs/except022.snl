@@ -3,7 +3,7 @@
 # the execution stack correctly.
 #
 
-use * from std;
+from std use *;
 
 exception XXX;
 

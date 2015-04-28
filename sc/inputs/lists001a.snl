@@ -5,7 +5,7 @@
 # Generic lists.
 #
 
-use * from std;
+from std use *;
 
 type list of T = ?{
     value : T;

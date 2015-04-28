@@ -5,7 +5,7 @@
 # Test generic array and ref indexing diagnostics
 #
 
-use * from std;
+from std use *;
 
 type node = ? struct {
     i : int;

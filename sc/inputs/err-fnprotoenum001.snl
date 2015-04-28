@@ -4,7 +4,7 @@
 # Test enum type identity in function prototypes.
 #
 
-use * from std;
+from std use *;
 
 type A = enum int ( a, b, c );
 type B = enum int ( x, z, y );

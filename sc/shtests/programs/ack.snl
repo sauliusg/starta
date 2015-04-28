@@ -5,7 +5,7 @@
 # ack(3,8) works with:
 # ./sl -I modules/ tt.snl -S 40000 -E 3000 -- 3 8
 
-use * from std;
+from std use *;
 
 function ack( m, n : int ) : int
 {

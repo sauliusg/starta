@@ -5,6 +5,6 @@
 # Test diagnostics of non-function calls.
 #
 
-use * from M;
+from M use *;
 
 M::i();

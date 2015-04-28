@@ -5,7 +5,7 @@
 # Test field alignment in classes
 #
 
-use * from std;
+from std use *;
 
 class A {
     //name : string;

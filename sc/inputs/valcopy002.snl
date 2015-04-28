@@ -6,7 +6,7 @@
 # compiling the ':=' assignemtn.
 #
 
-use * from std;
+from std use *;
 
 readonly mm = [ [ 1, 2, 4, 5 ], [ 3, 4 ], [ 5, 6 ] ]; // OK
 

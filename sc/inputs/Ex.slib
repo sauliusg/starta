@@ -1,6 +1,6 @@
 package Ex
 
-use * from std;
+from std use *;
 
 exception Ex1;
 exception Ex2;

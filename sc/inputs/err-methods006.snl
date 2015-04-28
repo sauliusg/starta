@@ -5,7 +5,7 @@
 # Test 'blob' types
 #
 
-use * from std;
+from std use *;
 
 struct A {
     a : int;

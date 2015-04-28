@@ -1,5 +1,5 @@
 
-use * from std;
+from std use *;
 
 type S = struct {
      string a;

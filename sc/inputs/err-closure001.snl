@@ -1,5 +1,5 @@
 
-use * from std;
+from std use *;
 
 var x, y, z = 1, 20, 3;
 

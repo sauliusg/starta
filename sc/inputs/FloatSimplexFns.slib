@@ -10,7 +10,7 @@
 
 package FloatSimplexFns;
 
-use * from std;
+from std use *;
 
 procedure mkcenter( simplex: array [][] of float;
                     exclude: long ): array of float

@@ -3,7 +3,7 @@
 # Test diagnostics of readonly variable increments.
 #
 
-use * from std;
+from std use *;
 
 readonly x = 1;
 

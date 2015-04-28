@@ -5,7 +5,7 @@
 # Test 
 #
 
-use * from std;
+from std use *;
 
 var strings = [
     [ "Mano", "batai", "buvo", "du," ],

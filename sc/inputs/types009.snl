@@ -5,7 +5,7 @@
 # Test compact type declarations (such like 'float[]')
 #
 
-use * from std;
+from std use *;
 
 function f( int i ): float[]
 {

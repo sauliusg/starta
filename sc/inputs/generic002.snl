@@ -5,7 +5,7 @@
 # Test generic types
 #
 
-use * from std;
+from std use *;
 
 procedure g( type T a; b : type T ) : int
 begin

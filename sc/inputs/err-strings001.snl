@@ -5,7 +5,7 @@
 # Test (in)-compatibility of strings
 #
 
-use * from std;
+from std use *;
 
 procedure print( s : string )
 {

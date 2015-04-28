@@ -5,7 +5,7 @@
 # Testing llength() and llast() functions
 #
 
-use * from std;
+from std use *;
 
 var m = new int[1000];
 

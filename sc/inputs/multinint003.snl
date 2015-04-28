@@ -4,7 +4,7 @@
 # Test multiple variable initialisation.
 #
 
-use * from std;
+from std use *;
 
 var x, y, z : double = 1, 2.0, 3.0D;
 

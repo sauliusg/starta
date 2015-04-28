@@ -5,7 +5,7 @@
 # Test readonlyness of function parameters.
 #
 
-use * from std;
+from std use *;
 
 function fn( int x; array of int m ) : float
 {

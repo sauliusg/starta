@@ -5,7 +5,7 @@
 # Test struct and class methods
 #
 
-use * from std;
+from std use *;
 
 procedure g( type T a; b : type T ) : int
 begin

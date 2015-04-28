@@ -1,6 +1,6 @@
 package Math;
 
-use * from std;
+from std use *;
 
 load "libraries/math/libmath.so.0.01";
 

@@ -4,7 +4,7 @@
 
 package Lists;
 
-use * from std;
+from std use *;
 
 type list of T = ?{
     next : list of T;

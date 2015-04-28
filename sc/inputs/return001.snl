@@ -5,7 +5,7 @@
 # Test return from Pascale-style loops.
 #
 
-use * from std;
+from std use *;
 
 function p( int x; m : array of int ) : int
 {

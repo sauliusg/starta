@@ -1,8 +1,8 @@
 
-use * from std;
+from std use *;
 
-use * from Y1;
-use * from Y2;
+from Y1 use *;
+from Y2 use *;
 
 var a : T;
 . a;

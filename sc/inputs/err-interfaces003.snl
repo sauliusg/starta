@@ -1,5 +1,5 @@
 
-use * from std;
+from std use *;
 
 class S {
     int i;

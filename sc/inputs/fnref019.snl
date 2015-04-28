@@ -1,5 +1,5 @@
 
-use * from std;
+from std use *;
 
 var fff = function( x, y : float ): float { return x*y/(x+y) };
 

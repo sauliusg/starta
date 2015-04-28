@@ -5,7 +5,7 @@
 # Test readonly variables.
 #
 
-use * from std;
+from std use *;
 
 // program (args : array of string; io : array of file);
 var io = stdfiles();

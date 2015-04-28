@@ -1,5 +1,5 @@
 
-use * from std;
+from std use *;
 
 var x = new int[10];
 var y: array of int;

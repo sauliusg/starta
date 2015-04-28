@@ -5,7 +5,7 @@
 # Test non-integer default function parameters
 #
 
-use * from std;
+from std use *;
 
 function f( a : array of int = null ) : int
 {

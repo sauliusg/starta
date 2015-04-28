@@ -4,8 +4,8 @@
 # Test fabs()-fmily functions
 #
 
-use * from std;
-use * from Math;
+from std use *;
+from Math use *;
 
 . fabs(1.0 - 2.0);
 . fabs(2.0 - 1.0);

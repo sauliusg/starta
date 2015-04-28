@@ -4,4 +4,4 @@
 # Test module disgnostics
 #
 
-use * from Mstrange;
+from Mstrange use *;

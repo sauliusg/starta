@@ -5,7 +5,7 @@
 # Read MTZ file(s) and print data in ASCII.
 #
 
-use * from std;
+from std use *;
 
 var argv = arguments();
 

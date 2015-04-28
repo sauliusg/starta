@@ -5,7 +5,7 @@
 # Test strindex() function
 #
 
-use * from std;
+from std use *;
 
 . strindex( "haystack", "needle" );
 . strindex( "haystack", "hay" );

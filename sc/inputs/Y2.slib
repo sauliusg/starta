@@ -1,7 +1,7 @@
 
 module Y2;
 
-use * from std;
+from std use *;
 
 type T = float;
 

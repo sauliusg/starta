@@ -8,12 +8,12 @@
 use M1;
 use M2;
 
-use * from M4;
+from M4 use *;
 
 M1::p1();
 M2::p2();
 
-use * from std;
+from std use *;
 
 . const(M4::X);
 . M4::Y;

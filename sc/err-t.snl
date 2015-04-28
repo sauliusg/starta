@@ -1,5 +1,5 @@
 
-use * from std;
+from std use *;
 
 function mini( point: type T;
                ndim: long;

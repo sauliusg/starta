@@ -27,7 +27,7 @@ type X3 = array [] of class { x, y : L; method f( i : I ) { self.x = i@L }};
 type X4 = array [][] of class { x, y : L; method f( i : I ) { self.x = i@L }};
 
 begin
-    use * from std;
+    from std use *;
     . "Anonymous class descriptions were compiled successfully."
 end
 
