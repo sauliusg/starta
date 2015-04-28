@@ -6153,8 +6153,8 @@ import_statement
 use_statement
    : _USE '*' _FROM __IDENTIFIER
        { $$ = $4; }
-   | _USE identifier_list _FROM __IDENTIFIER
-       { $$ = $4; }
+   | _FROM __IDENTIFIER _USE identifier_list 
+       { $$ = $2; }
    ;
 
 identifier_list
