@@ -3205,8 +3205,8 @@ static void compiler_check_and_drop_function_args( COMPILER *cc,
 }
 
 static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
-					    DNODE *fn_proto,
-					    cexception_t *ex )
+                                               DNODE *fn_proto,
+                                               cexception_t *ex )
 {
     DNODE *fn_dnode = NULL;
     TNODE *fn_tnode = NULL;
@@ -3218,8 +3218,15 @@ static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
     if( fn_dnode && !is_imported ) {
 	fn_tnode = dnode_type( fn_dnode );
 	if( !dnode_is_function_prototype( fn_dnode )) {
-	    yyerrorf( "function '%s' is already declared in this scope",
-		      dnode_name( fn_proto ));
+            char *original_name = dnode_original_name( fn_proto );
+            if( original_name ) {
+                yyerrorf( "method '%s' is already "
+                          "declared in this scope as '%s'",
+                          original_name, dnode_name( fn_proto ) );
+            } else {
+                yyerrorf( "function '%s' is already declared in this scope",
+                          dnode_name( fn_proto ));
+            }
 	} else
 	if( !tnode_function_prototypes_match_msg( fn_tnode,
 					          dnode_type( fn_proto ),
@@ -10676,6 +10683,7 @@ method_header
               }
 
               if( interface_type ) {
+                  cexception_t inner2;
                   /* UNiquify the interface method name: */
                   TNODE *base_type = interface_type, *current;
                   for( current = interface_type;
@@ -10684,20 +10692,51 @@ method_header
                        current = tnode_base_type( current )) {
                       base_type = current;
                   }
-                  char *interface_name = tnode_name( base_type );
+                  char *base_name = tnode_name( base_type );
+                  char *interface_name = tnode_name( interface_type );
                   char *volatile full_method_name = NULL;
+                  char *volatile original_method_name = NULL;
                   ssize_t length;
-                  length = (interface_name ? strlen( interface_name ) : 0)
-                      + (method_name ? strlen( method_name ) : 0) + 2;
-                  full_method_name = mallocx( length, px );
-                  snprintf( full_method_name, length, "%s@%s",
-                            method_name ? method_name : "",
-                            interface_name ? interface_name : "" );
+                  cexception_guard( inner ) {
+                      length = (interface_name ? strlen( interface_name ) : 0)
+                          + (method_name ? strlen( method_name ) : 0) + 2;
+                      full_method_name = mallocx( length, &inner2 );
+                      length = (base_name ? strlen( base_name ) : 0)
+                          + (method_name ? strlen( method_name ) : 0) + 2;
+                      original_method_name = mallocx( length, &inner2 );
 
-                  funct = new_dnode_method( full_method_name, parameter_list,
-                                            return_values, &inner );
+                      snprintf( full_method_name, length, "%s@%s",
+                                method_name ? method_name : "",
+                                base_name ? base_name : ""
+                            );
 
-                  freex( full_method_name );
+                      snprintf( original_method_name, length, "%s@%s",
+                                method_name ? method_name : "",
+                                interface_name ? interface_name : ""
+                            );
+
+#if 0
+                      printf( ">>>> '%s', original: '%s'\n",
+                              full_method_name, original_method_name );
+#endif
+
+                      funct = new_dnode_method( full_method_name, parameter_list,
+                                                return_values, &inner2 );
+
+                      if( strcmp( full_method_name,
+                                  original_method_name ) != 0 ) {
+                          dnode_set_original_name( funct, original_method_name,
+                                                   &inner2 );
+                      }
+
+                      freex( full_method_name );
+                      freex( original_method_name );
+                  }
+                  cexception_catch {
+                      freex( full_method_name );
+                      freex( original_method_name );
+                      cexception_reraise( inner2, &inner );
+                  }
               } else {
                   funct = new_dnode_method( method_name, parameter_list,
                                             return_values, &inner );
