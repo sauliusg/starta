@@ -35,15 +35,15 @@ class A implements I2, I1 {
     method nn@I2() { . "A.i =", self.i }
 }
 
-class A2 implements I2, I1 {
+class A implements I2, I1 {
     int i;
 
     constructor A( int i = 100 ) { self.i = i }
 
-    method mm@I2(): int {
+    method mm@I1(): int {
         return self.i + 1
     }
-    method mm@I1(): int {
+    method mm@I2(): int {
         return self.i + 2
     }
     method mn@I2( int i ): int
