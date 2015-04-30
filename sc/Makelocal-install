@@ -8,5 +8,5 @@ install: tests
 	strip ${PREFIX}/bin/sl
 	mkdir -p ${PREFIX}/lib/slc/libraries
 	cp -av modules/*.slib ${PREFIX}/lib/slc/
-	find libraries -name '*.so*' \
+	find libraries/ -name '*.so*' \
 	| xargs -i cp -av {} ${PREFIX}/lib/slc/libraries
