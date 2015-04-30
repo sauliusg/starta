@@ -1,0 +1,8 @@
+./sl: inputs/err-interfaces017a.snl(27,25): ERROR, method 'mm@I2' is already declared in this scope and implements 'mm@I1'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(46,25): ERROR, function 'mm@I1' is already declared in this scope
+    method mm@I1(): int {
+                        ^
+./sl: 2 error(s) detected
+
