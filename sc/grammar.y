@@ -3221,7 +3221,7 @@ static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
             char *original_name = dnode_original_name( fn_proto );
             if( original_name ) {
                 yyerrorf( "method '%s' is already "
-                          "declared in this scope as '%s'",
+                          "declared in this scope and implements '%s'",
                           original_name, dnode_name( fn_proto ) );
             } else {
                 yyerrorf( "function '%s' is already declared in this scope",
