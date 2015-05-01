@@ -5390,6 +5390,42 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
     compiler_assemble_static_data( cc, NULL,
 				   (1+interface_nr) * sizeof(ssize_t), ex );
 }
+ 
+static void compiler_lookup_interface_method( COMPILER *cc, 
+                                              TNODE *class_descr,
+                                              ssize_t interface_number,
+                                              ssize_t method_number,
+                                              TNODE **ret_interface,
+                                              DNODE **ret_method )
+{
+    TLIST *interface_list = tnode_interface_list( class_descr );
+    TLIST *interface_node;
+
+    assert( ret_interface );
+    assert( ret_method );
+
+    foreach_tlist( interface_node, interface_list ) {
+        TNODE *current_interface = tlist_data( interface_node );
+        TNODE *base_interface;
+        for( base_interface = current_interface; base_interface;
+             base_interface = tnode_base_type( base_interface )) {
+            ssize_t method_interface =
+                tnode_interface_number( base_interface );
+            if( method_interface + 1 != interface_number )
+                continue;
+            DNODE *methods = tnode_methods( base_interface );
+            DNODE *method;
+            foreach_dnode( method, methods ) {
+                ssize_t method_index = dnode_offset( method );
+                if( method_index == method_number ) {
+                    *ret_interface = base_interface;
+                    *ret_method = method;
+                    return;
+                }
+            }
+        }
+    }
+}
 
 static void compiler_finish_virtual_method_table( COMPILER *cc,
                                                   TNODE *class_descr,
@@ -5532,38 +5568,18 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
             method_count = vtable[0];
             for( j = 1; j <= method_count; j++ ) {
                 if( vtable[j] == 0 ) {
-                    TLIST *interface_list = tnode_interface_list( class_descr );
-                    TLIST *interface_node;
-                    int error_reported = 0;
-                    foreach_tlist( interface_node, interface_list ) {
-                        TNODE *current_interface = tlist_data( interface_node );
-                        TNODE *base_interface;
-                        for( base_interface = current_interface; base_interface;
-                             base_interface = tnode_base_type( base_interface )) {
-                            ssize_t method_interface =
-                                tnode_interface_number( base_interface );
-                            if( method_interface + 1 != i )
-                                continue;
-                            DNODE *methods = tnode_methods( base_interface );
-                            DNODE *method;
-                            vtable = (ssize_t*)
-                                (cc->static_data + itable[method_interface+1]);
-                            foreach_dnode( method, methods ) {
-                                ssize_t method_index = dnode_offset( method );
-                                if( method_index == j ) {
-                                    yyerrorf( "class '%s' does not implement method "
-                                              "'%s' from interface '%s'",
-                                              tnode_name(class_descr),
-                                              dnode_name( method ),
-                                              tnode_name( base_interface ));
-                                    error_reported = 1;
-                                    goto BREAK;
-                                }
-                            }
-                        }
-                    }
-                BREAK:
-                    if( !error_reported ) {
+                    TNODE *interface_tnode = NULL;
+                    DNODE *interface_method = NULL;
+                    compiler_lookup_interface_method
+                        ( cc, class_descr, i, j,
+                          &interface_tnode, &interface_method );
+                    if( interface_method ) {
+                        yyerrorf( "class '%s' does not implement method "
+                                  "'%s' from interface '%s'",
+                                  tnode_name(class_descr),
+                                  dnode_name( interface_method ),
+                                  tnode_name( interface_tnode ));
+                    } else {
                         yyerrorf( "class '%s' does not implement iterface method "
                                   "(interface %d, method %d)",
                                   tnode_name(class_descr), i, j );
