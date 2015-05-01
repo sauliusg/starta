@@ -361,6 +361,14 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                                    generic_types, ex );
     }
 
+    if( t1->kind == TK_INTERFACE && t2->kind == TK_INTERFACE ) {
+        return (!t1->name && tnode_classes_are_compatible( t1, t2,
+							   generic_types,
+							   ex )) ||
+            tnode_types_are_assignment_compatible( t1, t2->base_type,
+                                                   generic_types, ex );
+    }
+
     if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }

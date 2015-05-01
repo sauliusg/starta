@@ -883,8 +883,25 @@ DNODE *tnode_lookup_method( TNODE *tnode, char *method_name )
 
     if( method ) {
 	return method;
-    } else if( tnode->base_type && tnode->kind != TK_INTERFACE ) {
+    } else if( tnode->base_type ) {
 	return tnode_lookup_method( tnode->base_type, method_name );
+    } else {
+	return NULL;
+    }
+}
+
+DNODE *tnode_lookup_method_prototype( TNODE *tnode, char *method_name )
+{
+    DNODE *method;
+
+    assert( tnode );
+
+    method = dnode_list_lookup( tnode->methods, method_name );
+
+    if( method ) {
+	return method;
+    } else if( tnode->base_type && tnode->kind != TK_INTERFACE ) {
+	return tnode_lookup_method_prototype( tnode->base_type, method_name );
     } else {
 	return NULL;
     }

@@ -16,8 +16,5 @@
 ./sl: inputs/err-interfaces017b.snl(55,1): ERROR, unimplemented method (interface 2, method 2)
 }
 ^
-./sl: inputs/err-interfaces017b.snl(59,11): ERROR, object 'a' does not have method 'mn@I2'
-. a->mn@I2( 193 );
-          ^
-./sl: 7 error(s) detected
+./sl: 6 error(s) detected
 

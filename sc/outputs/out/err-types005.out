@@ -89,12 +89,15 @@ var a = new A(101);
 ./sl: inputs/err-types005.snl(36,18): ERROR, too little arguments in call to function 'A'
 var a = new A(101);
                  ^
-./sl: inputs/err-types005.snl(38,11): ERROR, object 'a' does not have method 'mn@I2'
-. a->mn@I2( 193 );
-          ^
 ./sl: inputs/err-types005.snl(38,17): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
 
 . a->mn@I2( 193 );
                 ^
-./sl: 30 error(s) detected
+./sl: inputs/err-types005.snl(38,17): ERROR, incompatible types for function 'mn' argument nr. 2
+. a->mn@I2( 193 );
+                ^
+./sl: inputs/err-types005.snl(38,17): ERROR, too little arguments in call to function 'mn'
+. a->mn@I2( 193 );
+                ^
+./sl: 31 error(s) detected
 
