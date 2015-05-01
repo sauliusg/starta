@@ -13,16 +13,16 @@
 ./sl: inputs/err-interfaces004.snl(35,27): ERROR, interface 'Module::Ig' is not declared in the current scope
     method sg @ Module::Ig( char x ) -> (string)
                           ^
-./sl: inputs/err-interfaces004.snl(39,1): ERROR, unimplemented method (interface 2, method 1)
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method (interface 2, method 1)
 }
 ^
-./sl: inputs/err-interfaces004.snl(39,1): ERROR, unimplemented method (interface 2, method 2)
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method (interface 2, method 2)
 }
 ^
-./sl: inputs/err-interfaces004.snl(39,1): ERROR, unimplemented method (interface 3, method 1)
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method (interface 3, method 1)
 }
 ^
-./sl: inputs/err-interfaces004.snl(39,1): ERROR, unimplemented method (interface 3, method 2)
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method (interface 3, method 2)
 }
 ^
 ./sl: 9 error(s) detected

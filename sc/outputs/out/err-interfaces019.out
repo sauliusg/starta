@@ -1,4 +1,4 @@
-./sl: inputs/err-interfaces019.snl(28,1): ERROR, unimplemented method (interface 2, method 1)
+./sl: inputs/err-interfaces019.snl(28,1): ERROR, class 'A' does not implement method (interface 2, method 1)
 }
 ^
 ./sl: 1 error(s) detected

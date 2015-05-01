@@ -5532,8 +5532,9 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
             method_count = vtable[0];
             for( j = 1; j <= method_count; j++ ) {
                 if( vtable[j] == 0 ) {
-                    yyerrorf( "unimplemented method (interface %d, "
-                              "method %d)", i, j );
+                    yyerrorf( "class '%s' does not implement method "
+                              "(interface %d, method %d)",
+                              tnode_name(class_descr), i, j );
                 }
             }
         }

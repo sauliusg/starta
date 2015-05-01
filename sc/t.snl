@@ -14,9 +14,6 @@ interface I1 {
 
 interface I2: I1 {
     method nn();
-    method nn() {
-        . "A default implementation of the nn@I2 is called"
-    }
 }
 
 interface I3: I1 {
