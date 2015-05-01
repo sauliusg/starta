@@ -6193,6 +6193,8 @@ use_statement
        { $$ = $5; }
    | _USE _VAR identifier_list _FROM __IDENTIFIER
        { $$ = $5; }
+   | _FROM __IDENTIFIER _USE identifier_list
+       { $$ = $2; }
    | _USE function_or_procedure identifier_list _FROM __IDENTIFIER
        { $$ = $5; }
    ;
