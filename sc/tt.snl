@@ -13,8 +13,9 @@ interface I1 {
 }
 
 interface I2: I1 {
-    method add( int i );
+    // method add( int i );
     method put( int i );
+    method x() { return };
 }
 
 class C implements I1, I2 {
@@ -36,7 +37,9 @@ var c = new C;
 c->add@I1( 10 );
 c->add@I2( 5 );
 
-// bytecode { PLD %c DUMPVMT }
+. c->get@I1();
+
+bytecode { PLD %c DUMPVMT }
 // . const( I2.put.offset );
 
 c->put@I2( 33 );
