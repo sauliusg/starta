@@ -72,13 +72,13 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(28,26): ERROR, type 'int' is not declared in the current scope
     method get@I2(): int { return self.value }
                          ^
-./sl: inputs/err-types004.snl(28,26): ERROR, method get() does not match method get it should implement - old or new prototype undefined return values
+./sl: inputs/err-types004.snl(28,26): ERROR, interface 'I2' does not implement method 'get'
     method get@I2(): int { return self.value }
                          ^
-./sl: inputs/err-types004.snl(28,46): ERROR, incompatible types of returned value 1 of function 'get@I1'
+./sl: inputs/err-types004.snl(28,46): ERROR, incompatible types of returned value 1 of function 'get@I2'
     method get@I2(): int { return self.value }
                                              ^
-./sl: inputs/err-types004.snl(28,46): ERROR, Prototype of method get@I1() does not match previous definition:
+./sl: inputs/err-types004.snl(28,46): ERROR, Prototype of method get@I2() does not match previous definition:
 old or new prototype undefined return values
     method get@I2(): int { return self.value }
                                              ^
@@ -108,7 +108,7 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(34,1): ERROR, unimplemented method (interface 2, method 3)
 }
 ^
-./sl: inputs/err-types004.snl(34,1): ERROR, unimplemented method (interface 2, method 4)
+./sl: inputs/err-types004.snl(34,1): ERROR, unimplemented method (interface 3, method 1)
 }
 ^
 ./sl: inputs/err-types004.snl(38,15): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
@@ -121,14 +121,11 @@ c->add@I1( 10 );
 ./sl: inputs/err-types004.snl(38,15): ERROR, too little arguments in call to function 'add'
 c->add@I1( 10 );
               ^
+./sl: inputs/err-types004.snl(39,10): ERROR, object 'c' does not have method 'add@I2'
+c->add@I2( 10 );
+         ^
 ./sl: inputs/err-types004.snl(39,15): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
 
-c->add@I2( 10 );
-              ^
-./sl: inputs/err-types004.snl(39,15): ERROR, incompatible types for function 'add' argument nr. 2
-c->add@I2( 10 );
-              ^
-./sl: inputs/err-types004.snl(39,15): ERROR, too little arguments in call to function 'add'
 c->add@I2( 10 );
               ^
 ./sl: inputs/err-types004.snl(42,25): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
@@ -145,5 +142,5 @@ c->put@I2( 33 );
 ./sl: inputs/err-types004.snl(44,15): ERROR, too little arguments in call to function 'put'
 c->put@I2( 33 );
               ^
-./sl: 44 error(s) detected
+./sl: 43 error(s) detected
 

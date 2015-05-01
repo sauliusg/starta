@@ -30,7 +30,7 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types005.snl(25,5): ERROR, type 'int' is not declared in the current scope
     {
     ^
-./sl: inputs/err-types005.snl(25,5): ERROR, method mm() does not match method mm it should implement - old or new prototype undefined return values
+./sl: inputs/err-types005.snl(25,5): ERROR, interface 'I2' does not implement method 'mm'
     {
     ^
 ./sl: inputs/err-types005.snl(27,5): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
@@ -40,10 +40,10 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types005.snl(27,5): ERROR, incompatible types for binary operator '+'
     }
     ^
-./sl: inputs/err-types005.snl(27,5): ERROR, too little values returned from function 'mm@I1'
+./sl: inputs/err-types005.snl(27,5): ERROR, too little values returned from function 'mm@I2'
     }
     ^
-./sl: inputs/err-types005.snl(27,5): ERROR, Prototype of method mm@I1() does not match previous definition:
+./sl: inputs/err-types005.snl(27,5): ERROR, Prototype of method mm@I2() does not match previous definition:
 old or new prototype undefined return values
     }
     ^
@@ -53,16 +53,16 @@ old or new prototype undefined return values
 ./sl: inputs/err-types005.snl(29,5): ERROR, type 'int' is not declared in the current scope
     {
     ^
-./sl: inputs/err-types005.snl(29,5): ERROR, method mn() does not match method mn it should implement - old or new prototype has undefined argument 2
+./sl: inputs/err-types005.snl(29,5): ERROR, interface 'I2' does not implement method 'mn'
     {
     ^
 ./sl: inputs/err-types005.snl(31,5): ERROR, incompatible types for binary operator '+'
     }
     ^
-./sl: inputs/err-types005.snl(31,5): ERROR, incompatible types of returned value 1 of function 'mn@I1'
+./sl: inputs/err-types005.snl(31,5): ERROR, incompatible types of returned value 1 of function 'mn@I2'
     }
     ^
-./sl: inputs/err-types005.snl(31,5): ERROR, Prototype of method mn@I1() does not match previous definition:
+./sl: inputs/err-types005.snl(31,5): ERROR, Prototype of method mn@I2() does not match previous definition:
 old or new prototype has undefined argument 2
     }
     ^
@@ -89,15 +89,12 @@ var a = new A(101);
 ./sl: inputs/err-types005.snl(36,18): ERROR, too little arguments in call to function 'A'
 var a = new A(101);
                  ^
+./sl: inputs/err-types005.snl(38,11): ERROR, object 'a' does not have method 'mn@I2'
+. a->mn@I2( 193 );
+          ^
 ./sl: inputs/err-types005.snl(38,17): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
 
 . a->mn@I2( 193 );
                 ^
-./sl: inputs/err-types005.snl(38,17): ERROR, incompatible types for function 'mn' argument nr. 2
-. a->mn@I2( 193 );
-                ^
-./sl: inputs/err-types005.snl(38,17): ERROR, too little arguments in call to function 'mn'
-. a->mn@I2( 193 );
-                ^
-./sl: 31 error(s) detected
+./sl: 30 error(s) detected
 

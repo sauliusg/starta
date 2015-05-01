@@ -1,0 +1,8 @@
+./sl: inputs/err-interfaces021.snl(64,11): ERROR, object 'a' does not have method 'mn@I2'
+. a->mn@I2( 193 );
+          ^
+./sl: inputs/err-interfaces021.snl(69,15): ERROR, interface 'I2' does not have method 'mn'
+. am[3]->mn@I2();
+              ^
+./sl: 2 error(s) detected
+

@@ -1,8 +1,32 @@
-./sl: inputs/err-interfaces017a.snl(27,25): ERROR, method 'mm@I2' is already declared in this scope and implements 'mm@I1'
+./sl: inputs/err-interfaces017a.snl(24,25): ERROR, interface 'I2' does not implement method 'mm'
     method mm@I2(): int {
                         ^
-./sl: inputs/err-interfaces017a.snl(46,25): ERROR, function 'mm@I1' is already declared in this scope
-    method mm@I1(): int {
+./sl: inputs/err-interfaces017a.snl(27,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
                         ^
-./sl: 2 error(s) detected
+./sl: inputs/err-interfaces017a.snl(27,25): ERROR, function 'mm@I2' is already declared in this scope
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(31,5): ERROR, interface 'I2' does not implement method 'mn'
+    {
+    ^
+./sl: inputs/err-interfaces017a.snl(36,1): ERROR, unimplemented method (interface 2, method 1)
+}
+^
+./sl: inputs/err-interfaces017a.snl(36,1): ERROR, unimplemented method (interface 2, method 2)
+}
+^
+./sl: inputs/err-interfaces017a.snl(43,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(50,5): ERROR, interface 'I2' does not implement method 'mn'
+    {
+    ^
+./sl: inputs/err-interfaces017a.snl(55,1): ERROR, unimplemented method (interface 2, method 2)
+}
+^
+./sl: inputs/err-interfaces017a.snl(59,11): ERROR, object 'a' does not have method 'mn@I2'
+. a->mn@I2( 193 );
+          ^
+./sl: 10 error(s) detected
 

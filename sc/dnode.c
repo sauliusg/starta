@@ -33,7 +33,6 @@
 struct DNODE {
     char *name;            /* The declared name; this name is supposed
                               to be unique in a current scope */
-    char *original_name;   /* The full original name, used for interfaces */
     dnode_flag_t flags;
     TNODE *tnode;          /* type descriptor node, describes the type
 			      of the variable, or the type of the
@@ -94,7 +93,6 @@ void delete_dnode( DNODE *node )
         if( --node->rcount > 0 )
 	    return;
 	freex( node->name );
-	freex( node->original_name );
 	freex( node->code );
 	delete_tnode( node->tnode );
 	delete_vartab( node->vartab );
@@ -130,13 +128,6 @@ DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex )
     }
     if( src->name )
 	dst->name = strdupx( src->name, ex );
-
-    if( dst->original_name ) {
-        freex( dst->original_name );
-        dst->original_name = NULL;
-    }
-    if( src->original_name )
-	dst->original_name = strdupx( src->original_name, ex );
 
     dst->flags = src->flags;
 
@@ -443,12 +434,6 @@ DNODE *dnode_list_invert( DNODE *dnode_list )
 }
 
 char *dnode_name( DNODE *dnode ) { assert( dnode ); return dnode->name; }
-
-char *dnode_original_name( DNODE *dnode )
-{
-    assert( dnode );
-    return dnode->original_name;
-}
 
 ssize_t dnode_offset( DNODE *dnode ) { assert( dnode ); return dnode->offset; }
 
@@ -772,17 +757,6 @@ DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex )
     assert( dnode );
     assert( !dnode->name );
     dnode->name = strdupx( name, ex );
-    return dnode;
-}
-
-DNODE *dnode_set_original_name( DNODE *dnode, char *name, cexception_t *ex )
-{
-    assert( dnode );
-    if( dnode->original_name ) {
-        freex( dnode->original_name );
-        dnode->original_name = NULL;
-    }
-    dnode->original_name = strdupx( name, ex );
     return dnode;
 }
 
