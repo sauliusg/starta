@@ -1,10 +1,10 @@
 ./sl: inputs/err-interfaces005.snl(21,32): ERROR, class 'C' does not implement interface 'I2'
     method m1@I2() -> (string) { return "m1@I2()" }
                                ^
-./sl: inputs/err-interfaces005.snl(22,1): ERROR, class 'C' does not implement method (interface 2, method 1)
+./sl: inputs/err-interfaces005.snl(22,1): ERROR, class 'C' does not implement iterface method (interface 2, method 1)
 }
 ^
-./sl: inputs/err-interfaces005.snl(22,1): ERROR, class 'C' does not implement method (interface 2, method 2)
+./sl: inputs/err-interfaces005.snl(22,1): ERROR, class 'C' does not implement iterface method (interface 2, method 2)
 }
 ^
 ./sl: 3 error(s) detected

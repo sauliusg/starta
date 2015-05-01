@@ -1,4 +1,4 @@
-./sl: inputs/err-interfaces013.snl(22,1): ERROR, class 'C' does not implement method (interface 3, method 2)
+./sl: inputs/err-interfaces013.snl(22,1): ERROR, class 'C' does not implement iterface method (interface 3, method 2)
 }
 ^
 ./sl: inputs/err-interfaces013.snl(26,11): ERROR, interface 'I3' is not declared in the current scope

@@ -4,7 +4,7 @@
 ./sl: inputs/err-interfaces017b.snl(31,5): ERROR, interface 'I2' does not implement method 'mn'
     {
     ^
-./sl: inputs/err-interfaces017b.snl(36,1): ERROR, class 'A' does not implement method (interface 2, method 2)
+./sl: inputs/err-interfaces017b.snl(36,1): ERROR, class 'A' does not implement iterface method (interface 2, method 2)
 }
 ^
 ./sl: inputs/err-interfaces017b.snl(43,25): ERROR, interface 'I2' does not implement method 'mm'
@@ -13,7 +13,7 @@
 ./sl: inputs/err-interfaces017b.snl(50,5): ERROR, interface 'I2' does not implement method 'mn'
     {
     ^
-./sl: inputs/err-interfaces017b.snl(55,1): ERROR, class 'A2' does not implement method (interface 2, method 2)
+./sl: inputs/err-interfaces017b.snl(55,1): ERROR, class 'A2' does not implement iterface method (interface 2, method 2)
 }
 ^
 ./sl: 6 error(s) detected

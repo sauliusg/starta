@@ -1,4 +1,4 @@
-./sl: inputs/err-interfaces006.snl(22,1): ERROR, class 'C' does not implement method (interface 3, method 2)
+./sl: inputs/err-interfaces006.snl(22,1): ERROR, class 'C' does not implement iterface method (interface 3, method 2)
 }
 ^
 ./sl: inputs/err-interfaces006.snl(26,11): ERROR, the caller class 'C' does not implement interface 'I1'
