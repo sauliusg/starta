@@ -946,10 +946,18 @@ TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name )
 
     assert( class_tnode );
     foreach_tlist( curr, class_tnode->interfaces ) {
+        TNODE *base_interface;
         TNODE *curr_tnode = tlist_data( curr );
         char *curr_name = tnode_name( curr_tnode );
         if( strcmp( name, curr_name ) == 0 ) {
             return curr_tnode;
+        }
+        for( base_interface = curr_tnode->base_type; base_interface;
+             base_interface = base_interface->next ) {
+            curr_name = tnode_name( base_interface );
+            if( strcmp( name, curr_name ) == 0 ) {
+                return curr_tnode;
+            }
         }
     }
     return NULL;
