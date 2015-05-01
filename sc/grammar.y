@@ -10697,7 +10697,7 @@ method_header
                   char *volatile full_method_name = NULL;
                   char *volatile original_method_name = NULL;
                   ssize_t length;
-                  cexception_guard( inner ) {
+                  cexception_guard( inner2 ) {
                       length = (interface_name ? strlen( interface_name ) : 0)
                           + (method_name ? strlen( method_name ) : 0) + 2;
                       full_method_name = mallocx( length, &inner2 );
