@@ -5432,6 +5432,9 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
        will allocate VMT's for each interface, for exactely the stored
        number of methods (plus one entry for the method count), and
        replace the method counts here with the VMT offsets. */
+    /* The 'itable' pointer MUST be reinitialised after each call to
+       'compiler_assemble_static_data', since the static data compiler
+       MAY reallocate the static data area cc->static_data: */
     itable = (ssize_t*)(cc->static_data + vmt_address);
     TLIST *interface_list = tnode_interface_list( class_descr );
     TLIST *interface_node;
@@ -5453,10 +5456,16 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
        entries with table offsets: */
     for( i = 2; i <= interface_nr+1; i++ ) {
         ssize_t method_count = itable[i];
-        itable[i] = compiler_assemble_static_data( cc, NULL,
-                                                   (method_count + 1) *
-                                                   sizeof(ssize_t), ex );
+        ssize_t itable_offset;
+        itable_offset = compiler_assemble_static_data( cc, NULL,
+                                                       (method_count + 1) *
+                                                       sizeof(ssize_t), ex );
+        /* The 'itable' pointer MUST be reinitialised after each call
+           to 'compiler_assemble_static_data', since the static data
+           compiler MAY reallocate the static data area
+           cc->static_data: */
         itable = (ssize_t*)(cc->static_data + vmt_address);
+        itable[i] = itable_offset;
         ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
     }
 
