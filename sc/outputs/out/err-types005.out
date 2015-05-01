@@ -73,10 +73,10 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types005.snl(33,31): ERROR, not enough values on the stack for unary operator '.'
     method nn@I2() { . "A.i =", self.i }
                               ^
-./sl: inputs/err-types005.snl(34,1): ERROR, class 'A' does not implement method (interface 2, method 1)
+./sl: inputs/err-types005.snl(34,1): ERROR, class 'A' does not implement iterface method (interface 2, method 1)
 }
 ^
-./sl: inputs/err-types005.snl(34,1): ERROR, class 'A' does not implement method (interface 2, method 2)
+./sl: inputs/err-types005.snl(34,1): ERROR, class 'A' does not implement iterface method (interface 2, method 2)
 }
 ^
 ./sl: inputs/err-types005.snl(36,18): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'

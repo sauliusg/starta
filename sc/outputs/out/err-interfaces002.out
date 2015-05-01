@@ -10,13 +10,13 @@
 ./sl: inputs/err-interfaces002.snl(35,26): ERROR, interface 'Module::Igg' is not declared in the current scope
     method sg@Module::Igg() -> (string)
                          ^
-./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement method (interface 2, method 2)
+./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement iterface method (interface 2, method 2)
 }
 ^
-./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement method (interface 3, method 1)
+./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement iterface method (interface 3, method 1)
 }
 ^
-./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement method (interface 3, method 2)
+./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement iterface method (interface 3, method 2)
 }
 ^
 ./sl: 7 error(s) detected

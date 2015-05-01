@@ -7,7 +7,7 @@
 ./sl: inputs/err-interfaces017.snl(28,26): ERROR, interface 'I2' does not implement method 'get'
     method get@I2(): int { return self.value }
                          ^
-./sl: inputs/err-interfaces017.snl(30,1): ERROR, class 'C' does not implement method (interface 2, method 3)
+./sl: inputs/err-interfaces017.snl(30,1): ERROR, class 'C' does not implement iterface method (interface 2, method 3)
 }
 ^
 ./sl: 4 error(s) detected
