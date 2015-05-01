@@ -1,12 +1,10 @@
-./sl: inputs/err-interfaces018.snl(25,1): ERROR, Prototype of method get() does not match inherted definition:
-old prototype argument 1 has type A, but new prototype has type Y
+./sl: inputs/err-interfaces018.snl(25,1): ERROR, interface 'Y' should not override method 'get' inherited from 'A'
 }
 ^
 ./sl: inputs/err-interfaces018.snl(25,1): ERROR, interfaces ('Y') can only inherit from other interfaces
 }
 ^
-./sl: inputs/err-interfaces018.snl(28,22): ERROR, Prototype of method get() does not match inherted definition:
-old prototype argument 1 has type A, but new prototype has type Z
+./sl: inputs/err-interfaces018.snl(28,22): ERROR, interface 'Z' should not override method 'get' inherited from 'A'
     method get(): int;
                      ^
 ./sl: inputs/err-interfaces018.snl(29,1): ERROR, interfaces ('Z') can only inherit from other interfaces
