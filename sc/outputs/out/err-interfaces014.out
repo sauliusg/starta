@@ -1,10 +1,10 @@
-./sl: inputs/err-interfaces014.snl(41,1): ERROR, class 'CC' does not implement iterface method (interface 2, method 2)
+./sl: inputs/err-interfaces014.snl(41,1): ERROR, class 'CC' does not implement method 'sub' from interface 'I1'
 }
 ^
-./sl: inputs/err-interfaces014.snl(41,1): ERROR, class 'CC' does not implement iterface method (interface 3, method 2)
+./sl: inputs/err-interfaces014.snl(41,1): ERROR, class 'CC' does not implement method 'remove' from interface 'I2'
 }
 ^
-./sl: inputs/err-interfaces014.snl(41,1): ERROR, class 'CC' does not implement iterface method (interface 3, method 3)
+./sl: inputs/err-interfaces014.snl(41,1): ERROR, class 'CC' does not implement method 'get' from interface 'I2'
 }
 ^
 ./sl: 3 error(s) detected

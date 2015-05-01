@@ -13,16 +13,16 @@
 ./sl: inputs/interfaces009.snl(41,17): ERROR, object 'x' does not have method 'm1'
         x->m1@I3();
                 ^
-./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement iterface method (interface 2, method 1)
+./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement method 'm1' from interface 'I1'
 }
 ^
-./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement iterface method (interface 2, method 2)
+./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement method 'm2' from interface 'I1'
 }
 ^
-./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement iterface method (interface 3, method 1)
+./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement method 'm1' from interface 'I2'
 }
 ^
-./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement iterface method (interface 3, method 2)
+./sl: inputs/interfaces009.snl(43,1): ERROR, class 'C' does not implement method 'm2' from interface 'I2'
 }
 ^
 ./sl: 9 error(s) detected

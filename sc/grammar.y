@@ -5532,9 +5532,42 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
             method_count = vtable[0];
             for( j = 1; j <= method_count; j++ ) {
                 if( vtable[j] == 0 ) {
-                    yyerrorf( "class '%s' does not implement iterface method "
-                              "(interface %d, method %d)",
-                              tnode_name(class_descr), i, j );
+                    TLIST *interface_list = tnode_interface_list( class_descr );
+                    TLIST *interface_node;
+                    int error_reported = 0;
+                    foreach_tlist( interface_node, interface_list ) {
+                        TNODE *current_interface = tlist_data( interface_node );
+                        TNODE *base_interface;
+                        for( base_interface = current_interface; base_interface;
+                             base_interface = tnode_base_type( base_interface )) {
+                            ssize_t method_interface =
+                                tnode_interface_number( base_interface );
+                            if( method_interface + 1 != i )
+                                continue;
+                            DNODE *methods = tnode_methods( base_interface );
+                            DNODE *method;
+                            vtable = (ssize_t*)
+                                (cc->static_data + itable[method_interface+1]);
+                            foreach_dnode( method, methods ) {
+                                ssize_t method_index = dnode_offset( method );
+                                if( method_index == j ) {
+                                    yyerrorf( "class '%s' does not implement method "
+                                              "'%s' from interface '%s'",
+                                              tnode_name(class_descr),
+                                              dnode_name( method ),
+                                              tnode_name( base_interface ));
+                                    error_reported = 1;
+                                    goto BREAK;
+                                }
+                            }
+                        }
+                    }
+                BREAK:
+                    if( !error_reported ) {
+                        yyerrorf( "class '%s' does not implement iterface method "
+                                  "(interface %d, method %d)",
+                                  tnode_name(class_descr), i, j );
+                    }
                 }
             }
         }
