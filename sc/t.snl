@@ -17,10 +17,7 @@ interface I2: I1 {
 }
 
 interface I3: I1 {
-    method nn(): string {
-        . "A default implementation of the nn@I3 is called";
-        return "default nn@I3";
-    }
+    method nn(): string;
 }
 
 class A implements I2, I3 {

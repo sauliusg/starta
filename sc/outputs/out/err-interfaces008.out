@@ -1,4 +1,4 @@
-./sl: inputs/err-interfaces008.snl(22,1): ERROR, class 'C' does not implement iterface method (interface 3, method 2)
+./sl: inputs/err-interfaces008.snl(22,1): ERROR, class 'C' does not implement method 'm2' from interface 'I2'
 }
 ^
 ./sl: inputs/err-interfaces008.snl(26,14): ERROR, interface 'I2' does not have method 'mx'
