@@ -5479,6 +5479,32 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
             }
 	}
     }
+    /* Fill in adresses of default method implementations provided by
+       some interfaces: */
+    {
+        TLIST *interface_list = tnode_interface_list( class_descr );
+        TLIST *interface_node;
+        foreach_tlist( interface_node, interface_list ) {
+            TNODE *current_interface = tlist_data( interface_node );
+            TNODE *base_interface;
+            for( base_interface = current_interface; base_interface;
+                 base_interface = tnode_base_type( base_interface )) {
+                ssize_t method_interface =
+                    tnode_interface_number( base_interface );
+                DNODE *methods = tnode_methods( base_interface );
+                DNODE *method;
+                vtable = (ssize_t*)
+                    (cc->static_data + itable[method_interface+1]);
+                foreach_dnode( method, methods ) {
+                    ssize_t method_index = dnode_offset( method );
+                    ssize_t method_address = dnode_ssize_value( method );
+                    if( vtable[method_index] == 0 && method_address != 0 ) {
+                        vtable[method_index] = method_address;
+                    }
+                }
+            }
+        }
+    }
 
     /* check whether all methods are implemented: */
 
@@ -7892,6 +7918,7 @@ interface_operator_list
 
 interface_operator
   : method_header
+  | method_definition
   ;
 
 struct_var_declaration
