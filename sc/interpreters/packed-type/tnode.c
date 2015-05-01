@@ -1306,8 +1306,14 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	    tnode_lookup_method( tnode->base_type, method_name ) : NULL;
 
 	if( inherited_method ) {
-	    if( !dnode_function_prototypes_match_msg( inherited_method, method,
-						      msg, sizeof(msg))) {
+            if( tnode->kind == TK_INTERFACE ) {
+		yyerrorf( "interface '%s' should not override "
+                          "method '%s' inherited from '%s'",
+                          tnode->name, dnode_name( method ),
+                          tnode->base_type->name );
+            } else
+            if( !dnode_function_prototypes_match_msg( inherited_method, method,
+                                                      msg, sizeof(msg))) {
 		yyerrorf( "Prototype of method %s() does not match "
 			  "inherted definition:\n%s", dnode_name( method ),
 			  msg );
