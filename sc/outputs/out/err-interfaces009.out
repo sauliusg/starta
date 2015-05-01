@@ -1,4 +1,4 @@
-./sl: inputs/err-interfaces009.snl(22,1): ERROR, unimplemented method (interface 3, method 2)
+./sl: inputs/err-interfaces009.snl(22,1): ERROR, class 'C' does not implement method (interface 3, method 2)
 }
 ^
 ./sl: inputs/err-interfaces009.snl(26,14): ERROR, the caller class 'C' does not implement interface 'I1'
