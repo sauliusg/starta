@@ -10683,8 +10683,9 @@ method_header
                       }
                   }
 
-                  implements_method = tnode_lookup_method( interface_type,
-                                                           method_name );
+                  implements_method =
+                      tnode_lookup_method_prototype( interface_type,
+                                                     method_name );
                   if( !implements_method ) {
                       if( interface_name ) {
                           yyerrorf( "interface '%s' does not implement method "

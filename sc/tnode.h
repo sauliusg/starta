@@ -148,9 +148,12 @@ DNODE *tnode_lookup_field( TNODE *tnode, char *field_name );
 
 DNODE *tnode_lookup_method( TNODE *tnode, char *method_name );
 
+DNODE *tnode_lookup_method_prototype( TNODE *tnode, char *method_name );
+
 DNODE *tnode_lookup_operator( TNODE *tnode, char *operator_name, int arity );
 
-DNODE *tnode_lookup_operator_nonrecursive( TNODE *tnode, char *operator_name, int arity );
+DNODE *tnode_lookup_operator_nonrecursive( TNODE *tnode, char *operator_name,
+                                           int arity );
 
 DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type );
 

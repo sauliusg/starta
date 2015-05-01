@@ -121,11 +121,14 @@ c->add@I1( 10 );
 ./sl: inputs/err-types004.snl(38,15): ERROR, too little arguments in call to function 'add'
 c->add@I1( 10 );
               ^
-./sl: inputs/err-types004.snl(39,10): ERROR, object 'c' does not have method 'add@I2'
-c->add@I2( 10 );
-         ^
 ./sl: inputs/err-types004.snl(39,15): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
 
+c->add@I2( 10 );
+              ^
+./sl: inputs/err-types004.snl(39,15): ERROR, incompatible types for function 'add' argument nr. 2
+c->add@I2( 10 );
+              ^
+./sl: inputs/err-types004.snl(39,15): ERROR, too little arguments in call to function 'add'
 c->add@I2( 10 );
               ^
 ./sl: inputs/err-types004.snl(42,25): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
@@ -142,5 +145,5 @@ c->put@I2( 33 );
 ./sl: inputs/err-types004.snl(44,15): ERROR, too little arguments in call to function 'put'
 c->put@I2( 33 );
               ^
-./sl: 43 error(s) detected
+./sl: 44 error(s) detected
 
