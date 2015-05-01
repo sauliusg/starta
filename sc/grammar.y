@@ -3218,15 +3218,8 @@ static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
     if( fn_dnode && !is_imported ) {
 	fn_tnode = dnode_type( fn_dnode );
 	if( !dnode_is_function_prototype( fn_dnode )) {
-            char *original_name = dnode_original_name( fn_proto );
-            if( original_name ) {
-                yyerrorf( "method '%s' is already "
-                          "declared in this scope and implements '%s'",
-                          original_name, dnode_name( fn_proto ) );
-            } else {
-                yyerrorf( "function '%s' is already declared in this scope",
-                          dnode_name( fn_proto ));
-            }
+            yyerrorf( "function '%s' is already declared in this scope",
+                      dnode_name( fn_proto ));
 	} else
 	if( !tnode_function_prototypes_match_msg( fn_tnode,
 					          dnode_type( fn_proto ),
@@ -5440,15 +5433,16 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     TLIST *interface_node;
     foreach_tlist( interface_node, interface_list ) {
         TNODE *current_interface = tlist_data( interface_node );
-        ssize_t interface_nr = tnode_interface_number( current_interface );
-        ssize_t method_count = 0;
-        TNODE *base;
-        for( base = current_interface; base; base = tnode_base_type(base)) {
-            method_count += dnode_list_length( tnode_methods( base ));
-        }
-        if( interface_nr > 0 &&
-            itable[interface_nr+1] < method_count ) {
-            itable[interface_nr+1] = method_count;
+        TNODE *base_interface;
+        for( base_interface = current_interface; base_interface;
+             base_interface = tnode_base_type( base_interface )) {
+            ssize_t interface_nr = tnode_interface_number( base_interface );
+            ssize_t method_count =
+                dnode_list_length( tnode_methods( base_interface ));
+            if( interface_nr > 0 &&
+                itable[interface_nr+1] < method_count ) {
+                itable[interface_nr+1] = method_count;
+            }
         }
     }
 
@@ -7856,7 +7850,7 @@ interface_declaration_body
                       $4 ? tnode_name( $4 ) : "?" );
         }
         if( $1 && tnode_kind( $1 ) != TK_INTERFACE ) {
-            yyerrorf( "interfaces ('%s') may only inherit from other interfaces",
+            yyerrorf( "interfaces ('%s') can only inherit from other interfaces",
                       $4 ? tnode_name( $4 ) : "?");
         }
         $$ = $4;
@@ -7870,7 +7864,7 @@ interface_declaration_body
                       $4 ? tnode_name( $4 ) : "?" );
         }
         if( $1 && tnode_kind( $1 ) != TK_INTERFACE ) {
-            yyerrorf( "interfaces ('%s') may only inherit from other interfaces",
+            yyerrorf( "interfaces ('%s') can only inherit from other interfaces",
                       $4 ? tnode_name( $4 ) : "?");
         }
         $$ = $4;
@@ -8268,10 +8262,7 @@ interface_declaration
     }
     interface_declaration_body
     {
- 	tnode_finish_interface( $5, compiler->last_interface_number + 1, px );
-        if( compiler->last_interface_number < tnode_interface_number( $5 ) ) {
-            compiler->last_interface_number = tnode_interface_number( $5 );
-        }
+ 	tnode_finish_interface( $5, ++compiler->last_interface_number, px );
 	compiler_end_scope( compiler, px );
 	compiler_typetab_insert( compiler, $5, px );
 	compiler->current_type = NULL;
@@ -8703,11 +8694,11 @@ multivalue_function_call
                                   interface_name );
                     }
                 } else {
-                    method = tnode_lookup_field( interface_type, method_name );
+                    method = tnode_lookup_method( interface_type, method_name );
                 }
             } else {
                 if( object_type ) {
-                    method = tnode_lookup_field( object_type, method_name );
+                    method = tnode_lookup_method( object_type, method_name );
                 }
             }
 
@@ -8741,11 +8732,25 @@ multivalue_function_call
 		    object_type ? tnode_name( object_type ) : NULL;
 
 		if( object_name && method_name ) {
-		    yyerrorf( "object '%s' does not have method '%s'",
-			      object_name, method_name );
+                    char *interface_name = interface_type ?
+                        tnode_name( interface_type ) : NULL;
+                    if( interface_name ) { 
+                        yyerrorf( "object '%s' does not have method '%s@%s'",
+                                  object_name, method_name, interface_name );
+                    } else {
+                        yyerrorf( "object '%s' does not have method '%s'",
+                                  object_name, method_name );
+                    }
 		} else if ( class_name && method_name ) {
-		    yyerrorf( "type/class '%s' does not have method '%s'",
-			      class_name, method_name );
+                    char *interface_name = interface_type ?
+                        tnode_name( interface_type ) : NULL;
+                    if( interface_name ) {
+                        yyerrorf( "type/class '%s' does not have method '%s@%s'",
+                                  class_name, method_name, interface_name );
+                    } else {
+                        yyerrorf( "type/class '%s' does not have method '%s'",
+                                  class_name, method_name );
+                    }
 		} else {
 		    yyerrorf( "can not locate method '%s'", method_name );
 		}
@@ -8801,11 +8806,11 @@ multivalue_function_call
                                   interface_name );
                     }
                 } else {
-                    method = tnode_lookup_field( interface_type, method_name );
+                    method = tnode_lookup_method( interface_type, method_name );
                 }
             } else {
                 if( object_type ) {
-                    method = tnode_lookup_field( object_type, method_name );
+                    method = tnode_lookup_method( object_type, method_name );
                 }
             }
 
@@ -10693,63 +10698,38 @@ method_header
 
               if( interface_type ) {
                   cexception_t inner2;
-                  /* UNiquify the interface method name: */
-                  TNODE *base_type = interface_type, *current;
-                  for( current = interface_type;
-                       current && tnode_kind( current ) == TK_INTERFACE &&
-                           tnode_lookup_method( current, method_name );
-                       current = tnode_base_type( current )) {
-                      base_type = current;
-                  }
-                  char *base_name = tnode_name( base_type );
                   char *interface_name = tnode_name( interface_type );
                   char *volatile full_method_name = NULL;
-                  char *volatile original_method_name = NULL;
                   ssize_t length;
+                  length = (interface_name ? strlen( interface_name ) : 0)
+                      + (method_name ? strlen( method_name ) : 0) + 2;
+
                   cexception_guard( inner2 ) {
-                      length = (interface_name ? strlen( interface_name ) : 0)
-                          + (method_name ? strlen( method_name ) : 0) + 2;
                       full_method_name = mallocx( length, &inner2 );
-                      length = (base_name ? strlen( base_name ) : 0)
-                          + (method_name ? strlen( method_name ) : 0) + 2;
-                      original_method_name = mallocx( length, &inner2 );
 
                       snprintf( full_method_name, length, "%s@%s",
                                 method_name ? method_name : "",
-                                base_name ? base_name : ""
-                            );
-
-                      snprintf( original_method_name, length, "%s@%s",
-                                method_name ? method_name : "",
                                 interface_name ? interface_name : ""
-                            );
+                                );
 
 #if 0
-                      printf( ">>>> '%s', original: '%s'\n",
-                              full_method_name, original_method_name );
+                      printf( ">>>> full method name = '%s'\n",
+                              full_method_name );
 #endif
 
                       funct = new_dnode_method( full_method_name, parameter_list,
                                                 return_values, &inner2 );
-
-                      if( strcmp( full_method_name,
-                                  original_method_name ) != 0 ) {
-                          dnode_set_original_name( funct, original_method_name,
-                                                   &inner2 );
-                      }
-
                       freex( full_method_name );
-                      freex( original_method_name );
                   }
                   cexception_catch {
                       freex( full_method_name );
-                      freex( original_method_name );
                       cexception_reraise( inner2, &inner );
                   }
               } else {
                   funct = new_dnode_method( method_name, parameter_list,
                                             return_values, &inner );
               }
+
               $$ = funct;
 
               if( implements_method ) {

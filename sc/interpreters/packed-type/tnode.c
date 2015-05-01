@@ -795,11 +795,7 @@ TNODE *tnode_finish_interface( TNODE * volatile node,
 {
     DNODE *curr_method;
 
-    if( node->base_type && node->base_type->kind == TK_INTERFACE ) {
-        node->interface_nr = node->base_type->interface_nr;
-    } else {
-        node->interface_nr = interface_nr;
-    }
+    node->interface_nr = interface_nr;
 
     foreach_dnode( curr_method, node->methods ) {
         TNODE *curr_method_type = dnode_type( curr_method );
@@ -863,6 +859,7 @@ DNODE *tnode_lookup_field( TNODE *tnode, char *field_name )
     assert( tnode );
 
     field = dnode_list_lookup( tnode->fields, field_name );
+
     if( !field ) {
         field = dnode_list_lookup( tnode->methods, field_name );
     }
@@ -886,7 +883,7 @@ DNODE *tnode_lookup_method( TNODE *tnode, char *method_name )
 
     if( method ) {
 	return method;
-    } else if( tnode->base_type ) {
+    } else if( tnode->base_type && tnode->kind != TK_INTERFACE ) {
 	return tnode_lookup_method( tnode->base_type, method_name );
     } else {
 	return NULL;
@@ -1463,7 +1460,8 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
 
     if( base_type ) {
         tnode->base_type = base_type;
-	tnode->max_vmt_offset = base_type->max_vmt_offset;
+        if( tnode->kind != TK_INTERFACE )
+            tnode->max_vmt_offset = base_type->max_vmt_offset;
 	tnode->size += tnode_size( base_type );
 	tnode->nrefs += base_type->nrefs;
 	tnode->nextnumoffs += base_type->nextnumoffs;

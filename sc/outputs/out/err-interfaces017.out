@@ -1,8 +1,17 @@
-./sl: inputs/err-interfaces017.snl(25,28): ERROR, method 'add@I2' is already declared in this scope and implements 'add@I1'
+./sl: inputs/err-interfaces017.snl(25,28): ERROR, interface 'I2' does not implement method 'add'
     method add@I2( int i ) { self.value += i; . "This is add@I2()" }
                            ^
-./sl: inputs/err-interfaces017.snl(26,28): ERROR, method 'sub@I2' is already declared in this scope and implements 'sub@I1'
+./sl: inputs/err-interfaces017.snl(26,28): ERROR, interface 'I2' does not implement method 'sub'
     method sub@I2( int i ) { self.value -= i; . "This is sub@I2()" }
                            ^
-./sl: 2 error(s) detected
+./sl: inputs/err-interfaces017.snl(28,26): ERROR, interface 'I2' does not implement method 'get'
+    method get@I2(): int { return self.value }
+                         ^
+./sl: inputs/err-interfaces017.snl(30,1): ERROR, unimplemented method (interface 2, method 3)
+}
+^
+./sl: inputs/err-interfaces017.snl(35,10): ERROR, object 'c' does not have method 'add@I2'
+c->add@I2( 10 );
+         ^
+./sl: 5 error(s) detected
 

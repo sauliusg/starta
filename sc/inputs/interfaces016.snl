@@ -24,12 +24,8 @@ class A implements I2 {
     method mm@I1(): int {
         return self.i + 1
     }
-/*
-    method mm@I2(): int {
-        return self.i + 2
-    }
-*/
-    method mn@I2( int i ): int
+
+    method mn@I1( int i ): int
     {
         return self.i + i
     }
@@ -42,15 +38,11 @@ class A2 implements I2, I1 {
 
     constructor A( int i = 100 ) { self.i = i }
 
-    method mm@I2(): int {
+    method mm@I1(): int {
         return self.i + 1
     }
-/*
-    method mm@I1(): int {
-        return self.i + 2
-    }
-*/
-    method mn@I2( int i ): int
+
+    method mn@I1( int i ): int
     {
         return self.i + i
     }
@@ -60,7 +52,7 @@ class A2 implements I2, I1 {
 
 var a = new A(101);
 
-. a->mn@I2( 193 );
+. a->mn@I1( 193 );
 a->nn@I2();
 
 // bytecode { PLD %a DUMPVMT }
