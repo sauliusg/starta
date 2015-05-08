@@ -7497,13 +7497,7 @@ var_type_description
 undelimited_or_structure_description
   : struct_description
   | class_description
-  | {
-      
-    } 
-    struct_or_class_description_body
-    {
-      $$ = $2;
-    }
+  | struct_or_class_description_body
   | undelimited_type_description
   ;
 
@@ -7545,15 +7539,12 @@ delimited_type_description
        $$ = share_tnode( $1 );
     }
 
-  | _LIKE type_identifier
-    {
-    }
-    struct_or_class_description_body
+  | _LIKE type_identifier struct_or_class_description_body
     {
 	$$ = new_tnode_synonim( share_tnode( $2 ), px );
-	$$ = tnode_move_operators( $$, $4 );
-	delete_tnode( $4 );
-	$4 = NULL;
+	$$ = tnode_move_operators( $$, $3 );
+	delete_tnode( $3 );
+	$3 = NULL;
 	assert( compiler->current_type );
 	tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
     }
@@ -7656,9 +7647,9 @@ interface_identifier_list
   ;
 
 struct_description
-  : opt_null_type_designator _STRUCT {} struct_or_class_description_body
+  : opt_null_type_designator _STRUCT struct_or_class_description_body
     {
-        $$ = tnode_finish_struct( $4, px );
+        $$ = tnode_finish_struct( $3, px );
         if( $1 ) {
             tnode_set_flags( $$, TF_NON_NULL );
         }
