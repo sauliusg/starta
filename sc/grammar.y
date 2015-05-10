@@ -7837,7 +7837,9 @@ inheritance_and_implementation_list
           }
       }
 
-      tnode_insert_interfaces( current_class, interfaces );
+      if( !tnode_interface_list( current_class )) {
+          tnode_insert_interfaces( current_class, interfaces );
+      }
       compiler_start_virtual_method_table( compiler, current_class, px );
 
       $$ = base_type;
