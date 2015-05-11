@@ -5809,6 +5809,7 @@ static cexception_t *px; /* parser exception */
 %type <tlist> interface_identifier_list
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
+%type <s>     module_import_identifier
 %type <dnode> operator_definition
 %type <dnode> operator_header
 %type <s>     opt_identifier
@@ -6258,17 +6259,24 @@ import_statement
        { $$ = $2; }
    ;
 
+module_import_identifier
+  : __IDENTIFIER
+  | __IDENTIFIER _IN __STRING_CONST
+;
+
 use_statement
    : _USE '*' _FROM __IDENTIFIER
        { $$ = $4; }
-   | _USE _TYPE identifier_list _FROM __IDENTIFIER
-       { $$ = $5; }
-   | _USE _VAR identifier_list _FROM __IDENTIFIER
-       { $$ = $5; }
-   | _FROM __IDENTIFIER _USE identifier_list
+   | _FROM module_import_identifier _USE '*'
        { $$ = $2; }
-   | _USE function_or_procedure identifier_list _FROM __IDENTIFIER
-       { $$ = $5; }
+   | _FROM module_import_identifier _USE identifier_list
+       { $$ = $2; }
+   | _FROM module_import_identifier _USE _TYPE identifier_list
+       { $$ = $2; }
+   | _FROM module_import_identifier _USE _VAR identifier_list
+       { $$ = $2; }
+   | _FROM module_import_identifier _USE function_or_procedure identifier_list
+       { $$ = $2; }
    ;
 
 identifier_list
