@@ -411,3 +411,8 @@ static void storeCurrentLine( char *line, int length )
        }
    }
 }
+
+void yyunget( void )
+{
+    yyless(0);
+}

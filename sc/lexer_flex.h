@@ -27,4 +27,6 @@ const char *compiler_flex_current_line( void );
 void compiler_flex_push_state( FILE *replace_yyin, cexception_t *ex );
 void compiler_flex_pop_state( void );
 
+void yyunget( void );
+
 #endif

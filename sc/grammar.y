@@ -6028,7 +6028,11 @@ undelimited_simple_statement
   : include_statement
        { compiler_open_include_file( compiler, $1, px ); }
   | import_statement
-       { compiler_import_package( compiler, $1, px ); }
+       {
+           yyunget(); /* return the last read lexer token, which is a
+                         look-ahead token, to the input stream. S.G.*/
+           compiler_import_package( compiler, $1, px );
+       }
   | use_statement
        { compiler_use_package( compiler, $1, px ); }
   | load_library_statement
@@ -6255,7 +6259,7 @@ package_statement
   ;
 
 import_statement
-   : _USE __IDENTIFIER
+   : _USE module_import_identifier
        { $$ = $2; }
    ;
 
