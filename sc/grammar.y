@@ -256,6 +256,8 @@ static void delete_compiler( COMPILER *c )
 
         delete_tlist( c->current_type_stack );
 
+        freex( c->use_package_name );
+
         freex( c );
     }
 }
