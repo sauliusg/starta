@@ -52,6 +52,7 @@ static char *compiler_version = "0.0";
 typedef struct COMPILER_STATE {
     char *filename;
     char *use_package_name;
+    char *package_filename;
     FILE *yyin;
     ssize_t line_no;
     ssize_t column_no;
@@ -67,6 +68,7 @@ static void delete_compiler_state( COMPILER_STATE *state )
 
 static COMPILER_STATE *new_compiler_state( char *filename,
 					   char *use_package_name,
+					   char *package_filename,
 					   FILE *file,
 					   ssize_t line_no,
 					   ssize_t column_no,
@@ -77,6 +79,7 @@ static COMPILER_STATE *new_compiler_state( char *filename,
 
     state->filename = filename;
     state->use_package_name = use_package_name;
+    state->package_filename = package_filename;
     state->yyin = file;
     state->line_no = line_no;
     state->column_no = column_no;
@@ -132,6 +135,7 @@ typedef struct {
     char *filename;
     FILE *yyin;
     char *use_package_name;
+    char *package_filename;
     COMPILER_STATE *include_files;
 
     DNODE *current_function; /* Function that is currently being
@@ -257,14 +261,15 @@ static void delete_compiler( COMPILER *c )
         delete_tlist( c->current_type_stack );
 
         freex( c->use_package_name );
+        freex( c->package_filename );
 
         freex( c );
     }
 }
 
 static COMPILER *new_compiler( char *filename,
-					   char **include_paths,
-					   cexception_t *ex )
+                               char **include_paths,
+                               cexception_t *ex )
 {
     cexception_t inner;
     COMPILER *cc = callocx( 1, sizeof(COMPILER), ex );
@@ -330,13 +335,15 @@ static void compiler_push_compiler_state( COMPILER *c,
 {
     COMPILER_STATE *cstate;
 
-    cstate = new_compiler_state( c->filename, c->use_package_name, c->yyin,
+    cstate = new_compiler_state( c->filename, c->use_package_name, 
+                                 c->package_filename, c->yyin,
 				 compiler_flex_current_line_number(),
 				 compiler_flex_current_position(),
 				 c->include_files, ex );
 
     c->filename = NULL;
     c->use_package_name = NULL;
+    c->package_filename = NULL;
     c->include_files = cstate;
 }
 
@@ -349,6 +356,9 @@ void compiler_pop_compiler_state( COMPILER *c )
 
     freex( c->use_package_name );
     c->use_package_name = top->use_package_name;
+
+    freex( c->package_filename );
+    c->package_filename = top->package_filename;
 
     c->include_files = top->next;
     assert( !c->filename );
