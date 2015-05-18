@@ -453,7 +453,7 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
 static void compiler_open_include_file( COMPILER *c, char *filename,
 					cexception_t *ex )
 {
-    char *full_name = compiler_find_include_file( c, filename, ex);
+    char *full_name = compiler_find_include_file( c, filename, ex );
     compiler_push_compiler_state( c, ex );
     compiler_save_flex_stream( c, full_name, ex );
 }
@@ -551,6 +551,8 @@ static void compiler_close_include_file( COMPILER *c,
     }
 
     compiler_pop_compiler_state( c );
+    freex( c->package_filename );
+    c->package_filename = NULL;
 }
 
 static void push_int( int **array, int *size, int value, cexception_t *ex )
@@ -4778,6 +4780,7 @@ static void compiler_use_package( COMPILER *c,
 	compiler_open_include_file( c, pkg_path, ex );
 	if( c->use_package_name ) {
 	    freex( c->use_package_name );
+            c->use_package_name = NULL;
 	}
 	c->use_package_name = strdupx( package_name, ex );
     }
@@ -6287,6 +6290,7 @@ module_import_identifier
           compiler->package_filename = NULL;
       }
       compiler->package_filename = strdupx( $3, px );
+      /* printf( ">>> package '%s', file '%s'\n", $1, $3 ); */
       $$ = $1;
   }
 ;
