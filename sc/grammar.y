@@ -1024,8 +1024,8 @@ static void tnode_report_missing_operator( TNODE *tnode,
 }
 
 static void compiler_emit( COMPILER *cc,
-			cexception_t *ex,
-			const char *format, ... )
+                           cexception_t *ex,
+                           const char *format, ... )
 {
     cexception_t inner;
     va_list ap;
@@ -1153,10 +1153,10 @@ static void compiler_fixup_inlined_function( COMPILER *cc,
 }
 
 static void compiler_emit_function_call( COMPILER *cc,
-				      DNODE *function,
-				      key_value_t *fixup_values,
-				      char *trailer,
-				      cexception_t *ex )
+                                         DNODE *function,
+                                         key_value_t *fixup_values,
+                                         char *trailer,
+                                         cexception_t *ex )
 {
     int is_bytecode = dnode_has_flags( function, DF_BYTECODE );
 
@@ -1220,8 +1220,8 @@ static void compiler_emit_function_call( COMPILER *cc,
 }
 
 static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
-                                         TYPETAB *generic_types,
-					 cexception_t *ex )
+                                            TYPETAB *generic_types,
+                                            cexception_t *ex )
 {
     cexception_t inner;
     TNODE *function_tnode;
@@ -1250,8 +1250,8 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
 }
 
 static void compiler_compile_type_conversion( COMPILER *cc,
-					   char *target_name,
-					   cexception_t *ex )
+                                              char *target_name,
+                                              cexception_t *ex )
 {
     cexception_t inner;
     ENODE * volatile expr = enode_list_pop( &cc->e_stack );
@@ -1320,8 +1320,8 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 }
 
 static void compiler_compile_return( COMPILER *cc,
-				  int nretvals,
-				  cexception_t *ex )
+                                     int nretvals,
+                                     cexception_t *ex )
 {
     int i;
     DNODE *function = cc ? cc->current_function : NULL;
@@ -1530,9 +1530,9 @@ static void compiler_init_operator_description( operator_description_t *od,
 }
 
 static void compiler_check_operator_args( COMPILER *cc,
-				       operator_description_t *od,
-				       TYPETAB *generic_types,
-                                       cexception_t *ex )
+                                          operator_description_t *od,
+                                          TYPETAB *generic_types,
+                                          cexception_t *ex )
 {
     DNODE *op_args;
     DNODE *arg;
@@ -1596,7 +1596,7 @@ static void compiler_check_operator_args( COMPILER *cc,
 }
 
 static void compiler_drop_operator_args( COMPILER *cc,
-				      operator_description_t *od )
+                                         operator_description_t *od )
 {
     DNODE *op_args;
     DNODE *arg;
