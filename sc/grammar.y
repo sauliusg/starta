@@ -429,6 +429,7 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
 	    FILE *f;
             /* first, check a compiler version-specific library: */
 	    full_path = make_full_file_name( filename, *path, version, ex );
+            /* printf( ">>> Checking '%s'\n", full_path ); */
 	    f = fopen( full_path, "r" );
 	    if( f ) {
 		fclose( f );
@@ -4746,7 +4747,8 @@ static void compiler_import_package( COMPILER *c,
 	vartab_insert_named( c->vartab, share_dnode( package ), ex );
 	/* printf( "found compiled package '%s'\n", package_name ); */
     } else {
-	char *pkg_path = compiler_find_package( c, package_name, ex );
+	char *pkg_path = c->package_filename ?
+            c->package_filename : compiler_find_package( c, package_name, ex );
 	compiler_open_include_file( c, pkg_path, ex );
     }
 }
@@ -4771,7 +4773,8 @@ static void compiler_use_package( COMPILER *c,
 	/* printf( "found compiled package '%s'\n", package_name ); */
 	compiler_use_exported_package_names( c, package, ex );
     } else {
-	char *pkg_path = compiler_find_package( c, package_name, ex );
+	char *pkg_path = c->package_filename ?
+            c->package_filename : compiler_find_package( c, package_name, ex );
 	compiler_open_include_file( c, pkg_path, ex );
 	if( c->use_package_name ) {
 	    freex( c->use_package_name );
@@ -6278,6 +6281,14 @@ import_statement
 module_import_identifier
   : __IDENTIFIER
   | __IDENTIFIER _IN __STRING_CONST
+  {
+      if( compiler->package_filename ) {
+          freex( compiler->package_filename );
+          compiler->package_filename = NULL;
+      }
+      compiler->package_filename = strdupx( $3, px );
+      $$ = $1;
+  }
 ;
 
 use_statement
