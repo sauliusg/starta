@@ -2,7 +2,7 @@
 
 }
 ^
-./sl: inputs/err-methods004.snl(27,27): ERROR, prototype of function h() does not match previous definition - old prototype argument 2 has type long, but new prototype has type int
+./sl: inputs/err-methods004.snl(27,27): ERROR, prototype of function h() does not match previous definition - old prototype argument 2 has type 'long', but new prototype has type 'int'
     method h(int x) : int { return self.i*self.i + x } // ERROR: prototype 
                           ^
 ./sl: 2 error(s) detected

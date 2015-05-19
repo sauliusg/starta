@@ -1,4 +1,4 @@
-./sl: inputs/err-fnargs012.snl(5,49): ERROR, prototype of function f() does not match previous definition - old prototype argument 3 has type char, but new prototype has type string
+./sl: inputs/err-fnargs012.snl(5,49): ERROR, prototype of function f() does not match previous definition - old prototype argument 3 has type 'char', but new prototype has type 'string'
 procedure f( x: int; y: float; z: string ) : int;
                                                 ^
 ./sl: 1 error(s) detected
