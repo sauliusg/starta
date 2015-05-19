@@ -205,7 +205,7 @@ while( gen <= generations ) {
         writestr( "Stable configuration reached.\n" );
 	break;
     endif
-    //sleep( 800000 );
+    sleep( 800000 );
     gen ++;
 }
 
