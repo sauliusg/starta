@@ -1189,7 +1189,7 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
         if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,
                                                   msg, sizeof(msg))) {
             yyerrorf( "Prototype of method %s() does not match "
-                      "inherted definition:\n%s", dnode_name( constructor ),
+                      "inherited definition:\n%s", dnode_name( constructor ),
                       msg );
             delete_dnode( constructor );
         } else {
@@ -1225,7 +1225,7 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	    if( !dnode_function_prototypes_match_msg( inherited_method, method,
 						      msg, sizeof(msg))) {
 		yyerrorf( "Prototype of method %s() does not match "
-			  "inherted definition:\n%s", dnode_name( method ),
+			  "inherited definition:\n%s", dnode_name( method ),
 			  msg );
 	    }
 	    method_offset = dnode_offset( inherited_method );
