@@ -4,8 +4,8 @@
 
 # Check whether packages can be imported from arbitrary files.
 
-from std use *
+use * from std
 
-from Mano in "my/packages.slib" use *
+use * from Mano in "my/packages.slib"
 
 . Mano::greeting( "Saulius" );

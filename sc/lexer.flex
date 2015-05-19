@@ -94,6 +94,7 @@ void compiler_flex_push_state( FILE *replace_yyin, cexception_t *ex )
     COMPILER_FLEX_STATE *save_state =
 	new_compiler_flex_state( YY_CURRENT_BUFFER, Include_stack, ex );
 
+    /* fprintf( stderr, ">>> flex: pushing lexer state\n" ); */
     Include_stack = save_state;
     yy_switch_to_buffer( yy_create_buffer( replace_yyin, YY_BUF_SIZE ));
 }
