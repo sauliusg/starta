@@ -39,12 +39,52 @@ static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
     }
 }
 
+int tnode_function_prototypes_match_msg( TNODE *f1, TNODE *f2,
+					 char *msg, int msglen );
+
 static int tnode_classes_are_compatible( TNODE *t1, TNODE *t2,
 					 TYPETAB *generic_types,
 					 cexception_t *ex )
 {
+    DNODE *t1_method, *t2_method;
+    long nmethods1, nmethods2;
+
     if( !t1 && !t2 ) return 1;
     if( !t1 || !t2 ) return 0;
+
+    t2_method = t2->methods;
+
+    nmethods1 = dnode_list_length( t1->methods );
+    nmethods2 = dnode_list_length( t2->methods );
+
+    if( nmethods1 != nmethods2 ) {
+        char *name1 = tnode_name( t1 );
+        char *name2 = tnode_name( t2 );
+        if( name1 && name2 ) {
+            yyerror( "classes '%s' and '%s' have different number of methods",
+                     name1, name2 );
+        } else {
+            yyerror( "classes have different number of methods" );            
+        }
+        return 0;
+    }
+
+    for( t1_method = t1->methods; t1_method && t2_method;
+         t1_method = dnode_next( t1_method )) {
+        TNODE *t1_method_type = dnode_type( t1_method );
+        TNODE *t2_method_type = dnode_type( t2_method );
+        char msg[100];
+        if( !tnode_function_prototypes_match_msg
+            ( t1_method_type, t2_method_type, msg, sizeof(msg)-1 )) {
+            yyerrorf( "incompatible class method '%s' ('%s'): %s", 
+                      dnode_name( t1_method ),
+                      dnode_name( t2_method ),
+                      msg );
+            return 0;
+        }
+        t2_method = dnode_next( t2_method );
+    }
+
     return
         tnode_structures_are_compatible( t1, t2, generic_types, ex ) &&
         tnode_classes_are_compatible( t1->base_type, t2->base_type,
@@ -487,10 +527,26 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 					generic_types, ex )) {
 	    if( msg ) {
                 if( f1_arg_type && f2_arg_type ) {
-                    snprintf( msg, msglen, "old prototype argument %d has "
-                              "type %s, but new prototype has type %s", narg,
-                              tnode_name( f1_arg_type ),
-                              tnode_name( f2_arg_type ));
+                    char *name1 = tnode_name( f1_arg_type );
+                    char *name2 = tnode_name( f2_arg_type );
+                    if( !name1 && !name2 ) {
+                        snprintf( msg, msglen, "old prototype argument %d has "
+                                  "different anonymous type", narg );
+                    } else
+                    if( !name1 ) {
+                        snprintf( msg, msglen, "old prototype argument %d has "
+                                  "anonymous type, but new prototype has "
+                                  "type '%s'", narg, name2 );
+                    } else
+                    if( !name2 ) {
+                        snprintf( msg, msglen, "old prototype argument %d has "
+                                  "type '%s', but new prototype has anonymous "
+                                  "type", narg, name1 );
+                    } else {
+                        snprintf( msg, msglen, "old prototype argument %d has "
+                                  "type '%s', but new prototype has type '%s'", narg,
+                                  name1, name2 );
+                    }
                 } else {
                     snprintf( msg, msglen, "old or new prototype has undefined "
                               "argument %d", narg );
