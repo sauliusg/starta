@@ -6047,12 +6047,24 @@ undelimited_simple_statement
        { compiler_open_include_file( compiler, $1, px ); }
   | import_statement
        {
-           yyunget(); /* return the last read lexer token, which is a
-                         look-ahead token, to the input stream. S.G.*/
+           if( yychar != YYEMPTY ) {
+               /* fprintf( stderr, ">>> yacc: 'yyunget()' in 'import_statement'\n" ); */
+               yyunget(); /* return the last read lexer token, which is a
+                             look-ahead token, to the input stream. S.G.*/
+               yyclearin; /* Discard the Bison look-ahead token. S.G. */
+           }
            compiler_import_package( compiler, $1, px );
        }
   | use_statement
-       { compiler_use_package( compiler, $1, px ); }
+       {
+           if( yychar != YYEMPTY ) {
+               /* fprintf( stderr, ">>> yacc: 'yyunget()' in 'use_statement'\n" ); */
+               yyunget(); /* return the last read lexer token, which is a
+                             look-ahead token, to the input stream. S.G.*/
+               yyclearin; /* Discard the Bison look-ahead token. S.G. */
+           }
+           compiler_use_package( compiler, $1, px );
+       }
   | load_library_statement
   | bytecode_statement
   | function_definition
@@ -6296,18 +6308,16 @@ module_import_identifier
 ;
 
 use_statement
-   : _USE '*' _FROM __IDENTIFIER
+   : _USE '*' _FROM module_import_identifier
        { $$ = $4; }
-   | _FROM module_import_identifier _USE '*'
-       { $$ = $2; }
-   | _FROM module_import_identifier _USE identifier_list
-       { $$ = $2; }
-   | _FROM module_import_identifier _USE _TYPE identifier_list
-       { $$ = $2; }
-   | _FROM module_import_identifier _USE _VAR identifier_list
-       { $$ = $2; }
-   | _FROM module_import_identifier _USE function_or_procedure identifier_list
-       { $$ = $2; }
+   | _USE identifier_list _FROM module_import_identifier
+       { $$ = $4; }
+   | _USE _TYPE identifier_list _FROM module_import_identifier
+       { $$ = $5; }
+   | _USE _VAR identifier_list _FROM module_import_identifier
+       { $$ = $5; }
+   | _USE function_or_procedure identifier_list _FROM module_import_identifier
+       { $$ = $5; }
    ;
 
 identifier_list

@@ -1,7 +1,7 @@
 
 package Mano;
 
-from std use *
+use * from std
 
 function greeting( name : string ) -> string
 begin
