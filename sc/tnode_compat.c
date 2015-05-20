@@ -12,6 +12,7 @@
 #include <tnode.ci>
 #include <string.h>
 #include <stdio.h>
+#include <yy.h>
 #include <assert.h>
 
 static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
@@ -61,10 +62,10 @@ static int tnode_classes_are_compatible( TNODE *t1, TNODE *t2,
         char *name1 = tnode_name( t1 );
         char *name2 = tnode_name( t2 );
         if( name1 && name2 ) {
-            yyerror( "classes '%s' and '%s' have different number of methods",
-                     name1, name2 );
+            yyerrorf( "classes '%s' and '%s' have different number of methods",
+                      name1, name2 );
         } else {
-            yyerror( "classes have different number of methods" );            
+            yyerrorf( "classes have different number of methods" );            
         }
         return 0;
     }
