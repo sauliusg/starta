@@ -403,31 +403,3 @@ cleanAll distclean: clean ${LOCAL_CLEAN_TARGETS}
 alltests testall:
 	./tools/testall 2>&1 | tee testall.log
 	${MAKE}
-
-#------------------------------------------------------------------------------
-
-INSTALL_DIR ?= ${HOME}/install/slc/
-PREFIX ?= ${INSTALL_DIR}/slc-r${SVN_VERSION}
-
-BINDIR = ${PREFIX}/bin
-LIBDIR = ${PREFIX}/lib/slc
-RC_DIR = ${PREFIX}/rc
-RC_FILE = ${RC_DIR}/slc.rc
-
-.PHONY: install
-
-install: ${TARGET}
-	mkdir -p ${BINDIR} ${LIBDIR} ${RC_DIR}
-	cp -av ${TARGET} ${BINDIR}
-	strip ${BINDIR}/$(notdir ${TARGET})
-	cp -av modules/*.slib ${LIBDIR}
-	rsync -avL libraries ${LIBDIR} \
-		--exclude '*.[cho]*' \
-		--exclude 'Make*' \
-		--exclude '.*' \
-		--exclude '*.sed' \
-		--exclude 'locally-generated' \
-		--exclude 'ifunctions'
-	find ${LIBDIR} -name '*.so*' | xargs -n1 -t strip
-	echo SL_INCLUDE_PATHS=${LIBDIR} > ${RC_FILE}
-	echo export SL_INCLUDE_PATHS >> ${RC_FILE}
