@@ -1,6 +1,6 @@
 # --*- Makefile -*--
 
-INSTALL_DIR ?= ${HOME}/install/slc/
+INSTALL_DIR ?= ${HOME}/install/slc
 PREFIX ?= ${INSTALL_DIR}/slc-r${SVN_VERSION}
 
 BINDIR = ${PREFIX}/bin
