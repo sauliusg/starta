@@ -580,7 +580,9 @@ int LDI( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     assert( offset >= 0 );
-    assert( src_header->nref * (ssize_t)REF_SIZE <= offset );
+    assert( ((char*)src_header >= (char*)istate.top && 
+             (char*)src_header <= (char*)istate.bottom) ||
+        src_header->nref * (ssize_t)REF_SIZE <= offset );
     memcpy( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]), size );
     STACKCELL_ZERO_PTR( istate.ep[0] );
 
