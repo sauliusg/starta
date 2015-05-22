@@ -1220,9 +1220,9 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                hold numeric value of the future type, in addition to
                the reference value for which the memory at the
                negative offset has just been allocated before: */
-            int bytes = sizeof(ssize_t);
-            int bits = (CHAR_BIT * bytes)/2;
-            int max_size = 1 << bits;
+            ssize_t bytes = sizeof(ssize_t);
+            ssize_t bits = (CHAR_BIT * bytes)/2;
+            ssize_t max_size = 1 << bits;
             ssize_t old_offset = tnode->nextnumoffs;
             field_size = sizeof(union stackunion);
             field_align = sizeof(double);

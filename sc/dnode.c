@@ -709,7 +709,7 @@ DNODE *dnode_list_last( DNODE *dnode )
     }
 }
 
-void dnode_assign_offset( DNODE *dnode, int *offset )
+void dnode_assign_offset( DNODE *dnode, ssize_t *offset )
 {
     int delta;
     ssize_t stackcells;
@@ -723,7 +723,7 @@ void dnode_assign_offset( DNODE *dnode, int *offset )
     dnode->offset = *offset - delta;
 }
 
-void dnode_list_assign_offsets( DNODE *dnode_list, int *offset )
+void dnode_list_assign_offsets( DNODE *dnode_list, ssize_t *offset )
 {
     DNODE *dnode;
 
@@ -733,7 +733,7 @@ void dnode_list_assign_offsets( DNODE *dnode_list, int *offset )
     }
 }
 
-DNODE *dnode_set_offset( DNODE *dnode, int offset )
+DNODE *dnode_set_offset( DNODE *dnode, ssize_t offset )
 {
     assert( dnode );
 #if 0
@@ -745,7 +745,7 @@ DNODE *dnode_set_offset( DNODE *dnode, int offset )
     return dnode;
 }
 
-DNODE *dnode_update_offset( DNODE *dnode, int offset )
+DNODE *dnode_update_offset( DNODE *dnode, ssize_t offset )
 {
     assert( dnode );
     dnode->offset = offset;

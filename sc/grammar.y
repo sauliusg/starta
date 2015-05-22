@@ -113,8 +113,8 @@ typedef struct {
 
     STLIST *symtab_stack; /* pushed symbol tables */
 
-    int local_offset;
-    int *local_offset_stack;
+    ssize_t local_offset;
+    ssize_t *local_offset_stack;
     int local_offset_stack_size;
 
     int last_interface_number;
@@ -555,6 +555,7 @@ static void compiler_close_include_file( COMPILER *c,
     c->package_filename = NULL;
 }
 
+#if 0
 static void push_int( int **array, int *size, int value, cexception_t *ex )
 {
     *array = reallocx( *array, ( *size + 1 ) * sizeof(**array), ex );
@@ -567,6 +568,7 @@ static int pop_int( int **array, int *size, cexception_t *ex )
     (*size) --;
     return (*array)[*size];
 }
+#endif
 
 static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
                           cexception_t *ex )
@@ -576,16 +578,16 @@ static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
     (*size) ++;
 }
 
-static void compiler_push_current_address( COMPILER *c, cexception_t *ex )
-{
-    push_ssize_t( &c->addr_stack, &c->addr_stack_size,
-		  thrcode_length(c->thrcode), ex );
-}
-
 static ssize_t pop_ssize_t( ssize_t **array, int *size, cexception_t *ex )
 {
     (*size) --;
     return (*array)[*size];
+}
+
+static void compiler_push_current_address( COMPILER *c, cexception_t *ex )
+{
+    push_ssize_t( &c->addr_stack, &c->addr_stack_size,
+		  thrcode_length(c->thrcode), ex );
 }
 
 static ssize_t compiler_pop_address( COMPILER *c, cexception_t *ex )
@@ -2985,8 +2987,8 @@ static void compiler_begin_scope( COMPILER *c,
     assert( c );
     assert( c->vartab );
 
-    push_int( &c->local_offset_stack, &c->local_offset_stack_size,
-	      c->local_offset, ex );
+    push_ssize_t( &c->local_offset_stack, &c->local_offset_stack_size,
+                  c->local_offset, ex );
     c->local_offset = starting_local_offset;
     vartab_begin_scope( c->vartab, ex );
     vartab_begin_scope( c->consts, ex );
@@ -3000,8 +3002,8 @@ static void compiler_end_scope( COMPILER *c, cexception_t *ex )
     assert( c );
     assert( c->vartab );
 
-    c->local_offset = pop_int( &c->local_offset_stack,
-			       &c->local_offset_stack_size, ex );
+    c->local_offset = pop_ssize_t( &c->local_offset_stack,
+                                   &c->local_offset_stack_size, ex );
     vartab_end_scope( c->consts, ex );
     vartab_end_scope( c->vartab, ex );
     vartab_end_scope( c->operators, ex );
@@ -3483,7 +3485,7 @@ static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
 	    ssize_t value = dnode_ssize_value( const_dnode );
 	    char value_str[100];
 
-	    snprintf( value_str, sizeof(value_str), "%d", value );
+	    snprintf( value_str, sizeof(value_str), "%ld", (long)value );
 	    string_offset =
 		compiler_assemble_static_string( cc, value_str, ex );
 	    dnode_set_offset( const_dnode, string_offset );
