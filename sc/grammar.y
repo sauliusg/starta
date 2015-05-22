@@ -4378,9 +4378,9 @@ static void compiler_convert_function_argument( COMPILER *cc,
 }
 
 static void compiler_compile_typed_const_value( COMPILER *cc,
-					     TNODE *const_type,
-					     const_value_t *v,
-					     cexception_t *ex )
+                                                TNODE *const_type,
+                                                const_value_t *v,
+                                                cexception_t *ex )
 {
     cexception_t inner;
     value_t vtype = v->value_type;
@@ -4391,26 +4391,26 @@ static void compiler_compile_typed_const_value( COMPILER *cc,
 	    case VT_INT:
 		const_value_to_string( v, &inner );
 		compiler_compile_typed_constant( cc, const_type,
-					      const_value_string( v ),
-					      &inner );
+                                                 const_value_string( v ),
+                                                 &inner );
 		break;
 	    case VT_FLOAT:
 		const_value_to_string( v, &inner );
 		compiler_compile_typed_constant( cc, const_type,
-					      const_value_string( v ),
-					      &inner );
+                                                 const_value_string( v ),
+                                                 &inner );
 		break;
 	    case VT_STRING:
 		const_value_to_string( v, &inner );
 		compiler_compile_typed_constant( cc, const_type,
-					      const_value_string( v ),
-					      &inner );
+                                                 const_value_string( v ),
+                                                 &inner );
 		break;
 	    case VT_ENUM:
 		const_value_to_string( v, &inner );
 		compiler_compile_typed_constant( cc, const_type,
-					      const_value_string( v ),
-					      &inner );
+                                                 const_value_string( v ),
+                                                 &inner );
 		break;
 	    case VT_NULL: {
 		    tnode = new_tnode_nullref( &inner );
@@ -5096,7 +5096,7 @@ const_value_t compiler_get_dnode_compile_time_attribute( DNODE *dnode,
     }
 
     if( strcmp( attribute_name, "offset" ) == 0 ) {
-	return make_const_value( ex, VT_INT, dnode_offset( dnode ));
+	return make_const_value( ex, VT_INT, (intmax_t)dnode_offset( dnode ));
     } else {
 	TNODE *tnode = dnode_type( dnode );
 	return compiler_get_tnode_compile_time_attribute( tnode,
