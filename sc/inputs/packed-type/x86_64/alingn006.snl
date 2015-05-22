@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test field alignment in records
+#
+
+use * from std;
+
+struct A {
+    name : array of char;
+    a : array [] of int;
+    char c;
+    int i;
+    char c1;
+    int i1;
+    char c2;
+    int i2;
+};
+
+. "A.name.offset=\t", const(A.name.offset/.stackcellsize);
+. "A.a.offset=\t", const(A.a.offset/.stackcellsize);
+. "A.c.offset=\t", const(A.c.offset/.stackcellsize);
+. "A.i.offset=\t", const(A.i.offset/.stackcellsize);
+. "A.c1.offset=\t", const(A.c1.offset/.stackcellsize);
+. "A.i1.offset=\t", const(A.i1.offset/.stackcellsize);
+. "A.c2.offset=\t", const(A.c2.offset/.stackcellsize);
+. "A.i2.offset=\t", const(A.i2.offset/.stackcellsize);
+
+."";
+. "A.size=\t", const(A.size/.stackcellsize);
