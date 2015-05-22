@@ -106,7 +106,7 @@ const_value_t make_const_value( cexception_t *ex,
 
     switch( value_type ) {
     case VT_INT:
-	r.value.i = va_arg( v, int );
+	r.value.i = va_arg( v, intmax_t );
 	break;
     case VT_FLOAT:
 	r.value.f = va_arg( v, double );
