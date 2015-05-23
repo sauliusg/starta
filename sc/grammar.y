@@ -4388,7 +4388,7 @@ static void compiler_compile_typed_const_value( COMPILER *cc,
 
     cexception_guard( inner ) {
 	switch( vtype ) {
-	    case VT_INT:
+	    case VT_INTMAX:
 		const_value_to_string( v, &inner );
 		compiler_compile_typed_constant( cc, const_type,
                                                  const_value_string( v ),
@@ -4441,20 +4441,20 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
     value_t vtype = v->value_type;
 
     switch( vtype ) {
-    case VT_INT:
+    case VT_INTMAX:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_INTEGER_SUFFIX,
-						module_name, suffix_name,
-						"integer" );
+                                                   module_name, suffix_name,
+                                                   "integer" );
 	break;
     case VT_FLOAT:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_FLOAT_SUFFIX,
-						module_name, suffix_name,
-						"float" );
+                                                   module_name, suffix_name,
+                                                   "float" );
 	break;
     case VT_STRING:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_STRING_SUFFIX,
-						module_name, suffix_name,
-						"string" );
+                                                   module_name, suffix_name,
+                                                   "string" );
 	break;
     case VT_ENUM: {
 	cexception_t inner;
@@ -5017,14 +5017,14 @@ static void compiler_check_default_value_compatibility( DNODE *arg,
     value_t val_kind = const_value_type( val );
 
     if( arg_kind == TK_INTEGER || arg_kind == TK_BOOL ) {
-	if( val_kind != VT_INT ) {
+	if( val_kind != VT_INTMAX ) {
 	    yyerrorf( "default value is not compatible with the "
 		      "function argument '%s' of type '%s'",
 		      dnode_name( arg ), tnode_name( arg_type ));
 	}
     } else
     if( arg_kind == TK_REAL ) {
-	if( val_kind != VT_FLOAT && val_kind != VT_INT ) {
+	if( val_kind != VT_FLOAT && val_kind != VT_INTMAX ) {
 	    yyerrorf( "default value is not compatible with the "
 		      "function argument '%s' of type '%s'",
 		      dnode_name( arg ), tnode_name( arg_type ));
@@ -5060,7 +5060,8 @@ static const_value_t compiler_make_compiler_attribute( char *attribute_name,
 						       cexception_t *ex )
 {
     if( strcmp( attribute_name, "stackcellsize" ) == 0 ) {
-	return make_const_value( ex, VT_INT, sizeof(stackcell_t) );
+	return make_const_value( ex, VT_INTMAX,
+                                 (intmax_t)sizeof(stackcell_t) );
     } else {
 	yyerrorf( "unknown compiler attribute '%s' requested",
 		  attribute_name );
@@ -5074,11 +5075,12 @@ const_value_t compiler_get_tnode_compile_time_attribute( TNODE *tnode,
 							 cexception_t *ex )
 {
     if( strcmp( attribute_name, "size" ) == 0 ) {
-	return make_const_value( ex, VT_INT, tnode_size( tnode ));
+	return make_const_value
+            ( ex, VT_INTMAX, (intmax_t)tnode_size( tnode ));
     } else
     if( strcmp( attribute_name, "nref" ) == 0 ) {
-	return make_const_value( ex, VT_INT,
-				 tnode_number_of_references( tnode ));
+	return make_const_value
+            ( ex, VT_INTMAX, (intmax_t)tnode_number_of_references( tnode ));
     } else {
 	yyerrorf( "unknown compile-time attribute '%s' requested",
 		  attribute_name );
@@ -5096,7 +5098,8 @@ const_value_t compiler_get_dnode_compile_time_attribute( DNODE *dnode,
     }
 
     if( strcmp( attribute_name, "offset" ) == 0 ) {
-	return make_const_value( ex, VT_INT, (intmax_t)dnode_offset( dnode ));
+	return
+            make_const_value( ex, VT_INTMAX, (intmax_t)dnode_offset( dnode ));
     } else {
 	TNODE *tnode = dnode_type( dnode );
 	return compiler_get_tnode_compile_time_attribute( tnode,
@@ -8712,7 +8715,7 @@ bytecode_constant
 	  const_value_t const_expr = $3;
 
 	  switch( const_expr.value_type ) {
-	  case VT_INT: {
+	  case VT_INTMAX: {
 	      ssize_t val = const_expr.value.i;
 	      compiler_emit( compiler, px, "\te\n", &val );
 	      }
@@ -11086,7 +11089,7 @@ constant_declaration
 constant_integer_expression
   : constant_expression
     {
-	if( const_value_type( &$1 ) == VT_INT ) {
+	if( const_value_type( &$1 ) == VT_INTMAX ) {
 	    $$ = const_value_integer( &$1 );
 	} else {
 	    yyerrorf( "constant integer value required" );
@@ -11126,7 +11129,7 @@ constant_expression
 
   | __INTEGER_CONST
       {
-	  $$ = make_const_value( px, VT_INT, atol( $1 ));
+	  $$ = make_const_value( px, VT_INTMAX, (intmax_t)atol( $1 ));
       }
 
   | __REAL_CONST
@@ -11152,19 +11155,19 @@ constant_expression
 	if( const_dnode ) {
 	    const_value_copy( &$$, dnode_value( const_dnode ), px );
 	} else {
-	    $$ = make_const_value( px, VT_INT, 0 );
+	    $$ = make_const_value( px, VT_INTMAX, (intmax_t)0 );
 	}
       }
 
   | module_list __COLON_COLON __IDENTIFIER
       {
 	DNODE *const_dnode = compiler_lookup_constant( compiler, $1, $3,
-						    "constant" );
+                                                       "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
 	    const_value_copy( &$$, dnode_value( const_dnode ), px );
 	} else {
-	    $$ = make_const_value( px, VT_INT, 0 );
+	    $$ = make_const_value( px, VT_INTMAX, (intmax_t)0 );
 	}
       }
 
