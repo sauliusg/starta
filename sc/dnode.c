@@ -214,8 +214,9 @@ DNODE* new_dnode_constant( char *name, const_value_t *value, cexception_t *ex )
 
     cexception_guard( inner ) {
         ret->name = strdupx( name, &inner );
-	if( const_value_type( value ) == VT_INT ) { /* for compatibility with */
-	    ret->value = value->value.i;            /* older code */
+	if( const_value_type( value ) == VT_INTMAX ) {
+            /* for compatibility with older code: */
+	    ret->value = value->value.i;
 	}
 	const_value_move( &ret->cvalue, value );
     }
@@ -355,8 +356,9 @@ ssize_t dnode_ssize_value( DNODE *dnode )
 DNODE *dnode_set_value( DNODE *dnode, const_value_t *val )
 {
     assert( dnode );
-    if( const_value_type( val ) == VT_INT ) { /* for compatibility with */
-	dnode->value = val->value.i;          /* older code */
+    if( const_value_type( val ) == VT_INTMAX ) {
+        /* for compatibility with older code: */
+	dnode->value = val->value.i;
     }
     const_value_move( &dnode->cvalue, val );
     return dnode;

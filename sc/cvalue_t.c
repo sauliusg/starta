@@ -42,7 +42,7 @@ char *const_value_string( const_value_t *val )
 long const_value_integer( const_value_t *val )
 {
     assert( val );
-    assert( val->value_type == VT_INT );
+    assert( val->value_type == VT_INTMAX );
     return val->value.i;
 }
 
@@ -90,7 +90,7 @@ const_value_t make_zero_const_value()
 {
     const_value_t r;
     memset( &r, 0, sizeof( r ));
-    r.value_type = VT_INT;
+    r.value_type = VT_INTMAX;
     return r;
 }
 
@@ -105,7 +105,7 @@ const_value_t make_const_value( cexception_t *ex,
     r.value_type = value_type;
 
     switch( value_type ) {
-    case VT_INT:
+    case VT_INTMAX:
 	r.value.i = va_arg( v, intmax_t );
 	break;
     case VT_FLOAT:
@@ -143,7 +143,7 @@ void const_value_to_float( const_value_t *x )
 {
     double d;
     switch( x->value_type ) {
-        case VT_INT:
+        case VT_INTMAX:
 	    x->value.f = x->value.i;
 	    break;
         case VT_FLOAT:
@@ -166,7 +166,7 @@ void const_value_to_string( const_value_t *x, cexception_t *ex )
 {
     char buff[80];
     switch( x->value_type ) {
-        case VT_INT:
+        case VT_INTMAX:
 	    snprintf( buff, sizeof(buff)-1, "%jd", x->value.i );
 	    break;
         case VT_FLOAT:
@@ -189,7 +189,7 @@ void const_value_to_int( const_value_t *x )
 {
     long l;
     switch( x->value_type ) {
-        case VT_INT:
+        case VT_INTMAX:
 	    break;
         case VT_FLOAT:
 	    x->value.i = /* ceill( x->value.f - 0.5 ); */ (int)( x->value.f - 0.5 );
@@ -205,7 +205,7 @@ void const_value_to_int( const_value_t *x )
         default:
 	    assert(0);
     }
-    x->value_type = VT_INT;
+    x->value_type = VT_INTMAX;
 }
 
 const_value_t const_value_strcat( const_value_t *s1, const_value_t *s2,
@@ -235,22 +235,22 @@ static const_value_t const_value_arithm( const_value_t *x, const_value_t *y,
 {
     const_value_t r = make_zero_const_value();
 
-    if( x->value_type == VT_INT && y->value_type == VT_INT ) {
+    if( x->value_type == VT_INTMAX && y->value_type == VT_INTMAX ) {
 	assert( larithm );
 	r.value.i = larithm( x->value.i, y->value.i );
-	r.value_type = VT_INT;
+	r.value_type = VT_INTMAX;
     } else if( x->value_type == VT_FLOAT || y->value_type == VT_FLOAT ) {
 	const_value_to_float( x );
 	const_value_to_float( y );
 	assert( farithm );
 	r.value.f = farithm( x->value.f, y->value.f );
 	r.value_type = VT_FLOAT;
-    } else if( x->value_type == VT_INT || y->value_type == VT_INT ) {
+    } else if( x->value_type == VT_INTMAX || y->value_type == VT_INTMAX ) {
 	const_value_to_int( x );
 	const_value_to_int( y );
 	assert( larithm );
 	r.value.i = larithm( x->value.i, y->value.i );
-	r.value_type = VT_INT;
+	r.value_type = VT_INTMAX;
     } else {
 	assert( 0 );
     }
@@ -299,7 +299,7 @@ const_value_t const_value_mod( const_value_t x, const_value_t y )
 
 const_value_t const_value_negate( const_value_t x )
 {
-    if( x.value_type == VT_INT ) {
+    if( x.value_type == VT_INTMAX ) {
 	x.value.i = -x.value.i;
     } else if( x.value_type == VT_FLOAT ) {
 	x.value.f = -x.value.f;
@@ -313,7 +313,7 @@ const_value_t const_value_negate( const_value_t x )
 const char *cvalue_type_name( const_value_t val )
 {
     switch( val.value_type ) {
-    case VT_INT: return "integer";
+    case VT_INTMAX: return "intmax";
     case VT_FLOAT: return "float";
     case VT_STRING: return "string";
     case VT_ENUM: return "enumerator";

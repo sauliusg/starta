@@ -13,7 +13,7 @@
 
 typedef enum value_t {
     VT_NONE,
-    VT_INT,
+    VT_INTMAX,
     VT_FLOAT,
     VT_STRING,
     VT_ENUM,
