@@ -639,7 +639,7 @@ int GLDI( INSTRUCTION_FN_ARGS )
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
     ssize_t bytes = sizeof(ssize_t);
     ssize_t bits = (bytes * CHAR_BIT)/2;
-    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t pos_offset = offset & ~(~((ssize_t)1) << bits);
     ssize_t neg_offset = offset >> bits;
     void** ref_ptr;
     void* num_ptr;
@@ -689,7 +689,7 @@ int GSTI( INSTRUCTION_FN_ARGS )
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
     ssize_t bytes = sizeof(ssize_t);
     ssize_t bits = (bytes * CHAR_BIT)/2;
-    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t pos_offset = offset & ~(~((ssize_t)1) << bits);
     ssize_t neg_offset = offset >> bits;
     void** ref_ptr;
     void* num_ptr;
