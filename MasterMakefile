@@ -240,11 +240,15 @@ ${TST_EXE_DIR}/%: ${TST_PRG_DIR}/%.c ${LINK_OBJ_FILES} \
 # compared with the sample outputs files in ./outputs/*.out, and any
 # differences will be recorded in ./outputs/*.diff #
 
+ARCH := $(shell uname -p)
+
 TEST_DIR = ./inputs
 OUTPUT_DIR = ./outputs/out
 DIFFIL_DIR = ./outputs/diff
 
 TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}} \
+	${wildcard ${TEST_DIR}/${ARCH}/*${EXT}} \
+	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/${ARCH}/*${EXT}} \
 	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/*${EXT}}
 
 RES_FILES  = ${patsubst ${TEST_DIR}/%${EXT},${OUTPUT_DIR}/%.out,${TEST_FILES}}
