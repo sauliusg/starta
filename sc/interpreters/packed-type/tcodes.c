@@ -1201,17 +1201,18 @@ int DUMPVMT( INSTRUCTION_FN_ARGS )
     interface_nr = itable[0];
     for( i = 0; i <= interface_nr; i++ ) {
 	if( i == 0 ) {
-	    printf( "NUMBER OF INTERFCES = %d\n", itable[i] );
+	    printf( "NUMBER OF INTERFCES = %"SSIZE_FMT"d\n", itable[i] );
 	    continue;
 	}
 
-	printf( "INTERFACE[%d]: vmt offset = %d\n", i, itable[i] );
+	printf( "INTERFACE[%"SSIZE_FMT"d]: vmt offset = %"SSIZE_FMT"d\n",
+                i, itable[i] );
         if( itable[i] == 0 ) continue;
 
 	vtable = (ssize_t*)(istate.static_data + itable[i]);
 	vm_nr = vtable[0];
 	for( j = 0; j <= vm_nr; j++ ) {
-	    printf( "VMT[%d]: %d\n", j, vtable[j] );
+	    printf( "VMT[%"SSIZE_FMT"d]: %"SSIZE_FMT"d\n", j, vtable[j] );
 	}
     }
 
@@ -4362,14 +4363,15 @@ int HASHDUMP( INSTRUCTION_FN_ARGS )
 
     ssize_t i;
 
-    printf( "HASHDUMP: el. size = %d, nref = %d, length = %d\n",
+    printf( "HASHDUMP: el. size = %d, nref = %"SSIZE_FMT"d, "
+            "length = %"SSIZE_FMT"d\n",
             hash_header->element_size, hash_nref, hash_length );
     for( i = 0; i < hash_length; i ++ ) {
         if( hash_nref > hash_length ) {
-            printf( "%d: '%s' -> (%p) '%s'\n", i, hash_keys[i],
+            printf( "%"SSIZE_FMT"d: '%s' -> (%p) '%s'\n", i, hash_keys[i],
                     hash_cells[i], hash_cells[i] );
         } else {
-            printf( "%d: '%s'\n", i, hash_keys[i] );
+            printf( "%"SSIZE_FMT"d: '%s'\n", i, hash_keys[i] );
         }
     }
 
@@ -5159,8 +5161,8 @@ int ASSERT( INSTRUCTION_FN_ARGS )
     char *message = istate.static_data + istate.code[istate.ip+3].ssizeval;
 
     if( !assertion_ok ) {
-        fprintf( stderr, "Assertion '%s' failed: line %d, file '%s'\n",
-                 message, line_no, filename );
+        fprintf( stderr, "Assertion '%s' failed: line %"SSIZE_FMT"d, "
+                 "file '%s'\n", message, line_no, filename );
     }
 
     istate.ep ++;
