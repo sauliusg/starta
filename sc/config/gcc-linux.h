@@ -22,8 +22,8 @@
 #define UNSIGNED_LONG_LONG_FMT  "L"
 #define LONG_FMT                "l"
 #define UNSIGNED_LONG_FMT       "ul"
-#define SIZE_FMT                "ul"
-#define SSIZE_FMT               "l"
+#define SIZE_FMT                "uz"
+#define SSIZE_FMT               "z"
 #define LONG_DOUBLE_FMT         "l"
 
 #endif
