@@ -1222,7 +1222,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                negative offset has just been allocated before: */
             ssize_t bytes = sizeof(ssize_t);
             ssize_t bits = (CHAR_BIT * bytes)/2;
-            ssize_t max_size = 1 << bits;
+            ssize_t max_size = ((ssize_t)1) << bits;
             ssize_t old_offset = tnode->nextnumoffs;
             field_size = sizeof(union stackunion);
             field_align = sizeof(double);
