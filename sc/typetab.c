@@ -269,7 +269,8 @@ TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
     if( node ) {
         if( node && node->count > 1 ) {
             yyerrorf( "type '%s' is imported more than once -- "
-                      "please use explicit package name for disambiguation" );
+                      "please use explicit package name for disambiguation",
+                      name );
         }
         assert( node->tnode );
         return node->tnode;
