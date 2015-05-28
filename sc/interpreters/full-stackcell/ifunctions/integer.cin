@@ -419,6 +419,7 @@ int @PREFIX1@FILESCAN( INSTRUCTION_FN_ARGS )
     FILE *fp = file ? file->fp : NULL;
     /* char *format = file ? file->string_scanf_format : NULL; */
     int value;
+    int nval;
 
     TRACE_FUNCTION();
 
@@ -445,7 +446,21 @@ int @PREFIX1@FILESCAN( INSTRUCTION_FN_ARGS )
 	return 0;
     }
 
-    fscanf( fp, "%d", &value );
+    nval = fscanf( fp, "%d", &value );
+
+    if( nval != 1 ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */
+              (char*)
+              cxprintf( "error scanning interger value from a file - %s",
+                        strerror(errno) ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_FILE_READ_ERROR,
+              EXCEPTION );
+	return 0;        
+    }
+
     istate.ep --;
     istate.ep[0].I = value;
 
