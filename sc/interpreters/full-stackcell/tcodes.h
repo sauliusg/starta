@@ -68,8 +68,12 @@ int LDGA( INSTRUCTION_FN_ARGS );
 int STG( INSTRUCTION_FN_ARGS );
 int LDI( INSTRUCTION_FN_ARGS );
 int STI( INSTRUCTION_FN_ARGS );
+int GLDI( INSTRUCTION_FN_ARGS );
+int GSTI( INSTRUCTION_FN_ARGS );
+#if 0
 #define GLDI LDI
 #define GSTI STI
+#endif
 
 int EXIT( INSTRUCTION_FN_ARGS );
 
@@ -306,7 +310,6 @@ int FILLMDARRAY( INSTRUCTION_FN_ARGS );
 int ASSERT( INSTRUCTION_FN_ARGS );
 
 int DEBUG( INSTRUCTION_FN_ARGS );
-int RTTIDUMP( INSTRUCTION_FN_ARGS );
 
 /* Opcode used to implement 'foreach' loops on arrays and linked
    lists: */

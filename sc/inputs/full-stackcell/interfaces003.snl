@@ -16,9 +16,14 @@ null interface Ig {
     method s() : string;
 }
 
-class S implements If, Ig {
+null class S implements If, Ig {
     int i;
     float k;
+
+    method f@If( x : int ): int { return 1 }
+    method s@If(): string { return null }
+    method g@Ig( x : int ): int { return 0 }
+    method s@Ig(): string { return "" }
 }
 
 . "S.size (stackcells) = ", const(S.size/S.k.size);
