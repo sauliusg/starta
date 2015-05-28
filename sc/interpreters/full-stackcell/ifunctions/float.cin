@@ -343,7 +343,7 @@ unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
 		ssize_t *offset, byte *blob, cexception_t *ex )
 {
     llong value = 0;
-    @type@ fvalue;
+    @type@ fvalue = 0;
     int i;
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
     union value {
@@ -411,9 +411,8 @@ unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
 			    "(check alignment!)", typechar, size, *offset ),
 		  /* module_id = */ 0,
 		  /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
-		  ex );        
-	    return 0;
-	    
+		  ex );
+	    return 0;	    
 	}
 	break;
     default:
