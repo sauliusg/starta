@@ -367,12 +367,11 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
 
 int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 {
+#if 0
     ssize_t nref = istate.code[istate.ip+1].ssizeval;
+#endif
     ssize_t n_elem = istate.ep[0].I;
     void *ptr;
-    ssize_t alloc_size;
-
-    alloc_size = sizeof(stackcell_t);
 
     TRACE_FUNCTION();
 
