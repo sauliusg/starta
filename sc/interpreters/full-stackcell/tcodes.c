@@ -591,47 +591,6 @@ int STI( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * GLDI (load indirect)
- *
- * bytecode:
- * GLDI
- * 
- * address --> value
- *
- */
-
-int GLDI( INSTRUCTION_FN_ARGS )
-{
-    TRACE_FUNCTION();
-
-    istate.ep[0] = *((stackcell_t*)STACKCELL_PTR(istate.ep[0]));
-
-    return 1;
-}
-
-/*
- * GSTI (generic store indirect)
- *
- * bytecode:
- * GSTI
- * 
- * ..., address, value --> 
- *
- */
-
-int GSTI( INSTRUCTION_FN_ARGS )
-{
-    TRACE_FUNCTION();
-
-    *((stackcell_t*)STACKCELL_PTR(istate.ep[1])) = istate.ep[0];
-    STACKCELL_ZERO_PTR( istate.ep[1] );
-
-    istate.ep += 2;
-
-    return 1;
-}
-
-/*
  * EXIT Call libc exit() to exit the program.
  * 
  * bytecode:
