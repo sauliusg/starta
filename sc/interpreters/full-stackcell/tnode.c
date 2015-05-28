@@ -1180,8 +1180,6 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
     TNODE *field_type;
     DNODE *current;
     type_kind_t field_kind;
-    char *name;
-    size_t field_size;
 
     assert( tnode );
     tnode_check_field_does_not_exist( tnode, tnode->fields, "field", field );
@@ -1189,8 +1187,6 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
     foreach_dnode( current, field ) {
 	field_type = dnode_type( current );
 	field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
-	name = field_type ? tnode_name( field_type ) : NULL;
-	field_size = sizeof(stackcell_t);
 
 	if( field_kind != TK_FUNCTION ) {
 	    dnode_set_offset( current, tnode->size );
