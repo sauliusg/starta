@@ -802,7 +802,7 @@ TNODE *tnode_finish_interface( TNODE * volatile node,
 
     foreach_dnode( curr_method, node->methods ) {
         TNODE *curr_method_type = dnode_type( curr_method );
-        curr_method_type->interface_nr = interface_nr;
+        curr_method_type->interface_nr = node->interface_nr;
     }
 
     return 
@@ -862,6 +862,7 @@ DNODE *tnode_lookup_field( TNODE *tnode, char *field_name )
     assert( tnode );
 
     field = dnode_list_lookup( tnode->fields, field_name );
+
     if( !field ) {
         field = dnode_list_lookup( tnode->methods, field_name );
     }
@@ -887,6 +888,23 @@ DNODE *tnode_lookup_method( TNODE *tnode, char *method_name )
 	return method;
     } else if( tnode->base_type ) {
 	return tnode_lookup_method( tnode->base_type, method_name );
+    } else {
+	return NULL;
+    }
+}
+
+DNODE *tnode_lookup_method_prototype( TNODE *tnode, char *method_name )
+{
+    DNODE *method;
+
+    assert( tnode );
+
+    method = dnode_list_lookup( tnode->methods, method_name );
+
+    if( method ) {
+	return method;
+    } else if( tnode->base_type && tnode->kind != TK_INTERFACE ) {
+	return tnode_lookup_method_prototype( tnode->base_type, method_name );
     } else {
 	return NULL;
     }
@@ -945,10 +963,18 @@ TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name )
 
     assert( class_tnode );
     foreach_tlist( curr, class_tnode->interfaces ) {
+        TNODE *base_interface;
         TNODE *curr_tnode = tlist_data( curr );
         char *curr_name = tnode_name( curr_tnode );
         if( strcmp( name, curr_name ) == 0 ) {
             return curr_tnode;
+        }
+        for( base_interface = curr_tnode->base_type; base_interface;
+             base_interface = base_interface->next ) {
+            curr_name = tnode_name( base_interface );
+            if( strcmp( name, curr_name ) == 0 ) {
+                return curr_tnode;
+            }
         }
     }
     return NULL;
@@ -1006,6 +1032,12 @@ ssize_t tnode_interface_number( TNODE *tnode )
 {
     assert( tnode );
     return tnode->interface_nr;
+}
+
+TLIST *tnode_interface_list( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->interfaces;
 }
 
 ssize_t tnode_max_interface( TNODE *class_descr )
@@ -1071,12 +1103,6 @@ DNODE *tnode_retval_next( TNODE* tnode, DNODE *retval )
     assert( tnode );
     if( !retval ) { return tnode->return_vals; }
     else          { return dnode_next(retval); }
-}
-
-static int tnode_retval_nr( TNODE *tnode )
-{
-    if( tnode->return_vals == NULL ) return 0;
-    else return dnode_list_length( tnode->return_vals );
 }
 
 TNODE *tnode_set_size( TNODE *tnode, int size )
@@ -1184,9 +1210,9 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                hold numeric value of the future type, in addition to
                the reference value for which the memory at the
                negative offset has just been allocated before: */
-            int bytes = sizeof(ssize_t);
-            int bits = (CHAR_BIT * bytes)/2;
-            int max_size = 1 << bits;
+            ssize_t bytes = sizeof(ssize_t);
+            ssize_t bits = (CHAR_BIT * bytes)/2;
+            ssize_t max_size = ((ssize_t)1) << bits;
             ssize_t field_size = sizeof(union stackunion);
 
             if( dnode_offset( current ) >= max_size ||
@@ -1256,8 +1282,14 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	    tnode_lookup_method( tnode->base_type, method_name ) : NULL;
 
 	if( inherited_method ) {
-	    if( !dnode_function_prototypes_match_msg( inherited_method, method,
-						      msg, sizeof(msg))) {
+            if( tnode->kind == TK_INTERFACE ) {
+		yyerrorf( "interface '%s' should not override "
+                          "method '%s' inherited from '%s'",
+                          tnode->name, dnode_name( method ),
+                          tnode->base_type->name );
+            } else
+            if( !dnode_function_prototypes_match_msg( inherited_method, method,
+                                                      msg, sizeof(msg))) {
 		yyerrorf( "Prototype of method %s() does not match "
 			  "inherited definition:\n%s", dnode_name( method ),
 			  msg );
@@ -1266,6 +1298,10 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	} else {
             if( method_interface_nr == 0 ) {
                 tnode->max_vmt_offset++;
+#if 0
+                printf( ">>> advancing VMT offset to %d for type '%s'\n",
+                        tnode->max_vmt_offset, tnode_name( tnode ));
+#endif
                 method_offset = tnode->max_vmt_offset;
             }
 	}
@@ -1273,6 +1309,10 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
         tnode_set_flags( tnode, TF_IS_REF );
 	tnode->methods = dnode_append( method, tnode->methods );
         if( method_interface_nr == 0 ) {
+#if 0
+            printf( ">>> setting offset %d for method '%s'\n",
+                    method_offset, dnode_name( method ));
+#endif
             dnode_set_offset( method, method_offset );
         }
     } else {
@@ -1419,7 +1459,8 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
 
     if( base_type ) {
         tnode->base_type = base_type;
-	tnode->max_vmt_offset = base_type->max_vmt_offset;
+        if( tnode->kind != TK_INTERFACE )
+            tnode->max_vmt_offset = base_type->max_vmt_offset;
 	tnode->size += tnode_size( base_type );
 	tnode->nrefs += base_type->nrefs;
 	tnode->nextnumoffs += base_type->nextnumoffs;
