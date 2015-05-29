@@ -1,0 +1,32 @@
+
+use * from std;
+
+null interface If {
+    method f( x : int ): int;
+    method s() : string;
+}
+
+. "If.f.offset =", const(If.f.offset);
+. "If.s.offset =", const(If.s.offset);
+
+. "there";
+
+null interface Ig {
+    method g( x : int ): int;
+    method s() : string;
+}
+
+null class S implements If, Ig {
+    int i;
+    float k;
+
+    method f@If( x : int ): int { return 1 }
+    method s@If(): string { return null }
+    method g@Ig( x : int ): int { return 0 }
+    method s@Ig(): string { return "" }
+}
+
+. "S.size (stackcells) = ", const(S.size/S.k.size);
+
+. "here";
+
