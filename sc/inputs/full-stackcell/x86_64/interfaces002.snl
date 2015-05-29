@@ -1,0 +1,27 @@
+
+use * from std;
+
+null interface If {
+    method f( x : int ): int;
+    method s() : string;
+}
+
+. "If.f.offset =", const(If.f.offset);
+. "If.s.offset =", const(If.s.offset);
+
+. "there";
+
+null interface Ig {
+    method g( x : int ): int;
+    method s() : string;
+}
+
+struct S implements If, Ig {
+    int i;
+    float k;
+}
+
+. "S.size = ", const(S.size)/const(S.i.size);
+
+. "here";
+
