@@ -618,7 +618,7 @@ int GLDI( INSTRUCTION_FN_ARGS )
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
     ssize_t bytes = sizeof(ssize_t);
     ssize_t bits = (bytes * CHAR_BIT)/2;
-    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t pos_offset = offset & ~(~((ssize_t)1) << bits);
     ssize_t neg_offset = offset >> bits;
     void** ref_ptr;
     void* num_ptr;
@@ -668,7 +668,7 @@ int GSTI( INSTRUCTION_FN_ARGS )
     alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
     ssize_t bytes = sizeof(ssize_t);
     ssize_t bits = (bytes * CHAR_BIT)/2;
-    ssize_t pos_offset = offset & ~(~1 << bits);
+    ssize_t pos_offset = offset & ~(~((ssize_t)1) << bits);
     ssize_t neg_offset = offset >> bits;
     void** ref_ptr;
     void* num_ptr;
@@ -1152,10 +1152,23 @@ int VCALL( INSTRUCTION_FN_ARGS )
 
     header = (alloccell_t*)object_ptr;
     itable = header[-1].vmt_offset;
-    /* in future, test that the virtual function or interface index is
-       not outside the virtual function table. */
+
+    assert( itable );
+    assert( itable[0] >= interface_nr );
+
     vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
     virtual_function_offset = vtable[virtual_function_nr];
+
+    if( virtual_function_offset == 0 ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "calling unimplemented interface method",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_UNIMPLEMENTED_METHOD,
+	      EXCEPTION );
+	return 0;
+    }
 
     istate.ep ++;
 
@@ -1198,17 +1211,18 @@ int DUMPVMT( INSTRUCTION_FN_ARGS )
     interface_nr = itable[0];
     for( i = 0; i <= interface_nr; i++ ) {
 	if( i == 0 ) {
-	    printf( "NUMBER OF INTERFCES = %d\n", itable[i] );
+	    printf( "NUMBER OF INTERFCES = %"SSIZE_FMT"d\n", itable[i] );
 	    continue;
 	}
 
-	printf( "INTERFACE[%d]: vmt offset = %d\n", i, itable[i] );
+	printf( "INTERFACE[%"SSIZE_FMT"d]: vmt offset = %"SSIZE_FMT"d\n",
+                i, itable[i] );
         if( itable[i] == 0 ) continue;
 
 	vtable = (ssize_t*)(istate.static_data + itable[i]);
 	vm_nr = vtable[0];
 	for( j = 0; j <= vm_nr; j++ ) {
-	    printf( "VMT[%d]: %d\n", j, vtable[j] );
+	    printf( "VMT[%"SSIZE_FMT"d]: %"SSIZE_FMT"d\n", j, vtable[j] );
 	}
     }
 
@@ -5163,8 +5177,8 @@ int ASSERT( INSTRUCTION_FN_ARGS )
     char *message = istate.static_data + istate.code[istate.ip+3].ssizeval;
 
     if( !assertion_ok ) {
-        fprintf( stderr, "Assertion '%s' failed: line %d, file '%s'\n",
-                 message, line_no, filename );
+        fprintf( stderr, "Assertion '%s' failed: line %"SSIZE_FMT"d, "
+                 "file '%s'\n", message, line_no, filename );
     }
 
     istate.ep ++;

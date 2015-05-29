@@ -6070,6 +6070,7 @@ undelimited_simple_statement
            }
            compiler_use_package( compiler, $1, px );
        }
+  | selective_use_statement
   | load_library_statement
   | bytecode_statement
   | function_definition
@@ -6315,14 +6316,17 @@ module_import_identifier
 use_statement
    : _USE '*' _FROM module_import_identifier
        { $$ = $4; }
-   | _USE identifier_list _FROM module_import_identifier
-       { $$ = $4; }
+   ;
+
+selective_use_statement
+   : _USE identifier_list _FROM module_import_identifier
+       {}
    | _USE _TYPE identifier_list _FROM module_import_identifier
-       { $$ = $5; }
+       {}
    | _USE _VAR identifier_list _FROM module_import_identifier
-       { $$ = $5; }
+       {}
    | _USE function_or_procedure identifier_list _FROM module_import_identifier
-       { $$ = $5; }
+       {}
    ;
 
 identifier_list
