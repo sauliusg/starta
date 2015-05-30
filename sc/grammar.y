@@ -5825,6 +5825,7 @@ static cexception_t *px; /* parser exception */
 %type <s>     module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
+%type <dnode> identifier_list
 %type <s>     import_statement
 %type <s>     include_statement
 %type <i>     index_expression
@@ -6320,7 +6321,12 @@ use_statement
 
 selective_use_statement
    : _USE identifier_list _FROM module_import_identifier
-       {}
+       {
+           DNODE *imported_identifiers = $2;
+           DNODE *identifier;
+           foreach_dnode( identifier, imported_identifiers ) {
+           }
+       }
    | _USE _TYPE identifier_list _FROM module_import_identifier
        {}
    | _USE _VAR identifier_list _FROM module_import_identifier
@@ -6329,9 +6335,13 @@ selective_use_statement
        {}
    ;
 
+/* FIXME: 'identifier_list' should be merged with
+   'variable_identifier_list' and 'argument_identifier_list'. S.G. */
 identifier_list
    : __IDENTIFIER
+     { $$ = new_dnode_name( $1, px ); }
    | identifier_list ',' __IDENTIFIER
+     { $$ = dnode_append( new_dnode_name( $3, px ), $1 ); }
    ;
 
 function_or_procedure: _FUNCTION | _PROCEDURE;
