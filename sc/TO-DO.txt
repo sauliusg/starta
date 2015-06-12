@@ -1,3 +1,4 @@
+-- Implement push and pop to the arrays (can be done by traversing the allocated reference tree like in GC).
 -- !!! 'new S' does not call a constructor or produce error message.
 -- !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
 -+ Implement check of measurement units at the compile time.
@@ -63,7 +64,6 @@ xx implement convenient conversion of fixed arrays into regular, variable arrays
 -- Implement regular expressions.
 -- Implement readonly structure members.
 ++ Implement readline() opcode and function
-?? Implement push and pop to the arrays (or use lists instead?).
 -- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
 ++ Implement objects.
 -- Implement dynamic, runtime-bound messages to objects.
