@@ -54,7 +54,7 @@ static struct {
 };
 #endif
 
-void *bcalloc( short element_size, ssize_t length, ssize_t nref )
+void *bcalloc( ssize_t element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
     ssize_t size = (length < 0 ? 1 : length) * element_size +

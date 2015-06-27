@@ -4,7 +4,7 @@ S.g.offset (inherited)  = 1
 S.k.offset (new)        = 5
 S.t.offset (inherited)  = 3
 -------------
-s.name offset = -9
+s.name offset = -10
 s.next offset = -5
 s.i    offset = 2
 -------------

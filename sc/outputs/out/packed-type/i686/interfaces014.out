@@ -1,14 +1,14 @@
 This is add@I1()
 This is add@I1()
 NUMBER OF INTERFCES = 3
-INTERFACE[1]: vmt offset = 1303
+INTERFACE[1]: vmt offset = 1427
 VMT[0]: 0
-INTERFACE[2]: vmt offset = 1307
+INTERFACE[2]: vmt offset = 1431
 VMT[0]: 3
 VMT[1]: 987
 VMT[2]: 1008
 VMT[3]: 1029
-INTERFACE[3]: vmt offset = 1323
+INTERFACE[3]: vmt offset = 1447
 VMT[0]: 1
 VMT[1]: 1038
 1

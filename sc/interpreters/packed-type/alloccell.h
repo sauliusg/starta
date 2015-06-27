@@ -25,22 +25,24 @@ typedef struct alloccell_t {
     short flags;              /* Various flags for garbage collector, etc. */
     short element_size;       /* Contains size of elements in the
 			         allocated memory block, in bytes (NOT
-			         including sizeof(alloccell_t)). This
-			         size does *not* include any
-			         references allocated at the negative
-			         offsets. If length > 0, there are
-			         'length' blocks of size
+			         including sizeof(alloccell_t)). */
+    ssize_t size;             /* Contains size the allocated memory
+			         block in bytes (NOT including
+			         sizeof(alloccell_t) ). If length > 0,
+			         'size' there MUST be enough for at
+			         least 'length' blocks of size
 			         'element_size'. If length == 0, there
 			         MAY be *no* blocks allocated after
-			         the alloccell_t header. If length ==
-			         -1, the allocated block is not an
-			         array, but rather a structure or an
-			         object and there is exactely *one*
-			         block of size 'element_size'
-			         allocated after the header;
-			         'element_size' includes all
-			         non-reference fields of the
-			         structure. */
+			         the alloccell_t header (and size ==
+			         0). If length == -1, the allocated
+			         block is not an array, but rather a
+			         structure or an object and there is
+			         exactely *one* block of size 'size'
+			         allocated. Sizes of fields both
+			         before the header (references) and
+			         after the header (plain numbers) are
+			         added up in this value, with
+			         paddings. */
     ssize_t length;           /* contains number of elements if the
 				 allocated block is an array; for
 				 non-array elements contains value a
