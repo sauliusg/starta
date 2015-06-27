@@ -6424,7 +6424,7 @@ selective_use_statement
            DNODE *imported_identifiers = $3;
            DNODE *identifier;
            if( !module ) {
-               yyerrorf( "module '%s' is not found for type import "
+               yyerrorf( "module '%s' is not found for constant import "
                          "-- consider 'use %s' first",
                          module_name, module_name );
            } else {
