@@ -12,8 +12,6 @@ use P1; use P2;
 use var aBunny from P1;
 use var funny from P1;
 use type funny from P1;
-use var print_funny from P1
-
-use type molecule from P2
+use function print_funny from P1
 
 print_funny( funny );

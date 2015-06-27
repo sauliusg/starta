@@ -16,6 +16,9 @@ type bunny = struct {
     long there;
 }
 
+var funny = new funny;
+var aBunny = new bunny;
+
 function print_funny( funny a )
 {
     . "P1 has", a.here, "units of fun, and long is", a.there

@@ -9,11 +9,9 @@ use * from std;
 
 use P1; use P2;
 
-use var aBunny from P1;
-use var funny from P1;
-use type funny from P1;
-use var print_funny from P1
+use function fg, aBunny from P1;
+use function ff, gg from P2;
 
-use type molecule from P2
-
-print_funny( funny );
+ff();
+fg();
+gg();
