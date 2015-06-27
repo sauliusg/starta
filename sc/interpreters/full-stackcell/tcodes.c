@@ -1018,10 +1018,29 @@ int VCALL( INSTRUCTION_FN_ARGS )
     itable = header[-1].vmt_offset;
 
     assert( itable );
-    assert( itable[0] >= interface_nr );
 
-    vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
-    virtual_function_offset = vtable[virtual_function_nr];
+    ssize_t vtable_last = 0;
+    ssize_t interface_count = itable[0];
+    if( interface_count >= interface_nr + 1 ) {
+        vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
+        if( vtable != 0 ) {
+            vtable_last = vtable[0];
+            if( virtual_function_nr <= vtable_last ) {
+                virtual_function_offset = vtable[virtual_function_nr];
+            }
+        }
+    }
+
+    if( interface_count <= interface_nr || !vtable || vtable_last == 0 ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -11,
+	      /* message = */
+	      "calling method of an unimplemented interface",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_UNIMPLEMENTED_INTERFACE,
+	      EXCEPTION );
+	return 0;
+    }
 
     if( virtual_function_offset == 0 ) {
 	interpret_raise_exception_with_bcalloc_message
