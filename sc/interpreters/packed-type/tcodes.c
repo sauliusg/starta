@@ -1150,11 +1150,6 @@ int VCALL( INSTRUCTION_FN_ARGS )
 
     if( interface_count >= interface_nr + 1 ) {
         vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
-#if 0
-    printf( ">>> VCALL: interface = %d, ifcount = %d, method = %d, itable = %d, vtable = %d, offset = %d\n",
-            interface_nr, interface_count, virtual_function_nr, itable, vtable,
-            virtual_function_offset );
-#endif
 
         if( vtable != 0 ) {
             vtable_last = vtable[0];
