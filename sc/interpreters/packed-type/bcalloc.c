@@ -83,7 +83,7 @@ void *bcalloc( ssize_t element_size, ssize_t length, ssize_t nref )
 	allocated = ptr;
 	ptr->rcount = 1;
 	ptr->magic = BC_MAGIC;
-	// ptr->size = size;
+	ptr->size = size;
 	ptr->element_size = element_size;
 	ptr->length = length;
 	ptr->nref = nref;
@@ -123,10 +123,6 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
     alloccell_t *ptr;
     assert( nref == 1 || nref == 0 );
     ptr = bcalloc( element_size, length, nref * length );
-    if( ptr ) {
-        ptr[-1].length = length;
-        ptr[-1].element_size = element_size;
-    }
     return ptr;
 }
 
