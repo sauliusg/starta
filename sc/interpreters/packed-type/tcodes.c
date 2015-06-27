@@ -950,16 +950,22 @@ int APUSH( INSTRUCTION_FN_ARGS )
         if( nref >= 0 && length >= 0 && element_size > 0 ) {
             if( (length + 1) * element_size > size ) {
                 /* need to reallocate the array: */
-                // ssize_t new_size;
-                // void *new_array = bcalloc( );
+                ssize_t new_size = element_size * (length + 1) * 2;
+                void *new_array = bcalloc( new_size, element_size, length,
+                                           nref > 0 ? nref + 1 : 0 );
+                BC_CHECK_PTR( new_array );
+                memcpy( new_array, array, length * element_size );
+                array = new_array;
+                STACKCELL_SET_ADDR( istate.ep[1], new_array );
             }
             /* Array now has enough capacity to push a new element: */
             if( nref == 0 ) {
                 /* FIXME: how to deal with empty ponter arrays? S.G. */
-                /* Array */
                 memcpy( (char*)array + length * element_size, value, element_size );
-                array[-1].length++;
+            } else {
+                *((void**)array + length) = STACKCELL_PTR( *value );
             }
+            array[-1].length++;
         }
     }
 
