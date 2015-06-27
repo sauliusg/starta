@@ -5694,6 +5694,7 @@ static void compiler_set_pragma( COMPILER *c, char *pragma_name, ssize_t value )
 static void compiler_import_selected_names( COMPILER *c,
                                             DNODE *imported_identifiers,
                                             char *module_name,
+                                            int keyword,
                                             cexception_t *ex )
 {
     DNODE *module = 
@@ -5708,6 +5709,22 @@ static void compiler_import_selected_names( COMPILER *c,
             DNODE *identifier_dnode =
                 dnode_vartab_lookup_var( module, name );
             if( identifier_dnode ) {
+                TNODE *identifier_type = dnode_type( identifier_dnode );
+                type_kind_t identifier_kind = tnode_kind( identifier_type );
+                if( keyword != 0 ) {
+                    if( keyword == IMPORT_FUNCTION && 
+                        identifier_kind != TK_FUNCTION ) {
+                        yyerrorf( "imported name '%s' should be a function "
+                                  "or a procedure, but it is a variable",
+                                  name );
+                    }
+                    if( keyword == IMPORT_VAR && 
+                        identifier_kind == TK_FUNCTION ) {
+                        yyerrorf( "imported name '%s' should be a variable "
+                                  "or a procedure, but it is a %s",
+                                  name, tnode_kind_name( identifier_type ));
+                    }
+                }
                 vartab_insert( c->vartab, name, 
                                share_dnode( identifier_dnode ), ex );
             } else {
@@ -6352,7 +6369,7 @@ selective_use_statement
            DNODE *imported_identifiers = $2;
 
            compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, px );
+                                           module_name, IMPORT_ALL, px );
 
            delete_dnode( imported_identifiers );
        }
@@ -6395,7 +6412,7 @@ selective_use_statement
            DNODE *imported_identifiers = $3;
 
            compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, px );
+                                           module_name, IMPORT_VAR, px );
 
            delete_dnode( imported_identifiers );
        }
@@ -6433,7 +6450,7 @@ selective_use_statement
            DNODE *imported_identifiers = $3;
 
            compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, px );
+                                           module_name, IMPORT_FUNCTION, px );
 
            delete_dnode( imported_identifiers );
        }

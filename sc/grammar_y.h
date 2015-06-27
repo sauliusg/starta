@@ -19,6 +19,16 @@ typedef enum {
   last_COMPILER_ERROR
 } compiler_error_t;
 
+typedef enum {
+  IMPORT_ALL = 0,
+  IMPORT_VAR,
+  IMPORT_CONST,
+  IMPORT_TYPE,
+  IMPORT_FUNCTION,
+
+  last_IMPORT_KEYWORD
+} import_keyword_t;
+
 THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
                                 cexception_t *ex );
 

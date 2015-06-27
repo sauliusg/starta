@@ -9,8 +9,8 @@ use P1; use P2;
 
 use type funny from P1;
 use type Atom from P2;
-use var fg, ff from P1;
-use var gg from P2;
+use function fg, ff from P1;
+use function gg from P2;
 
 use * from std;
 
