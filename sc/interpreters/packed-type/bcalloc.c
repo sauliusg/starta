@@ -54,10 +54,11 @@ static struct {
 };
 #endif
 
-void *bcalloc( ssize_t element_size, ssize_t length, ssize_t nref )
+void *bcalloc( ssize_t size, ssize_t element_size,
+               ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
-    ssize_t size = (length < 0 ? 1 : length) * element_size;
+    // ssize_t size = (length < 0 ? 1 : length) * element_size;
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {
@@ -122,7 +123,8 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr;
     assert( nref == 1 || nref == 0 );
-    ptr = bcalloc( element_size, length, nref * length );
+    ptr = bcalloc( element_size * length, element_size,
+                   length, nref * length );
     return ptr;
 }
 
