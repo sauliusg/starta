@@ -391,7 +391,7 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
     if( nref == 0 ) {
 #if 0
         /* ssize_t alloc_size = (element_size + hash_key_ptr_size) * n_elem; */
-        ptr = bcalloc( element_size, 
+        ptr = bcalloc( element_size * n_elem, element_size,
                        /* length = */ n_elem, /* nref = */ -n_elem );
 #else
         ssize_t alloc_size = element_size + hash_key_ptr_size;
@@ -402,7 +402,8 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
            a refernece: */
         /* ssize_t alloc_size = REF_SIZE * n_elem * 2; */
         assert( element_size == REF_SIZE );
-        ptr = bcalloc( element_size * 2,
+        ptr = bcalloc( /* size = */ n_elem * element_size * 2,
+                       /* element_size = */ element_size * 2,
                        /* length = */ n_elem, /* nref = */ n_elem * 2 );
     }
     BC_CHECK_PTR( ptr );
