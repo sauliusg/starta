@@ -1,0 +1,20 @@
+package P1;
+
+use * from std;
+
+function ff()
+{
+    . "Hi, I am ff() from P1!";
+}
+
+procedure fg()
+{
+    . "Hi, I am fg() from P1!";
+}
+
+function xx()
+{
+    . "Hi, I am xx() from P1!";
+}
+
+end package P1;
