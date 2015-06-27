@@ -6347,7 +6347,32 @@ selective_use_statement
            delete_dnode( imported_identifiers );
        }
    | _USE _TYPE identifier_list _FROM module_import_identifier
-       {}
+       {
+           char *module_name = $5;
+           DNODE *module = 
+               vartab_lookup( compiler->compiled_packages, module_name );
+           DNODE *imported_identifiers = $3;
+           DNODE *identifier;
+           if( !module ) {
+               yyerrorf( "module '%s' is not found for type import "
+                         "-- consider 'use %s' first",
+                         module_name, module_name );
+           } else {
+               foreach_dnode( identifier, imported_identifiers ) {
+                   char *name = dnode_name( identifier );
+                   TNODE *identifier_tnode =
+                       dnode_typetab_lookup_type( module, name );
+                   if( identifier_tnode ) {
+                       typetab_insert( compiler->typetab, name, 
+                                       share_tnode( identifier_tnode ), px );
+                   } else {
+                       yyerrorf( "type '%s' is not found in module '%s'",
+                                 name, module_name );
+                   }
+               }
+           }
+           delete_dnode( imported_identifiers );
+       }
    | _USE _VAR identifier_list _FROM module_import_identifier
        {}
    | _USE function_or_procedure identifier_list _FROM module_import_identifier
