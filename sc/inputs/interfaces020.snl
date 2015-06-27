@@ -1,0 +1,93 @@
+//--*- Java -*--
+// Compiler tests
+//
+//
+// Test import of modules (only module name is imported, not the names
+// it provides -- these must be mentioned explicitely with the package
+// name when used.
+//
+
+use * from std;
+
+interface IChemAtom {
+    
+    method getcoord(): float[];
+    method gettype(): string;
+}
+
+interface IDrawAtom {
+    
+    method getcolor(): int[];
+    method getradius(): float;
+}
+
+class Atom implements IChemAtom, IDrawAtom {
+    string chemtype;
+    float x, y, z;
+    float r;
+    int color[];
+
+    constructor Atom( chemtype : string = "C";
+                      float x = 0; float y = 0; float z = 0 )
+    {
+        self.chemtype = chemtype;
+        self.x = x;
+        self.y = y;
+        self.z = z;
+        self.r = 10;
+        self.color = [ 1, 1, 1 ];
+    }
+    method getcoord@IChemAtom() : float[] { return [self.x, self.y, self.z] }
+    method gettype@IChemAtom() : string { return self.chemtype }
+
+    method getcolor@IDrawAtom() : int[] { return self.color[] }
+    method getradius@IDrawAtom() : float { return self.r }
+}
+
+class CrystalAtom implements IChemAtom {
+    string chemtype;
+    float x, y, z;
+
+    constructor CrystalAtom( chemtype : string = "C";
+                             float x = 0; float y = 0; float z = 0 )
+    {
+        self.chemtype = chemtype;
+        self.x = x;
+        self.y = y;
+        self.z = z;
+    }
+    method getcoord@IChemAtom() : float[] { return [self.x, self.y, self.z] }
+    method gettype@IChemAtom() : string { return self.chemtype }
+}
+
+class DrawAtom implements IDrawAtom {
+    float r;
+    int color[];
+
+    constructor DrawAtom()
+    {
+        self.r = 10;
+        self.color = [ 1, 1, 1 ];
+    }
+    method getcolor@IDrawAtom() : int[] { return self.color[] }
+    method getradius@IDrawAtom() : float { return self.r }
+}
+
+var m = new Atom( "H" ) * new [200];
+
+. m[0]->gettype@IChemAtom();
+. m[1]->gettype@IChemAtom();
+
+procedure ff( IDrawAtom a[] )
+{
+    . a[0]->getradius();
+    a[0] = new DrawAtom();
+}
+
+ff( m );
+
+. m[0]->gettype@IChemAtom();
+
+ff( m );
+
+. m[0]->gettype@IChemAtom();

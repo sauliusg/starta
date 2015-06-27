@@ -1136,7 +1136,7 @@ int VCALL( INSTRUCTION_FN_ARGS )
     thrcode_t* object_ptr = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *header;
     ssize_t *itable, *vtable;
-    ssize_t virtual_function_offset;
+    ssize_t virtual_function_offset = 0;
 
     TRACE_FUNCTION();
 
@@ -1144,14 +1144,39 @@ int VCALL( INSTRUCTION_FN_ARGS )
     itable = header[-1].vmt_offset;
 
     assert( itable );
-    assert( itable[0] >= interface_nr );
 
-    vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
-    virtual_function_offset = vtable[virtual_function_nr];
+    ssize_t vtable_last = 0;
+    ssize_t interface_count = itable[0];
+    if( interface_count >= interface_nr ) {
+        vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
+        if( vtable != 0 ) {
+            vtable_last = vtable[0];
+            if( virtual_function_nr <= vtable_last ) {
+                virtual_function_offset = vtable[virtual_function_nr];
+            }
+        }
+    }
+
+#if 0
+    printf( ">>> VCALL: interface = %d, ifcount = %d, method = %d, itable = %d, vtable = %d, offset = %d\n",
+            interface_nr, interface_count, virtual_function_nr, itable, vtable,
+            virtual_function_offset );
+#endif
+
+    if( interface_count < interface_nr || !vtable || vtable_last == 0 ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "calling method of an unimplemented interface",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_UNIMPLEMENTED_INTERFACE,
+	      EXCEPTION );
+	return 0;
+    }
 
     if( virtual_function_offset == 0 ) {
 	interpret_raise_exception_with_bcalloc_message
-	    ( /* err_code = */ -1,
+	    ( /* err_code = */ -11,
 	      /* message = */
 	      "calling unimplemented interface method",
 	      /* module_id = */ 0,
