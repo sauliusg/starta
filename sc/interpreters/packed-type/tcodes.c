@@ -1147,8 +1147,15 @@ int VCALL( INSTRUCTION_FN_ARGS )
 
     ssize_t vtable_last = 0;
     ssize_t interface_count = itable[0];
-    if( interface_count >= interface_nr ) {
+
+    if( interface_count >= interface_nr + 1 ) {
         vtable = (ssize_t*)(istate.static_data + itable[interface_nr + 1]);
+#if 0
+    printf( ">>> VCALL: interface = %d, ifcount = %d, method = %d, itable = %d, vtable = %d, offset = %d\n",
+            interface_nr, interface_count, virtual_function_nr, itable, vtable,
+            virtual_function_offset );
+#endif
+
         if( vtable != 0 ) {
             vtable_last = vtable[0];
             if( virtual_function_nr <= vtable_last ) {
@@ -1157,13 +1164,7 @@ int VCALL( INSTRUCTION_FN_ARGS )
         }
     }
 
-#if 0
-    printf( ">>> VCALL: interface = %d, ifcount = %d, method = %d, itable = %d, vtable = %d, offset = %d\n",
-            interface_nr, interface_count, virtual_function_nr, itable, vtable,
-            virtual_function_offset );
-#endif
-
-    if( interface_count < interface_nr || !vtable || vtable_last == 0 ) {
+    if( interface_count <= interface_nr || !vtable || vtable_last == 0 ) {
 	interpret_raise_exception_with_bcalloc_message
 	    ( /* err_code = */ -1,
 	      /* message = */
