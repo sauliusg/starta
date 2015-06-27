@@ -6381,6 +6381,29 @@ selective_use_statement
        }
    | _USE _VAR identifier_list _FROM module_import_identifier
        {
+           char *module_name = $5;
+           DNODE *module = 
+               vartab_lookup( compiler->compiled_packages, module_name );
+           DNODE *imported_identifiers = $3;
+           DNODE *identifier;
+           if( !module ) {
+               yyerrorf( "module '%s' is not found -- consider 'use %s' first",
+                         module_name, module_name );
+           } else {
+               foreach_dnode( identifier, imported_identifiers ) {
+                   char *name = dnode_name( identifier );
+                   DNODE *identifier_dnode =
+                       dnode_vartab_lookup_var( module, name );
+                   if( identifier_dnode ) {
+                       vartab_insert( compiler->vartab, name, 
+                                      share_dnode( identifier_dnode ), px );
+                   } else {
+                       yyerrorf( "name '%s' is not found in module '%s'",
+                                 name, module_name );
+                   }
+               }
+           }
+           delete_dnode( imported_identifiers );
        }
    | _USE _CONST identifier_list _FROM module_import_identifier
        {
