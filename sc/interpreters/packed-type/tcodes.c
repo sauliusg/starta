@@ -936,13 +936,14 @@ int CLONE( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *ptr;
-    ssize_t nref, element_size, nele;
+    ssize_t nref, size, element_size, nele;
 
     TRACE_FUNCTION();
 
     if( !array ) return 1;
 
     element_size = array[-1].element_size;
+    size = array[-1].size;
     nref = array[-1].nref;
     nele = array[-1].length;
 
@@ -950,14 +951,14 @@ int CLONE( INSTRUCTION_FN_ARGS )
         assert( nref == 0 || nref == nele );
         ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
     } else {
-        ptr = bcalloc( element_size, element_size, -1, nref );
+        ptr = bcalloc( size, element_size, -1, nref );
     }
 
     BC_CHECK_PTR( ptr );
 
     memcpy( ptr, array,
             nele >= 0 ? (ssize_t)element_size * (ssize_t)nele :
-            element_size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
+            size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
 
     if( nref < 0 ) {
         ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;
