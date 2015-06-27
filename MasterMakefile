@@ -337,8 +337,9 @@ tests alltests: test shtests
 
 listdiff: # test
 	@-( test -d ${DIFFIL_DIR} && \
-	    ls -l ${DIFFIL_DIR}/*.diff ${DIFFIL_DIR}/*/*.diff \
-	| awk '{if( $$5 > 0 ) print}' ) || \
+	    find ${DIFFIL_DIR} -name '*.diff' \
+		| xargs ls -l \
+		| awk '{if( $$5 > 0 ) print}' ) || \
 	    true
 	@-( test -d ${TST_DIF_DIR} && \
 	    ls -l ${TST_DIF_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
