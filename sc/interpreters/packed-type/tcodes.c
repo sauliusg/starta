@@ -810,7 +810,7 @@ int ALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, /* element_size = */ size, /* length = */ -1, nref );
+    ptr = bcalloc( size, /* element_size = */ -1, /* length = */ -1, nref );
 
     BC_CHECK_PTR( ptr );
 
