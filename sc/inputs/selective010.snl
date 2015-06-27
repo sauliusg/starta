@@ -9,14 +9,14 @@ use * from std;
 
 use P1; use P2;
 
-use * from P1;
-use const C3, K1 from P2;
+use const C1, C2 from P1;
+use const K1, K2 from P2;
 
 . const(C1);
 . const(P1::C2);
 . const(K1);
 . const(P2::K2);
 
-. const(P1::C3);
-. const(P2::K3);
-. const(C3);
+.const(P1::C3);
+.const(P2::K3);
+.const(P2::C3);

@@ -15,6 +15,11 @@ type Atom = class {
     xyz : array of double;
 }
 
+const K1 = 90;
+const K2 = "strstrstr";
+const K3 = "morecore";
+const C3 = "different from P1::C3";
+
 type molecule = array of Atom;
 
 function print_funny( funny x )
