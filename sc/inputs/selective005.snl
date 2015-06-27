@@ -23,4 +23,4 @@ use * from std;
 x.here = 325;
 x.there = 10000234;
 
-P2::print_funny( x );
+P1::print_funny( x );

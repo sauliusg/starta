@@ -2,6 +2,21 @@ package P1;
 
 use * from std;
 
+type funny = struct {
+    int here;
+    long there;
+}
+
+type bunny = struct {
+    int here;
+    long there;
+}
+
+function print_funny( funny a )
+{
+    . "P1 has", a.here, "units of fun, and long is", a.there
+}
+
 function ff()
 {
     . "Hi, I am ff() from P1!";
