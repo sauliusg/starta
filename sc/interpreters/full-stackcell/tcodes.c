@@ -1033,7 +1033,7 @@ int VCALL( INSTRUCTION_FN_ARGS )
 
     if( interface_count <= interface_nr || !vtable || vtable_last == 0 ) {
 	interpret_raise_exception_with_bcalloc_message
-	    ( /* err_code = */ -11,
+	    ( /* err_code = */ -1,
 	      /* message = */
 	      "calling method of an unimplemented interface",
 	      /* module_id = */ 0,
