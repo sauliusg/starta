@@ -10,7 +10,7 @@ use * from std;
 use P1; use P2;
 
 use * from P1;
-use const C3, K1 from P2;
+use * from P2;
 
 . const(C1);
 . const(P1::C2);
@@ -19,4 +19,4 @@ use const C3, K1 from P2;
 
 . const(P1::C3);
 . const(P2::K3);
-. const(C3);
+. const(P2::C3);

@@ -6401,6 +6401,31 @@ selective_use_statement
        }
    | _USE _CONST identifier_list _FROM module_import_identifier
        {
+           char *module_name = $5;
+           DNODE *module = 
+               vartab_lookup( compiler->compiled_packages, module_name );
+           DNODE *imported_identifiers = $3;
+           DNODE *identifier;
+           if( !module ) {
+               yyerrorf( "module '%s' is not found for type import "
+                         "-- consider 'use %s' first",
+                         module_name, module_name );
+           } else {
+               foreach_dnode( identifier, imported_identifiers ) {
+                   char *name = dnode_name( identifier );
+                   DNODE *identifier_dnode =
+                       dnode_consttab_lookup_const( module, name );
+                   if( identifier_dnode ) {
+                       vartab_insert( compiler->consts, name, 
+                                      share_dnode( identifier_dnode ),
+                                      px );
+                   } else {
+                       yyerrorf( "constant '%s' is not found in module '%s'",
+                                 name, module_name );
+                   }
+               }
+           }
+           delete_dnode( imported_identifiers );
        }
    | _USE function_or_procedure identifier_list _FROM module_import_identifier
        {
