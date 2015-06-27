@@ -6344,6 +6344,7 @@ selective_use_statement
                    }
                }
            }
+           delete_dnode( imported_identifiers );
        }
    | _USE _TYPE identifier_list _FROM module_import_identifier
        {}
