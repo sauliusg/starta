@@ -2,8 +2,8 @@
 // Check module (package) implementation.
 //
 
-// Check whether specific names can be imported from selected
-// packages:
+// Checking the simplies case of the APUSH opcode and the generic
+// 'push()' function:
 
 use * from std;
 
