@@ -5,10 +5,10 @@
 // Check whether specific names can be imported from selected
 // packages:
 
-use P1;
+use P1; use P2;
 
-use ff, fg from P1;
-use * from P2;
+use ff, uuvv from P1;
+use gg from P2;
 
 fg();
 ff();

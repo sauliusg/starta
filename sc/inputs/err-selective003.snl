@@ -7,8 +7,8 @@
 
 use P1;
 
-use ff, fg from P1;
-use * from P2;
+use ff, uuvv from P1;
+use gg from P2;
 
 fg();
 ff();

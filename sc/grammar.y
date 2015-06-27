@@ -6322,9 +6322,27 @@ use_statement
 selective_use_statement
    : _USE identifier_list _FROM module_import_identifier
        {
+           char *module_name = $4;
+           DNODE *module = 
+               vartab_lookup( compiler->compiled_packages, module_name );
            DNODE *imported_identifiers = $2;
            DNODE *identifier;
-           foreach_dnode( identifier, imported_identifiers ) {
+           if( !module ) {
+               yyerrorf( "module '%s' is not found -- consider 'use %s' first",
+                         module_name, module_name );
+           } else {
+               foreach_dnode( identifier, imported_identifiers ) {
+                   char *name = dnode_name( identifier );
+                   DNODE *identifier_dnode =
+                       dnode_vartab_lookup_var( module, name );
+                   if( identifier_dnode ) {
+                       vartab_insert( compiler->vartab, name, 
+                                      share_dnode( identifier_dnode ), px );
+                   } else {
+                       yyerrorf( "name '%s' is not found in module '%s'",
+                                 name, module_name );
+                   }
+               }
            }
        }
    | _USE _TYPE identifier_list _FROM module_import_identifier

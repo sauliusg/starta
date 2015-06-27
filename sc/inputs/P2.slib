@@ -1,0 +1,19 @@
+#
+# Test package (module) namespaces.
+#
+
+package P2;
+
+use * from std;
+
+function ff()
+{
+    . "Hi, I am ff() from P2!";
+}
+
+function gg()
+{
+    . "Hi, I am gg() from P2!";
+}
+
+end package P2;
