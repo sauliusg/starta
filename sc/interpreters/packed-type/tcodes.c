@@ -923,6 +923,53 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * APUSH Array push -- push a new element onto an array. Increase the
+ *       array length accordingly. Reallocate memory of necessary.
+ *
+ * bytecode:
+ * APUSH
+ *
+ * stack:
+ * array, value -> array_with_the_value
+ */
+
+int APUSH( INSTRUCTION_FN_ARGS )
+{
+    stackcell_t *value = &istate.ep[0];
+    alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
+    ssize_t nref, size, length, element_size;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        nref = array[-1].nref;
+        size = array[-1].size;
+        length = array[-1].length;
+        element_size = array[-1].element_size;
+        /* We only push values onto arrays, not to structures: */
+        if( nref >= 0 && length >= 0 && element_size > 0 ) {
+            if( (length + 1) * element_size > size ) {
+                /* need to reallocate the array: */
+                // ssize_t new_size;
+                // void *new_array = bcalloc( );
+            }
+            /* Array now has enough capacity to push a new element: */
+            if( nref == 0 ) {
+                /* FIXME: how to deal with empty ponter arrays? S.G. */
+                /* Array */
+                memcpy( (char*)array + length * element_size, value, element_size );
+                array[-1].length++;
+            }
+        }
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
  * CLONE (clone object on the top of the stack)
  *
  * bytecode:
