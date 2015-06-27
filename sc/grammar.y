@@ -6380,9 +6380,14 @@ selective_use_statement
            delete_dnode( imported_identifiers );
        }
    | _USE _VAR identifier_list _FROM module_import_identifier
-       {}
+       {
+       }
+   | _USE _CONST identifier_list _FROM module_import_identifier
+       {
+       }
    | _USE function_or_procedure identifier_list _FROM module_import_identifier
-       {}
+       {
+       }
    ;
 
 /* FIXME: 'identifier_list' should be merged with
