@@ -12,15 +12,15 @@ use type Atom from P2;
 use fg, ff from P1;
 use gg from P2;
 
-use * from std;
-
 var x : funny = new funny;
-var a = struct Atom { xyz : [0.5D, 0.5D, 0.1D] };
+var a = struct Atom { xyz : [0.5, 0.5, 0.1] };
 
 fg();
 P1::ff();
 gg();
 P2::ff();
+
+use * from std;
 
 x.here = 325;
 x.there = 10000234;

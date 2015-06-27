@@ -6363,8 +6363,14 @@ selective_use_statement
                    TNODE *identifier_tnode =
                        dnode_typetab_lookup_type( module, name );
                    if( identifier_tnode ) {
-                       typetab_insert( compiler->typetab, name, 
-                                       share_tnode( identifier_tnode ), px );
+                       if( typetab_lookup( compiler->typetab, name )) {
+                           yyerrorf( "type named '%s' is already defined -- "
+                                     "can not import", name );
+                       } else {
+                           typetab_insert( compiler->typetab, name, 
+                                           share_tnode( identifier_tnode ),
+                                           px );
+                       }
                    } else {
                        yyerrorf( "type '%s' is not found in module '%s'",
                                  name, module_name );

@@ -1,0 +1,5 @@
+./sl: inputs/err-selective008.snl(11,23): ERROR, type named 'funny' is already defined -- can not import
+use type funny from P2;
+                      ^
+./sl: 1 error(s) detected
+
