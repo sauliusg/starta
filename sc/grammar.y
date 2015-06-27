@@ -6429,6 +6429,13 @@ selective_use_statement
        }
    | _USE function_or_procedure identifier_list _FROM module_import_identifier
        {
+           char *module_name = $5;
+           DNODE *imported_identifiers = $3;
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, px );
+
+           delete_dnode( imported_identifiers );
        }
    ;
 
