@@ -7,4 +7,6 @@
 
 use P1; use P2;
 
-use const NNN from P1;
+use * from std;
+
+. P1::aBunny.here;
