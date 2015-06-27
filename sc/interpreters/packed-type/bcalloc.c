@@ -57,8 +57,7 @@ static struct {
 void *bcalloc( ssize_t element_size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
-    ssize_t size = (length < 0 ? 1 : length) * element_size +
-        (nref >= 0 ? 0 : abs(nref) * REF_SIZE);
+    ssize_t size = (length < 0 ? 1 : length) * element_size;
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {

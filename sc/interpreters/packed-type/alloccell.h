@@ -25,7 +25,9 @@ typedef struct alloccell_t {
     short flags;              /* Various flags for garbage collector, etc. */
     short element_size;       /* Contains size of elements in the
 			         allocated memory block, in bytes (NOT
-			         including sizeof(alloccell_t)). */
+			         including sizeof(alloccell_t)). If
+			         the allocated block is not an array,
+			         element_size MAY be -1. */
     ssize_t size;             /* Contains size the allocated memory
 			         block in bytes (NOT including
 			         sizeof(alloccell_t) ). If length > 0,

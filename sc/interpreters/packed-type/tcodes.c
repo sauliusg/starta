@@ -956,7 +956,8 @@ int CLONE( INSTRUCTION_FN_ARGS )
     BC_CHECK_PTR( ptr );
 
     memcpy( ptr, array,
-            nele >= 0 ? (ssize_t)element_size * (ssize_t)nele : element_size );
+            nele >= 0 ? (ssize_t)element_size * (ssize_t)nele :
+            element_size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
 
     if( nref < 0 ) {
         ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;
