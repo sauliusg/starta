@@ -5691,6 +5691,32 @@ static void compiler_set_pragma( COMPILER *c, char *pragma_name, ssize_t value )
     }
 }
 
+static void compiler_import_selected_names( COMPILER *c,
+                                            DNODE *imported_identifiers,
+                                            char *module_name,
+                                            cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_packages, module_name );
+    DNODE *identifier;
+    if( !module ) {
+        yyerrorf( "module '%s' is not found -- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        foreach_dnode( identifier, imported_identifiers ) {
+            char *name = dnode_name( identifier );
+            DNODE *identifier_dnode =
+                dnode_vartab_lookup_var( module, name );
+            if( identifier_dnode ) {
+                vartab_insert( c->vartab, name, 
+                               share_dnode( identifier_dnode ), ex );
+            } else {
+                yyerrorf( "name '%s' is not found in module '%s'",
+                          name, module_name );
+            }
+        }
+    }
+}
 
 static COMPILER * volatile compiler;
 
@@ -6323,27 +6349,11 @@ selective_use_statement
    : _USE identifier_list _FROM module_import_identifier
        {
            char *module_name = $4;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
            DNODE *imported_identifiers = $2;
-           DNODE *identifier;
-           if( !module ) {
-               yyerrorf( "module '%s' is not found -- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               foreach_dnode( identifier, imported_identifiers ) {
-                   char *name = dnode_name( identifier );
-                   DNODE *identifier_dnode =
-                       dnode_vartab_lookup_var( module, name );
-                   if( identifier_dnode ) {
-                       vartab_insert( compiler->vartab, name, 
-                                      share_dnode( identifier_dnode ), px );
-                   } else {
-                       yyerrorf( "name '%s' is not found in module '%s'",
-                                 name, module_name );
-                   }
-               }
-           }
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, px );
+
            delete_dnode( imported_identifiers );
        }
    | _USE _TYPE identifier_list _FROM module_import_identifier
@@ -6382,27 +6392,11 @@ selective_use_statement
    | _USE _VAR identifier_list _FROM module_import_identifier
        {
            char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
            DNODE *imported_identifiers = $3;
-           DNODE *identifier;
-           if( !module ) {
-               yyerrorf( "module '%s' is not found -- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               foreach_dnode( identifier, imported_identifiers ) {
-                   char *name = dnode_name( identifier );
-                   DNODE *identifier_dnode =
-                       dnode_vartab_lookup_var( module, name );
-                   if( identifier_dnode ) {
-                       vartab_insert( compiler->vartab, name, 
-                                      share_dnode( identifier_dnode ), px );
-                   } else {
-                       yyerrorf( "name '%s' is not found in module '%s'",
-                                 name, module_name );
-                   }
-               }
-           }
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, px );
+
            delete_dnode( imported_identifiers );
        }
    | _USE _CONST identifier_list _FROM module_import_identifier
