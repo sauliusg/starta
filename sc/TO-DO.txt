@@ -1,4 +1,5 @@
--- Implement push and pop to the arrays (can be done by traversing the allocated reference tree like in GC).
+++ Implement push and pop to the arrays (can be done by traversing the allocated reference tree like in GC).
+-- Implement 'ref T' and 'num T' generic types.
 -- !!! 'new S' does not call a constructor or produce error message.
 xx !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
 -+ Implement check of measurement units at the compile time.
