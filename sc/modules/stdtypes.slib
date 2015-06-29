@@ -1112,6 +1112,41 @@ inline bytecode function llast( m : ref ) : long
     LLENGTH LLDC 1 LSUB
 }
 
+inline bytecode function nref( m : ref ) : int
+{
+    NREF
+}
+
+inline bytecode function lnref( m : ref ) : long
+{
+    LNREF
+}
+
+inline bytecode function capacity( m : array ) : int
+{
+    CAPACITY
+}
+
+inline bytecode function lcapacity( m : array ) : long
+{
+    LCAPACITY
+}
+
+#
+# Pushing an poping to the arrays:
+#
+
+inline bytecode procedure push( a : array of type T; value : type T )
+    -> array of type T
+{
+    APUSH
+}
+
+inline bytecode function trim( a : array of type T ): array of type T
+{
+    TRIM
+}
+
 #
 # String comparison functions
 #
