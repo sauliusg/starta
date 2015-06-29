@@ -938,35 +938,38 @@ int APUSH( INSTRUCTION_FN_ARGS )
     stackcell_t *value = &istate.ep[0];
     alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
     ssize_t nref, size, length, element_size;
+    alloccell_flag_t flags;
 
     TRACE_FUNCTION();
 
     if( array ) {
+        flags = array[-1].flags;
         nref = array[-1].nref;
         size = array[-1].size;
         length = array[-1].length;
         element_size = array[-1].element_size;
         /* We only push values onto arrays, not to structures: */
-        if( nref >= 0 && length >= 0 && element_size > 0 ) {
+        if( length >= 0 && element_size > 0 ) {
             if( (length + 1) * element_size > size ) {
                 /* need to reallocate the array: */
                 ssize_t new_size = element_size * (length + 1) * 2;
-                void *new_array = bcalloc( new_size, element_size, length,
-                                           nref > 0 ? nref : 0 );
+                void *new_array = bcalloc( new_size, element_size, length, nref );
                 BC_CHECK_PTR( new_array );
                 memcpy( new_array, array, length * element_size );
                 array = new_array;
                 STACKCELL_SET_ADDR( istate.ep[1], new_array );
             }
             /* Array now has enough capacity to push a new element: */
-            if( nref == 0 ) {
-                /* FIXME: how to deal with empty ponter arrays? S.G. */
-                memcpy( (char*)array + length * element_size, value, element_size );
-            } else {
+            if( flags & AF_HAS_REFS ) {
                 *((void**)array + length) = STACKCELL_PTR( *value );
+            } else {
+                memcpy( (char*)array + length * element_size, value, element_size );
             }
             array[-1].length++;
-            if( nref > 0 ) array[-1].nref ++;
+            if( flags & AF_HAS_REFS ) {
+                array[-1].nref ++;
+                array[-1].flags |= AF_HAS_REFS;
+            }
         }
     }
 

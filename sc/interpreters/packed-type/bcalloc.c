@@ -125,6 +125,9 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
     assert( nref == 1 || nref == 0 );
     ptr = bcalloc( element_size * length, element_size,
                    length, nref * length );
+    if( ptr && nref != 0 ) {
+        ptr[-1].flags |= AF_HAS_REFS;
+    }
     return ptr;
 }
 
