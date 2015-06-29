@@ -430,6 +430,22 @@ int @PREFIX1@LENGTH( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+int @PREFIX1@NREF( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *block = istate.ep[0].PTR;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    if( block ) {
+	istate.ep[0].I = block[-1].nref;
+    } else {
+	istate.ep[0].I = 0;
+    }
+
+    return 1;
+}
+
 /*
  * FILESCAN (read (scanf) integer value from the top of stack to a file)
  * 
