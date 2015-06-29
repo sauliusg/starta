@@ -4,7 +4,7 @@
 
 use * from std;
 
-function map( p: function (x:type T)->(type T); m: array of type T ): array of type T
+procedure map( p: function (x:type T)->(type T); m: array of type T ): array of type T
 {
     foreach var e in m do
         e = p(e);
