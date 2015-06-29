@@ -4,7 +4,7 @@ t.nref =	 -1
 t.size =	 20
 
 field offsets:
-t.s.offset =	 -72
+t.s.offset =	 -80
 t.x.offset =	 0
 
 for type 'T':
