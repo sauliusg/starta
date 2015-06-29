@@ -20,7 +20,9 @@ typedef enum {
     EF_GUARDING_ARG  = 0x02,
     EF_HAS_ERRORS    = 0x04,
     EF_VARADDR_EXPR  = 0x08,
-    EF_IS_READONLY   = 0x10
+    EF_IS_READONLY   = 0x10,
+    EF_IS_CONSTANT   = 0x20,
+    EF_IS_ZERO       = 0x40
 } enode_flag_t;
 
 void delete_enode( ENODE* node );

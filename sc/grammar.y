@@ -3560,9 +3560,9 @@ static void compiler_compile_enumeration_constant( COMPILER *cc,
 }
 
 static void compiler_compile_typed_constant( COMPILER *cc,
-					  TNODE *const_type,
-					  char *value,
-					  cexception_t *ex )
+                                             TNODE *const_type,
+                                             char *value,
+                                             cexception_t *ex )
 {
     if( const_type ) {
 	ssize_t string_offset;
@@ -3576,7 +3576,7 @@ static void compiler_compile_typed_constant( COMPILER *cc,
 		if( val_end ) *val_end = '\0';
 		cexception_guard( inner ) {
 		    compiler_compile_enum_const_from_tnode( cc, enum_value_name,
-							 const_type, &inner );
+                                                            const_type, &inner );
 		}
 		cexception_catch {
 		    freex( enum_value_name );
@@ -3598,17 +3598,23 @@ static void compiler_compile_typed_constant( COMPILER *cc,
 	    share_tnode( const_type );
 	    tnode_report_missing_operator( const_type, "ldc", 0 );
 	}
+        ENODE *expr = cc->e_stack;
+        assert( expr );
+        enode_set_flags( expr, EF_IS_CONSTANT );
+        if( strcmp( value, "0" ) == 0 ) {
+            enode_set_flags( expr, EF_IS_ZERO );
+        }
 	string_offset = compiler_assemble_static_string( cc, value, ex );
 	compiler_emit( cc, ex, "e\n", &string_offset );
     }
 }
 
 static void compiler_compile_constant( COMPILER *cc,
-				    type_suffix_t suffix_type,
-				    char *module_name,
-				    char *suffix, char *constant_kind_name,
-				    char *value,
-				    cexception_t *ex )
+                                       type_suffix_t suffix_type,
+                                       char *module_name,
+                                       char *suffix, char *constant_kind_name,
+                                       char *value,
+                                       cexception_t *ex )
 {
     TNODE *const_type =
 	compiler_lookup_suffix_tnode( cc, suffix_type, module_name,
@@ -3618,9 +3624,9 @@ static void compiler_compile_constant( COMPILER *cc,
 }
 
 static DNODE* compiler_lookup_constant( COMPILER *cc,
-				     char *module_name,
-				     char *identifier,
-				     char *message )
+                                        char *module_name,
+                                        char *identifier,
+                                        char *message )
 {
     DNODE *module;
     DNODE *constnode;
@@ -5637,9 +5643,12 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     }
 }
 
-static void compiler_check_array_component_is_not_null( TNODE *tnode )
+static void compiler_check_array_component_is_not_null( TNODE *tnode,
+                                                        ENODE *array_length_expr )
 {
-    if( tnode_is_non_null_reference( tnode )) {
+    if( tnode_is_non_null_reference( tnode ) &&
+        ( array_length_expr == NULL || 
+          !enode_has_flags( array_length_expr, EF_IS_ZERO ) )) {
         char *type_name = tnode_name( tnode );
         if( type_name ) {
             yyerrorf( "type '%s' is a non-null reference -- "
@@ -10250,27 +10259,27 @@ generator_new
 
   | _NEW compact_type_description '[' expression ']'
       {
-          compiler_check_array_component_is_not_null( $2 );
+          compiler_check_array_component_is_not_null( $2, compiler->e_stack );
           compiler_compile_array_alloc( compiler, $2, px );
       }
   | _NEW compact_type_description md_array_allocator '[' expression ']'
       {
-          compiler_check_array_component_is_not_null( $2 );
+          compiler_check_array_component_is_not_null( $2, compiler->e_stack  );
           compiler_compile_mdalloc( compiler, $2, $3, px );
       }
   | _NEW _ARRAY '[' expression ']' _OF var_type_description
       {
-          compiler_check_array_component_is_not_null( $7 );
+          compiler_check_array_component_is_not_null( $7, compiler->e_stack  );
           compiler_compile_array_alloc( compiler, $7, px );
       }
   | _NEW _ARRAY md_array_allocator '[' expression ']' _OF var_type_description
       {
-          compiler_check_array_component_is_not_null( $8 );
+          compiler_check_array_component_is_not_null( $8, compiler->e_stack  );
           compiler_compile_mdalloc( compiler, $8, $3, px );
       }
   | _NEW compact_type_description '[' expression ']' _OF var_type_description
       {
-          compiler_check_array_component_is_not_null( $7 );
+          compiler_check_array_component_is_not_null( $7, compiler->e_stack  );
           compiler_compile_composite_alloc( compiler, $2, $7, px );
       }
   | _NEW _BLOB '(' expression ')'
@@ -10513,47 +10522,47 @@ constant
   : __INTEGER_CONST
       {
        compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-			       NULL, NULL, "integer", $1, px );
+                                  NULL, NULL, "integer", $1, px );
       }
   | __INTEGER_CONST __IDENTIFIER
       {
        compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-			       NULL, $2, "integer", $1, px );
+                                  NULL, $2, "integer", $1, px );
       }
   | __INTEGER_CONST module_list __COLON_COLON __IDENTIFIER
       {
        compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-			       $2, $4, "integer", $1, px );
+                                  $2, $4, "integer", $1, px );
       }
   | __REAL_CONST
       {
        compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
-			       NULL, NULL, "real", $1, px );
+                                  NULL, NULL, "real", $1, px );
       }
   | __REAL_CONST __IDENTIFIER
       {
        compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
-			       NULL, $2, "real", $1, px );
+                                  NULL, $2, "real", $1, px );
       }
   | __REAL_CONST module_list __COLON_COLON __IDENTIFIER
       {
        compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
-			       $2, $4, "real", $1, px );
+                                  $2, $4, "real", $1, px );
       }
   | __STRING_CONST
       {
        compiler_compile_constant( compiler, TS_STRING_SUFFIX,
-			       NULL, NULL, "string", $1, px );
+                                  NULL, NULL, "string", $1, px );
       }
   | __STRING_CONST __IDENTIFIER
       {
        compiler_compile_constant( compiler, TS_STRING_SUFFIX,
-			       NULL, $2, "string", $1, px );
+                                  NULL, $2, "string", $1, px );
       }
   | __STRING_CONST module_list __COLON_COLON __IDENTIFIER
       {
        compiler_compile_constant( compiler, TS_STRING_SUFFIX,
-			       $2, $4, "string", $1, px );
+                                  $2, $4, "string", $1, px );
       }
   | __IDENTIFIER  __IDENTIFIER
       {
@@ -10568,7 +10577,7 @@ constant
   | _CONST __IDENTIFIER
       {
 	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $2,
-						    "constant" );
+                                                       "constant" );
 	if( const_dnode ) {
 	    char pad[80];
 
