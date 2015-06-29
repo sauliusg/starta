@@ -11,6 +11,7 @@ inline bytecode procedure push( a : array of type T; value : T )
 }
 
 inline bytecode function nref( a : array ): int { NREF }
+inline bytecode function capacity( a : array ): int { CAPACITY }
 
 function print_array( array of type T a; function ( T element ) print )
 {
@@ -19,24 +20,15 @@ function print_array( array of type T a; function ( T element ) print )
     enddo
 }
 
-var m : string[];
+var m = new int[0];
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
 
-. "========================================";
-
-m = push( m, "delta" );
-
-. "length(m) ==", length(m);
-. "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
-
-. "========================================";
-
-m = push( m, "epsilon" );
-
-. "length(m) ==", length(m);
-. "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+var n = 0;
+while true {
+    m = push( m, n );
+    var l = length(m);
+    if l < 100 or l % 1000000 == 0 { . l, capacity(m) }
+    n ++;
+}
