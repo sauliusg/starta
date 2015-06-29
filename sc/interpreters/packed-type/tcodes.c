@@ -952,7 +952,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
                 /* need to reallocate the array: */
                 ssize_t new_size = element_size * (length + 1) * 2;
                 void *new_array = bcalloc( new_size, element_size, length,
-                                           nref > 0 ? nref + 1 : 0 );
+                                           nref > 0 ? nref : 0 );
                 BC_CHECK_PTR( new_array );
                 memcpy( new_array, array, length * element_size );
                 array = new_array;
@@ -966,6 +966,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
                 *((void**)array + length) = STACKCELL_PTR( *value );
             }
             array[-1].length++;
+            if( nref > 0 ) array[-1].nref ++;
         }
     }
 
