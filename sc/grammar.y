@@ -4854,11 +4854,13 @@ static void compiler_compile_array_expression( COMPILER* cc,
 
 	for( i = 1; i < nexpr; i++ ) {
 	    ENODE *curr = enode_list_pop( &cc->e_stack );
-	    TNODE *curr_type = enode_type( curr );
-	    if( !tnode_types_are_identical( top_type, curr_type, NULL, ex )) {
-		yyerrorf( "incompatible types of array components" );
-	    }
-	    delete_enode( curr );
+	    TNODE *curr_type = curr ? enode_type( curr ) : NULL;
+            if( curr ) {
+                if( !tnode_types_are_identical( top_type, curr_type, NULL, ex )) {
+                    yyerrorf( "incompatible types of array components" );
+                }
+                delete_enode( curr );
+            }
 	}
 	if( tnode_is_reference( top_type )) {
 	    compiler_emit( cc, ex, "\tce\n", PMKARRAY, &nexpr );
