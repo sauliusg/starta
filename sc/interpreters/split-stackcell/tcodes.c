@@ -901,6 +901,193 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * APUSH -- Array push -- push a new element onto an array. Increase the
+ *          array length accordingly. Reallocate memory if necessary.
+ *
+ * bytecode:
+ * APUSH
+ *
+ * stack:
+ * array, value -> array_with_the_value
+ */
+
+int APUSH( INSTRUCTION_FN_ARGS )
+{
+    stackcell_t *value = &istate.ep[0];
+    alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
+    ssize_t nref, size, length, element_size;
+    alloccell_flag_t flags;
+
+    TRACE_FUNCTION();
+
+    if( !array ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "can not push value onto a null array",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
+	      EXCEPTION );
+    } else {
+        flags = array[-1].flags;
+        nref = array[-1].nref;
+        size = array[-1].size;
+        length = array[-1].length;
+        element_size = alloccell_has_references( array[-1] ) ?
+            REF_SIZE : sizeof(stackunion_t);
+        /* We only push values onto arrays, not to structures: */
+        if( length >= 0 && element_size > 0 ) {
+            if( (length + 1) * element_size > size ) {
+                /* need to reallocate the array: */
+                ssize_t new_size = element_size * (length + 1) * 2;
+                void *new_array = bcalloc( new_size, length, nref );
+                BC_CHECK_PTR( new_array );
+                memcpy( new_array, array, length * element_size );
+                array = new_array;
+                STACKCELL_SET_ADDR( istate.ep[1], new_array );
+            }
+            /* Array now has enough capacity to push a new element: */
+            if( flags & AF_HAS_REFS ) {
+                *((void**)array + length) = STACKCELL_PTR( *value );
+            } else {
+                memcpy( (char*)array + length * element_size, &(value->num), element_size );
+            }
+            array[-1].length++;
+            if( flags & AF_HAS_REFS ) {
+                array[-1].nref ++;
+                array[-1].flags |= AF_HAS_REFS;
+            }
+        }
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * APOP -- Array pop -- pop the past element from the array. Throw
+ *         exception if the arrayis empty or null.
+ *
+ * bytecode:
+ * POP
+ *
+ * stack:
+ * array -> value
+ */
+
+int APOP( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
+    ssize_t length, element_size;
+    alloccell_flag_t flags;
+
+    TRACE_FUNCTION();
+
+    if( !array ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "can not pop values from a null array",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
+	      EXCEPTION );
+    } else {
+        flags = array[-1].flags;
+        length = array[-1].length;
+        element_size = alloccell_has_references( array[-1] ) ?
+            REF_SIZE : sizeof(stackunion_t);
+        /* We only pop values onto arrays, not to structures: */
+        if( length >= 0 && element_size > 0 ) {
+            if( length == 0 ) {
+                interpret_raise_exception_with_bcalloc_message
+                    ( /* err_code = */ -1,
+                      /* message = */
+                      "can not pop values from an empty array",
+                      /* module_id = */ 0,
+                      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
+                      EXCEPTION );
+            }
+            if( flags & AF_HAS_REFS ) {
+                STACKCELL_SET_ADDR( istate.ep[0],
+                                    *((void**)array + length - 1) );
+            } else {
+                STACKCELL_ZERO_PTR( istate.ep[0] );
+                memcpy( &(istate.ep[0].num),
+                        (char*)array + (length-1) * element_size, element_size );
+            }
+            array[-1].length--;
+            if( flags & AF_HAS_REFS ) {
+                assert( array[-1].nref > 0 );
+                array[-1].nref --;
+                array[-1].flags |= AF_HAS_REFS;
+            }
+            
+        }
+    }
+
+    return 1;
+}
+
+/*
+ * TRIM -- reallocate array so that only the minimal number of
+ *         elements is allcoated afterwards.
+ *
+ * bytecode:
+ * TRIM
+ *
+ * stack:
+ * array -> array
+ */
+
+int TRIM( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
+    ssize_t size, length, element_size, capacity;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        size = array[-1].size;
+        length = array[-1].length;
+        element_size = alloccell_has_references( array[-1] ) ?
+            REF_SIZE : sizeof(stackunion_t);
+        capacity = size/element_size;
+        /* We only trim arrays, not to structures: */
+        if( length >= 0 && element_size > 0 ) {
+            if( length < capacity ) {
+#if 0
+                /* The following code can only be used if we have a
+                   guarantee that realloc() with a new size smaller
+                   that is allcoated never moves the memory block (S.G.): */
+                ssize_t new_size = element_size * length;
+                alloccell_t *old_hdr, *hdr;
+                old_hdr = &array[-1];
+                assert( new_size < size );
+                /* The following code breaks the SPOT (Single Point of
+                   Truth) in bcalloc(), since we assume how the size
+                   is calculated in the bcalloc() function (S.G.): */
+                hdr = realloc( old_hdr, new_size + sizeof(alloccell_t) );
+                assert( old_hdr == hdr );
+                hdr->size = new_size;
+#else
+                /* need to reallocate the array: */
+                ssize_t nref = array[-1].nref;
+                ssize_t new_size = element_size * length;
+                void *new_array = bcalloc( new_size, length, nref );
+                BC_CHECK_PTR( new_array );
+                memcpy( new_array, array, new_size );
+                STACKCELL_SET_ADDR( istate.ep[0], new_array );
+#endif
+            }
+        }
+    }
+
+    return 1;
+}
+
+/*
  * CLONE (clone object on the top of the stack)
  *
  * bytecode:
@@ -5243,14 +5430,14 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
     ssize_t element_offset = istate.ep[0].num.offs;
     ssize_t jmp_offset = istate.code[istate.ip+1].ssizeval;
     ssize_t length = array_ref ? array_ref[-1].length : 0;
-    ssize_t array_size = array_ref ? array_ref[-1].size : 0;
     ssize_t nref = array_ref ? array_ref[-1].nref : 0;
     ssize_t element_size = nref == 0 ? sizeof(stackunion_t) : REF_SIZE;
     int nref_sign = nref < 0 ? -1 : 1;
+    ssize_t array_size = length * element_size;
 
     TRACE_FUNCTION();
 
-    assert( element_size * length == array_size );
+    assert( element_size * length <= array_size );
 
     /* Reset the element offset on the very first iteration: */
     if( element_offset < 0 &&

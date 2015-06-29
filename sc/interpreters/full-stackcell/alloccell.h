@@ -49,4 +49,6 @@ typedef struct alloccell_t {
 void alloccell_set_values( alloccell_t *hdr, ssize_t element_size,
                            ssize_t len );
 
+#define alloccell_has_references(ac)  (((ac).flags & AF_HAS_REFS) != 0)
+
 #endif

@@ -406,6 +406,17 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 
 #include <alloccell.h>
 
+/*
+ * LENGTH -- return the length of an array.
+ *
+ * bytecode:
+ * LENGTH
+ * 
+ * stack:
+ * ..., array --> array_length
+ * 
+ */
+
 int @PREFIX1@LENGTH( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *block = istate.ep[0].PTR;
@@ -415,6 +426,72 @@ int @PREFIX1@LENGTH( INSTRUCTION_FN_ARGS )
     STACKCELL_ZERO_PTR( istate.ep[0] );
     if( block ) {
 	istate.ep[0].I = block[-1].length;
+    } else {
+	istate.ep[0].I = 0;
+    }
+
+    return 1;
+}
+
+/*
+ * NREF -- return the reference count of an array.
+ *
+ * bytecode:
+ * NREF
+ * 
+ * stack:
+ * ..., array --> array_length
+ * 
+ */
+
+int @PREFIX1@NREF( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *block = istate.ep[0].PTR;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    if( block ) {
+	istate.ep[0].I = block[-1].nref;
+    } else {
+	istate.ep[0].I = 0;
+    }
+
+    return 1;
+}
+
+/*
+ * CAPACITY -- return the allocated memory capacity of an
+ *             array. Capacity is equal to the number of elements that
+ *             can be stored in this allocated array; the actual
+ *             number of stored elements may be smaller than this:
+ *             length <= capacity.
+ *
+ * bytecode:
+ * CAPACITY
+ * 
+ * stack:
+ * ..., array --> array_capacity
+ * 
+ */
+
+int @PREFIX1@CAPACITY( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *block = istate.ep[0].PTR;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    if( block ) {
+        ssize_t size, element_size;
+        size = block[-1].size;
+        element_size = alloccell_has_references( block[-1] ) ?
+            REF_SIZE : sizeof(stackunion_t);
+        if( element_size > 0 ) {
+            istate.ep[0].I = size/element_size;
+        } else {
+            istate.ep[0].I = -1;
+        }
     } else {
 	istate.ep[0].I = 0;
     }

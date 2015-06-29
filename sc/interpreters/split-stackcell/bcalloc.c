@@ -138,7 +138,11 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
     assert( nref == 1 || nref == 0 );
     if( nref > 0 ) {
-        return bcalloc( REF_SIZE * length, length, length );
+        alloccell_t *ptr = bcalloc( REF_SIZE * length, length, length );
+        if( ptr && nref != 0 ) {
+            ptr[-1].flags |= AF_HAS_REFS;
+        }
+        return ptr;
     } else {
         return bcalloc( sizeof(stackunion_t) * length, length, 0 );
     }
