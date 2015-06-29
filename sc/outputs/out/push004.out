@@ -1,0 +1,20 @@
+length(m) == 3
+nref(m)   == 3
+alpha
+beta
+gamma
+========================================
+length(m) == 4
+nref(m)   == 4
+alpha
+beta
+gamma
+delta
+========================================
+length(m) == 5
+nref(m)   == 5
+alpha
+beta
+gamma
+delta
+epsilon
