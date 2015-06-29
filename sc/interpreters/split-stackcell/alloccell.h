@@ -15,6 +15,8 @@
 typedef enum {
     AF_NONE = 0x00,
     AF_USED = 0x01,
+    AF_READONLY = 0x02,
+    AF_HAS_REFS = 0x04,
     AF_last
 } alloccell_flag_t;
 
@@ -46,5 +48,7 @@ typedef struct alloccell_t {
 
 void alloccell_set_values( alloccell_t *hdr, ssize_t element_size,
                            ssize_t len );
+
+#define alloccell_has_references(ac)  (((ac).flags & AF_HAS_REFS) != 0)
 
 #endif
