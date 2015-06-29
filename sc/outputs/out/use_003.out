@@ -1,0 +1,38 @@
+./sl: inputs/use_003.snl(16,33): ERROR, type with empty suffix is not defined in this scope for types of kind 'real'
+
+var a = struct Atom { xyz : [0.5, 0.5, 0.1] };
+                                ^
+./sl: inputs/use_003.snl(16,38): ERROR, type with empty suffix is not defined in this scope for types of kind 'real'
+
+var a = struct Atom { xyz : [0.5, 0.5, 0.1] };
+                                     ^
+./sl: inputs/use_003.snl(16,43): ERROR, type with empty suffix is not defined in this scope for types of kind 'real'
+
+var a = struct Atom { xyz : [0.5, 0.5, 0.1] };
+                                          ^
+./sl: inputs/use_003.snl(16,43): ERROR, incompatible types of array components
+var a = struct Atom { xyz : [0.5, 0.5, 0.1] };
+                                          ^
+./sl: inputs/use_003.snl(16,45): ERROR, not enough values on the stack for assignment
+var a = struct Atom { xyz : [0.5, 0.5, 0.1] };
+                                            ^
+./sl: inputs/use_003.snl(29,5): ERROR, this type has no field named 'xyz'
+. a.xyz[0], a.xyz[1], a.xyz[2];
+    ^
+./sl: inputs/use_003.snl(29,11): ERROR, this type has no unary operator named '.'
+. a.xyz[0], a.xyz[1], a.xyz[2];
+          ^
+./sl: inputs/use_003.snl(29,15): ERROR, this type has no field named 'xyz'
+. a.xyz[0], a.xyz[1], a.xyz[2];
+              ^
+./sl: inputs/use_003.snl(29,21): ERROR, this type has no unary operator named '.'
+. a.xyz[0], a.xyz[1], a.xyz[2];
+                    ^
+./sl: inputs/use_003.snl(29,25): ERROR, this type has no field named 'xyz'
+. a.xyz[0], a.xyz[1], a.xyz[2];
+                        ^
+./sl: inputs/use_003.snl(29,31): ERROR, this type has no unary operator named '.'
+. a.xyz[0], a.xyz[1], a.xyz[2];
+                              ^
+./sl: 11 error(s) detected
+
