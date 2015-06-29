@@ -1030,7 +1030,8 @@ int APOP( INSTRUCTION_FN_ARGS )
                       EXCEPTION );
             }
             if( flags & AF_HAS_REFS ) {
-                STACKCELL_SET_ADDR( istate.ep[0], *((void**)array + length) );
+                STACKCELL_SET_ADDR( istate.ep[0],
+                                    *((void**)array + length - 1) );
             } else {
                 STACKCELL_ZERO_PTR( istate.ep[0] );
                 memcpy( &(istate.ep[0].num),
