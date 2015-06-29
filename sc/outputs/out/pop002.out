@@ -1,0 +1,22 @@
+length(m) == 0
+length(n) == 0
+========================================
+length(m) == 3
+[ 0 ]: eins
+[ 1 ]: zwei
+[ 2 ]: drei
+length(n) == 4
+[ 0 ]: first 123
+[ 1 ]: second 200
+[ 2 ]: third 300
+[ 3 ]: fourth 400
+========================================
+popped value = drei
+popped value = zwei
+length(m) == 1
+[ 0 ]: eins
+popped value = fourth
+popped value = third
+length(n) == 2
+[ 0 ]: 123   first
+[ 1 ]: 200   second
