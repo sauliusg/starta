@@ -4,8 +4,12 @@
 
 use * from std;
 
-var m = new ldouble[10];
+var m = new double[10];
 
-m[0] = -234.5;
+var x : float = -234.5;
+
+. x;
+
+m[0] = x;
 
 . m[0];

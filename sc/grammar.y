@@ -1952,11 +1952,11 @@ static void compiler_compile_unop( COMPILER *cc,
 }
 
 static void compiler_emit_st( COMPILER *cc,
-			   TNODE *expr_type,
-			   char *var_name,
-			   ssize_t var_offset,
-			   int var_scope,
-			   cexception_t *ex )
+                              TNODE *expr_type,
+                              char *var_name,
+                              ssize_t var_offset,
+                              int var_scope,
+                              cexception_t *ex )
 {
     operator_description_t od;
 
@@ -2231,11 +2231,12 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 			tnode_lookup_conversion( element_type, expr_type )) {
 			compiler_compile_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
+                        expr_type = enode_type( expr );
 		    } else {
 			yyerrorf( "incompatible types for assignment" );
 		    }
 		}
-	    }
+            }
 
 	    if( !enode_is_readonly_compatible_with_expr( expr, lval )) {
 		if( enode_has_flags( lval, EF_IS_READONLY )) {
@@ -2252,7 +2253,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		yyerrorf( "lvalue is needed for assignment" );
 	    } else {
 		compiler_check_operator_args( cc, &od, NULL /*generic_types*/,
-                                           &inner );
+                                              &inner );
 	    }
 
 	    top1 = enode_list_pop( &cc->e_stack );
