@@ -923,8 +923,8 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * APUSH Array push -- push a new element onto an array. Increase the
- *       array length accordingly. Reallocate memory of necessary.
+ * APUSH -- Array push -- push a new element onto an array. Increase the
+ *          array length accordingly. Reallocate memory of necessary.
  *
  * bytecode:
  * APUSH
@@ -983,6 +983,62 @@ int APUSH( INSTRUCTION_FN_ARGS )
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * TRIM -- reallocate array so that only the minimal number of
+ *         elements is allcoated afterwards.
+ *
+ * bytecode:
+ * TRIM
+ *
+ * stack:
+ * array -> array
+ */
+
+int TRIM( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
+    ssize_t size, length, element_size, capacity;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        size = array[-1].size;
+        length = array[-1].length;
+        element_size = array[-1].element_size;
+        capacity = size/element_size;
+        /* We only trim arrays, not to structures: */
+        if( length >= 0 && element_size > 0 ) {
+            if( length < capacity ) {
+#if 0
+                /* The following code can only be used if we have a
+                   guarantee that realloc() with a new size smaller
+                   that is allcoated never moves the memory block (S.G.): */
+                ssize_t new_size = element_size * length;
+                alloccell_t *old_hdr, *hdr;
+                old_hdr = &array[-1];
+                assert( new_size < size );
+                /* The following code breaks the SPOT (Single Point of
+                   Truth) in bcalloc(), since we assume how the size
+                   is calculated in the bcalloc() function (S.G.): */
+                hdr = realloc( old_hdr, new_size + sizeof(alloccell_t) );
+                assert( old_hdr == hdr );
+                hdr->size = new_size;
+#else
+                /* need to reallocate the array: */
+                ssize_t nref = array[-1].nref;
+                ssize_t new_size = element_size * length;
+                void *new_array = bcalloc( new_size, element_size, length, nref );
+                BC_CHECK_PTR( new_array );
+                memcpy( new_array, array, new_size );
+                STACKCELL_SET_ADDR( istate.ep[0], new_array );
+#endif
+            }
+        }
+    }
 
     return 1;
 }
