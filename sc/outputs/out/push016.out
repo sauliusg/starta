@@ -1,0 +1,4 @@
+./sl: Unhandled exception -1 in the bytecode interpreter: can not push value onto a null array
+length(m) == 0
+nref(m)   == 0
+========================================
