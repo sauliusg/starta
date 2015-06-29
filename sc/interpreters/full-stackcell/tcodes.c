@@ -982,6 +982,8 @@ int CLONE( INSTRUCTION_FN_ARGS )
 
     ptr = bcalloc( size, nele, nref );
 
+    ptr[-1].vmt_offset = array[-1].vmt_offset;
+
     BC_CHECK_PTR( ptr );
 
     memcpy( ptr, array, size );
