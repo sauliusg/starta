@@ -7,7 +7,7 @@
 
 use * from std;
 
-null struct S { int i; string s };
+struct S { int i; string s };
 
 var s = new S[0];
 
