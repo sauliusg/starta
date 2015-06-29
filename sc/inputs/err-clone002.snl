@@ -33,7 +33,7 @@ class Atom implements IChemAtom {
 
 var m, n = new Atom( "H" ) * new [200], [ 10.0D, 20.0D, 30.0D ];
 
-foreach var atom in n do { atom = atom[] }
+foreach var atom in n { atom = atom[] }
 
 m[0].chemtype = "Se";
 

@@ -4111,14 +4111,16 @@ static void compiler_compile_subarray( COMPILER *cc,
 }
 
 static void compiler_compile_indexing( COMPILER *cc,
-				    int array_is_reference,
-				    int expr_count,
-				    cexception_t *ex )
+                                       int array_is_reference,
+                                       int expr_count,
+                                       cexception_t *ex )
 {
     if( expr_count == 1 ) {
 	compiler_compile_address_of_indexed_element( cc, ex );
     } else if( expr_count == 0 ) {
-	assert( array_is_reference );
+	if( !array_is_reference ) {
+            yyerrorf( "only references sould be cloned with '[]' operator" );
+        }
         compiler_emit( cc, ex, "\tc\n", CLONE );
     } else if( expr_count == -1 ) {
 	assert( 0 );
