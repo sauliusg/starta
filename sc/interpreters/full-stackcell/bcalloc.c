@@ -128,8 +128,14 @@ void *bcalloc_stackcells( ssize_t length, ssize_t nref )
 
 void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 {
+    alloccell_t *ptr;
     assert( nref == 1 || nref == 0 );
-    return bcalloc( sizeof(stackcell_t) * length, length, nref * length );
+    ptr = bcalloc( sizeof(stackcell_t) * length, length, nref * length );
+    if( ptr && nref != 0 ) {
+        ptr[-1].flags |= AF_HAS_REFS;
+    }
+
+    return ptr;
 }
 
 void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,

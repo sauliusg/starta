@@ -15,6 +15,8 @@
 typedef enum {
     AF_NONE = 0x00,
     AF_USED = 0x01,
+    AF_READONLY = 0x02,
+    AF_HAS_REFS = 0x04,
     AF_last
 } alloccell_flag_t;
 
