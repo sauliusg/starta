@@ -1,0 +1,11 @@
+./sl: inputs/err-readonly007.snl(11,7): ERROR, can not assign to the readonly variable 'x'
+x = 10;
+      ^
+./sl: inputs/err-readonly007.snl(17,7): ERROR, may not increment readonly variable 'e'
+    e ++;
+      ^
+./sl: inputs/err-readonly007.snl(18,10): ERROR, can not assign to the readonly variable 'e'
+    e = 0;
+         ^
+./sl: 3 error(s) detected
+

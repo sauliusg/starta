@@ -6,8 +6,9 @@
 
 use * from std;
 
-var m : double;
-
-m = -234.5;
-
-. m;
+function gn( int x; array of int m ) : float
+{
+    m = new int[10];
+    x = x + 1;
+    return 0.0
+}

@@ -2020,6 +2020,7 @@ static void compiler_compile_variable_assignment_or_init(
 
         /* TYPETAB *generic_types = new_typetab( ex ); */
         TYPETAB *generic_types = NULL;
+        int has_errors = 0;
         if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
                                                     generic_types, ex )) {
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
@@ -2028,8 +2029,6 @@ static void compiler_compile_variable_assignment_or_init(
 		compiler_compile_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
-		compiler_emit_st( cc, expr_type, var_name, var_offset,
-                                  var_scope, ex );
 	    } else {
 		if( var_name ) {
 		    yyerrorf( "incompatible types for assignment to variable "
@@ -2037,29 +2036,33 @@ static void compiler_compile_variable_assignment_or_init(
 		} else {
 		    yyerrorf( "incompatible types for assignment to variable" );
 		}
+                has_errors = 1;
 	    }
-	} else if( !(*enode_is_readonly_compatible)( expr, variable )) {
-	    char *name = variable ? dnode_name( variable ) : NULL;
-	    if( dnode_has_flags( variable, DF_IS_READONLY )) {
-		if( name ) {
-		    yyerrorf( "can not assign to the readonly variable '%s'",
-			      name );
-		} else {
-		    yyerrorf( "can not assign to a readonly variable" );
-		}
-	    } else {
-		if( name ) {
-		    yyerrorf( "can not assign readonly content to variable '%s'",
-			      name );
-		} else {
-		    yyerrorf( "can not assign readonly content to this "
-			      "variable" );
-		}
-	    }
-	} else {
-	    compiler_emit_st( cc, expr_type, var_name, var_offset,
-			   var_scope, ex );
 	}
+        if( variable && !has_errors ) {
+            if( !(*enode_is_readonly_compatible)( expr, variable )) {
+                char *name = variable ? dnode_name( variable ) : NULL;
+                if( dnode_has_flags( variable, DF_IS_READONLY )) {
+                    if( name ) {
+                        yyerrorf( "can not assign to the readonly variable '%s'",
+                                  name );
+                    } else {
+                        yyerrorf( "can not assign to a readonly variable" );
+                    }
+                } else {
+                    if( name ) {
+                        yyerrorf( "can not assign readonly content to variable '%s'",
+                                  name );
+                    } else {
+                        yyerrorf( "can not assign readonly content to this "
+                                  "variable" );
+                    }
+                }
+            } else {
+                compiler_emit_st( cc, expr_type, var_name, var_offset,
+                                  var_scope, ex );
+            }
+        }
         delete_typetab( generic_types );
         compiler_drop_top_expression( cc );
     }
@@ -7340,6 +7343,10 @@ control_statement
             tnode_element_type( aggregate_expression_type ) : NULL;
         ssize_t neg_element_size = -1;
         ssize_t zero = 0;
+
+        if( enode_has_flags( compiler->e_stack, EF_IS_READONLY )) {
+	    dnode_set_flags( loop_counter_var, DF_IS_READONLY );
+        }
 
         /* stack now: ..., array_current_ptr */
         if( element_type ) {
