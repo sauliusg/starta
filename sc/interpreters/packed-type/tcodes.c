@@ -971,7 +971,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
             if( flags & AF_HAS_REFS ) {
                 *((void**)array + length) = STACKCELL_PTR( *value );
             } else {
-                memcpy( (char*)array + length * element_size, value, element_size );
+                memcpy( (char*)array + length * element_size, &(value->num), element_size );
             }
             array[-1].length++;
             if( flags & AF_HAS_REFS ) {
@@ -983,6 +983,68 @@ int APUSH( INSTRUCTION_FN_ARGS )
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * APOP -- Array pop -- pop the past element from the array. Throw
+ *         exception if the arrayis empty or null.
+ *
+ * bytecode:
+ * POP
+ *
+ * stack:
+ * array -> value
+ */
+
+int APOP( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
+    ssize_t length, element_size;
+    alloccell_flag_t flags;
+
+    TRACE_FUNCTION();
+
+    if( !array ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "can not pop values from a null array",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
+	      EXCEPTION );
+    } else {
+        flags = array[-1].flags;
+        length = array[-1].length;
+        element_size = array[-1].element_size;
+        /* We only pop values onto arrays, not to structures: */
+        if( length >= 0 && element_size > 0 ) {
+            if( length == 0 ) {
+                interpret_raise_exception_with_bcalloc_message
+                    ( /* err_code = */ -1,
+                      /* message = */
+                      "can not pop values from an empty array",
+                      /* module_id = */ 0,
+                      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
+                      EXCEPTION );
+            }
+            if( flags & AF_HAS_REFS ) {
+                STACKCELL_SET_ADDR( istate.ep[0], *((void**)array + length) );
+            } else {
+                STACKCELL_ZERO_PTR( istate.ep[0] );
+                memcpy( &(istate.ep[0].num),
+                        (char*)array + (length-1) * element_size, element_size );
+            }
+            array[-1].length--;
+            if( flags & AF_HAS_REFS ) {
+                assert( array[-1].nref > 0 );
+                array[-1].nref --;
+                array[-1].flags |= AF_HAS_REFS;
+            }
+            
+        }
+    }
 
     return 1;
 }

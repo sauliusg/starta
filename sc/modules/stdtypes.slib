@@ -1142,6 +1142,11 @@ inline bytecode procedure push( a : array of type T; value : type T )
     APUSH
 }
 
+inline bytecode procedure pop( a : array of type T ) : type T
+{
+    APOP
+}
+
 inline bytecode function trim( a : array of type T ): array of type T
 {
     TRIM
