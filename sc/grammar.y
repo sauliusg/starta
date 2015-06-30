@@ -6414,6 +6414,25 @@ selective_use_statement
                            typetab_insert( compiler->typetab, name, 
                                            share_tnode( identifier_tnode ),
                                            px );
+                           type_kind_t kind = tnode_kind( identifier_tnode );
+                           char *suffix = tnode_suffix( identifier_tnode );
+                           if( !suffix ) suffix = "";
+                           if( kind == TK_INTEGER || kind == TK_REAL || 
+                               kind == TK_STRING || suffix != NULL ) {
+                               type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
+                               switch( kind ) {
+                               case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
+                               case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
+                               case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
+                               default:
+                                   break;
+                               }
+                               if( suffix_kind != TS_NOT_A_SUFFIX ) {
+                                   typetab_override_suffix
+                                       ( compiler->typetab, suffix, suffix_kind,
+                                         share_tnode( identifier_tnode ), px );
+                               }
+                           }
                        }
                    } else {
                        yyerrorf( "type '%s' is not found in module '%s'",
