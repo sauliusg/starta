@@ -29,7 +29,7 @@ var m = new int[0 int];
 . "length(m) ==" string, length(m);
 . "nref(m)   ==" string, nref(m);
 
-var n = 0 int;
+var n = 0;
 while true {
     m = push( m, n );
     var l = length(m);
