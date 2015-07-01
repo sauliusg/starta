@@ -3,6 +3,7 @@
 //
 
 use std;
+use type array from std;
 use type int, string from std;
 use function length from std;
 use var true from std;
@@ -24,7 +25,7 @@ function print_array( array of type T a; function ( T element ) print )
     enddo
 }
 
-var m = new int[0 int];
+var m = new int[0];
 
 . "length(m) ==" string, length(m);
 . "nref(m)   ==" string, nref(m);
@@ -33,9 +34,9 @@ var n = 0;
 while true {
     m = push( m, n );
     var l = length(m);
-    if l < 16 int or l % 100 int == 0 int {
+    if l < 16 or l % 100 == 0 {
         . l, capacity(m), capacity(m=trim(m))
     }
     n ++;
-    do break if n > 10000 int
+    do break if n > 10000
 }
