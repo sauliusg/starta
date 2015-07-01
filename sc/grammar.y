@@ -6390,6 +6390,34 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
+   | _USE _TYPE _ARRAY _FROM module_import_identifier
+       {
+           char *module_name = $5;
+           DNODE *module = 
+               vartab_lookup( compiler->compiled_packages, module_name );
+           if( !module ) {
+               yyerrorf( "module '%s' is not found for type import "
+                         "-- consider 'use %s' first",
+                         module_name, module_name );
+           } else {
+               char *name = "array";
+               TNODE *identifier_tnode =
+                   dnode_typetab_lookup_type( module, name );
+               if( identifier_tnode ) {
+                   if( typetab_lookup( compiler->typetab, name )) {
+                       yyerrorf( "type named '%s' is already defined -- "
+                                 "can not import", name );
+                   } else {
+                       typetab_insert( compiler->typetab, name, 
+                                       share_tnode( identifier_tnode ),
+                                       px );
+                   }
+               } else {
+                   yyerrorf( "type '%s' is not found in module '%s'",
+                             name, module_name );
+               }
+           }
+       }
    | _USE _TYPE identifier_list _FROM module_import_identifier
        {
            char *module_name = $5;
