@@ -1334,7 +1334,7 @@ int VCALL( INSTRUCTION_FN_ARGS )
     ssize_t virtual_function_nr = istate.code[istate.ip+2].ssizeval;
     thrcode_t* object_ptr = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *header;
-    ssize_t *itable, *vtable;
+    ssize_t *itable, *vtable = NULL;
     ssize_t virtual_function_offset = 0;
 
     TRACE_FUNCTION();
