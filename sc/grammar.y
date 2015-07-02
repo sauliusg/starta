@@ -3560,7 +3560,7 @@ static void compiler_compile_enumeration_constant( COMPILER *cc,
     TNODE *const_type =
 	compiler_lookup_tnode( cc, module_name, type_name, "enumeration type" );
 
-    return compiler_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
+    compiler_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
 }
 
 static void compiler_compile_typed_constant( COMPILER *cc,
