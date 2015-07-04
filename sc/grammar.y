@@ -2567,8 +2567,10 @@ static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
                     enode_set_flags( cc->e_stack, EF_IS_READONLY );
                 }
 	    } else {
-		yyerrorf( "when generating OVER, second expression from the "
-			  "stack top has no type (?!)" );
+                if( expr2 && !enode_has_flags( expr2, EF_HAS_ERRORS )) {
+                    yyerrorf( "when generating OVER, second expression from the "
+                              "stack top has no type (?!)" );
+                }
 	    }
 	    compiler_emit( cc, ex, "\tc\n", OVER );
 	}
