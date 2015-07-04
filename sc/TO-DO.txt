@@ -1,7 +1,10 @@
 -- Implement possibility to define operators like 'operator "." ( array of int )'
 -- Implement possibility to use constants with type suffixes as default function parameter values.
 -- Implement '-I path//' construct for recursive directory searches
+-- Implement regular expressions.
 -- Think/implement generic 'copy()' and 'clone()' functions for deep cloning
+-- Implement 'mmap'.
+-- Implement readonly allocated blocks with run-time checks
 -- Implement run-time null-pointer and array bound checks
 -- Think about modules to implement simple and convenient GUI.
 -- Implement generation of standalone executable files.
@@ -12,8 +15,8 @@
 -- Implement precondition and postconditions
 -- Implement pragma to skip included files from '--debug code' listing.
 -- Implement compile-time checks of uncaught exceptions
--- print out nice labels in human-readable code (produced by '-d code')
 -- Implement '--use' and '--import' options to specify used/imported modules on the command line.
+-- print out nice labels in human-readable code (produced by '-d code')
 -- ideally, make output of 'sl -d code' compilable by sl itself
 -- Write comments explaining compiler design considerations.
 -- Think about functions with variable number of args.
@@ -21,7 +24,6 @@
 -- Think about 'var x;' declarations of safe untyped variables (a special "value" type?).
 -- Tests, tests, tests ...
 -- Perform all strength reducing optimisations in 'bytecode_emit_...()' f-ns.
--- Implement regular expressions.
 -- Implement readonly structure members.
 -- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
 -- Implement dynamic, runtime-bound messages to objects.
@@ -33,7 +35,7 @@
 -- Implement array "stringification".
 -- Implement AND ALSO and OR ALSO.
 -- Implement 'unless' and 'until' operators.
--- Ensure that functions have no access to global data.
+-- Ensure that functions have no access to global data (?).
 -- Design possibility of the looped module usage (?).
 -- Collect tests for error diagnostics, inputs/err-*.snl, into separate subdirectories and adapt Makefile accordingly.
 -- Check share_xxx() usage.
@@ -56,13 +58,13 @@
 ** Implement automatic type conversion in 'return' statements.
 +- Implement 'list of T'.
 +- Implement 'hash of T' (or 'dictionary of T').
-+- implement "clone" operator for reference types.
 +- Implement map operator/function.
 +- Implement functions to narrow numbers.
 +- Think about the possibility to introduce 'xxx of T' types.
 +- Think about the possibility of "generic" functions with type "placeholders"
 +- Implement label printouts in the bytecode emitter functions.
 +- Implement advanced arithmetics and function calls for constant arithmetics
+++ implement "clone" operator for reference types.
 ++ Implement 'trim()' for arrays.
 ++ Implement push and pop to the arrays (can be done by traversing the allocated reference tree like in GC).
 ++ 'new S' does not call a constructor or produce error message.
