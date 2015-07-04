@@ -1,24 +1,33 @@
+-- Implement possibility to define operators like 'operator "." ( array of int )'
+-- Implement possibility to use constants with type suffixes as default function parameter values.
+-- Implement '-I path//' construct for recursive directory searches
+-- Think/implement generic 'copy()' and 'clone()' functions for deep cloning
+-- Implement run-time null-pointer and array bound checks
+-- Think about modules to implement simple and convenient GUI.
+-- Implement generation of standalone executable files.
+-- Implement pre-compiled modules.
+-- Implement peephole optimiser.
+-- Think about convenient interface to use modules in my language in other languages.
+-- Think about convenient use of modules written in other languages in my language programs.
+-- Implement precondition and postconditions
+-- Implement pragma to skip included files from '--debug code' listing.
+-- Implement compile-time checks of uncaught exceptions
+-- print out nice labels in human-readable code (produced by '-d code')
+-+ Implement check of measurement units at the compile time.
++- Implement 'list of T'.
++- Implement 'hash of T' (or 'dictionary of T').
+?? Implement 'ref T' and 'num T' generic types.
 ++ Implement 'trim()' for arrays.
 ++ Implement push and pop to the arrays (can be done by traversing the allocated reference tree like in GC).
--- Implement 'ref T' and 'num T' generic types.
 ++ 'new S' does not call a constructor or produce error message.
 xx !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
--+ Implement check of measurement units at the compile time.
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
 ++ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
--- Implement run-time null-pointer and array bound checks
 ++ Implement 'foreach ... in'
 ++ Implement a separate operator table.
--- Implement generation of standalone executable files.
--- Think about convenient interface to use modules in my language in other languages.
--- Think about convenient use of modules written in other languages in my language programs.
--- Think about modules to implement simple and convenient GUI.
 ++ Rethink the implmentation of names for interface method implementations.
--- Implement precondition and postconditions
 ++ Implement assert'ions.
--- Implement pre-compiled modules.
--- Implement peephole optimiser.
 xx Think if there would be a benefit from BNZ operator that removes its value from the stack only on branch.
 xx Make sure that begin_scope() function calls begin_subscope()
 xx Change i/o operators from << and >> to <- and ->.
@@ -29,22 +38,14 @@ xx Change i/o operators from << and >> to <- and ->.
 ++ Implement subarrays and substrings.
 xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 ++ Implement 'strstart()', 'strend()' and similar string comparison functions
--- Think/implement generic 'copy()' and 'clone()' functions, instead of or in addition to the '[]' and ':=' operators.
 ++ Change names of STDIN()/STDOUT()/STDERR() standard functions to lowercase.
 ?? Make it possible to use 'float[]' as type designators of return values.
 ++ Implement functions 'argument(i)' and 'argumentnr()'
--- Implement pragma to skip included files from '--debug code' listing.
 ++ describe all options in --help (also all --debug arguments).
 xx Implement 'unaliased' values
--- Implement checks of uncaught exceptions (exceptions cheched by module, not by function)!
 xx Think about 'print/println/prints/printsln' operators
 ++ Think about the transfer oprators to a common operator table, with the possibility to overload types.
--- Implement possibility to define operators like 'operator "." ( array of int )'
--- Implement possibility to use constants with type suffixes as default function parameter values.
-+- Implement 'list of T'.
-+- Implement 'hash of T' (or 'dictionary of T').
--- print out nice labels in human-readable code (produced by '-d code')
--- move COMPILER object and compiler_...() functions from 'snail.y' into a separate compiler.c file (and comiler.h header).
+xx move COMPILER object and compiler_...() functions from 'snail.y' into a separate compiler.c file (and comiler.h header).
 xx implement stack reference types.
 ++ implement pointers to functions.
 ++ implement non-null reference types.
