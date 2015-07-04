@@ -3662,12 +3662,12 @@ static DNODE* compiler_lookup_constant( COMPILER *cc,
 }
 
 static void compiler_compile_ld( COMPILER *cc,
-			      DNODE *varnode,
-			      char *operator_name,
-			      void *fallback_opcode,
-			      TNODE* (*tnode_creator)
+                                 DNODE *varnode,
+                                 char *operator_name,
+                                 void *fallback_opcode,
+                                 TNODE* (*tnode_creator)
 			          ( TNODE *base, cexception_t *xx ),
-			      cexception_t *ex )
+                                 cexception_t *ex )
 {
     cexception_t inner;
     DNODE *operator = NULL;
@@ -3770,22 +3770,22 @@ static void compiler_compile_ld( COMPILER *cc,
 }
 
 static void compiler_compile_load_variable_value( COMPILER *cc,
-					       DNODE *varnode,
-					       cexception_t *ex )
+                                                  DNODE *varnode,
+                                                  cexception_t *ex )
 {
     compiler_compile_ld( cc, varnode, "ld", LD, NULL, ex );
 }
 
 static void compiler_compile_load_function_address( COMPILER *cc,
-						 DNODE *varnode,
-						 cexception_t *ex )
+                                                    DNODE *varnode,
+                                                    cexception_t *ex )
 {
     compiler_compile_ld( cc, varnode, "ldfn", LDFN, NULL, ex );
 }
 
 static void compiler_compile_load_variable_address( COMPILER *cc,
-						 DNODE *varnode,
-						 cexception_t *ex )
+                                                    DNODE *varnode,
+                                                    cexception_t *ex )
 {
     compiler_compile_ld( cc, varnode, "lda", LDA, new_tnode_addressof, ex );
 }
@@ -3817,7 +3817,7 @@ static void compiler_compile_main_thrcode( COMPILER *cc )
 }
 
 static void compiler_merge_functions_and_main( COMPILER *cc,
-					    cexception_t *ex  )
+                                               cexception_t *ex  )
 {
     assert( cc );
     thrcode_merge( cc->function_thrcode, cc->main_thrcode, ex );
@@ -3828,7 +3828,7 @@ static void compiler_merge_functions_and_main( COMPILER *cc,
 }
 
 static void compiler_push_thrcode( COMPILER *sc,
-			 cexception_t *ex )
+                                   cexception_t *ex )
 {
     thrlist_push_data( &sc->thrstack, &sc->thrcode, delete_thrcode, NULL, ex );
     create_thrcode( &sc->thrcode, ex );
@@ -3859,7 +3859,7 @@ static void compiler_merge_top_thrcodes( COMPILER *sc, cexception_t *ex )
 }
 
 static void compiler_merge_functions_and_top( COMPILER *cc,
-                                           cexception_t *ex )
+                                              cexception_t *ex )
 {
     assert( cc );
     assert( cc->function_thrcode != cc->thrcode );
@@ -3879,8 +3879,8 @@ static void compiler_merge_functions_and_top( COMPILER *cc,
 }
 
 static void compiler_get_inline_code( COMPILER *cc,
-					    DNODE *function,
-					    cexception_t *ex )
+                                      DNODE *function,
+                                      cexception_t *ex )
 {
     ssize_t code_start = compiler_pop_address( cc, ex );
     ssize_t code_end = thrcode_length( cc->thrcode );
@@ -3904,7 +3904,7 @@ static int compiler_count_return_values( DNODE *funct )
 }
 
 static void compiler_compile_address_of_indexed_element( COMPILER *cc,
-						      cexception_t *ex )
+                                                         cexception_t *ex )
 {
     cexception_t inner;
     ENODE * volatile index_expr = NULL;
@@ -4003,7 +4003,7 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 }
 
 static void compiler_compile_subarray( COMPILER *cc,
-                                    cexception_t *ex )
+                                       cexception_t *ex )
 {
     cexception_t inner;
     ENODE * volatile index_expr1 = NULL;
@@ -4136,8 +4136,8 @@ static void compiler_compile_indexing( COMPILER *cc,
 }
 
 static void compiler_compile_type_declaration( COMPILER *cc,
-					    TNODE *type_descr,
-					    cexception_t *ex )
+                                               TNODE *type_descr,
+                                               cexception_t *ex )
 {
     cexception_t inner;
     ANODE * volatile suffix = NULL;
@@ -4291,9 +4291,9 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 }
 
 static void compiler_emit_catch_comparison( COMPILER *cc,
-					 char *module_name,
-					 char *exception_name,
-					 cexception_t *ex )
+                                            char *module_name,
+                                            char *exception_name,
+                                            cexception_t *ex )
 {
     DNODE *exception =
         compiler_lookup_dnode( cc, module_name, exception_name, "exception" );
@@ -4326,8 +4326,8 @@ static void compiler_emit_catch_comparison( COMPILER *cc,
 }
 
 static void compiler_finish_catch_comparisons( COMPILER *cc,
-					    int nfixups,
-					    cexception_t *ex )
+                                               int nfixups,
+                                               cexception_t *ex )
 {
     int i;
     ssize_t zero = 0;
@@ -4372,7 +4372,7 @@ static void compiler_check_enum_attributes( TNODE *tnode )
 }
 
 static void compiler_convert_function_argument( COMPILER *cc,
-					     cexception_t *ex )
+                                                cexception_t *ex )
 {
     TNODE *arg_type = cc->current_arg ? dnode_type( cc->current_arg ) : NULL;
     TNODE *exp_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
@@ -4444,10 +4444,10 @@ static void compiler_compile_typed_const_value( COMPILER *cc,
 }
 
 static void compiler_compile_multitype_const_value( COMPILER *cc,
-                                                 const_value_t *v,
-                                                 char *module_name,
-                                                 char *suffix_name,
-                                                 cexception_t *ex )
+                                                    const_value_t *v,
+                                                    char *module_name,
+                                                    char *suffix_name,
+                                                    cexception_t *ex )
 {
     TNODE *const_type = NULL;
     value_t vtype = v->value_type;
@@ -4510,8 +4510,8 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
 }
 
 static void compiler_emit_default_arguments( COMPILER *cc,
-					  char *arg_name,
-					  cexception_t *ex )
+                                             char *arg_name,
+                                             cexception_t *ex )
 {
     DNODE *arg;
 
@@ -4597,7 +4597,7 @@ static struct {
 };
 
 static void compiler_insert_default_exceptions( COMPILER *c,
-					     cexception_t *ex )
+                                                cexception_t *ex )
 {
     int i;
 
@@ -4612,7 +4612,7 @@ static void compiler_insert_default_exceptions( COMPILER *c,
 }
 
 static void compiler_compile_file_input_operator( COMPILER *cc,
-					       cexception_t *ex )
+                                                  cexception_t *ex )
 {
     ENODE *top_expr = cc->e_stack;
     TNODE *top_type = top_expr ? enode_type( top_expr ) : NULL;
@@ -4662,8 +4662,8 @@ static void compiler_check_non_null_variables( DNODE *dnode_list )
 }
 
 static void compiler_compile_variable_initialisations( COMPILER *cc,
-						    DNODE *lst,
-						    cexception_t *ex )
+                                                       DNODE *lst,
+                                                       cexception_t *ex )
 {
     DNODE *var;
 
@@ -4677,8 +4677,8 @@ static void compiler_compile_variable_initialisations( COMPILER *cc,
 }
 
 static void compiler_compile_zero_out_stackcells( COMPILER *cc,
-					       DNODE *variables,
-					       cexception_t *ex )
+                                                  DNODE *variables,
+                                                  cexception_t *ex )
 {
     DNODE *var;
     ssize_t nvars = 0;
@@ -4807,10 +4807,10 @@ static void compiler_debug()
 }
 
 static void compiler_compile_multiple_assignment( COMPILER *cc,
-					       ssize_t nvars,
-					       ssize_t nvars_left,
-					       ssize_t nvalues,
-					       cexception_t *ex )
+                                                  ssize_t nvars,
+                                                  ssize_t nvars_left,
+                                                  ssize_t nvalues,
+                                                  cexception_t *ex )
 {
     ssize_t i;
 
@@ -4841,8 +4841,8 @@ static void compiler_compile_multiple_assignment( COMPILER *cc,
 }
 
 static void compiler_compile_array_expression( COMPILER* cc,
-					    ssize_t nexpr,
-					    cexception_t *ex )
+                                               ssize_t nexpr,
+                                               cexception_t *ex )
 {
     ssize_t i;
 
@@ -5288,9 +5288,9 @@ static void compiler_load_library( COMPILER *compiler,
 }
 
 static void compiler_check_and_push_function_name( COMPILER *cc,
-						char *module_name,
-						char *function_name,
-						cexception_t *ex )
+                                                   char *module_name,
+                                                   char *function_name,
+                                                   cexception_t *ex )
 {
     TNODE *fn_tnode = NULL;
     type_kind_t fn_kind;
@@ -5326,7 +5326,7 @@ static void compiler_check_and_push_function_name( COMPILER *cc,
 }
 
 static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
-						       cexception_t *ex )
+                                                          cexception_t *ex )
 {
     cexception_t inner;
     DNODE *funct = cc->current_call;
