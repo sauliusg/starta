@@ -372,29 +372,34 @@ const_value_t *dnode_value( DNODE *dnode )
 
 DNODE *dnode_set_flags( DNODE *dnode, dnode_flag_t flags )
 {
+    assert( dnode );
     dnode->flags |= flags;
     return dnode;
 }
 
 DNODE *dnode_reset_flags( DNODE *dnode, dnode_flag_t flags )
 {
+    assert( dnode );
     dnode->flags &= ~flags;
     return dnode;
 }
 
 DNODE *dnode_copy_flags( DNODE *dnode, dnode_flag_t flags )
 {
+    assert( dnode );
     dnode->flags = flags;
     return dnode;
 }
 
 int dnode_has_flags( DNODE *dnode, dnode_flag_t flags )
 {
+    assert( dnode );
     return (dnode->flags & flags);
 }
 
 int dnode_has_initialiser( DNODE *dnode )
 {
+    assert( dnode );
     return (dnode->flags & DF_HAS_INITIALISER);
 }
 
