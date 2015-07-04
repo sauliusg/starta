@@ -13,14 +13,59 @@
 -- Implement pragma to skip included files from '--debug code' listing.
 -- Implement compile-time checks of uncaught exceptions
 -- print out nice labels in human-readable code (produced by '-d code')
+-- Implement '--use' and '--import' options to specify used/imported modules on the command line.
+-- ideally, make output of 'sl -d code' compilable by sl itself
+-- Write comments explaining compiler design considerations.
+-- Think about functions with variable number of args.
+-- Think about adding two and three return values for operators "dup" and "over", respectively.
+-- Think about 'var x;' declarations of safe untyped variables (a special "value" type?).
+-- Tests, tests, tests ...
+-- Perform all strength reducing optimisations in 'bytecode_emit_...()' f-ns.
+-- Implement regular expressions.
+-- Implement readonly structure members.
+-- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
+-- Implement dynamic, runtime-bound messages to objects.
+-- Implement named exception groups.
+-- Implement multi-line strings between << >> pseudo-quotes.
+-- Implement merging of equal strings into one in static data.
+-- Implement i/o to strings.
+-- Implement array concatenation operators.
+-- Implement array "stringification".
+-- Implement AND ALSO and OR ALSO.
+-- Implement 'unless' and 'until' operators.
+-- Ensure that functions have no access to global data.
+-- Design possibility of the looped module usage (?).
+-- Collect tests for error diagnostics, inputs/err-*.snl, into separate subdirectories and adapt Makefile accordingly.
+-- Check share_xxx() usage.
+-- Allow NULL dimension pointer in new_tnode_array().
 -+ Implement check of measurement units at the compile time.
+-+ finish implementation of constants and constant compile-time folding
+-+ Write thorough tests for stdio operators (also for input!)
+-+ Implement anonymous array and struct compatibility.
+!! WARN: printf formats are incorrect for ints of different sizes.
+?? Implement 'ref T' and 'num T' generic types.
+?? Write comments how begin_scope() and begin_subscope() are supposed to work
+?? The same for end_{sub}scope() functions
+?? Implement exception types (classes?).
+?? Make it possible to use 'float[]' as type designators of return values.
+?? Implement type-declared methods (functions).
+** write tests for user-defined "drop" and "dropn" operators.
+** write correct DROP/PDROP/user defined "drop" selection in all cases,
+** See if functions generating STI and LDI can be merged -- not yet.
+** SWAP -- no user defined "swap" at the moment,
+** Implement automatic type conversion in 'return' statements.
 +- Implement 'list of T'.
 +- Implement 'hash of T' (or 'dictionary of T').
-?? Implement 'ref T' and 'num T' generic types.
++- implement "clone" operator for reference types.
++- Implement map operator/function.
++- Implement functions to narrow numbers.
++- Think about the possibility to introduce 'xxx of T' types.
++- Think about the possibility of "generic" functions with type "placeholders"
++- Implement label printouts in the bytecode emitter functions.
++- Implement advanced arithmetics and function calls for constant arithmetics
 ++ Implement 'trim()' for arrays.
 ++ Implement push and pop to the arrays (can be done by traversing the allocated reference tree like in GC).
 ++ 'new S' does not call a constructor or produce error message.
-xx !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
 ++ Implement constructors for classes.
 ++ Add diagnostics of unimplemented class methods.
 ++ Implement optimisation of "ldc" operators from "LDCS string" to "LDC value".
@@ -28,70 +73,22 @@ xx !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
 ++ Implement a separate operator table.
 ++ Rethink the implmentation of names for interface method implementations.
 ++ Implement assert'ions.
-xx Think if there would be a benefit from BNZ operator that removes its value from the stack only on branch.
-xx Make sure that begin_scope() function calls begin_subscope()
-xx Change i/o operators from << and >> to <- and ->.
-?? Write comments how begin_scope() and begin_subscope() are supposed to work
-?? The same for end_{sub}scope() functions
-?? Implement exception types (classes?).
 ++ Implement program() { ... } construct. (to be done: program return values).
 ++ Implement subarrays and substrings.
-xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
 ++ Implement 'strstart()', 'strend()' and similar string comparison functions
 ++ Change names of STDIN()/STDOUT()/STDERR() standard functions to lowercase.
-?? Make it possible to use 'float[]' as type designators of return values.
 ++ Implement functions 'argument(i)' and 'argumentnr()'
 ++ describe all options in --help (also all --debug arguments).
-xx Implement 'unaliased' values
-xx Think about 'print/println/prints/printsln' operators
 ++ Think about the transfer oprators to a common operator table, with the possibility to overload types.
-xx move COMPILER object and compiler_...() functions from 'snail.y' into a separate compiler.c file (and comiler.h header).
-xx implement stack reference types.
 ++ implement pointers to functions.
 ++ implement non-null reference types.
 ++ implement 'p = ? q' assignment for save conversion of regular references into non-null references (the assignment should raise a runtime exception if the reference to be converted is null).
-+- implement "clone" operator for reference types.
-xx implement convenient conversion of fixed arrays into regular, variable arrays and strings
--- Implement '--use' and '--import' options to specify used/imported modules on the command line.
--- ideally, make output of 'sl -d code' compilable by sl itself
--+ finish implementation of constants and constant compile-time folding
--- Write comments explaining compiler design considerations.
--- Think about functions with variable number of args.
--- Think about adding two and three return values for operators "dup" and "over", respectively.
--- Think about 'var x;' declarations of safe untyped variables (a special "value" type?).
--- Tests, tests, tests ...
--- Perform all strength reducing optimisations in 'bytecode_emit_...()' f-ns.
 ++ Make stacks relocatable.
-?? Implement type-declared methods (functions).
 ++ Implement reporting of source file name in error messages.
--- Implement regular expressions.
--- Implement readonly structure members.
 ++ Implement readline() opcode and function
--- Implement operators that return multiple values, and generation of DUP, ROT, FILESCAN and maybe SWAP operators using these operators, not the current ad hoc code generation.
 ++ Implement objects.
--- Implement dynamic, runtime-bound messages to objects.
 ++ Implement virtual functions
--- Implement named exception groups.
--- Implement multi-line strings between << >> pseudo-quotes.
--- Implement merging of equal strings into one in static data.
-+- Implement map operator/function.
--- Implement i/o to strings.
-+- Implement functions to narrow numbers.
--- Implement array concatenation operators.
--- Implement array "stringification".
--- Implement AND ALSO and OR ALSO.
--- Implement 'unless' and 'until' operators.
-xx Implement "square" multidimensional arrays.
--- Ensure that functions have no access to global data.
--- Design possibility of the looped module usage (?).
--- Collect tests for error diagnostics, inputs/err-*.snl, into separate subdirectories and adapt Makefile accordingly.
--- Check share_xxx() usage.
--- Allow NULL dimension pointer in new_tnode_array().
--+ Write thorough tests for stdio operators (also for input!)
-+- Think about the possibility to introduce 'xxx of T' types.
-+- Think about the possibility of "generic" functions with type "placeholders"
 ++ Implement garbage collector invocation policy.
--+ Implement anonymous array and struct compatibility.
 ++ Implement multivalue assignment to closure variables.
 ++ Implement function closures.
 ++ Implement blobs and pack/unpack.
@@ -99,9 +96,7 @@ xx Implement "square" multidimensional arrays.
 ++ Implement string indexing.
 ++ Implement string concatenation (implemented as '_' and '+' operators).
 ++ Implement string comparisons.
-+- Implement label printouts in the bytecode emitter functions.
 ++ Implement array length() functions in 'stdtypes.slib'.
-+- Implement advanced arithmetics and function calls for constant arithmetics
 ++ Correct compiler so that it can compile multiple files.
 ++ Check and correct shortcut boolean implementation.
 ++ Correct printf() arguments so that they always match format.
@@ -161,7 +156,6 @@ xx Implement "square" multidimensional arrays.
 ++ Implement garbage collector (port garbage collector).
 ++ Implement forward struct declarations.
 ++ Implement fixed arrays.
-xx Implement files.
 ++ Implement field reordering in structures
 ++ Implement expression stack checks and dropping of extra expressions in multivalue assignments.
 ++ Implement exceptions.
@@ -227,11 +221,17 @@ xx Implement files.
 ++ Add 'procedure' keyword.
 ++ !! Make sure that functions always leave stack with enough values on return; implement this by checking that the last generated opcode is 'RET', and if not, emit load of enough emty stackcells and RET at the end of a function code. Currently, this check is only implementedas a run-time evaluation stack underflow detection.
 ++ !! Make sure := does not copy immutable references
-** write tests for user-defined "drop" and "dropn" operators.
-** write correct DROP/PDROP/user defined "drop" selection in all cases,
-** See if functions generating STI and LDI can be merged -- not yet.
-** SWAP -- no user defined "swap" at the moment,
+xx !!! Implements VMT for structures (and thus for "X of Y" types) if necessary!
+xx Think if there would be a benefit from BNZ operator that removes its value from the stack only on branch.
+xx Make sure that begin_scope() function calls begin_subscope()
+xx Change i/o operators from << and >> to <- and ->.
+xx Try to implement formatted prints a-la Pascal's write( x:8:3 )
+xx Implement 'unaliased' values
+xx Think about 'print/println/prints/printsln' operators
+xx move COMPILER object and compiler_...() functions from 'snail.y' into a separate compiler.c file (and comiler.h header).
+xx implement stack reference types.
+xx implement convenient conversion of fixed arrays into regular, variable arrays and strings
+xx Implement "square" multidimensional arrays.
+xx Implement files.
 xx Implement garbage collector bitmaps (?) -- not doing, so far using negative reference offsets for classes with inheritance.
 xx Check whether types are correctly converted in return statements -- so far, not necessary.
-** Implement automatic type conversion in 'return' statements.
-!! WARN: printf formats are incorrect for ints of different sizes.
