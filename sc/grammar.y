@@ -6642,7 +6642,7 @@ variable_access_identifier
 incdec_statement
   : variable_access_identifier __INC
       {
-          if( dnode_has_flags( $1, DF_IS_READONLY )) {
+          if( $1 && dnode_has_flags( $1, DF_IS_READONLY )) {
               yyerrorf( "may not increment readonly variable '%s'",
                         dnode_name( $1 ));
           } else {
@@ -6661,7 +6661,7 @@ incdec_statement
       }
   | variable_access_identifier __DEC
       {
-          if( dnode_has_flags( $1, DF_IS_READONLY )) {
+          if( $1 && dnode_has_flags( $1, DF_IS_READONLY )) {
               yyerrorf( "may not decrement readonly variable '%s'",
                         dnode_name( $1 ));
           } else {

@@ -1,0 +1,29 @@
+./sl: inputs/err-foreach001.snl(9,11): ERROR, variable 'e' is not declared in the current scope
+foreach e in m do
+          ^
+./sl: inputs/err-foreach001.snl(9,16): ERROR, when generating OVER, second expression from the stack top has no type (?!)
+foreach e in m do
+               ^
+./sl: inputs/err-foreach001.snl(9,16): ERROR, when generating OVER, second expression from the stack top has no type (?!)
+foreach e in m do
+               ^
+./sl: inputs/err-foreach001.snl(10,8): ERROR, variable 'e' is not declared in the current scope
+    . e;
+       ^
+./sl: inputs/err-foreach001.snl(11,7): ERROR, variable 'e' is not declared in the current scope
+    e ++;
+      ^
+./sl: inputs/err-foreach001.snl(12,7): ERROR, variable 'e' is not declared in the current scope
+    e --;
+      ^
+./sl: inputs/err-foreach001.snl(13,7): ERROR, variable 'e' is not declared in the current scope
+    e = 0;
+      ^
+./sl: inputs/err-foreach001.snl(14,1): ERROR, when generating OVER, second expression from the stack top has no type (?!)
+enddo
+^
+./sl: inputs/err-foreach001.snl(14,1): ERROR, when generating OVER, second expression from the stack top has no type (?!)
+enddo
+^
+./sl: 9 error(s) detected
+
