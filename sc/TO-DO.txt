@@ -1,5 +1,4 @@
 -- Add pragma to warn about unused return value for functions, very important for 'push()'.
--- Implement possibility to define operators like 'operator "." ( array of int )'
 -- Implement possibility to use constants with type suffixes as default function parameter values.
 -- Implement '-I path//' construct for recursive directory searches
 -- Implement regular expressions.
@@ -60,6 +59,7 @@
 +- Implement 'list of T'.
 +- Implement 'hash of T' (or 'dictionary of T').
 +- Implement map operator/function.
++- Implement possibility to define operators like 'operator "." ( array of int )'
 +- Implement functions to narrow numbers.
 +- Think about the possibility to introduce 'xxx of T' types.
 +- Think about the possibility of "generic" functions with type "placeholders"
