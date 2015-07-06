@@ -1,6 +1,6 @@
 -- Add pragma to warn about unused return value for functions, very important for 'push()'.
 -- Implement possibility to use constants with type suffixes as default function parameter values.
--- Implement '-I path//' construct for recursive directory searches
+-+ Implement '-I path//' construct for recursive directory searches (clean up the code)
 -- Implement regular expressions.
 -- Think/implement generic 'copy()' and 'clone()' functions for deep cloning
 -- Implement 'mmap'.
