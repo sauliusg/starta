@@ -15,6 +15,10 @@
 #include <string.h>
 #include <ctype.h>
 #include <dlfcn.h>
+#include <dirent.h> /* For scanning directories (recursively) */
+#include <fcntl.h> /* Definition of AT_* constants */
+#include <sys/stat.h> /* For calling 'fstatat()' -- 'struct stat' definition */
+#include <errno.h>
 #include <cexceptions.h>
 #include <cxprintf.h>
 #include <allocx.h>
@@ -409,6 +413,98 @@ static char *make_full_file_name( char *filename, char *path,
     }
 }
 
+/*
+ * Recursively open directories and scan their contents:
+ */
+static int rscandir( DIR *dp, char *filename,
+                     char *dirname,  /* Basename of the currently
+                                        processed directory */
+                     char **dirpath, /* Full path to the currently
+                                        processed directory */
+                     cexception_t *ex )
+{
+    struct dirent *dire;
+
+    assert( dirpath );
+
+    while( (dire = readdir( dp )) != NULL ) {
+        struct stat fstat;
+        if( fstatat( dirfd(dp), dire->d_name, &fstat, /* flags = */ 0 ) != 0 ) {
+            fprintf( stderr, "%s: ERROR, could not stat (fstatat) entry '%s' - %s\n",
+                     filename, dire->d_name, strerror(errno));
+            errno = 0;
+            continue;                
+        }
+        if( strcmp( filename, dire->d_name ) == 0 ) {
+            /* printf( ">>> found '%s' in '%s'\n", filename, dirname ); */
+            assert( !*dirpath );
+            *dirpath = strdupx( dirname, ex );
+            return 1;
+        }
+#if 0
+        printf( "inode = %8jd, offset = %10jd, length = %d, type = %d, "
+                "is_dir = %d, name = '%s'\n", (intmax_t)dire->d_ino,
+                (intmax_t)dire->d_off, dire->d_reclen,
+                dire->d_type, S_ISDIR(fstat.st_mode), dire->d_name );
+#endif
+        if( S_ISDIR(fstat.st_mode) &&
+            strcmp( dire->d_name, "." ) != 0 &&
+            strcmp( dire->d_name, ".." ) != 0 ) {
+            int subdir_fd;
+            DIR *subdir_dp;
+            if( (subdir_fd =
+                 openat( dirfd(dp), dire->d_name, O_RDONLY )) < 0 ) {
+                fprintf( stderr, "%s: ERROR, could not open subdirectory "
+                         "'%s' - %s\n", filename, dire->d_name,
+                         strerror(errno));
+                errno = 0;
+                continue;
+            }
+            if( (subdir_dp = fdopendir( subdir_fd )) == NULL ) {
+                fprintf( stderr, "%s: ERROR, could not fd-open subdirectory "
+                         "'%s' - %s\n", filename, dire->d_name,
+                         strerror(errno));
+                errno = 0;
+                continue;
+            }
+            int is_found = 
+                rscandir( subdir_dp, filename, dire->d_name, dirpath, ex );
+            closedir( subdir_dp );
+            if( is_found ) {
+                assert( *dirpath );
+                char *new_dirpath = NULL;
+                ssize_t new_length =
+                    strlen( *dirpath ) + 
+                    strlen( dirname ) + 
+                    2; /* Two positions extra for '/' and for '\0'. */
+                int remove = 0; /* number of characters to remove from
+                                   the directory name end */
+                if( strstr( dirname, "//" ) == 
+                    dirname + strlen(dirname) - 2 ) {
+                    remove = 2;
+                } else if( strstr( dirname, "/" ) ==
+                           dirname + strlen(dirname) - 1 ) {
+                    remove = 1;
+                }
+                new_dirpath = mallocx( new_length, ex );
+                strncpy( new_dirpath, dirname, strlen(dirname) - remove );
+                new_dirpath[strlen(dirname) - remove]  = '\0';
+                strcat( new_dirpath, "/" );
+                strcat( new_dirpath, *dirpath );
+                freex( *dirpath );
+                *dirpath = new_dirpath;
+                return 1;
+            }
+        }
+        errno = 0;
+    }
+    if( errno != 0 ) {
+        fprintf( stderr, "%s: ERROR, could not read directory - "
+                 "%s\n", filename, strerror(errno));
+    }
+    return 0;
+}
+
 static char *compiler_find_include_file( COMPILER *c, char *filename,
 					 cexception_t *ex )
 {
@@ -444,6 +540,27 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
 		/* printf( "Found '%s'\n", full_path ); */
 		return full_path;
 	    }
+            if( strstr( *path, "//" ) == 
+                *path + strlen(*path) - 2 ) {
+                /* printf( ">>>> will search '%s' recursively\n", *path ); */
+                char *dirpath = NULL;
+                DIR *dp =opendir( *path );
+                if( !dp ) {
+                    fprintf( stderr, "%s: ERROR, could not open directory - %s\n",
+                             *path, strerror(errno));
+                    continue;
+                }
+                int is_found = 
+                    rscandir( dp, filename, *path, &dirpath, ex );
+                closedir( dp );
+                if( is_found ) {
+                    full_path = make_full_file_name( filename, dirpath, NULL, ex );
+                    /* printf( ">>>> The found path is '%s'\n" , full_path ); */
+                }
+                if( dirpath )
+                    freex( dirpath );
+                return full_path;
+            }
 	}
 	make_full_file_name( NULL, NULL, NULL, ex );
 	return filename;
