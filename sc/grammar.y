@@ -559,7 +559,8 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
                 }
                 if( dirpath )
                     freex( dirpath );
-                return full_path;
+                if( is_found)
+                    return full_path;
             }
 	}
 	make_full_file_name( NULL, NULL, NULL, ex );
