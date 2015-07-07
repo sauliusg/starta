@@ -431,8 +431,8 @@ static int rscandir( DIR *dp, char *filename,
     while( (dire = readdir( dp )) != NULL ) {
         struct stat fstat;
         if( fstatat( dirfd(dp), dire->d_name, &fstat, /* flags = */ 0 ) != 0 ) {
-            fprintf( stderr, "%s: ERROR, could not stat (fstatat) entry '%s' - %s\n",
-                     filename, dire->d_name, strerror(errno));
+            yyerrorf( "%s: ERROR, could not stat (fstatat) entry '%s' - %s\n",
+                      filename, dire->d_name, strerror(errno));
             errno = 0;
             continue;                
         }
@@ -455,16 +455,16 @@ static int rscandir( DIR *dp, char *filename,
             DIR *subdir_dp;
             if( (subdir_fd =
                  openat( dirfd(dp), dire->d_name, O_RDONLY )) < 0 ) {
-                fprintf( stderr, "%s: ERROR, could not open subdirectory "
-                         "'%s' - %s\n", filename, dire->d_name,
-                         strerror(errno));
+                yyerrorf( "%s: ERROR, could not open subdirectory "
+                          "'%s' - %s\n", filename, dire->d_name,
+                          strerror(errno));
                 errno = 0;
                 continue;
             }
             if( (subdir_dp = fdopendir( subdir_fd )) == NULL ) {
-                fprintf( stderr, "%s: ERROR, could not fd-open subdirectory "
-                         "'%s' - %s\n", filename, dire->d_name,
-                         strerror(errno));
+                yyerrorf( "%s: ERROR, could not fd-open subdirectory "
+                          "'%s' - %s\n", filename, dire->d_name,
+                          strerror(errno));
                 errno = 0;
                 continue;
             }
@@ -500,8 +500,8 @@ static int rscandir( DIR *dp, char *filename,
         errno = 0;
     }
     if( errno != 0 ) {
-        fprintf( stderr, "%s: ERROR, could not read directory - "
-                 "%s\n", filename, strerror(errno));
+        yyerrorf( "%s: ERROR, could not read directory - "
+                  "%s\n", filename, strerror(errno));
     }
     return 0;
 }
