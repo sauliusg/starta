@@ -6024,6 +6024,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     index_expression
 %type <tnode> inheritance_and_implementation_list
 %type <tlist> interface_identifier_list
+%type <s>     labeled_for
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
 %type <s>     module_import_identifier
@@ -7297,6 +7298,16 @@ elsif_statement
     }
 ;
 
+labeled_for
+: opt_label _FOR
+      {
+	compiler_begin_subscope( compiler, px );
+        $$ = $1;
+      }
+;
+
+in_loop_separator : __THICK_ARROW | _IN ;
+
 control_statement
   : if_condition _THEN statement_list _ENDIF
       {
@@ -7372,11 +7383,7 @@ control_statement
         compiler_end_subscope( compiler, px );
       }
 
-  | opt_label _FOR
-      {
-	compiler_begin_subscope( compiler, px );
-      } 
-    '(' statement ';'
+  | labeled_for '(' statement ';'
       {
         compiler_push_loop( compiler, $1, 0, px );
 	compiler_push_thrcode( compiler, px );
@@ -7409,7 +7416,7 @@ control_statement
 	compiler_end_subscope( compiler, px );
       }
 
-  | opt_label _FOR lvariable
+  | labeled_for lvariable
       {
         compiler_push_loop( compiler, $1, 2, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
@@ -7445,24 +7452,21 @@ control_statement
 	compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
 	compiler_fixup_op_break( compiler, px );
 	compiler_pop_loop( compiler );
+	compiler_end_subscope( compiler, px );
       }
 
-  | opt_label _FOR variable_declaration_keyword
+  | labeled_for variable_declaration_keyword for_variable_declaration
       {
-	compiler_begin_subscope( compiler, px );
-      }
-    for_variable_declaration
-      {
-	int readonly = $3;
+	int readonly = $2;
 	if( readonly ) {
-	    dnode_set_flags( $5, DF_IS_READONLY );
+	    dnode_set_flags( $3, DF_IS_READONLY );
 	}
 	compiler_push_loop( compiler, $1, 2, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     '=' expression
       {
-	DNODE *loop_counter = $5;
+	DNODE *loop_counter = $3;
 
 	if( dnode_type( loop_counter ) == NULL ) {
 	    dnode_append_type( loop_counter,
@@ -7636,6 +7640,167 @@ control_statement
         compiler_make_stack_top_addressof( compiler, px );
         compiler_compile_ldi( compiler, px );
         compiler_compile_sti( compiler, px );
+      }
+     loop_body
+      {
+        /* stack now:
+           ..., lvariable_address, array_current_ptr */
+        ENODE *loop_var = compiler->e_stack; /* array_current_ptr */
+        loop_var = loop_var ? enode_next( loop_var ) : NULL; /* lvariable_address */
+        
+        if( loop_var && !enode_has_flags( loop_var, EF_IS_READONLY )) {
+            /* Store the current array element into the loop variable: */
+            /* stack now:
+               ..., lvariable_address, array_current_ptr */
+            compiler_compile_over( compiler, px );
+            compiler_compile_over( compiler, px );
+            compiler_make_stack_top_element_type( compiler );
+            compiler_make_stack_top_addressof( compiler, px );
+            compiler_compile_swap( compiler, px );
+            compiler_compile_ldi( compiler, px );
+            compiler_compile_sti( compiler, px );
+        }
+
+	compiler_fixup_op_continue( compiler, px );
+	compiler_fixup_here( compiler );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
+
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
+      }
+
+  | labeled_for '(' variable_declaration_keyword for_variable_declaration
+      {
+	int readonly = $3;
+	if( readonly ) {
+	    dnode_set_flags( $4, DF_IS_READONLY );
+	}
+	compiler_push_loop( compiler, /* loop_label = */ $1,
+                            /* ncounters = */ 0, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+      }
+    in_loop_separator expression ')'
+      {
+	DNODE *loop_counter_var = $4;
+        TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
+        TNODE *element_type = 
+            aggregate_expression_type ?
+            tnode_element_type( aggregate_expression_type ) : NULL;
+        ssize_t neg_element_size = -1;
+        ssize_t zero = 0;
+
+        if( enode_has_flags( compiler->e_stack, EF_IS_READONLY )) {
+	    dnode_set_flags( loop_counter_var, DF_IS_READONLY );
+        }
+
+        /* stack now: ..., array_current_ptr */
+        if( element_type ) {
+            if( dnode_type( loop_counter_var ) == NULL ) {
+                dnode_append_type( loop_counter_var,
+                                   share_tnode( element_type ));
+            }
+            dnode_assign_offset( loop_counter_var,
+                                 &compiler->local_offset );
+        }
+
+	compiler_vartab_insert_named_vars( compiler, loop_counter_var, px );
+
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &neg_element_size );
+
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+
+        compiler_push_current_address( compiler, px );
+
+        /* stack now: ..., array_current_ptr */
+        /* Store the current array element into the loop variable: */
+        compiler_compile_dup( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        if( aggregate_expression_type &&
+            tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+            tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+            compiler_compile_ldi( compiler, px );
+        } else {
+            compiler_emit( compiler, px, "\tc\n", GLDI );
+            compiler_stack_top_dereference( compiler );
+        }
+        compiler_compile_variable_initialisation
+            ( compiler, loop_counter_var, px );
+      }
+     loop_body
+      {
+	int readonly = $3;
+	DNODE *loop_counter_var = $4;
+        /* stack now: ..., array_current_ptr */
+
+        /* Store the the loop variable back into the current array element: */
+        if( !readonly ) {
+            TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
+            TNODE *element_type = 
+                aggregate_expression_type ?
+                tnode_element_type( aggregate_expression_type ) : NULL;
+
+            compiler_compile_dup( compiler, px );
+            compiler_make_stack_top_element_type( compiler );
+            compiler_make_stack_top_addressof( compiler, px );
+            compiler_compile_load_variable_value( compiler,
+                                                  loop_counter_var, px );
+            if( aggregate_expression_type &&
+                tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+                tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+                compiler_compile_sti( compiler, px );
+            } else {
+                compiler_emit( compiler, px, "\tc\n", GSTI );
+                compiler_drop_top_expression( compiler );
+                compiler_drop_top_expression( compiler );
+            }
+        }
+
+	compiler_fixup_op_continue( compiler, px );
+        compiler_fixup_here( compiler );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
+
+	compiler_fixup_op_break( compiler, px );
+	compiler_pop_loop( compiler );
+	compiler_end_subscope( compiler, px );
+      }
+
+  | labeled_for '(' lvariable
+      {
+        compiler_push_loop( compiler, /* loop_label = */ $1,
+                            /* ncounters = */ 1, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+        /* stack now: ..., lvariable_address */
+      }
+    in_loop_separator expression ')'
+      {
+        /* stack now:
+           ..., lvariable_address, array_last_ptr */
+        ssize_t neg_element_size = -1;
+        ssize_t zero = 0;
+
+        /* stack now: ..., lvariable_address, array_current_ptr */
+
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &neg_element_size );
+
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+
+        /* The execution flow should return here after each iteration: */
+        compiler_push_current_address( compiler, px );
+
+        /* stack now: ..., lvariable_address, array_current_ptr */
+        /* Store the current array element into the loop variable: */
+        compiler_compile_over( compiler, px );
+        compiler_compile_over( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_ldi( compiler, px );
+        compiler_compile_sti( compiler, px );
+        compiler_end_subscope( compiler, px );
       }
      loop_body
       {
