@@ -419,8 +419,9 @@ static char *make_full_file_name( char *filename, char *path,
 static int rscandir( DIR *dp, char *filename,
                      char *dirname,  /* Basename of the currently
                                         processed directory */
-                     char **dirpath, /* Full path to the currently
-                                        processed directory */
+                     char *volatile* dirpath, /* Full path to the
+                                                 currently processed
+                                                 directory */
                      cexception_t *ex )
 {
     struct dirent *dire;
@@ -543,22 +544,34 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
             if( strstr( *path, "//" ) == 
                 *path + strlen(*path) - 2 ) {
                 /* printf( ">>>> will search '%s' recursively\n", *path ); */
-                char *dirpath = NULL;
-                DIR *dp =opendir( *path );
+                cexception_t inner;
+                char * volatile dirpath = NULL;
+                DIR * volatile dp = opendir( *path );
+                int volatile is_found = 0;
+
                 if( !dp ) {
                     fprintf( stderr, "%s: ERROR, could not open directory - %s\n",
                              *path, strerror(errno));
                     continue;
                 }
-                int is_found = 
-                    rscandir( dp, filename, *path, &dirpath, ex );
-                closedir( dp );
-                if( is_found ) {
-                    full_path = make_full_file_name( filename, dirpath, NULL, ex );
-                    /* printf( ">>>> The found path is '%s'\n" , full_path ); */
-                }
-                if( dirpath )
+                cexception_guard( inner ) {
+                    is_found = 
+                        rscandir( dp, filename, *path, &dirpath, &inner );
+                    closedir( dp );
+                    dp = NULL;
+                    if( is_found ) {
+                        full_path = make_full_file_name( filename, dirpath, 
+                                                         NULL, &inner );
+                        /* printf( ">>>> The found path is '%s'\n",
+                           full_path ); */
+                    }
                     freex( dirpath );
+                }
+                cexception_catch {
+                    freex( dirpath );
+                    closedir( dp );
+                    cexception_reraise( inner, ex );
+                }
                 if( is_found)
                     return full_path;
             }
