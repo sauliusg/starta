@@ -8653,6 +8653,11 @@ delimited_type_declaration
 	compiler_end_scope( compiler, px );
 	compiler_compile_type_declaration( compiler, $3, px );
       }
+  | type_declaration_start '=' _NEW var_type_description
+      {
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $4, px );
+      }
   | type_declaration_start '=' delimited_type_description /*type_*/initialiser
       {
         compiler_compile_drop( compiler, px );
@@ -8673,6 +8678,17 @@ undelimited_type_declaration
       {
 	compiler_end_scope( compiler, px );
 	compiler_compile_type_declaration( compiler, $3, px );
+	compiler->current_type = NULL;
+      }
+
+  | type_declaration_start '=' _NEW var_type_description
+    struct_or_class_body
+      {
+	compiler_end_scope( compiler, px );
+	compiler_compile_type_declaration( compiler, $4, px );
+        /* FIXME: Use $5 in a sensible way here ... S.G. */
+        delete_tnode( $5 );
+        $5 = NULL;
 	compiler->current_type = NULL;
       }
 
