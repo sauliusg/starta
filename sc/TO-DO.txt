@@ -1,3 +1,4 @@
+-- Implement 'type x = new y' construct, and make types 'a' and 'b' equivalent after 'type a = b' 
 -- Add pragma to warn about unused return value for functions, very important for 'push()'.
 -- Implement possibility to use constants with type suffixes as default function parameter values.
 -+ Implement '-I path//' construct for recursive directory searches (clean up the code)
