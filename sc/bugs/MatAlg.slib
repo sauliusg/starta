@@ -1,0 +1,102 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2015-05-20 22:28:10 +0300 (Wed, 20 May 2015) $ 
+//$Revision: 48 $
+//$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/sgem-xray/trunk/lib/Spacegroups.slib $
+//---------------------------------------------------------------------------*/
+//*
+// Provides simple functions for matrix operator algebra.
+//**
+
+module MatAlg
+
+use * from std;
+
+function multiply( m1, m2 : array [][] of float ): array [][] of float
+{
+    var prod = m1[];
+
+    for( var row => prod ) { row = row[] }
+
+    for( var i = 0; i < length(m1); i ++ ) {
+        for( var j = 0; j < length(m1); j ++ ) {
+            prod[i][j] = 0.0;
+            for( var k = 0; k < length(m1); k ++ ) {
+                prod[i][j] += m1[i][k] * m2[k][j];
+            }
+        }
+    }
+    return prod;
+}
+
+operator "*"( m1, m2 : array [][] of float ): array [][] of float
+{
+    return multiply( m1, m2 );
+}
+
+operator "*"( float k; m : array [][] of float ): array [][] of float
+{
+    var prod = m[];
+
+    for( var row => prod ) { row = row[] }
+
+    for( var i = 0; i < length(m); i ++ ) {
+        for( var j = 0; j < length(m); j ++ ) {
+            prod[i][j] *= k;
+        }
+    }
+    return prod;
+}
+
+function det3( s : float[][] ): float
+{
+    return
+        + s[0][0] * s[1][1] * s[2][2]
+        + s[1][0] * s[2][1] * s[0][2]
+        + s[0][1] * s[1][2] * s[2][0]
+
+        - s[0][2] * s[1][1] * s[2][0]
+        - s[0][0] * s[1][2] * s[2][1]
+        - s[0][1] * s[1][0] * s[2][2];
+}
+
+function det2( s : float[][] ): float
+{
+    return
+        + s[0][0] * s[1][1]
+        - s[1][0] * s[0][1]
+}
+
+exception UNSUPPORTED_MATRIX_SIZE;
+
+function adjunct3( m : float[][]; int row; int col ): float
+{
+    var matrix = new float[2][2];
+
+    var mi, mj = 0, 0;
+    for( var i = 0; i < 3; i ++ ) {
+        do continue if( i == row );
+        mj = 0;
+        for( var j = 0; j < 3; j ++ ) {
+	    do continue if( j == col );
+            matrix[mi][mj] = m[i][j];
+            mj ++;
+        }
+        mi ++;
+    }
+    do raise UNSUPPORTED_MATRIX_SIZE if( mi != 2 );
+    do raise UNSUPPORTED_MATRIX_SIZE if( mj != 2 );
+    var coef = ((row + col) % 2 == 0) ? +1.0 : -1.0;
+    return coef * det2( matrix );
+}
+
+function inv3( m : float[][] ): float[][]
+{
+    return (1/det3(m)) * [
+        [ adjunct3(m,0,0), adjunct3(m,0,1), adjunct3(m,0,2) ],
+        [ adjunct3(m,1,0), adjunct3(m,1,1), adjunct3(m,1,2) ],
+        [ adjunct3(m,2,0), adjunct3(m,2,1), adjunct3(m,2,2) ]
+    ];
+}
+
+end module MatAlg;
