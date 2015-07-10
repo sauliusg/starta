@@ -4290,7 +4290,7 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	if( tnode_name( type_descr ) == NULL ) {
 	    tnode = tnode_set_name( type_descr, type_name, &inner );
 	} else if( type_descr != cc->current_type ) {
-	    tnode = tnode_set_name( new_tnode_synonim( type_descr, &inner ),
+	    tnode = tnode_set_name( new_tnode_derived( type_descr, &inner ),
 				    type_name, &inner );
 	    suffix = new_anode_string_attribute( "suffix", tnode_name( tnode ),
 						 &inner );
@@ -8140,7 +8140,7 @@ delimited_type_description
     }
     struct_or_class_body
     {
-	$$ = new_tnode_synonim( share_tnode( $2 ), px );
+	$$ = new_tnode_derived( share_tnode( $2 ), px );
 	$$ = tnode_move_operators( $$, $4 );
 	delete_tnode( $4 );
 	$4 = NULL;
@@ -8151,7 +8151,7 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_synonim( composite, px );
+      $$ = new_tnode_derived( composite, px );
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
     }
@@ -8312,7 +8312,7 @@ undelimited_type_description
   | type_identifier _OF undelimited_or_structure_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_synonim( composite, px );
+      $$ = new_tnode_derived( composite, px );
       tnode_insert_element_type( $$, $3 );
     }
 
@@ -10267,7 +10267,7 @@ struct_expression
 
   | _TYPE type_identifier _OF delimited_type_description
      {
-	 TNODE *composite = new_tnode_synonim( $2, px );
+	 TNODE *composite = new_tnode_derived( $2, px );
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
@@ -11622,7 +11622,7 @@ field_designator
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
         TNODE *composite = $2;
-        composite = new_tnode_synonim( composite, px );
+        composite = new_tnode_derived( composite, px );
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
