@@ -78,7 +78,7 @@ TNODE *new_tnode_any( cexception_t *ex );
 #endif
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
-TNODE *new_tnode_synonim( TNODE *base, cexception_t *ex );
+TNODE *new_tnode_derived( TNODE *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
 TNODE *new_tnode_type_descriptor( cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
