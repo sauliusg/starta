@@ -65,8 +65,6 @@ typedef enum {
     TK_FUNCTION_REF,
     TK_NULLREF,
     TK_IGNORE, /* "type" of ignored arguments, e.g. for the "over" operator */
-    TK_TYPE_DESCR, /* type descriptor - RTTI - making types "first
-                      class" values. */
     TK_EXCEPTION,
     last_type_kind_t
 } type_kind_t;
@@ -79,15 +77,11 @@ TNODE *new_tnode_forward_class( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_interface( char *name, cexception_t *ex );
 TNODE *new_tnode_ptr( cexception_t *ex );
 TNODE *new_tnode_nullref( cexception_t *ex );
-#if 0
-TNODE *new_tnode_any( cexception_t *ex );
-#endif
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
 TNODE *new_tnode_derived( TNODE *base, cexception_t *ex );
 TNODE *new_tnode_equivalent( char *name, TNODE *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
-TNODE *new_tnode_type_descriptor( cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
 TNODE *tnode_set_nref( TNODE *tnode, ssize_t nref );
 
