@@ -54,7 +54,13 @@ typedef enum {
     TK_CONSTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
-    TK_DERIVED,
+    TK_DERIVED,     /* A new derived type inherits implementation and
+                       interface (operators) from its parent, or base,
+                       type, but which itself can not be assigned to
+                       floats, and two derived types are incompatible
+                       with each other. */
+    TK_EQUIVALENT,  /* Completely equivalent type, or synonim;
+                       declared as 'type X = Y;'*/
     TK_REF,
     TK_FUNCTION_REF,
     TK_NULLREF,
@@ -79,6 +85,7 @@ TNODE *new_tnode_any( cexception_t *ex );
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
 TNODE *new_tnode_derived( TNODE *base, cexception_t *ex );
+TNODE *new_tnode_equivalent( char *name, TNODE *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
 TNODE *new_tnode_type_descriptor( cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
