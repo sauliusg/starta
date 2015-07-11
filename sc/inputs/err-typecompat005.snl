@@ -7,8 +7,8 @@
 
 use * from std;
 
-type inches = float;
-type cm = float;
+type inches = new float;
+type cm = new float;
 
 var c : cm;
 var i : inches;

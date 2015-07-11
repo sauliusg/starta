@@ -30,6 +30,7 @@ typedef enum {
     TF_EXTENDABLE_ENUM = 0x10,
     TF_IS_IMMUTABLE    = 0x20,
     TF_NON_NULL        = 0x40,
+    TF_IS_EQUIVALENT   = 0x80,
     last_TYPE_FLAG
 } type_flag_t;
 
@@ -59,8 +60,6 @@ typedef enum {
                        type, but which itself can not be assigned to
                        floats, and two derived types are incompatible
                        with each other. */
-    TK_EQUIVALENT,  /* Completely equivalent type, or synonim;
-                       declared as 'type X = Y;'*/
     TK_REF,
     TK_FUNCTION_REF,
     TK_NULLREF,
@@ -80,7 +79,7 @@ TNODE *new_tnode_nullref( cexception_t *ex );
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
 TNODE *new_tnode_derived( TNODE *base, cexception_t *ex );
-TNODE *new_tnode_equivalent( char *name, TNODE *base, cexception_t *ex );
+TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
 TNODE *tnode_set_nref( TNODE *tnode, ssize_t nref );
