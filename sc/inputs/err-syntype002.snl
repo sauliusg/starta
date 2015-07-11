@@ -7,8 +7,8 @@
 
 include "stdtypes.slib"
 
-type cell  = float;
-type voxel = float;
+type cell  = new float;
+type voxel = new float;
 
 var a, b, c : cell;
 var u, v, w : voxel;

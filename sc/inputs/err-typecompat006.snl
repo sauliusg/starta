@@ -7,8 +7,8 @@
 
 use * from std;
 
-type inches = float;
-type cm = float;
+type inches = new float;
+type cm = new float;
 
 type landmarks = array [][] of cm;
 type matrix = array [][] of float;

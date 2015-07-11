@@ -1748,10 +1748,10 @@ static void compiler_drop_operator_args( COMPILER *cc,
 }
 
 static void compiler_push_operator_retvals( COMPILER *cc,
-					 operator_description_t *od,
-					 ENODE * volatile *on_error_expr,
-                                         TYPETAB *generic_types,
-					 cexception_t *ex )
+                                            operator_description_t *od,
+                                            ENODE * volatile *on_error_expr,
+                                            TYPETAB *generic_types,
+                                            cexception_t *ex )
 {
     TNODE *retval_type;
 
@@ -1764,7 +1764,10 @@ static void compiler_push_operator_retvals( COMPILER *cc,
 	    ( tnode_kind( od->containing_type ) == TK_DERIVED ||
 	      tnode_kind( od->containing_type ) == TK_ENUM ) &&
 	    (od->flags & ODF_IS_INHERITED) != 0 ) {
-	TNODE *base_type = tnode_base_type( od->containing_type );
+	TNODE *curr_type = od->containing_type;
+        while( tnode_has_flags( curr_type, TF_IS_EQUIVALENT ) &&
+               (curr_type = tnode_base_type( curr_type )) != NULL );
+        TNODE *base_type = tnode_base_type( curr_type );
 	if( retval_type == base_type ) {
 	    retval_type = od->containing_type;
 	}
@@ -1814,9 +1817,9 @@ static void compiler_emit_operator_or_report_missing( COMPILER *cc,
 }
 
 static void compiler_check_operator_retvals( COMPILER *cc,
-					  operator_description_t *od,
-					  int minvals,
-					  int maxvals )
+                                             operator_description_t *od,
+                                             int minvals,
+                                             int maxvals )
 {
     assert( od );
     assert( od->magic == OD_MAGIC );
@@ -2434,10 +2437,10 @@ static void compiler_duplicate_top_expression( COMPILER *cc,
 }
 
 static void compiler_compile_operator( COMPILER *cc,
-				    TNODE *tnode,
-				    char *operator_name,
-				    int arity,
-				    cexception_t *ex )
+                                       TNODE *tnode,
+                                       char *operator_name,
+                                       int arity,
+                                       cexception_t *ex )
 {
     operator_description_t od;
 
@@ -2448,11 +2451,11 @@ static void compiler_compile_operator( COMPILER *cc,
 }
 
 static void compiler_check_and_compile_operator( COMPILER *cc,
-					      TNODE *tnode,
-					      char *operator_name,
-					      int arity,
-					      key_value_t *fixup_values,
-					      cexception_t *ex )
+                                                 TNODE *tnode,
+                                                 char *operator_name,
+                                                 int arity,
+                                                 key_value_t *fixup_values,
+                                                 cexception_t *ex )
 {
     cexception_t inner;
     operator_description_t od;
@@ -2476,9 +2479,9 @@ static void compiler_check_and_compile_operator( COMPILER *cc,
 }
 
 static void compiler_check_and_compile_top_operator( COMPILER *cc,
-						  char *operator,
-						  int arity,
-						  cexception_t *ex )
+                                                     char *operator,
+                                                     int arity,
+                                                     cexception_t *ex )
 {
     ENODE *expr = cc->e_stack;
     TNODE *tnode = NULL;
@@ -2556,10 +2559,11 @@ static void compiler_compile_dup( COMPILER *cc, cexception_t *ex )
 	if( od.operator ) {
 	    ENODE *new_expr = expr;
 	    compiler_emit_function_call( cc, od.operator, NULL, "\n", ex );
-	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/,
+                                          ex );
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    compiler_push_operator_retvals( cc, &od, &new_expr,
-                                         NULL /* generic_types */, ex );
+                                            NULL /* generic_types */, ex );
 	    if( !new_expr ) {
 		share_enode( expr );
 	    }
@@ -2683,12 +2687,12 @@ static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 	    operator_description_t od;
 
 	    compiler_init_operator_description( &od, cc, expr2_type,
-                                             "over", 2, ex );
+                                                "over", 2, ex );
 	    compiler_check_operator_args( cc, &od, generic_types, ex );
 	    compiler_emit_operator_or_report_missing( cc, &od, NULL, "", ex );
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    compiler_push_operator_retvals( cc, &od, NULL, generic_types,
-					 ex );
+                                            ex );
 	    compiler_emit( cc, ex, "\n" );
 	} else {
 	    if( expr2_type ) {
@@ -4290,7 +4294,7 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	if( tnode_name( type_descr ) == NULL ) {
 	    tnode = tnode_set_name( type_descr, type_name, &inner );
 	} else if( type_descr != cc->current_type ) {
-	    tnode = tnode_set_name( new_tnode_derived( type_descr, &inner ),
+	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
 				    type_name, &inner );
 	    suffix = new_anode_string_attribute( "suffix", tnode_name( tnode ),
 						 &inner );
@@ -8655,8 +8659,22 @@ delimited_type_declaration
       }
   | type_declaration_start '=' _NEW var_type_description
       {
+        cexception_t inner;
+        TNODE * type_description = $4;
+        TNODE * volatile ntype = NULL; /* new type */
 	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $4, px );
+        cexception_guard( inner ) {
+            ntype = new_tnode_derived( type_description, &inner );
+            assert( compiler->current_type );
+            tnode_set_name( ntype, tnode_name( compiler->current_type ),
+                            &inner );
+            // ntype =  $4;            
+            compiler_compile_type_declaration( compiler, ntype, &inner );
+        }
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
       }
   | type_declaration_start '=' delimited_type_description /*type_*/initialiser
       {
@@ -8678,17 +8696,6 @@ undelimited_type_declaration
       {
 	compiler_end_scope( compiler, px );
 	compiler_compile_type_declaration( compiler, $3, px );
-	compiler->current_type = NULL;
-      }
-
-  | type_declaration_start '=' _NEW var_type_description
-    struct_or_class_body
-      {
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $4, px );
-        /* FIXME: Use $5 in a sensible way here ... S.G. */
-        delete_tnode( $5 );
-        $5 = NULL;
 	compiler->current_type = NULL;
       }
 

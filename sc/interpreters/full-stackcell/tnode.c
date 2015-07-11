@@ -291,19 +291,10 @@ TNODE *new_tnode_derived( TNODE *base, cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_equivalent( char *name, TNODE *base, cexception_t *ex )
+TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex )
 {
-    cexception_t inner;
-    TNODE *node = new_tnode( ex );
-
-    cexception_guard( inner ) {
-	node->kind = TK_EQUIVALENT;
-        node->name = strdupx( name, &inner );
-    }
-    cexception_catch {
-	delete_tnode( node );
-	cexception_reraise( inner, ex );
-    }
+    TNODE *node = new_tnode_derived( base, ex );
+    node->flags |= TF_IS_EQUIVALENT;
     return node;
 }
 
