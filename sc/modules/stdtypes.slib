@@ -961,6 +961,19 @@ type ldouble = {
     inline bytecode operator "**" ( i : ldouble; j : ldouble ) : ldouble
         { LDPOW };
 *)
+    bytecode inline operator "<" ( x, y : ldouble ) : bool
+        { LDLTBOOL };
+    bytecode inline operator ">" ( x, y : ldouble ) : bool
+        { LDGTBOOL };
+    bytecode inline operator "<=" ( x, y : ldouble ) : bool
+        { LDLEBOOL };
+    bytecode inline operator ">=" ( x, y : ldouble ) : bool
+        { LDGEBOOL };
+    bytecode inline operator "==" ( x, y : ldouble ) : bool
+        { LDEQBOOL };
+    bytecode inline operator "!=" ( x, y : ldouble ) : bool
+        { LDNEBOOL };
+
     inline bytecode operator "." ( i : ldouble )
         { LDPRINT };
     inline bytecode operator "<" ( i : ldouble )
