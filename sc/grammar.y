@@ -10423,6 +10423,11 @@ arithmetic_expression
        compiler_compile_binop( compiler, "%%", px );
       }
 
+  | __DOUBLE_PERCENT expression %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "%%", px );
+      }
+
 /*
   | '<' __IDENTIFIER '>' expression %prec __UNARY
       {
