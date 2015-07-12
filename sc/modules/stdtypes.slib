@@ -75,6 +75,9 @@ type char = {
     inline bytecode operator "%%" ( format : string; x : char ) : string
         { BSPRINTF };
 
+    inline bytecode operator "%%" ( x : char ) : string
+        { SLDC "%c" SWAP BSPRINTF };
+
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; char value )
         { BPACK };
@@ -257,6 +260,9 @@ type byte = {
     inline bytecode operator "%%" ( format : string; x : byte ) : string
         { BSPRINTF };
 
+    inline bytecode operator "%%" ( x : byte ) : string
+        { SLDC "%hhd" SWAP BSPRINTF };
+
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; byte value )
         { BPACK };
@@ -338,6 +344,9 @@ type short = {
 
     inline bytecode operator "%%" ( format : string; x : short ) : string
         { HSPRINTF };
+
+    inline bytecode operator "%%" ( x : short ) : string
+        { SLDC "%hd" SWAP HSPRINTF };
 
     inline bytecode operator "ldc" () : short
         { HLDCS };
@@ -453,11 +462,15 @@ type int = {
 
     inline bytecode operator "<<" ( f : file; i : int ) : file
     	{ FILEPRINT };
+
     inline bytecode operator ">>" ( f : file ) : int
     	{ FILESCAN };
 
     inline bytecode operator "%%" ( format : string; x : int ) : string
         { ISPRINTF };
+
+    inline bytecode operator "%%" ( x : int ) : string
+        { SLDC "%d" SWAP ISPRINTF };
 
     bytecode inline operator "jnz" ( x : int )
         { JNZ };
@@ -584,6 +597,9 @@ type long = {
     inline bytecode operator "%%" ( format : string; x : long ) : string
         { LSPRINTF };
 
+    inline bytecode operator "%%" ( x : long ) : string
+        { SLDC "%ld" SWAP LSPRINTF };
+
     inline bytecode operator "@long" ( i : short ) : long
         { HEXTEND EXTEND };
 
@@ -704,6 +720,9 @@ type llong = {
     inline bytecode operator "%%" ( format : string; x : llong ) : string
         { LLSPRINTF };
 
+    inline bytecode operator "%%" ( x : llong ) : string
+        { SLDC "%lld" SWAP LLSPRINTF };
+
     inline bytecode operator "@llong" ( i : short ) : llong
         { HEXTEND EXTEND LEXTEND };
 
@@ -811,6 +830,9 @@ type float = {
     inline bytecode operator "%%" ( format : string; x : float ) : string
         { FSPRINTF };
 
+    inline bytecode operator "%%" ( x : float ) : string
+        { SLDC "%g" SWAP FSPRINTF };
+
     // inline bytecode operator "@float" ( i : float ) : float {};
 
     inline bytecode operator "@float" ( i : int ) : float
@@ -898,6 +920,9 @@ type double = {
 
     inline bytecode operator "%%" ( format : string; x : double ) : string
         { DSPRINTF };
+
+    inline bytecode operator "%%" ( x : double ) : string
+        { SLDC "%g" SWAP DSPRINTF };
 
     inline bytecode operator "@double" ( i : int ) : double
         { I2D };
@@ -988,6 +1013,9 @@ type ldouble = {
     inline bytecode operator "%%" ( format : string; x : ldouble ) : string
         { LDSPRINTF };
 
+    inline bytecode operator "%%" ( x : ldouble ) : string
+        { SLDC "%Lg" SWAP LDSPRINTF };
+
     inline bytecode operator "@ldouble" ( i : int ) : ldouble
         { I2LD };
 
@@ -1034,6 +1062,9 @@ type string = ?{
 
     inline bytecode operator "%%" ( format : string; x : string ) : string
         { SSPRINTF };
+
+    inline bytecode operator "%%" ( x : string ) : string
+        { SLDC "%s" SWAP SSPRINTF };
 
     inline bytecode operator "[char]" ( s : string; i : char ) : char
         { BPCKIDX 1 CLDI };
