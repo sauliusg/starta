@@ -940,6 +940,11 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type )
 	conversion = tnode_lookup_conversion( tnode, src_type->base_type );
     }
 
+    if( !conversion && tnode && tnode->base_type &&
+	tnode->kind == TK_DERIVED && tnode_has_flags( tnode, TF_IS_EQUIVALENT )) {
+	conversion = tnode_lookup_conversion( tnode->base_type, src_type );
+    }
+
     return conversion;
 }
 

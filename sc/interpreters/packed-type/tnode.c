@@ -936,6 +936,7 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type )
     conversion = tnode ?
 	dnode_list_lookup( tnode->conversions, src_type_name ) :
 	NULL;
+
     if( !conversion && tnode && src_type->base_type &&
 	( src_type->kind == TK_DERIVED || src_type->kind == TK_ENUM )) {
 	conversion = tnode_lookup_conversion( tnode, src_type->base_type );
