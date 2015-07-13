@@ -5232,6 +5232,14 @@ const_value_t compiler_get_tnode_compile_time_attribute( TNODE *tnode,
     if( strcmp( attribute_name, "nref" ) == 0 ) {
 	return make_const_value
             ( ex, VT_INTMAX, (intmax_t)tnode_number_of_references( tnode ));
+    }
+    if( strcmp( attribute_name, "kind" ) == 0 ) {
+	return make_const_value
+            ( ex, VT_INTMAX, (intmax_t)tnode_kind( tnode ));
+    }
+    if( strcmp( attribute_name, "isref" ) == 0 ) {
+	return make_const_value
+            ( ex, VT_INTMAX, (intmax_t)(tnode_is_reference( tnode ) ? 1 : 0));
     } else {
 	yyerrorf( "unknown compile-time attribute '%s' requested",
 		  attribute_name );
