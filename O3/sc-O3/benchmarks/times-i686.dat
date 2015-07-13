@@ -1,15 +1,17 @@
-Tue Dec  4 20:49:44 EET 2012
-Linux 2.6.38-16-generic i686
-Intel(R) Celeron(R) M processor          900MHz
-gcc (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
-fn001-loop.snl       real 0m0.013s
-fn001.snl            real 0m0.332s
-l-slow.snl           real 0m0.509s
-l-slower.snl         real 0m1.974s
-l.snl                real 0m0.574s
-mat001.snl           real 1m10.526s
-mat001asm.snl        real 0m33.345s
-mat002.snl           real 0m1.430s
-pl-slow.snl          real 0m0.229s
-pl-slower.snl        real 0m0.864s
-pl.snl               real 0m0.232s
+Mon Jul 13 21:35:27 EEST 2015
+Linux 3.13.0-37-generic i686
+Intel(R) Pentium(R) CPU B980 @ 2.40GHz
+Intel(R) Pentium(R) CPU B980 @ 2.40GHz
+gcc (Ubuntu 4.8.4-2ubuntu1~14.04) 4.8.4
+fib.snl              real 0m3.088s
+fn001-loop.snl       real 0m0.008s
+fn001.snl            real 0m0.085s
+l-slow.snl           real 0m0.147s
+l-slower.snl         real 0m0.571s
+l.snl                real 0m0.148s
+mat001.snl           real 0m17.584s
+mat001asm.snl        real 0m8.785s
+mat002.snl           real 0m0.408s
+pl-slow.snl          real 0m0.078s
+pl-slower.snl        real 0m0.290s
+pl.snl               real 0m0.077s

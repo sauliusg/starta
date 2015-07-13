@@ -1,14 +1,15 @@
-Tue Dec  4 20:51:35 EET 2012
-Linux 2.6.38-16-generic i686
-gcc (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
-fn001-loop.snl         86
-fn001.snl              91
-l-slow.snl            100
-l-slower.snl          102
-l.snl                  56
-mat001.snl            180
-mat001asm.snl         166
-mat002.snl            186
-pl-slow.snl            80
-pl-slower.snl          80
-pl.snl                 51
+Mon Jul 13 21:35:59 EEST 2015
+Linux 3.13.0-37-generic i686
+gcc (Ubuntu 4.8.4-2ubuntu1~14.04) 4.8.4
+fib.snl              1132
+fn001-loop.snl         91
+fn001.snl              96
+l-slow.snl            101
+l-slower.snl          103
+l.snl                  57
+mat001.snl            189
+mat001asm.snl         175
+mat002.snl            199
+pl-slow.snl            83
+pl-slower.snl          83
+pl.snl                 54
