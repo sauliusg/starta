@@ -1,0 +1,15 @@
+//
+// Benchmark recursive functions:
+//
+
+use * from std;
+
+function fib(int n) -> int
+{
+    return n < 2 ? n : fib(n-1) + fib(n-2);
+}
+
+for var i = 1 to 1000 do
+    assert fib(20) == 6765
+enddo
+
