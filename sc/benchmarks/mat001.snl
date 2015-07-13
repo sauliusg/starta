@@ -34,9 +34,9 @@ type int = {
     inline bytecode operator "[]" ( a : array; i : int ) : addressof
         { INDEX };
     inline bytecode operator "new[]" ( i : int ) : array
-        { AALLOC %%element_nref };
+        { AALLOC %%element_size %%element_nref };
     inline bytecode operator "new[][]" ( i : int ) : array
-        { MDALLOCC %%element_nref %%level };
+        { MDALLOCC %%element_size %%element_nref %%level };
     inline bytecode operator "loop" ( c : addressof; i : int )
         { LOOP };
 };
