@@ -4,56 +4,36 @@
 
 use * from std;
 
-var i : int;
-var s : string;
+function clone( m : array of type T; int level = 1 ): array of T
+{
+    if( level == 0 ) { return m }
 
-. "==================================================";
-. const(i.size);
-. const(i.nref);
-. const(i.offset);
-. const(i.kind);
-. const(i.isref);
+    var n = m[];
 
-. "";
-. "==================================================";
-. const(s.size);
-. const(s.nref);
-. const(s.offset);
-. const(s.kind);
-. const(s.isref);
+    if( level > 1 ) {
+        foreach var element in n {
+            element = clone( element, level - 1 );
+        }
+    }
 
-type S = struct {
-    int i, j, k;
-    float x, y, z;
-    string name;
-};
+    return n
+}
 
-. "";
-. "==================================================";
-. const(S.size);
-. const(S.nref);
-. const(S.kind);
-. const(S.isref);
+operator "." ( int[][] m )
+{
+    < "[ ";
+    for( var i = 0; i < length(m); i ++ ) do
+        < "[ ";
+        for( var j = 0; j < length(m); j ++ ) do
+                  < m[i][j], " "
+        enddo
+        < "] ";
+    enddo
+    . "]"
+}
 
-type R = struct {
-    int i, j, k;
-    float x, y, z;
-};
+var m = [ [1,2,3], [4,5,6], [7,8,9] ];
 
-. "";
-. "==================================================";
-. const(R.size);
-. const(R.nref);
-. const(R.kind);
-. const(R.isref);
+. m;
 
-var m = [ "one", "two", "three" ];
-
-."";
-. "==================================================";
-. const(m.size);
-. const(m.nref);
-. const(m.offset);
-. const(m.kind);
-. const(m.isref);
-
+. clone(m)
