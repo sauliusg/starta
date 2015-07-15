@@ -1351,3 +1351,11 @@ inline bytecode function exit( int exit_code )
 {
     EXIT
 }
+
+#
+# Deep cloning of objects and arrays:
+#
+
+inline bytecode 
+function clone( m : array of type T; int level = 1 ): array of T
+{ DEEPCLONE }
