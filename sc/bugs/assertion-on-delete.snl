@@ -1,0 +1,27 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+function clone( m : array of type T; int level = 1 ): T[]
+{
+    var n = m[];
+}
+
+operator "." ( int[][] m )
+{
+    < "[ ";
+    foreach var mm in m do
+        < "[ ";
+        foreach var i in mm do
+                  < i, " "
+        enddo
+        < "]";
+    enddo
+    . "]"
+}
+
+var m = [ [1,2,3], [4,5,6], [7,8,9] ];
+
+. m;
