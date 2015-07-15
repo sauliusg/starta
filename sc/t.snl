@@ -4,7 +4,7 @@
 
 use * from std;
 
-function clone( m : array of type T; int level = 1 ): array of T
+function clone( m : ref T; int level = 1 ): ref T
 {
     if( level == 0 ) { return m }
 
