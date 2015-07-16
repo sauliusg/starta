@@ -10686,6 +10686,8 @@ generator_new
           TNODE *element_type =  next_expr ? enode_type( next_expr ) : NULL;
           compiler_compile_array_alloc( compiler, element_type, px );
           compiler_emit( compiler, px, "\tc\n", FILLARRAY );
+          compiler_swap_top_expressions( compiler );
+          compiler_drop_top_expression( compiler );
       }
   | expression '*' _NEW md_array_allocator '[' expression ']'
       {
@@ -10696,6 +10698,8 @@ generator_new
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
           compiler_compile_mdalloc( compiler, element_type, level, px );
           compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
+          compiler_swap_top_expressions( compiler );
+          compiler_drop_top_expression( compiler );
       }
   ;
 
