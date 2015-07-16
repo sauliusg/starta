@@ -45,7 +45,7 @@ include ${DEPEND_FILES}
 	${GCC} ${CFLAGS} -M -MG $< > $@
 
 %.o: %.c
-	${CC} -c ${CFLAGS} -o $@ $<
+	${CC} -c ${CFLAGS} ${OPTFLAGS} -o $@ $<
 
 %.so.${SO_VERSION}: ${OFILES}
 	${LD} -shared -soname $*.so.${SO_MAJOR} -o $@ $^ ${LIBFLAGS}
