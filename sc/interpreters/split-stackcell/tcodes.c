@@ -1142,6 +1142,134 @@ int CLONE( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * DEEPCLONE  Clone object on the top of the stack, up to the 'nlevels' levels deep.
+ *
+ * bytecode:
+ * DEEPCLONE
+ *
+ * stack:
+ * object_ref nlevels --> copy_ref
+ */
+
+static int deep_clone( alloccell_t *ptr, int level )
+{
+    ssize_t i, length, nref;
+
+    if( level <= 0 ) return 1;
+    if( !ptr ) return 1;
+
+    length = ptr[-1].length;
+    nref = ptr[-1].nref;
+
+    if( nref == 0 ) return 1;
+
+    void **array;
+    int delta;
+    if( nref > 0 ) {
+        array = (void**)ptr;
+        delta = 1;
+    } else {
+        array = (void**)&ptr[-1];
+        array --;
+        delta = -1;
+        length = -nref;
+    }
+
+    for( i = 0; abs(i) < abs(length); i += delta ) {
+        alloccell_t *element = array[i];
+        if( element ) {
+            ssize_t nref = element[-1].nref;
+            ssize_t length = element[-1].length;
+            ssize_t size = element[-1].size;
+            ssize_t element_size =
+                element[-1].nref > 0 ? REF_SIZE : sizeof(stackunion_t);
+            if( length >= 0 ) {
+                assert( nref == 0 || nref == length );
+                array[i] = bcalloc_array( element_size, length,
+                                          nref == 0 ? 0 : 1 );
+            } else {
+                array[i] = bcalloc( size, -1, nref );
+            }
+
+            BC_CHECK_PTR( array[i] );
+
+            memcpy( array[i], element,
+                    length >= 0 ? (ssize_t)element_size * (ssize_t)length :
+                    size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
+
+            ((alloccell_t*)array[i])[-1].vmt_offset = element[-1].vmt_offset;
+
+            if( nref < 0 ) {
+                ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;
+                void *ref_dst = (char*)array[i] - sizeof(alloccell_t) - ref_size;
+                void *ref_src = (char*)element - sizeof(alloccell_t) - ref_size;
+                memcpy( ref_dst, ref_src, ref_size );
+            }
+            
+            if( level > 0 && array[i] ) {
+                if( !deep_clone( array[i], level - 1 ) ) {
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+int DEEPCLONE( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
+    int levels = istate.ep[0].num.i;
+    alloccell_t *ptr;
+    ssize_t nref, size, element_size, nele;
+
+    TRACE_FUNCTION();
+
+    if( !array || levels == 0 ) {
+        istate.ep ++;
+        return 1;
+    }
+
+    size = array[-1].size;
+    nref = array[-1].nref;
+    nele = array[-1].length;
+    element_size =
+        array[-1].nref > 0 ? REF_SIZE : sizeof(stackunion_t);
+
+    if( nele >= 0 ) {
+        assert( nref == 0 || nref == nele );
+        ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
+    } else {
+        ptr = bcalloc( size, -1, nref );
+    }
+
+    BC_CHECK_PTR( ptr );
+    STACKCELL_SET_ADDR( istate.ep[1], ptr );
+
+    memcpy( ptr, array,
+            nele >= 0 ? (ssize_t)element_size * (ssize_t)nele :
+            size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
+
+    ptr[-1].vmt_offset = array[-1].vmt_offset;
+
+    if( nref < 0 ) {
+        ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;
+        void *ref_dst = (char*)ptr - sizeof(alloccell_t) - ref_size;
+        void *ref_src = (char*)array - sizeof(alloccell_t) - ref_size;
+        memcpy( ref_dst, ref_src, ref_size );
+    }
+
+    if( levels > 1 ) {
+        deep_clone( ptr, levels - 1 );
+    }
+
+    STACKCELL_SET_ADDR( istate.ep[1], ptr );
+    istate.ep++;
+
+    return 1;
+}
+
+/*
  * MEMCPY (copy memory)
  *
  * bytecode:
