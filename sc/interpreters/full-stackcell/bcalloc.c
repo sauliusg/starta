@@ -57,10 +57,10 @@ void *bcalloc( size_t size, ssize_t length, ssize_t nref )
 {
     alloccell_t *ptr = NULL;
 
-    assert( nref <= length || length == 0 );
+    assert( nref <= length || length == -1 );
     assert( size >= nref * sizeof(stackcell_t) );
-    assert( nref == 0 || size >= length * sizeof(stackcell_t) );
-    assert( nref != 0 || size >= length );
+    assert( nref == 0 || length == -1 || size >= length * sizeof(stackcell_t));
+    assert( nref != 0 || length == -1 || size >= length );
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {

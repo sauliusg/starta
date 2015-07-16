@@ -27,7 +27,7 @@ typedef struct alloccell_t {
     ssize_t length;           /* contains number of elements if the
 				 allocated block is an array; for
 				 non-array elements contains value
-				 0. For strings should contain
+				 -1. For strings should contain
 				 strlen() of the string, which will be
 				 as a rule size - 1 (the last '\0'
 				 byte is not counted in 'length'. */
