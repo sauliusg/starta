@@ -1192,7 +1192,7 @@ static int deep_clone( alloccell_t *ptr, int level )
         length = -nref;
     }
 
-    for( i = 0; i < length; i += delta ) {
+    for( i = 0; abs(i) < abs(length); i += delta ) {
         alloccell_t *element = array[i];
         if( element ) {
             ssize_t nref = element[-1].nref;
@@ -1222,7 +1222,7 @@ static int deep_clone( alloccell_t *ptr, int level )
                 memcpy( ref_dst, ref_src, ref_size );
             }
             
-            if( level > 0 ) {
+            if( level > 0 && array[i] ) {
                 if( !deep_clone( array[i], level - 1 ) ) {
                     return 0;
                 }
