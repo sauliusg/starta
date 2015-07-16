@@ -994,6 +994,108 @@ int CLONE( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * DEEPCLONE  Clone object on the top of the stack, up to the 'nlevels' levels deep.
+ *
+ * bytecode:
+ * DEEPCLONE
+ *
+ * stack:
+ * object_ref nlevels --> copy_ref
+ */
+
+static int deep_clone( alloccell_t *ptr, int level )
+{
+    ssize_t i, nref;
+
+    if( level <= 0 ) return 1;
+    if( !ptr ) return 1;
+
+    nref = ptr[-1].nref;
+
+    if( nref == 0 ) return 1;
+
+    stackcell_t *array = (stackcell_t*)ptr;
+
+    for( i = 0; i < nref; i ++ ) {
+        alloccell_t *element = STACKCELL_PTR( array[i] );
+        if( !element ) continue;
+        if( element ) {
+            ssize_t nref = element[-1].nref;
+            ssize_t length = element[-1].length;
+            ssize_t size = element[-1].size;
+            ssize_t element_size = sizeof(stackcell_t);
+            void *ptr;
+            if( length >= 0 ) {
+                // printf( ">>> length = %2d, size = %d, nref = %d, flags & AF_HAS_REFS = %d\n",
+                //        length, size, nref, element[-1].flags & AF_HAS_REFS );
+                ptr = bcalloc_array( element_size, length,
+                                     element[-1].flags & AF_HAS_REFS ? 1 : 0 );
+                // nref == 0 ? 0 : 1 );
+            } else {
+                ptr = bcalloc( size, -1, nref );
+            }
+
+            BC_CHECK_PTR( ptr );
+            STACKCELL_SET_ADDR( array[i], ptr );
+
+            memcpy( ptr, element, size );
+
+            ((alloccell_t*)ptr)[-1].vmt_offset = element[-1].vmt_offset;
+
+            if( level > 0 ) {
+                if( !deep_clone( STACKCELL_PTR( array[i] ), level - 1 ) ) {
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+int DEEPCLONE( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
+    int levels = istate.ep[0].num.i;
+    alloccell_t *ptr;
+    ssize_t nref, size, element_size, nele;
+
+    TRACE_FUNCTION();
+
+    if( !array || levels == 0 ) {
+        istate.ep ++;
+        return 1;
+    }
+
+    element_size = sizeof(stackcell_t);
+    size = array[-1].size;
+    nref = array[-1].nref;
+    nele = array[-1].length;
+
+    if( nele >= 0 ) {
+        assert( nref == 0 || nref == nele );
+        ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
+    } else {
+        ptr = bcalloc( size, -1, nref );
+    }
+
+    BC_CHECK_PTR( ptr );
+    STACKCELL_SET_ADDR( istate.ep[1], ptr );
+
+    memcpy( ptr, array, size );
+
+    ptr[-1].vmt_offset = array[-1].vmt_offset;
+
+    if( levels > 1 ) {
+        deep_clone( ptr, levels - 1 );
+    }
+
+    STACKCELL_SET_ADDR( istate.ep[1], ptr );
+    istate.ep++;
+
+    return 1;
+}
+
+/*
  * MEMCPY (copy memory)
  *
  * bytecode:
