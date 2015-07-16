@@ -42,7 +42,7 @@ var m = struct S { name => "Default S" } * new [3][2];
 
 . clone(m, 3);
 
-var n = clone(m, 3);
+var n = clone(m, 2);
 
 foreach var nn in n {
     var i = 0;

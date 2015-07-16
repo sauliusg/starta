@@ -13,7 +13,7 @@ operator "." ( int[][] m )
     for( var i = 0; i < length(m); i ++ ) {
         if( m[i] != null ) {
             < "[ ";
-            for( var j = 0; j < length(m); j ++ ) {
+            for( var j = 0; j < length(m[i]); j ++ ) {
                 < m[i][j], "";
             }
             < "] ";;
