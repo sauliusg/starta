@@ -41,7 +41,9 @@ var m = struct S { name => "Default S", xyz => new float[3] } * new [3][2];
 
 . m;
 
-var n = clone(m, 4);
+. clone(m, 3);
+
+var n = clone(m, 3);
 
 foreach var nn in n {
     var i = 0;
