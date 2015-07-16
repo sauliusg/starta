@@ -12,7 +12,7 @@ struct S {
     operator "<" ( S s )
     {
         if( s ) {
-            < "{ ", "\"" + s.name + "\"", s.i, s.j, 
+            < "{", "\"" + s.name + "\"", s.i, s.j, 
                 s.xyz[0], s.xyz[1], s.xyz[2], "} ";
         } else {
             < "null S";
