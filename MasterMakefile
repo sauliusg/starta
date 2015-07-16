@@ -337,17 +337,16 @@ tests alltests: test shtests
 .PHONY: listdiff
 
 listdiff: # test
-	@-( test -d ${DIFFIL_DIR} && \
-	    find ${DIFFIL_DIR} -name '*.diff' \
-		| xargs ls -l \
-		| awk '{if( $$5 > 0 ) print}' ) || \
-	    true
-	@-( test -d ${TST_DIF_DIR} && \
-	    ls -l ${TST_DIF_DIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
-	    true
-	@-( test -d ${SHELL_DIFDIR} && \
-	    ls -l ${SHELL_DIFDIR}/*.diff | awk '{if( $$5 > 0 ) print}' ) || \
-	    true
+	@- if [ -d ${DIFFIL_DIR} ]; then \
+	   find ${DIFFIL_DIR} -name '*.diff' -size +0 \
+		| xargs --no-run-if-empty ls -l; fi
+	@- if [ -d ${TST_DIF_DIR} ]; then \
+	   find ${TST_DIF_DIR} -name '*.diff' -size +0 \
+		| xargs --no-run-if-empty ls -l; fi
+	@- if [ -d ${SHELL_DIFDIR} ]; then \
+	   find ${SHELL_DIFDIR} -name '*.diff' -size +0 \
+		| xargs --no-run-if-empty ls -l; fi
+
 
 #------------------------------------------------------------------------------
 
