@@ -572,7 +572,7 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
                     closedir( dp );
                     cexception_reraise( inner, ex );
                 }
-                if( is_found)
+                if( is_found )
                     return full_path;
             }
 	}
