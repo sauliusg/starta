@@ -6186,7 +6186,7 @@ delimited_statement
   ;
 
 assert_statement
-  : _ASSERT boolean_expression
+  : _ASSERT expression
   {
     ssize_t current_line_no = compiler_flex_current_line_number();
 
