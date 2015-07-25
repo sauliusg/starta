@@ -571,13 +571,25 @@ int LDI( INSTRUCTION_FN_ARGS )
 {
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[0] );
-    alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
+    alloccell_t *src = (alloccell_t*)(istate.ep[0].PTR);
+    alloccell_t *src_header = src - 1;
 #if 0
     ssize_t element_size = src_header->element_size;
     ssize_t length = src_header->length;
 #endif
 
     TRACE_FUNCTION();
+
+    if( !src ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     assert( offset >= 0 );
     assert( ((char*)src_header >= (char*)istate.top && 
@@ -643,11 +655,23 @@ int GLDI( INSTRUCTION_FN_ARGS )
     ssize_t neg_offset = offset >> bits;
     void** ref_ptr;
     void* num_ptr;
+    alloccell_t *src = istate.ep[0].PTR;
+    alloccell_t *src_header = src - 1;
     void** ref_src = (void**)STACKCELL_PTR(istate.ep[0]);
-    alloccell_t *src_header = (alloccell_t*)(istate.ep[0].PTR) - 1;
-    ssize_t element_size = src_header->element_size;
+    ssize_t element_size = src ? src_header->element_size : 0;
 
     TRACE_FUNCTION();
+
+    if( !src ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     if( offset >= 0 ) {
         if( src_header->nref <= 0 ) {
@@ -3735,9 +3759,21 @@ int PSTG( INSTRUCTION_FN_ARGS )
 
 int PLDI( INSTRUCTION_FN_ARGS )
 {
+    void **src = istate.ep[0].PTR;
     void *addr;
 
     TRACE_FUNCTION();
+
+    if( !src ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     addr = *((void**)STACKCELL_PTR(istate.ep[0]));
     STACKCELL_SET_ADDR( istate.ep[0], addr );
