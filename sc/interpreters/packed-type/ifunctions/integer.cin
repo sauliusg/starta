@@ -240,7 +240,8 @@ int @PREFIX1@INDEX( INSTRUCTION_FN_ARGS )
     if( index >= length ) {
         interpret_raise_exception_with_bcalloc_message
             ( /* err_code = */ -5,
-              /* message = */ "array index out of bounds",
+              /* message = */ 
+              (char*)cxprintf( "array index %d out of bounds", index ),
               /* module_id = */ 0,
               /* exception_id = */ SL_EXCEPTION_ARRAY_INDEX_OVERFLOW,
               EXCEPTION );
