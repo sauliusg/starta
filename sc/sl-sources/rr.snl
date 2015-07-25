@@ -168,7 +168,7 @@ begin
             if( (rem and 2 byte) == 0 byte ) {
                 newrule[i][j] := mate_rule[0..sum];
             } else {
-                newrule[i][j] := mate_rule;
+                newrule[i][j] := mate_rule[last(mate_rule)-sum..last(mate_rule)];
             }
 
 	    if( newfield[i][j] != field[i][j] ) then
