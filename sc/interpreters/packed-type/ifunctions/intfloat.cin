@@ -429,7 +429,20 @@ int @PREFIX@STG( INSTRUCTION_FN_ARGS )
 
 int @PREFIX@STI( INSTRUCTION_FN_ARGS )
 {
+    alloccell_t *dst = (alloccell_t*)(istate.ep[1].PTR);
+
     TRACE_FUNCTION();
+
+    if( !dst ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     *((@type@*)STACKCELL_PTR(istate.ep[1])) = istate.ep[0].I;
     STACKCELL_ZERO_PTR( istate.ep[1] );

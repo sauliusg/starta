@@ -615,13 +615,25 @@ int STI( INSTRUCTION_FN_ARGS )
 {
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t offset = STACKCELL_OFFSET( istate.ep[1] );
-    alloccell_t *dst_header = (alloccell_t*)(istate.ep[1].PTR) - 1;
+    alloccell_t *dst = (alloccell_t*)(istate.ep[1].PTR);
+    alloccell_t *dst_header = dst - 1;
 #if 0
     ssize_t element_size = dst_header->element_size;
     ssize_t length = dst_header->length;
 #endif
 
     TRACE_FUNCTION();
+
+    if( !dst ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     assert( offset >= 0 );
     assert( dst_header->nref * (ssize_t)REF_SIZE <= offset );
@@ -3790,7 +3802,20 @@ int PLDI( INSTRUCTION_FN_ARGS )
 
 int PSTI( INSTRUCTION_FN_ARGS )
 {
+    alloccell_t *dst = (alloccell_t*)(istate.ep[1].PTR);
+
     TRACE_FUNCTION();
+
+    if( !dst ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
     STACKCELL_ZERO_PTR( istate.ep[1] );
