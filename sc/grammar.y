@@ -4728,7 +4728,11 @@ static struct {
     { "BlobOverflowException",    SL_EXCEPTION_BLOB_OVERFLOW },
     { "BadBlobDescriptor",        SL_EXCEPTION_BLOB_BAD_DESCR },
     { "ArrayOverflowException",   SL_EXCEPTION_ARRAY_OVERFLOW },
+    { "ArrayIndexNegative",       SL_EXCEPTION_ARRAY_INDEX_NEGATIVE },
+    { "ArrayIndexOverflow",       SL_EXCEPTION_ARRAY_INDEX_OVERFLOW },
     { "TruncatedInteger",         SL_EXCEPTION_TRUNCATED_INTEGER },
+    { "UnimplementedMethod",      SL_EXCEPTION_UNIMPLEMENTED_METHOD },
+    { "UnimplementedInterface",   SL_EXCEPTION_UNIMPLEMENTED_INTERFACE },
 
     { NULL, SL_EXCEPTION_NULL }
 };
