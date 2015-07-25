@@ -4,6 +4,34 @@
 
 use * from std;
 
+// A cellular automaton pixel is 2 bits (4 values).
+
+// A central cell and its 8 Moore neighboors
+// (https://en.wikipedia.org/wiki/Moore_neighborhood) concatenated
+// give 9*2 = 18 bits, or 2**18 possible values.
+
+// A rules is formed by making a table with 2**18 entries, so that
+// each combination of a central value and its 8 neightbours can be
+// mapped into any arbitrary new value. Since pixel values are two
+// bits, an 8-bit byte can hold 4 (2**2) such values, and therefore a
+// rule can be packed into 2**18/2**2 = 2**16 = 64K bytes. A byte of a
+// rule conveniently holds four new values for four possible central
+// cell states, given the neighbourhood combination (8 * 2 = 16 bits,
+// 2**16 = 64K possible index values).
+
+// For an evolution to be possible, a rule-change rule must be
+// present. The rule-change rule will depend on the value of the
+// central cell, and either on the values of the neighbours. First, we
+// need to select a second "mating" rule (the first rule will be
+// always the central cell's rule). To specify this, we need 3 bits
+// (for 8 combinations). Then we need to specify a cut position (2**16
+// possibilities), and the exchange/no-exchange (crossing-over)
+// possibility (2 variants, 1 bits). Thus, for rule change we need 20
+// bits total. We can make this from: a) the central cell value (2
+// bits); b) all neighbout values (16 bits) c) the rule's value for
+// the central cell+neighbour combination (2 bits); total 16 + 2 + 2 =
+// 20 bits.
+
 function make_Life_rule( depth: int ) : array of byte
 {
     var states = depth/4;
@@ -92,7 +120,7 @@ function make_random_rule( depth: int ) : array of byte
 type Cell = byte;
 
 procedure generation( newfield, field : array [][] of Cell;
-                      rule: array [][][] of byte ) : int
+                      newrule, rule: array [][][] of byte ) : int
 begin
     var i, j : int;
     var sum : int;
@@ -121,9 +149,27 @@ begin
 
             var rem : byte = field[i][j];
 
-            newfield[i][j] =
+            var newval : byte;
+            newfield[i][j] = newval =
                 ((rule[i][j][sum] & (3 byte shl (2 byte * rem)))
                   shr (2 byte * rem)) & 3 byte;
+
+            // The neighbour rule used to "mate" with the current one:
+            // use 'newval' and 'rem' LSB to select the neighhbour to donate the rule;
+            // use 'rem' second bit to decide whether to swap or not;
+            // use 'sum' to decide where to cut the rule:
+            var di = [i,  i,  i1, i1, i1, i2, i2, i2];
+            var dj = [j1, j2, j1, j,  j2, j1, j,  j2];
+            var deltaidx = (newval shl 1 byte) or (rem and 1 byte);
+            var ri = di[deltaidx];
+            var rj = dj[deltaidx];
+            var mate_rule = rule[ri][rj];
+
+            if( (rem and 2 byte) == 0 byte ) {
+                newrule[i][j] := mate_rule[0..sum];
+            } else {
+                newrule[i][j] := mate_rule;
+            }
 
 	    if( newfield[i][j] != field[i][j] ) then
 		nchanges ++;
@@ -262,7 +308,7 @@ var height = length(field[0]);
 var newfield = new Cell[width][height];
 
 var states = 1 shl 18;
-. states;
+. states, states/4;
 
 // var rules : array [][][] of byte = new byte[width][height][states/4];
 var rules : array [][][] of byte = new (array of byte)[width][height];
@@ -275,6 +321,8 @@ for var i = 0 to last(rules) do
         // rules[i][j] = make_random_rule( states );
     enddo
 enddo
+
+var newrules = new byte[width][height][states/4];
 
 printfield( field );
 
@@ -291,8 +339,9 @@ var nchanges: int;
 printfield( field );
 
 while( gen <= generations ) {
-    nchanges = generation( newfield, field, rules );
+    nchanges = generation( newfield, field, newrules, rules );
     field, newfield = newfield, field;
+    rules, newrules = newrules, rules;
     < "\033[H";
     < "Generation:";
     < gen;
@@ -302,7 +351,7 @@ while( gen <= generations ) {
         . "Stable configuration reached.";
 	break;
     endif
-    sleep( 800000 );
+    // sleep( 800000 );
     gen ++;
 }
 
