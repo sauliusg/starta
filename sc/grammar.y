@@ -695,21 +695,6 @@ static void compiler_close_include_file( COMPILER *c,
     c->package_filename = NULL;
 }
 
-#if 0
-static void push_int( int **array, int *size, int value, cexception_t *ex )
-{
-    *array = reallocx( *array, ( *size + 1 ) * sizeof(**array), ex );
-    (*array)[*size] = value;
-    (*size) ++;
-}
-
-static int pop_int( int **array, int *size, cexception_t *ex )
-{
-    (*size) --;
-    return (*array)[*size];
-}
-#endif
-
 static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
                           cexception_t *ex )
 {
