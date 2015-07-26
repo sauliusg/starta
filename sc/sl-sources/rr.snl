@@ -322,7 +322,8 @@ for var i = 0 to last(rules) do
     enddo
 enddo
 
-var newrules = new byte[width][height][states/4];
+// var newrules = new byte[width][height][states/4];
+var newrules = clone( rules, 3 );
 
 printfield( field );
 
@@ -335,7 +336,7 @@ var gen : int = 1;
 
 var nchanges: int;
 
-. "Generation:0";
+. "Generation: 0";
 printfield( field );
 
 while( gen <= generations ) {
