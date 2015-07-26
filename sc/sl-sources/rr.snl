@@ -296,7 +296,7 @@ function atoi( s : string ) : int
 	val = val * 10 + digit( s[i] );
     enddo
 
-    return val;
+    return sign * val;
 }
 
 program life( string argv[] )
