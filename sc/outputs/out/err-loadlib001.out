@@ -1,5 +1,4 @@
-./sl: inputs/err-loadlib001.snl(8,6): ERROR, could not open shared library '/usr/lib/noexistent.so' - no such file or directory
+./sl: inputs/err-loadlib001.snl(8,6): ERROR, could not find shared library '/usr/lib/noexistent.so' in the include path
 load "/usr/lib/noexistent.so";
      ^
-./sl: 1 error(s) detected
-
+could not find required shared libraries, terminating.
