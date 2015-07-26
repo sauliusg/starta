@@ -587,9 +587,11 @@ static void compiler_open_include_file( COMPILER *c, char *filename,
 {
     char *full_name = compiler_find_include_file( c, filename, ex );
     if( !full_name ) {
+        yyerrorf( "could not find module '%s' in the include path",
+                  filename );
         cexception_raise
             ( ex, COMPILER_FILE_SEARCH_ERROR,
-              cxprintf( "could not find file '%s'", filename ));
+              "could not find required module, terminating" );
     } else {
         compiler_push_compiler_state( c, ex );
         compiler_save_flex_stream( c, full_name, ex );
@@ -5402,10 +5404,11 @@ static void compiler_load_library( COMPILER *compiler,
 
     if( !library_path  ) {
         freex( library_name );
+        yyerrorf( "could not find shared library '%s' in the include path",
+                  library_filename );
         cexception_raise
             ( ex, COMPILER_FILE_SEARCH_ERROR,
-              cxprintf( "could not find file for the library '%s'",
-                        library_filename ));
+              "could not find required shared libraries, terminating." );
         return;
     }
 

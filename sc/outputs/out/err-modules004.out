@@ -1,1 +1,4 @@
-could not open file 'Deep.slib': No such file or directory
+./sl: inputs/err-modules004.snl(7,9): ERROR, could not find module 'Deep.slib' in the include path
+use Deep;
+        ^
+could not find required module, terminating
