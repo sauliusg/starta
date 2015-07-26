@@ -264,6 +264,11 @@ function isdigit( c : char ) : bool
            c == '9'c;
 }
 
+function isspace( c : char ) : bool
+{
+    return c == ' 'c || c == '\t'c;
+}
+
 inline bytecode function digit( c : char ) : int
 {
     SLDC '0' BLDI SUB HEXTEND EXTEND
@@ -272,8 +277,21 @@ inline bytecode function digit( c : char ) : int
 function atoi( s : string ) : int
 {
     var val = 0;
+    var pos : int = 0;
+    var sign = 1;
 
-    for var i = 0 to last(s) do
+    while( pos < length(s) && isspace(s[pos])) { pos ++ }
+
+    if( pos < length(s) && s[pos] == '-'c ) {
+        sign = -1;
+        pos ++
+    }
+
+    if( pos < length(s) && s[pos] == '+'c ) {
+        pos ++
+    }
+
+    for var i = pos to last(s) do
 	if( !isdigit( s[i] )) { break };
 	val = val * 10 + digit( s[i] );
     enddo
@@ -336,16 +354,15 @@ var gen : int = 1;
 
 var nchanges: int;
 
-. "Generation: 0";
+. "Generation:", generations;
 printfield( field );
 
-while( gen <= generations ) {
+while( generations < 0 || gen <= generations ) {
     nchanges = generation( newfield, field, newrules, rules );
     field, newfield = newfield, field;
     rules, newrules = newrules, rules;
     < "\033[H";
-    < "Generation:";
-    < gen, nchanges;
+    < "Generation:", gen, nchanges;
     . "              ";
     printfield( field );
     if( nchanges == 0 ) then
