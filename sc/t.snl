@@ -6,29 +6,6 @@
 
 use * from std;
 
-var p = new null struct { int i; string name };
-
-p = null;
-
-try {
-    p.name = "Structure name";
-}
-catch ArrayIndexNegative( var errno : int; var message : string ) {
-    . "ArrayIndexNegative :", message;
-}
-catch( var errno : int; var message : string ) {
-    . message;
-}
-
-try {
-    p.i = 10;
-}
-catch ArrayIndexNegative( var errno : int; var message : string ) {
-    . "ArrayIndexNegative :", message;
-}
-catch NullPointerError( var errno : int; var message : string ) {
-    . "NullPointerError :", message;
-}
-catch( var errno : int; var message : string ) {
-    . message;
-}
+. atoi( "1" );
+. atoi( "-1" );
+. atoi( argument(1) );
