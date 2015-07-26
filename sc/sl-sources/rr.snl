@@ -344,8 +344,8 @@ while( gen <= generations ) {
     rules, newrules = newrules, rules;
     < "\033[H";
     < "Generation:";
-    < gen;
-    . "";
+    < gen, nchanges;
+    . "              ";
     printfield( field );
     if( nchanges == 0 ) then
         . "Stable configuration reached.";
