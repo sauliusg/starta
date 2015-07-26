@@ -4,7 +4,6 @@
 -- Implement regular expressions.
 -- Implement 'mmap'.
 -- Implement readonly allocated blocks with run-time checks
--- Implement run-time null-pointer and array bound checks
 -- Think about modules to implement simple and convenient GUI.
 -- Implement generation of standalone executable files.
 -- Implement pre-compiled modules.
@@ -65,6 +64,7 @@
 +- Implement label printouts in the bytecode emitter functions.
 +- Implement advanced arithmetics and function calls for constant arithmetics
 ++ Implement '-I path//' construct for recursive directory searches (clean up the code)
+++ Implement run-time null-pointer and array bound checks
 ++ Think/implement generic 'copy()' and 'clone()' functions for deep cloning
 ++ Implement 'type x = new y' construct, and make types 'a' and 'b' equivalent after 'type a = b' 
 ++ implement "clone" operator for reference types.
