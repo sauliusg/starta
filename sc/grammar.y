@@ -535,6 +535,7 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
 	    }
             /* if no luck, check for a generic library: */
 	    full_path = make_full_file_name( filename, *path, NULL, ex );
+            /* printf( ">>> Checking '%s'\n", full_path ); */
 	    f = fopen( full_path, "r" );
 	    if( f ) {
 		fclose( f );
@@ -577,7 +578,7 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
             }
 	}
 	make_full_file_name( NULL, NULL, NULL, ex );
-	return filename;
+	return NULL;
     }
 }
 
@@ -585,8 +586,14 @@ static void compiler_open_include_file( COMPILER *c, char *filename,
 					cexception_t *ex )
 {
     char *full_name = compiler_find_include_file( c, filename, ex );
-    compiler_push_compiler_state( c, ex );
-    compiler_save_flex_stream( c, full_name, ex );
+    if( !full_name ) {
+        cexception_raise
+            ( ex, COMPILER_FILE_SEARCH_ERROR,
+              cxprintf( "could not find file '%s'", filename ));
+    } else {
+        compiler_push_compiler_state( c, ex );
+        compiler_save_flex_stream( c, full_name, ex );
+    }
 }
 
 static void compiler_push_symbol_tables( COMPILER *c,
@@ -5392,6 +5399,15 @@ static void compiler_load_library( COMPILER *compiler,
 
     char *library_path =
         compiler_find_include_file( compiler, library_filename, ex );
+
+    if( !library_path  ) {
+        freex( library_name );
+        cexception_raise
+            ( ex, COMPILER_FILE_SEARCH_ERROR,
+              cxprintf( "could not find file for the library '%s'",
+                        library_filename ));
+        return;
+    }
 
     strncpy( library_name, library_name_start, library_name_length );
 

@@ -72,8 +72,8 @@ typedef struct COMPILER_FLEX_STATE {
 } COMPILER_FLEX_STATE;
 
 static COMPILER_FLEX_STATE *new_compiler_flex_state( YY_BUFFER_STATE flex_state,
-                                               COMPILER_FLEX_STATE *next,
-                                               cexception_t *ex )
+                                                     COMPILER_FLEX_STATE *next,
+                                                     cexception_t *ex )
 {
     COMPILER_FLEX_STATE *state = callocx( sizeof(*state), 1, ex );
     state->flex_state = flex_state;
