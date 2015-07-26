@@ -1,6 +1,5 @@
 -- Add pragma to warn about unused return value for functions, very important for 'push()'.
 -- Implement possibility to use constants with type suffixes as default function parameter values.
--+ Implement '-I path//' construct for recursive directory searches (clean up the code)
 -- Implement regular expressions.
 -- Implement 'mmap'.
 -- Implement readonly allocated blocks with run-time checks
@@ -64,6 +63,7 @@
 +- Think about the possibility of "generic" functions with type "placeholders"
 +- Implement label printouts in the bytecode emitter functions.
 +- Implement advanced arithmetics and function calls for constant arithmetics
+++ Implement '-I path//' construct for recursive directory searches (clean up the code)
 ++ Think/implement generic 'copy()' and 'clone()' functions for deep cloning
 ++ Implement 'type x = new y' construct, and make types 'a' and 'b' equivalent after 'type a = b' 
 ++ implement "clone" operator for reference types.
