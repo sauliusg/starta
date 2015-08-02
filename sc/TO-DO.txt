@@ -1,3 +1,5 @@
+-- Implement Unix pipe constructs -- this may be a killer feature.
+-- Implement 'language' constructs -- this will be a killer feature.
 -- Make assertions throw exceptions on failures.
 -- Implement generation to the native code, with optimisations.
 -- Implement storage of full information about the codecell in thrcode
