@@ -1,3 +1,7 @@
+-- Make assertions throw exceptions on failures.
+-- Implement generation to the native code, with optimisations.
+-- Implement storage of full information about the codecell in thrcode
+-- Implement array and list comprehensions -- this makes code shorter!
 -- Think about implementing generic types as code templates, with code regeneration.
 -- Implement generic types with the Type<K,E> syntax
 -- Implement generic types with the Type<K:Iface1,E:Iface2> syntax
