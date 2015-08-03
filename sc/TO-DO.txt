@@ -1,3 +1,5 @@
+-- Think how to ensure readonliness of function aruments
+-- Implement destructors
 -- Make assertions throw exceptions on failures.
 -- Make C-style type declarations possible in exception prototypes
 -- Implement Unix pipe constructs -- this may be a killer feature.
