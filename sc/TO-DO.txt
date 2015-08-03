@@ -56,7 +56,7 @@
 ?? Write comments how begin_scope() and begin_subscope() are supposed to work
 ?? The same for end_{sub}scope() functions
 ?? Implement exception types (classes?).
-?? Make it possible to use 'float[]' as type designators of return values.
+++ Make it possible to use 'float[]' as type designators of return values.
 ?? Implement type-declared methods (functions).
 ** write tests for user-defined "drop" and "dropn" operators.
 ** write correct DROP/PDROP/user defined "drop" selection in all cases,
