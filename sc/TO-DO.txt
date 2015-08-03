@@ -1,10 +1,24 @@
--- Implement Unix pipe constructs -- this may be a killer feature.
--- Implement 'language' constructs -- this will be a killer feature.
 -- Make assertions throw exceptions on failures.
+-- Make C-style type declarations possible in exception prototypes
+-- Implement Unix pipe constructs -- this may be a killer feature.
+-- Think about convenient interface to use modules in my language in other languages.
+-- Implement 'language' constructs -- this will be a killer feature.
+-- Implement structure/class field set/get methods
+-- Implement structure/class field before/after Set/Get methods.
+-- Implement 'ref T' and 'num T' generic types.
+-- Implement public, protected and private members.
+-- Diagnose missing 'return expr' statements for subroutines that return values
+-- Think about convenient use of modules written in other languages in my language programs.
+-? Think about list constants?
+-- Think about more generic iterators/continuations
+-- Think if we can do return type inference from 'return' statements
+-- Think about more consise closure (lambda-function) notation.
+-- Implement generatiom of a real threaded code?
 -- Implement generation to the native code, with optimisations.
 -- Implement storage of full information about the codecell in thrcode
 -- Implement array and list comprehensions -- this makes code shorter!
 -- Think about implementing generic types as code templates, with code regeneration.
+-- Think about implementing 'lazy' (or 'ondemand') class fields
 -- Implement generic types with the Type<K,E> syntax
 -- Implement generic types with the Type<K:Iface1,E:Iface2> syntax
 -- Implement module download from the Internet.
@@ -17,8 +31,6 @@
 -- Implement generation of standalone executable files.
 -- Implement pre-compiled modules.
 -- Implement peephole optimiser.
--- Think about convenient interface to use modules in my language in other languages.
--- Think about convenient use of modules written in other languages in my language programs.
 -- Implement precondition and postconditions
 -- Implement pragma to skip included files from '--debug code' listing.
 -- Implement compile-time checks of uncaught exceptions
@@ -52,12 +64,9 @@
 -+ Write thorough tests for stdio operators (also for input!)
 -+ Implement anonymous array and struct compatibility.
 !! WARN: printf formats are incorrect for ints of different sizes.
-?? Implement 'ref T' and 'num T' generic types.
 ?? Write comments how begin_scope() and begin_subscope() are supposed to work
 ?? The same for end_{sub}scope() functions
 ?? Implement exception types (classes?).
-++ Make it possible to use 'float[]' as type designators of return values.
-?? Implement type-declared methods (functions).
 ** write tests for user-defined "drop" and "dropn" operators.
 ** write correct DROP/PDROP/user defined "drop" selection in all cases,
 ** See if functions generating STI and LDI can be merged -- not yet.
@@ -72,6 +81,8 @@
 +- Think about the possibility of "generic" functions with type "placeholders"
 +- Implement label printouts in the bytecode emitter functions.
 +- Implement advanced arithmetics and function calls for constant arithmetics
+++ Implement type-declared methods (functions).
+++ Make it possible to use 'float[]' as type designators of return values.
 ++ Implement '-I path//' construct for recursive directory searches (clean up the code)
 ++ Implement run-time null-pointer and array bound checks
 ++ Think/implement generic 'copy()' and 'clone()' functions for deep cloning
