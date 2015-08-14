@@ -1,6 +1,5 @@
 -- Think how to ensure readonliness of function arguments
 -- Implement destructors
--- Make assertions throw exceptions on failures.
 -- Implement Unix pipe constructs -- this may be a killer feature.
 -- Think about convenient interface to use modules in my language in other languages.
 -- Implement 'language' constructs -- this will be a killer feature.
@@ -82,6 +81,7 @@
 +- Think about the possibility of "generic" functions with type "placeholders"
 +- Implement label printouts in the bytecode emitter functions.
 +- Implement advanced arithmetics and function calls for constant arithmetics
+++ Make assertions throw exceptions on failures.
 ++ Make C-style type declarations possible in exception prototypes
 ++ Implement type-declared methods (functions).
 ++ Make it possible to use 'float[]' as type designators of return values.
