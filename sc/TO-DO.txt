@@ -1,4 +1,4 @@
--- Think how to ensure readonliness of function aruments
+-- Think how to ensure readonliness of function arguments
 -- Implement destructors
 -- Make assertions throw exceptions on failures.
 -- Make C-style type declarations possible in exception prototypes
