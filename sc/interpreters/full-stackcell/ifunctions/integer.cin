@@ -7,6 +7,7 @@
 
 #include <pack.h>
 #include <refsize.h>
+#include <alloccell.h>
 /* #include <hashcell.h> */
 
 #ifdef I
@@ -209,7 +210,42 @@ int @PREFIX1@JNZ( INSTRUCTION_FN_ARGS )
 
 int @PREFIX1@INDEX( INSTRUCTION_FN_ARGS )
 {
+    @type@ index = istate.ep[0].I;
+    alloccell_t *array_ptr = istate.ep[1].PTR;
+    ssize_t length = array_ptr ? array_ptr[-1].length : 0;
+
     TRACE_FUNCTION();
+
+    if( !array_ptr ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ "can't index null array",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
+
+    if( index < 0 ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -4,
+              /* message = */ "negative array index",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_ARRAY_INDEX_NEGATIVE,
+              EXCEPTION );
+	return 0;
+    }
+
+    if( index >= length ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -5,
+              /* message = */ 
+              (char*)cxprintf( "array index %d out of bounds", index ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_ARRAY_INDEX_OVERFLOW,
+              EXCEPTION );
+	return 0;
+    }
 
     STACKCELL_OFFSET_PTR( istate.ep[1], istate.ep[0].I * sizeof(stackcell_t) );
     istate.ep ++;

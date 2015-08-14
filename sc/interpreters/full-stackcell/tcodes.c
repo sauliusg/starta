@@ -560,7 +560,20 @@ int STG( INSTRUCTION_FN_ARGS )
 
 int LDI( INSTRUCTION_FN_ARGS )
 {
+    void *src = istate.ep[0].PTR;
+
     TRACE_FUNCTION();
+
+    if( !src ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     // istate.ep[0].num = ((stackcell_t*)STACKCELL_PTR(istate.ep[0]))->num;
     istate.ep[0] = *((stackcell_t*)STACKCELL_PTR(istate.ep[0]));
@@ -578,7 +591,20 @@ int LDI( INSTRUCTION_FN_ARGS )
 
 int STI( INSTRUCTION_FN_ARGS )
 {
+    alloccell_t *dst = (alloccell_t*)(istate.ep[1].PTR);
+
     TRACE_FUNCTION();
+
+    if( !dst ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     // ((stackcell_t*)STACKCELL_PTR(istate.ep[1]))->num = istate.ep[0].num;
     *((stackcell_t*)STACKCELL_PTR(istate.ep[1])) = istate.ep[0];
@@ -3565,9 +3591,21 @@ int PSTG( INSTRUCTION_FN_ARGS )
 
 int PLDI( INSTRUCTION_FN_ARGS )
 {
+    stackcell_t *src = istate.ep[0].PTR;
     void *addr;
 
     TRACE_FUNCTION();
+
+    if( !src ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
     addr = ((stackcell_t*)STACKCELL_PTR(istate.ep[0]))->ptr;
     STACKCELL_SET_ADDR( istate.ep[0], addr );
@@ -3584,7 +3622,20 @@ int PLDI( INSTRUCTION_FN_ARGS )
 
 int PSTI( INSTRUCTION_FN_ARGS )
 {
+    alloccell_t *dst = (alloccell_t*)(istate.ep[1].PTR);
+
     TRACE_FUNCTION();
+
+    if( !dst ) {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "dereferencing null pointer in %s", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
 
 #if 0
     *((void**)STACKCELL_PTR(istate.ep[1])) = STACKCELL_PTR( istate.ep[0] );
@@ -5261,8 +5312,15 @@ int ASSERT( INSTRUCTION_FN_ARGS )
     char *message = istate.static_data + istate.code[istate.ip+3].ssizeval;
 
     if( !assertion_ok ) {
-        fprintf( stderr, "Assertion '%s' failed: line %"SSIZE_FMT"d, "
-                 "file '%s'\n", message, line_no, filename );
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "assertion '%s' failed: line %"SSIZE_FMT"d, "
+                "file '%s'", message, line_no, filename ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+        return 0;
     }
 
     istate.ep ++;
