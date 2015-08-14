@@ -5953,7 +5953,6 @@ static cexception_t *px; /* parser exception */
 %token _ENUM
 %token _EXCEPTION
 %token _FOR
-%token _FOREACH
 %token _FORWARD
 %token _FROM
 %token _FUNCTION
@@ -7529,15 +7528,11 @@ control_statement
 	compiler_end_subscope( compiler, px );
       }
 
-  | opt_label _FOREACH variable_declaration_keyword
+  | labeled_for variable_declaration_keyword for_variable_declaration
       {
-        compiler_begin_subscope( compiler, px );
-      }
-    for_variable_declaration
-      {
-	int readonly = $3;
+	int readonly = $2;
 	if( readonly ) {
-	    dnode_set_flags( $5, DF_IS_READONLY );
+	    dnode_set_flags( $3, DF_IS_READONLY );
 	}
 	compiler_push_loop( compiler, /* loop_label = */ $1,
                             /* ncounters = */ 0, px );
@@ -7545,7 +7540,7 @@ control_statement
       }
     _IN expression
       {
-	DNODE *loop_counter_var = $5;
+	DNODE *loop_counter_var = $3;
         TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
         TNODE *element_type = 
             aggregate_expression_type ?
@@ -7594,8 +7589,8 @@ control_statement
       }
      loop_body
       {
-	int readonly = $3;
-	DNODE *loop_counter_var = $5;
+	int readonly = $2;
+	DNODE *loop_counter_var = $3;
         /* stack now: ..., array_current_ptr */
 
         /* Store the the loop variable back into the current array element: */
@@ -7631,14 +7626,14 @@ control_statement
 	compiler_end_subscope( compiler, px );
       }
 
-  | opt_label _FOREACH lvariable
+  | labeled_for lvariable _IN
       {
         compiler_push_loop( compiler, /* loop_label = */ $1,
                             /* ncounters = */ 1, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
         /* stack now: ..., lvariable_address */
       }
-    _IN expression
+    expression
       {
         /* stack now:
            ..., lvariable_address, array_last_ptr */
