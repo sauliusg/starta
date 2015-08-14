@@ -27,6 +27,11 @@ type bool = {
 
     bytecode inline operator "jz" ( x : bool )
         { BJZ };
+
+    inline bytecode operator "assert" ( x : bool )
+    {
+        ASSERT %%lineno %%file %%line
+    }
 }
 
 readonly false = 0b;
