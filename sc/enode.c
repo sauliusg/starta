@@ -122,6 +122,12 @@ ENODE *enode_set_flags( ENODE *enode, enode_flag_t flags )
     return enode;
 }
 
+ENODE *enode_reset_flags( ENODE *enode, enode_flag_t flags )
+{
+    enode->flags &= ~flags;
+    return enode;
+}
+
 int enode_has_flags( ENODE *enode, enode_flag_t flags )
 {
     return (enode->flags & flags);

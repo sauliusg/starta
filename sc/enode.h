@@ -43,6 +43,8 @@ int enode_size( ENODE *enode );
 
 ENODE *enode_set_flags( ENODE *enode, enode_flag_t flags );
 
+ENODE *enode_reset_flags( ENODE *enode, enode_flag_t flags );
+
 int enode_has_flags( ENODE *enode, enode_flag_t flags );
 
 ENODE *enode_set_has_errors( ENODE *enode );
