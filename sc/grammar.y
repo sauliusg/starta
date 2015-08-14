@@ -1263,9 +1263,9 @@ static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
 }
 
 static void compiler_fixup_inlined_function( COMPILER *cc,
-					  DNODE *function,
-					  key_value_t *fixup_values,
-					  ssize_t code_start )
+                                             DNODE *function,
+                                             key_value_t *fixup_values,
+                                             ssize_t code_start )
 {
     FIXUP *fixup, *fixup_list;
 
@@ -1314,7 +1314,7 @@ static void compiler_emit_function_call( COMPILER *cc,
 	}
 	if( fixup_values ) {
 	    compiler_fixup_inlined_function( cc, function, fixup_values,
-					  code_start );
+                                             code_start );
 	}
     } else {
 	TNODE *fn_tnode = function ? dnode_type( function ) : NULL;
@@ -1794,10 +1794,10 @@ static void compiler_push_operator_retvals( COMPILER *cc,
 }
 
 static void compiler_emit_operator_or_report_missing( COMPILER *cc,
-						   operator_description_t *od,
-						   key_value_t *fixup_values,
-						   char *trailer,
-						   cexception_t *ex )
+                                                      operator_description_t *od,
+                                                      key_value_t *fixup_values,
+                                                      char *trailer,
+                                                      cexception_t *ex )
 {
     assert( od );
     assert( od->magic == OD_MAGIC );
@@ -2012,10 +2012,10 @@ static void compiler_compile_binop( COMPILER *cc,
 	    top2 = enode_list_pop( &cc->e_stack );
 
 	    compiler_emit_operator_or_report_missing( cc, &od, NULL, "\n",
-                                                   &inner );
+                                                      &inner );
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    compiler_push_operator_retvals( cc, &od, &top2, generic_types,
-                                         &inner );
+                                            &inner );
 	}
     }
     cexception_catch {
@@ -2039,8 +2039,8 @@ static key_value_t *make_array_element_key_value_list( TNODE *array )
 }
 
 static void compiler_compile_unop( COMPILER *cc,
-				char *unop_name,
-				cexception_t *ex )
+                                   char *unop_name,
+                                   cexception_t *ex )
 {
     cexception_t inner;
     ENODE * volatile expr = cc->e_stack;
@@ -2055,8 +2055,12 @@ static void compiler_compile_unop( COMPILER *cc,
 	} else {
 	    TNODE *expr_type = enode_type( expr );
 	    operator_description_t od;
-	    key_value_t *fixup_values =
-		make_array_element_key_value_list( expr_type );
+	    key_value_t *fixup_values = NULL;
+            if( expr_type && tnode_kind( expr_type ) == TK_ARRAY ) {
+		fixup_values = make_array_element_key_value_list( expr_type );
+            } else {
+                fixup_values = make_tnode_key_value_list( expr_type );
+            }
 
 	    compiler_init_operator_description( &od, cc, expr_type,
                                              unop_name, 1, ex );
@@ -2065,7 +2069,7 @@ static void compiler_compile_unop( COMPILER *cc,
 	    top = enode_list_pop( &cc->e_stack );
 
 	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
-						   "\n", ex );
+                                                      "\n", ex );
 	    compiler_check_operator_retvals( cc, &od, 0, 1 );
 	    compiler_push_operator_retvals( cc, &od, &top, generic_types, &inner );
 	}
@@ -6198,18 +6202,22 @@ delimited_statement
 assert_statement
   : _ASSERT expression
   {
+    /*
     ssize_t current_line_no = compiler_flex_current_line_number();
-
     ssize_t file_name_offset = compiler_assemble_static_string
         ( compiler, compiler->filename, px );
 
     ssize_t current_line_offset = compiler_assemble_static_string
         ( compiler, (char*)compiler_flex_current_line(), px );
+    */
 
+    compiler_compile_unop( compiler, "assert", px );
+
+    /*
     compiler_emit( compiler, px, "\tceee\n", ASSERT,
                 &current_line_no, &file_name_offset, &current_line_offset );
-
     compiler_drop_top_expression( compiler );
+    */
   }
   ;
 
@@ -9271,7 +9279,7 @@ bytecode_constant
                 dnode_insert_code_fixup( compiler->current_function,
                                          type_attribute_fixup );
             }
-	}
+        }
       }
 
   | _CONST '(' constant_expression ')'
