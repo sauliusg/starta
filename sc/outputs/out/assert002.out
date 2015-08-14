@@ -1,4 +1,3 @@
-Assertion '    assert x < 10;' failed: line 8, file 'inputs/assert002.snl'
 0
 1
 2
@@ -10,4 +9,5 @@ Assertion '    assert x < 10;' failed: line 8, file 'inputs/assert002.snl'
 8
 9
 10
+assertion 'assert x < 10;' failed: line 9, file 'inputs/assert002.snl'
 After the loop.

@@ -5561,8 +5561,15 @@ int ASSERT( INSTRUCTION_FN_ARGS )
     char *message = istate.static_data + istate.code[istate.ip+3].ssizeval;
 
     if( !assertion_ok ) {
-        fprintf( stderr, "Assertion '%s' failed: line %"SSIZE_FMT"d, "
-                 "file '%s'\n", message, line_no, filename );
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "assertion '%s' failed: line %"SSIZE_FMT"d, "
+                "file '%s'", message, line_no, filename ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+        return 0;
     }
 
     istate.ep ++;
