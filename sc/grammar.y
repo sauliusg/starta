@@ -4257,6 +4257,9 @@ static void compiler_compile_indexing( COMPILER *cc,
             yyerrorf( "only references sould be cloned with '[]' operator" );
         }
         compiler_emit( cc, ex, "\tc\n", CLONE );
+        if( cc->e_stack ) {
+            enode_reset_flags( cc->e_stack, EF_IS_READONLY );
+        }
     } else if( expr_count == -1 ) {
 	assert( 0 );
     } else if( expr_count == 2 ) {
