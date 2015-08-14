@@ -219,7 +219,7 @@ endif       { MARK; return _ENDIF; }
 enum        { MARK; return _ENUM; }
 exception   { MARK; return _EXCEPTION; }
 for         { MARK; return _FOR; }
-foreach     { MARK; return _FOREACH; }
+foreach     { MARK; return _FOR; }
 forward     { MARK; return _FORWARD; }
 from        { MARK; return _FROM; }
 function    { MARK; return _FUNCTION; }
