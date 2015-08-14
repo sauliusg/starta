@@ -7979,12 +7979,38 @@ catch_variable_declaration
 	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
 	 compiler_push_typed_expression( compiler, new_tnode_ref( px ), px );
 	 compiler_check_and_compile_operator( compiler, $4, opname,
-					   /*arity:*/1,
-					   /*fixup_values:*/ NULL, px );
+                                              /*arity:*/1,
+                                              /*fixup_values:*/ NULL, px );
 	 compiler_emit( compiler, px, "\n" );
 	 compiler_compile_variable_assignment( compiler, $2, px );	 
      }
      vartab_insert_named_vars( compiler->vartab, $2, px );
+    }
+
+  | _VAR var_type_description uninitialised_var_declarator_list
+    {
+     char *opname = "exceptionval";
+     ssize_t try_var_offset = compiler->try_variable_stack ?
+	 compiler->try_variable_stack[compiler->try_block_level-1] : 0;
+
+     dnode_list_append_type( $3, $2 );
+     dnode_list_assign_offsets( $3, &compiler->local_offset );     
+     if( $2 && dnode_list_length( $3 ) > 1 ) {
+	 yyerrorf( "only one variable may be declared in the 'catch' clause" );
+     }
+     if( !$2 || !compiler_lookup_operator( compiler, $2, opname, 1, px )) {
+	 yyerrorf( "type of variable declared in a 'catch' clause must "
+		   "have unary '%s' operator", opname );
+     } else {
+	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
+	 compiler_push_typed_expression( compiler, new_tnode_ref( px ), px );
+	 compiler_check_and_compile_operator( compiler, $2, opname,
+                                              /*arity:*/1,
+                                              /*fixup_values:*/ NULL, px );
+	 compiler_emit( compiler, px, "\n" );
+	 compiler_compile_variable_assignment( compiler, $3, px );	 
+     }
+     vartab_insert_named_vars( compiler->vartab, $3, px );
     }
   ;
 
