@@ -1208,12 +1208,12 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
 {
     static key_value_t empty_list[1] = {{ NULL }};
     static key_value_t list[] = {
-	{ "element_nref" },
-        { "element_size" },
-        { "element_align" },
-        { "nref" },
-        { "alloc_size" },
-        { "vmt_offset" },
+	/* 0 */ { "element_nref" },
+        /* 1 */ { "element_size" },
+        /* 2 */ { "element_align" },
+        /* 3 */ { "nref" },
+        /* 4 */ { "alloc_size" },
+        /* 5 */ { "vmt_offset" },
 	{ NULL },
     };
 
@@ -1227,6 +1227,112 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
     list[3].val = tnode_number_of_references( tnode );
     list[4].val = tnode_size( tnode );
     list[5].val = tnode_vmt_offset( tnode );
+
+    /* For placeholders, we just in case allocate arrays thay say they
+       contain references. This is necessary so that GC does not
+       collect allocated elements in case the generic type is indeed a
+       reference, and we assign them as elements to an allocated array
+       of generic type: */
+
+    list[0].val = tnode_is_reference( tnode ) ? 1 : 
+        (tnode_kind(tnode) == TK_PLACEHOLDER ? 1 : 0);
+
+    return list;
+}
+ 
+static ssize_t compiler_assemble_static_data( COMPILER *cc,
+					      void *data,
+					      ssize_t data_size,
+					      cexception_t *ex )
+{
+    ssize_t new_size, old_size;
+
+    assert( cc );
+
+    old_size = cc->static_data_size;
+    new_size = old_size + data_size;
+    cc->static_data = reallocx( cc->static_data, new_size, ex );
+    if( data ) {
+	memcpy( cc->static_data + old_size, data, data_size );
+    } else {
+	memset( cc->static_data + old_size, 0, data_size );
+    }
+    cc->static_data_size = new_size;
+
+    return old_size;
+}
+
+#define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((ssize_t)(N)) % (lim)) % (lim) )
+
+static void compiler_assemble_static_alloc_hdr( COMPILER *cc,
+                                                ssize_t element_size,
+						ssize_t len,
+						cexception_t *ex )
+{
+    ssize_t old_size, new_size;
+    alloccell_t *hdr;
+
+    new_size = old_size = cc->static_data_size;
+    ALIGN_NUMBER( new_size, sizeof(void*) );
+
+    compiler_assemble_static_data( cc, /* data */ NULL,
+				   new_size - old_size + sizeof(alloccell_t),
+				   ex );
+
+    hdr = (alloccell_t*)(cc->static_data + new_size);
+    alloccell_set_values( hdr, element_size, len );
+}
+
+static ssize_t compiler_assemble_static_ssize_t( COMPILER *cc,
+						 ssize_t size,
+						 cexception_t *ex )
+{
+    return compiler_assemble_static_data( cc, &size, sizeof(size), ex );
+}
+
+static ssize_t compiler_assemble_static_string( COMPILER *cc,
+						char *str,
+						cexception_t *ex )
+{
+    compiler_assemble_static_alloc_hdr( cc, 1, strlen(str) + 1, ex );
+    return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
+}
+
+static 
+key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
+                                                 TNODE *tnode,
+                                                 cexception_t *ex )
+{
+    static key_value_t empty_list[1] = {{ NULL }};
+    static key_value_t list[] = {
+	/* 0 */ { "element_nref" },
+        /* 1 */ { "element_size" },
+        /* 2 */ { "element_align" },
+        /* 3 */ { "nref" },
+        /* 4 */ { "alloc_size" },
+        /* 5 */ { "vmt_offset" },
+        /* 6 */ { "lineno" },
+        /* 7 */ { "line" },
+        /* 8 */ { "file" },
+	{ NULL },
+    };
+
+    if( !tnode ) return empty_list;
+
+    list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
+    list[1].val = tnode_is_reference( tnode ) ? 
+        REF_SIZE : tnode_size( tnode );
+    list[2].val = tnode_align( tnode );
+
+    list[3].val = tnode_number_of_references( tnode );
+    list[4].val = tnode_size( tnode );
+    list[5].val = tnode_vmt_offset( tnode );
+
+    list[6].val = compiler_flex_current_line_number();
+    list[7].val = compiler_assemble_static_string
+        ( cc, (char*)compiler_flex_current_line(), ex );
+    list[8].val = compiler_assemble_static_string
+        ( cc, (char*)cc->filename, ex );;
 
     /* For placeholders, we just in case allocate arrays thay say they
        contain references. This is necessary so that GC does not
@@ -2059,11 +2165,12 @@ static void compiler_compile_unop( COMPILER *cc,
             if( expr_type && tnode_kind( expr_type ) == TK_ARRAY ) {
 		fixup_values = make_array_element_key_value_list( expr_type );
             } else {
-                fixup_values = make_tnode_key_value_list( expr_type );
+                fixup_values =
+                    make_compiler_tnode_key_value_list( cc, expr_type, ex );
             }
 
 	    compiler_init_operator_description( &od, cc, expr_type,
-                                             unop_name, 1, ex );
+                                                unop_name, 1, ex );
 	    compiler_check_operator_args( cc, &od, generic_types, &inner );
 
 	    top = enode_list_pop( &cc->e_stack );
@@ -3485,64 +3592,6 @@ static void compiler_emit_drop_returned_values( COMPILER *cc,
     } else if( drop_retvals == 1 ) {
 	compiler_compile_drop( cc, ex );
     }    
-}
-
-static ssize_t compiler_assemble_static_data( COMPILER *cc,
-					      void *data,
-					      ssize_t data_size,
-					      cexception_t *ex )
-{
-    ssize_t new_size, old_size;
-
-    assert( cc );
-
-    old_size = cc->static_data_size;
-    new_size = old_size + data_size;
-    cc->static_data = reallocx( cc->static_data, new_size, ex );
-    if( data ) {
-	memcpy( cc->static_data + old_size, data, data_size );
-    } else {
-	memset( cc->static_data + old_size, 0, data_size );
-    }
-    cc->static_data_size = new_size;
-
-    return old_size;
-}
-
-#define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((ssize_t)(N)) % (lim)) % (lim) )
-
-static void compiler_assemble_static_alloc_hdr( COMPILER *cc,
-                                                ssize_t element_size,
-						ssize_t len,
-						cexception_t *ex )
-{
-    ssize_t old_size, new_size;
-    alloccell_t *hdr;
-
-    new_size = old_size = cc->static_data_size;
-    ALIGN_NUMBER( new_size, sizeof(void*) );
-
-    compiler_assemble_static_data( cc, /* data */ NULL,
-				   new_size - old_size + sizeof(alloccell_t),
-				   ex );
-
-    hdr = (alloccell_t*)(cc->static_data + new_size);
-    alloccell_set_values( hdr, element_size, len );
-}
-
-static ssize_t compiler_assemble_static_ssize_t( COMPILER *cc,
-						 ssize_t size,
-						 cexception_t *ex )
-{
-    return compiler_assemble_static_data( cc, &size, sizeof(size), ex );
-}
-
-static ssize_t compiler_assemble_static_string( COMPILER *cc,
-						char *str,
-						cexception_t *ex )
-{
-    compiler_assemble_static_alloc_hdr( cc, 1, strlen(str) + 1, ex );
-    return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
 }
 
 static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
