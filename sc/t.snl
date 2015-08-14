@@ -6,22 +6,13 @@
 
 use * from std;
 
-exception DIVISION_BY_ZERO;
+var x = 1;
 
-function g( float x ) -> float
+inline bytecode operator "assert" ( f : bool )
 {
-    if( x == 0.0 ) {
-        raise DIVISION_BY_ZERO( "attempt to divide by 0 in function g()" );
-    }
-    return 1.0/x;
+    ASSERT %%lineno %%file %%line
 }
 
-try {
-    . g( 2 );
-    . g( 1 );
-    . g( 0 );
-    . g( 3 );
-}
-catch( var string m; var int err ) {
-    . argument(0) + ":", "ERROR:", m, "(err code = %d)"%%err
-}
+assert x > 2;
+
+. "Here!";
