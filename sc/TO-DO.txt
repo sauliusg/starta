@@ -1,7 +1,6 @@
 -- Think how to ensure readonliness of function arguments
 -- Implement destructors
 -- Make assertions throw exceptions on failures.
--- Make C-style type declarations possible in exception prototypes
 -- Implement Unix pipe constructs -- this may be a killer feature.
 -- Think about convenient interface to use modules in my language in other languages.
 -- Implement 'language' constructs -- this will be a killer feature.
@@ -11,7 +10,6 @@
 -- Implement public, protected and private members.
 -- Diagnose missing 'return expr' statements for subroutines that return values
 -- Think about convenient use of modules written in other languages in my language programs.
--? Think about list constants?
 -- Think about more generic iterators/continuations
 -- Think if we can do return type inference from 'return' statements
 -- Think about more consise closure (lambda-function) notation.
@@ -61,6 +59,7 @@
 -- Collect tests for error diagnostics, inputs/err-*.snl, into separate subdirectories and adapt Makefile accordingly.
 -- Check share_xxx() usage.
 -- Allow NULL dimension pointer in new_tnode_array().
+-? Think about list constants?
 -+ Implement check of measurement units at the compile time.
 -+ finish implementation of constants and constant compile-time folding
 -+ Write thorough tests for stdio operators (also for input!)
@@ -83,6 +82,7 @@
 +- Think about the possibility of "generic" functions with type "placeholders"
 +- Implement label printouts in the bytecode emitter functions.
 +- Implement advanced arithmetics and function calls for constant arithmetics
+++ Make C-style type declarations possible in exception prototypes
 ++ Implement type-declared methods (functions).
 ++ Make it possible to use 'float[]' as type designators of return values.
 ++ Implement '-I path//' construct for recursive directory searches (clean up the code)
