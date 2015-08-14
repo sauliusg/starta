@@ -1298,6 +1298,13 @@ static ssize_t compiler_assemble_static_string( COMPILER *cc,
     return compiler_assemble_static_data( cc, str, strlen(str) + 1, ex );
 }
 
+static
+const char *skip_leading_spaces( const char *s )
+{
+    while( isspace(*s) ) s++;
+    return s;
+}
+
 static 
 key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
                                                  TNODE *tnode,
@@ -1330,7 +1337,7 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
 
     list[6].val = compiler_flex_current_line_number();
     list[7].val = compiler_assemble_static_string
-        ( cc, (char*)compiler_flex_current_line(), ex );
+        ( cc, (char*)skip_leading_spaces(compiler_flex_current_line()), ex );
     list[8].val = compiler_assemble_static_string
         ( cc, (char*)cc->filename, ex );;
 
