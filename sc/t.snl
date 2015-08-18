@@ -2,17 +2,15 @@
 // Compiler tests
 //
 
-// Test catch variable declarations, C syntax
+// Test embedded Perl.
 
+use Perl;
 use * from std;
 
-var x = 1;
+var perl_code = "$a = 10.4; $b = 12.7; print \"from Perl: \", $a + $b, \"\\n\";";
 
-inline bytecode operator "assert" ( f : bool )
-{
-    ASSERT %%lineno %%file %%line
-}
+. perl_code;
 
-assert x > 2;
+bytecode { PLD %perl_code libPerl::RUN }
 
-. "Here!";
+bytecode { libPerl::FINISH }

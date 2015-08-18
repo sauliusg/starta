@@ -1,0 +1,6 @@
+include ../../Makeconf
+
+CFLAGS = -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions \
+       $(shell perl -MExtUtils::Embed -e ccopts -e ldopts)
+
+LIBFLAGS = $(shell perl -MExtUtils::Embed -e ldopts | sed 's/-Wl,-E  -fstack-protector//')
