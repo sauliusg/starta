@@ -1,0 +1,2 @@
+from Perl: 23.1
+$a = 10.4; $b = 12.7; print "from Perl: ", $a + $b, "\n";
