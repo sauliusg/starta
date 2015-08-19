@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo apt-get install -v libperl-dev
+sudo apt-get install -y libperl-dev
