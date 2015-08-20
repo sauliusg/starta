@@ -1,5 +1,5 @@
-./sl: inputs/err-operators001.snl(38,28): ERROR, incompatible types for binary operator 'and'
-    if( m && i <= last( m )) {
-                           ^
-./sl: 1 error(s) detected
-
+560
+10
+560
+0
+560

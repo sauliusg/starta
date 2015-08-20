@@ -37,9 +37,6 @@ old or new prototype has undefined argument 2
 
     }
     ^
-./sl: inputs/err-types005.snl(27,5): ERROR, incompatible types for binary operator '+'
-    }
-    ^
 ./sl: inputs/err-types005.snl(27,5): ERROR, too little values returned from function 'mm@I2'
     }
     ^
@@ -55,9 +52,6 @@ old or new prototype undefined return values
     ^
 ./sl: inputs/err-types005.snl(29,5): ERROR, interface 'I2' does not implement method 'mn'
     {
-    ^
-./sl: inputs/err-types005.snl(31,5): ERROR, incompatible types for binary operator '+'
-    }
     ^
 ./sl: inputs/err-types005.snl(31,5): ERROR, incompatible types of returned value 1 of function 'mn@I2'
     }
@@ -99,5 +93,5 @@ var a = new A(101);
 ./sl: inputs/err-types005.snl(38,17): ERROR, too little arguments in call to function 'mn'
 . a->mn@I2( 193 );
                 ^
-./sl: 31 error(s) detected
+./sl: 29 error(s) detected
 

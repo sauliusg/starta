@@ -2051,6 +2051,7 @@ static int compiler_check_top_2_expressions_are_identical( COMPILER *cc,
 		  "for binary operator '%s'", binop_name );
 	return 0;
     } else {
+#if 0
 	TNODE *type1 = enode_type( expr1 );
 	TNODE *type2 = enode_type( expr2 );
 
@@ -2060,6 +2061,7 @@ static int compiler_check_top_2_expressions_are_identical( COMPILER *cc,
 		      binop_name );
 	    return 0;
 	}
+#endif
 	return 1;
     }
 }

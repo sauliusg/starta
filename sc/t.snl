@@ -2,15 +2,30 @@
 // Compiler tests
 //
 
-// Test embedded Perl.
+// Test binary operators with different types/
 
-use Perl;
 use * from std;
 
-var perl_code = "$a = 10.4; $b = 12.7; print \"from Perl: \", $a + $b, \"\\n\";";
+var m = [ 3.0, 4.0, 1.0, 4.0, 12.0 ];
 
-. perl_code;
+procedure mtimes( float k; float m[] ): float[]
+{
+    for var e in m {
+        e *= k
+    }
+    return m
+}
 
-bytecode { PLD %perl_code libPerl::RUN }
+operator "*"( float k; float m[] ): float[]
+{
+    return mtimes( k, m[] );
+}
 
-bytecode { libPerl::FINISH }
+operator "<" ( float m[] ) { for var e in m do < e, " "; enddo }
+operator "." ( float m[] ) { < m }
+
+var n = 2.0 * m;
+
+. n;
+. 0.5 * m;
+. m

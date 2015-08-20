@@ -35,9 +35,6 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(22,28): ERROR, method add() does not match method add it should implement - old or new prototype has undefined argument 2
     method add@I1( int i ) { self.value += i; . "This is add@I1()" }
                            ^
-./sl: inputs/err-types004.snl(22,45): ERROR, incompatible types for binary operator '+'
-    method add@I1( int i ) { self.value += i; . "This is add@I1()" }
-                                            ^
 ./sl: inputs/err-types004.snl(22,68): ERROR, type with empty suffix is not defined in this scope for types of kind 'string'
 
     method add@I1( int i ) { self.value += i; . "This is add@I1()" }
@@ -55,9 +52,6 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(23,28): ERROR, method sub() does not match method sub it should implement - old or new prototype has undefined argument 2
     method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
                            ^
-./sl: inputs/err-types004.snl(23,45): ERROR, incompatible types for binary operator '-'
-    method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
-                                            ^
 ./sl: inputs/err-types004.snl(23,68): ERROR, type with empty suffix is not defined in this scope for types of kind 'string'
 
     method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
@@ -145,5 +139,5 @@ c->put@I2( 33 );
 ./sl: inputs/err-types004.snl(44,15): ERROR, too little arguments in call to function 'put'
 c->put@I2( 33 );
               ^
-./sl: 44 error(s) detected
+./sl: 42 error(s) detected
 
