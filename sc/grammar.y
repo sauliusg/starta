@@ -3568,8 +3568,8 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 }
 
 static void compiler_emit_argument_list( COMPILER *cc,
-                                      DNODE *argument_list,
-				      cexception_t *ex )
+                                         DNODE *argument_list,
+                                         cexception_t *ex )
 {
     DNODE *varnode;
 
@@ -6082,7 +6082,6 @@ static cexception_t *px; /* parser exception */
 
 %type <dnode> argument
 %type <dnode> argument_list
-%type <dnode> argument_identifier_list
 %type <dnode> closure_header
 %type <dnode> closure_var_declaration
 %type <dnode> closure_var_list_declaration
@@ -6102,6 +6101,7 @@ static cexception_t *px; /* parser exception */
 %type <s>     module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
+%type <dnode> identifier
 %type <dnode> identifier_list
 %type <s>     import_statement
 %type <s>     include_statement
@@ -6158,7 +6158,6 @@ static cexception_t *px; /* parser exception */
 %type <s>     use_statement
 %type <dnode> variable_access_identifier
 %type <dnode> variable_access_for_indexing
-%type <dnode> variable_identifier
 %type <dnode> variable_identifier_list
 %type <i>     variable_declaration_keyword
 %type <dnode> variable_declarator_list
@@ -6742,13 +6741,16 @@ selective_use_statement
        }
    ;
 
-/* FIXME: 'identifier_list' should be merged with
-   'variable_identifier_list' and 'argument_identifier_list'. S.G. */
-identifier_list
-   : __IDENTIFIER
+identifier
+  : __IDENTIFIER
      { $$ = new_dnode_name( $1, px ); }
-   | identifier_list ',' __IDENTIFIER
-     { $$ = dnode_append( new_dnode_name( $3, px ), $1 ); }
+  ;
+
+identifier_list
+   : identifier
+     { $$ = $1; }
+   | identifier_list ',' identifier
+     { $$ = dnode_append( $3, $1 ); }
    ;
 
 function_or_procedure: _FUNCTION | _PROCEDURE;
@@ -7052,7 +7054,7 @@ opt_variable_declaration_keyword
 ;
 
 variable_declaration
-  : variable_declaration_keyword variable_identifier ':' var_type_description
+  : variable_declaration_keyword identifier ':' var_type_description
     {
      int readonly = $1;
 
@@ -7068,7 +7070,7 @@ variable_declaration
      compiler_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword 
-    variable_identifier ',' variable_identifier_list ':' var_type_description
+    identifier ',' variable_identifier_list ':' var_type_description
     {
      int readonly = $1;
 
@@ -7085,7 +7087,7 @@ variable_declaration
      compiler_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword
-    variable_identifier ':' var_type_description initialiser
+    identifier ':' var_type_description initialiser
     {
      int readonly = $1;
      DNODE *var = $2;
@@ -7099,7 +7101,7 @@ variable_declaration
      compiler_compile_initialise_variable( compiler, var, px );
     }
 
-  | variable_declaration_keyword variable_identifier ','
+  | variable_declaration_keyword identifier ','
     variable_identifier_list ':' var_type_description '=' multivalue_expression_list
     {
      int readonly = $1;
@@ -7139,7 +7141,7 @@ variable_declaration
      }
     }
 
-  | variable_declaration_keyword variable_identifier ','
+  | variable_declaration_keyword identifier ','
     variable_identifier_list ':' var_type_description '=' simple_expression
     {
         yyerrorf( "need more than one expression to initialise %d variables",
@@ -7167,7 +7169,7 @@ variable_declaration
 	compiler_compile_variable_initialisations( compiler, $3, px );
       }
 
-  | variable_declaration_keyword variable_identifier initialiser
+  | variable_declaration_keyword identifier initialiser
     {
      TNODE *expr_type = compiler->e_stack ?
 	 share_tnode( enode_type( compiler->e_stack )) : NULL;
@@ -7197,7 +7199,7 @@ variable_declaration
      compiler_compile_initialise_variable( compiler, var, px );
     }
  
- | variable_declaration_keyword variable_identifier ','
+ | variable_declaration_keyword identifier ','
     variable_identifier_list '=' multivalue_expression_list
     {
      int readonly = $1;
@@ -7274,15 +7276,17 @@ uninitialised_var_declarator_list
   ;
 
 variable_declarator
-  : variable_identifier
-  | variable_identifier dimension_list
+  : identifier
+  | identifier dimension_list
       { $$ = dnode_insert_type( $1, $2 ); }
   ;
 
 variable_identifier_list
-  : variable_identifier
+  : identifier
     { $$ = $1; }
-  | variable_identifier_list ',' variable_identifier
+  | variable_identifier_list ',' identifier
+    /* variable_identifier_list and identifier_list are build in the
+       oposite order: */
     { $$ = dnode_append( $1, $3 ); }
   ;
 
@@ -7304,11 +7308,6 @@ return_statement
       { compiler_compile_return( compiler, $3, px ); }
   ;
 
-variable_identifier
-  : __IDENTIFIER
-     { $$ = new_dnode_name( $1, px ); }
-  ;
-
 /*--------------------------------------------------------------------------*/
 
 opt_label
@@ -7327,19 +7326,19 @@ if_condition
   ;
 
 for_variable_declaration
-  : variable_identifier ':' var_type_description
+  : identifier ':' var_type_description
       {
 	  dnode_append_type( $1, $3 );
 	  dnode_assign_offset( $1, &compiler->local_offset );
 	  $$ = $1;
       }
-  | var_type_description variable_identifier
+  | var_type_description identifier
       {
 	  dnode_append_type( $2, $1 );
 	  dnode_assign_offset( $2, &compiler->local_offset );
 	  $$ = $2;
       }
-  | variable_identifier
+  | identifier
       {
 	  $$ = $1;
       }
@@ -9868,7 +9867,7 @@ closure_initialisation_list
 
 closure_var_declaration
   : opt_variable_declaration_keyword
-    variable_identifier ':' var_type_description
+    identifier ':' var_type_description
       {
        int readonly = $1;
        if( readonly ) {
@@ -9891,7 +9890,7 @@ closure_var_declaration
 
 closure_var_list_declaration
   : opt_variable_declaration_keyword
-    variable_identifier ',' variable_identifier_list ':' var_type_description
+    identifier ',' variable_identifier_list ':' var_type_description
       {
        int readonly = $1;
        DNODE *variables = dnode_append( $2, $4 );
@@ -10005,7 +10004,7 @@ closure_initialisation
     }
 }
 
-| opt_variable_declaration_keyword variable_identifier
+| opt_variable_declaration_keyword identifier
 {
     int readonly = $1;
     DNODE *closure_var = $2;
@@ -10043,7 +10042,7 @@ closure_initialisation
     compiler_emit( compiler, px, "\tc\n", DUP );
 }
 
-| opt_variable_declaration_keyword variable_identifier ','
+| opt_variable_declaration_keyword identifier ','
   variable_identifier_list
 {
     int readonly = $1;
@@ -11134,7 +11133,7 @@ opt_readonly
   ;
 
 argument
-  : opt_readonly argument_identifier_list ':' var_type_description
+  : opt_readonly identifier_list ':' var_type_description
     {
 	$$ = dnode_list_append_type( $2, $4 );
 	if( $1 ) {
@@ -11142,7 +11141,7 @@ argument
 	}
     }
 
-  | opt_readonly argument_identifier_list ':' var_type_description
+  | opt_readonly identifier_list ':' var_type_description
         '=' constant_expression
     {
 	DNODE *arg;
@@ -11188,13 +11187,6 @@ argument
 	      dnode_list_set_flags( $$, DF_IS_READONLY );
 	  }
       }
-  ;
-
-argument_identifier_list
-  : __IDENTIFIER
-    { $$ = new_dnode_name( $1, px ); }
-  | argument_identifier_list ',' __IDENTIFIER
-    { $$ = dnode_append( new_dnode_name( $3, px ), $1 ); }
   ;
 
 function_or_operator_start
