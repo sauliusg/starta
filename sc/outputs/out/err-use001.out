@@ -7,7 +7,7 @@
 ./sl: inputs/err-use001.snl(16,25): ERROR, function 'testmath::sqr' is not declared in the current scope
     return testmath::sqr( x ) / y
                         ^
-./sl: inputs/err-use001.snl(17,1): ERROR, incompatible types for binary operator '/'
+./sl: inputs/err-use001.snl(17,1): ERROR, incompatible type of argument 1 for operator '/'
 }
 ^
 ./sl: inputs/err-use001.snl(21,24): ERROR, 'use' statement should not be used within subroutines
@@ -19,7 +19,7 @@
 ./sl: inputs/err-use001.snl(23,29): ERROR, function 'testmath::sqr' is not declared in the current scope
     return x / testmath::sqr( y );
                             ^
-./sl: inputs/err-use001.snl(23,34): ERROR, incompatible types for binary operator '/'
+./sl: inputs/err-use001.snl(23,34): ERROR, incompatible type of argument 2 for operator '/'
     return x / testmath::sqr( y );
                                  ^
 ./sl: 8 error(s) detected

@@ -17,14 +17,8 @@ inline bytecode function float_as_C( x : float ): C {};
 
     return float_as_C((F_as_float(t) - 32) * 5/9);
                                          ^
-./sl: inputs/err-types003.snl(15,42): ERROR, incompatible types for binary operator '-'
-    return float_as_C((F_as_float(t) - 32) * 5/9);
-                                         ^
 ./sl: inputs/err-types003.snl(15,47): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
 
-    return float_as_C((F_as_float(t) - 32) * 5/9);
-                                              ^
-./sl: inputs/err-types003.snl(15,47): ERROR, incompatible types for binary operator '*'
     return float_as_C((F_as_float(t) - 32) * 5/9);
                                               ^
 ./sl: inputs/err-types003.snl(15,49): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
@@ -58,5 +52,5 @@ inline bytecode function float_as_C( x : float ): C {};
 ./sl: inputs/err-types003.snl(25,20): ERROR, type 'C' has no unary operator named '.'
 . C_from_F( 100 F );
                    ^
-./sl: 19 error(s) detected
+./sl: 17 error(s) detected
 
