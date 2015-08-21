@@ -3357,8 +3357,8 @@ static DNODE* compiler_lookup_dnode( COMPILER *cc,
 */
 
 static void compiler_push_varaddr_expr( COMPILER *cc,
-				     char *variable_name,
-				     cexception_t *ex )
+                                        char *variable_name,
+                                        cexception_t *ex )
 {
     DNODE *var_dnode = compiler_lookup_dnode( cc, NULL /* module_name */,
                                            variable_name, "variable" );
