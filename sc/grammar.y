@@ -906,7 +906,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     	    		        "defined in the current scope";
 	}
 	compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX, tnode,
-				  type_conflict_msg, ex );
+                                     type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
 	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
@@ -923,7 +923,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     	    		        "defined in the current scope";
 	}
 	compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX, tnode,
-				  type_conflict_msg, ex );
+                                     type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
 	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
@@ -940,7 +940,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     	    		        "defined in the current scope";
 	}
 	compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX, tnode,
-				  type_conflict_msg, ex );
+                                     type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
 	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
@@ -957,7 +957,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     	    		        "defined in the current scope";
 	}
 	compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX, tnode,
-				  type_conflict_msg, ex );
+                                     type_conflict_msg, ex );
 	share_tnode( tnode );
 	if( cc->current_package ) {
 	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
@@ -974,6 +974,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     case TK_REF:
     case TK_FUNCTION_REF:
     case TK_DERIVED:
+        delete_tnode( tnode );
 	break;
     default:
 	yyerrorf( "types of kind '%s' do not have suffix table",
@@ -4364,7 +4365,7 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	compiler_typetab_insert( cc, tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
-	compiler_insert_tnode_into_suffix_list( cc, tnode, &inner );
+	compiler_insert_tnode_into_suffix_list( cc, share_tnode( tnode ), &inner );
 	/* cc->current_type = NULL; */
         delete_tnode( compiler_pop_current_type( cc ));
 	freex( type_name );
