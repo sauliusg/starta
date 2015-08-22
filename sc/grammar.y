@@ -6580,13 +6580,16 @@ package_statement
 import_statement
    : _USE module_import_identifier
        { $$ = $2; }
-   | _USE module_import_identifier '@' identifier_list
-       { $$ = $2; }
    ;
 
+opt_module_parameters
+: '@' identifier_list
+| /* empty */
+;
+
 module_import_identifier
-  : __IDENTIFIER
-  | __IDENTIFIER _IN __STRING_CONST
+  : __IDENTIFIER opt_module_parameters
+  | __IDENTIFIER _IN __STRING_CONST opt_module_parameters
   {
       if( compiler->package_filename ) {
           freex( compiler->package_filename );
@@ -6605,16 +6608,6 @@ use_statement
 
 selective_use_statement
    : _USE identifier_list _FROM module_import_identifier
-       {
-           char *module_name = $4;
-           DNODE *imported_identifiers = $2;
-
-           compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, IMPORT_ALL, px );
-
-           delete_dnode( imported_identifiers );
-       }
-   | _USE identifier_list _FROM module_import_identifier '@' identifier_list
        {
            char *module_name = $4;
            DNODE *imported_identifiers = $2;
