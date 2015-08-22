@@ -9,6 +9,7 @@
 -- Implement 'ref T' and 'num T' generic types.
 -- Implement public, protected and private members.
 -- Diagnose missing 'return expr' statements for subroutines that return values
+-- Think how to implement parameterised modules.
 -- Think about convenient use of modules written in other languages in my language programs.
 -- Think about more generic iterators/continuations
 -- Think if we can do return type inference from 'return' statements
