@@ -8177,7 +8177,7 @@ var_type_description
     { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
   | type_identifier dimension_list
     {
-        $$ = tnode_append_element_type( $2, $1 );
+        $$ = tnode_append_element_type( $2, share_tnode( $1 ));
     }
   ;
 
