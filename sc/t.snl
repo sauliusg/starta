@@ -2,11 +2,12 @@
 // Compiler tests
 //
 
-// Regression test for a buggy derived type multidimensional array declaration.
+// Test parametrised modules
 
 use * from std;
 
-type t = float;
+use * from M1 @ ( int, float );
 
-var m: t[][];
-var n: t[][];
+. "back to the main program";
+
+p1();

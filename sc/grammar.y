@@ -6584,6 +6584,8 @@ import_statement
 
 opt_module_parameters
 : '@' identifier_list
+| '@' '(' identifier_list ')'
+/* | '(' identifier_list ')' */
 | /* empty */
 ;
 
