@@ -6,7 +6,7 @@
 
 use * from std;
 
-use * from M1 @ ( int, float );
+use * from M1( int, float );
 
 . "back to the main program";
 
