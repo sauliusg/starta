@@ -6590,8 +6590,8 @@ opt_module_parameters
 ;
 
 module_import_identifier
-  : __IDENTIFIER opt_module_parameters
-  | __IDENTIFIER _IN __STRING_CONST opt_module_parameters
+  : __IDENTIFIER opt_module_parameters ';'
+  | __IDENTIFIER _IN __STRING_CONST opt_module_parameters ';'
   {
       if( compiler->package_filename ) {
           freex( compiler->package_filename );
