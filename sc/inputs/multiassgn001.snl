@@ -37,7 +37,7 @@ writeln( c );
 
 newline();
 
-(a, b) = b, a;
+a, b = b, a;
 
 writeln( a );
 writeln( b );
