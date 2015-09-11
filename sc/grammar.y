@@ -6583,15 +6583,13 @@ import_statement
    ;
 
 opt_module_parameters
-: '@' identifier_list
-| '@' '(' identifier_list ')'
-| '(' identifier_list ')'
+: '(' identifier_list ')'
 | /* empty */
 ;
 
 module_import_identifier
-  : __IDENTIFIER opt_module_parameters ';'
-  | __IDENTIFIER _IN __STRING_CONST opt_module_parameters ';'
+  : __IDENTIFIER opt_module_parameters
+  | __IDENTIFIER _IN __STRING_CONST opt_module_parameters
   {
       if( compiler->package_filename ) {
           freex( compiler->package_filename );
@@ -9096,8 +9094,7 @@ type_initialiser
 a[i] = b + c;
 
 2) multiple assignments:
-( a[i], b, c ) = b + c, d, f( x, y );
-( a, b ) = f( x, y, z );
+  a[i], b, c = b + c, d, f( x, y );
   a, b   = f( x, y, z );
 
 */
@@ -9135,15 +9132,6 @@ assignment_statement
   | lvalue '=' expression
       {
 	  compiler_compile_sti( compiler, px );
-      }
-  | '('
-      {
-	  /* Values must be emmitted first in the code. */
-	  compiler_push_thrcode( compiler, px );
-      }
-    lvalue_list ')' '=' multivalue_expression_list
-      {
-	  compiler_compile_multiple_assignment( compiler, $3, $3, $6, px );
       }
 
   | lvalue ',' 
