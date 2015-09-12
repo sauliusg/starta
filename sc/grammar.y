@@ -6557,7 +6557,7 @@ package_name
 package_keyword : _PACKAGE | _MODULE;
 
 package_statement
-  : package_keyword package_name
+  : package_keyword package_name opt_module_parameters
       {
 	  vartab_insert_named( compiler->vartab, $2, px );
 	  compiler_begin_package( compiler, share_dnode( $2 ), px );
@@ -6568,9 +6568,9 @@ package_statement
 	  char *name;
 	  if( compiler->current_package &&
 	      (name = dnode_name( compiler->current_package )) != NULL ) {
-	      if( strcmp( $7, name ) != 0 ) {
+	      if( strcmp( $8, name ) != 0 ) {
 		  yyerrorf( "package '%s' ends with 'end package %s'",
-			    name, $7 );
+			    name, $8 );
 	      }
 	  }
 	  compiler_end_package( compiler, px );

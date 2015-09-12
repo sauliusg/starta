@@ -6,8 +6,6 @@
 
 use * from std;
 
-use * from M1( int, float );
+use * from Parametrised( int, float );
 
-. "back to the main program";
-
-p1();
+. "In the main program";
