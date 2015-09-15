@@ -1,5 +1,5 @@
 
-module Parametrised( type inttype, type floattype )
+module Parametrised( type inttype, type floattype = double )
 
 
 
