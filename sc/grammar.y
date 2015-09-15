@@ -6568,12 +6568,17 @@ module_parameter_list
 ;
 
 module_parameter
-: _TYPE __IDENTIFIER
-| _PROCEDURE  __IDENTIFIER
-| _FUNCTION __IDENTIFIER
-| _CONST __IDENTIFIER
-| _VAR __IDENTIFIER
-| _OPERATOR __STRING_CONST
+: _TYPE __IDENTIFIER opt_default_module_parameter
+| _PROCEDURE  __IDENTIFIER opt_default_module_parameter
+| _FUNCTION __IDENTIFIER opt_default_module_parameter
+| _CONST __IDENTIFIER opt_default_module_parameter
+| _VAR __IDENTIFIER opt_default_module_parameter
+| _OPERATOR __STRING_CONST opt_default_module_parameter
+;
+
+opt_default_module_parameter
+: /* empty */
+| '=' __IDENTIFIER
 ;
 
 package_statement
