@@ -6556,6 +6556,26 @@ package_name
 
 package_keyword : _PACKAGE | _MODULE;
 
+opt_module_parameters
+: /* empty */
+| '(' module_parameter_list ')'
+;
+
+module_parameter_list
+: module_parameter
+| module_parameter_list ',' module_parameter
+| module_parameter_list ';' module_parameter
+;
+
+module_parameter
+: _TYPE __IDENTIFIER
+| _PROCEDURE  __IDENTIFIER
+| _FUNCTION __IDENTIFIER
+| _CONST __IDENTIFIER
+| _VAR __IDENTIFIER
+| _OPERATOR __STRING_CONST
+;
+
 package_statement
   : package_keyword package_name opt_module_parameters
       {
@@ -6582,14 +6602,14 @@ import_statement
        { $$ = $2; }
    ;
 
-opt_module_parameters
+opt_module_arguments
 : '(' identifier_list ')'
 | /* empty */
 ;
 
 module_import_identifier
-  : __IDENTIFIER opt_module_parameters
-  | __IDENTIFIER _IN __STRING_CONST opt_module_parameters
+  : __IDENTIFIER opt_module_arguments
+  | __IDENTIFIER _IN __STRING_CONST opt_module_arguments
   {
       if( compiler->package_filename ) {
           freex( compiler->package_filename );
