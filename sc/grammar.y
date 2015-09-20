@@ -6634,6 +6634,7 @@ opt_default_module_parameter
 package_statement
   : package_keyword package_name opt_module_parameters
       {
+          dnode_insert_module_args( $2, $3 );
 	  vartab_insert_named( compiler->vartab, $2, px );
 	  compiler_begin_package( compiler, share_dnode( $2 ), px );
       }
@@ -6667,21 +6668,9 @@ opt_module_arguments
 module_import_identifier
   : __IDENTIFIER opt_module_arguments
   {
-      cexception_t inner;
-      DNODE * volatile module_name_dnode = new_dnode_package( $1, px );
+      DNODE *module_name_dnode = new_dnode_package( $1, px );
       DNODE *module_arguments = $2;
-
-      cexception_guard( inner ) {
-          if( module_arguments ) {
-              vartab_insert_named_vars
-                  ( dnode_vartab( module_name_dnode ),
-                    module_arguments, &inner );
-          }
-      }
-      cexception_catch {
-          delete_dnode( module_name_dnode );
-          cexception_reraise( inner, px );
-      }
+      dnode_insert_module_args( module_name_dnode, module_arguments );
       $$ = module_name_dnode;
   }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments

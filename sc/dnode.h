@@ -115,6 +115,10 @@ DNODE *dnode_set_offset( DNODE *dnode, ssize_t offset );
 
 DNODE *dnode_update_offset( DNODE *dnode, ssize_t offset );
 
+DNODE *dnode_module_args( DNODE *dnode );
+
+DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *args );
+
 void dnode_assign_offset( DNODE *dnode, ssize_t *offset );
 
 void dnode_list_assign_offsets( DNODE *dnode_list, ssize_t *offset );
