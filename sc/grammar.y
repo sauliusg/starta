@@ -4951,9 +4951,10 @@ static int compiler_can_compile_use_statement( COMPILER *cc,
 }
 
 static void compiler_import_package( COMPILER *c,
-				     char *package_name,
+				     DNODE *package_name_dnode,
 				     cexception_t *ex )
 {
+    char *package_name = dnode_name( package_name_dnode );
     DNODE *package = vartab_lookup( c->compiled_packages, package_name );
 
     if( !compiler_can_compile_use_statement( c, "import" )) {
@@ -4971,9 +4972,10 @@ static void compiler_import_package( COMPILER *c,
 }
 
 static void compiler_use_package( COMPILER *c,
-				  char *package_name,
+				  DNODE *package_name_dnode,
 				  cexception_t *ex )
 {
+    char *package_name = dnode_name( package_name_dnode );
     DNODE *package = vartab_lookup( c->compiled_packages, package_name );
 
     if( !compiler_can_compile_use_statement( c, "use" )) {
@@ -6104,7 +6106,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     multivalue_expression_list
 %type <dnode> identifier
 %type <dnode> identifier_list
-%type <s>     import_statement
+%type <dnode> import_statement
 %type <s>     include_statement
 %type <i>     index_expression
 %type <tnode> inheritance_and_implementation_list
@@ -6112,7 +6114,7 @@ static cexception_t *px; /* parser exception */
 %type <s>     labeled_for
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
-%type <s>     module_import_identifier
+%type <dnode> module_import_identifier
 %type <dnode> operator_definition
 %type <dnode> operator_header
 %type <s>     opt_identifier
@@ -6156,7 +6158,7 @@ static cexception_t *px; /* parser exception */
 %type <tnode> undelimited_type_description
 %type <tnode> delimited_type_description
 %type <anode> type_attribute
-%type <s>     use_statement
+%type <dnode> use_statement
 %type <dnode> variable_access_identifier
 %type <dnode> variable_access_for_indexing
 %type <dnode> variable_identifier_list
@@ -6614,6 +6616,9 @@ opt_module_arguments
 
 module_import_identifier
   : __IDENTIFIER opt_module_arguments
+  {
+      $$ = new_dnode_name( $1, px );
+  }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments
   {
       if( compiler->package_filename ) {
@@ -6622,7 +6627,7 @@ module_import_identifier
       }
       compiler->package_filename = strdupx( $3, px );
       /* printf( ">>> package '%s', file '%s'\n", $1, $3 ); */
-      $$ = $1;
+      $$ = new_dnode_name( $1, px );
   }
 ;
 
@@ -6632,7 +6637,7 @@ use_statement
    ;
 
 selective_use_statement
-   : _USE identifier_list _FROM module_import_identifier
+   : _USE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $4;
            DNODE *imported_identifiers = $2;
@@ -6642,7 +6647,7 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
-   | _USE _TYPE _ARRAY _FROM module_import_identifier
+   | _USE _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *module = 
@@ -6670,7 +6675,7 @@ selective_use_statement
                }
            }
        }
-   | _USE _TYPE identifier_list _FROM module_import_identifier
+   | _USE _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *module = 
@@ -6722,7 +6727,7 @@ selective_use_statement
            }
            delete_dnode( imported_identifiers );
        }
-   | _USE _VAR identifier_list _FROM module_import_identifier
+   | _USE _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *imported_identifiers = $3;
@@ -6732,7 +6737,7 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
-   | _USE _CONST identifier_list _FROM module_import_identifier
+   | _USE _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *module = 
@@ -6760,7 +6765,7 @@ selective_use_statement
            }
            delete_dnode( imported_identifiers );
        }
-   | _USE function_or_procedure identifier_list _FROM module_import_identifier
+   | _USE function_or_procedure identifier_list _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *imported_identifiers = $3;

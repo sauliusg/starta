@@ -6,6 +6,6 @@
 
 use * from std;
 
-use * from Parametrised( int, float ) for IF_Paramatrised;
+use Parametrised( int, float ) for IF_Paramatrised;
 
 . "In the main program";
