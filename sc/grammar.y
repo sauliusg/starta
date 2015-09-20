@@ -5973,6 +5973,34 @@ static void compiler_import_selected_names( COMPILER *c,
     }
 }
 
+static DNODE* compiler_module_parameter_dnode( char *parameter_name,
+                                               char *parameter_default,
+                                               type_kind_t kind,
+                                               cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE *volatile dnode_type = tnode_set_kind( new_tnode( ex ), kind );
+    DNODE *volatile parameter_dnode = NULL;
+
+    cexception_guard( inner ) {
+        parameter_dnode = new_dnode_name( parameter_name, &inner );
+        dnode_insert_type( parameter_dnode, dnode_type );
+#if 0
+        if( parameter_default ) {
+            cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
+                              "So far, default module parameter types "
+                              "are not supported :(" );
+        }
+#endif
+    }
+    cexception_catch {
+        delete_tnode( dnode_type );
+        cexception_reraise( inner, ex );
+    }
+
+    return parameter_dnode;
+}
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -6115,8 +6143,11 @@ static cexception_t *px; /* parser exception */
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
 %type <dnode> module_import_identifier
+%type <dnode> module_parameter
+%type <dnode> module_parameter_list
 %type <dnode> operator_definition
 %type <dnode> operator_header
+%type <s>     opt_default_module_parameter
 %type <s>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
@@ -6131,6 +6162,7 @@ static cexception_t *px; /* parser exception */
 %type <tlist> opt_implemented_interfaces
 %type <s>     opt_label
 %type <dnode> opt_module_arguments
+%type <dnode> opt_module_parameters
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
 %type <i>     opt_variable_declaration_keyword
@@ -6563,27 +6595,40 @@ package_keyword : _PACKAGE | _MODULE;
 
 opt_module_parameters
 : /* empty */
+    { $$ = NULL; }
 | '(' module_parameter_list ')'
+    { $$ = $2; }
 ;
 
 module_parameter_list
 : module_parameter
+    { $$ = $1; }
 | module_parameter_list ',' module_parameter
+    { $$ = dnode_append( $1, $3 ); }
 | module_parameter_list ';' module_parameter
+    { $$ = dnode_append( $1, $3 ); }
 ;
 
 module_parameter
 : _TYPE __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_TYPE, px ); }
 | _PROCEDURE  __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_FUNCTION, px ); }
 | _FUNCTION __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_FUNCTION, px ); }
 | _CONST __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_CONST, px ); }
 | _VAR __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_VAR, px ); }
 | _OPERATOR __STRING_CONST opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_OPERATOR, px ); }
 ;
 
 opt_default_module_parameter
 : /* empty */
+    { $$ = NULL; }
 | '=' __IDENTIFIER
+    { $$ = $2; }
 ;
 
 package_statement
