@@ -6608,7 +6608,7 @@ import_statement
    ;
 
 opt_module_arguments
-: '(' identifier_list ')'
+: '(' identifier_list ')' _FOR __IDENTIFIER
 | /* empty */
 ;
 

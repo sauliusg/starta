@@ -4,14 +4,5 @@
 
 use * from std;
 
-type t = float;
-
-function f( t m[][] ): t[][]
-{
-    return m;
-}
-
-procedure g( t m[][] ): t[][]
-{
-    return m;
-}
+use P1;
+use type funny from P1;
