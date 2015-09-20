@@ -6344,6 +6344,7 @@ undelimited_simple_statement
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
            compiler_import_package( compiler, $1, px );
+           delete_dnode( $1 );
        }
   | use_statement
        {
@@ -6354,6 +6355,7 @@ undelimited_simple_statement
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
            compiler_use_package( compiler, $1, px );
+           delete_dnode( $1 );
        }
   | selective_use_statement
   | load_library_statement
