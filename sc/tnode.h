@@ -65,6 +65,9 @@ typedef enum {
     TK_NULLREF,
     TK_IGNORE, /* "type" of ignored arguments, e.g. for the "over" operator */
     TK_EXCEPTION,
+    TK_TYPE, /* for module parameters that represent types */
+    TK_CONST, /* for module parameters that represent constants */
+    TK_VAR, /* for module parameters that represent variables */
     last_type_kind_t
 } type_kind_t;
 
@@ -196,7 +199,6 @@ DNODE *tnode_retval_next( TNODE* tnode, DNODE *retval );
 
 TNODE *tnode_set_size( TNODE *tnode, int size );
 
-const char *tnode_kind_name( TNODE *tnode );
 void tnode_print( TNODE *tnode );
 void tnode_print_indent( TNODE *tnode, int indent );
 
