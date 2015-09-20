@@ -71,6 +71,8 @@ struct DNODE {
     VARTAB *consts;        /* constants declared in a module */
     TYPETAB *typetab;      /* types declared in a module */
     VARTAB *operators;     /* operators declared in modules */
+    DNODE *module_args;    /* Arguments or parameters of a
+                              parametrised module. */
 
     DNODE *next; /* reference to the next declaration in a declaration
 		    list */
@@ -110,6 +112,7 @@ void delete_dnode( DNODE *node )
 #endif
 	delete_fixup_list( node->code_fixups );
 	const_value_free( &node->cvalue );
+        delete_dnode( node->module_args );
 	free_dnode( node );
 	node = next;
     }
@@ -714,6 +717,19 @@ DNODE *dnode_list_last( DNODE *dnode )
 	}
 	return dnode;
     }
+}
+
+DNODE *dnode_module_args( DNODE *dnode )
+{
+    assert( dnode );
+    return dnode->module_args;
+}
+
+DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *args )
+{
+    assert( dnode );
+    dnode->module_args = args;
+    return dnode;
 }
 
 void dnode_assign_offset( DNODE *dnode, ssize_t *offset )
