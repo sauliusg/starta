@@ -1,6 +1,6 @@
-./sl: inputs/err-selective004.snl(11,15): ERROR, symbol 'ff' already declared in the current scope
+./sl: inputs/err-selective004.snl(11,13): ERROR, symbol 'ff' already declared in the current scope
 use ff from P2;
-              ^
+            ^
 ./sl: inputs/err-selective004.snl(15,3): ERROR, function 'gg' is not declared in the current scope
 gg();
   ^
