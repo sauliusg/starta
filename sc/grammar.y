@@ -6130,6 +6130,7 @@ static cexception_t *px; /* parser exception */
 %type <i>     opt_function_or_procedure_keyword
 %type <tlist> opt_implemented_interfaces
 %type <s>     opt_label
+%type <dnode> opt_module_arguments
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
 %type <i>     opt_variable_declaration_keyword
@@ -6613,13 +6614,30 @@ import_statement
 
 opt_module_arguments
 : '(' identifier_list ')' _FOR __IDENTIFIER
+    { $$ = $2; }
 | /* empty */
+    { $$ = NULL; }
 ;
 
 module_import_identifier
   : __IDENTIFIER opt_module_arguments
   {
-      $$ = new_dnode_name( $1, px );
+      cexception_t inner;
+      DNODE * volatile module_name_dnode = new_dnode_package( $1, px );
+      DNODE *module_arguments = $2;
+
+      cexception_guard( inner ) {
+          if( module_arguments ) {
+              vartab_insert_named_vars
+                  ( dnode_vartab( module_name_dnode ),
+                    module_arguments, &inner );
+          }
+      }
+      cexception_catch {
+          delete_dnode( module_name_dnode );
+          cexception_reraise( inner, px );
+      }
+      $$ = module_name_dnode;
   }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments
   {
