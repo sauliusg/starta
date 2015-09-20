@@ -6665,6 +6665,13 @@ package_statement
                       printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
                               dnode_name( arg ), tnode_kind_name( param_type ),
                               dnode_name( param ));
+                      if( tnode_kind( param_type ) == TK_TYPE ) {
+                          
+                      } else {
+                          yyerrorf( "sorry, parameters of kind '%s' are not yet "
+                                    "supported for modules", 
+                                    tnode_kind_name( param_type ));
+                      }
                       param = dnode_next( param );
                   }
               }
