@@ -57,6 +57,7 @@ typedef struct COMPILER_STATE {
     char *filename;
     char *use_package_name;
     char *package_filename;
+    DNODE *requested_package_dnode;
     FILE *yyin;
     ssize_t line_no;
     ssize_t column_no;
@@ -73,6 +74,7 @@ static void delete_compiler_state( COMPILER_STATE *state )
 static COMPILER_STATE *new_compiler_state( char *filename,
 					   char *use_package_name,
 					   char *package_filename,
+                                           DNODE *requested_package,
 					   FILE *file,
 					   ssize_t line_no,
 					   ssize_t column_no,
@@ -84,6 +86,7 @@ static COMPILER_STATE *new_compiler_state( char *filename,
     state->filename = filename;
     state->use_package_name = use_package_name;
     state->package_filename = package_filename;
+    state->requested_package_dnode = requested_package;
     state->yyin = file;
     state->line_no = line_no;
     state->column_no = column_no;
@@ -135,11 +138,13 @@ typedef struct {
 			     deleted (freed) in
 			     delete_compiler()... */
 
-    /* The following three fields are used to process include files: */
+    /* The following fields are used to process include files and
+       modules: */
     char *filename;
     FILE *yyin;
     char *use_package_name;
     char *package_filename;
+    DNODE *requested_package;
     COMPILER_STATE *include_files;
 
     DNODE *current_function; /* Function that is currently being
@@ -266,6 +271,7 @@ static void delete_compiler( COMPILER *c )
 
         freex( c->use_package_name );
         freex( c->package_filename );
+        delete_dnode( c->requested_package );
 
         freex( c );
     }
@@ -340,7 +346,8 @@ static void compiler_push_compiler_state( COMPILER *c,
     COMPILER_STATE *cstate;
 
     cstate = new_compiler_state( c->filename, c->use_package_name, 
-                                 c->package_filename, c->yyin,
+                                 c->package_filename, c->requested_package,
+                                 c->yyin,
 				 compiler_flex_current_line_number(),
 				 compiler_flex_current_position(),
 				 c->include_files, ex );
@@ -348,6 +355,7 @@ static void compiler_push_compiler_state( COMPILER *c,
     c->filename = NULL;
     c->use_package_name = NULL;
     c->package_filename = NULL;
+    c->requested_package = NULL;
     c->include_files = cstate;
 }
 
@@ -363,6 +371,9 @@ void compiler_pop_compiler_state( COMPILER *c )
 
     freex( c->package_filename );
     c->package_filename = top->package_filename;
+
+    delete_dnode( c->requested_package );
+    c->requested_package = top->requested_package_dnode;
 
     c->include_files = top->next;
     assert( !c->filename );
@@ -691,7 +702,9 @@ static void compiler_close_include_file( COMPILER *c,
     }
 
     compiler_pop_compiler_state( c );
-    freex( c->package_filename );
+    freex( c->package_filename ); /* CHECKME: does this work with files
+                                     included from include files?
+                                     S.G. */
     c->package_filename = NULL;
 }
 
@@ -4968,6 +4981,8 @@ static void compiler_import_package( COMPILER *c,
 	char *pkg_path = c->package_filename ?
             c->package_filename : compiler_find_package( c, package_name, ex );
 	compiler_open_include_file( c, pkg_path, ex );
+        assert( !c->requested_package  );
+        c->requested_package = package_name_dnode;
     }
 }
 
@@ -4995,6 +5010,10 @@ static void compiler_use_package( COMPILER *c,
 	char *pkg_path = c->package_filename ?
             c->package_filename : compiler_find_package( c, package_name, ex );
 	compiler_open_include_file( c, pkg_path, ex );
+
+        assert( !c->requested_package  );
+        c->requested_package = package_name_dnode;
+
 	if( c->use_package_name ) {
 	    freex( c->use_package_name );
             c->use_package_name = NULL;
@@ -6377,7 +6396,6 @@ undelimited_simple_statement
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
            compiler_import_package( compiler, $1, px );
-           delete_dnode( $1 );
        }
   | use_statement
        {
@@ -6388,7 +6406,6 @@ undelimited_simple_statement
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
            compiler_use_package( compiler, $1, px );
-           delete_dnode( $1 );
        }
   | selective_use_statement
   | load_library_statement
@@ -6637,6 +6654,19 @@ package_statement
           dnode_insert_module_args( $2, $3 );
 	  vartab_insert_named( compiler->vartab, $2, px );
 	  compiler_begin_package( compiler, share_dnode( $2 ), px );
+
+          if( compiler->requested_package ) {
+              DNODE *arg, *param, *module_args =
+                  dnode_module_args( compiler->requested_package );
+              if( module_args ) {
+                  param = $3;
+                  foreach_dnode( arg, module_args ) {
+                      printf( ">>>> parameter '%s', argument '%s'\n",
+                              dnode_name( arg ), dnode_name( param ));
+                      param = dnode_next( param );
+                  }
+              }
+          }
       }
     statement_list
     '}' package_keyword __IDENTIFIER
