@@ -6661,8 +6661,10 @@ package_statement
               if( module_args ) {
                   param = $3;
                   foreach_dnode( arg, module_args ) {
-                      printf( ">>>> parameter '%s', argument '%s'\n",
-                              dnode_name( arg ), dnode_name( param ));
+                      TNODE *param_type = dnode_type( param );
+                      printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
+                              dnode_name( arg ), tnode_kind_name( param_type ),
+                              dnode_name( param ));
                       param = dnode_next( param );
                   }
               }
