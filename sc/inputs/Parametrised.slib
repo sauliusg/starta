@@ -1,6 +1,6 @@
 
 module Parametrised( type inttype, type floattype = double )
 
-
+var i : inttype;
 
 end module Parametrised
