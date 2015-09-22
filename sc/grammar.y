@@ -6659,6 +6659,7 @@ package_statement
               DNODE *arg, *param, *module_args =
                   dnode_module_args( compiler->requested_package );
               if( module_args ) {
+                  TYPETAB *ttab = compiler->include_files->typetab;
                   param = $3;
                   foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
