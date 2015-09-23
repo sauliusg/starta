@@ -789,11 +789,11 @@ static void compiler_check_enum_basetypes( TNODE *lookup_tnode, TNODE *tnode )
 }
 
 static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
-					char *name,
-					type_suffix_t suffix_type,
-					TNODE *tnode,
-					char *type_conflict_msg,
-					cexception_t *ex )
+                                           char *name,
+                                           type_suffix_t suffix_type,
+                                           TNODE *tnode,
+                                           char *type_conflict_msg,
+                                           cexception_t *ex )
 {
     TNODE *lookup_node;
     int count = 0;
@@ -840,8 +840,8 @@ static int compiler_current_scope( COMPILER *cc )
 }
 
 static void compiler_typetab_insert( COMPILER *cc,
-				  TNODE *tnode,
-				  cexception_t *ex )
+                                     TNODE *tnode,
+                                     cexception_t *ex )
 {
     TNODE *lookup_tnode =
 	compiler_typetab_insert_msg( cc, tnode_name( tnode ),
@@ -880,7 +880,7 @@ static void compiler_vartab_insert_single_named_var( COMPILER *cc,
 }
 
 static void compiler_consttab_insert_consts( COMPILER *cc, DNODE *consts,
-					  cexception_t *ex )
+                                             cexception_t *ex )
 {
     vartab_insert_named_vars( cc->consts, consts, ex );
     if( cc->current_package ) {
@@ -890,8 +890,8 @@ static void compiler_consttab_insert_consts( COMPILER *cc, DNODE *consts,
 }
 
 static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
-						 TNODE *tnode,
-						 cexception_t *ex )
+                                                    TNODE *tnode,
+                                                    cexception_t *ex )
 {
     TNODE *base_type = NULL;
     char *suffix;
@@ -3281,7 +3281,7 @@ static void compiler_end_scope( COMPILER *c, cexception_t *ex )
 }
 
 static void compiler_begin_subscope( COMPILER *c,
-				  cexception_t *ex )
+                                     cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -3317,8 +3317,8 @@ static void compiler_push_guarding_retval( COMPILER *cc, cexception_t *ex )
 }
 
 static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
-					   char *module_name,
-					   char *identifier )
+                                              char *module_name,
+                                              char *identifier )
 {
     DNODE *module;
 
@@ -6659,15 +6659,32 @@ package_statement
               DNODE *arg, *param, *module_args =
                   dnode_module_args( compiler->requested_package );
               if( module_args ) {
-                  TYPETAB *ttab = compiler->include_files->typetab;
+                  TYPETAB *ttab =
+                      symtab_typetab( stlist_data( compiler->symtab_stack ));
                   param = $3;
+                  module_args = dnode_list_invert( module_args );
                   foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
-                      printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
-                              dnode_name( arg ), tnode_kind_name( param_type ),
-                              dnode_name( param ));
+                      // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
+                      //         dnode_name( arg ), tnode_kind_name( param_type ),
+                      //         dnode_name( param ));
                       if( tnode_kind( param_type ) == TK_TYPE ) {
-                          
+                          TNODE *arg_type = typetab_lookup( ttab, dnode_name( arg ));
+                          // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
+                          char *type_name = dnode_name( param );
+                          cexception_t inner;
+                          TNODE * volatile type_tnode =
+                              new_tnode_equivalent( arg_type, px );
+                          cexception_guard( inner ) {
+                              tnode_set_name( type_tnode, type_name, &inner );
+                              compiler_typetab_insert( compiler, type_tnode, &inner );
+                              type_tnode = NULL;
+                          }
+                          cexception_catch {
+                              delete_tnode( type_tnode );
+                              module_args = dnode_list_invert( module_args );
+                              cexception_reraise( inner, px );
+                          }
                       } else {
                           yyerrorf( "sorry, parameters of kind '%s' are not yet "
                                     "supported for modules", 
@@ -6675,6 +6692,7 @@ package_statement
                       }
                       param = dnode_next( param );
                   }
+                  module_args = dnode_list_invert( module_args );
               }
           }
       }

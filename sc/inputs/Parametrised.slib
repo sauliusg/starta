@@ -3,4 +3,19 @@ module Parametrised( type inttype, type floattype = double )
 
 var i : inttype;
 
+function parallel( floattype x; floattype y ): floattype
+{
+    return x*y/(x+y);
+}
+
+function doubled( floattype x ): floattype
+{
+    return x * 2 floattype;
+}
+
+function divide( floattype x; inttype i ): floattype
+{
+    return x/i@floattype;
+} 
+
 end module Parametrised

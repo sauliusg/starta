@@ -16,5 +16,3 @@ var x = parallel( 2.3, 4.8 );
 . 'x =', x;
 
 . "In the main program";
-
-. divide( 2.4, 2 );

@@ -2,7 +2,26 @@
 //
 // Check chained stringification operators:
 
+module F;
+
 use * from std;
 
-use P1;
-use type funny from P1;
+type f = float;
+
+var x : f;
+
+function double( x : f ): f
+{
+    return x * 2 f;
+}
+
+end module F;
+
+use * from std;
+use * from F;
+
+x = 2.99;
+
+. x;
+
+. double( x );
