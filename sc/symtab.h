@@ -30,4 +30,6 @@ void obtain_tables_from_symtab( SYMTAB *symtab,
 				TYPETAB **typetab,
 				VARTAB **operators );
 
+TYPETAB *symtab_typetab( SYMTAB *st );
+
 #endif
