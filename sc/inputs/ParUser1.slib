@@ -1,0 +1,26 @@
+
+module ParUser1
+
+// This module uses a parametrised module, "Parametrised"; this is the
+// same module as is used in the ParUser2 module and should not be
+// compiled for the second time.
+
+use * from std;
+use * from Parametrised( long, double ) for LDParametrised;
+
+procedure seti( long value )
+{
+    // Set the global "i" variable from the instantiated
+    // "Parametrised" module:
+
+    i = value;
+}
+
+procedure geti(): long
+{
+    // Get the global "i" variable value:
+
+    return i
+}
+
+end module ParUser1
