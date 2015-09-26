@@ -198,6 +198,37 @@ void vartab_insert( VARTAB *table, const char *name,
     }
 }
 
+static
+VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
+                                        SYMTAB *symtab );
+
+void vartab_insert_named_module( VARTAB *table, DNODE *module,
+                                 SYMTAB *st, cexception_t *ex )
+{
+    VAR_NODE * volatile node = NULL;
+    char *name = dnode_name( module );
+    assert( table );
+
+    if( (node = vartab_lookup_module_varnode( table, module, st )) != NULL ) {
+        if( node->scope == table->current_scope &&
+            (node->flags & VNF_IS_IMPORTED) == 0 ) {
+            yyerrorf( "symbol '%s' already declared in the current scope",
+                      name );
+            table->duplicates =
+                new_var_node_linked( table->duplicates, ex );
+            table->duplicates->dnode = module;
+        }
+    }
+    if( !node || node->scope != table->current_scope ||
+        (node->flags & VNF_IS_IMPORTED) != 0 ) {
+        table->node = new_var_node( module, name,
+                                    table->current_scope,
+                                    table->current_subscope,
+                                    /* count = */ 1,
+                                    table->node, ex );
+    }
+}
+
 void vartab_insert_modules_name( VARTAB *table, const char *name,
                                  DNODE *dnode, cexception_t *ex )
 {
@@ -261,6 +292,32 @@ DNODE *vartab_lookup( VARTAB *table, const char *name )
                   "please use explicit package name for disambiguation",
                   name );
     }
+    return node ? node->dnode : NULL;
+}
+
+static
+VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
+                                        SYMTAB *symtab )
+{
+    VAR_NODE *node;
+    char *module_name = dnode_name( module );
+
+    assert( table );
+    for( node = table->node; node != NULL; node = node->next ) {
+        if( strcmp( module_name, node->name ) == 0 ) {
+	    assert( node->dnode );
+            if( dnode_module_args_are_identical( node->dnode, module,
+                                                 symtab ) ) {
+                return node;
+            }
+	}
+    }
+    return NULL;
+}
+
+DNODE *vartab_lookup_module( VARTAB *table, DNODE *module, SYMTAB *symtab )
+{
+    VAR_NODE *node = vartab_lookup_module_varnode( table, module, symtab );
     return node ? node->dnode : NULL;
 }
 

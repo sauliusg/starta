@@ -1020,3 +1020,51 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
     assert( dnode->typetab );
     return typetab_lookup_suffix( dnode->typetab, name, suffix );
 }
+
+int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
+{
+    DNODE *arg1, *arg2;
+    TYPETAB *ttab = symtab_typetab( symtab );
+
+    assert( ttab );
+
+    arg2 = dnode_list_invert( m2->module_args );
+    foreach_dnode( arg1, m1->module_args ) {
+        TNODE *arg1_type = dnode_type( arg1 );
+        // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
+        //         dnode_name( arg ), tnode_kind_name( param_type ),
+        //         dnode_name( param ));
+        if( tnode_kind( arg1_type ) == TK_TYPE ) {
+            TNODE *arg2_type = typetab_lookup( ttab, dnode_name( arg2 ));
+            // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
+#if 0
+            printf( ">>> checking types for identity:"
+                    " arg1 = '%s' (type = '%s', base = '%s'), "
+                    "arg2 = '%s' (type = '%s')\n",
+                    dnode_name( arg1 ),
+                    arg1 ? tnode_kind_name( dnode_type( arg1 )) : "?",
+                    arg1 ? tnode_name( tnode_base_type( dnode_type( arg1 ))) : "?",
+                    dnode_name( arg2 ),
+                    arg2_type ? tnode_name( arg2_type ) : "?"
+                    );
+#endif
+            if( !tnode_types_are_identical( tnode_base_type( dnode_type( arg1 )),
+                                            arg2_type,
+                                            NULL, NULL ) ) {
+                printf( ">>> NOT identical\n" );
+                dnode_list_invert( m2->module_args );
+                return 0;
+            }
+        } else {
+            yyerrorf( "sorry, parameters of kind '%s' are not yet "
+                      "supported for modules", 
+                      tnode_kind_name( arg1_type ));
+        }
+
+        if( arg2 )
+            arg2 = arg2->next;
+    }
+
+    dnode_list_invert( m2->module_args );
+    return 1;
+}

@@ -15,6 +15,7 @@ typedef struct DNODE DNODE;
 #include <tnode.h>
 #include <typetab.h>
 #include <vartab.h>
+#include <symtab.h>
 #include <cvalue_t.h>
 #include <run.h>
 #include <cexceptions.h>
@@ -237,5 +238,7 @@ TNODE *dnode_typetab_lookup_type( DNODE *dnode, const char *name );
 
 TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 				    type_suffix_t suffix );
+
+int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab );
 
 #endif

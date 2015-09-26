@@ -3251,7 +3251,7 @@ static void compiler_compile_mdalloc( COMPILER *cc,
 }
 
 static void compiler_begin_scope( COMPILER *c,
-			       cexception_t *ex )
+                                  cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -4920,7 +4920,8 @@ static void compiler_begin_package( COMPILER *c,
 				    cexception_t *ex )
 {
     compiler_push_symbol_tables( c, ex );
-    vartab_insert_named( c->compiled_packages, package, ex );
+    vartab_insert_named_module( c->compiled_packages, package, 
+                                stlist_data( c->symtab_stack ), ex );
     vartab_insert_named( c->vartab, share_dnode( package ), ex );
     dlist_push_dnode( &c->current_package_stack, &c->current_package, ex );
     c->current_package = package;
@@ -4991,7 +4992,9 @@ static void compiler_use_package( COMPILER *c,
 				  cexception_t *ex )
 {
     char *package_name = dnode_name( package_name_dnode );
-    DNODE *package = vartab_lookup( c->compiled_packages, package_name );
+    DNODE *package = vartab_lookup_module( c->compiled_packages,
+                                           package_name_dnode,
+                                           stlist_data( c->symtab_stack ));
 
     if( !compiler_can_compile_use_statement( c, "use" )) {
 	return;
@@ -5000,7 +5003,8 @@ static void compiler_use_package( COMPILER *c,
     if( package != NULL ) {
         char *package_name = dnode_name( package );
         DNODE *existing_package = package_name ?
-            vartab_lookup( c->vartab, package_name ) : NULL;
+            vartab_lookup_module( c->vartab, package_name_dnode,
+                                  stlist_data( c->symtab_stack )) : NULL;
         if( !existing_package || existing_package != package ) {
             vartab_insert_named( c->vartab, share_dnode( package ), ex );
         }
@@ -6652,7 +6656,9 @@ package_statement
   : package_keyword package_name opt_module_parameters
       {
           dnode_insert_module_args( $2, $3 );
-	  vartab_insert_named( compiler->vartab, $2, px );
+	  vartab_insert_named_module( compiler->vartab, $2, 
+                                      stlist_data( compiler->symtab_stack ),
+                                      px );
 	  compiler_begin_package( compiler, share_dnode( $2 ), px );
 
           if( compiler->requested_package ) {
@@ -6679,6 +6685,8 @@ package_statement
                               tnode_set_name( type_tnode, type_name, &inner );
                               compiler_typetab_insert( compiler, type_tnode, &inner );
                               type_tnode = NULL;
+                              share_tnode( arg_type );
+                              tnode_insert_base_type( param_type, arg_type );
                           }
                           cexception_catch {
                               delete_tnode( type_tnode );
