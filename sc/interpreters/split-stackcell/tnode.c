@@ -1109,6 +1109,9 @@ const char *tnode_kind_name( TNODE *tnode )
 {
     static char buffer[80];
 
+    if( !tnode )
+        return "(null)";
+
     switch( tnode->kind ) {
         case TK_NONE:          return "<no kind>";
         case TK_BOOL:          return "bool";

@@ -7,13 +7,14 @@
 use * from std;
 
 use ParUser1;
-use ParUser2;
+use ParUser3;
 
 . ParUser1::geti();
-. ParUser2::geti();
+. ParUser3::geti();
 
 ParUser1::seti( 1000000000L );
 
 . ParUser1::geti(); // Should print "1000000000"
-. ParUser2::geti(); // Should also print "1000000000", since "i" is in
-                    // the same module in both cases.
+. ParUser3::geti(); // Should print a different value since "ParUser3"
+                    // instantiates the "Parametrised" module with
+                    // different parameters.
