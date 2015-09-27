@@ -6171,6 +6171,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> module_parameter_list
 %type <dnode> operator_definition
 %type <dnode> operator_header
+%type <s>     opt_as_identifier
 %type <s>     opt_default_module_parameter
 %type <s>     opt_identifier
 %type <tnode> opt_method_interface
@@ -6737,23 +6738,28 @@ import_statement
    ;
 
 opt_module_arguments
-: '(' identifier_list ')' _AS __IDENTIFIER
+: '(' identifier_list ')'
     { $$ = $2; }
-| '(' identifier_list ')'
+| /* empty */
+    { $$ = NULL; }
+;
+
+opt_as_identifier
+:  _AS __IDENTIFIER
     { $$ = $2; }
 | /* empty */
     { $$ = NULL; }
 ;
 
 module_import_identifier
-  : __IDENTIFIER opt_module_arguments
+  : __IDENTIFIER opt_module_arguments opt_as_identifier
   {
       DNODE *module_name_dnode = new_dnode_package( $1, px );
       DNODE *module_arguments = $2;
       dnode_insert_module_args( module_name_dnode, module_arguments );
       $$ = module_name_dnode;
   }
-  | __IDENTIFIER _IN __STRING_CONST opt_module_arguments
+  | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
   {
       if( compiler->package_filename ) {
           freex( compiler->package_filename );
