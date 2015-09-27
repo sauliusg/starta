@@ -1,27 +1,14 @@
-// --*- C -*--
+//--*- Java -*--
+// Compiler tests
 //
-// Check chained stringification operators:
 
-module F;
-
-use * from std;
-
-type f = float;
-
-var x : f;
-
-function double( x : f ): f
-{
-    return x * 2 f;
-}
-
-end module F;
+// Test parametrised modules
 
 use * from std;
-use * from F;
+use * from Parametrised( int, float );
 
-x = 2.99;
+. i;
 
-. x;
+i = 23456;
 
-. double( x );
+. i;

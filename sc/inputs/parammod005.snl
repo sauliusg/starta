@@ -6,7 +6,7 @@
 
 use * from std;
 
-use * from Parametrised( int, float ) for IFParametrised;
+use * from Parametrised( int, float ) as IFParametrised;
 
 use ParUser1a;
 use ParUser3a;

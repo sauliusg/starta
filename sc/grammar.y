@@ -6050,6 +6050,7 @@ static cexception_t *px; /* parser exception */
 
 %token _ADDRESSOF
 %token _ARRAY
+%token _AS
 %token _ASSERT
 %token _BLOB
 %token _BREAK
@@ -6736,7 +6737,9 @@ import_statement
    ;
 
 opt_module_arguments
-: '(' identifier_list ')' _FOR __IDENTIFIER
+: '(' identifier_list ')' _AS __IDENTIFIER
+    { $$ = $2; }
+| '(' identifier_list ')'
     { $$ = $2; }
 | /* empty */
     { $$ = NULL; }
