@@ -1023,12 +1023,18 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 
 int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
 {
-    DNODE *arg1, *arg2;
-    TYPETAB *ttab = symtab_typetab( symtab );
+    DNODE *arg1, *arg2, *m2args;
+    TYPETAB *ttab = symtab ? symtab_typetab( symtab ) : NULL;
 
-    assert( ttab );
+    arg2 = m2args = dnode_list_invert( m2->module_args );
 
-    arg2 = dnode_list_invert( m2->module_args );
+    if( !ttab ) {
+        if( m1->module_args )
+            return 0;
+        else
+            return 1;
+    }
+
     foreach_dnode( arg1, m1->module_args ) {
         TNODE *arg1_type = dnode_type( arg1 );
         // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
@@ -1051,8 +1057,8 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             if( !tnode_types_are_identical( tnode_base_type( dnode_type( arg1 )),
                                             arg2_type,
                                             NULL, NULL ) ) {
-                printf( ">>> NOT identical\n" );
-                dnode_list_invert( m2->module_args );
+                // printf( ">>> NOT identical\n" );
+                dnode_list_invert( m2args );
                 return 0;
             }
         } else {
@@ -1065,6 +1071,6 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             arg2 = arg2->next;
     }
 
-    dnode_list_invert( m2->module_args );
+    dnode_list_invert( m2args );
     return 1;
 }

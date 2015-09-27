@@ -1,0 +1,5 @@
+./sl: inputs/err-parammod001.snl(16,29): ERROR, type 'int' has no conversion from type 'long'
+ParUser3::seti( 1000000000L );
+                            ^
+./sl: 1 error(s) detected
+
