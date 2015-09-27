@@ -1,0 +1,26 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+use * from Parametrised( int, float );
+
+use ParUser1a;
+use ParUser3a;
+
+. i;
+. ParUser1a::geti();
+. ParUser3a::geti();
+
+i = 23456;
+ParUser1a::seti( 100000000L );
+ParUser3a::seti( 10000S );
+
+. i;
+. ParUser1a::geti(); // Should print "1000000000"
+. ParUser3a::geti(); // Should print a different value since "ParUser3"
+                     // instantiates the "Parametrised" module with
+                     // different parameters.
