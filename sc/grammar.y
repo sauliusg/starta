@@ -6655,27 +6655,36 @@ opt_default_module_parameter
 package_statement
   : package_keyword package_name opt_module_parameters
       {
-          dnode_insert_module_args( $2, $3 );
-	  vartab_insert_named_module( compiler->vartab, $2, 
+          DNODE *module_dnode = $2;
+          DNODE *module_params = $3;
+
+          dnode_insert_module_args( module_dnode, module_params );
+
+	  vartab_insert_named_module( compiler->vartab, module_dnode, 
                                       stlist_data( compiler->symtab_stack ),
                                       px );
-	  compiler_begin_package( compiler, share_dnode( $2 ), px );
+
+	  compiler_begin_package( compiler, share_dnode(module_dnode), px );
 
           if( compiler->requested_package ) {
+              // printf( ">>> There is a requested package '%s'\n",
+              //         dnode_name(compiler->requested_package) );
               DNODE *arg, *param, *module_args =
                   dnode_module_args( compiler->requested_package );
               if( module_args ) {
                   TYPETAB *ttab =
                       symtab_typetab( stlist_data( compiler->symtab_stack ));
-                  param = $3;
+                  param = module_params;
                   module_args = dnode_list_invert( module_args );
                   foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
-                      // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
-                      //         dnode_name( arg ), tnode_kind_name( param_type ),
-                      //         dnode_name( param ));
+                      // printf( ">>>> argument '%s', parameter '%s' (type kind = %s)\n",
+                      //         dnode_name( arg ), dnode_name( param ),
+                      //         tnode_kind_name( param_type )
+                      //         );
                       if( tnode_kind( param_type ) == TK_TYPE ) {
-                          TNODE *arg_type = typetab_lookup( ttab, dnode_name( arg ));
+                          TNODE *arg_type =
+                              typetab_lookup( ttab, dnode_name( arg ));
                           // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
                           char *type_name = dnode_name( param );
                           cexception_t inner;
@@ -6703,6 +6712,8 @@ package_statement
                   module_args = dnode_list_invert( module_args );
               }
           }
+          // printf( ">>> Will now compile statements for '%s' module\n",
+          //         dnode_name( module_dnode ));
       }
     statement_list
     '}' package_keyword __IDENTIFIER
