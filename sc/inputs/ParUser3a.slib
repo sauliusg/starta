@@ -6,7 +6,7 @@ module ParUser3a
 // compiled for the second time.
 
 use * from std;
-use * from Parametrised( short, float ) for SFParametrised;
+use * from Parametrised( short, float ) as SFParametrised;
 
 procedure seti( short value )
 {

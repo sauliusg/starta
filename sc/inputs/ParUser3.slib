@@ -6,7 +6,7 @@ module ParUser3
 // compiled for the second time.
 
 use * from std;
-use * from Parametrised( int, float ) for IFParametrised;
+use * from Parametrised( int, float ) as IFParametrised;
 
 procedure seti( int value )
 {

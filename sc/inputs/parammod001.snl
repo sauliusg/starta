@@ -6,7 +6,7 @@
 
 use * from std;
 
-use * from Parametrised( int, float ) for IF_Paramatrised;
+use * from Parametrised( int, float ) as IF_Paramatrised;
 
 i = 34;
 

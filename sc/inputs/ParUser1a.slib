@@ -6,7 +6,7 @@ module ParUser1a
 // compiled for the second time.
 
 use * from std;
-use * from Parametrised( llong, double ) for LLDParametrised;
+use * from Parametrised( llong, double ) as LLDParametrised;
 
 procedure seti( llong value )
 {
