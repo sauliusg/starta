@@ -33,6 +33,8 @@
 struct DNODE {
     char *name;            /* The declared name; this name is supposed
                               to be unique in a current scope */
+    char *synonim;         /* Synonim name for different
+                              implementations of parametrised modules. */
     dnode_flag_t flags;
     TNODE *tnode;          /* type descriptor node, describes the type
 			      of the variable, or the type of the
@@ -95,6 +97,7 @@ void delete_dnode( DNODE *node )
         if( --node->rcount > 0 )
 	    return;
 	freex( node->name );
+	freex( node->synonim );
 	freex( node->code );
 	delete_tnode( node->tnode );
 	delete_vartab( node->vartab );
@@ -780,6 +783,22 @@ DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex )
     assert( dnode );
     assert( !dnode->name );
     dnode->name = strdupx( name, ex );
+    return dnode;
+}
+
+DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex )
+{
+    assert( dnode );
+    assert( !dnode->synonim );
+    dnode->synonim = strdupx( synonim, ex );
+    return dnode;
+}
+
+DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim )
+{
+    assert( dnode );
+    assert( !dnode->synonim );
+    dnode->synonim = synonim;
     return dnode;
 }
 
