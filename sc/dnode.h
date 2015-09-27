@@ -134,6 +134,10 @@ DNODE *dnode_replace_type( DNODE *dnode, TNODE *tnode );
 
 DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex );
 
+DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex );
+
+DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim );
+
 DNODE *dnode_append_type( DNODE *dnode, TNODE *tnode );
 
 DNODE *dnode_list_append_type( DNODE *dnode, TNODE *tnode );

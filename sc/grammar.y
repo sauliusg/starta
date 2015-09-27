@@ -6756,18 +6756,32 @@ module_import_identifier
   {
       DNODE *module_name_dnode = new_dnode_package( $1, px );
       DNODE *module_arguments = $2;
+      char *module_synonim = $3;
       dnode_insert_module_args( module_name_dnode, module_arguments );
+      dnode_insert_synonim( module_name_dnode, module_synonim );
       $$ = module_name_dnode;
   }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
   {
+      cexception_t inner;
+      DNODE * volatile module_name_dnode = new_dnode_package( $1, px );
+      DNODE *module_arguments = $4;
+      char *module_synonim = $5;
       if( compiler->package_filename ) {
           freex( compiler->package_filename );
           compiler->package_filename = NULL;
       }
-      compiler->package_filename = strdupx( $3, px );
+      cexception_guard( inner ) {
+          compiler->package_filename = strdupx( $3, &inner );
+      }
+      cexception_catch {
+          delete_dnode( module_name_dnode );
+          cexception_reraise( inner, px );
+      }
       /* printf( ">>> package '%s', file '%s'\n", $1, $3 ); */
-      $$ = new_dnode_name( $1, px );
+      dnode_insert_module_args( module_name_dnode, module_arguments );
+      dnode_insert_synonim( module_name_dnode, module_synonim );
+      $$ = module_name_dnode;
   }
 ;
 
