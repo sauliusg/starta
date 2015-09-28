@@ -802,6 +802,12 @@ DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim )
     return dnode;
 }
 
+char *dnode_synonim( DNODE *dnode )
+{
+    assert( dnode );
+    return dnode->synonim;
+}
+
 DNODE *dnode_append_type( DNODE *dnode, TNODE *tnode )
 {
     TNODE *true_tnode = NULL;
@@ -1045,14 +1051,14 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
     DNODE *arg1, *arg2, *m2args;
     TYPETAB *ttab = symtab ? symtab_typetab( symtab ) : NULL;
 
-    arg2 = m2args = dnode_list_invert( m2->module_args );
-
     if( !ttab ) {
         if( m1->module_args )
             return 0;
         else
             return 1;
     }
+
+    arg2 = m2args = dnode_list_invert( m2->module_args );
 
     foreach_dnode( arg1, m1->module_args ) {
         TNODE *arg1_type = dnode_type( arg1 );

@@ -701,6 +701,43 @@ static void compiler_close_include_file( COMPILER *c,
 	}
     }
 
+    if( c->requested_package ) {
+        cexception_t inner;
+        char *synonim;
+        // printf( ">>>> checking module synonim for module '%s'...\n", dnode_name( c->requested_package ));
+        if( (synonim = dnode_synonim( c->requested_package )) != NULL ) {
+            // printf( ">>>> inserting synonim '%s' for module '%s'\n", synonim, dnode_name( c->requested_package ));
+            TYPETAB * typetab = NULL;
+            VARTAB * vartab = NULL;
+            VARTAB * consttab = NULL;
+            VARTAB * optab = NULL;
+
+            SYMTAB * volatile symtab = NULL;
+
+            cexception_guard( inner ) {
+                symtab = new_symtab( c->vartab, c->consts, c->typetab,
+                                   c->operators, &inner );
+
+                DNODE *compiled_package =
+                    vartab_lookup_module( c->vartab, c->requested_package,
+                                          symtab );
+
+                vartab_insert( c->vartab, synonim,
+                               share_dnode( compiled_package ), &inner );
+
+                obtain_tables_from_symtab( symtab, &vartab,
+                                           &consttab, &typetab, &optab );
+                delete_symtab( symtab );
+            }
+            cexception_catch {
+                obtain_tables_from_symtab( symtab, &vartab,
+                                           &consttab, &typetab, &optab );
+                delete_symtab( symtab );
+                cexception_reraise( inner, ex );
+            }            
+        }
+    }
+
     compiler_pop_compiler_state( c );
     freex( c->package_filename ); /* CHECKME: does this work with files
                                      included from include files?
@@ -4969,14 +5006,17 @@ static void compiler_import_package( COMPILER *c,
 				     cexception_t *ex )
 {
     char *package_name = dnode_name( package_name_dnode );
-    DNODE *package = vartab_lookup( c->compiled_packages, package_name );
+    DNODE *package = vartab_lookup_module( c->compiled_packages,
+                                           package_name_dnode,
+                                           stlist_data( c->symtab_stack ));
 
     if( !compiler_can_compile_use_statement( c, "import" )) {
 	return;
     }
 
     if( package != NULL ) {
-	vartab_insert_named( c->vartab, share_dnode( package ), ex );
+	vartab_insert_named_module( c->vartab, share_dnode( package ),
+                                    stlist_data( c->symtab_stack ), ex );
 	/* printf( "found compiled package '%s'\n", package_name ); */
     } else {
 	char *pkg_path = c->package_filename ?
@@ -6662,7 +6702,7 @@ package_statement
 
           dnode_insert_module_args( module_dnode, module_params );
 
-	  vartab_insert_named_module( compiler->vartab, module_dnode, 
+	  vartab_insert_named_module( compiler->vartab, module_dnode,
                                       stlist_data( compiler->symtab_stack ),
                                       px );
 
