@@ -202,11 +202,10 @@ static
 VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
                                         SYMTAB *symtab );
 
-void vartab_insert_named_module( VARTAB *table, DNODE *module,
-                                 SYMTAB *st, cexception_t *ex )
+void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
+                           SYMTAB *st, cexception_t *ex )
 {
     VAR_NODE * volatile node = NULL;
-    char *name = dnode_name( module );
     assert( table );
 
     if( (node = vartab_lookup_module_varnode( table, module, st )) != NULL ) {
@@ -227,6 +226,13 @@ void vartab_insert_named_module( VARTAB *table, DNODE *module,
                                     /* count = */ 1,
                                     table->node, ex );
     }
+}
+
+void vartab_insert_named_module( VARTAB *table, DNODE *module,
+                                 SYMTAB *st, cexception_t *ex )
+{
+    char *name = dnode_name( module );
+    vartab_insert_module( table, module, name, st, ex );
 }
 
 void vartab_insert_modules_name( VARTAB *table, const char *name,

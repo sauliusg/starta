@@ -138,6 +138,8 @@ DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex );
 
 DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim );
 
+char *dnode_synonim( DNODE *dnode );
+
 DNODE *dnode_append_type( DNODE *dnode, TNODE *tnode );
 
 DNODE *dnode_list_append_type( DNODE *dnode, TNODE *tnode );
