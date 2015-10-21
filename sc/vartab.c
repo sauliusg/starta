@@ -75,8 +75,8 @@ static VAR_NODE *new_var_node_linked( VAR_NODE *next, cexception_t *ex )
 static void delete_var_node( VAR_NODE *node )
 {
     if( node ) {
-        freex( node->name );
 	delete_dnode( node->dnode );
+        freex( node->name );
         /* freex( node ); */
         free_var_node( node );
     }

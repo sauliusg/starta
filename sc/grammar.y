@@ -722,8 +722,10 @@ static void compiler_close_include_file( COMPILER *c,
                     vartab_lookup_module( c->vartab, c->requested_package,
                                           symtab );
 
-                vartab_insert( c->vartab, synonim,
-                               share_dnode( compiled_package ), &inner );
+                if( compiled_package ) {
+                    vartab_insert( c->vartab, synonim,
+                                   share_dnode( compiled_package ), &inner );
+                }
 
                 obtain_tables_from_symtab( symtab, &vartab,
                                            &consttab, &typetab, &optab );
@@ -892,8 +894,8 @@ static void compiler_typetab_insert( COMPILER *cc,
 }
 
 static void compiler_vartab_insert_named_vars( COMPILER *cc,
-					    DNODE *vars,
-					    cexception_t *ex )
+                                               DNODE *vars,
+                                               cexception_t *ex )
 {
     vartab_insert_named_vars( cc->vartab, vars, ex );
     if( cc->current_package && dnode_scope( vars ) == 0 ) {
@@ -903,8 +905,8 @@ static void compiler_vartab_insert_named_vars( COMPILER *cc,
 }
 
 static void compiler_vartab_insert_single_named_var( COMPILER *cc,
-                                                  DNODE *var,
-                                                  cexception_t *ex )
+                                                     DNODE *var,
+                                                     cexception_t *ex )
 {
     char *name = dnode_name( var );
     assert( name );
@@ -6728,6 +6730,10 @@ package_statement
                           TNODE *arg_type =
                               typetab_lookup( ttab, dnode_name( arg ));
                           // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
+                          if( !arg_type ) {
+                              yyerrorf( "type '%s' is not defined for module parameter",
+                                        dnode_name( arg ));
+                          }
                           char *type_name = dnode_name( param );
                           cexception_t inner;
                           TNODE * volatile type_tnode =
@@ -6743,6 +6749,40 @@ package_statement
                               delete_tnode( type_tnode );
                               module_args = dnode_list_invert( module_args );
                               cexception_reraise( inner, px );
+                          }
+                      } else if( tnode_kind( param_type ) == TK_CONST ) {
+                          VARTAB *ctab =
+                              symtab_consttab( stlist_data( compiler->symtab_stack ));
+                          DNODE *argument_dnode =
+                              vartab_lookup( ctab, dnode_name( arg ));
+                          /* Insert the constant under the module parameter name: */
+                          // compiler_consttab_insert_consts
+                          //    ( compiler, share_dnode( argument_dnode ), px );
+                          if( argument_dnode ) {
+                              vartab_insert( compiler->consts, dnode_name( param ),
+                                             share_dnode( argument_dnode ), px );
+                          } else {
+                              yyerrorf( "constant '%s' is not found for module"
+                                        " parameter",
+                                        dnode_name( arg ));
+                          }
+                      } else if( tnode_kind( param_type ) == TK_VAR ||
+                                 tnode_kind( param_type ) == TK_FUNCTION ) {
+                          VARTAB *vartab =
+                              symtab_vartab( stlist_data( compiler->symtab_stack ));
+                          DNODE *argument_dnode =
+                              vartab_lookup( vartab, dnode_name( arg ));
+                          /* Insert the variable or function under the
+                             module parameter name: */
+                          // compiler_vartab_insert_single_named_var
+                          //     ( compiler, share_dnode( argument_dnode ), px );
+                          if( argument_dnode ) {
+                              vartab_insert( compiler->vartab, dnode_name( param ), 
+                                             share_dnode( argument_dnode ), px );
+                          } else {
+                              yyerrorf( "variable or function '%s' is not found"
+                                        " for module parameter",
+                                        dnode_name( arg ));
                           }
                       } else {
                           yyerrorf( "sorry, parameters of kind '%s' are not yet "

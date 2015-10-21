@@ -6,6 +6,6 @@
 
 use * from std;
 
-use * from Parametrised( int, fluffy ) as P;
+use Parametrised( int, double ) as P;
 
 . P::parallel( 10, 30 );
