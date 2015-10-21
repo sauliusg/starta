@@ -7,10 +7,10 @@
 use * from std;
 
 const N = 100;
-var v = 40.5;
+var v = 23.9;
 
 procedure add( double x, y ): double { return x + y }
 
-use ParamConstVarProc( N, v, add ) as P;
+use ParamConstVarProc( N, V, add ) as P;
 
 . P::pp( 10 );
