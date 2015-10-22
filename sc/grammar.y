@@ -3509,9 +3509,9 @@ static void compiler_make_stack_top_addressof( COMPILER *cc,
 }
 
 static void compiler_check_and_drop_function_args( COMPILER *cc,
-						DNODE *function,
-                                                TYPETAB *generic_types,
-                                                cexception_t *ex )
+                                                   DNODE *function,
+                                                   TYPETAB *generic_types,
+                                                   cexception_t *ex )
 {
     DNODE *function_args = dnode_function_args( function );
     DNODE *formal_arg = NULL;
@@ -4641,11 +4641,13 @@ static void compiler_convert_function_argument( COMPILER *cc,
 
     if( arg_type && exp_type ) {
 	if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
-	    !tnode_types_are_assignment_compatible( arg_type, exp_type, NULL, ex )) {
-	    char *arg_type_name = tnode_name( arg_type );
-	    if( arg_type_name ) {
-		compiler_compile_named_type_conversion( cc, arg_type_name, ex );
-	    }
+	    !tnode_types_are_assignment_compatible( arg_type, exp_type,
+                                                    NULL, ex )) {
+            char *arg_type_name = tnode_name( arg_type );
+            if( arg_type_name ) {
+                compiler_compile_type_conversion
+                    ( cc, arg_type, /* target_name: */NULL,  ex );
+            }
 	}
     }
     cc->current_arg = cc->current_arg ? dnode_prev( cc->current_arg ) : NULL;
@@ -5641,7 +5643,7 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
         if( funct && fn_type ) {
             compiler_emit_default_arguments( cc, NULL, &inner );
             compiler_check_and_drop_function_args( cc, funct, generic_types,
-                                                &inner );
+                                                   &inner );
             compiler_emit_function_call( cc, funct, NULL, "\n", &inner );
             if( tnode_kind( fn_type ) == TK_FUNCTION_REF ) {
                 compiler_drop_top_expression( cc );
