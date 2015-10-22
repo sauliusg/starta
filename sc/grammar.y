@@ -1543,6 +1543,7 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
 }
 
 static void compiler_compile_type_conversion( COMPILER *cc,
+                                              TNODE *target_type,
                                               char *target_name,
                                               cexception_t *ex )
 {
@@ -1552,13 +1553,15 @@ static void compiler_compile_type_conversion( COMPILER *cc,
     TNODE * expr_type = expr ? enode_type( expr ) : NULL;
     char *source_name = expr_type ? tnode_name( expr_type ) : NULL;
 
+    if( !target_name && target_type ) {
+        target_name = tnode_name( target_type );
+    }
+
     cexception_guard( inner ) {
 	if( !expr ) {
 	    yyerrorf( "not enough values on the stack for type conversion "
 		      "from '%s' to '%s'", source_name, target_name );
 	} else {
-	    TNODE *target_type =
-		typetab_lookup( cc->typetab, target_name );
 	    DNODE *conversion =
 		target_type ?
                 tnode_lookup_conversion( target_type, expr_type ) :
@@ -1612,6 +1615,16 @@ static void compiler_compile_type_conversion( COMPILER *cc,
     }
 }
 
+static void compiler_compile_named_type_conversion( COMPILER *cc,
+                                                    char *target_name,
+                                                    cexception_t *ex )
+{
+    TNODE *target_type =
+        typetab_lookup( cc->typetab, target_name );
+
+    compiler_compile_type_conversion( cc, target_type, target_name, ex );
+}
+
 static void compiler_compile_return( COMPILER *cc,
                                      int nretvals,
                                      cexception_t *ex )
@@ -1649,7 +1662,7 @@ static void compiler_compile_return( COMPILER *cc,
                 i == 0 &&
                 tnode_lookup_conversion( returned_type,
                                          available_type  )) {
-                compiler_compile_type_conversion( cc, returned_type_name, ex );
+                compiler_compile_named_type_conversion( cc, returned_type_name, ex );
                 expr = cc->e_stack;
                 if( expr ) {
                     available_type = enode_type( expr );
@@ -2327,7 +2340,7 @@ static void compiler_compile_variable_assignment_or_init(
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( expr_type && dst_name &&
 		tnode_lookup_conversion( var_type, expr_type )) {
-		compiler_compile_type_conversion( cc, dst_name, ex );
+		compiler_compile_named_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
 	    } else {
@@ -2533,7 +2546,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
 			tnode_lookup_conversion( element_type, expr_type )) {
-			compiler_compile_type_conversion( cc, dst_name, ex );
+			compiler_compile_named_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
                         expr_type = enode_type( expr );
 		    } else {
@@ -4631,7 +4644,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
 	    !tnode_types_are_assignment_compatible( arg_type, exp_type, NULL, ex )) {
 	    char *arg_type_name = tnode_name( arg_type );
 	    if( arg_type_name ) {
-		compiler_compile_type_conversion( cc, arg_type_name, ex );
+		compiler_compile_named_type_conversion( cc, arg_type_name, ex );
 	    }
 	}
     }
@@ -10796,18 +10809,18 @@ arithmetic_expression
 /*
   | '<' __IDENTIFIER '>' expression %prec __UNARY
       {
-       compiler_compile_type_conversion( compiler, /*target_name* /$2, px );
+       compiler_compile_named_type_conversion( compiler, /*target_name* /$2, px );
       }
 */
 
   | expression '@' __IDENTIFIER
       {
-       compiler_compile_type_conversion( compiler, /*target_name*/$3, px );
+       compiler_compile_named_type_conversion( compiler, /*target_name*/$3, px );
       }
 
   | expression '@' '(' var_type_description ')'
       {
-       compiler_compile_type_conversion( compiler, NULL, px );
+       compiler_compile_named_type_conversion( compiler, NULL, px );
       }
 
   | expression '?'
