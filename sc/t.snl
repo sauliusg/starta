@@ -6,11 +6,27 @@
 
 use * from std;
 
-const N = 100;
-var v = 40.5;
+const N1 = 100;
+const N2 = 200;
+const N3 = 300;
 
-procedure add( double x, y ): double { return x + y }
+use C( N1 ) as C1;
+use C( N2 ) as C2;
+use C( N3 ) as C3;
 
-use ParamConstVarProc( N, v, add ) as P;
+. C1::x;
+C1::x = 11;
+. C1::x;
 
-. P::pp( 10 );
+. C2::x;
+C2::x = 12;
+. C2::x;
+
+. C3::x;
+C3::x = 13;
+. C3::x;
+
+. "==================";
+. C1::x;
+. C2::x;
+. C3::x;
