@@ -1089,7 +1089,10 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         } else if( tnode_kind( arg1_type ) == TK_CONST ) {
             VARTAB *ctab = symtab_consttab( symtab );
             DNODE *arg2_const = vartab_lookup( ctab, dnode_name( arg2 ));
-#warning FIXME -- implement correct comparison of constants. S.G.
+            if( arg2_const != dnode_module_args( arg1 ) ) {
+                dnode_list_invert( m2args );
+                return 0;
+            }
         } else if( tnode_kind( arg1_type ) == TK_VAR ||
                    tnode_kind( arg1_type ) == TK_FUNCTION ) {
 #warning FIXME -- implement correct comparison of variables and functions. S.G.
