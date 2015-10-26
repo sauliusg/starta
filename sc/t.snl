@@ -11,8 +11,8 @@ const N2 = 200;
 const N3 = 300;
 
 use C( N1 ) as C1;
-use C( N2 ) as C2;
-use C( N3 ) as C3;
+use C( N1 ) as C2;
+use C( N1 ) as C3;
 
 . C1::x;
 C1::x = 11;

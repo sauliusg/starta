@@ -6,7 +6,7 @@
 
 use * from std;
 use Parametrised( int, float ) as ifP;
-use Parametrised( long, double ) as ldP;
+use Parametrised( int, float ) as ldP;
 
 . ifP::i;
 
