@@ -716,7 +716,7 @@ static void compiler_close_include_file( COMPILER *c,
 
             cexception_guard( inner ) {
                 symtab = new_symtab( c->vartab, c->consts, c->typetab,
-                                   c->operators, &inner );
+                                     c->operators, &inner );
 
                 DNODE *compiled_package =
                     vartab_lookup_module( c->vartab, c->requested_package,
@@ -6774,6 +6774,7 @@ package_statement
                           // compiler_consttab_insert_consts
                           //    ( compiler, share_dnode( argument_dnode ), px );
                           if( argument_dnode ) {
+                              dnode_insert_module_args( param, share_dnode( argument_dnode ));
                               vartab_insert( compiler->consts, dnode_name( param ),
                                              share_dnode( argument_dnode ), px );
                           } else {

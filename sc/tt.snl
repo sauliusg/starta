@@ -5,8 +5,8 @@
 // Test parametrised modules
 
 use * from std;
-use * from Parametrised( int, float ) as ifP;
-use * from Parametrised( long, double ) as ldP;
+use Parametrised( int, float ) as ifP;
+use Parametrised( long, double ) as ldP;
 
 . ifP::i;
 
