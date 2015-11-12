@@ -5104,9 +5104,9 @@ static void compiler_use_package( COMPILER *c,
                     vartab_lookup_module
                     ( c->vartab, package_name_dnode, symtab )
                     : NULL;
-                if( !existing_package || existing_package != package ) {
+                char *synonim = dnode_synonim( package_name_dnode );
+                if( !existing_package || existing_package != package || synonim ) {
                     // printf( ">>> found package '%s' for reuse\n", package_name );
-                    char *synonim = dnode_synonim( package_name_dnode );
                     // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
                     if( synonim ) {
                         vartab_insert_module( c->vartab, share_dnode( package ),
