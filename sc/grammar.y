@@ -694,7 +694,8 @@ static void compiler_close_include_file( COMPILER *c,
 	DNODE *module = NULL;
 	module = vartab_lookup( c->compiled_packages, c->use_package_name );
 	if( module ) {
-	    /* printf( "module '%s' is being used\n", c->use_package_name ); */
+	    /* printf( ">>> module '%s' is being used\n", 
+               c->use_package_name ); */
 	    compiler_use_exported_package_names( c, module, ex );
 	} else {
 	    yyerrorf( "no module named '%s'?", c->use_package_name );
@@ -5022,65 +5023,130 @@ static void compiler_import_package( COMPILER *c,
 				     DNODE *package_name_dnode,
 				     cexception_t *ex )
 {
+    cexception_t inner;
     char *package_name = dnode_name( package_name_dnode );
+
+    SYMTAB *volatile symtab = new_symtab( c->vartab, c->consts, c->typetab,
+                                          c->operators, ex );
+
+
     DNODE *package = vartab_lookup_module( c->compiled_packages,
                                            package_name_dnode,
-                                           stlist_data( c->symtab_stack ));
+                                           symtab );
 
-    if( !compiler_can_compile_use_statement( c, "import" )) {
-	return;
+    cexception_guard( inner ) {
+        if( compiler_can_compile_use_statement( c, "import" )) {
+
+            // printf( ">>> can import package '%s'\n", package_name );
+
+            if( package != NULL ) {
+                char *synonim = dnode_synonim( package_name_dnode );
+                // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+                if( synonim ) {
+                    vartab_insert_module( c->vartab, share_dnode( package ),
+                                          synonim, symtab, &inner );
+                } else {
+                    vartab_insert_named_module( c->vartab, share_dnode( package ),
+                                                symtab, &inner );
+                }
+                /* printf( "found compiled package '%s'\n", package_name ); */
+            } else {
+                char *pkg_path = c->package_filename ?
+                    c->package_filename : compiler_find_package( c, package_name,
+                                                                 &inner );
+                compiler_open_include_file( c, pkg_path, &inner );
+                assert( !c->requested_package  );
+                c->requested_package = package_name_dnode;
+            }
+        }
+    }
+    cexception_catch {
+        VARTAB *vt, *ct, *ot;
+        TYPETAB *tt;
+        obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+        delete_symtab( symtab );
+        cexception_reraise( inner, ex );
     }
 
-    if( package != NULL ) {
-	vartab_insert_named_module( c->vartab, share_dnode( package ),
-                                    stlist_data( c->symtab_stack ), ex );
-	/* printf( "found compiled package '%s'\n", package_name ); */
-    } else {
-	char *pkg_path = c->package_filename ?
-            c->package_filename : compiler_find_package( c, package_name, ex );
-	compiler_open_include_file( c, pkg_path, ex );
-        assert( !c->requested_package  );
-        c->requested_package = package_name_dnode;
-    }
+    VARTAB *vt, *ct, *ot;
+    TYPETAB *tt;
+    obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+    delete_symtab( symtab );
 }
+
+/* 
+   FIXME: functions 'compiler_import_package()' and
+   'compiler_use_package()' contain too much repetitive code and must
+   be merged to maintain SPOT. S.G.
+*/
 
 static void compiler_use_package( COMPILER *c,
 				  DNODE *package_name_dnode,
 				  cexception_t *ex )
 {
+    cexception_t inner;
+
     char *package_name = dnode_name( package_name_dnode );
+
+    SYMTAB *volatile symtab = new_symtab( c->vartab, c->consts, c->typetab,
+                                          c->operators, ex );
+
     DNODE *package = vartab_lookup_module( c->compiled_packages,
                                            package_name_dnode,
-                                           stlist_data( c->symtab_stack ));
+                                           symtab );
 
-    if( !compiler_can_compile_use_statement( c, "use" )) {
-	return;
-    }
+    cexception_guard( inner ) {
+        if( compiler_can_compile_use_statement( c, "use" )) {
+            // printf( ">>> can use package '%s'\n", package_name );
+            if( package != NULL ) {
+                char *package_name = dnode_name( package );
+                DNODE *existing_package = package_name ?
+                    vartab_lookup_module
+                    ( c->vartab, package_name_dnode, symtab )
+                    : NULL;
+                if( !existing_package || existing_package != package ) {
+                    // printf( ">>> found package '%s' for reuse\n", package_name );
+                    char *synonim = dnode_synonim( package_name_dnode );
+                    // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+                    if( synonim ) {
+                        vartab_insert_module( c->vartab, share_dnode( package ),
+                                              synonim, symtab, &inner );
+                    } else {
+                        vartab_insert_named_module( c->vartab, share_dnode( package ),
+                                                    symtab, &inner );
+                    } 
+                }
+                /* printf( "found compiled package '%s'\n", package_name ); */
+                compiler_use_exported_package_names( c, package, &inner );
+            } else {
+                char *pkg_path = c->package_filename ?
+                    c->package_filename :
+                    compiler_find_package( c, package_name, &inner );
+                compiler_open_include_file( c, pkg_path, &inner );
 
-    if( package != NULL ) {
-        char *package_name = dnode_name( package );
-        DNODE *existing_package = package_name ?
-            vartab_lookup_module( c->vartab, package_name_dnode,
-                                  stlist_data( c->symtab_stack )) : NULL;
-        if( !existing_package || existing_package != package ) {
-            vartab_insert_named( c->vartab, share_dnode( package ), ex );
+                assert( !c->requested_package  );
+                c->requested_package = package_name_dnode;
+
+                if( c->use_package_name ) {
+                    freex( c->use_package_name );
+                    c->use_package_name = NULL;
+                }
+                c->use_package_name = strdupx( package_name, &inner );
+            }
         }
-	/* printf( "found compiled package '%s'\n", package_name ); */
-	compiler_use_exported_package_names( c, package, ex );
-    } else {
-	char *pkg_path = c->package_filename ?
-            c->package_filename : compiler_find_package( c, package_name, ex );
-	compiler_open_include_file( c, pkg_path, ex );
-
-        assert( !c->requested_package  );
-        c->requested_package = package_name_dnode;
-
-	if( c->use_package_name ) {
-	    freex( c->use_package_name );
-            c->use_package_name = NULL;
-	}
-	c->use_package_name = strdupx( package_name, ex );
     }
+    cexception_catch {
+        VARTAB *vt, *ct, *ot;
+        TYPETAB *tt;
+        obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+        delete_symtab( symtab );
+        cexception_reraise( inner, ex );
+    }
+
+    VARTAB *vt, *ct, *ot;
+    TYPETAB *tt;
+    obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+    delete_symtab( symtab );
 }
 
 static void compiler_debug()
