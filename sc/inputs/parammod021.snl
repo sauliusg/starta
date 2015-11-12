@@ -10,8 +10,8 @@ const N1 = 100;
 const N2 = 200;
 const N3 = 300;
 
-use C( N1 ) as C1;
-use * from C( N1 ) as C2;
+use * from C( N1 ) as C1;
+use C( N1 ) as C2;
 use C( N3 ) as C3;
 
 . C1::x;
