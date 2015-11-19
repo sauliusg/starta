@@ -1,4 +1,4 @@
-./sl: inputs/ParamConstVarProc.slib(4,55): ERROR, variable or function 'V' is not found for module parameter
+./sl: inputs/ParamConstVarProc.slib(4,55): ERROR, variable 'V' is not found for module parameter 'X'
 module ParamConstVarProc( const C, var X, procedure P )
                                                       ^
 ./sl: inputs/ParamConstVarProc.slib(11,25): ERROR, variable 'X' is not declared in the current scope
