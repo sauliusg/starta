@@ -6856,9 +6856,8 @@ package_statement
                               vartab_lookup( vartab, dnode_name( arg ));
                           /* Insert the variable or function under the
                              module parameter name: */
-                          // compiler_vartab_insert_single_named_var
-                          //     ( compiler, share_dnode( argument_dnode ), px );
                           if( argument_dnode ) {
+                              dnode_insert_module_args( param, share_dnode( argument_dnode ));
                               vartab_insert( compiler->vartab, dnode_name( param ),
                                              share_dnode( argument_dnode ), px );
                           } else {
