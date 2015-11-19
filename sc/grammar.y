@@ -6859,12 +6859,16 @@ package_statement
                           // compiler_vartab_insert_single_named_var
                           //     ( compiler, share_dnode( argument_dnode ), px );
                           if( argument_dnode ) {
-                              vartab_insert( compiler->vartab, dnode_name( param ), 
+                              vartab_insert( compiler->vartab, dnode_name( param ),
                                              share_dnode( argument_dnode ), px );
                           } else {
-                              yyerrorf( "variable or function '%s' is not found"
-                                        " for module parameter",
-                                        dnode_name( arg ));
+                              char *item_name =
+                                  tnode_kind( param_type ) == TK_VAR ?
+                                  "variable" : "function";
+                              yyerrorf( "%s '%s' is not found"
+                                        " for module parameter '%s'",
+                                        item_name, dnode_name( arg ),
+                                        dnode_name( param ));
                           }
                       } else {
                           yyerrorf( "sorry, parameters of kind '%s' are not yet "
