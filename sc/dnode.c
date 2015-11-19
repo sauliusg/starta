@@ -1095,7 +1095,22 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             }
         } else if( tnode_kind( arg1_type ) == TK_VAR ||
                    tnode_kind( arg1_type ) == TK_FUNCTION ) {
-#warning FIXME -- implement correct comparison of variables and functions. S.G.
+            VARTAB *vtab = symtab_vartab( symtab );
+            DNODE *arg2_dnode = vartab_lookup( vtab, dnode_name( arg2 ));
+#if 0
+            printf( ">>> checking variables or functions for identity: "
+                    "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
+                    "(found as '%s')\n",
+                    dnode_name( arg1 ),
+                    dnode_name( dnode_module_args( arg1 )),
+                    dnode_name( arg2 ),
+                    dnode_name( arg2_dnode )
+                    );
+#endif
+            if( arg2_dnode != dnode_module_args( arg1 ) ) {
+                dnode_list_invert( m2args );
+                return 0;
+            }
         } else {
             yyerrorf( "sorry, parameters of kind '%s' are not yet "
                       "supported for modules", 
