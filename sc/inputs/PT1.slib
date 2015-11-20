@@ -1,0 +1,19 @@
+// --*- Java -*--
+// An example of a module parametrised with a constant, a variable and
+// a procedure.
+
+module PT1( const C, type T, var X, function P )
+
+use * from std;
+
+const N = 100;
+
+var x : double = 30.5;
+
+procedure add( double x, y ): double { return x + y }
+
+use ProcTypeParam( N, double, x, add ) as PT;
+
+function pp( double x ): double { return PT::pp( x ) }
+
+end module PT1;
