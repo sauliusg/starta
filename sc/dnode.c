@@ -1060,6 +1060,10 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
 
     arg2 = m2args = dnode_list_invert( m2->module_args );
 
+#if 0
+    printf( "\n" );
+#endif
+
     foreach_dnode( arg1, m1->module_args ) {
         TNODE *arg1_type = dnode_type( arg1 );
         // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
@@ -1089,6 +1093,16 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         } else if( tnode_kind( arg1_type ) == TK_CONST ) {
             VARTAB *ctab = symtab_consttab( symtab );
             DNODE *arg2_const = vartab_lookup( ctab, dnode_name( arg2 ));
+#if 0
+            printf( ">>> checking constant for identity: "
+                    "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
+                    "(found as '%s')\n",
+                    dnode_name( arg1 ),
+                    dnode_name( dnode_module_args( arg1 )),
+                    dnode_name( arg2 ),
+                    arg2_const ? dnode_name( arg2_const ) : "?"
+                    );
+#endif
             if( arg2_const != dnode_module_args( arg1 ) ) {
                 dnode_list_invert( m2args );
                 return 0;

@@ -12,8 +12,8 @@ use PT2;
 . PT1::pp( 10 ); // 100 + 30.5 + 10 = 140.5
 . PT2::pp( 10 ); // 100 + 30.5 + 10 = 140.5
 
-// P1::inner = 11.1D;
-// P2::inner = 22.2D;
-// 
-// . P1::inner;
-// . P2::inner;
+PT1::set_inner( 123 );
+PT2::set_inner( 456 );
+
+. PT1::get_inner();
+. PT2::get_inner();
