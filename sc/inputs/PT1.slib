@@ -16,4 +16,14 @@ use ProcTypeParam( N, double, x, add ) as PT;
 
 function pp( double x ): double { return PT::pp( x ) }
 
+procedure set_inner( i : double )
+{
+    PT::inner = i
+}
+
+function get_inner(): double
+{
+    return PT::inner
+}
+
 end module PT1;
