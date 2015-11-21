@@ -423,6 +423,7 @@ DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags )
     return dnode;
 }
 
+#if 0
 DNODE *dnode_list_invert( DNODE *dnode_list )
 {
     DNODE *inverse_list = NULL;
@@ -442,6 +443,7 @@ DNODE *dnode_list_invert( DNODE *dnode_list )
     }
     return inverse_list;
 }
+#endif
 
 char *dnode_name( DNODE *dnode ) { assert( dnode ); return dnode->name; }
 
@@ -714,6 +716,8 @@ DNODE *dnode_list_last( DNODE *dnode )
     if( !dnode ) {
 	return NULL;
     } else {
+        if( dnode->last )
+            dnode = dnode->last;
 	while( dnode->next ) {
 	    dnode = dnode->next;
 	}
