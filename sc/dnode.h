@@ -99,7 +99,9 @@ dnode_flag_t dnode_flags( DNODE *dnode );
 
 DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags );
 
+#if 0
 DNODE *dnode_list_invert( DNODE *dnode_list );
+#endif
 
 char *dnode_name( DNODE *dnode );
 
@@ -176,7 +178,10 @@ DNODE *dnode_prev( DNODE* dnode );
 DNODE *dnode_list_last( DNODE* dnode );
 
 #define foreach_dnode( NODE, LIST ) \
-   for( NODE = LIST; NODE != NULL; NODE = dnode_next( NODE ))
+    for( NODE = LIST; NODE != NULL; NODE = dnode_next( NODE ))
+
+#define foreach_reverse_dnode( NODE, LIST ) \
+    for( NODE = dnode_list_last(LIST); NODE != NULL; NODE = dnode_prev( NODE ))
 
 DNODE *dnode_function_args( DNODE *dnode );
 
