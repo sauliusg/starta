@@ -1809,7 +1809,7 @@ static void compiler_check_operator_args( COMPILER *cc,
 
             nargs = dnode_list_length( op_args );
 
-            foreach_dnode( arg, op_args ) {
+            foreach_reverse_dnode( arg, op_args ) {
                 TNODE *argument_type;
                 TNODE *expr_type;
 
