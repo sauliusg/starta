@@ -9385,7 +9385,7 @@ multivalue_function_call
 	  compiler->current_arg = fn_tnode ?
               tnode_args( fn_tnode ) : NULL;
 
-          fn_kind= fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
+          fn_kind = fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
           if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
               compiler_push_typed_expression( compiler, share_tnode(fn_tnode), px );
@@ -9980,7 +9980,7 @@ closure_initialisation
                 compiler_compile_drop( compiler, px );
             } else {
                 compiler_compile_dropn( compiler, value_count - variable_count,
-                                     px );
+                                        px );
             }
         }
     }
@@ -10200,7 +10200,7 @@ closure_header
 
           dnode_insert_type( self_dnode, share_tnode( closure_type ));
 
-          parameters = dnode_append( self_dnode, parameters );
+          parameters = dnode_append( parameters, self_dnode );
           self_dnode = NULL;
         
           dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
@@ -11225,7 +11225,7 @@ function_or_operator_start
 	      compiler_emit_function_arguments( funct, compiler, px );
 	  }
           if( fn_tnode && tnode_kind( fn_tnode ) == TK_CLOSURE ) {
-              tnode_drop_first_argument( fn_tnode );
+              tnode_drop_last_argument( fn_tnode );
           }
 	}
 ;

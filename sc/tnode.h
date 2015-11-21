@@ -220,7 +220,9 @@ TNODE *tnode_element_type( TNODE *tnode );
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type );
 TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type );
 
+#if 0
 TNODE *tnode_insert_function_parameters( TNODE* tnode, DNODE *parameters );
+#endif
 
 int tnode_function_prototypes_match_msg( TNODE *f1, TNODE *f2,
 					 char *msg, int msglen );
@@ -263,7 +265,7 @@ DNODE *tnode_constructor( TNODE *tnode );
 
 TNODE *tnode_next( TNODE* list );
 
-TNODE *tnode_drop_first_argument( TNODE *tnode );
+TNODE *tnode_drop_last_argument( TNODE *tnode );
 
 #define foreach_tnode_base_class( NODE, LIST ) \
    for( NODE = LIST; NODE != NULL; NODE = tnode_base_type( NODE ))
