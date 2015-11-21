@@ -239,4 +239,6 @@ TNODE *dnode_typetab_lookup_type( DNODE *dnode, const char *name );
 TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 				    type_suffix_t suffix );
 
+DNODE *dnode_remove_last( DNODE *list );
+
 #endif

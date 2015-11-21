@@ -1013,3 +1013,22 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
     assert( dnode->typetab );
     return typetab_lookup_suffix( dnode->typetab, name, suffix );
 }
+
+DNODE *dnode_remove_last( DNODE *list )
+{
+    DNODE *last_arg;
+
+    assert( list );
+
+    last_arg = list->last ? list->last : list;
+    while( last_arg->next ) {
+        last_arg = last_arg->next;
+    }
+    last_arg->prev->next = NULL;
+    list->last = last_arg->prev;
+    delete_dnode( last_arg );
+    for( last_arg = list->next; last_arg; last_arg = last_arg->next ) {
+        last_arg->last = list->last;
+    }
+    return list;
+}
