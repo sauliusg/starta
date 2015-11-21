@@ -692,6 +692,7 @@ DNODE *dnode_disconnect( DNODE *dnode )
     if( dnode->next ) {
 	dnode->next->prev = NULL;
 	dnode->next = NULL;
+        dnode->last = NULL;
     }
     return dnode;
 }
