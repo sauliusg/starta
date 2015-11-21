@@ -5561,7 +5561,7 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
         if( funct && fn_type ) {
             compiler_emit_default_arguments( cc, NULL, &inner );
             compiler_check_and_drop_function_args( cc, funct, generic_types,
-                                                &inner );
+                                                   &inner );
             compiler_emit_function_call( cc, funct, NULL, "\n", &inner );
             if( tnode_kind( fn_type ) == TK_FUNCTION_REF ) {
                 compiler_drop_top_expression( cc );
@@ -9435,7 +9435,7 @@ multivalue_function_call
 	  }
 
 	  compiler->current_arg = fn_tnode ?
-	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
+	      tnode_args( fn_tnode ) : NULL;
 
 	  compiler_push_guarding_arg( compiler, px );
 	}
@@ -9606,9 +9606,12 @@ multivalue_function_call
 		    yyerrorf( "called field is not a method" );
 		}
 
-		compiler->current_arg = fn_tnode ?
-		    dnode_prev( dnode_list_last( tnode_args( fn_tnode ))) :
-		    NULL;
+                DNODE *first_arg = fn_tnode ?
+                    tnode_args( fn_tnode ) : NULL;;
+
+		compiler->current_arg = first_arg ?
+		    dnode_next( first_arg ) : NULL;
+
 	    } else if( object_expr && class_has_interface ) {
                 char *interface_name = interface_type ?
                     tnode_name( interface_type ) : NULL;
@@ -10674,7 +10677,7 @@ generator_new
               compiler->current_call = share_dnode( constructor_dnode );
           
               compiler->current_arg = constructor_tnode ?
-                  dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+                  dnode_next( tnode_args( constructor_tnode )) :
                   NULL;
 
               compiler_compile_dup( compiler, px );
@@ -10718,9 +10721,9 @@ generator_new
               dnode_type( constructor_dnode ) : NULL;
 
           compiler->current_call = share_dnode( constructor_dnode );
-          
+
           compiler->current_arg = constructor_tnode ?
-              dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+              dnode_next( tnode_args( constructor_tnode )) :
               NULL;
 
           compiler_compile_dup( compiler, px );
@@ -11592,7 +11595,7 @@ opt_base_class_initialisation
         compiler->current_call = share_dnode( constructor_dnode );
           
         compiler->current_arg = constructor_tnode ?
-            dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+            dnode_next( tnode_args( constructor_tnode )) :
             NULL;
 
         self_dnode = compiler_lookup_dnode( compiler, NULL, "self", "variable" );
@@ -11627,7 +11630,7 @@ constructor_header
               self_dnode = new_dnode_name( "self", &inner );
               dnode_insert_type( self_dnode, share_tnode( class_tnode ));
 
-              parameter_list = dnode_append( parameter_list, self_dnode );
+              parameter_list = dnode_append( self_dnode, parameter_list );
               self_dnode = NULL;
 
 	      $$ = funct = new_dnode_constructor( constructor_name,
