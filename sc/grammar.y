@@ -9452,7 +9452,6 @@ multivalue_function_call
             char  *method_name = $3;
             TNODE *interface_type = $4;
             DNODE *method = NULL;
-            DNODE *last_arg = NULL;
             int class_has_interface = 1;
 
             if( interface_type ) {
@@ -9498,14 +9497,12 @@ multivalue_function_call
                     compiler->current_call = share_dnode( method );
                 }
 
-                last_arg = fn_tnode ?
-                    tnode_args( fn_tnode ) : NULL;
+                DNODE *first_arg = fn_tnode ?
+                    tnode_args( fn_tnode ) : NULL;;
 
-                last_arg = last_arg ?
-                    dnode_list_last( last_arg ) : NULL;
+		compiler->current_arg = first_arg ?
+		    dnode_next( first_arg ) : NULL;
 
-		compiler->current_arg = last_arg ?
-		    dnode_prev( last_arg ) : NULL;
 	    } else if( object && class_has_interface ) {
 		char *object_name = object ? dnode_name( object ) : NULL;
 		char *class_name =
@@ -11435,7 +11432,7 @@ method_header
 
               dnode_insert_type( self_dnode, share_tnode( current_class ));
 
-              parameter_list = dnode_append( parameter_list, self_dnode );
+              parameter_list = dnode_append( self_dnode, parameter_list );
               self_dnode = NULL;
 
               if( interface_type ) {

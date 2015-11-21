@@ -683,7 +683,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
 	if( tail ) {
 	    tail->prev = last;
 	}
-        head->last = tail;
+        head->last = tail && tail->last ? tail->last : tail;
 	return head;
     }
 }
