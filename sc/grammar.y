@@ -10113,11 +10113,13 @@ closure_initialisation
         }
     }
 
-    len = 0;
+    // len = 0;
+    i = 0;
     // closure_var_list = dnode_list_invert( closure_var_list );
     foreach_reverse_dnode( var, closure_var_list ) {
-        len ++;
-        if( len <= expr_nr ) {
+        i ++;
+        if( i > len ) break;
+        if( i <= expr_nr ) {
             TNODE *var_type = var ? dnode_type( var ) : NULL;
 
             assert( var_type );
