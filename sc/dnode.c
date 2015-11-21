@@ -76,6 +76,9 @@ struct DNODE {
 		    list */
     DNODE *prev; /* reference to the previous declaration in a
 		    declaration list */
+    DNODE *last; /* Last element of the linked list attached to this
+                    dnode; can be used for efficient appendeing of new
+                    nodes to the DNODE * list.*/
 };
 
 #include <dnode_a.ci>
@@ -670,7 +673,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
     if( !head ) {
         return tail;
     } else {
-        last = head;
+        last = head->last ? head->last : head;
         while( last->next ) {
 	    last = last->next;
 	}
@@ -678,6 +681,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
 	if( tail ) {
 	    tail->prev = last;
 	}
+        head->last = tail;
 	return head;
     }
 }
