@@ -1067,7 +1067,7 @@ DNODE *tnode_args( TNODE* tnode )
     return tnode->args;
 }
 
-#if 0
+#if 1
 DNODE *tnode_arg_next( TNODE* tnode, DNODE *arg )
 {
     assert( tnode );
@@ -1076,12 +1076,14 @@ DNODE *tnode_arg_next( TNODE* tnode, DNODE *arg )
 }
 #endif
 
+#if 0
 DNODE *tnode_arg_prev( TNODE* tnode, DNODE *arg )
 {
     assert( tnode );
     if( !arg ) { return dnode_list_last( tnode->args ); }
     else       { return dnode_prev(arg); }
 }
+#endif
 
 DNODE *tnode_retvals( TNODE* tnode )
 {
