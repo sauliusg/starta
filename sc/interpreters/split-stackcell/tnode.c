@@ -1068,7 +1068,7 @@ DNODE *tnode_args( TNODE* tnode )
     return tnode->args;
 }
 
-#if 0
+#if 1
 DNODE *tnode_arg_next( TNODE* tnode, DNODE *arg )
 {
     assert( tnode );
@@ -1077,12 +1077,14 @@ DNODE *tnode_arg_next( TNODE* tnode, DNODE *arg )
 }
 #endif
 
+#if 0
 DNODE *tnode_arg_prev( TNODE* tnode, DNODE *arg )
 {
     assert( tnode );
     if( !arg ) { return dnode_list_last( tnode->args ); }
     else       { return dnode_prev(arg); }
 }
+#endif
 
 DNODE *tnode_retvals( TNODE* tnode )
 {
@@ -1533,6 +1535,7 @@ TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type )
     return tnode;
 }
 
+#if 0
 TNODE *tnode_insert_function_parameters( TNODE* tnode, DNODE *parameters )
 {
     assert( tnode );
@@ -1540,6 +1543,7 @@ TNODE *tnode_insert_function_parameters( TNODE* tnode, DNODE *parameters )
     tnode->args = parameters;
     return tnode;
 }
+#endif
 
 TNODE *tnode_set_flags( TNODE* node, type_flag_t flags )
 {
@@ -1734,15 +1738,17 @@ TNODE *tnode_next( TNODE* list )
     else return list->next;
 }
 
-TNODE *tnode_drop_first_argument( TNODE *tnode )
+TNODE *tnode_drop_last_argument( TNODE *tnode )
 {
-    DNODE *first_arg;
-
     if( tnode ) {
-        first_arg = tnode->args;
-        tnode->args = dnode_next( first_arg );
-        dnode_disconnect( first_arg );
-        delete_dnode( first_arg );
+        if( tnode->args ) {
+            if( !dnode_next( tnode->args )) {
+                delete_dnode( tnode->args );
+                tnode->args = NULL;
+            } else {
+                tnode->args = dnode_remove_last( tnode->args );
+            }
+        }
     }
 
     return tnode;

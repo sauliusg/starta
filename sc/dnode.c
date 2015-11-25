@@ -76,6 +76,9 @@ struct DNODE {
 		    list */
     DNODE *prev; /* reference to the previous declaration in a
 		    declaration list */
+    DNODE *last; /* Last element of the linked list attached to this
+                    dnode; can be used for efficient appendeing of new
+                    nodes to the DNODE * list.*/
 };
 
 #include <dnode_a.ci>
@@ -420,6 +423,7 @@ DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags )
     return dnode;
 }
 
+#if 0
 DNODE *dnode_list_invert( DNODE *dnode_list )
 {
     DNODE *inverse_list = NULL;
@@ -439,6 +443,7 @@ DNODE *dnode_list_invert( DNODE *dnode_list )
     }
     return inverse_list;
 }
+#endif
 
 char *dnode_name( DNODE *dnode ) { assert( dnode ); return dnode->name; }
 
@@ -670,7 +675,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
     if( !head ) {
         return tail;
     } else {
-        last = head;
+        last = head->last ? head->last : head;
         while( last->next ) {
 	    last = last->next;
 	}
@@ -678,6 +683,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
 	if( tail ) {
 	    tail->prev = last;
 	}
+        head->last = tail && tail->last ? tail->last : tail;
 	return head;
     }
 }
@@ -688,6 +694,7 @@ DNODE *dnode_disconnect( DNODE *dnode )
     if( dnode->next ) {
 	dnode->next->prev = NULL;
 	dnode->next = NULL;
+        dnode->last = NULL;
     }
     return dnode;
 }
@@ -709,6 +716,8 @@ DNODE *dnode_list_last( DNODE *dnode )
     if( !dnode ) {
 	return NULL;
     } else {
+        if( dnode->last )
+            dnode = dnode->last;
 	while( dnode->next ) {
 	    dnode = dnode->next;
 	}
@@ -1003,4 +1012,23 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 {
     assert( dnode->typetab );
     return typetab_lookup_suffix( dnode->typetab, name, suffix );
+}
+
+DNODE *dnode_remove_last( DNODE *list )
+{
+    DNODE *last_arg;
+
+    assert( list );
+
+    last_arg = list->last ? list->last : list;
+    while( last_arg->next ) {
+        last_arg = last_arg->next;
+    }
+    last_arg->prev->next = NULL;
+    list->last = last_arg->prev;
+    delete_dnode( last_arg );
+    for( last_arg = list->next; last_arg; last_arg = last_arg->next ) {
+        last_arg->last = list->last;
+    }
+    return list;
 }

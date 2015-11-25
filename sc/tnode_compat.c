@@ -531,8 +531,8 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 
     assert( f1 );
     assert( f2 );
-    f1_arg = tnode_arg_prev( f1, NULL );
-    f2_arg = tnode_arg_prev( f2, NULL );
+    f1_arg = tnode_arg_next( f1, NULL );
+    f2_arg = tnode_arg_next( f2, NULL );
     while( f1_arg && f2_arg ) {
 	TNODE *f1_arg_type = dnode_type( f1_arg );
 	TNODE *f2_arg_type = dnode_type( f2_arg );
@@ -575,8 +575,8 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
             }
 	    return 0;
 	}
-	f1_arg = tnode_arg_prev( f1, f1_arg );
-	f2_arg = tnode_arg_prev( f2, f2_arg );
+	f1_arg = tnode_arg_next( f1, f1_arg );
+	f2_arg = tnode_arg_next( f2, f2_arg );
     }
     if( f1_arg || f2_arg ) {
 	if( msg ) {

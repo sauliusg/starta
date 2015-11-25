@@ -8,7 +8,7 @@
 include "stdtypes.slib"
 include "stdio.slib"
 
-var b = fload( "outputs/data.txt" );
+var b = fload( "inputs/data008.txt" );
 
 . length(b);
 
