@@ -4,5 +4,5 @@
 
 use * from std;
 
-function ff( int z; int y ): float, int;
-procedure ff( int z; int y ): float, int;
+function ff( int z; int y ): long;
+function ff( int z; int y ): float;

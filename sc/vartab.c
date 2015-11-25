@@ -303,7 +303,7 @@ DNODE *vartab_lookup_operator( VARTAB *table, const char *name,
         if( strcmp( name, node->name ) == 0 ) {
             TNODE *operator_type = dnode_type( node->dnode );
             DNODE *parameter = operator_type ?
-                dnode_list_last( tnode_args( operator_type )) : NULL;
+                tnode_args( operator_type ) : NULL;
             found = 0;
             {
                 cexception_t inner;
@@ -327,7 +327,7 @@ DNODE *vartab_lookup_operator( VARTAB *table, const char *name,
                             found = 0;
                             break;
                         }
-                        parameter = dnode_prev( parameter );
+                        parameter = dnode_next( parameter );
                     }
                 }
                 delete_typetab( generic_types );
