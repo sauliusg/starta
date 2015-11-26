@@ -1639,8 +1639,8 @@ static void compiler_compile_return( COMPILER *cc,
 
     assert( cc );
 
-    fn_retvals = dnode_list_invert( fn_retvals );
-    retval = fn_retvals;
+    // fn_retvals = dnode_list_invert( fn_retvals );
+    retval = dnode_list_last( fn_retvals );
     expr = cc->e_stack;
     for( i = 0; expr && i < nretvals; i++ ) {
 	TNODE *available_type;
@@ -1675,10 +1675,10 @@ static void compiler_compile_return( COMPILER *cc,
             }
 	}
 
-	retval = dnode_next( retval );
+	retval = dnode_prev( retval );
 	expr = enode_next( expr );
     }
-    fn_retvals = dnode_list_invert( fn_retvals );
+    // fn_retvals = dnode_list_invert( fn_retvals );
 
     if( !cc->current_function ) {
 	yyerrorf( "the \"return\" statement should be used only in "
@@ -1875,7 +1875,7 @@ static void compiler_check_operator_args( COMPILER *cc,
 
             nargs = dnode_list_length( op_args );
 
-            foreach_dnode( arg, op_args ) {
+            foreach_reverse_dnode( arg, op_args ) {
                 TNODE *argument_type;
                 TNODE *expr_type;
 
@@ -3520,7 +3520,7 @@ static void compiler_check_and_drop_function_args( COMPILER *cc,
     ssize_t n = 0;
     ssize_t nargs = dnode_list_length( function_args );
 
-    foreach_dnode( formal_arg, function_args ) {
+    foreach_reverse_dnode( formal_arg, function_args ) {
         if( !cc->e_stack || enode_has_flags( cc->e_stack, EF_GUARDING_ARG )) {
             if( cc->e_stack /* && !dnode_has_initialiser( formal_arg ) */) {
                 yyerrorf( "too little arguments in call to function '%s'",
@@ -3640,7 +3640,7 @@ static void compiler_emit_argument_list( COMPILER *cc,
 {
     DNODE *varnode;
 
-    foreach_dnode( varnode, argument_list ) {
+    foreach_reverse_dnode( varnode, argument_list ) {
 	TNODE *argtype = dnode_type( varnode );
 
 	dnode_assign_offset( varnode, &cc->local_offset );
@@ -4516,7 +4516,7 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
     int n = 1;
     int retval = 1;
 
-    args = dnode_list_invert( args );
+    // args = dnode_list_invert( args );
     foreach_dnode( arg, args ) {
 	TNODE *arg_type = dnode_type( arg );
 	switch( n ) {
@@ -4544,7 +4544,7 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 	}
 	n++;
     }
-    args = dnode_list_invert( args );
+    // args = dnode_list_invert( args );
     if( --n > 3 ) {
 	yyerrorf( "too many arguments for the program "
 		  "(found %d, must be <= 3)", n );
@@ -4651,7 +4651,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
             }
 	}
     }
-    cc->current_arg = cc->current_arg ? dnode_prev( cc->current_arg ) : NULL;
+    cc->current_arg = cc->current_arg ? dnode_next( cc->current_arg ) : NULL;
 }
 
 static void compiler_compile_typed_const_value( COMPILER *cc,
@@ -4801,7 +4801,7 @@ static void compiler_emit_default_arguments( COMPILER *cc,
 		}
 	    }
 	}
-	arg = dnode_prev( arg );
+	arg = dnode_next( arg );
     }
     if( arg == NULL && arg_name != NULL ) {
 	yyerrorf( "function '%s' has no argument '%s' to emit",
@@ -5097,7 +5097,7 @@ static void compiler_use_package( COMPILER *c,
 
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "use" )) {
-            // printf( ">>> can use package '%s'\n", package_name );
+            printf( ">>> can use package '%s'\n", package_name );
             if( package != NULL ) {
                 char *package_name = dnode_name( package );
                 DNODE *existing_package = package_name ?
@@ -5105,9 +5105,10 @@ static void compiler_use_package( COMPILER *c,
                     ( c->vartab, package_name_dnode, symtab )
                     : NULL;
                 char *synonim = dnode_synonim( package_name_dnode );
+                printf( "<<< existing_package == %p, synonim == %p >>>\n", existing_package, synonim );
                 if( !existing_package || existing_package != package || synonim ) {
-                    // printf( ">>> found package '%s' for reuse\n", package_name );
-                    // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+                    printf( ">>> found package '%s' for reuse\n", package_name );
+                    printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
                     if( synonim ) {
                         vartab_insert_module( c->vartab, share_dnode( package ),
                                               synonim, symtab, &inner );
@@ -6800,7 +6801,7 @@ package_statement
                   TYPETAB *ttab =
                       symtab_typetab( stlist_data( compiler->symtab_stack ));
                   param = module_params;
-                  module_args = dnode_list_invert( module_args );
+                  // module_args = dnode_list_invert( module_args );
                   foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
                       // printf( ">>>> argument '%s', parameter '%s' (type kind = %s)\n",
@@ -6828,7 +6829,7 @@ package_statement
                           }
                           cexception_catch {
                               delete_tnode( type_tnode );
-                              module_args = dnode_list_invert( module_args );
+                              // module_args = dnode_list_invert( module_args );
                               cexception_reraise( inner, px );
                           }
                       } else if( tnode_kind( param_type ) == TK_CONST ) {
@@ -6876,7 +6877,7 @@ package_statement
                       }
                       param = dnode_next( param );
                   }
-                  module_args = dnode_list_invert( module_args );
+                  // module_args = dnode_list_invert( module_args );
               }
           }
           // printf( ">>> Will now compile statements for '%s' module\n",
@@ -7105,7 +7106,7 @@ identifier_list
    : identifier
      { $$ = $1; }
    | identifier_list ',' identifier
-     { $$ = dnode_append( $3, $1 ); }
+     { $$ = dnode_append( $1, $3 ); }
    ;
 
 function_or_procedure: _FUNCTION | _PROCEDURE;
@@ -7462,7 +7463,8 @@ variable_declaration
      int readonly = $1;
      int expr_nr = $8;
 
-     $2 = dnode_list_invert( dnode_append( $2, $4 ));
+     // $2 = dnode_list_invert( dnode_append( $2, $4 ));
+     $2 = dnode_append( $2, $4 );
      dnode_list_append_type( $2, $6 );
      dnode_list_assign_offsets( $2, &compiler->local_offset );
      compiler_vartab_insert_named_vars( compiler, $2, px );
@@ -7488,7 +7490,7 @@ variable_declaration
          }
 
          len = 0;
-         foreach_dnode( var, lst ) {
+         foreach_reverse_dnode( var, lst ) {
              len ++;
              if( len <= expr_nr )
                  compiler_compile_initialise_variable( compiler, var, px );
@@ -7502,7 +7504,7 @@ variable_declaration
         yyerrorf( "need more than one expression to initialise %d variables",
                   dnode_list_length( $4 ) + 1 );
 
-        $2 = dnode_list_invert( dnode_append( $2, $4 ));
+        $2 = dnode_append( $2, $4 );
         dnode_list_append_type( $2, $6 );
         dnode_list_assign_offsets( $2, &compiler->local_offset );
         compiler_vartab_insert_named_vars( compiler, $2, px );
@@ -7559,7 +7561,7 @@ variable_declaration
     {
      int readonly = $1;
 
-     $2 = dnode_list_invert( dnode_append( $2, $4 ));
+     $2 = dnode_append( $2, $4 );
      dnode_list_assign_offsets( $2, &compiler->local_offset );
      compiler_vartab_insert_named_vars( compiler, $2, px );
      if( readonly ) {
@@ -7586,7 +7588,7 @@ variable_declaration
          }
 
          len = 0;
-	 foreach_dnode( var, lst ) {
+	 foreach_reverse_dnode( var, lst ) {
              len ++;
              TNODE *expr_type = compiler->e_stack ?
                  share_tnode( enode_type( compiler->e_stack )) : NULL;
@@ -7640,8 +7642,6 @@ variable_identifier_list
   : identifier
     { $$ = $1; }
   | variable_identifier_list ',' identifier
-    /* variable_identifier_list and identifier_list are build in the
-       oposite order: */
     { $$ = dnode_append( $1, $3 ); }
   ;
 
@@ -9728,9 +9728,9 @@ multivalue_function_call
 	      dnode_type( compiler->current_call ) : NULL;
 
 	  compiler->current_arg = fn_tnode ?
-	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
+              tnode_args( fn_tnode ) : NULL;
 
-          fn_kind= fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
+          fn_kind = fn_tnode ? tnode_kind( fn_tnode ) : TK_NONE;
 
           if( fn_kind == TK_FUNCTION_REF || fn_kind == TK_CLOSURE ) {
               compiler_push_typed_expression( compiler, share_tnode(fn_tnode), px );
@@ -9780,7 +9780,7 @@ multivalue_function_call
 	  }
 
 	  compiler->current_arg = fn_tnode ?
-	      dnode_list_last( tnode_args( fn_tnode )) : NULL;
+	      tnode_args( fn_tnode ) : NULL;
 
 	  compiler_push_guarding_arg( compiler, px );
 	}
@@ -9797,7 +9797,6 @@ multivalue_function_call
             char  *method_name = $3;
             TNODE *interface_type = $4;
             DNODE *method = NULL;
-            DNODE *last_arg = NULL;
             int class_has_interface = 1;
 
             if( interface_type ) {
@@ -9843,14 +9842,12 @@ multivalue_function_call
                     compiler->current_call = share_dnode( method );
                 }
 
-                last_arg = fn_tnode ?
-                    tnode_args( fn_tnode ) : NULL;
+                DNODE *first_arg = fn_tnode ?
+                    tnode_args( fn_tnode ) : NULL;;
 
-                last_arg = last_arg ?
-                    dnode_list_last( last_arg ) : NULL;
+		compiler->current_arg = first_arg ?
+		    dnode_next( first_arg ) : NULL;
 
-		compiler->current_arg = last_arg ?
-		    dnode_prev( last_arg ) : NULL;
 	    } else if( object && class_has_interface ) {
 		char *object_name = object ? dnode_name( object ) : NULL;
 		char *class_name =
@@ -9954,9 +9951,12 @@ multivalue_function_call
 		    yyerrorf( "called field is not a method" );
 		}
 
-		compiler->current_arg = fn_tnode ?
-		    dnode_prev( dnode_list_last( tnode_args( fn_tnode ))) :
-		    NULL;
+                DNODE *first_arg = fn_tnode ?
+                    tnode_args( fn_tnode ) : NULL;;
+
+		compiler->current_arg = first_arg ?
+		    dnode_next( first_arg ) : NULL;
+
 	    } else if( object_expr && class_has_interface ) {
                 char *interface_name = interface_type ?
                     tnode_name( interface_type ) : NULL;
@@ -10325,7 +10325,7 @@ closure_initialisation
                 compiler_compile_drop( compiler, px );
             } else {
                 compiler_compile_dropn( compiler, value_count - variable_count,
-                                     px );
+                                        px );
             }
         }
     }
@@ -10421,8 +10421,8 @@ closure_initialisation
     assert( closure_tnode );
 
     current_expr = top_expr;
-    closure_var_list = dnode_list_invert( closure_var_list );
-    foreach_dnode( var, closure_var_list ) {
+    // closure_var_list = dnode_list_invert( closure_var_list );
+    foreach_reverse_dnode( var, closure_var_list ) {
         TNODE *expr_type = current_expr ?
             share_tnode( enode_type( current_expr )) : NULL;
         type_kind_t expr_type_kind = expr_type ?
@@ -10440,7 +10440,7 @@ closure_initialisation
         dnode_append_type( var, expr_type );
         current_expr = current_expr ? enode_next( current_expr ) : NULL;
     }
-    closure_var_list = dnode_list_invert( closure_var_list );
+    // closure_var_list = dnode_list_invert( closure_var_list );
 
     tnode_insert_fields( closure_tnode, closure_var_list );
 
@@ -10458,11 +10458,13 @@ closure_initialisation
         }
     }
 
-    len = 0;
-    closure_var_list = dnode_list_invert( closure_var_list );
-    foreach_dnode( var, closure_var_list ) {
-        len ++;
-        if( len <= expr_nr ) {
+    // len = 0;
+    i = 0;
+    // closure_var_list = dnode_list_invert( closure_var_list );
+    foreach_reverse_dnode( var, closure_var_list ) {
+        i ++;
+        if( i > len ) break;
+        if( i <= expr_nr ) {
             TNODE *var_type = var ? dnode_type( var ) : NULL;
 
             assert( var_type );
@@ -10481,7 +10483,7 @@ closure_initialisation
             compiler_compile_sti( compiler, px );
         }
     }
-    closure_var_list = dnode_list_invert( closure_var_list );
+    // closure_var_list = dnode_list_invert( closure_var_list );
 
     compiler_emit( compiler, px, "\tc\n", RFROMR );
 }
@@ -10545,7 +10547,7 @@ closure_header
 
           dnode_insert_type( self_dnode, share_tnode( closure_type ));
 
-          parameters = dnode_append( self_dnode, parameters );
+          parameters = dnode_append( parameters, self_dnode );
           self_dnode = NULL;
         
           dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
@@ -11022,7 +11024,7 @@ generator_new
               compiler->current_call = share_dnode( constructor_dnode );
           
               compiler->current_arg = constructor_tnode ?
-                  dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+                  dnode_next( tnode_args( constructor_tnode )) :
                   NULL;
 
               compiler_compile_dup( compiler, px );
@@ -11066,9 +11068,9 @@ generator_new
               dnode_type( constructor_dnode ) : NULL;
 
           compiler->current_call = share_dnode( constructor_dnode );
-          
+
           compiler->current_arg = constructor_tnode ?
-              dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+              dnode_next( tnode_args( constructor_tnode )) :
               NULL;
 
           compiler_compile_dup( compiler, px );
@@ -11463,9 +11465,7 @@ argument_list
   : argument
     { $$ = $1; }
   | argument_list ';' argument
-    /* build a list of names in reverse order (opposite to the order which
-       they appear in a programm text): */
-    { $$ = dnode_append( $3, $1 ); }
+    { $$ = dnode_append( $1, $3 ); }
   | /* empty */
     { $$ = NULL; }
   ;
@@ -11506,7 +11506,8 @@ argument
 
   | opt_readonly var_type_description uninitialised_var_declarator_list
       {
-	$$ = dnode_list_append_type( dnode_list_invert( $3 ), $2 );
+        // $$ = dnode_list_append_type( dnode_list_invert( $3 ), $2 );
+	$$ = dnode_list_append_type( $3, $2 );
 	if( $1 ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
 	}
@@ -11571,7 +11572,7 @@ function_or_operator_start
 	      compiler_emit_function_arguments( funct, compiler, px );
 	  }
           if( fn_tnode && tnode_kind( fn_tnode ) == TK_CLOSURE ) {
-              tnode_drop_first_argument( fn_tnode );
+              tnode_drop_last_argument( fn_tnode );
           }
 	}
 ;
@@ -11781,7 +11782,7 @@ method_header
 
               dnode_insert_type( self_dnode, share_tnode( current_class ));
 
-              parameter_list = dnode_append( parameter_list, self_dnode );
+              parameter_list = dnode_append( self_dnode, parameter_list );
               self_dnode = NULL;
 
               if( interface_type ) {
@@ -11941,7 +11942,7 @@ opt_base_class_initialisation
         compiler->current_call = share_dnode( constructor_dnode );
           
         compiler->current_arg = constructor_tnode ?
-            dnode_prev( dnode_list_last( tnode_args( constructor_tnode ))) :
+            dnode_next( tnode_args( constructor_tnode )) :
             NULL;
 
         self_dnode = compiler_lookup_dnode( compiler, NULL, "self", "variable" );
@@ -11976,7 +11977,7 @@ constructor_header
               self_dnode = new_dnode_name( "self", &inner );
               dnode_insert_type( self_dnode, share_tnode( class_tnode ));
 
-              parameter_list = dnode_append( parameter_list, self_dnode );
+              parameter_list = dnode_append( self_dnode, parameter_list );
               self_dnode = NULL;
 
 	      $$ = funct = new_dnode_constructor( constructor_name,
