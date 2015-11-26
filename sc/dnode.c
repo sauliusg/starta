@@ -80,6 +80,9 @@ struct DNODE {
 		    list */
     DNODE *prev; /* reference to the previous declaration in a
 		    declaration list */
+    DNODE *last; /* Last element of the linked list attached to this
+                    dnode; can be used for efficient appendeing of new
+                    nodes to the DNODE * list.*/
 };
 
 #include <dnode_a.ci>
@@ -426,6 +429,7 @@ DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags )
     return dnode;
 }
 
+#if 0
 DNODE *dnode_list_invert( DNODE *dnode_list )
 {
     DNODE *inverse_list = NULL;
@@ -445,6 +449,7 @@ DNODE *dnode_list_invert( DNODE *dnode_list )
     }
     return inverse_list;
 }
+#endif
 
 char *dnode_name( DNODE *dnode ) { assert( dnode ); return dnode->name; }
 
@@ -676,7 +681,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
     if( !head ) {
         return tail;
     } else {
-        last = head;
+        last = head->last ? head->last : head;
         while( last->next ) {
 	    last = last->next;
 	}
@@ -684,6 +689,7 @@ DNODE* dnode_append( DNODE *head, DNODE *tail )
 	if( tail ) {
 	    tail->prev = last;
 	}
+        head->last = tail && tail->last ? tail->last : tail;
 	return head;
     }
 }
@@ -694,6 +700,7 @@ DNODE *dnode_disconnect( DNODE *dnode )
     if( dnode->next ) {
 	dnode->next->prev = NULL;
 	dnode->next = NULL;
+        dnode->last = NULL;
     }
     return dnode;
 }
@@ -715,6 +722,8 @@ DNODE *dnode_list_last( DNODE *dnode )
     if( !dnode ) {
 	return NULL;
     } else {
+        if( dnode->last )
+            dnode = dnode->last;
 	while( dnode->next ) {
 	    dnode = dnode->next;
 	}
@@ -1048,7 +1057,7 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 
 int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
 {
-    DNODE *arg1, *arg2, *m2args;
+    DNODE *arg1, *arg2;
     TYPETAB *ttab = symtab ? symtab_typetab( symtab ) : NULL;
 
     if( !ttab ) {
@@ -1058,11 +1067,11 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             return 1;
     }
 
-    arg2 = m2args = dnode_list_invert( m2->module_args );
-
-#if 0
+#if 1
     printf( "\n" );
 #endif
+
+    arg2 = m2->module_args;
 
     foreach_dnode( arg1, m1->module_args ) {
         TNODE *arg1_type = dnode_type( arg1 );
@@ -1072,28 +1081,29 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         if( tnode_kind( arg1_type ) == TK_TYPE ) {
             TNODE *arg2_type = typetab_lookup( ttab, dnode_name( arg2 ));
             // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
-#if 0
-            printf( ">>> checking types for identity:"
-                    " arg1 = '%s' (type = '%s', base = '%s'), "
-                    "arg2 = '%s' (type = '%s')\n",
+#if 1
+            printf( ">>> checking types for identity: "
+                    "arg1 = %p '%s' (type = '%s', base = '%s'), "
+                    "arg2 = %p '%s' (type = '%s')\n",
+                    arg1 ? tnode_base_type( dnode_type( arg1 )) : NULL,
                     dnode_name( arg1 ),
                     arg1 ? tnode_kind_name( dnode_type( arg1 )) : "?",
                     arg1 ? tnode_name( tnode_base_type( dnode_type( arg1 ))) : "?",
-                    dnode_name( arg2 ),
+                    arg2_type, dnode_name( arg2 ),
                     arg2_type ? tnode_name( arg2_type ) : "?"
                     );
 #endif
-            if( !tnode_types_are_identical( tnode_base_type( dnode_type( arg1 )),
-                                            arg2_type,
-                                            NULL, NULL ) ) {
+            if( !tnode_types_are_identical
+                ( tnode_base_type( dnode_type( arg1 )),
+                  arg2_type,
+                  NULL, NULL ) ) {
                 // printf( ">>> NOT identical\n" );
-                dnode_list_invert( m2args );
                 return 0;
             }
         } else if( tnode_kind( arg1_type ) == TK_CONST ) {
             VARTAB *ctab = symtab_consttab( symtab );
             DNODE *arg2_const = vartab_lookup( ctab, dnode_name( arg2 ));
-#if 0
+#if 1
             printf( ">>> checking constant for identity: "
                     "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
                     "(found as '%s')\n",
@@ -1104,14 +1114,13 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
                     );
 #endif
             if( arg2_const != dnode_module_args( arg1 ) ) {
-                dnode_list_invert( m2args );
                 return 0;
             }
         } else if( tnode_kind( arg1_type ) == TK_VAR ||
                    tnode_kind( arg1_type ) == TK_FUNCTION ) {
             VARTAB *vtab = symtab_vartab( symtab );
             DNODE *arg2_dnode = vartab_lookup( vtab, dnode_name( arg2 ));
-#if 0
+#if 1
             printf( ">>> checking variables or functions for identity: "
                     "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
                     "(found as '%s')\n",
@@ -1122,14 +1131,12 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
                     );
 #endif
             if( arg2_dnode != dnode_module_args( arg1 ) ) {
-                dnode_list_invert( m2args );
                 return 0;
             }
         } else {
             yyerrorf( "sorry, parameters of kind '%s' are not yet "
                       "supported for modules", 
                       tnode_kind_name( arg1_type ));
-            dnode_list_invert( m2args );
             return 0;
         }
 
@@ -1137,6 +1144,24 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             arg2 = arg2->next;
     }
 
-    dnode_list_invert( m2args );
     return 1;
+}
+
+DNODE *dnode_remove_last( DNODE *list )
+{
+    DNODE *last_arg;
+
+    assert( list );
+
+    last_arg = list->last ? list->last : list;
+    while( last_arg->next ) {
+        last_arg = last_arg->next;
+    }
+    last_arg->prev->next = NULL;
+    list->last = last_arg->prev;
+    delete_dnode( last_arg );
+    for( last_arg = list->next; last_arg; last_arg = last_arg->next ) {
+        last_arg->last = list->last;
+    }
+    return list;
 }

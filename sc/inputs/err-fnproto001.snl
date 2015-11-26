@@ -1,0 +1,8 @@
+// --*- C -*--
+//
+// Check repeated function prototypes with different return values:
+
+use * from std;
+
+function ff( int z; int y ): long;
+function ff( int z; int y ): float;
