@@ -4976,7 +4976,9 @@ static void compiler_begin_package( COMPILER *c,
 {
     compiler_push_symbol_tables( c, ex );
     vartab_insert_named_module( c->compiled_packages, package, 
-                                stlist_data( c->symtab_stack ), ex );
+                                /* SYMTAB *st = */ NULL,
+                                // stlist_data( c->symtab_stack ),
+                                ex );
     vartab_insert_named( c->vartab, share_dnode( package ), ex );
     dlist_push_dnode( &c->current_package_stack, &c->current_package, ex );
     c->current_package = package;
