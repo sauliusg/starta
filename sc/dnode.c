@@ -1060,14 +1060,16 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
     DNODE *arg1, *arg2;
     TYPETAB *ttab = symtab ? symtab_typetab( symtab ) : NULL;
 
+#if 1
     if( !ttab ) {
         if( m1->module_args )
             return 0;
         else
             return 1;
     }
+#endif
 
-#if 1
+#if 0
     printf( "\n" );
 #endif
 
@@ -1079,9 +1081,12 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         //         dnode_name( arg ), tnode_kind_name( param_type ),
         //         dnode_name( param ));
         if( tnode_kind( arg1_type ) == TK_TYPE ) {
-            TNODE *arg2_type = typetab_lookup( ttab, dnode_name( arg2 ));
+            TNODE *arg2_type = ttab ?
+                typetab_lookup( ttab, dnode_name( arg2 )) : 
+                tnode_base_type( dnode_type( arg2 ));
             // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
-#if 1
+#if 0
+            printf( ">>> typtab is %p\n", ttab );
             printf( ">>> checking types for identity: "
                     "arg1 = %p '%s' (type = '%s', base = '%s'), "
                     "arg2 = %p '%s' (type = '%s')\n",
@@ -1103,7 +1108,7 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         } else if( tnode_kind( arg1_type ) == TK_CONST ) {
             VARTAB *ctab = symtab_consttab( symtab );
             DNODE *arg2_const = vartab_lookup( ctab, dnode_name( arg2 ));
-#if 1
+#if 0
             printf( ">>> checking constant for identity: "
                     "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
                     "(found as '%s')\n",
@@ -1120,7 +1125,7 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
                    tnode_kind( arg1_type ) == TK_FUNCTION ) {
             VARTAB *vtab = symtab_vartab( symtab );
             DNODE *arg2_dnode = vartab_lookup( vtab, dnode_name( arg2 ));
-#if 1
+#if 0
             printf( ">>> checking variables or functions for identity: "
                     "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
                     "(found as '%s')\n",

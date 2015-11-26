@@ -5097,7 +5097,7 @@ static void compiler_use_package( COMPILER *c,
 
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "use" )) {
-            printf( ">>> can use package '%s'\n", package_name );
+            // printf( ">>> can use package '%s'\n", package_name );
             if( package != NULL ) {
                 char *package_name = dnode_name( package );
                 DNODE *existing_package = package_name ?
@@ -5105,17 +5105,20 @@ static void compiler_use_package( COMPILER *c,
                     ( c->vartab, package_name_dnode, symtab )
                     : NULL;
                 char *synonim = dnode_synonim( package_name_dnode );
-                printf( "<<< existing_package == %p, synonim == %p >>>\n", existing_package, synonim );
+                // printf( "<<< existing_package == %p, synonim == %p >>>\n", existing_package, synonim );
                 if( !existing_package || existing_package != package || synonim ) {
-                    printf( ">>> found package '%s' for reuse\n", package_name );
-                    printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+                    // printf( ">>> found package '%s' for reuse\n", package_name );
+                    // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
                     if( synonim ) {
+                        // printf( ">>> inserting synonim\n" );
                         vartab_insert_module( c->vartab, share_dnode( package ),
                                               synonim, symtab, &inner );
                     } else {
+                        // printf( ">>> inserting under its own name\n" );
                         vartab_insert_named_module( c->vartab, share_dnode( package ),
                                                     symtab, &inner );
-                    } 
+                    }
+                    // printf( ">>> after inserting '%s' as '%s'\n", package_name, synonim );
                 }
                 /* printf( "found compiled package '%s'\n", package_name ); */
                 compiler_use_exported_package_names( c, package, &inner );
