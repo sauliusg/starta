@@ -1,0 +1,11 @@
+// An example of a module parametrised with a constant, a variable and
+// a procedure.
+
+module TypeParam( type T, type X )
+
+use * from std;
+
+var inner: T;
+var x : X;
+
+end module TypeParam;
