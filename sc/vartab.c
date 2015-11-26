@@ -200,7 +200,7 @@ void vartab_insert( VARTAB *table, const char *name,
 
 static
 VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
-                                        SYMTAB *symtab );
+                                        char *name, SYMTAB *symtab );
 
 void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
                            SYMTAB *st, cexception_t *ex )
@@ -208,7 +208,7 @@ void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
     VAR_NODE * volatile node = NULL;
     assert( table );
 
-    if( (node = vartab_lookup_module_varnode( table, module, st )) != NULL ) {
+    if( (node = vartab_lookup_module_varnode( table, module, name, st )) != NULL ) {
         if( node->scope == table->current_scope &&
             (node->flags & VNF_IS_IMPORTED) == 0 ) {
             yyerrorf( "symbol '%s' already declared in the current scope",
@@ -303,10 +303,10 @@ DNODE *vartab_lookup( VARTAB *table, const char *name )
 
 static
 VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
-                                        SYMTAB *symtab )
+                                        char *name, SYMTAB *symtab )
 {
     VAR_NODE *node;
-    char *module_name = dnode_name( module );
+    char *module_name = name ? name : dnode_name( module );
 
     assert( table );
     for( node = table->node; node != NULL; node = node->next ) {
@@ -323,7 +323,8 @@ VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module,
 
 DNODE *vartab_lookup_module( VARTAB *table, DNODE *module, SYMTAB *symtab )
 {
-    VAR_NODE *node = vartab_lookup_module_varnode( table, module, symtab );
+    VAR_NODE *node =
+        vartab_lookup_module_varnode( table, module, NULL, symtab );
     return node ? node->dnode : NULL;
 }
 
