@@ -71,3 +71,27 @@ void obtain_tables_from_symtab( SYMTAB *symtab,
     symtab->typetab = NULL;
     symtab->operators = NULL;
 }
+
+TYPETAB *symtab_typetab( SYMTAB *st )
+{
+    assert( st );
+    return st->typetab;
+}
+
+VARTAB *symtab_vartab( SYMTAB *st )
+{
+    assert( st );
+    return st->vartab;
+}
+
+VARTAB *symtab_consttab( SYMTAB *st )
+{
+    assert( st );
+    return st->consts;
+}
+
+VARTAB *symtab_optab( SYMTAB *st )
+{
+    assert( st );
+    return st->operators;
+}

@@ -33,6 +33,8 @@
 struct DNODE {
     char *name;            /* The declared name; this name is supposed
                               to be unique in a current scope */
+    char *synonim;         /* Synonim name for different
+                              implementations of parametrised modules. */
     dnode_flag_t flags;
     TNODE *tnode;          /* type descriptor node, describes the type
 			      of the variable, or the type of the
@@ -71,6 +73,8 @@ struct DNODE {
     VARTAB *consts;        /* constants declared in a module */
     TYPETAB *typetab;      /* types declared in a module */
     VARTAB *operators;     /* operators declared in modules */
+    DNODE *module_args;    /* Arguments or parameters of a
+                              parametrised module. */
 
     DNODE *next; /* reference to the next declaration in a declaration
 		    list */
@@ -96,6 +100,7 @@ void delete_dnode( DNODE *node )
         if( --node->rcount > 0 )
 	    return;
 	freex( node->name );
+	freex( node->synonim );
 	freex( node->code );
 	delete_tnode( node->tnode );
 	delete_vartab( node->vartab );
@@ -113,6 +118,7 @@ void delete_dnode( DNODE *node )
 #endif
 	delete_fixup_list( node->code_fixups );
 	const_value_free( &node->cvalue );
+        delete_dnode( node->module_args );
 	free_dnode( node );
 	node = next;
     }
@@ -725,6 +731,19 @@ DNODE *dnode_list_last( DNODE *dnode )
     }
 }
 
+DNODE *dnode_module_args( DNODE *dnode )
+{
+    assert( dnode );
+    return dnode->module_args;
+}
+
+DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *args )
+{
+    assert( dnode );
+    dnode->module_args = args;
+    return dnode;
+}
+
 void dnode_assign_offset( DNODE *dnode, ssize_t *offset )
 {
     int delta;
@@ -774,6 +793,28 @@ DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex )
     assert( !dnode->name );
     dnode->name = strdupx( name, ex );
     return dnode;
+}
+
+DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex )
+{
+    assert( dnode );
+    assert( !dnode->synonim );
+    dnode->synonim = strdupx( synonim, ex );
+    return dnode;
+}
+
+DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim )
+{
+    assert( dnode );
+    assert( !dnode->synonim );
+    dnode->synonim = synonim;
+    return dnode;
+}
+
+char *dnode_synonim( DNODE *dnode )
+{
+    assert( dnode );
+    return dnode->synonim;
 }
 
 DNODE *dnode_append_type( DNODE *dnode, TNODE *tnode )
@@ -1012,6 +1053,103 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 {
     assert( dnode->typetab );
     return typetab_lookup_suffix( dnode->typetab, name, suffix );
+}
+
+int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
+{
+    DNODE *arg1, *arg2;
+    TYPETAB *ttab = symtab ? symtab_typetab( symtab ) : NULL;
+
+#if 1
+    if( !ttab ) {
+        if( m1->module_args )
+            return 0;
+        else
+            return 1;
+    }
+#endif
+
+#if 0
+    printf( "\n" );
+#endif
+
+    arg2 = m2->module_args;
+
+    foreach_dnode( arg1, m1->module_args ) {
+        TNODE *arg1_type = dnode_type( arg1 );
+        // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
+        //         dnode_name( arg ), tnode_kind_name( param_type ),
+        //         dnode_name( param ));
+        if( tnode_kind( arg1_type ) == TK_TYPE ) {
+            TNODE *arg2_type = ttab ?
+                typetab_lookup( ttab, dnode_name( arg2 )) : 
+                tnode_base_type( dnode_type( arg2 ));
+            // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
+#if 0
+            printf( ">>> typtab is %p\n", ttab );
+            printf( ">>> checking types for identity: "
+                    "arg1 = %p '%s' (type = '%s', base = '%s'), "
+                    "arg2 = %p '%s' (type = '%s')\n",
+                    arg1 ? tnode_base_type( dnode_type( arg1 )) : NULL,
+                    dnode_name( arg1 ),
+                    arg1 ? tnode_kind_name( dnode_type( arg1 )) : "?",
+                    arg1 ? tnode_name( tnode_base_type( dnode_type( arg1 ))) : "?",
+                    arg2_type, dnode_name( arg2 ),
+                    arg2_type ? tnode_name( arg2_type ) : "?"
+                    );
+#endif
+            if( !tnode_types_are_identical
+                ( tnode_base_type( dnode_type( arg1 )),
+                  arg2_type,
+                  NULL, NULL ) ) {
+                // printf( ">>> NOT identical\n" );
+                return 0;
+            }
+        } else if( tnode_kind( arg1_type ) == TK_CONST ) {
+            VARTAB *ctab = symtab_consttab( symtab );
+            DNODE *arg2_const = vartab_lookup( ctab, dnode_name( arg2 ));
+#if 0
+            printf( ">>> checking constant for identity: "
+                    "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
+                    "(found as '%s')\n",
+                    dnode_name( arg1 ),
+                    dnode_name( dnode_module_args( arg1 )),
+                    dnode_name( arg2 ),
+                    arg2_const ? dnode_name( arg2_const ) : "?"
+                    );
+#endif
+            if( arg2_const != dnode_module_args( arg1 ) ) {
+                return 0;
+            }
+        } else if( tnode_kind( arg1_type ) == TK_VAR ||
+                   tnode_kind( arg1_type ) == TK_FUNCTION ) {
+            VARTAB *vtab = symtab_vartab( symtab );
+            DNODE *arg2_dnode = vartab_lookup( vtab, dnode_name( arg2 ));
+#if 0
+            printf( ">>> checking variables or functions for identity: "
+                    "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
+                    "(found as '%s')\n",
+                    dnode_name( arg1 ),
+                    dnode_name( dnode_module_args( arg1 )),
+                    dnode_name( arg2 ),
+                    dnode_name( arg2_dnode )
+                    );
+#endif
+            if( arg2_dnode != dnode_module_args( arg1 ) ) {
+                return 0;
+            }
+        } else {
+            yyerrorf( "sorry, parameters of kind '%s' are not yet "
+                      "supported for modules", 
+                      tnode_kind_name( arg1_type ));
+            return 0;
+        }
+
+        if( arg2 )
+            arg2 = arg2->next;
+    }
+
+    return 1;
 }
 
 DNODE *dnode_remove_last( DNODE *list )

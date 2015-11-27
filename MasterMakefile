@@ -84,7 +84,7 @@ LOCAL_LIB := ${addprefix lib, ${addsuffix .a, ${notdir ${shell pwd}} }}
 TST_PRG_DIR  = ./testprogs
 TST_EXE_DIR  = ./testbin
 
-TST_SOURCES   = ${wildcard ${TST_PRG_DIR}/*.c}
+TST_SOURCES   = $(sort ${wildcard ${TST_PRG_DIR}/*.c})
 TST_DRIVERS   = ${patsubst %.c, ${TST_EXE_DIR}/%, ${notdir ${TST_SOURCES}}}
 TST_BASENAMES = ${notdir ${TST_SOURCES}}
 TST_DIRS      = ${dir ${TST_SOURCES}}
@@ -100,7 +100,7 @@ vpath %.h ${SRC_DIR} ${OTHER_DIRS}
 
 VPATH = ${OTHER_DIRS}
 
-OTHER_CFILES := ${notdir ${wildcard ${addsuffix /*.c, ${OTHER_DIRS}}}}
+OTHER_CFILES := ${notdir $(sort ${wildcard ${addsuffix /*.c, ${OTHER_DIRS}}})}
 OTHER_CFILES := ${filter-out %.tab.c lex.yy.c %.lex.c, ${OTHER_CFILES}}
 OTHER_OBJS    = ${OTHER_CFILES:%.c=${OBJDIR}/%.o}
 OTHER_DEPENDS = ${OTHER_CFILES:%.c=.%.d}
@@ -247,10 +247,10 @@ TEST_DIR = ./inputs
 OUTPUT_DIR = ./outputs/out
 DIFFIL_DIR = ./outputs/diff
 
-TEST_FILES = ${wildcard ${TEST_DIR}/*${EXT}} \
+TEST_FILES = $(sort ${wildcard ${TEST_DIR}/*${EXT}} \
 	${wildcard ${TEST_DIR}/${ARCH}/*${EXT}} \
 	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/${ARCH}/*${EXT}} \
-	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/*${EXT}}
+	${wildcard ${TEST_DIR}/$(notdir ${INTERPRETER_DIR})/*${EXT}})
 
 RES_FILES  = ${patsubst ${TEST_DIR}/%${EXT},${OUTPUT_DIR}/%.out,${TEST_FILES}}
 DIFF_FILES = ${patsubst ${TEST_DIR}/%${EXT},${DIFFIL_DIR}/%.diff,${TEST_FILES}}
@@ -273,7 +273,7 @@ SHELL_TSTDIR = ./shtests
 SHELL_OUTDIR = ./shoutputs/out
 SHELL_DIFDIR = ./shoutputs/diff
 
-SHELL_TESTS   = ${wildcard ${SHELL_TSTDIR}/*.sh}
+SHELL_TESTS   = $(sort ${wildcard ${SHELL_TSTDIR}/*.sh})
 SHELL_BASES   = ${notdir ${SHELL_TESTS}}
 SHELL_OUTPUTS = ${addprefix ${SHELL_OUTDIR}/, ${SHELL_BASES:%.sh=%.out}}
 SHELL_DIFFS   = ${addprefix ${SHELL_DIFDIR}/, ${SHELL_BASES:%.sh=%.diff}}
@@ -356,7 +356,7 @@ BENCH_DIR    = ./benchmarks
 ARCH_TYPE    = ${shell uname -m}
 BENCH_FILE   = ${BENCH_DIR}/times-${ARCH_TYPE}.dat
 SIZE_FILE    = ${BENCH_DIR}/sizes-${ARCH_TYPE}.dat
-BENCH_INPUTS = ${wildcard ${BENCH_DIR}/*${EXT}}
+BENCH_INPUTS = $(sort ${wildcard ${BENCH_DIR}/*${EXT}})
 
 benchmarks benchmark bench: ${BENCH_FILE} ${SIZE_FILE}
 

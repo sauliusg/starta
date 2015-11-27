@@ -1,14 +1,14 @@
-./sl: inputs/err-selective009.snl(12,27): ERROR, constant 'Cx1' is not found in module 'P1'
+./sl: inputs/err-selective009.snl(12,25): ERROR, constant 'Cx1' is not found in module 'P1'
 use const Cx1, Cx2 from P1;
-                          ^
-./sl: inputs/err-selective009.snl(12,27): ERROR, constant 'Cx2' is not found in module 'P1'
+                        ^
+./sl: inputs/err-selective009.snl(12,25): ERROR, constant 'Cx2' is not found in module 'P1'
 use const Cx1, Cx2 from P1;
-                          ^
-./sl: inputs/err-selective009.snl(13,27): ERROR, constant 'Kx1' is not found in module 'P2'
+                        ^
+./sl: inputs/err-selective009.snl(13,25): ERROR, constant 'Kx1' is not found in module 'P2'
 use const Kx1, Kx2 from P2;
-                          ^
-./sl: inputs/err-selective009.snl(13,27): ERROR, constant 'Kx2' is not found in module 'P2'
+                        ^
+./sl: inputs/err-selective009.snl(13,25): ERROR, constant 'Kx2' is not found in module 'P2'
 use const Kx1, Kx2 from P2;
-                          ^
+                        ^
 ./sl: 4 error(s) detected
 
