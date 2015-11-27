@@ -27,14 +27,14 @@ var b : int = 70;
 var l : long;
 var x : float;
 
-(l, x) = compute( a, b );
+l, x = compute( a, b );
 
 . l;
 . x;
 
 . "";
 
-(l, x) = compute( a, b@float + 0.7 );
+l, x = compute( a, b@float + 0.7 );
 
 . l;
 . x;

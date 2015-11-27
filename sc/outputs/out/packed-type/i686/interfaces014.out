@@ -5,11 +5,11 @@ INTERFACE[1]: vmt offset = 2978
 VMT[0]: 0
 INTERFACE[2]: vmt offset = 2982
 VMT[0]: 3
-VMT[1]: 1070
-VMT[2]: 1091
-VMT[3]: 1112
+VMT[1]: 1076
+VMT[2]: 1097
+VMT[3]: 1118
 INTERFACE[3]: vmt offset = 2998
 VMT[0]: 1
-VMT[1]: 1121
+VMT[1]: 1127
 1
 put@I2 implemented by A: setting self.i to 33

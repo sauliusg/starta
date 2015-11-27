@@ -1,8 +1,8 @@
-./sl: inputs/err-mass004.snl(55,32): ERROR, incompatible types for assignment
-( i, n[3], n[9] ) = l, m, l - m;
-                               ^
-./sl: inputs/err-mass004.snl(55,32): ERROR, incompatible types for assignment
-( i, n[3], n[9] ) = l, m, l - m;
-                               ^
+./sl: inputs/err-mass004.snl(55,28): ERROR, incompatible types for assignment
+i, n[3], n[9] = l, m, l - m;
+                           ^
+./sl: inputs/err-mass004.snl(55,28): ERROR, incompatible types for assignment
+i, n[3], n[9] = l, m, l - m;
+                           ^
 ./sl: 2 error(s) detected
 

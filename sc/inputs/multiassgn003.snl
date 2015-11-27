@@ -70,29 +70,29 @@ i = 7;
 m = new int[20];
 s = new S;
 
-( p, q ) = add_and_sub( a, b );
+p, q = add_and_sub( a, b );
 
 < p; space(); < q; newline();
 
-( p, q, dummy, dummy ) = all_actions( a, b );
+p, q, dummy, dummy = all_actions( a, b );
 
 < p; space(); < q; newline();
 
-( p, m[i], q, s.y ) = all_actions( a, b );
+p, m[i], q, s.y = all_actions( a, b );
 
 < p; space(); < q; space();
 
 for j = 1 to 10 do < m[j]; space(); enddo;
 newline();
 
-( m[i], q, s.x, p ) = all_actions( a, b );
+m[i], q, s.x, p = all_actions( a, b );
 
 < p; space(); < q; space();
 
 for j = 1 to 10 do < m[j]; space(); enddo;
 newline();
 
-( m[i-1], m[i], s.x, m[i+1] ) = all_actions( a, b );
+m[i-1], m[i], s.x, m[i+1] = all_actions( a, b );
 
 < p; space(); < q; space();
 

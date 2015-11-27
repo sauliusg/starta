@@ -15,6 +15,7 @@ typedef struct DNODE DNODE;
 #include <tnode.h>
 #include <typetab.h>
 #include <vartab.h>
+#include <symtab.h>
 #include <cvalue_t.h>
 #include <run.h>
 #include <cexceptions.h>
@@ -117,6 +118,10 @@ DNODE *dnode_set_offset( DNODE *dnode, ssize_t offset );
 
 DNODE *dnode_update_offset( DNODE *dnode, ssize_t offset );
 
+DNODE *dnode_module_args( DNODE *dnode );
+
+DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *args );
+
 void dnode_assign_offset( DNODE *dnode, ssize_t *offset );
 
 void dnode_list_assign_offsets( DNODE *dnode_list, ssize_t *offset );
@@ -130,6 +135,12 @@ DNODE *dnode_list_insert_type( DNODE *dnode, TNODE *tnode );
 DNODE *dnode_replace_type( DNODE *dnode, TNODE *tnode );
 
 DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex );
+
+DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex );
+
+DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim );
+
+char *dnode_synonim( DNODE *dnode );
 
 DNODE *dnode_append_type( DNODE *dnode, TNODE *tnode );
 
@@ -238,6 +249,8 @@ TNODE *dnode_typetab_lookup_type( DNODE *dnode, const char *name );
 
 TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 				    type_suffix_t suffix );
+
+int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab );
 
 DNODE *dnode_remove_last( DNODE *list );
 

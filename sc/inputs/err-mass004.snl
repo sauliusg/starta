@@ -52,4 +52,4 @@ var n : array of long;
 
 n = new long[10];
 
-( i, n[3], n[9] ) = l, m, l - m;
+i, n[3], n[9] = l, m, l - m;

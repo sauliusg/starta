@@ -12,7 +12,7 @@ var n : array of int;
 
 n = new int[10];
 
-( i, n[3], n[9] ) = l, m, l - m;
+i, n[3], n[9] = l, m, l - m;
 
 function ff( x, y : int ) : int, int
 {
