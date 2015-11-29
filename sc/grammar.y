@@ -6801,8 +6801,9 @@ package_statement
               if( module_args ) {
                   TYPETAB *ttab =
                       symtab_typetab( stlist_data( compiler->symtab_stack ));
-                  param = module_params;
-                  foreach_dnode( arg, module_args ) {
+                  arg = module_args;
+                  foreach_dnode( param, module_params ) {
+                      // foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
                       // printf( ">>>> argument '%s', parameter '%s' (type kind = %s)\n",
                       //         dnode_name( arg ), dnode_name( param ),
@@ -6874,7 +6875,7 @@ package_statement
                                     "supported for modules", 
                                     tnode_kind_name( param_type ));
                       }
-                      param = dnode_next( param );
+                      arg = dnode_next( arg );
                   }
               }
           }
