@@ -1058,6 +1058,9 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
         //         dnode_name( arg ), tnode_kind_name( param_type ),
         //         dnode_name( param ));
+        if( !arg2 ) {
+            return 0;
+        }
         if( tnode_kind( arg1_type ) == TK_TYPE ) {
             TNODE *arg2_type = ttab ?
                 typetab_lookup( ttab, dnode_name( arg2 )) : 
