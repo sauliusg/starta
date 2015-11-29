@@ -6133,13 +6133,10 @@ static DNODE* compiler_module_parameter_dnode( char *parameter_name,
     cexception_guard( inner ) {
         parameter_dnode = new_dnode_name( parameter_name, &inner );
         dnode_insert_type( parameter_dnode, dnode_type );
-#if 0
-        if( parameter_default ) {
-            cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
-                              "So far, default module parameter types "
-                              "are not supported :(" );
-        }
-#endif
+        /* We will use the 'synonim' field to pass the default module
+           parameter name: */
+        dnode_set_synonim( parameter_dnode, parameter_default, &inner );
+        freex( parameter_default );
     }
     cexception_catch {
         delete_tnode( dnode_type );
@@ -6809,13 +6806,21 @@ package_statement
                       //         dnode_name( arg ), dnode_name( param ),
                       //         tnode_kind_name( param_type )
                       //         );
+                      char *argument_name;
+                      if( !arg ) {
+                          argument_name = dnode_synonim( param );
+                          if( !argument_name )
+                              break;
+                      } else {
+                          argument_name = dnode_name( arg );
+                      }
                       if( tnode_kind( param_type ) == TK_TYPE ) {
                           TNODE *arg_type =
-                              typetab_lookup( ttab, dnode_name( arg ));
+                              typetab_lookup( ttab, argument_name );
                           // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
                           if( !arg_type ) {
                               yyerrorf( "type '%s' is not defined for module parameter",
-                                        dnode_name( arg ));
+                                        argument_name );
                           }
                           char *type_name = dnode_name( param );
                           cexception_t inner;
@@ -6836,7 +6841,7 @@ package_statement
                           VARTAB *ctab =
                               symtab_consttab( stlist_data( compiler->symtab_stack ));
                           DNODE *argument_dnode =
-                              vartab_lookup( ctab, dnode_name( arg ));
+                              vartab_lookup( ctab, argument_name );
                           /* Insert the constant under the module parameter name: */
                           // compiler_consttab_insert_consts
                           //    ( compiler, share_dnode( argument_dnode ), px );
@@ -6846,15 +6851,14 @@ package_statement
                                              share_dnode( argument_dnode ), px );
                           } else {
                               yyerrorf( "constant '%s' is not found for module"
-                                        " parameter",
-                                        dnode_name( arg ));
+                                        " parameter", argument_name );
                           }
                       } else if( tnode_kind( param_type ) == TK_VAR ||
                                  tnode_kind( param_type ) == TK_FUNCTION ) {
                           VARTAB *vartab =
                               symtab_vartab( stlist_data( compiler->symtab_stack ));
                           DNODE *argument_dnode =
-                              vartab_lookup( vartab, dnode_name( arg ));
+                              vartab_lookup( vartab, argument_name );
                           /* Insert the variable or function under the
                              module parameter name: */
                           if( argument_dnode ) {
@@ -6867,7 +6871,7 @@ package_statement
                                   "variable" : "function";
                               yyerrorf( "%s '%s' is not found"
                                         " for module parameter '%s'",
-                                        item_name, dnode_name( arg ),
+                                        item_name, argument_name,
                                         dnode_name( param ));
                           }
                       } else {
@@ -6875,7 +6879,8 @@ package_statement
                                     "supported for modules", 
                                     tnode_kind_name( param_type ));
                       }
-                      arg = dnode_next( arg );
+                      if( arg )
+                          arg = dnode_next( arg );
                   }
               }
           }

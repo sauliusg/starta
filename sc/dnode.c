@@ -1058,12 +1058,17 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         // printf( ">>>> parameter '%s' (type kind = %s), argument '%s'\n",
         //         dnode_name( arg ), tnode_kind_name( param_type ),
         //         dnode_name( param ));
+        char *argument_name;
         if( !arg2 ) {
-            return 0;
+            argument_name = dnode_synonim( arg1 );
+            if( !argument_name )
+                return 0;
+        } else {
+            argument_name = dnode_name( arg2 );
         }
         if( tnode_kind( arg1_type ) == TK_TYPE ) {
             TNODE *arg2_type = ttab ?
-                typetab_lookup( ttab, dnode_name( arg2 )) : 
+                typetab_lookup( ttab, argument_name ) :
                 tnode_base_type( dnode_type( arg2 ));
             // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
 #if 0
@@ -1075,7 +1080,7 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
                     dnode_name( arg1 ),
                     arg1 ? tnode_kind_name( dnode_type( arg1 )) : "?",
                     arg1 ? tnode_name( tnode_base_type( dnode_type( arg1 ))) : "?",
-                    arg2_type, dnode_name( arg2 ),
+                    arg2_type, argument_name,
                     arg2_type ? tnode_name( arg2_type ) : "?"
                     );
 #endif
@@ -1088,14 +1093,14 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             }
         } else if( tnode_kind( arg1_type ) == TK_CONST ) {
             VARTAB *ctab = symtab_consttab( symtab );
-            DNODE *arg2_const = vartab_lookup( ctab, dnode_name( arg2 ));
+            DNODE *arg2_const = vartab_lookup( ctab, argument_name );
 #if 0
             printf( ">>> checking constant for identity: "
                     "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
                     "(found as '%s')\n",
                     dnode_name( arg1 ),
                     dnode_name( dnode_module_args( arg1 )),
-                    dnode_name( arg2 ),
+                    argument_name,
                     arg2_const ? dnode_name( arg2_const ) : "?"
                     );
 #endif
@@ -1105,14 +1110,14 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
         } else if( tnode_kind( arg1_type ) == TK_VAR ||
                    tnode_kind( arg1_type ) == TK_FUNCTION ) {
             VARTAB *vtab = symtab_vartab( symtab );
-            DNODE *arg2_dnode = vartab_lookup( vtab, dnode_name( arg2 ));
+            DNODE *arg2_dnode = vartab_lookup( vtab, argument_name );
 #if 0
             printf( ">>> checking variables or functions for identity: "
                     "arg1 = '%s' (module arg: '%s'), arg2 = '%s' "
                     "(found as '%s')\n",
                     dnode_name( arg1 ),
                     dnode_name( dnode_module_args( arg1 )),
-                    dnode_name( arg2 ),
+                    argument_name,
                     dnode_name( arg2_dnode )
                     );
 #endif

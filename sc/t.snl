@@ -6,11 +6,6 @@
 
 use * from std;
 
-use PTypeOnly1;
-use PTypeOnly2;
+use * from Parametrised( int ) as P;
 
-PTypeOnly1::set_inner( 123 );
-PTypeOnly2::set_inner( 456 );
-
-. PTypeOnly1::get_inner();
-. PTypeOnly2::get_inner();
+. P::parallel( 10, 30 );
