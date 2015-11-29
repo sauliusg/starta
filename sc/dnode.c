@@ -429,28 +429,6 @@ DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags )
     return dnode;
 }
 
-#if 0
-DNODE *dnode_list_invert( DNODE *dnode_list )
-{
-    DNODE *inverse_list = NULL;
-    DNODE *next = NULL;
-
-    while( dnode_list ) {
-        next = dnode_list->next;
-	dnode_list->next = inverse_list;
-	if( inverse_list ) {
-	    inverse_list->prev = dnode_list;
-	}
-	inverse_list = dnode_list;
-	dnode_list = next;
-    }
-    if( inverse_list ) {
-	inverse_list->prev = NULL;
-    }
-    return inverse_list;
-}
-#endif
-
 char *dnode_name( DNODE *dnode ) { assert( dnode ); return dnode->name; }
 
 ssize_t dnode_offset( DNODE *dnode ) { assert( dnode ); return dnode->offset; }

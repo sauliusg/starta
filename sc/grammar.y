@@ -1639,7 +1639,6 @@ static void compiler_compile_return( COMPILER *cc,
 
     assert( cc );
 
-    // fn_retvals = dnode_list_invert( fn_retvals );
     retval = dnode_list_last( fn_retvals );
     expr = cc->e_stack;
     for( i = 0; expr && i < nretvals; i++ ) {
@@ -1678,7 +1677,6 @@ static void compiler_compile_return( COMPILER *cc,
 	retval = dnode_prev( retval );
 	expr = enode_next( expr );
     }
-    // fn_retvals = dnode_list_invert( fn_retvals );
 
     if( !cc->current_function ) {
 	yyerrorf( "the \"return\" statement should be used only in "
@@ -4516,7 +4514,6 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
     int n = 1;
     int retval = 1;
 
-    // args = dnode_list_invert( args );
     foreach_dnode( arg, args ) {
 	TNODE *arg_type = dnode_type( arg );
 	switch( n ) {
@@ -4544,7 +4541,6 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 	}
 	n++;
     }
-    // args = dnode_list_invert( args );
     if( --n > 3 ) {
 	yyerrorf( "too many arguments for the program "
 		  "(found %d, must be <= 3)", n );
@@ -6806,7 +6802,6 @@ package_statement
                   TYPETAB *ttab =
                       symtab_typetab( stlist_data( compiler->symtab_stack ));
                   param = module_params;
-                  // module_args = dnode_list_invert( module_args );
                   foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
                       // printf( ">>>> argument '%s', parameter '%s' (type kind = %s)\n",
@@ -6834,7 +6829,6 @@ package_statement
                           }
                           cexception_catch {
                               delete_tnode( type_tnode );
-                              // module_args = dnode_list_invert( module_args );
                               cexception_reraise( inner, px );
                           }
                       } else if( tnode_kind( param_type ) == TK_CONST ) {
@@ -6882,7 +6876,6 @@ package_statement
                       }
                       param = dnode_next( param );
                   }
-                  // module_args = dnode_list_invert( module_args );
               }
           }
           // printf( ">>> Will now compile statements for '%s' module\n",
@@ -7468,7 +7461,6 @@ variable_declaration
      int readonly = $1;
      int expr_nr = $8;
 
-     // $2 = dnode_list_invert( dnode_append( $2, $4 ));
      $2 = dnode_append( $2, $4 );
      dnode_list_append_type( $2, $6 );
      dnode_list_assign_offsets( $2, &compiler->local_offset );
@@ -10426,7 +10418,6 @@ closure_initialisation
     assert( closure_tnode );
 
     current_expr = top_expr;
-    // closure_var_list = dnode_list_invert( closure_var_list );
     foreach_reverse_dnode( var, closure_var_list ) {
         TNODE *expr_type = current_expr ?
             share_tnode( enode_type( current_expr )) : NULL;
@@ -10445,7 +10436,6 @@ closure_initialisation
         dnode_append_type( var, expr_type );
         current_expr = current_expr ? enode_next( current_expr ) : NULL;
     }
-    // closure_var_list = dnode_list_invert( closure_var_list );
 
     tnode_insert_fields( closure_tnode, closure_var_list );
 
@@ -10465,7 +10455,6 @@ closure_initialisation
 
     // len = 0;
     i = 0;
-    // closure_var_list = dnode_list_invert( closure_var_list );
     foreach_reverse_dnode( var, closure_var_list ) {
         i ++;
         if( i > len ) break;
@@ -10488,7 +10477,6 @@ closure_initialisation
             compiler_compile_sti( compiler, px );
         }
     }
-    // closure_var_list = dnode_list_invert( closure_var_list );
 
     compiler_emit( compiler, px, "\tc\n", RFROMR );
 }
@@ -11511,7 +11499,6 @@ argument
 
   | opt_readonly var_type_description uninitialised_var_declarator_list
       {
-        // $$ = dnode_list_append_type( dnode_list_invert( $3 ), $2 );
 	$$ = dnode_list_append_type( $3, $2 );
 	if( $1 ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
