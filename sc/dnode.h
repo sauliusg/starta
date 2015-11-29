@@ -100,10 +100,6 @@ dnode_flag_t dnode_flags( DNODE *dnode );
 
 DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags );
 
-#if 0
-DNODE *dnode_list_invert( DNODE *dnode_list );
-#endif
-
 char *dnode_name( DNODE *dnode );
 
 int dnode_scope( DNODE *dnode );
