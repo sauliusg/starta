@@ -6176,6 +6176,61 @@ static void compiler_import_array_definition( COMPILER *c, char *module_name,
     }
 }
 
+static void compiler_import_type_identifier_list( COMPILER *c, 
+                                                  DNODE *imported_identifiers,
+                                                  char *module_name,
+                                                  cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_packages, module_name );
+
+    if( !module ) {
+        yyerrorf( "module '%s' is not found for type import "
+                  "-- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        DNODE *identifier;
+        foreach_dnode( identifier, imported_identifiers ) {
+            char *name = dnode_name( identifier );
+            TNODE *identifier_tnode =
+                dnode_typetab_lookup_type( module, name );
+            if( identifier_tnode ) {
+                if( typetab_lookup( c->typetab, name )) {
+                    yyerrorf( "type named '%s' is already defined -- "
+                              "can not import", name );
+                } else {
+                    typetab_insert( c->typetab, name, 
+                                    share_tnode( identifier_tnode ),
+                                    ex );
+                    type_kind_t kind = tnode_kind( identifier_tnode );
+                    char *suffix = tnode_suffix( identifier_tnode );
+                    if( !suffix ) suffix = "";
+                    if( kind == TK_INTEGER || kind == TK_REAL || 
+                        kind == TK_STRING || suffix != NULL ) {
+                        type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
+                        switch( kind ) {
+                        case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
+                        case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
+                        case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
+                        default:
+                            break;
+                        }
+                        if( suffix_kind != TS_NOT_A_SUFFIX ) {
+                            typetab_override_suffix
+                                ( c->typetab, suffix, suffix_kind,
+                                  share_tnode( identifier_tnode ), ex );
+                        }
+                    }
+                }
+            } else {
+                yyerrorf( "type '%s' is not found in module '%s'",
+                          name, module_name );
+            }
+        }
+    }
+    delete_dnode( imported_identifiers );
+}
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -7043,6 +7098,7 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
+
    | _USE _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
            compiler_import_array_definition( compiler, $5, px );
@@ -7054,56 +7110,13 @@ selective_use_statement
 
    | _USE _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
-           DNODE *imported_identifiers = $3;
-           DNODE *identifier;
-           if( !module ) {
-               yyerrorf( "module '%s' is not found for type import "
-                         "-- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               foreach_dnode( identifier, imported_identifiers ) {
-                   char *name = dnode_name( identifier );
-                   TNODE *identifier_tnode =
-                       dnode_typetab_lookup_type( module, name );
-                   if( identifier_tnode ) {
-                       if( typetab_lookup( compiler->typetab, name )) {
-                           yyerrorf( "type named '%s' is already defined -- "
-                                     "can not import", name );
-                       } else {
-                           typetab_insert( compiler->typetab, name, 
-                                           share_tnode( identifier_tnode ),
-                                           px );
-                           type_kind_t kind = tnode_kind( identifier_tnode );
-                           char *suffix = tnode_suffix( identifier_tnode );
-                           if( !suffix ) suffix = "";
-                           if( kind == TK_INTEGER || kind == TK_REAL || 
-                               kind == TK_STRING || suffix != NULL ) {
-                               type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
-                               switch( kind ) {
-                               case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
-                               case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
-                               case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
-                               default:
-                                   break;
-                               }
-                               if( suffix_kind != TS_NOT_A_SUFFIX ) {
-                                   typetab_override_suffix
-                                       ( compiler->typetab, suffix, suffix_kind,
-                                         share_tnode( identifier_tnode ), px );
-                               }
-                           }
-                       }
-                   } else {
-                       yyerrorf( "type '%s' is not found in module '%s'",
-                                 name, module_name );
-                   }
-               }
-           }
-           delete_dnode( imported_identifiers );
+           compiler_import_type_identifier_list( compiler, $3, $5, px );
        }
+   | _IMPORT _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_type_identifier_list( compiler, $3, $5, px );
+       }
+
    | _USE _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
