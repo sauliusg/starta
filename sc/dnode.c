@@ -1067,6 +1067,12 @@ int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab )
             argument_name = dnode_name( arg2 );
         }
         if( tnode_kind( arg1_type ) == TK_TYPE ) {
+            /* Prevent assertions from failing if the argument name is
+               not given -- such things can happen if numeric constant
+               is passed instead of a named module parameter (in this
+               branch, instead of a type): */
+            if( !argument_name )
+                return 0;
             TNODE *arg2_type = ttab ?
                 typetab_lookup( ttab, argument_name ) :
                 tnode_base_type( dnode_type( arg2 ));

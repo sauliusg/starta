@@ -6933,12 +6933,20 @@ package_statement
                           argument_name = dnode_name( arg );
                       }
                       if( tnode_kind( param_type ) == TK_TYPE ) {
-                          TNODE *arg_type =
-                              typetab_lookup( ttab, argument_name );
+                          TNODE *arg_type = argument_name ?
+                              typetab_lookup( ttab, argument_name ) :
+                              NULL;
                           // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
                           if( !arg_type ) {
-                              yyerrorf( "type '%s' is not defined for module parameter",
-                                        argument_name );
+                              if( argument_name ) {
+                                  yyerrorf( "type '%s' is not defined for "
+                                            "module parameter",
+                                            argument_name );
+                              } else {
+                                  yyerrorf( "type is not defined for "
+                                            "module parameter '%s'",
+                                            dnode_name( param ));
+                              }
                           }
                           char *type_name = dnode_name( param );
                           cexception_t inner;
