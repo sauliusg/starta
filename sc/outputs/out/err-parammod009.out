@@ -1,0 +1,81 @@
+./sl: inputs/Parametrised.slib(2,60): ERROR, type is not defined for module parameter 'inttype'
+module Parametrised( type inttype, type floattype = double )
+                                                           ^
+./sl: inputs/Parametrised.slib(18,16): ERROR, type 'floattype' has no conversion from type 'inttype'
+    return x/i@floattype;
+               ^
+./sl: inputs/Parametrised.slib(2,60): ERROR, type is not defined for module parameter 'floattype'
+module Parametrised( type inttype, type floattype = double )
+                                                           ^
+./sl: inputs/Parametrised.slib(8,15): ERROR, type 'floattype' has no binary operator named '*'
+    return x*y/(x+y);
+              ^
+./sl: inputs/Parametrised.slib(8,20): ERROR, type 'floattype' has no binary operator named '+'
+    return x*y/(x+y);
+                   ^
+./sl: inputs/Parametrised.slib(8,21): ERROR, type 'floattype' has no binary operator named '/'
+    return x*y/(x+y);
+                    ^
+./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no operator named 'ldc'
+    return x * 2 floattype;
+                          ^
+./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no binary operator named '*'
+    return x * 2 floattype;
+                          ^
+./sl: inputs/Parametrised.slib(18,16): ERROR, type 'floattype' has no conversion from type 'inttype'
+    return x/i@floattype;
+               ^
+./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no binary operator named '/'
+    return x/i@floattype;
+                        ^
+./sl: inputs/err-parammod009.snl(11,9): ERROR, module 'ifP' is not available in the current scope
+. ifP::i;
+        ^
+./sl: inputs/err-parammod009.snl(11,9): ERROR, variable 'ifP::i' is not declared in the current scope
+. ifP::i;
+        ^
+./sl: inputs/err-parammod009.snl(13,8): ERROR, module 'ifP' is not available in the current scope
+ifP::i = 23456;
+       ^
+./sl: inputs/err-parammod009.snl(13,8): ERROR, variable 'ifP::i' is not declared in the current scope
+ifP::i = 23456;
+       ^
+./sl: inputs/err-parammod009.snl(15,9): ERROR, module 'ifP' is not available in the current scope
+. ifP::i;
+        ^
+./sl: inputs/err-parammod009.snl(15,9): ERROR, variable 'ifP::i' is not declared in the current scope
+. ifP::i;
+        ^
+./sl: inputs/err-parammod009.snl(17,9): ERROR, module 'ldP' is not available in the current scope
+. ldP::i;
+        ^
+./sl: inputs/err-parammod009.snl(17,9): ERROR, variable 'ldP::i' is not declared in the current scope
+. ldP::i;
+        ^
+./sl: inputs/err-parammod009.snl(19,8): ERROR, module 'ldP' is not available in the current scope
+ldP::i = 40000 ldP::inttype;
+       ^
+./sl: inputs/err-parammod009.snl(19,8): ERROR, variable 'ldP::i' is not declared in the current scope
+ldP::i = 40000 ldP::inttype;
+       ^
+./sl: inputs/err-parammod009.snl(19,28): ERROR, module 'ldP' is not available in the current scope
+ldP::i = 40000 ldP::inttype;
+                           ^
+./sl: inputs/err-parammod009.snl(19,28): ERROR, type with suffix 'inttype' is not defined in this scope for types of kind 'integer'
+
+ldP::i = 40000 ldP::inttype;
+                           ^
+./sl: inputs/err-parammod009.snl(21,9): ERROR, module 'ldP' is not available in the current scope
+. ldP::i;
+        ^
+./sl: inputs/err-parammod009.snl(21,9): ERROR, variable 'ldP::i' is not declared in the current scope
+. ldP::i;
+        ^
+./sl: inputs/err-parammod009.snl(22,9): ERROR, module 'ifP' is not available in the current scope
+. ifP::i;
+        ^
+./sl: inputs/err-parammod009.snl(22,9): ERROR, variable 'ifP::i' is not declared in the current scope
+. ifP::i;
+        ^
+./sl: 26 error(s) detected
+
