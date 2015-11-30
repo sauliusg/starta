@@ -1,0 +1,56 @@
+// --*- C -*--
+
+// Check boxed integers.
+
+use * from std;
+
+struct Int {
+    int value;
+
+    operator "+"( Int a, b ): Int
+    {
+        return struct Int { value => a.value + b.value }
+    }
+
+    operator "-"( Int a, b ): Int
+    {
+        return struct Int { value => a.value - b.value }
+    }
+
+    operator "*"( Int a, b ): Int
+    {
+        return struct Int { value => a.value * b.value }
+    }
+
+    operator "/"( Int a, b ): Int
+    {
+        return struct Int { value => a.value / b.value }
+    }
+
+    operator "%"( Int a, b ): Int
+    {
+        return struct Int { value => a.value % b.value }
+    }
+
+    operator "@int"( int i ): Int
+    {
+        return struct Int { value => i };
+    }
+
+    operator "<"( Int i )
+    {
+        < i.value
+    }
+
+    operator "."( Int i )
+    {
+        < i.value
+    }
+};
+
+function something( Int i, j ): Int
+{
+    return 2@Int * i + j;
+}
+
+. something( 2, 3 );
