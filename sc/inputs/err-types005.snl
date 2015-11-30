@@ -1,11 +1,11 @@
-#
+# --*- Java -*--
 # Compiler tests
 #
 #
 # Test interfaces
 #
 
-use std;
+import std;
 
 interface I1 {
     method mm() : int;
