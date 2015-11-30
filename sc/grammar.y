@@ -6931,6 +6931,24 @@ module_argument
 : identifier
 | _CONST constant_expression
     { $$ = new_dnode_constant( /* name */ NULL, &$2, px ); }
+| __INTEGER_CONST
+    {
+        const_value_t cval = 
+            make_const_value( px, VT_INTMAX, (intmax_t)atol( $1 ));
+        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+    }
+
+| __REAL_CONST
+    {
+        const_value_t cval = make_const_value( px, VT_FLOAT, atof( $1 ));
+        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+    }
+
+| __STRING_CONST
+    {
+        const_value_t cval = make_const_value( px, VT_STRING, $1 );
+        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+    }
 ;
 
 opt_as_identifier
