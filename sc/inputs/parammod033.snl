@@ -6,7 +6,7 @@
 
 use * from std;
 
-use * from ConstParam( const 100, int ) as P;
+use * from ConstParam( const(100), int ) as P;
 
 . length( P::table );
 . P::table[0];
