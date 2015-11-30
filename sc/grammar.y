@@ -6146,6 +6146,36 @@ static DNODE* compiler_module_parameter_dnode( char *parameter_name,
     return parameter_dnode;
 }
 
+static void compiler_import_array_definition( COMPILER *c, char *module_name,
+                                              cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_packages, module_name );
+
+    if( !module ) {
+        yyerrorf( "module '%s' is not found for type import "
+                  "-- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        char *name = "array";
+        TNODE *identifier_tnode =
+            dnode_typetab_lookup_type( module, name );
+        if( identifier_tnode ) {
+            if( typetab_lookup( c->typetab, name )) {
+                yyerrorf( "type named '%s' is already defined -- "
+                          "can not import", name );
+            } else {
+                typetab_insert( c->typetab, name, 
+                                share_tnode( identifier_tnode ),
+                                ex );
+            }
+        } else {
+            yyerrorf( "type '%s' is not found in module '%s'",
+                      name, module_name );
+        }
+    }
+}
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -7015,31 +7045,7 @@ selective_use_statement
        }
    | _USE _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
-           if( !module ) {
-               yyerrorf( "module '%s' is not found for type import "
-                         "-- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               char *name = "array";
-               TNODE *identifier_tnode =
-                   dnode_typetab_lookup_type( module, name );
-               if( identifier_tnode ) {
-                   if( typetab_lookup( compiler->typetab, name )) {
-                       yyerrorf( "type named '%s' is already defined -- "
-                                 "can not import", name );
-                   } else {
-                       typetab_insert( compiler->typetab, name, 
-                                       share_tnode( identifier_tnode ),
-                                       px );
-                   }
-               } else {
-                   yyerrorf( "type '%s' is not found in module '%s'",
-                             name, module_name );
-               }
-           }
+           compiler_import_array_definition( compiler, $5, px );
        }
    | _USE _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
