@@ -6993,12 +6993,12 @@ module_import_identifier
   }
 ;
 
-use_or_import_keyword: _USE | _IMPORT ;
-
 use_statement
    : _USE module_import_identifier
        { $$ = $2; }
-   | use_or_import_keyword '*' _FROM module_import_identifier
+   | _USE '*' _FROM module_import_identifier
+       { $$ = $4; }
+   | _IMPORT '*' _FROM module_import_identifier
        { $$ = $4; }
    ;
 
