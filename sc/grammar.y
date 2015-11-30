@@ -6341,7 +6341,6 @@ static cexception_t *px; /* parser exception */
 %type <dnode> use_statement
 %type <dnode> variable_access_identifier
 %type <dnode> variable_access_for_indexing
-%type <dnode> variable_identifier_list
 %type <i>     variable_declaration_keyword
 %type <dnode> variable_declarator_list
 %type <dnode> uninitialised_var_declarator_list
@@ -7430,7 +7429,7 @@ variable_declaration
      compiler_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword 
-    identifier ',' variable_identifier_list ':' var_type_description
+    identifier ',' identifier_list ':' var_type_description
     {
      int readonly = $1;
 
@@ -7462,7 +7461,7 @@ variable_declaration
     }
 
   | variable_declaration_keyword identifier ','
-    variable_identifier_list ':' var_type_description '=' multivalue_expression_list
+    identifier_list ':' var_type_description '=' multivalue_expression_list
     {
      int readonly = $1;
      int expr_nr = $8;
@@ -7502,7 +7501,7 @@ variable_declaration
     }
 
   | variable_declaration_keyword identifier ','
-    variable_identifier_list ':' var_type_description '=' simple_expression
+    identifier_list ':' var_type_description '=' simple_expression
     {
         yyerrorf( "need more than one expression to initialise %d variables",
                   dnode_list_length( $4 ) + 1 );
@@ -7560,7 +7559,7 @@ variable_declaration
     }
  
  | variable_declaration_keyword identifier ','
-    variable_identifier_list '=' multivalue_expression_list
+    identifier_list '=' multivalue_expression_list
     {
      int readonly = $1;
 
@@ -7639,13 +7638,6 @@ variable_declarator
   : identifier
   | identifier dimension_list
       { $$ = dnode_insert_type( $1, $2 ); }
-  ;
-
-variable_identifier_list
-  : identifier
-    { $$ = $1; }
-  | variable_identifier_list ',' identifier
-    { $$ = dnode_append( $1, $3 ); }
   ;
 
 return_statement
@@ -8384,7 +8376,7 @@ catch_var_identifier
   ;
 
 catch_variable_declaration
-  : _VAR variable_identifier_list ':' var_type_description
+  : _VAR identifier_list ':' var_type_description
     {
      char *opname = "exceptionval";
      ssize_t try_var_offset = compiler->try_variable_stack ?
@@ -9012,12 +9004,12 @@ interface_operator
   ;
 
 struct_var_declaration
-  : variable_identifier_list ':' var_type_description
+  : identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $1, $3 );
       }
 
-  | _VAR variable_identifier_list ':' var_type_description
+  | _VAR identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $2, $4 );
       }
@@ -10238,7 +10230,7 @@ closure_var_declaration
 
 closure_var_list_declaration
   : opt_variable_declaration_keyword
-    identifier ',' variable_identifier_list ':' var_type_description
+    identifier ',' identifier_list ':' var_type_description
       {
        int readonly = $1;
        DNODE *variables = dnode_append( $2, $4 );
@@ -10391,7 +10383,7 @@ closure_initialisation
 }
 
 | opt_variable_declaration_keyword identifier ','
-  variable_identifier_list
+  identifier_list
 {
     int readonly = $1;
     DNODE *closure_var_list = dnode_append( $2, $4 );
