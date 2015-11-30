@@ -6275,6 +6275,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> function_header
 %type <dnode> method_definition
 %type <dnode> method_header
+%type <dnode> module_argument_list
 %type <s>     module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
@@ -6907,10 +6908,16 @@ import_statement
    ;
 
 opt_module_arguments
-: '(' identifier_list ')'
+: '(' module_argument_list ')'
     { $$ = $2; }
 | /* empty */
     { $$ = NULL; }
+;
+
+module_argument_list
+: identifier
+| module_argument_list ',' identifier
+   { $$ = dnode_append( $1, $3 ); }
 ;
 
 opt_as_identifier
