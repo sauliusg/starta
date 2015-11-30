@@ -7127,6 +7127,18 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
+
+   | _IMPORT _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           char *module_name = $5;
+           DNODE *imported_identifiers = $3;
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, IMPORT_VAR, px );
+
+           delete_dnode( imported_identifiers );
+       }
+
    | _USE _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
