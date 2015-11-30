@@ -9,7 +9,7 @@ use * from std;
 
 import P1; import P2;
 
-use var aBunny from P1;
+import var aBunny from P1;
 use var funny from P1;
 use type funny from P1;
 use function print_funny from P1
