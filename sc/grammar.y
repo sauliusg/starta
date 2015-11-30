@@ -7047,6 +7047,11 @@ selective_use_statement
        {
            compiler_import_array_definition( compiler, $5, px );
        }
+   | _IMPORT _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_array_definition( compiler, $5, px );
+       }
+
    | _USE _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
