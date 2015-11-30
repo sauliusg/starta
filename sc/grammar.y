@@ -7001,10 +7001,16 @@ package_statement
                               char *item_name =
                                   tnode_kind( param_type ) == TK_VAR ?
                                   "variable" : "function";
-                              yyerrorf( "%s '%s' is not found"
-                                        " for module parameter '%s'",
-                                        item_name, argument_name,
-                                        dnode_name( param ));
+                              if( argument_name ) {
+                                  yyerrorf( "%s '%s' is not found"
+                                            " for module parameter '%s'",
+                                            item_name, argument_name,
+                                            dnode_name( param ));
+                              } else {
+                                  yyerrorf( "%s is not found"
+                                            " for module parameter '%s'",
+                                            item_name, dnode_name( param ));
+                              }
                           }
                       } else {
                           yyerrorf( "sorry, parameters of kind '%s' are not yet "
