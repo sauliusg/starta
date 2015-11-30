@@ -226,6 +226,7 @@ from        { MARK; return _FROM; }
 function    { MARK; return _FUNCTION; }
 if          { MARK; return _IF; }
 implements  { MARK; return _IMPLEMENTS; }
+import      { MARK; return _IMPORT; }
 in          { MARK; return _IN; }
 include     { MARK; return _INCLUDE; }
 inline      { MARK; return _INLINE; }

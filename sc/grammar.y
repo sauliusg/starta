@@ -6197,6 +6197,7 @@ static cexception_t *px; /* parser exception */
 %token _FUNCTION
 %token _IF
 %token _IMPLEMENTS
+%token _IMPORT
 %token _IN
 %token _INCLUDE
 %token _INLINE
@@ -6910,7 +6911,7 @@ package_statement
   ;
 
 import_statement
-   : _USE module_import_identifier
+   : _IMPORT module_import_identifier
        { $$ = $2; }
    ;
 
@@ -6992,8 +6993,12 @@ module_import_identifier
   }
 ;
 
+use_or_import_keyword: _USE | _IMPORT ;
+
 use_statement
-   : _USE '*' _FROM module_import_identifier
+   : _USE module_import_identifier
+       { $$ = $2; }
+   | use_or_import_keyword '*' _FROM module_import_identifier
        { $$ = $4; }
    ;
 

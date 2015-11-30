@@ -5,9 +5,8 @@
 // Check whether specific names can be imported from selected
 // packages:
 
-use P1; use P2;
+use P1; import P2;
 
-use * from P1;
 use gg from P2;
 
 fg();
