@@ -6231,6 +6231,37 @@ static void compiler_import_type_identifier_list( COMPILER *c,
     delete_dnode( imported_identifiers );
 }
 
+static void compiler_import_selected_constants( COMPILER *c,
+                                                DNODE *imported_identifiers, 
+                                                char *module_name,
+                                                cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_packages, module_name );
+
+    if( !module ) {
+        yyerrorf( "module '%s' is not found for constant import "
+                  "-- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        DNODE *identifier;
+        foreach_dnode( identifier, imported_identifiers ) {
+            char *name = dnode_name( identifier );
+            DNODE *identifier_dnode =
+                dnode_consttab_lookup_const( module, name );
+            if( identifier_dnode ) {
+                vartab_insert( c->consts, name, 
+                               share_dnode( identifier_dnode ),
+                               ex );
+            } else {
+                yyerrorf( "constant '%s' is not found in module '%s'",
+                          name, module_name );
+            }
+        }
+    }
+    delete_dnode( imported_identifiers );
+}
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -7141,33 +7172,26 @@ selective_use_statement
 
    | _USE _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
+           compiler_import_selected_constants( compiler, $3, $5, px );
+       }
+   | _IMPORT _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_selected_constants( compiler, $3, $5, px );
+       }
+
+   | _USE function_or_procedure identifier_list
+     _FROM /* module_import_identifier */  __IDENTIFIER
+       {
            char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
            DNODE *imported_identifiers = $3;
-           DNODE *identifier;
-           if( !module ) {
-               yyerrorf( "module '%s' is not found for constant import "
-                         "-- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               foreach_dnode( identifier, imported_identifiers ) {
-                   char *name = dnode_name( identifier );
-                   DNODE *identifier_dnode =
-                       dnode_consttab_lookup_const( module, name );
-                   if( identifier_dnode ) {
-                       vartab_insert( compiler->consts, name, 
-                                      share_dnode( identifier_dnode ),
-                                      px );
-                   } else {
-                       yyerrorf( "constant '%s' is not found in module '%s'",
-                                 name, module_name );
-                   }
-               }
-           }
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, IMPORT_FUNCTION, px );
+
            delete_dnode( imported_identifiers );
        }
-   | _USE function_or_procedure identifier_list _FROM /* module_import_identifier */  __IDENTIFIER
+   | _IMPORT function_or_procedure identifier_list 
+     _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *imported_identifiers = $3;
