@@ -345,6 +345,8 @@ static VAR_NODE *vartab_lookup_varnode( VARTAB *table, const char *name )
 {
     VAR_NODE *node;
     assert( table );
+    if( !name )
+        return NULL;
     for( node = table->node; node != NULL; node = node->next ) {
         if( strcmp( name, node->name ) == 0 ) {
 	    assert( node->dnode );

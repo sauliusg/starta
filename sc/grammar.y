@@ -6843,6 +6843,12 @@ package_statement
                               symtab_consttab( stlist_data( compiler->symtab_stack ));
                           DNODE *argument_dnode =
                               vartab_lookup( ctab, argument_name );
+                          if( !argument_dnode && dnode_name( arg ) == NULL ) {
+                              /* The 'arg' dnode represents a constant expression: */
+                              dnode_set_name( arg, dnode_name( param ), px );
+                              argument_dnode = arg;
+                              vartab_insert_named( ctab, share_dnode( arg ), px );
+                          }
                           /* Insert the constant under the module parameter name: */
                           // compiler_consttab_insert_consts
                           //    ( compiler, share_dnode( argument_dnode ), px );
@@ -6923,6 +6929,8 @@ module_argument_list
 
 module_argument
 : identifier
+| _CONST constant_expression
+    { $$ = new_dnode_constant( /* name */ NULL, &$2, px ); }
 ;
 
 opt_as_identifier
