@@ -307,10 +307,22 @@ VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module,
 {
     VAR_NODE *node;
     char *module_name = name ? name : dnode_name( module );
+    char *module_filename = module ? NULL : dnode_filename( module );
 
     assert( table );
     for( node = table->node; node != NULL; node = node->next ) {
-        if( strcmp( module_name, node->name ) == 0 ) {
+        char *table_filename =
+            node->dnode ? dnode_filename( node->dnode ) : NULL;
+#if 0
+        printf( "vartab>>> now checking module '%s' (node name '%s'), "
+                "filename '%s'\n",
+                dnode_name( node->dnode ), node->name, 
+                dnode_filename( node->dnode ));
+#endif
+        if( strcmp( module_name, node->name ) == 0 &&
+            ( (!module_filename && !table_filename) ||
+              (module_filename && table_filename &&
+               strcmp( module_filename, table_filename ) == 0 ))) {
 	    assert( node->dnode );
             if( dnode_module_args_are_identical( node->dnode, module,
                                                  symtab ) ) {

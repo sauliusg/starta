@@ -102,6 +102,8 @@ DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags );
 
 char *dnode_name( DNODE *dnode );
 
+char *dnode_filename( DNODE *dnode );
+
 int dnode_scope( DNODE *dnode );
 
 DNODE *dnode_set_scope( DNODE *dnode, int scope );
@@ -129,6 +131,8 @@ DNODE *dnode_insert_type( DNODE *dnode, TNODE *tnode );
 DNODE *dnode_list_insert_type( DNODE *dnode, TNODE *tnode );
 
 DNODE *dnode_replace_type( DNODE *dnode, TNODE *tnode );
+
+DNODE *dnode_set_filename( DNODE *dnode, char *filename, cexception_t *ex );
 
 DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex );
 

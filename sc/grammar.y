@@ -694,8 +694,10 @@ static void compiler_close_include_file( COMPILER *c,
 	DNODE *module = NULL;
 	module = vartab_lookup( c->compiled_packages, c->use_package_name );
 	if( module ) {
-	    /* printf( ">>> module '%s' is being used\n", 
-               c->use_package_name ); */
+#if 0
+	    printf( ">>> module '%s' is being used\n", 
+                    c->use_package_name );
+#endif
 	    compiler_use_exported_package_names( c, module, ex );
 	} else {
 	    yyerrorf( "no module named '%s'?", c->use_package_name );
@@ -705,9 +707,17 @@ static void compiler_close_include_file( COMPILER *c,
     if( c->requested_package ) {
         cexception_t inner;
         char *synonim;
-        // printf( ">>>> checking module synonim for module '%s'...\n", dnode_name( c->requested_package ));
+#if 1
+        printf( ">>>> checking module synonim for module '%s'...\n",
+                dnode_name( c->requested_package ));
+#endif
         if( (synonim = dnode_synonim( c->requested_package )) != NULL ) {
-            // printf( ">>>> inserting synonim '%s' for module '%s'\n", synonim, dnode_name( c->requested_package ));
+#if 1
+            printf( ">>>> inserting synonim '%s' for module '%s' "
+                    "in file '%s'\n", synonim, 
+                    dnode_name( c->requested_package ),
+                    dnode_filename( c->requested_package ));
+#endif
             TYPETAB * typetab = NULL;
             VARTAB * vartab = NULL;
             VARTAB * consttab = NULL;
@@ -3392,9 +3402,9 @@ static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
 }
 
 static DNODE* compiler_lookup_dnode( COMPILER *cc,
-				  char *module_name,
-				  char *identifier,
-				  char *message )
+                                     char *module_name,
+                                     char *identifier,
+                                     char *message )
 {
     DNODE *varnode =
 	compiler_lookup_dnode_silently( cc, module_name, identifier );
@@ -3673,10 +3683,10 @@ static void compiler_emit_drop_returned_values( COMPILER *cc,
 }
 
 static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
-					 type_suffix_t suffix_type,
-					 char *module_name,
-					 char *suffix,
-					 char *constant_kind_name )
+                                            type_suffix_t suffix_type,
+                                            char *module_name,
+                                            char *suffix,
+                                            char *constant_kind_name )
 {
     TNODE *const_type = NULL;
     DNODE *module  = NULL;
@@ -3762,10 +3772,10 @@ static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
 }
 
 static TNODE* compiler_lookup_tnode_with_function( COMPILER *cc,
-                                                char *module_name,
-                                                char *identifier,
-                                                TNODE* (*typetab_lookup_fn)
-                                                    (TYPETAB*,const char*))
+                                                   char *module_name,
+                                                   char *identifier,
+                                                   TNODE* (*typetab_lookup_fn)
+                                                   (TYPETAB*,const char*))
 {
     if( !module_name ) {
 	return (*typetab_lookup_fn)( cc->typetab, identifier );
@@ -5036,6 +5046,12 @@ static void compiler_import_package( COMPILER *c,
                                            package_name_dnode,
                                            symtab );
 
+#if 0
+    printf( ">>> package = '%s', filename = '%s'\n",
+            dnode_name( package_name_dnode ),
+            dnode_filename( package_name_dnode ));
+#endif
+
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "import" )) {
 
@@ -5097,9 +5113,17 @@ static void compiler_use_package( COMPILER *c,
                                            package_name_dnode,
                                            symtab );
 
+#if 0
+    printf( ">>> package = '%s', filename = '%s'\n",
+            dnode_name( package_name_dnode ),
+            dnode_filename( package_name_dnode ));
+#endif
+
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "use" )) {
-            // printf( ">>> can use package '%s'\n", package_name );
+#if 1
+            printf( ">>> can use package '%s'\n", package_name );
+#endif
             if( package != NULL ) {
                 char *package_name = dnode_name( package );
                 DNODE *existing_package = package_name ?
@@ -5107,7 +5131,10 @@ static void compiler_use_package( COMPILER *c,
                     ( c->vartab, package_name_dnode, symtab )
                     : NULL;
                 char *synonim = dnode_synonim( package_name_dnode );
-                // printf( "<<< existing_package == %p, synonim == %p >>>\n", existing_package, synonim );
+#if 1
+                printf( "<<< existing_package == %p, synonim == %p >>>\n", 
+                        existing_package, synonim );
+#endif
                 if( !existing_package || existing_package != package || synonim ) {
                     // printf( ">>> found package '%s' for reuse\n", package_name );
                     // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
@@ -5128,6 +5155,11 @@ static void compiler_use_package( COMPILER *c,
                 char *pkg_path = c->package_filename ?
                     c->package_filename :
                     compiler_find_package( c, package_name, &inner );
+
+#if 1
+                printf( ">>> about to open file named '%s'\n", pkg_path );
+#endif
+
                 compiler_open_include_file( c, pkg_path, &inner );
 
                 assert( !c->requested_package  );
@@ -5676,7 +5708,7 @@ static void compiler_check_and_push_function_name( COMPILER *cc,
 
     cc->current_call = 
 	share_dnode( compiler_lookup_dnode( cc, module_name, function_name,
-					 "function" ));
+                                            "function" ));
 
     fn_tnode = cc->current_call ?
 	dnode_type( cc->current_call ) : NULL;
@@ -7050,6 +7082,11 @@ package_statement
           DNODE *module_params = $3;
 
           dnode_insert_module_args( module_dnode, module_params );
+#if 0
+          printf( ">>> compiler->filename = '%s'\n", compiler->filename );
+          printf( ">>> requested pkg name = '%s'\n", 
+                  dnode_filename( compiler->requested_package ) );
+#endif
 
 	  vartab_insert_named_module( compiler->vartab, module_dnode,
                                       stlist_data( compiler->symtab_stack ),
@@ -7129,17 +7166,38 @@ opt_as_identifier
 module_import_identifier
   : __IDENTIFIER opt_module_arguments opt_as_identifier
   {
-      DNODE *module_name_dnode = new_dnode_package( $1, px );
+      cexception_t inner;
+      char *module_name = $1;
+      DNODE *module_name_dnode = new_dnode_package( module_name, px );
       DNODE *module_arguments = $2;
       char *module_synonim = $3;
       dnode_insert_module_args( module_name_dnode, module_arguments );
       dnode_insert_synonim( module_name_dnode, module_synonim );
+
+      cexception_guard( inner ) {
+          char *pkg_path =
+              compiler_find_include_file
+              ( compiler,
+                compiler_find_package( compiler, module_name, &inner ),
+                &inner );
+          dnode_set_filename( module_name_dnode, pkg_path, &inner );
+#if 1
+          printf( ">>> inserted filename '%s' for module '%s'\n",
+              pkg_path, dnode_name( module_name_dnode ));
+#endif
+      }
+      cexception_catch {
+          delete_dnode( module_name_dnode );
+          cexception_reraise( inner, px );
+      }
+
       $$ = module_name_dnode;
   }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
   {
       cexception_t inner;
       DNODE * volatile module_name_dnode = new_dnode_package( $1, px );
+      char *module_filename = $3;
       DNODE *module_arguments = $4;
       char *module_synonim = $5;
       if( compiler->package_filename ) {
@@ -7148,14 +7206,27 @@ module_import_identifier
       }
       cexception_guard( inner ) {
           compiler->package_filename = strdupx( $3, &inner );
+          char *pkg_path =
+              compiler_find_include_file( compiler, module_filename, &inner );
+          dnode_set_filename( module_name_dnode, pkg_path, &inner );
+#if 1
+          printf( ">>> inserted filename '%s' for module '%s', "
+              "searched as '%s'\n",
+              pkg_path, dnode_name( module_name_dnode ), module_filename );
+#endif
       }
       cexception_catch {
           delete_dnode( module_name_dnode );
+          freex( module_filename );
           cexception_reraise( inner, px );
       }
-      /* printf( ">>> package '%s', file '%s'\n", $1, $3 ); */
       dnode_insert_module_args( module_name_dnode, module_arguments );
       dnode_insert_synonim( module_name_dnode, module_synonim );
+#if 0
+      printf( ">>> package '%s', synonim '%s', file '%s'\n",
+              $1, module_synonim, $3 );
+#endif
+      freex( module_filename );
       $$ = module_name_dnode;
   }
 ;
