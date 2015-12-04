@@ -6918,7 +6918,6 @@ package_statement
                       symtab_typetab( stlist_data( compiler->symtab_stack ));
                   arg = module_args;
                   foreach_dnode( param, module_params ) {
-                      // foreach_dnode( arg, module_args ) {
                       TNODE *param_type = dnode_type( param );
                       // printf( ">>>> argument '%s', parameter '%s' (type kind = %s)\n",
                       //         dnode_name( arg ), dnode_name( param ),
