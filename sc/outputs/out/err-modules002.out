@@ -1,4 +1,4 @@
-./sl: inputs/Mstrange.slib(11,13): ERROR, package 'Mstrange' ends with 'end package Mbad'
+./sl: inputs/Mstrange.slib(11,13): ERROR, module 'Mstrange' ends with 'end module Mbad'
 end package Mbad;
             ^
 ./sl: 1 error(s) detected

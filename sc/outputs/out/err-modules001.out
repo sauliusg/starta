@@ -1,4 +1,4 @@
-./sl: inputs/Mbad.slib(11,13): ERROR, package 'Mgood' ends with 'end package Mbad'
+./sl: inputs/Mbad.slib(11,13): ERROR, module 'Mgood' ends with 'end module Mbad'
 end package Mbad;
             ^
 ./sl: inputs/Mbad.slib(12,17): ERROR, no module named 'Mbad'?

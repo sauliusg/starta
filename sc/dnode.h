@@ -70,7 +70,7 @@ DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
 DNODE* new_dnode_operator( char *name, DNODE *parameters, DNODE *return_values,
 			   cexception_t *ex );
 
-DNODE *new_dnode_package( char *name, cexception_t *ex );
+DNODE *new_dnode_module( char *name, cexception_t *ex );
 
 DNODE *share_dnode( DNODE* node );
 

@@ -329,7 +329,7 @@ DNODE* new_dnode_operator( char *name,
     return op;
 }
 
-DNODE *new_dnode_package( char *name, cexception_t *ex )
+DNODE *new_dnode_module( char *name, cexception_t *ex )
 {
     cexception_t inner;
     DNODE *volatile node = new_dnode_name( name, ex );
