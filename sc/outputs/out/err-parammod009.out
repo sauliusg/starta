@@ -28,53 +28,52 @@ module Parametrised( type inttype, type floattype = double )
 ./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no binary operator named '/'
     return x/i@floattype;
                         ^
-./sl: inputs/err-parammod009.snl(11,9): ERROR, module 'ifP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(11,6): ERROR, module 'ifP' is not available in the current scope
+. ifP::i;
+     ^
+./sl: inputs/err-parammod009.snl(11,9): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 . ifP::i;
         ^
-./sl: inputs/err-parammod009.snl(11,9): ERROR, variable 'ifP::i' is not declared in the current scope
-. ifP::i;
-        ^
-./sl: inputs/err-parammod009.snl(13,8): ERROR, module 'ifP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(13,4): ERROR, module 'ifP' is not available in the current scope
+ifP::i = 23456;
+   ^
+./sl: inputs/err-parammod009.snl(13,8): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 ifP::i = 23456;
        ^
-./sl: inputs/err-parammod009.snl(13,8): ERROR, variable 'ifP::i' is not declared in the current scope
-ifP::i = 23456;
-       ^
-./sl: inputs/err-parammod009.snl(15,9): ERROR, module 'ifP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(15,6): ERROR, module 'ifP' is not available in the current scope
+. ifP::i;
+     ^
+./sl: inputs/err-parammod009.snl(15,9): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 . ifP::i;
         ^
-./sl: inputs/err-parammod009.snl(15,9): ERROR, variable 'ifP::i' is not declared in the current scope
-. ifP::i;
-        ^
-./sl: inputs/err-parammod009.snl(17,9): ERROR, module 'ldP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(17,6): ERROR, module 'ldP' is not available in the current scope
+. ldP::i;
+     ^
+./sl: inputs/err-parammod009.snl(17,9): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 . ldP::i;
         ^
-./sl: inputs/err-parammod009.snl(17,9): ERROR, variable 'ldP::i' is not declared in the current scope
-. ldP::i;
-        ^
-./sl: inputs/err-parammod009.snl(19,8): ERROR, module 'ldP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(19,4): ERROR, module 'ldP' is not available in the current scope
+ldP::i = 40000 ldP::inttype;
+   ^
+./sl: inputs/err-parammod009.snl(19,8): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 ldP::i = 40000 ldP::inttype;
        ^
-./sl: inputs/err-parammod009.snl(19,8): ERROR, variable 'ldP::i' is not declared in the current scope
+./sl: inputs/err-parammod009.snl(19,19): ERROR, module 'ldP' is not available in the current scope
 ldP::i = 40000 ldP::inttype;
-       ^
-./sl: inputs/err-parammod009.snl(19,28): ERROR, module 'ldP' is not available in the current scope
+                  ^
+./sl: inputs/err-parammod009.snl(19,28): ERROR, type 'inttype' is imported more than once -- please use explicit package name for disambiguation
 ldP::i = 40000 ldP::inttype;
                            ^
-./sl: inputs/err-parammod009.snl(19,28): ERROR, type with suffix 'inttype' is not defined in this scope for types of kind 'integer'
-
-ldP::i = 40000 ldP::inttype;
-                           ^
-./sl: inputs/err-parammod009.snl(21,9): ERROR, module 'ldP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(21,6): ERROR, module 'ldP' is not available in the current scope
+. ldP::i;
+     ^
+./sl: inputs/err-parammod009.snl(21,9): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 . ldP::i;
         ^
-./sl: inputs/err-parammod009.snl(21,9): ERROR, variable 'ldP::i' is not declared in the current scope
-. ldP::i;
-        ^
-./sl: inputs/err-parammod009.snl(22,9): ERROR, module 'ifP' is not available in the current scope
+./sl: inputs/err-parammod009.snl(22,6): ERROR, module 'ifP' is not available in the current scope
 . ifP::i;
-        ^
-./sl: inputs/err-parammod009.snl(22,9): ERROR, variable 'ifP::i' is not declared in the current scope
+     ^
+./sl: inputs/err-parammod009.snl(22,9): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 . ifP::i;
         ^
 ./sl: 26 error(s) detected

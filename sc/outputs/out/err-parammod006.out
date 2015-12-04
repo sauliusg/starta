@@ -41,11 +41,14 @@ function divide( floattype x; inttype i ): floattype
 ./sl: inputs/Parametrised.slib(18,25): ERROR, incompatible types of returned value 1 of function 'divide'
     return x/i@floattype;
                         ^
-./sl: inputs/err-parammod006.snl(11,14): ERROR, module 'P' is not available in the current scope
+./sl: inputs/err-parammod006.snl(11,4): ERROR, module 'P' is not available in the current scope
 . P::parallel( 10, 30 );
-             ^
-./sl: inputs/err-parammod006.snl(11,14): ERROR, function 'P::parallel' is not declared in the current scope
+   ^
+./sl: inputs/err-parammod006.snl(11,23): ERROR, incompatible types for function 'parallel' argument nr. 2
 . P::parallel( 10, 30 );
-             ^
-./sl: 16 error(s) detected
+                      ^
+./sl: inputs/err-parammod006.snl(11,23): ERROR, incompatible types for function 'parallel' argument nr. 1
+. P::parallel( 10, 30 );
+                      ^
+./sl: 17 error(s) detected
 

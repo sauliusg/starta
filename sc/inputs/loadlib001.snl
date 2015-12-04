@@ -8,6 +8,6 @@
 load "libraries/test/libtest.so.0.01";
 
 bytecode {
-    libtest::TEST
-    libtest::TEST
+    libtest:TEST
+    libtest:TEST
 };

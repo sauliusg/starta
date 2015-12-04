@@ -10,11 +10,8 @@ fg();
 ./sl: inputs/err-selective003.snl(15,3): ERROR, function 'gg' is not declared in the current scope
 gg();
   ^
-./sl: inputs/err-selective003.snl(16,7): ERROR, module 'P2' is not available in the current scope
+./sl: inputs/err-selective003.snl(16,3): ERROR, module 'P2' is not available in the current scope
 P2::ff();
-      ^
-./sl: inputs/err-selective003.snl(16,7): ERROR, function 'P2::ff' is not declared in the current scope
-P2::ff();
-      ^
-./sl: 6 error(s) detected
+  ^
+./sl: 5 error(s) detected
 
