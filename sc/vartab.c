@@ -303,7 +303,7 @@ DNODE *vartab_lookup( VARTAB *table, const char *name )
     VAR_NODE *node = vartab_lookup_varnode( table, name );
     if( node && node->count > 1 ) {
         yyerrorf( "name '%s' is imported more than once -- "
-                  "please use explicit package name for disambiguation",
+                  "please use explicit module name for disambiguation",
                   name );
     }
     return node ? node->dnode : NULL;
