@@ -604,6 +604,9 @@ static void compiler_open_include_file( COMPILER *c, char *filename,
             ( ex, COMPILER_FILE_SEARCH_ERROR,
               "could not find required module, terminating" );
     } else {
+#if 0
+        printf( ">>> filename to open '%s'\n", full_name );
+#endif
         compiler_push_compiler_state( c, ex );
         compiler_save_flex_stream( c, full_name, ex );
     }
@@ -5130,7 +5133,7 @@ static void compiler_use_package( COMPILER *c,
                                            symtab );
 
 #if 0
-    printf( ">>> package = '%s', filename = '%s'\n",
+    printf( "\n>>> package = '%s', filename = '%s'\n",
             dnode_name( package_name_dnode ),
             dnode_filename( package_name_dnode ));
 #endif
@@ -7221,16 +7224,31 @@ module_import_identifier
       dnode_insert_synonim( module_name_dnode, module_synonim );
 
       cexception_guard( inner ) {
-          char *pkg_path =
-              compiler_find_include_file
-              ( compiler,
-                compiler_find_package( compiler, module_name, &inner ),
-                &inner );
-          dnode_set_filename( module_name_dnode, pkg_path, &inner );
+          int count, is_imported;
+          DNODE *existing_name = 
+              vartab_lookup_silently( compiler->vartab, module_name, 
+                                      &count, &is_imported );
+          if( !existing_name ) {
+              char *pkg_path =
+                  compiler_find_include_file
+                  ( compiler,
+                    compiler_find_package( compiler, module_name, &inner ),
+                    &inner );
+              dnode_set_filename( module_name_dnode, pkg_path, &inner );
 #if 0
-          printf( ">>> inserted filename '%s' for module '%s'\n",
-              pkg_path, dnode_name( module_name_dnode ));
+              printf( ">>> inserted filename '%s' for module '%s'\n",
+                  pkg_path, dnode_name( module_name_dnode ));
 #endif
+          } else {
+              char *filename = dnode_filename( existing_name );
+              if( count == 1 && filename ) {
+                  dnode_set_filename( module_name_dnode, filename, &inner );
+#if 0
+              printf( ">>> copying filename filename '%s' for module '%s'\n",
+                  filename, dnode_name( module_name_dnode ));
+#endif
+              }
+          }
       }
       cexception_catch {
           delete_dnode( module_name_dnode );
