@@ -691,8 +691,6 @@ static void compiler_drop_include_file( COMPILER *c )
 static void compiler_close_include_file( COMPILER *c,
 					 cexception_t *ex )
 {
-    compiler_restore_flex_stream( c );
-
     if( c->use_package_name ) {
 	DNODE *module = NULL;
 	module = vartab_lookup( c->compiled_packages, c->use_package_name );
@@ -766,6 +764,7 @@ static void compiler_close_include_file( COMPILER *c,
         }
     }
 
+    compiler_restore_flex_stream( c );
     compiler_pop_compiler_state( c );
     freex( c->package_filename ); /* CHECKME: does this work with files
                                      included from include files?
