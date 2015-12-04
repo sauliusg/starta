@@ -1,0 +1,11 @@
+./sl: (null)(11,41): ERROR, symbol 'M1' already declared in the current scope
+end module Mod1;
+                                        ^
+./sl: inputs/err-modules005.snl(14,6): ERROR, module 'M2' is not available in the current scope
+M2::f();
+     ^
+./sl: inputs/err-modules005.snl(14,6): ERROR, function 'M2::f' is not declared in the current scope
+M2::f();
+     ^
+./sl: 3 error(s) detected
+
