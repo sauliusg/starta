@@ -7235,10 +7235,10 @@ module_import_identifier
       dnode_insert_synonim( module_name_dnode, module_synonim );
 
       cexception_guard( inner ) {
-          int count, is_imported;
+          int count = 0;
           DNODE *existing_name = 
               vartab_lookup_silently( compiler->vartab, module_name, 
-                                      &count, &is_imported );
+                                      &count, /* is_imported = */ NULL );
           if( !existing_name ) {
               char *pkg_path =
                   compiler_find_include_file
