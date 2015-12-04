@@ -4853,13 +4853,13 @@ static void compiler_check_raise_expression( COMPILER *c,
 
     if( !c->e_stack ) {
 	yyerrorf( "Not enough values on the stack for raising exception?" );
-    }
-    if( !(top_type = enode_type( c->e_stack ))) {
+    } else if( !(top_type = enode_type( c->e_stack ))) {
 	yyerrorf( "Value on the top of the stack is untyped when "
 		  "raising exception?" );
+    } else {
+        compiler_check_and_compile_operator( c, top_type, "exceptionset", 1,
+                                             NULL, ex );
     }
-    compiler_check_and_compile_operator( c, top_type, "exceptionset", 1,
-                                      NULL, ex );
 }
 
 static struct {
