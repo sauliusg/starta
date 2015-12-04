@@ -1,6 +1,6 @@
-./sl: (null)(11,41): ERROR, symbol 'M1' already declared in the current scope
+./sl: inputs/modules/dir2/Mod2.slib(15,16): ERROR, symbol 'M1' already declared in the current scope
 end module Mod1;
-                                        ^
+               ^
 ./sl: inputs/err-modules005.snl(14,6): ERROR, module 'M2' is not available in the current scope
 M2::f();
      ^
