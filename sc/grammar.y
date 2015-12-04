@@ -6284,9 +6284,28 @@ static void compiler_process_module_parameters( COMPILER *cc,
             TNODE *param_type = dnode_type( param );
             char *argument_name;
             if( !arg ) {
+                /* maybe paremeter has a default value? Check: */
                 argument_name = dnode_synonim( param );
-                if( !argument_name )
+                if( !argument_name ) {
+                    /* No default value -- an error: */
+                    COMPILER_STATE *st = cc->include_files;
+                    char *filename = st ? st->filename : NULL;
+                    int line_no = st ? st->line_no : 0;
+                    if( filename ) {
+                        yyerrorf( "missing actual argument for "
+                                  "parameter '%s' of module '%s' "
+                                  "included from file '%s', line %d",
+                                  dnode_name( param ),
+                                  dnode_name( cc->requested_package ),
+                                  filename, line_no );
+                    } else {
+                        yyerrorf( "missing actual argument for "
+                                  "parameter '%s' of module '%s'",
+                                  dnode_name( param ),
+                                  dnode_name( cc->requested_package ));
+                    }
                     break;
+                }
             } else {
                 argument_name = dnode_name( arg );
             }
