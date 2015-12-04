@@ -1,0 +1,5 @@
+./sl: inputs/ConstParam.slib(4,36): ERROR, too many arguments for module 'ConstParam' included from file 'inputs/err-parammod011.snl', line 9
+module ConstParam( const C, type T )
+                                   ^
+./sl: 1 error(s) detected
+

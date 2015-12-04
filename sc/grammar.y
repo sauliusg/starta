@@ -3241,16 +3241,20 @@ static void compiler_compile_array_alloc_operator( COMPILER *cc,
 }
 
 static void compiler_compile_array_alloc( COMPILER *cc,
-				       TNODE *element_type,
-				       cexception_t *ex )
+                                          TNODE *element_type,
+                                          cexception_t *ex )
 {
     key_value_t *fixup_values = make_tnode_key_value_list( element_type );
 
-    if( tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+    if( element_type && tnode_kind( element_type ) != TK_PLACEHOLDER ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
-        yyerrorf( "in this type representation, can not allocate array "
-                  "of generic type %s", tnode_name( element_type ));
+        if( element_type ) {
+            yyerrorf( "in this type representation, can not allocate array "
+                      "of generic type %s", tnode_name( element_type ));
+        } else {
+            yyerrorf( "undefined element type for array allocation" );
+        }
     }
     compiler_push_array_of_type( cc, element_type, ex );
 }
@@ -6370,8 +6374,22 @@ static void compiler_process_module_parameters( COMPILER *cc,
             }
             if( arg )
                 arg = dnode_next( arg );
+        } /* foreach_dnode( param, module_params ) { ... */
+        if( arg ) {
+            COMPILER_STATE *st = cc->include_files;
+            char *filename = st ? st->filename : NULL;
+            int line_no = st ? st->line_no : 0;
+            if( filename ) {
+                yyerrorf( "too many arguments for module '%s' "
+                          "included from file '%s', line %d",
+                          dnode_name( cc->requested_package ),
+                          filename, line_no );
+            } else {
+                yyerrorf( "too many arguments for module '%s'",
+                          dnode_name( cc->requested_package ));
+            }
         }
-    }
+    } /* if( module_args ) { ... */
 }
 
 static COMPILER * volatile compiler;
