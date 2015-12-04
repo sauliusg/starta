@@ -4,10 +4,10 @@
 ./sl: inputs/err-interfaces002.snl(31,18): ERROR, interface 'Iff' is not declared in the current scope
     method sf@Iff() -> (string)
                  ^
-./sl: inputs/err-interfaces002.snl(35,26): ERROR, module 'Module' is not available in the current scope
+./sl: inputs/err-interfaces002.snl(35,21): ERROR, module 'Module' is not available in the current scope
     method sg@Module::Igg() -> (string)
-                         ^
-./sl: inputs/err-interfaces002.snl(35,26): ERROR, interface 'Module::Igg' is not declared in the current scope
+                    ^
+./sl: inputs/err-interfaces002.snl(35,26): ERROR, interface 'Igg' is not declared in the current scope
     method sg@Module::Igg() -> (string)
                          ^
 ./sl: inputs/err-interfaces002.snl(39,1): ERROR, class 'S' does not implement method 's' from interface 'If'

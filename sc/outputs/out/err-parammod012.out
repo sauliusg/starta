@@ -7,19 +7,19 @@ var table = new T[const(C)];
 ./sl: inputs/ConstParam.slib(10,28): ERROR, undefined element type for array allocation
 var table = new T[const(C)];
                            ^
-./sl: inputs/err-parammod012.snl(11,20): ERROR, module 'P' is not available in the current scope
+./sl: inputs/err-parammod012.snl(11,12): ERROR, module 'P' is not available in the current scope
 . length( P::table );
-                   ^
-./sl: inputs/err-parammod012.snl(11,20): ERROR, variable 'P::table' is not declared in the current scope
+           ^
+./sl: inputs/err-parammod012.snl(11,20): ERROR, variable 'table' is not declared in the current scope
 . length( P::table );
                    ^
 ./sl: inputs/err-parammod012.snl(11,20): ERROR, incompatible types for function 'length' argument nr. 1
 . length( P::table );
                    ^
-./sl: inputs/err-parammod012.snl(12,11): ERROR, module 'P' is not available in the current scope
+./sl: inputs/err-parammod012.snl(12,4): ERROR, module 'P' is not available in the current scope
 . P::table[0];
-          ^
-./sl: inputs/err-parammod012.snl(12,11): ERROR, variable 'P::table' is not declared in the current scope
+   ^
+./sl: inputs/err-parammod012.snl(12,11): ERROR, variable 'table' is not declared in the current scope
 . P::table[0];
           ^
 ./sl: inputs/err-parammod012.snl(12,14): ERROR, not enough values on the stack for indexing operator

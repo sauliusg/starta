@@ -3408,34 +3408,26 @@ static void compiler_push_guarding_retval( COMPILER *cc, cexception_t *ex )
 }
 
 static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
-                                              char *module_name,
+                                              DNODE *module,
                                               char *identifier )
 {
-    DNODE *module;
-
-    if( !module_name ) {
+    if( !module ) {
 	return vartab_lookup( cc->vartab, identifier );
     } else {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    return NULL;
-	} else {
-	    return dnode_vartab_lookup_var( module, identifier );
-	}
+        return dnode_vartab_lookup_var( module, identifier );
     }
 }
 
 static DNODE* compiler_lookup_dnode( COMPILER *cc,
-                                     char *module_name,
+                                     DNODE *module,
                                      char *identifier,
                                      char *message )
 {
     DNODE *varnode =
-	compiler_lookup_dnode_silently( cc, module_name, identifier );
+	compiler_lookup_dnode_silently( cc, module, identifier );
 
     if( !varnode ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	if( !message ) message = "name";
 	if( module_name ) {
 	    yyerrorf( "%s '%s::%s' is not declared in the "
@@ -3466,7 +3458,7 @@ static void compiler_push_varaddr_expr( COMPILER *cc,
                                         cexception_t *ex )
 {
     DNODE *var_dnode = compiler_lookup_dnode( cc, NULL /* module_name */,
-                                           variable_name, "variable" );
+                                              variable_name, "variable" );
     ENODE *arg = var_dnode ?
         new_enode_varaddr_expr( var_dnode, ex ) : NULL;
     if( arg ) {
@@ -3710,27 +3702,20 @@ static void compiler_emit_drop_returned_values( COMPILER *cc,
 
 static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
                                             type_suffix_t suffix_type,
-                                            char *module_name,
+                                            DNODE *module,
                                             char *suffix,
                                             char *constant_kind_name )
 {
     TNODE *const_type = NULL;
-    DNODE *module  = NULL;
 
-    if( module_name ) {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	} else {
-	    const_type =
-		dnode_typetab_lookup_suffix( module, suffix ? suffix : "",
-					     suffix_type );
-	    if( !const_type ) {
-		const_type =
-		    dnode_typetab_lookup_type( module, suffix ? suffix : "" );
-	    }
-	}
+    if( module ) {
+        const_type =
+            dnode_typetab_lookup_suffix( module, suffix ? suffix : "",
+                                         suffix_type );
+        if( !const_type ) {
+            const_type =
+                dnode_typetab_lookup_type( module, suffix ? suffix : "" );
+        }
     } else {
 	const_type =
 	    typetab_lookup_suffix( cc->typetab, suffix ? 
@@ -3757,9 +3742,9 @@ static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
 }
 
 static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
-						 char *value_name,
-						 TNODE *const_type,
-						 cexception_t *ex )
+                                                    char *value_name,
+                                                    TNODE *const_type,
+                                                    cexception_t *ex )
 {
     DNODE *const_dnode = const_type ?
 	tnode_lookup_field( const_type, value_name ) : NULL;
@@ -3798,44 +3783,38 @@ static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
 }
 
 static TNODE* compiler_lookup_tnode_with_function( COMPILER *cc,
-                                                   char *module_name,
+                                                   DNODE *module,
                                                    char *identifier,
                                                    TNODE* (*typetab_lookup_fn)
                                                    (TYPETAB*,const char*))
 {
-    if( !module_name ) {
+    if( !module ) {
 	return (*typetab_lookup_fn)( cc->typetab, identifier );
     } else {
-	DNODE *module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    return NULL;
-	} else {
-	    return dnode_typetab_lookup_type( module, identifier );
-	}
+        return dnode_typetab_lookup_type( module, identifier );
     }
 }
 
 static TNODE* compiler_lookup_tnode_silently( COMPILER *cc,
-					   char *module_name,
-					   char *identifier )
+                                              DNODE *module,
+                                              char *identifier )
 {
-    return compiler_lookup_tnode_with_function( cc, module_name,
-                                             identifier,
-                                             typetab_lookup_silently );
+    return compiler_lookup_tnode_with_function( cc, module,
+                                                identifier,
+                                                typetab_lookup_silently );
 }
 
 static TNODE* compiler_lookup_tnode( COMPILER *cc,
-				  char *module_name,
-				  char *identifier,
-				  char *message )
+                                     DNODE *module,
+                                     char *identifier,
+                                     char *message )
 {
-    TNODE *typenode = compiler_lookup_tnode_with_function( cc, module_name, 
-                                                        identifier, 
-                                                        typetab_lookup );
+    TNODE *typenode = compiler_lookup_tnode_with_function( cc, module,
+                                                           identifier,
+                                                           typetab_lookup );
 
     if( !typenode ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	if( !message ) message = "name";
 	if( module_name ) {
 	    yyerrorf( "%s '%s::%s' is not declared in the "
@@ -3850,13 +3829,13 @@ static TNODE* compiler_lookup_tnode( COMPILER *cc,
 }
 
 static void compiler_compile_enumeration_constant( COMPILER *cc,
-						char *module_name,
-						char *value_name,
-						char *type_name,
-						cexception_t *ex )
+                                                   DNODE *module,
+                                                   char *value_name,
+                                                   char *type_name,
+                                                   cexception_t *ex )
 {
     TNODE *const_type =
-	compiler_lookup_tnode( cc, module_name, type_name, "enumeration type" );
+	compiler_lookup_tnode( cc, module, type_name, "enumeration type" );
 
     compiler_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
 }
@@ -3913,39 +3892,32 @@ static void compiler_compile_typed_constant( COMPILER *cc,
 
 static void compiler_compile_constant( COMPILER *cc,
                                        type_suffix_t suffix_type,
-                                       char *module_name,
+                                       DNODE *module,
                                        char *suffix, char *constant_kind_name,
                                        char *value,
                                        cexception_t *ex )
 {
     TNODE *const_type =
-	compiler_lookup_suffix_tnode( cc, suffix_type, module_name,
-				   suffix, constant_kind_name );
+	compiler_lookup_suffix_tnode( cc, suffix_type, module,
+                                      suffix, constant_kind_name );
 
     compiler_compile_typed_constant( cc, const_type, value, ex );
 }
 
 static DNODE* compiler_lookup_constant( COMPILER *cc,
-                                        char *module_name,
+                                        DNODE *module,
                                         char *identifier,
                                         char *message )
 {
-    DNODE *module;
     DNODE *constnode;
 
-    if( !module_name ) {
+    if( !module ) {
 	constnode = vartab_lookup( cc->consts, identifier );
     } else {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    constnode = NULL;
-	} else {
-	    constnode = dnode_consttab_lookup_const( module, identifier );
-	}
+        constnode = dnode_consttab_lookup_const( module, identifier );
     }
     if( !constnode ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	if( !message ) message = "name";
 	if( module_name ) {
 	    yyerrorf( "%s '%s::%s' is not declared in the "
@@ -4590,18 +4562,19 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 }
 
 static void compiler_emit_catch_comparison( COMPILER *cc,
-                                            char *module_name,
+                                            DNODE *module,
                                             char *exception_name,
                                             cexception_t *ex )
 {
     DNODE *exception =
-        compiler_lookup_dnode( cc, module_name, exception_name, "exception" );
+        compiler_lookup_dnode( cc, module, exception_name, "exception" );
     ssize_t zero = 0;
     ssize_t exception_val;
     ssize_t try_var_offset = cc->try_variable_stack ?
 	cc->try_variable_stack[cc->try_block_level-1] : 0;
 
-    if( module_name ) {
+    if( module ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	compiler_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
 	compiler_emit( cc, ex, "\n\tc\n", EXCEPTIONMODULE );
 	compiler_emit( cc, ex, "\tce\n", SLDC, &module_name );
@@ -4619,7 +4592,7 @@ static void compiler_emit_catch_comparison( COMPILER *cc,
     compiler_emit( cc, ex, "\tce\n", LDC, &exception_val );
     compiler_emit( cc, ex, "\tc\n", EQBOOL );
 
-    if( module_name ) {
+    if( module ) {
 	compiler_fixup_here( cc );
     }
 }
@@ -4746,7 +4719,7 @@ static void compiler_compile_typed_const_value( COMPILER *cc,
 
 static void compiler_compile_multitype_const_value( COMPILER *cc,
                                                     const_value_t *v,
-                                                    char *module_name,
+                                                    DNODE *module,
                                                     char *suffix_name,
                                                     cexception_t *ex )
 {
@@ -4756,17 +4729,17 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
     switch( vtype ) {
     case VT_INTMAX:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_INTEGER_SUFFIX,
-                                                   module_name, suffix_name,
+                                                   module, suffix_name,
                                                    "integer" );
 	break;
     case VT_FLOAT:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_FLOAT_SUFFIX,
-                                                   module_name, suffix_name,
+                                                   module, suffix_name,
                                                    "float" );
 	break;
     case VT_STRING:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_STRING_SUFFIX,
-                                                   module_name, suffix_name,
+                                                   module, suffix_name,
                                                    "string" );
 	break;
     case VT_ENUM: {
@@ -4787,9 +4760,9 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
 	*value_name_terminator = '\0';
 
 	cexception_guard( inner ) {
-	    compiler_compile_enumeration_constant( cc, module_name,
-						value_name, type_name,
-						&inner );
+	    compiler_compile_enumeration_constant( cc, module,
+                                                   value_name, type_name,
+                                                   &inner );
 	}
 	cexception_catch {
 	    freex( value_name );
@@ -5155,7 +5128,7 @@ static void compiler_use_module( COMPILER *c,
             printf( ">>> can use module '%s'\n", module_name );
 #endif
             if( module != NULL ) {
-                char *module_name = dnode_name( module );
+                char *module_name = module ? dnode_name( module ) : NULL;
                 DNODE *existing_module = module_name ?
                     vartab_lookup_module
                     ( c->vartab, module_name_dnode, symtab )
@@ -5557,7 +5530,7 @@ const_value_t compiler_get_dnode_compile_time_attribute( DNODE *dnode,
 }
 
 static const_value_t compiler_make_compile_time_value( COMPILER *cc,
-						       char *module_name,
+						       DNODE *module,
 						       char *identifier,
 						       char *attribute_name,
 						       cexception_t *ex )
@@ -5565,10 +5538,10 @@ static const_value_t compiler_make_compile_time_value( COMPILER *cc,
     DNODE *variable = NULL;
     TNODE *tnode = NULL;
 
-    variable = compiler_lookup_dnode_silently( cc, module_name, identifier );
+    variable = compiler_lookup_dnode_silently( cc, module, identifier );
 
     if( !variable ) {
-	tnode = compiler_lookup_tnode_silently( cc, module_name, identifier );
+	tnode = compiler_lookup_tnode_silently( cc, module, identifier );
 	if( tnode ) {
 	    return compiler_get_tnode_compile_time_attribute( tnode,
 							      attribute_name,
@@ -5588,7 +5561,7 @@ static const_value_t compiler_make_compile_time_value( COMPILER *cc,
 }
 
 static DNODE* compiler_lookup_type_field( COMPILER *cc,
-					  char *module_name,
+					  DNODE *module,
 					  char *identifier,
 					  char *field_identifier )
 {
@@ -5596,10 +5569,10 @@ static DNODE* compiler_lookup_type_field( COMPILER *cc,
     TNODE *tnode = NULL;
     DNODE *field;
 
-    variable = compiler_lookup_dnode_silently( cc, module_name, identifier );
+    variable = compiler_lookup_dnode_silently( cc, module, identifier );
 
     if( !variable ) {
-	tnode = compiler_lookup_tnode_silently( cc, module_name, identifier );
+	tnode = compiler_lookup_tnode_silently( cc, module, identifier );
 	if( !tnode ) {
 	    yyerrorf( "neither type nor variable '%s' can be found when "
 		      "searching for field '%s'", identifier, field_identifier );
@@ -5733,7 +5706,7 @@ static void compiler_load_library( COMPILER *compiler,
 }
 
 static void compiler_check_and_push_function_name( COMPILER *cc,
-                                                   char *module_name,
+                                                   DNODE *module,
                                                    char *function_name,
                                                    cexception_t *ex )
 {
@@ -5747,7 +5720,7 @@ static void compiler_check_and_push_function_name( COMPILER *cc,
 		      &cc->current_arg, ex );
 
     cc->current_call = 
-	share_dnode( compiler_lookup_dnode( cc, module_name, function_name,
+	share_dnode( compiler_lookup_dnode( cc, module, function_name,
                                             "function" ));
 
     fn_tnode = cc->current_call ?
@@ -6615,7 +6588,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> method_header
 %type <dnode> module_argument
 %type <dnode> module_argument_list
-%type <s>     module_list
+%type <dnode> module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
 %type <dnode> identifier
@@ -7508,7 +7481,26 @@ program_definition
 
 module_list
 : __IDENTIFIER
+{
+    DNODE *module;
+    module = vartab_lookup( compiler->vartab, $1 );
+    if( !module ) {
+        yyerrorf( "module '%s' is not available in the current scope", $1 );
+    }
+    $$ = module;
+}
 | module_list __COLON_COLON __IDENTIFIER
+{
+    DNODE *container = $1;
+    DNODE *module;
+    if( container ) {
+        module = dnode_vartab_lookup_var( container, $3 );
+        if( !module ) {
+            yyerrorf( "module '%s' is not available in as a submodule", $3 );
+        }
+    }
+    $$ = module;
+}
 ;
 
 variable_access_identifier
@@ -9913,6 +9905,8 @@ opcode
   : __IDENTIFIER
       { compiler_emit( compiler, px, "\tC\n", $1 ); }
   | module_list __COLON_COLON __IDENTIFIER
+      { compiler_emit( compiler, px, "\tMC\n", dnode_name($1), $3 ); }
+  | __IDENTIFIER ':' __IDENTIFIER
       { compiler_emit( compiler, px, "\tMC\n", $1, $3 ); }
   ;
 
@@ -12041,9 +12035,9 @@ opt_method_interface
   }
   | '@' module_list __COLON_COLON __IDENTIFIER
   {
-      char *module_name = $2;
+      DNODE *module = $2;
       char *interface_name = $4;
-      $$ = compiler_lookup_tnode( compiler, module_name,
+      $$ = compiler_lookup_tnode( compiler, module,
                                   interface_name, "interface" );
   }
   | /* empty */

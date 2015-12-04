@@ -4,12 +4,12 @@
 ./sl: inputs/err-interfaces001.snl(32,5): ERROR, interface 'If' does not implement method 'ss'
     {
     ^
-./sl: inputs/err-interfaces001.snl(35,27): ERROR, module 'Module' is not available in the current scope
+./sl: inputs/err-interfaces001.snl(35,23): ERROR, module 'Module' is not available in the current scope
     method sg @ Module::Ig() -> (string)
-                          ^
-./sl: inputs/err-interfaces001.snl(35,27): ERROR, interface 'Module::Ig' is not declared in the current scope
-    method sg @ Module::Ig() -> (string)
-                          ^
+                      ^
+./sl: inputs/err-interfaces001.snl(36,5): ERROR, interface 'Ig' does not implement method 'sg'
+    {
+    ^
 ./sl: inputs/err-interfaces001.snl(39,1): ERROR, class 'S' does not implement method 'f' from interface 'If'
 }
 ^

@@ -11,7 +11,7 @@ load "libraries/math/libmath.so.0.01";
 inline bytecode function
 round( x : float ) : long
 {
-    FLDC 0.5 FADD libmath::LFLOOR
+    FLDC 0.5 FADD libmath:LFLOOR
 }
 
 var a : int = 4;
