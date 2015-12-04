@@ -7121,9 +7121,18 @@ module_statement
               cexception_reraise( inner, px );
           }
 
+#if 0
+          printf( ">>> inserting module '%s' into vartab %p\n", 
+                  dnode_name( module_dnode ), compiler->vartab );
+#endif
 	  vartab_insert_named_module( compiler->vartab, module_dnode,
                                       stlist_data( compiler->symtab_stack ),
                                       px );
+          if( compiler->current_module && dnode_scope( module_dnode ) == 0 ) {
+              dnode_vartab_insert_named_vars( compiler->current_module,
+                                              share_dnode( module_dnode ),
+                                              px );
+          }
 
 	  compiler_begin_module( compiler, share_dnode(module_dnode), px );
 

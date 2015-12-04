@@ -18,7 +18,6 @@ end module I1;
 end module M;
 
 use std;
-use M;
+// use M;
 
 . M::I1::ff();
-. I1::ff();
