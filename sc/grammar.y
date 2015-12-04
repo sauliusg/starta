@@ -6919,10 +6919,6 @@ package_statement
                   arg = module_args;
                   foreach_dnode( param, module_params ) {
                       TNODE *param_type = dnode_type( param );
-                      // printf( ">>>> argument '%s', parameter '%s' (type kind = %s)\n",
-                      //         dnode_name( arg ), dnode_name( param ),
-                      //         tnode_kind_name( param_type )
-                      //         );
                       char *argument_name;
                       if( !arg ) {
                           argument_name = dnode_synonim( param );
@@ -6935,7 +6931,6 @@ package_statement
                           TNODE *arg_type = argument_name ?
                               typetab_lookup( ttab, argument_name ) :
                               NULL;
-                          // printf( ">>> found type '%s'\n", tnode_name( arg_type ) );
                           if( !arg_type ) {
                               if( argument_name ) {
                                   yyerrorf( "type '%s' is not defined for "
@@ -6974,8 +6969,6 @@ package_statement
                               vartab_insert_named( ctab, share_dnode( arg ), px );
                           }
                           /* Insert the constant under the module parameter name: */
-                          // compiler_consttab_insert_consts
-                          //    ( compiler, share_dnode( argument_dnode ), px );
                           if( argument_dnode ) {
                               dnode_insert_module_args( param, share_dnode( argument_dnode ));
                               vartab_insert( compiler->consts, dnode_name( param ),
@@ -7021,8 +7014,6 @@ package_statement
                   }
               }
           }
-          // printf( ">>> Will now compile statements for '%s' module\n",
-          //         dnode_name( module_dnode ));
       }
     statement_list
     '}' package_keyword __IDENTIFIER
