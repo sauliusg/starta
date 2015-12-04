@@ -5066,12 +5066,14 @@ static void compiler_import_package( COMPILER *c,
 
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "import" )) {
-
-            // printf( ">>> can import package '%s'\n", package_name );
-
+#if 0
+            printf( ">>> can import package '%s'\n", package_name );
+#endif
             if( package != NULL ) {
                 char *synonim = dnode_synonim( package_name_dnode );
-                // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+#if 0
+                printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+#endif
                 if( synonim ) {
                     vartab_insert_module( c->vartab, share_dnode( package ),
                                           synonim, symtab, &inner );
@@ -5079,7 +5081,9 @@ static void compiler_import_package( COMPILER *c,
                     vartab_insert_named_module( c->vartab, share_dnode( package ),
                                                 symtab, &inner );
                 }
-                /* printf( "found compiled package '%s'\n", package_name ); */
+#if 0
+                printf( "found compiled package '%s'\n", package_name );
+#endif
             } else {
                 char *pkg_path = c->package_filename ?
                     c->package_filename : compiler_find_package( c, package_name,
@@ -5148,20 +5152,30 @@ static void compiler_use_package( COMPILER *c,
                         existing_package, synonim );
 #endif
                 if( !existing_package || existing_package != package || synonim ) {
-                    // printf( ">>> found package '%s' for reuse\n", package_name );
-                    // printf( ">>> will insert package '%s' as '%s'\n", package_name, synonim );
+#if 0
+                    printf( ">>> found package '%s' for reuse\n", 
+                            package_name );
+                    printf( ">>> will insert package '%s' as '%s'\n", 
+                            package_name, 
+                            synonim ? synonim : dnode_name( package ));
+#endif
                     if( synonim ) {
-                        // printf( ">>> inserting synonim\n" );
+#if 0
+                        printf( ">>> inserting synonim\n" );
+#endif
                         vartab_insert_module( c->vartab, share_dnode( package ),
                                               synonim, symtab, &inner );
                     } else {
-                        // printf( ">>> inserting under its own name\n" );
+#if 0
+                        printf( ">>> inserting under its own name\n" );
+#endif
                         vartab_insert_named_module( c->vartab, share_dnode( package ),
                                                     symtab, &inner );
                     }
-                    // printf( ">>> after inserting '%s' as '%s'\n", package_name, synonim );
                 }
-                /* printf( "found compiled package '%s'\n", package_name ); */
+#if 0
+                printf( "found compiled package '%s'\n", package_name );
+#endif
                 compiler_use_exported_package_names( c, package, &inner );
             } else {
                 char *pkg_path = c->package_filename ?
@@ -7096,11 +7110,16 @@ package_statement
           dnode_insert_module_args( module_dnode, module_params );
 #if 0
           printf( ">>> compiler->filename = '%s'\n", compiler->filename );
-          printf( ">>> requested_package = '%s', synonim = '%s', "
-                  "filename = '%s'\n", 
-                  dnode_name( compiler->requested_package ),
-                  dnode_synonim( compiler->requested_package ),
-                  dnode_filename( compiler->requested_package ));
+          if( compiler->requested_package ) {
+              printf( ">>> requested_package = '%s', synonim = '%s', "
+                      "filename = '%s'\n", 
+                      dnode_name( compiler->requested_package ),
+                      dnode_synonim( compiler->requested_package ),
+                      dnode_filename( compiler->requested_package ));
+          } else {
+              printf( ">>> no requested package for '%s'\n",
+                      dnode_name( module_dnode ));
+          }
 #endif
           cexception_t inner;
           cexception_guard( inner ) {
