@@ -1,0 +1,11 @@
+./sl: inputs/err-except006.snl(87,38): ERROR, Not enough values on the stack for raising exception?
+    do raise UNSUPPORTED_MATRIX_SIZE if( mi != 2 );
+                                     ^
+./sl: inputs/err-except006.snl(88,38): ERROR, Not enough values on the stack for raising exception?
+    do raise UNSUPPORTED_MATRIX_SIZE if( mj != 2 );
+                                     ^
+./sl: inputs/err-except006.snl(95,22): ERROR, incompatible type of argument 1 for operator '/'
+    return (1/det3(m)) * [
+                     ^
+./sl: 3 error(s) detected
+
