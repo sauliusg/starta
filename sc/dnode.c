@@ -33,6 +33,10 @@
 struct DNODE {
     char *name;            /* The declared name; this name is supposed
                               to be unique in a current scope */
+    char * filename;       /* Name of the file in which a module named
+                              in the "name" field is declared; a
+                              unique pair identifying a module is
+                              (name, filename). */
     char *synonim;         /* Synonim name for different
                               implementations of parametrised modules. */
     dnode_flag_t flags;
@@ -100,6 +104,7 @@ void delete_dnode( DNODE *node )
         if( --node->rcount > 0 )
 	    return;
 	freex( node->name );
+	freex( node->filename );
 	freex( node->synonim );
 	freex( node->code );
 	delete_tnode( node->tnode );
@@ -430,6 +435,12 @@ DNODE *dnode_list_set_flags( DNODE *dnode, dnode_flag_t flags )
 }
 
 char *dnode_name( DNODE *dnode ) { assert( dnode ); return dnode->name; }
+
+char *dnode_filename( DNODE *dnode )
+{
+    assert( dnode );
+    return dnode->filename;
+}
 
 ssize_t dnode_offset( DNODE *dnode ) { assert( dnode ); return dnode->offset; }
 
@@ -770,6 +781,14 @@ DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex )
     assert( dnode );
     assert( !dnode->name );
     dnode->name = strdupx( name, ex );
+    return dnode;
+}
+
+DNODE *dnode_set_filename( DNODE *dnode, char *filename, cexception_t *ex )
+{
+    assert( dnode );
+    assert( !dnode->filename );
+    dnode->filename = strdupx( filename, ex );
     return dnode;
 }
 
