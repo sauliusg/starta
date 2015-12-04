@@ -6,7 +6,7 @@
 
 use std;
 
-use Mod1 in "modules/dir1/Mod1.slib"
+use Mod1 in "modules/dir1/Mod1.slib" 
     as M1;
 use Mod1 in "modules/dir2/Mod2.slib" as M2;
 

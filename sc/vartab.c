@@ -307,7 +307,7 @@ VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module,
 {
     VAR_NODE *node;
     char *module_name = name ? name : dnode_name( module );
-    char *module_filename = module ? NULL : dnode_filename( module );
+    char *module_filename = module ? dnode_filename( module ) : NULL;
 
     assert( table );
     for( node = table->node; node != NULL; node = node->next ) {

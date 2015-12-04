@@ -707,12 +707,12 @@ static void compiler_close_include_file( COMPILER *c,
     if( c->requested_package ) {
         cexception_t inner;
         char *synonim;
-#if 1
+#if 0
         printf( ">>>> checking module synonim for module '%s'...\n",
                 dnode_name( c->requested_package ));
 #endif
         if( (synonim = dnode_synonim( c->requested_package )) != NULL ) {
-#if 1
+#if 0
             printf( ">>>> inserting synonim '%s' for module '%s' "
                     "in file '%s'\n", synonim, 
                     dnode_name( c->requested_package ),
@@ -732,6 +732,18 @@ static void compiler_close_include_file( COMPILER *c,
                 DNODE *compiled_package =
                     vartab_lookup_module( c->vartab, c->requested_package,
                                           symtab );
+#if 0
+                if( !compiled_package ) {
+                    printf( "!!! could not find package to insert for '%s'\n",
+                            dnode_name( c->requested_package ));
+                } else {
+                    printf( ">>>> found module '%s' to insert under synonim "
+                    "'%s' in file '%s'\n", 
+                    dnode_name( compiled_package ),
+                    synonim, 
+                    dnode_filename( compiled_package ));
+                }
+#endif
 
                 if( compiled_package ) {
                     vartab_insert( c->vartab, synonim,
@@ -5121,7 +5133,7 @@ static void compiler_use_package( COMPILER *c,
 
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "use" )) {
-#if 1
+#if 0
             printf( ">>> can use package '%s'\n", package_name );
 #endif
             if( package != NULL ) {
@@ -5131,7 +5143,7 @@ static void compiler_use_package( COMPILER *c,
                     ( c->vartab, package_name_dnode, symtab )
                     : NULL;
                 char *synonim = dnode_synonim( package_name_dnode );
-#if 1
+#if 0
                 printf( "<<< existing_package == %p, synonim == %p >>>\n", 
                         existing_package, synonim );
 #endif
@@ -5156,7 +5168,7 @@ static void compiler_use_package( COMPILER *c,
                     c->package_filename :
                     compiler_find_package( c, package_name, &inner );
 
-#if 1
+#if 0
                 printf( ">>> about to open file named '%s'\n", pkg_path );
 #endif
 
@@ -7084,9 +7096,24 @@ package_statement
           dnode_insert_module_args( module_dnode, module_params );
 #if 0
           printf( ">>> compiler->filename = '%s'\n", compiler->filename );
-          printf( ">>> requested pkg name = '%s'\n", 
-                  dnode_filename( compiler->requested_package ) );
+          printf( ">>> requested_package = '%s', synonim = '%s', "
+                  "filename = '%s'\n", 
+                  dnode_name( compiler->requested_package ),
+                  dnode_synonim( compiler->requested_package ),
+                  dnode_filename( compiler->requested_package ));
 #endif
+          cexception_t inner;
+          cexception_guard( inner ) {
+              if( compiler->requested_package ) {
+                  dnode_set_filename( module_dnode, 
+                                      dnode_filename( compiler->requested_package ),
+                                      &inner );
+              }
+          }
+          cexception_catch {
+              delete_dnode( module_dnode );
+              cexception_reraise( inner, px );
+          }
 
 	  vartab_insert_named_module( compiler->vartab, module_dnode,
                                       stlist_data( compiler->symtab_stack ),
@@ -7181,7 +7208,7 @@ module_import_identifier
                 compiler_find_package( compiler, module_name, &inner ),
                 &inner );
           dnode_set_filename( module_name_dnode, pkg_path, &inner );
-#if 1
+#if 0
           printf( ">>> inserted filename '%s' for module '%s'\n",
               pkg_path, dnode_name( module_name_dnode ));
 #endif
@@ -7209,7 +7236,7 @@ module_import_identifier
           char *pkg_path =
               compiler_find_include_file( compiler, module_filename, &inner );
           dnode_set_filename( module_name_dnode, pkg_path, &inner );
-#if 1
+#if 0
           printf( ">>> inserted filename '%s' for module '%s', "
               "searched as '%s'\n",
               pkg_path, dnode_name( module_name_dnode ), module_filename );
