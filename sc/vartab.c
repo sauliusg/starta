@@ -206,9 +206,13 @@ void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
                            SYMTAB *st, cexception_t *ex )
 {
     VAR_NODE * volatile node = NULL;
+    int count = 0;
     assert( table );
 
-    if( (node = vartab_lookup_module_varnode( table, module, name, st )) != NULL ) {
+    vartab_lookup_silently( table, name, &count, /* &s_imported = */ NULL );
+
+    if( (node = vartab_lookup_module_varnode( table, module, name, st ))
+        != NULL ) {
         if( node->scope == table->current_scope &&
             (node->flags & VNF_IS_IMPORTED) == 0 ) {
             yyerrorf( "symbol '%s' already declared in the current scope",
@@ -223,7 +227,11 @@ void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
         table->node = new_var_node( module, name,
                                     table->current_scope,
                                     table->current_subscope,
-                                    /* count = */ 1,
+#if 1
+                                    /* count = */ count + 1,
+#else
+                                    1,
+#endif
                                     table->node, ex );
     }
 }
@@ -309,6 +317,10 @@ VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module,
     char *module_name = name ? name : dnode_name( module );
     char *module_filename = module ? dnode_filename( module ) : NULL;
 
+#if 0
+    printf( "\n>>>> %s():\n", __FUNCTION__ );
+#endif
+
     assert( table );
     for( node = table->node; node != NULL; node = node->next ) {
         char *table_filename =
@@ -344,11 +356,11 @@ DNODE *vartab_lookup_silently( VARTAB *table, const char *name,
                                int *count, int *is_imported )
 {
     VAR_NODE *node = vartab_lookup_varnode( table, name );
-    assert( count );
-    assert( is_imported );
     if( node ) {
-        *count = node->count;
-        *is_imported = ((node->flags & VNF_IS_IMPORTED) != 0);
+        if( count )
+            *count = node->count;
+        if( is_imported ) 
+            *is_imported = ((node->flags & VNF_IS_IMPORTED) != 0);
     }
     return node ? node->dnode : NULL;
 }

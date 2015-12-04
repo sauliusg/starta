@@ -693,7 +693,14 @@ static void compiler_close_include_file( COMPILER *c,
 {
     if( c->use_package_name ) {
 	DNODE *module = NULL;
+#if 0
 	module = vartab_lookup( c->compiled_packages, c->use_package_name );
+#else
+	module = vartab_lookup_silently( c->compiled_packages,
+                                         c->use_package_name,
+                                         /* count = */ NULL,
+                                         /* is_imported = */ NULL );
+#endif
 	if( module ) {
 #if 0
 	    printf( ">>> module '%s' is being used\n", 
@@ -745,7 +752,12 @@ static void compiler_close_include_file( COMPILER *c,
                     dnode_filename( compiled_package ));
                 }
 #endif
-
+                /* Synonim is inserted as a simple variable, not as a
+                   module (i.e. only the name uniqueness is
+                   considered, module arguments are not taken into
+                   account. This is necessary to ensure unique names
+                   for enamed parametrised modules, as in 'use M(int)
+                   as M1; use M(long) as M2' */
                 if( compiled_package ) {
                     vartab_insert( c->vartab, synonim,
                                    share_dnode( compiled_package ), &inner );
@@ -5157,19 +5169,19 @@ static void compiler_use_package( COMPILER *c,
 #if 0
                     printf( ">>> found package '%s' for reuse\n", 
                             package_name );
-                    printf( ">>> will insert package '%s' as '%s'\n", 
+                    printf( ">>> will reinsert package '%s' as '%s'\n", 
                             package_name, 
                             synonim ? synonim : dnode_name( package ));
 #endif
                     if( synonim ) {
 #if 0
-                        printf( ">>> inserting synonim\n" );
+                        printf( ">>> reinserting synonim\n" );
 #endif
                         vartab_insert_module( c->vartab, share_dnode( package ),
                                               synonim, symtab, &inner );
                     } else {
 #if 0
-                        printf( ">>> inserting under its own name\n" );
+                        printf( ">>> reinserting under its own name\n" );
 #endif
                         vartab_insert_named_module( c->vartab, share_dnode( package ),
                                                     symtab, &inner );
@@ -7240,7 +7252,7 @@ module_import_identifier
 #endif
           } else {
               char *filename = dnode_filename( existing_name );
-              if( count == 1 && filename ) {
+              if( filename ) {
                   dnode_set_filename( module_name_dnode, filename, &inner );
 #if 0
               printf( ">>> copying filename filename '%s' for module '%s'\n",
