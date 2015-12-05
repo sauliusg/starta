@@ -840,6 +840,9 @@ type float = {
 
     // inline bytecode operator "@float" ( i : float ) : float {};
 
+    inline bytecode operator "@float" ( i : short ) : float
+        { EXTEND I2F };
+
     inline bytecode operator "@float" ( i : int ) : float
         { I2F };
 
@@ -928,6 +931,9 @@ type double = {
 
     inline bytecode operator "%%" ( x : double ) : string
         { SLDC "%g" SWAP DSPRINTF };
+
+    inline bytecode operator "@float" ( i : short ) : float
+        { EXTEND I2D };
 
     inline bytecode operator "@double" ( i : int ) : double
         { I2D };

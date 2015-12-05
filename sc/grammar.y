@@ -55,8 +55,9 @@ static char *compiler_version = "0.0";
 
 typedef struct COMPILER_STATE {
     char *filename;
-    char *use_package_name;
-    char *package_filename;
+    char *use_module_name;
+    char *module_filename;
+    DNODE *requested_module_dnode;
     FILE *yyin;
     ssize_t line_no;
     ssize_t column_no;
@@ -71,8 +72,9 @@ static void delete_compiler_state( COMPILER_STATE *state )
 }
 
 static COMPILER_STATE *new_compiler_state( char *filename,
-					   char *use_package_name,
-					   char *package_filename,
+					   char *use_module_name,
+					   char *module_filename,
+                                           DNODE *requested_module,
 					   FILE *file,
 					   ssize_t line_no,
 					   ssize_t column_no,
@@ -82,8 +84,9 @@ static COMPILER_STATE *new_compiler_state( char *filename,
     COMPILER_STATE * volatile state = callocx( sizeof( *state ), 1, ex );
 
     state->filename = filename;
-    state->use_package_name = use_package_name;
-    state->package_filename = package_filename;
+    state->use_module_name = use_module_name;
+    state->module_filename = module_filename;
+    state->requested_module_dnode = requested_module;
     state->yyin = file;
     state->line_no = line_no;
     state->column_no = column_no;
@@ -135,11 +138,13 @@ typedef struct {
 			     deleted (freed) in
 			     delete_compiler()... */
 
-    /* The following three fields are used to process include files: */
+    /* The following fields are used to process include files and
+       modules: */
     char *filename;
     FILE *yyin;
-    char *use_package_name;
-    char *package_filename;
+    char *use_module_name;
+    char *module_filename;
+    DNODE *requested_module;
     COMPILER_STATE *include_files;
 
     DNODE *current_function; /* Function that is currently being
@@ -199,10 +204,10 @@ typedef struct {
     ssize_t *catch_jumpover_stack;
     int catch_jumpover_stack_length;
 
-    /* fields used for the implementation of packages: */
-    VARTAB *compiled_packages;
-    DLIST *current_package_stack;
-    DNODE *current_package; /* this field must not be deleted when deleting
+    /* fields used for the implementation of modules: */
+    VARTAB *compiled_modules;
+    DLIST *current_module_stack;
+    DNODE *current_module; /* this field must not be deleted when deleting
 			       COMPILER */
 
     /* track which non-null reference fields of a structure are
@@ -231,7 +236,7 @@ static void delete_compiler( COMPILER *c )
 	freex( c->static_data );
 	delete_vartab( c->vartab );
 	delete_vartab( c->consts );
-	delete_vartab( c->compiled_packages );
+	delete_vartab( c->compiled_modules );
 	delete_typetab( c->typetab );
 	delete_vartab( c->operators );
 
@@ -255,7 +260,7 @@ static void delete_compiler( COMPILER *c )
 	delete_dlist( c->current_call_stack );
         assert( !c->current_arg_stack );
 
-	delete_dlist( c->current_package_stack );
+	delete_dlist( c->current_module_stack );
 
         delete_vartab( c->initialised_references );
 	delete_stlist( c->initialised_ref_symtab_stack );
@@ -264,8 +269,9 @@ static void delete_compiler( COMPILER *c )
 
         delete_tlist( c->current_type_stack );
 
-        freex( c->use_package_name );
-        freex( c->package_filename );
+        freex( c->use_module_name );
+        freex( c->module_filename );
+        delete_dnode( c->requested_module );
 
         freex( c );
     }
@@ -290,7 +296,7 @@ static COMPILER *new_compiler( char *filename,
 
 	cc->vartab = new_vartab( &inner );
 	cc->consts = new_vartab( &inner );
-	cc->compiled_packages = new_vartab( &inner );
+	cc->compiled_modules = new_vartab( &inner );
 	cc->typetab = new_typetab( &inner );
 	cc->operators = new_vartab( &inner );
 
@@ -339,15 +345,17 @@ static void compiler_push_compiler_state( COMPILER *c,
 {
     COMPILER_STATE *cstate;
 
-    cstate = new_compiler_state( c->filename, c->use_package_name, 
-                                 c->package_filename, c->yyin,
+    cstate = new_compiler_state( c->filename, c->use_module_name, 
+                                 c->module_filename, c->requested_module,
+                                 c->yyin,
 				 compiler_flex_current_line_number(),
 				 compiler_flex_current_position(),
 				 c->include_files, ex );
 
     c->filename = NULL;
-    c->use_package_name = NULL;
-    c->package_filename = NULL;
+    c->use_module_name = NULL;
+    c->module_filename = NULL;
+    c->requested_module = NULL;
     c->include_files = cstate;
 }
 
@@ -358,11 +366,14 @@ void compiler_pop_compiler_state( COMPILER *c )
     top = c->include_files;
     assert( top );
 
-    freex( c->use_package_name );
-    c->use_package_name = top->use_package_name;
+    freex( c->use_module_name );
+    c->use_module_name = top->use_module_name;
 
-    freex( c->package_filename );
-    c->package_filename = top->package_filename;
+    freex( c->module_filename );
+    c->module_filename = top->module_filename;
+
+    delete_dnode( c->requested_module );
+    c->requested_module = top->requested_module_dnode;
 
     c->include_files = top->next;
     assert( !c->filename );
@@ -593,6 +604,9 @@ static void compiler_open_include_file( COMPILER *c, char *filename,
             ( ex, COMPILER_FILE_SEARCH_ERROR,
               "could not find required module, terminating" );
     } else {
+#if 0
+        printf( ">>> filename to open '%s'\n", full_name );
+#endif
         compiler_push_compiler_state( c, ex );
         compiler_save_flex_stream( c, full_name, ex );
     }
@@ -611,13 +625,13 @@ static void compiler_push_symbol_tables( COMPILER *c,
     c->operators = new_vartab( ex );
 }
 
-static void compiler_use_exported_package_names( COMPILER *c,
-						 DNODE *module,
-						 cexception_t *ex )
+static void compiler_use_exported_module_names( COMPILER *c,
+                                                DNODE *module,
+                                                cexception_t *ex )
 {
     assert( module );
 
-    /* printf( "importing package '%s'\n", dnode_name( module )); */
+    /* printf( "importing module '%s'\n", dnode_name( module )); */
 
     vartab_copy_table( c->vartab, dnode_vartab( module ), ex );
     vartab_copy_table( c->consts, dnode_constants_vartab( module ), ex );
@@ -677,22 +691,97 @@ static void compiler_drop_include_file( COMPILER *c )
 static void compiler_close_include_file( COMPILER *c,
 					 cexception_t *ex )
 {
-    compiler_restore_flex_stream( c );
-
-    if( c->use_package_name ) {
+    if( c->use_module_name ) {
 	DNODE *module = NULL;
-	module = vartab_lookup( c->compiled_packages, c->use_package_name );
+#if 0
+	module = vartab_lookup( c->compiled_modules, c->use_module_name );
+#else
+	module = vartab_lookup_silently( c->compiled_modules,
+                                         c->use_module_name,
+                                         /* count = */ NULL,
+                                         /* is_imported = */ NULL );
+#endif
 	if( module ) {
-	    /* printf( "module '%s' is being used\n", c->use_package_name ); */
-	    compiler_use_exported_package_names( c, module, ex );
+#if 0
+	    printf( ">>> module '%s' is being used\n", 
+                    c->use_module_name );
+#endif
+	    compiler_use_exported_module_names( c, module, ex );
 	} else {
-	    yyerrorf( "no module named '%s'?", c->use_package_name );
+	    yyerrorf( "no module named '%s'?", c->use_module_name );
 	}
     }
 
+    if( c->requested_module ) {
+        cexception_t inner;
+        char *synonim;
+#if 0
+        printf( ">>>> checking module synonim for module '%s'...\n",
+                dnode_name( c->requested_module ));
+#endif
+        if( (synonim = dnode_synonim( c->requested_module )) != NULL ) {
+#if 0
+            printf( ">>>> inserting synonim '%s' for module '%s' "
+                    "in file '%s'\n", synonim, 
+                    dnode_name( c->requested_module ),
+                    dnode_filename( c->requested_module ));
+#endif
+            TYPETAB * typetab = NULL;
+            VARTAB * vartab = NULL;
+            VARTAB * consttab = NULL;
+            VARTAB * optab = NULL;
+
+            SYMTAB * volatile symtab = NULL;
+
+            cexception_guard( inner ) {
+                symtab = new_symtab( c->vartab, c->consts, c->typetab,
+                                     c->operators, &inner );
+
+                DNODE *compiled_module =
+                    vartab_lookup_module( c->vartab, c->requested_module,
+                                          symtab );
+#if 0
+                if( !compiled_module ) {
+                    printf( "!!! could not find module to insert for '%s'\n",
+                            dnode_name( c->requested_module ));
+                } else {
+                    printf( ">>>> found module '%s' to insert under synonim "
+                    "'%s' in file '%s'\n", 
+                    dnode_name( compiled_module ),
+                    synonim, 
+                    dnode_filename( compiled_module ));
+                }
+#endif
+                /* Synonim is inserted as a simple variable, not as a
+                   module (i.e. only the name uniqueness is
+                   considered, module arguments are not taken into
+                   account. This is necessary to ensure unique names
+                   for enamed parametrised modules, as in 'use M(int)
+                   as M1; use M(long) as M2' */
+                if( compiled_module ) {
+                    vartab_insert( c->vartab, synonim,
+                                   share_dnode( compiled_module ), &inner );
+                }
+
+                obtain_tables_from_symtab( symtab, &vartab,
+                                           &consttab, &typetab, &optab );
+                delete_symtab( symtab );
+            }
+            cexception_catch {
+                obtain_tables_from_symtab( symtab, &vartab,
+                                           &consttab, &typetab, &optab );
+                delete_symtab( symtab );
+                cexception_reraise( inner, ex );
+            }            
+        }
+    }
+
+    compiler_restore_flex_stream( c );
     compiler_pop_compiler_state( c );
-    freex( c->package_filename );
-    c->package_filename = NULL;
+    freex( c->module_filename ); /* CHECKME: does this work with files
+                                     included from include files?
+                                     S.G. */
+    c->module_filename = NULL;
 }
 
 static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
@@ -776,11 +865,11 @@ static void compiler_check_enum_basetypes( TNODE *lookup_tnode, TNODE *tnode )
 }
 
 static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
-					char *name,
-					type_suffix_t suffix_type,
-					TNODE *tnode,
-					char *type_conflict_msg,
-					cexception_t *ex )
+                                           char *name,
+                                           type_suffix_t suffix_type,
+                                           TNODE *tnode,
+                                           char *type_conflict_msg,
+                                           cexception_t *ex )
 {
     TNODE *lookup_node;
     int count = 0;
@@ -827,58 +916,58 @@ static int compiler_current_scope( COMPILER *cc )
 }
 
 static void compiler_typetab_insert( COMPILER *cc,
-				  TNODE *tnode,
-				  cexception_t *ex )
+                                     TNODE *tnode,
+                                     cexception_t *ex )
 {
     TNODE *lookup_tnode =
 	compiler_typetab_insert_msg( cc, tnode_name( tnode ),
 				  TS_NOT_A_SUFFIX, tnode,
 				  "type '%s' is already declared", ex );
-    if( cc->current_package && lookup_tnode == tnode &&
+    if( cc->current_module && lookup_tnode == tnode &&
         compiler_current_scope( cc )  == 0 ) {
-	dnode_typetab_insert_named_tnode( cc->current_package,
+	dnode_typetab_insert_named_tnode( cc->current_module,
 					  share_tnode( tnode ), ex );
     }
 }
 
 static void compiler_vartab_insert_named_vars( COMPILER *cc,
-					    DNODE *vars,
-					    cexception_t *ex )
+                                               DNODE *vars,
+                                               cexception_t *ex )
 {
     vartab_insert_named_vars( cc->vartab, vars, ex );
-    if( cc->current_package && dnode_scope( vars ) == 0 ) {
-	dnode_vartab_insert_named_vars( cc->current_package,
+    if( cc->current_module && dnode_scope( vars ) == 0 ) {
+	dnode_vartab_insert_named_vars( cc->current_module,
 					share_dnode( vars ), ex );
     }
 }
 
 static void compiler_vartab_insert_single_named_var( COMPILER *cc,
-                                                  DNODE *var,
-                                                  cexception_t *ex )
+                                                     DNODE *var,
+                                                     cexception_t *ex )
 {
     char *name = dnode_name( var );
     assert( name );
 
     vartab_insert( cc->vartab, name, var, ex );
-    if( cc->current_package && dnode_scope( var ) == 0 ) {
-	dnode_vartab_insert_dnode( cc->current_package, name,
+    if( cc->current_module && dnode_scope( var ) == 0 ) {
+	dnode_vartab_insert_dnode( cc->current_module, name,
                                    share_dnode( var ), ex );
     }
 }
 
 static void compiler_consttab_insert_consts( COMPILER *cc, DNODE *consts,
-					  cexception_t *ex )
+                                             cexception_t *ex )
 {
     vartab_insert_named_vars( cc->consts, consts, ex );
-    if( cc->current_package ) {
-	dnode_consttab_insert_consts( cc->current_package,
+    if( cc->current_module ) {
+	dnode_consttab_insert_consts( cc->current_module,
 				      share_dnode( consts ), ex );
     }
 }
 
 static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
-						 TNODE *tnode,
-						 cexception_t *ex )
+                                                    TNODE *tnode,
+                                                    cexception_t *ex )
 {
     TNODE *base_type = NULL;
     char *suffix;
@@ -908,8 +997,8 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX, tnode,
                                      type_conflict_msg, ex );
 	share_tnode( tnode );
-	if( cc->current_package ) {
-	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
+	if( cc->current_module ) {
+	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_INTEGER_SUFFIX,
 					       share_tnode( tnode ), ex );
 	}
@@ -925,8 +1014,8 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX, tnode,
                                      type_conflict_msg, ex );
 	share_tnode( tnode );
-	if( cc->current_package ) {
-	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
+	if( cc->current_module ) {
+	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_FLOAT_SUFFIX,
 					       share_tnode( tnode ), ex );
 	}
@@ -942,8 +1031,8 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX, tnode,
                                      type_conflict_msg, ex );
 	share_tnode( tnode );
-	if( cc->current_package ) {
-	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
+	if( cc->current_module ) {
+	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_STRING_SUFFIX,
 					       share_tnode( tnode ), ex );
 	}
@@ -959,8 +1048,8 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX, tnode,
                                      type_conflict_msg, ex );
 	share_tnode( tnode );
-	if( cc->current_package ) {
-	    dnode_typetab_insert_tnode_suffix( cc->current_package, suffix,
+	if( cc->current_module ) {
+	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_NOT_A_SUFFIX,
 					       share_tnode( tnode ), ex );
 	}
@@ -1057,8 +1146,8 @@ static void compiler_compile_exception( COMPILER *c,
 
 	dnode_set_ssize_value( exception, exception_nr );
 	vartab_insert_named( c->vartab, exception, &inner );
-        if( c->current_package && dnode_scope( exception ) == 0 ) {
-            dnode_vartab_insert_named_vars( c->current_package,
+        if( c->current_module && dnode_scope( exception ) == 0 ) {
+            dnode_vartab_insert_named_vars( c->current_module,
                                             share_dnode( exception ), ex );
         }
     }
@@ -1491,6 +1580,7 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
 }
 
 static void compiler_compile_type_conversion( COMPILER *cc,
+                                              TNODE *target_type,
                                               char *target_name,
                                               cexception_t *ex )
 {
@@ -1500,13 +1590,15 @@ static void compiler_compile_type_conversion( COMPILER *cc,
     TNODE * expr_type = expr ? enode_type( expr ) : NULL;
     char *source_name = expr_type ? tnode_name( expr_type ) : NULL;
 
+    if( !target_name && target_type ) {
+        target_name = tnode_name( target_type );
+    }
+
     cexception_guard( inner ) {
 	if( !expr ) {
 	    yyerrorf( "not enough values on the stack for type conversion "
 		      "from '%s' to '%s'", source_name, target_name );
 	} else {
-	    TNODE *target_type =
-		typetab_lookup( cc->typetab, target_name );
 	    DNODE *conversion =
 		target_type ?
                 tnode_lookup_conversion( target_type, expr_type ) :
@@ -1560,6 +1652,16 @@ static void compiler_compile_type_conversion( COMPILER *cc,
     }
 }
 
+static void compiler_compile_named_type_conversion( COMPILER *cc,
+                                                    char *target_name,
+                                                    cexception_t *ex )
+{
+    TNODE *target_type =
+        typetab_lookup( cc->typetab, target_name );
+
+    compiler_compile_type_conversion( cc, target_type, target_name, ex );
+}
+
 static void compiler_compile_return( COMPILER *cc,
                                      int nretvals,
                                      cexception_t *ex )
@@ -1573,7 +1675,6 @@ static void compiler_compile_return( COMPILER *cc,
 
     assert( cc );
 
-    // fn_retvals = dnode_list_invert( fn_retvals );
     retval = dnode_list_last( fn_retvals );
     expr = cc->e_stack;
     for( i = 0; expr && i < nretvals; i++ ) {
@@ -1597,7 +1698,7 @@ static void compiler_compile_return( COMPILER *cc,
                 i == 0 &&
                 tnode_lookup_conversion( returned_type,
                                          available_type  )) {
-                compiler_compile_type_conversion( cc, returned_type_name, ex );
+                compiler_compile_named_type_conversion( cc, returned_type_name, ex );
                 expr = cc->e_stack;
                 if( expr ) {
                     available_type = enode_type( expr );
@@ -1612,7 +1713,6 @@ static void compiler_compile_return( COMPILER *cc,
 	retval = dnode_prev( retval );
 	expr = enode_next( expr );
     }
-    // fn_retvals = dnode_list_invert( fn_retvals );
 
     if( !cc->current_function ) {
 	yyerrorf( "the \"return\" statement should be used only in "
@@ -2275,7 +2375,7 @@ static void compiler_compile_variable_assignment_or_init(
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( expr_type && dst_name &&
 		tnode_lookup_conversion( var_type, expr_type )) {
-		compiler_compile_type_conversion( cc, dst_name, ex );
+		compiler_compile_named_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
 	    } else {
@@ -2481,7 +2581,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
 			tnode_lookup_conversion( element_type, expr_type )) {
-			compiler_compile_type_conversion( cc, dst_name, ex );
+			compiler_compile_named_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
                         expr_type = enode_type( expr );
 		    } else {
@@ -3177,16 +3277,20 @@ static void compiler_compile_array_alloc_operator( COMPILER *cc,
 }
 
 static void compiler_compile_array_alloc( COMPILER *cc,
-				       TNODE *element_type,
-				       cexception_t *ex )
+                                          TNODE *element_type,
+                                          cexception_t *ex )
 {
     key_value_t *fixup_values = make_tnode_key_value_list( element_type );
 
-    if( tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+    if( element_type && tnode_kind( element_type ) != TK_PLACEHOLDER ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
-        yyerrorf( "in this type representation, can not allocate array "
-                  "of generic type %s", tnode_name( element_type ));
+        if( element_type ) {
+            yyerrorf( "in this type representation, can not allocate array "
+                      "of generic type %s", tnode_name( element_type ));
+        } else {
+            yyerrorf( "undefined element type for array allocation" );
+        }
     }
     compiler_push_array_of_type( cc, element_type, ex );
 }
@@ -3238,7 +3342,7 @@ static void compiler_compile_mdalloc( COMPILER *cc,
 }
 
 static void compiler_begin_scope( COMPILER *c,
-			       cexception_t *ex )
+                                  cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -3268,7 +3372,7 @@ static void compiler_end_scope( COMPILER *c, cexception_t *ex )
 }
 
 static void compiler_begin_subscope( COMPILER *c,
-				  cexception_t *ex )
+                                     cexception_t *ex )
 {
     assert( c );
     assert( c->vartab );
@@ -3304,34 +3408,26 @@ static void compiler_push_guarding_retval( COMPILER *cc, cexception_t *ex )
 }
 
 static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
-					   char *module_name,
-					   char *identifier )
+                                              DNODE *module,
+                                              char *identifier )
 {
-    DNODE *module;
-
-    if( !module_name ) {
+    if( !module ) {
 	return vartab_lookup( cc->vartab, identifier );
     } else {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    return NULL;
-	} else {
-	    return dnode_vartab_lookup_var( module, identifier );
-	}
+        return dnode_vartab_lookup_var( module, identifier );
     }
 }
 
 static DNODE* compiler_lookup_dnode( COMPILER *cc,
-				  char *module_name,
-				  char *identifier,
-				  char *message )
+                                     DNODE *module,
+                                     char *identifier,
+                                     char *message )
 {
     DNODE *varnode =
-	compiler_lookup_dnode_silently( cc, module_name, identifier );
+	compiler_lookup_dnode_silently( cc, module, identifier );
 
     if( !varnode ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	if( !message ) message = "name";
 	if( module_name ) {
 	    yyerrorf( "%s '%s::%s' is not declared in the "
@@ -3362,7 +3458,7 @@ static void compiler_push_varaddr_expr( COMPILER *cc,
                                         cexception_t *ex )
 {
     DNODE *var_dnode = compiler_lookup_dnode( cc, NULL /* module_name */,
-                                           variable_name, "variable" );
+                                              variable_name, "variable" );
     ENODE *arg = var_dnode ?
         new_enode_varaddr_expr( var_dnode, ex ) : NULL;
     if( arg ) {
@@ -3605,28 +3701,21 @@ static void compiler_emit_drop_returned_values( COMPILER *cc,
 }
 
 static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
-					 type_suffix_t suffix_type,
-					 char *module_name,
-					 char *suffix,
-					 char *constant_kind_name )
+                                            type_suffix_t suffix_type,
+                                            DNODE *module,
+                                            char *suffix,
+                                            char *constant_kind_name )
 {
     TNODE *const_type = NULL;
-    DNODE *module  = NULL;
 
-    if( module_name ) {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	} else {
-	    const_type =
-		dnode_typetab_lookup_suffix( module, suffix ? suffix : "",
-					     suffix_type );
-	    if( !const_type ) {
-		const_type =
-		    dnode_typetab_lookup_type( module, suffix ? suffix : "" );
-	    }
-	}
+    if( module ) {
+        const_type =
+            dnode_typetab_lookup_suffix( module, suffix ? suffix : "",
+                                         suffix_type );
+        if( !const_type ) {
+            const_type =
+                dnode_typetab_lookup_type( module, suffix ? suffix : "" );
+        }
     } else {
 	const_type =
 	    typetab_lookup_suffix( cc->typetab, suffix ? 
@@ -3653,9 +3742,9 @@ static TNODE *compiler_lookup_suffix_tnode( COMPILER *cc,
 }
 
 static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
-						 char *value_name,
-						 TNODE *const_type,
-						 cexception_t *ex )
+                                                    char *value_name,
+                                                    TNODE *const_type,
+                                                    cexception_t *ex )
 {
     DNODE *const_dnode = const_type ?
 	tnode_lookup_field( const_type, value_name ) : NULL;
@@ -3694,44 +3783,38 @@ static void compiler_compile_enum_const_from_tnode( COMPILER *cc,
 }
 
 static TNODE* compiler_lookup_tnode_with_function( COMPILER *cc,
-                                                char *module_name,
-                                                char *identifier,
-                                                TNODE* (*typetab_lookup_fn)
-                                                    (TYPETAB*,const char*))
+                                                   DNODE *module,
+                                                   char *identifier,
+                                                   TNODE* (*typetab_lookup_fn)
+                                                   (TYPETAB*,const char*))
 {
-    if( !module_name ) {
+    if( !module ) {
 	return (*typetab_lookup_fn)( cc->typetab, identifier );
     } else {
-	DNODE *module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    return NULL;
-	} else {
-	    return dnode_typetab_lookup_type( module, identifier );
-	}
+        return dnode_typetab_lookup_type( module, identifier );
     }
 }
 
 static TNODE* compiler_lookup_tnode_silently( COMPILER *cc,
-					   char *module_name,
-					   char *identifier )
+                                              DNODE *module,
+                                              char *identifier )
 {
-    return compiler_lookup_tnode_with_function( cc, module_name,
-                                             identifier,
-                                             typetab_lookup_silently );
+    return compiler_lookup_tnode_with_function( cc, module,
+                                                identifier,
+                                                typetab_lookup_silently );
 }
 
 static TNODE* compiler_lookup_tnode( COMPILER *cc,
-				  char *module_name,
-				  char *identifier,
-				  char *message )
+                                     DNODE *module,
+                                     char *identifier,
+                                     char *message )
 {
-    TNODE *typenode = compiler_lookup_tnode_with_function( cc, module_name, 
-                                                        identifier, 
-                                                        typetab_lookup );
+    TNODE *typenode = compiler_lookup_tnode_with_function( cc, module,
+                                                           identifier,
+                                                           typetab_lookup );
 
     if( !typenode ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	if( !message ) message = "name";
 	if( module_name ) {
 	    yyerrorf( "%s '%s::%s' is not declared in the "
@@ -3746,13 +3829,13 @@ static TNODE* compiler_lookup_tnode( COMPILER *cc,
 }
 
 static void compiler_compile_enumeration_constant( COMPILER *cc,
-						char *module_name,
-						char *value_name,
-						char *type_name,
-						cexception_t *ex )
+                                                   DNODE *module,
+                                                   char *value_name,
+                                                   char *type_name,
+                                                   cexception_t *ex )
 {
     TNODE *const_type =
-	compiler_lookup_tnode( cc, module_name, type_name, "enumeration type" );
+	compiler_lookup_tnode( cc, module, type_name, "enumeration type" );
 
     compiler_compile_enum_const_from_tnode( cc, value_name, const_type, ex );
 }
@@ -3809,39 +3892,32 @@ static void compiler_compile_typed_constant( COMPILER *cc,
 
 static void compiler_compile_constant( COMPILER *cc,
                                        type_suffix_t suffix_type,
-                                       char *module_name,
+                                       DNODE *module,
                                        char *suffix, char *constant_kind_name,
                                        char *value,
                                        cexception_t *ex )
 {
     TNODE *const_type =
-	compiler_lookup_suffix_tnode( cc, suffix_type, module_name,
-				   suffix, constant_kind_name );
+	compiler_lookup_suffix_tnode( cc, suffix_type, module,
+                                      suffix, constant_kind_name );
 
     compiler_compile_typed_constant( cc, const_type, value, ex );
 }
 
 static DNODE* compiler_lookup_constant( COMPILER *cc,
-                                        char *module_name,
+                                        DNODE *module,
                                         char *identifier,
                                         char *message )
 {
-    DNODE *module;
     DNODE *constnode;
 
-    if( !module_name ) {
+    if( !module ) {
 	constnode = vartab_lookup( cc->consts, identifier );
     } else {
-	module = vartab_lookup( cc->vartab, module_name );
-	if( !module ) {
-	    yyerrorf( "module '%s' is not available in the current scope",
-		      module_name  );
-	    constnode = NULL;
-	} else {
-	    constnode = dnode_consttab_lookup_const( module, identifier );
-	}
+        constnode = dnode_consttab_lookup_const( module, identifier );
     }
     if( !constnode ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	if( !message ) message = "name";
 	if( module_name ) {
 	    yyerrorf( "%s '%s::%s' is not declared in the "
@@ -4450,7 +4526,6 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
     int n = 1;
     int retval = 1;
 
-    // args = dnode_list_invert( args );
     foreach_dnode( arg, args ) {
 	TNODE *arg_type = dnode_type( arg );
 	switch( n ) {
@@ -4478,7 +4553,6 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 	}
 	n++;
     }
-    // args = dnode_list_invert( args );
     if( --n > 3 ) {
 	yyerrorf( "too many arguments for the program "
 		  "(found %d, must be <= 3)", n );
@@ -4488,18 +4562,19 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 }
 
 static void compiler_emit_catch_comparison( COMPILER *cc,
-                                            char *module_name,
+                                            DNODE *module,
                                             char *exception_name,
                                             cexception_t *ex )
 {
     DNODE *exception =
-        compiler_lookup_dnode( cc, module_name, exception_name, "exception" );
+        compiler_lookup_dnode( cc, module, exception_name, "exception" );
     ssize_t zero = 0;
     ssize_t exception_val;
     ssize_t try_var_offset = cc->try_variable_stack ?
 	cc->try_variable_stack[cc->try_block_level-1] : 0;
 
-    if( module_name ) {
+    if( module ) {
+        char *module_name = module ? dnode_name( module ) : NULL;
 	compiler_emit( cc, ex, "\n\tce\n", PLD, &try_var_offset );
 	compiler_emit( cc, ex, "\n\tc\n", EXCEPTIONMODULE );
 	compiler_emit( cc, ex, "\tce\n", SLDC, &module_name );
@@ -4517,7 +4592,7 @@ static void compiler_emit_catch_comparison( COMPILER *cc,
     compiler_emit( cc, ex, "\tce\n", LDC, &exception_val );
     compiler_emit( cc, ex, "\tc\n", EQBOOL );
 
-    if( module_name ) {
+    if( module ) {
 	compiler_fixup_here( cc );
     }
 }
@@ -4576,11 +4651,13 @@ static void compiler_convert_function_argument( COMPILER *cc,
 
     if( arg_type && exp_type ) {
 	if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
-	    !tnode_types_are_assignment_compatible( arg_type, exp_type, NULL, ex )) {
-	    char *arg_type_name = tnode_name( arg_type );
-	    if( arg_type_name ) {
-		compiler_compile_type_conversion( cc, arg_type_name, ex );
-	    }
+	    !tnode_types_are_assignment_compatible( arg_type, exp_type,
+                                                    NULL, ex )) {
+            char *arg_type_name = tnode_name( arg_type );
+            if( arg_type_name ) {
+                compiler_compile_type_conversion
+                    ( cc, arg_type, /* target_name: */NULL,  ex );
+            }
 	}
     }
     cc->current_arg = cc->current_arg ? dnode_next( cc->current_arg ) : NULL;
@@ -4642,7 +4719,7 @@ static void compiler_compile_typed_const_value( COMPILER *cc,
 
 static void compiler_compile_multitype_const_value( COMPILER *cc,
                                                     const_value_t *v,
-                                                    char *module_name,
+                                                    DNODE *module,
                                                     char *suffix_name,
                                                     cexception_t *ex )
 {
@@ -4652,17 +4729,17 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
     switch( vtype ) {
     case VT_INTMAX:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_INTEGER_SUFFIX,
-                                                   module_name, suffix_name,
+                                                   module, suffix_name,
                                                    "integer" );
 	break;
     case VT_FLOAT:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_FLOAT_SUFFIX,
-                                                   module_name, suffix_name,
+                                                   module, suffix_name,
                                                    "float" );
 	break;
     case VT_STRING:
 	const_type = compiler_lookup_suffix_tnode( cc, TS_STRING_SUFFIX,
-                                                   module_name, suffix_name,
+                                                   module, suffix_name,
                                                    "string" );
 	break;
     case VT_ENUM: {
@@ -4683,9 +4760,9 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
 	*value_name_terminator = '\0';
 
 	cexception_guard( inner ) {
-	    compiler_compile_enumeration_constant( cc, module_name,
-						value_name, type_name,
-						&inner );
+	    compiler_compile_enumeration_constant( cc, module,
+                                                   value_name, type_name,
+                                                   &inner );
 	}
 	cexception_catch {
 	    freex( value_name );
@@ -4761,13 +4838,13 @@ static void compiler_check_raise_expression( COMPILER *c,
 
     if( !c->e_stack ) {
 	yyerrorf( "Not enough values on the stack for raising exception?" );
-    }
-    if( !(top_type = enode_type( c->e_stack ))) {
+    } else if( !(top_type = enode_type( c->e_stack ))) {
 	yyerrorf( "Value on the top of the stack is untyped when "
 		  "raising exception?" );
+    } else {
+        compiler_check_and_compile_operator( c, top_type, "exceptionset", 1,
+                                             NULL, ex );
     }
-    compiler_check_and_compile_operator( c, top_type, "exceptionset", 1,
-                                      NULL, ex );
 }
 
 static struct {
@@ -4902,31 +4979,34 @@ static void compiler_compile_zero_out_stackcells( COMPILER *cc,
     }
 }
 
-static void compiler_begin_package( COMPILER *c,
-				    DNODE *package,
-				    cexception_t *ex )
+static void compiler_begin_module( COMPILER *c,
+                                   DNODE *module,
+                                   cexception_t *ex )
 {
     compiler_push_symbol_tables( c, ex );
-    vartab_insert_named( c->compiled_packages, package, ex );
-    vartab_insert_named( c->vartab, share_dnode( package ), ex );
-    dlist_push_dnode( &c->current_package_stack, &c->current_package, ex );
-    c->current_package = package;
+    vartab_insert_named_module( c->compiled_modules, module, 
+                                /* SYMTAB *st = */ NULL,
+                                // stlist_data( c->symtab_stack ),
+                                ex );
+    vartab_insert_named( c->vartab, share_dnode( module ), ex );
+    dlist_push_dnode( &c->current_module_stack, &c->current_module, ex );
+    c->current_module = module;
 }
 
-static void compiler_end_package( COMPILER *c, cexception_t *ex )
+static void compiler_end_module( COMPILER *c, cexception_t *ex )
 {
     compiler_pop_symbol_tables( c );
-    c->current_package = dlist_pop_data( &c->current_package_stack );
+    c->current_module = dlist_pop_data( &c->current_module_stack );
 }
 
-static char *compiler_find_package( COMPILER *c,
-				    const char *package_name,
-				    cexception_t *ex )
+static char *compiler_find_module( COMPILER *c,
+                                   const char *module_name,
+                                   cexception_t *ex )
 {
     static char buffer[300];
     ssize_t len;
 
-    len = snprintf( buffer, sizeof(buffer), "%s.slib", package_name );
+    len = snprintf( buffer, sizeof(buffer), "%s.slib", module_name );
 
     assert( len < sizeof(buffer) );
 
@@ -4950,55 +5030,174 @@ static int compiler_can_compile_use_statement( COMPILER *cc,
     return 1;
 }
 
-static void compiler_import_package( COMPILER *c,
-				     char *package_name,
-				     cexception_t *ex )
+static void compiler_import_module( COMPILER *c,
+                                    DNODE *module_name_dnode,
+                                    cexception_t *ex )
 {
-    DNODE *package = vartab_lookup( c->compiled_packages, package_name );
+    cexception_t inner;
+    char *module_name = dnode_name( module_name_dnode );
 
-    if( !compiler_can_compile_use_statement( c, "import" )) {
-	return;
+    SYMTAB *volatile symtab = new_symtab( c->vartab, c->consts, c->typetab,
+                                          c->operators, ex );
+
+
+    DNODE *module = vartab_lookup_module( c->compiled_modules,
+                                          module_name_dnode,
+                                          symtab );
+
+#if 0
+    printf( ">>> module = '%s', filename = '%s'\n",
+            dnode_name( module_name_dnode ),
+            dnode_filename( module_name_dnode ));
+#endif
+
+    cexception_guard( inner ) {
+        if( compiler_can_compile_use_statement( c, "import" )) {
+#if 0
+            printf( ">>> can import module '%s'\n", module_name );
+#endif
+            if( module != NULL ) {
+                char *synonim = dnode_synonim( module_name_dnode );
+#if 0
+                printf( ">>> will insert module '%s' as '%s'\n", module_name, synonim );
+#endif
+                if( synonim ) {
+                    vartab_insert_module( c->vartab, share_dnode( module ),
+                                          synonim, symtab, &inner );
+                } else {
+                    vartab_insert_named_module( c->vartab, share_dnode( module ),
+                                                symtab, &inner );
+                }
+#if 0
+                printf( "found compiled module '%s'\n", module_name );
+#endif
+            } else {
+                char *pkg_path = c->module_filename ?
+                    c->module_filename : compiler_find_module( c, module_name,
+                                                               &inner );
+                compiler_open_include_file( c, pkg_path, &inner );
+                assert( !c->requested_module  );
+                c->requested_module = module_name_dnode;
+            }
+        }
+    }
+    cexception_catch {
+        VARTAB *vt, *ct, *ot;
+        TYPETAB *tt;
+        obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+        delete_symtab( symtab );
+        cexception_reraise( inner, ex );
     }
 
-    if( package != NULL ) {
-	vartab_insert_named( c->vartab, share_dnode( package ), ex );
-	/* printf( "found compiled package '%s'\n", package_name ); */
-    } else {
-	char *pkg_path = c->package_filename ?
-            c->package_filename : compiler_find_package( c, package_name, ex );
-	compiler_open_include_file( c, pkg_path, ex );
-    }
+    VARTAB *vt, *ct, *ot;
+    TYPETAB *tt;
+    obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+    delete_symtab( symtab );
 }
 
-static void compiler_use_package( COMPILER *c,
-				  char *package_name,
-				  cexception_t *ex )
+/* 
+   FIXME: functions 'compiler_import_module()' and
+   'compiler_use_module()' contain too much repetitive code and must
+   be merged to maintain SPOT. S.G.
+*/
+
+static void compiler_use_module( COMPILER *c,
+                                 DNODE *module_name_dnode,
+                                 cexception_t *ex )
 {
-    DNODE *package = vartab_lookup( c->compiled_packages, package_name );
+    cexception_t inner;
 
-    if( !compiler_can_compile_use_statement( c, "use" )) {
-	return;
-    }
+    char *module_name = dnode_name( module_name_dnode );
 
-    if( package != NULL ) {
-        char *package_name = dnode_name( package );
-        DNODE *existing_package = package_name ?
-            vartab_lookup( c->vartab, package_name ) : NULL;
-        if( !existing_package || existing_package != package ) {
-            vartab_insert_named( c->vartab, share_dnode( package ), ex );
+    SYMTAB *volatile symtab = new_symtab( c->vartab, c->consts, c->typetab,
+                                          c->operators, ex );
+
+    DNODE *module = vartab_lookup_module( c->compiled_modules,
+                                          module_name_dnode,
+                                          symtab );
+
+#if 0
+    printf( "\n>>> module = '%s', filename = '%s'\n",
+            dnode_name( module_name_dnode ),
+            dnode_filename( module_name_dnode ));
+#endif
+
+    cexception_guard( inner ) {
+        if( compiler_can_compile_use_statement( c, "use" )) {
+#if 0
+            printf( ">>> can use module '%s'\n", module_name );
+#endif
+            if( module != NULL ) {
+                char *module_name = module ? dnode_name( module ) : NULL;
+                DNODE *existing_module = module_name ?
+                    vartab_lookup_module
+                    ( c->vartab, module_name_dnode, symtab )
+                    : NULL;
+                char *synonim = dnode_synonim( module_name_dnode );
+#if 0
+                printf( "<<< existing_module == %p, synonim == %p >>>\n", 
+                        existing_module, synonim );
+#endif
+                if( !existing_module || existing_module != module || synonim ) {
+#if 0
+                    printf( ">>> found module '%s' for reuse\n", 
+                            module_name );
+                    printf( ">>> will reinsert module '%s' as '%s'\n", 
+                            module_name, 
+                            synonim ? synonim : dnode_name( module ));
+#endif
+                    if( synonim ) {
+#if 0
+                        printf( ">>> reinserting synonim\n" );
+#endif
+                        vartab_insert_module( c->vartab, share_dnode( module ),
+                                              synonim, symtab, &inner );
+                    } else {
+#if 0
+                        printf( ">>> reinserting under its own name\n" );
+#endif
+                        vartab_insert_named_module( c->vartab, share_dnode( module ),
+                                                    symtab, &inner );
+                    }
+                }
+#if 0
+                printf( "found compiled module '%s'\n", module_name );
+#endif
+                compiler_use_exported_module_names( c, module, &inner );
+            } else {
+                char *pkg_path = c->module_filename ?
+                    c->module_filename :
+                    compiler_find_module( c, module_name, &inner );
+
+#if 0
+                printf( ">>> about to open file named '%s'\n", pkg_path );
+#endif
+
+                compiler_open_include_file( c, pkg_path, &inner );
+
+                assert( !c->requested_module  );
+                c->requested_module = module_name_dnode;
+
+                if( c->use_module_name ) {
+                    freex( c->use_module_name );
+                    c->use_module_name = NULL;
+                }
+                c->use_module_name = strdupx( module_name, &inner );
+            }
         }
-	/* printf( "found compiled package '%s'\n", package_name ); */
-	compiler_use_exported_package_names( c, package, ex );
-    } else {
-	char *pkg_path = c->package_filename ?
-            c->package_filename : compiler_find_package( c, package_name, ex );
-	compiler_open_include_file( c, pkg_path, ex );
-	if( c->use_package_name ) {
-	    freex( c->use_package_name );
-            c->use_package_name = NULL;
-	}
-	c->use_package_name = strdupx( package_name, ex );
     }
+    cexception_catch {
+        VARTAB *vt, *ct, *ot;
+        TYPETAB *tt;
+        obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+        delete_symtab( symtab );
+        cexception_reraise( inner, ex );
+    }
+
+    VARTAB *vt, *ct, *ot;
+    TYPETAB *tt;
+    obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
+    delete_symtab( symtab );
 }
 
 static void compiler_debug()
@@ -5331,7 +5530,7 @@ const_value_t compiler_get_dnode_compile_time_attribute( DNODE *dnode,
 }
 
 static const_value_t compiler_make_compile_time_value( COMPILER *cc,
-						       char *package_name,
+						       DNODE *module,
 						       char *identifier,
 						       char *attribute_name,
 						       cexception_t *ex )
@@ -5339,10 +5538,10 @@ static const_value_t compiler_make_compile_time_value( COMPILER *cc,
     DNODE *variable = NULL;
     TNODE *tnode = NULL;
 
-    variable = compiler_lookup_dnode_silently( cc, package_name, identifier );
+    variable = compiler_lookup_dnode_silently( cc, module, identifier );
 
     if( !variable ) {
-	tnode = compiler_lookup_tnode_silently( cc, package_name, identifier );
+	tnode = compiler_lookup_tnode_silently( cc, module, identifier );
 	if( tnode ) {
 	    return compiler_get_tnode_compile_time_attribute( tnode,
 							      attribute_name,
@@ -5362,7 +5561,7 @@ static const_value_t compiler_make_compile_time_value( COMPILER *cc,
 }
 
 static DNODE* compiler_lookup_type_field( COMPILER *cc,
-					  char *package_name,
+					  DNODE *module,
 					  char *identifier,
 					  char *field_identifier )
 {
@@ -5370,10 +5569,10 @@ static DNODE* compiler_lookup_type_field( COMPILER *cc,
     TNODE *tnode = NULL;
     DNODE *field;
 
-    variable = compiler_lookup_dnode_silently( cc, package_name, identifier );
+    variable = compiler_lookup_dnode_silently( cc, module, identifier );
 
     if( !variable ) {
-	tnode = compiler_lookup_tnode_silently( cc, package_name, identifier );
+	tnode = compiler_lookup_tnode_silently( cc, module, identifier );
 	if( !tnode ) {
 	    yyerrorf( "neither type nor variable '%s' can be found when "
 		      "searching for field '%s'", identifier, field_identifier );
@@ -5507,7 +5706,7 @@ static void compiler_load_library( COMPILER *compiler,
 }
 
 static void compiler_check_and_push_function_name( COMPILER *cc,
-                                                   char *module_name,
+                                                   DNODE *module,
                                                    char *function_name,
                                                    cexception_t *ex )
 {
@@ -5521,8 +5720,8 @@ static void compiler_check_and_push_function_name( COMPILER *cc,
 		      &cc->current_arg, ex );
 
     cc->current_call = 
-	share_dnode( compiler_lookup_dnode( cc, module_name, function_name,
-					 "function" ));
+	share_dnode( compiler_lookup_dnode( cc, module, function_name,
+                                            "function" ));
 
     fn_tnode = cc->current_call ?
 	dnode_type( cc->current_call ) : NULL;
@@ -5934,7 +6133,7 @@ static void compiler_import_selected_names( COMPILER *c,
                                             cexception_t *ex )
 {
     DNODE *module = 
-        vartab_lookup( c->compiled_packages, module_name );
+        vartab_lookup( c->compiled_modules, module_name );
     DNODE *identifier;
     if( !module ) {
         yyerrorf( "module '%s' is not found -- consider 'use %s' first",
@@ -5971,6 +6170,292 @@ static void compiler_import_selected_names( COMPILER *c,
     }
 }
 
+static DNODE* compiler_module_parameter_dnode( char *parameter_name,
+                                               char *parameter_default,
+                                               type_kind_t kind,
+                                               cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE *volatile dnode_type = tnode_set_kind( new_tnode( ex ), kind );
+    DNODE *volatile parameter_dnode = NULL;
+
+    cexception_guard( inner ) {
+        parameter_dnode = new_dnode_name( parameter_name, &inner );
+        dnode_insert_type( parameter_dnode, dnode_type );
+        /* We will use the 'synonim' field to pass the default module
+           parameter name: */
+        dnode_set_synonim( parameter_dnode, parameter_default, &inner );
+        freex( parameter_default );
+    }
+    cexception_catch {
+        delete_tnode( dnode_type );
+        cexception_reraise( inner, ex );
+    }
+
+    return parameter_dnode;
+}
+
+static void compiler_import_array_definition( COMPILER *c, char *module_name,
+                                              cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_modules, module_name );
+
+    if( !module ) {
+        yyerrorf( "module '%s' is not found for type import "
+                  "-- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        char *name = "array";
+        TNODE *identifier_tnode =
+            dnode_typetab_lookup_type( module, name );
+        if( identifier_tnode ) {
+            if( typetab_lookup( c->typetab, name )) {
+                yyerrorf( "type named '%s' is already defined -- "
+                          "can not import", name );
+            } else {
+                typetab_insert( c->typetab, name, 
+                                share_tnode( identifier_tnode ),
+                                ex );
+            }
+        } else {
+            yyerrorf( "type '%s' is not found in module '%s'",
+                      name, module_name );
+        }
+    }
+}
+
+static void compiler_import_type_identifier_list( COMPILER *c, 
+                                                  DNODE *imported_identifiers,
+                                                  char *module_name,
+                                                  cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_modules, module_name );
+
+    if( !module ) {
+        yyerrorf( "module '%s' is not found for type import "
+                  "-- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        DNODE *identifier;
+        foreach_dnode( identifier, imported_identifiers ) {
+            char *name = dnode_name( identifier );
+            TNODE *identifier_tnode =
+                dnode_typetab_lookup_type( module, name );
+            if( identifier_tnode ) {
+                if( typetab_lookup( c->typetab, name )) {
+                    yyerrorf( "type named '%s' is already defined -- "
+                              "can not import", name );
+                } else {
+                    typetab_insert( c->typetab, name, 
+                                    share_tnode( identifier_tnode ),
+                                    ex );
+                    type_kind_t kind = tnode_kind( identifier_tnode );
+                    char *suffix = tnode_suffix( identifier_tnode );
+                    if( !suffix ) suffix = "";
+                    if( kind == TK_INTEGER || kind == TK_REAL || 
+                        kind == TK_STRING || suffix != NULL ) {
+                        type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
+                        switch( kind ) {
+                        case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
+                        case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
+                        case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
+                        default:
+                            break;
+                        }
+                        if( suffix_kind != TS_NOT_A_SUFFIX ) {
+                            typetab_override_suffix
+                                ( c->typetab, suffix, suffix_kind,
+                                  share_tnode( identifier_tnode ), ex );
+                        }
+                    }
+                }
+            } else {
+                yyerrorf( "type '%s' is not found in module '%s'",
+                          name, module_name );
+            }
+        }
+    }
+    delete_dnode( imported_identifiers );
+}
+
+static void compiler_import_selected_constants( COMPILER *c,
+                                                DNODE *imported_identifiers, 
+                                                char *module_name,
+                                                cexception_t *ex )
+{
+    DNODE *module = 
+        vartab_lookup( c->compiled_modules, module_name );
+
+    if( !module ) {
+        yyerrorf( "module '%s' is not found for constant import "
+                  "-- consider 'use %s' first",
+                  module_name, module_name );
+    } else {
+        DNODE *identifier;
+        foreach_dnode( identifier, imported_identifiers ) {
+            char *name = dnode_name( identifier );
+            DNODE *identifier_dnode =
+                dnode_consttab_lookup_const( module, name );
+            if( identifier_dnode ) {
+                vartab_insert( c->consts, name, 
+                               share_dnode( identifier_dnode ),
+                               ex );
+            } else {
+                yyerrorf( "constant '%s' is not found in module '%s'",
+                          name, module_name );
+            }
+        }
+    }
+    delete_dnode( imported_identifiers );
+}
+
+static void compiler_process_module_parameters( COMPILER *cc,
+                                                DNODE *module_params,
+                                                cexception_t *ex )
+{
+#if 0
+    printf( ">>> There is a requested module '%s'\n",
+            dnode_name( cc->requested_module ));
+#endif
+    DNODE *arg, *param, *module_args =
+        dnode_module_args( cc->requested_module );
+    if( module_args ) {
+        TYPETAB *ttab =
+            symtab_typetab( stlist_data( cc->symtab_stack ));
+        arg = module_args;
+        foreach_dnode( param, module_params ) {
+            TNODE *param_type = dnode_type( param );
+            char *argument_name;
+            if( !arg ) {
+                /* maybe paremeter has a default value? Check: */
+                argument_name = dnode_synonim( param );
+                if( !argument_name ) {
+                    /* No default value -- an error: */
+                    COMPILER_STATE *st = cc->include_files;
+                    char *filename = st ? st->filename : NULL;
+                    int line_no = st ? st->line_no : 0;
+                    if( filename ) {
+                        yyerrorf( "missing actual argument for "
+                                  "parameter '%s' of module '%s' "
+                                  "included from file '%s', line %d",
+                                  dnode_name( param ),
+                                  dnode_name( cc->requested_module ),
+                                  filename, line_no );
+                    } else {
+                        yyerrorf( "missing actual argument for "
+                                  "parameter '%s' of module '%s'",
+                                  dnode_name( param ),
+                                  dnode_name( cc->requested_module ));
+                    }
+                    break;
+                }
+            } else {
+                argument_name = dnode_name( arg );
+            }
+            if( tnode_kind( param_type ) == TK_TYPE ) {
+                TNODE *arg_type = argument_name ?
+                    typetab_lookup( ttab, argument_name ) :
+                    NULL;
+                if( !arg_type ) {
+                    if( argument_name ) {
+                        yyerrorf( "type '%s' is not defined for "
+                                  "module parameter",
+                                  argument_name );
+                    } else {
+                        yyerrorf( "type is not defined for "
+                                  "module parameter '%s'",
+                                  dnode_name( param ));
+                    }
+                }
+                char *type_name = dnode_name( param );
+                cexception_t inner;
+                TNODE * volatile type_tnode =
+                    new_tnode_equivalent( arg_type, ex );
+                cexception_guard( inner ) {
+                    tnode_set_name( type_tnode, type_name, &inner );
+                    compiler_typetab_insert( cc, type_tnode, &inner );
+                    type_tnode = NULL;
+                    share_tnode( arg_type );
+                    tnode_insert_base_type( param_type, arg_type );
+                }
+                cexception_catch {
+                    delete_tnode( type_tnode );
+                    cexception_reraise( inner, ex );
+                }
+            } else if( tnode_kind( param_type ) == TK_CONST ) {
+                VARTAB *ctab =
+                    symtab_consttab( stlist_data( cc->symtab_stack ));
+                DNODE *argument_dnode =
+                    vartab_lookup( ctab, argument_name );
+                if( !argument_dnode && dnode_name( arg ) == NULL ) {
+                    /* The 'arg' dnode represents a constant expression: */
+                    dnode_set_name( arg, dnode_name( param ), ex );
+                    argument_dnode = arg;
+                    vartab_insert_named( ctab, share_dnode( arg ), ex );
+                }
+                /* Insert the constant under the module parameter name: */
+                if( argument_dnode ) {
+                    dnode_insert_module_args( param, share_dnode( argument_dnode ));
+                    vartab_insert( cc->consts, dnode_name( param ),
+                                   share_dnode( argument_dnode ), ex );
+                } else {
+                    yyerrorf( "constant '%s' is not found for module"
+                              " parameter", argument_name );
+                }
+            } else if( tnode_kind( param_type ) == TK_VAR ||
+                       tnode_kind( param_type ) == TK_FUNCTION ) {
+                VARTAB *vartab =
+                    symtab_vartab( stlist_data( cc->symtab_stack ));
+                DNODE *argument_dnode =
+                    vartab_lookup( vartab, argument_name );
+                /* Insert the variable or function under the
+                   module parameter name: */
+                if( argument_dnode ) {
+                    dnode_insert_module_args( param, share_dnode( argument_dnode ));
+                    vartab_insert( cc->vartab, dnode_name( param ),
+                                   share_dnode( argument_dnode ), ex );
+                } else {
+                    char *item_name =
+                        tnode_kind( param_type ) == TK_VAR ?
+                        "variable" : "function";
+                    if( argument_name ) {
+                        yyerrorf( "%s '%s' is not found"
+                                  " for module parameter '%s'",
+                                  item_name, argument_name,
+                                  dnode_name( param ));
+                    } else {
+                        yyerrorf( "%s is not found"
+                                  " for module parameter '%s'",
+                                  item_name, dnode_name( param ));
+                    }
+                }
+            } else {
+                yyerrorf( "sorry, parameters of kind '%s' are not yet "
+                          "supported for modules", 
+                          tnode_kind_name( param_type ));
+            }
+            if( arg )
+                arg = dnode_next( arg );
+        } /* foreach_dnode( param, module_params ) { ... */
+        if( arg ) {
+            COMPILER_STATE *st = cc->include_files;
+            char *filename = st ? st->filename : NULL;
+            int line_no = st ? st->line_no : 0;
+            if( filename ) {
+                yyerrorf( "too many arguments for module '%s' "
+                          "included from file '%s', line %d",
+                          dnode_name( cc->requested_module ),
+                          filename, line_no );
+            } else {
+                yyerrorf( "too many arguments for module '%s'",
+                          dnode_name( cc->requested_module ));
+            }
+        }
+    } /* if( module_args ) { ... */
+}
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -5997,6 +6482,7 @@ static cexception_t *px; /* parser exception */
 
 %token _ADDRESSOF
 %token _ARRAY
+%token _AS
 %token _ASSERT
 %token _BLOB
 %token _BREAK
@@ -6021,6 +6507,7 @@ static cexception_t *px; /* parser exception */
 %token _FUNCTION
 %token _IF
 %token _IMPLEMENTS
+%token _IMPORT
 %token _IN
 %token _INCLUDE
 %token _INLINE
@@ -6099,12 +6586,14 @@ static cexception_t *px; /* parser exception */
 %type <dnode> function_header
 %type <dnode> method_definition
 %type <dnode> method_header
-%type <s>     module_list
+%type <dnode> module_argument
+%type <dnode> module_argument_list
+%type <dnode> module_list
 %type <i>     multivalue_function_call
 %type <i>     multivalue_expression_list
 %type <dnode> identifier
 %type <dnode> identifier_list
-%type <s>     import_statement
+%type <dnode> import_statement
 %type <s>     include_statement
 %type <i>     index_expression
 %type <tnode> inheritance_and_implementation_list
@@ -6112,9 +6601,13 @@ static cexception_t *px; /* parser exception */
 %type <s>     labeled_for
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
-%type <s>     module_import_identifier
+%type <dnode> module_import_identifier
+%type <dnode> module_parameter
+%type <dnode> module_parameter_list
 %type <dnode> operator_definition
 %type <dnode> operator_header
+%type <s>     opt_as_identifier
+%type <s>     opt_default_module_parameter
 %type <s>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
@@ -6128,10 +6621,12 @@ static cexception_t *px; /* parser exception */
 %type <i>     opt_function_or_procedure_keyword
 %type <tlist> opt_implemented_interfaces
 %type <s>     opt_label
+%type <dnode> opt_module_arguments
+%type <dnode> opt_module_parameters
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
 %type <i>     opt_variable_declaration_keyword
-%type <dnode> package_name
+%type <dnode> module_name
 %type <dnode> program_header
 %type <dnode> raised_exception_identifier;
 %type <dnode> retval_description_list
@@ -6156,10 +6651,9 @@ static cexception_t *px; /* parser exception */
 %type <tnode> undelimited_type_description
 %type <tnode> delimited_type_description
 %type <anode> type_attribute
-%type <s>     use_statement
+%type <dnode> use_statement
 %type <dnode> variable_access_identifier
 %type <dnode> variable_access_for_indexing
-%type <dnode> variable_identifier_list
 %type <i>     variable_declaration_keyword
 %type <dnode> variable_declarator_list
 %type <dnode> uninitialised_var_declarator_list
@@ -6248,7 +6742,7 @@ delimited_statement
   | io_statement
   | program_definition
   | delimited_control_statement
-  | package_statement
+  | module_statement
   | break_or_continue_statement
   | pack_statement
   | assert_statement
@@ -6341,7 +6835,7 @@ undelimited_simple_statement
                              look-ahead token, to the input stream. S.G.*/
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
-           compiler_import_package( compiler, $1, px );
+           compiler_import_module( compiler, $1, px );
        }
   | use_statement
        {
@@ -6351,7 +6845,7 @@ undelimited_simple_statement
                              look-ahead token, to the input stream. S.G.*/
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
-           compiler_use_package( compiler, $1, px );
+           compiler_use_module( compiler, $1, px );
        }
   | selective_use_statement
   | load_library_statement
@@ -6360,8 +6854,8 @@ undelimited_simple_statement
   | operator_definition
     {
         vartab_insert_named_operator( compiler->operators, $1, px );
-        if( compiler->current_package && dnode_scope( $1 ) == 0 ) {
-            dnode_optab_insert_named_operator( compiler->current_package,
+        if( compiler->current_module && dnode_scope( $1 ) == 0 ) {
+            dnode_optab_insert_named_operator( compiler->current_module,
                                                share_dnode( $1 ), px );
         }
     }
@@ -6544,65 +7038,267 @@ exception_declaration
   ;
 
 /*--------------------------------------------------------------------------*/
-/* package and import statements */
+/* module and import statements */
 
-package_name
+module_name
   : __IDENTIFIER
       {
-	  DNODE *package_dnode = new_dnode_package( $1, px );
-	  $$ = package_dnode;
+	  DNODE *module_dnode = new_dnode_module( $1, px );
+	  $$ = module_dnode;
       }
   ;
 
-package_keyword : _PACKAGE | _MODULE;
+module_keyword : _PACKAGE | _MODULE;
 
-package_statement
-  : package_keyword package_name
+opt_module_parameters
+: /* empty */
+    { $$ = NULL; }
+| '(' module_parameter_list ')'
+    { $$ = $2; }
+;
+
+module_parameter_list
+: module_parameter
+    { $$ = $1; }
+| module_parameter_list ',' module_parameter
+    { $$ = dnode_append( $1, $3 ); }
+| module_parameter_list ';' module_parameter
+    { $$ = dnode_append( $1, $3 ); }
+;
+
+module_parameter
+: _TYPE __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_TYPE, px ); }
+| _PROCEDURE  __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_FUNCTION, px ); }
+| _FUNCTION __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_FUNCTION, px ); }
+| _CONST __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_CONST, px ); }
+| _VAR __IDENTIFIER opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_VAR, px ); }
+| _OPERATOR __STRING_CONST opt_default_module_parameter
+    { $$ = compiler_module_parameter_dnode( $2, $3, TK_OPERATOR, px ); }
+;
+
+opt_default_module_parameter
+: /* empty */
+    { $$ = NULL; }
+| '=' __IDENTIFIER
+    { $$ = $2; }
+;
+
+module_statement
+  : module_keyword module_name opt_module_parameters
       {
-	  vartab_insert_named( compiler->vartab, $2, px );
-	  compiler_begin_package( compiler, share_dnode( $2 ), px );
+          DNODE *module_dnode = $2;
+          DNODE *module_params = $3;
+
+          dnode_insert_module_args( module_dnode, module_params );
+#if 0
+          printf( ">>> compiler->filename = '%s'\n", compiler->filename );
+          if( compiler->requested_module ) {
+              printf( ">>> requested_module = '%s', synonim = '%s', "
+                      "filename = '%s'\n", 
+                      dnode_name( compiler->requested_module ),
+                      dnode_synonim( compiler->requested_module ),
+                      dnode_filename( compiler->requested_module ));
+          } else {
+              printf( ">>> no requested module for '%s'\n",
+                      dnode_name( module_dnode ));
+          }
+#endif
+          cexception_t inner;
+          cexception_guard( inner ) {
+              if( compiler->requested_module ) {
+                  dnode_set_filename( module_dnode, 
+                                      dnode_filename( compiler->requested_module ),
+                                      &inner );
+              }
+          }
+          cexception_catch {
+              delete_dnode( module_dnode );
+              cexception_reraise( inner, px );
+          }
+
+#if 0
+          printf( ">>> inserting module '%s' into vartab %p\n", 
+                  dnode_name( module_dnode ), compiler->vartab );
+#endif
+	  vartab_insert_named_module( compiler->vartab, module_dnode,
+                                      stlist_data( compiler->symtab_stack ),
+                                      px );
+          if( compiler->current_module && dnode_scope( module_dnode ) == 0 ) {
+              dnode_vartab_insert_named_vars( compiler->current_module,
+                                              share_dnode( module_dnode ),
+                                              px );
+          }
+
+	  compiler_begin_module( compiler, share_dnode(module_dnode), px );
+
+          if( compiler->requested_module ) {
+              compiler_process_module_parameters( compiler, module_params,
+                                                  px );
+          }
       }
     statement_list
-    '}' package_keyword __IDENTIFIER
+    '}' module_keyword __IDENTIFIER
       {
 	  char *name;
-	  if( compiler->current_package &&
-	      (name = dnode_name( compiler->current_package )) != NULL ) {
-	      if( strcmp( $7, name ) != 0 ) {
-		  yyerrorf( "package '%s' ends with 'end package %s'",
-			    name, $7 );
+	  if( compiler->current_module &&
+	      (name = dnode_name( compiler->current_module )) != NULL ) {
+	      if( strcmp( $8, name ) != 0 ) {
+		  yyerrorf( "module '%s' ends with 'end module %s'",
+			    name, $8 );
 	      }
 	  }
-	  compiler_end_package( compiler, px );
+	  compiler_end_module( compiler, px );
       }
   ;
 
 import_statement
-   : _USE module_import_identifier
+   : _IMPORT module_import_identifier
        { $$ = $2; }
    ;
 
+opt_module_arguments
+: '(' module_argument_list ')'
+    { $$ = $2; }
+| /* empty */
+    { $$ = NULL; }
+;
+
+module_argument_list
+: module_argument
+| module_argument_list ',' module_argument
+   { $$ = dnode_append( $1, $3 ); }
+;
+
+module_argument
+: identifier
+| _CONST constant_expression
+    { $$ = new_dnode_constant( /* name */ NULL, &$2, px ); }
+| __INTEGER_CONST
+    {
+        const_value_t cval = 
+            make_const_value( px, VT_INTMAX, (intmax_t)atol( $1 ));
+        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+    }
+
+| __REAL_CONST
+    {
+        const_value_t cval = make_const_value( px, VT_FLOAT, atof( $1 ));
+        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+    }
+
+| __STRING_CONST
+    {
+        const_value_t cval = make_const_value( px, VT_STRING, $1 );
+        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+    }
+;
+
+opt_as_identifier
+:  _AS __IDENTIFIER
+    { $$ = $2; }
+| /* empty */
+    { $$ = NULL; }
+;
+
 module_import_identifier
-  : __IDENTIFIER
-  | __IDENTIFIER _IN __STRING_CONST
+  : __IDENTIFIER opt_module_arguments opt_as_identifier
   {
-      if( compiler->package_filename ) {
-          freex( compiler->package_filename );
-          compiler->package_filename = NULL;
+      cexception_t inner;
+      char *module_name = $1;
+      DNODE *module_name_dnode = new_dnode_module( module_name, px );
+      DNODE *module_arguments = $2;
+      char *module_synonim = $3;
+      dnode_insert_module_args( module_name_dnode, module_arguments );
+      dnode_insert_synonim( module_name_dnode, module_synonim );
+
+      cexception_guard( inner ) {
+          int count = 0;
+          DNODE *existing_name = 
+              vartab_lookup_silently( compiler->vartab, module_name, 
+                                      &count, /* is_imported = */ NULL );
+          if( !existing_name ) {
+              char *pkg_path =
+                  compiler_find_include_file
+                  ( compiler,
+                    compiler_find_module( compiler, module_name, &inner ),
+                    &inner );
+              dnode_set_filename( module_name_dnode, pkg_path, &inner );
+#if 0
+              printf( ">>> inserted filename '%s' for module '%s'\n",
+                  pkg_path, dnode_name( module_name_dnode ));
+#endif
+          } else {
+              char *filename = dnode_filename( existing_name );
+              if( filename ) {
+                  dnode_set_filename( module_name_dnode, filename, &inner );
+#if 0
+              printf( ">>> copying filename filename '%s' for module '%s'\n",
+                  filename, dnode_name( module_name_dnode ));
+#endif
+              }
+          }
       }
-      compiler->package_filename = strdupx( $3, px );
-      /* printf( ">>> package '%s', file '%s'\n", $1, $3 ); */
-      $$ = $1;
+      cexception_catch {
+          delete_dnode( module_name_dnode );
+          cexception_reraise( inner, px );
+      }
+
+      $$ = module_name_dnode;
+  }
+  | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
+  {
+      cexception_t inner;
+      DNODE * volatile module_name_dnode = new_dnode_module( $1, px );
+      char *module_filename = $3;
+      DNODE *module_arguments = $4;
+      char *module_synonim = $5;
+      if( compiler->module_filename ) {
+          freex( compiler->module_filename );
+          compiler->module_filename = NULL;
+      }
+      cexception_guard( inner ) {
+          compiler->module_filename = strdupx( $3, &inner );
+          char *pkg_path =
+              compiler_find_include_file( compiler, module_filename, &inner );
+          dnode_set_filename( module_name_dnode, pkg_path, &inner );
+#if 0
+          printf( ">>> inserted filename '%s' for module '%s', "
+              "searched as '%s'\n",
+              pkg_path, dnode_name( module_name_dnode ), module_filename );
+#endif
+      }
+      cexception_catch {
+          delete_dnode( module_name_dnode );
+          freex( module_filename );
+          cexception_reraise( inner, px );
+      }
+      dnode_insert_module_args( module_name_dnode, module_arguments );
+      dnode_insert_synonim( module_name_dnode, module_synonim );
+#if 0
+      printf( ">>> module '%s', synonim '%s', file '%s'\n",
+              $1, module_synonim, $3 );
+#endif
+      freex( module_filename );
+      $$ = module_name_dnode;
   }
 ;
 
 use_statement
-   : _USE '*' _FROM module_import_identifier
+   : _USE module_import_identifier
+       { $$ = $2; }
+   | _USE '*' _FROM module_import_identifier
+       { $$ = $4; }
+   | _IMPORT '*' _FROM module_import_identifier
        { $$ = $4; }
    ;
 
 selective_use_statement
-   : _USE identifier_list _FROM module_import_identifier
+   : _USE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $4;
            DNODE *imported_identifiers = $2;
@@ -6612,87 +7308,26 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
-   | _USE _TYPE _ARRAY _FROM module_import_identifier
+
+   | _USE _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
-           if( !module ) {
-               yyerrorf( "module '%s' is not found for type import "
-                         "-- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               char *name = "array";
-               TNODE *identifier_tnode =
-                   dnode_typetab_lookup_type( module, name );
-               if( identifier_tnode ) {
-                   if( typetab_lookup( compiler->typetab, name )) {
-                       yyerrorf( "type named '%s' is already defined -- "
-                                 "can not import", name );
-                   } else {
-                       typetab_insert( compiler->typetab, name, 
-                                       share_tnode( identifier_tnode ),
-                                       px );
-                   }
-               } else {
-                   yyerrorf( "type '%s' is not found in module '%s'",
-                             name, module_name );
-               }
-           }
+           compiler_import_array_definition( compiler, $5, px );
        }
-   | _USE _TYPE identifier_list _FROM module_import_identifier
+   | _IMPORT _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
-           DNODE *imported_identifiers = $3;
-           DNODE *identifier;
-           if( !module ) {
-               yyerrorf( "module '%s' is not found for type import "
-                         "-- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               foreach_dnode( identifier, imported_identifiers ) {
-                   char *name = dnode_name( identifier );
-                   TNODE *identifier_tnode =
-                       dnode_typetab_lookup_type( module, name );
-                   if( identifier_tnode ) {
-                       if( typetab_lookup( compiler->typetab, name )) {
-                           yyerrorf( "type named '%s' is already defined -- "
-                                     "can not import", name );
-                       } else {
-                           typetab_insert( compiler->typetab, name, 
-                                           share_tnode( identifier_tnode ),
-                                           px );
-                           type_kind_t kind = tnode_kind( identifier_tnode );
-                           char *suffix = tnode_suffix( identifier_tnode );
-                           if( !suffix ) suffix = "";
-                           if( kind == TK_INTEGER || kind == TK_REAL || 
-                               kind == TK_STRING || suffix != NULL ) {
-                               type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
-                               switch( kind ) {
-                               case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
-                               case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
-                               case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
-                               default:
-                                   break;
-                               }
-                               if( suffix_kind != TS_NOT_A_SUFFIX ) {
-                                   typetab_override_suffix
-                                       ( compiler->typetab, suffix, suffix_kind,
-                                         share_tnode( identifier_tnode ), px );
-                               }
-                           }
-                       }
-                   } else {
-                       yyerrorf( "type '%s' is not found in module '%s'",
-                                 name, module_name );
-                   }
-               }
-           }
-           delete_dnode( imported_identifiers );
+           compiler_import_array_definition( compiler, $5, px );
        }
-   | _USE _VAR identifier_list _FROM module_import_identifier
+
+   | _USE _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_type_identifier_list( compiler, $3, $5, px );
+       }
+   | _IMPORT _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_type_identifier_list( compiler, $3, $5, px );
+       }
+
+   | _USE _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *imported_identifiers = $3;
@@ -6702,35 +7337,40 @@ selective_use_statement
 
            delete_dnode( imported_identifiers );
        }
-   | _USE _CONST identifier_list _FROM module_import_identifier
+
+   | _IMPORT _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
            char *module_name = $5;
-           DNODE *module = 
-               vartab_lookup( compiler->compiled_packages, module_name );
            DNODE *imported_identifiers = $3;
-           DNODE *identifier;
-           if( !module ) {
-               yyerrorf( "module '%s' is not found for constant import "
-                         "-- consider 'use %s' first",
-                         module_name, module_name );
-           } else {
-               foreach_dnode( identifier, imported_identifiers ) {
-                   char *name = dnode_name( identifier );
-                   DNODE *identifier_dnode =
-                       dnode_consttab_lookup_const( module, name );
-                   if( identifier_dnode ) {
-                       vartab_insert( compiler->consts, name, 
-                                      share_dnode( identifier_dnode ),
-                                      px );
-                   } else {
-                       yyerrorf( "constant '%s' is not found in module '%s'",
-                                 name, module_name );
-                   }
-               }
-           }
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, IMPORT_VAR, px );
+
            delete_dnode( imported_identifiers );
        }
-   | _USE function_or_procedure identifier_list _FROM module_import_identifier
+
+   | _USE _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_selected_constants( compiler, $3, $5, px );
+       }
+   | _IMPORT _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
+       {
+           compiler_import_selected_constants( compiler, $3, $5, px );
+       }
+
+   | _USE function_or_procedure identifier_list
+     _FROM /* module_import_identifier */  __IDENTIFIER
+       {
+           char *module_name = $5;
+           DNODE *imported_identifiers = $3;
+
+           compiler_import_selected_names( compiler, imported_identifiers,
+                                           module_name, IMPORT_FUNCTION, px );
+
+           delete_dnode( imported_identifiers );
+       }
+   | _IMPORT function_or_procedure identifier_list 
+     _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *module_name = $5;
            DNODE *imported_identifiers = $3;
@@ -6850,7 +7490,26 @@ program_definition
 
 module_list
 : __IDENTIFIER
+{
+    DNODE *module;
+    module = vartab_lookup( compiler->vartab, $1 );
+    if( !module ) {
+        yyerrorf( "module '%s' is not available in the current scope", $1 );
+    }
+    $$ = module;
+}
 | module_list __COLON_COLON __IDENTIFIER
+{
+    DNODE *container = $1;
+    DNODE *module;
+    if( container ) {
+        module = dnode_vartab_lookup_var( container, $3 );
+        if( !module ) {
+            yyerrorf( "module '%s' is not available in as a submodule", $3 );
+        }
+    }
+    $$ = module;
+}
 ;
 
 variable_access_identifier
@@ -7071,7 +7730,7 @@ variable_declaration
      compiler_check_non_null_variables( $2 );
     }
   | variable_declaration_keyword 
-    identifier ',' variable_identifier_list ':' var_type_description
+    identifier ',' identifier_list ':' var_type_description
     {
      int readonly = $1;
 
@@ -7103,12 +7762,11 @@ variable_declaration
     }
 
   | variable_declaration_keyword identifier ','
-    variable_identifier_list ':' var_type_description '=' multivalue_expression_list
+    identifier_list ':' var_type_description '=' multivalue_expression_list
     {
      int readonly = $1;
      int expr_nr = $8;
 
-     // $2 = dnode_list_invert( dnode_append( $2, $4 ));
      $2 = dnode_append( $2, $4 );
      dnode_list_append_type( $2, $6 );
      dnode_list_assign_offsets( $2, &compiler->local_offset );
@@ -7144,7 +7802,7 @@ variable_declaration
     }
 
   | variable_declaration_keyword identifier ','
-    variable_identifier_list ':' var_type_description '=' simple_expression
+    identifier_list ':' var_type_description '=' simple_expression
     {
         yyerrorf( "need more than one expression to initialise %d variables",
                   dnode_list_length( $4 ) + 1 );
@@ -7202,7 +7860,7 @@ variable_declaration
     }
  
  | variable_declaration_keyword identifier ','
-    variable_identifier_list '=' multivalue_expression_list
+    identifier_list '=' multivalue_expression_list
     {
      int readonly = $1;
 
@@ -7281,13 +7939,6 @@ variable_declarator
   : identifier
   | identifier dimension_list
       { $$ = dnode_insert_type( $1, $2 ); }
-  ;
-
-variable_identifier_list
-  : identifier
-    { $$ = $1; }
-  | variable_identifier_list ',' identifier
-    { $$ = dnode_append( $1, $3 ); }
   ;
 
 return_statement
@@ -8026,7 +8677,7 @@ catch_var_identifier
   ;
 
 catch_variable_declaration
-  : _VAR variable_identifier_list ':' var_type_description
+  : _VAR identifier_list ':' var_type_description
     {
      char *opname = "exceptionval";
      ssize_t try_var_offset = compiler->try_variable_stack ?
@@ -8654,12 +9305,12 @@ interface_operator
   ;
 
 struct_var_declaration
-  : variable_identifier_list ':' var_type_description
+  : identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $1, $3 );
       }
 
-  | _VAR variable_identifier_list ':' var_type_description
+  | _VAR identifier_list ':' var_type_description
       {
        $$ = dnode_list_append_type( $2, $4 );
       }
@@ -9088,8 +9739,7 @@ type_initialiser
 a[i] = b + c;
 
 2) multiple assignments:
-( a[i], b, c ) = b + c, d, f( x, y );
-( a, b ) = f( x, y, z );
+  a[i], b, c = b + c, d, f( x, y );
   a, b   = f( x, y, z );
 
 */
@@ -9127,15 +9777,6 @@ assignment_statement
   | lvalue '=' expression
       {
 	  compiler_compile_sti( compiler, px );
-      }
-  | '('
-      {
-	  /* Values must be emmitted first in the code. */
-	  compiler_push_thrcode( compiler, px );
-      }
-    lvalue_list ')' '=' multivalue_expression_list
-      {
-	  compiler_compile_multiple_assignment( compiler, $3, $3, $6, px );
       }
 
   | lvalue ',' 
@@ -9273,6 +9914,8 @@ opcode
   : __IDENTIFIER
       { compiler_emit( compiler, px, "\tC\n", $1 ); }
   | module_list __COLON_COLON __IDENTIFIER
+      { compiler_emit( compiler, px, "\tMC\n", dnode_name($1), $3 ); }
+  | __IDENTIFIER ':' __IDENTIFIER
       { compiler_emit( compiler, px, "\tMC\n", $1, $3 ); }
   ;
 
@@ -9890,7 +10533,7 @@ closure_var_declaration
 
 closure_var_list_declaration
   : opt_variable_declaration_keyword
-    identifier ',' variable_identifier_list ':' var_type_description
+    identifier ',' identifier_list ':' var_type_description
       {
        int readonly = $1;
        DNODE *variables = dnode_append( $2, $4 );
@@ -10043,7 +10686,7 @@ closure_initialisation
 }
 
 | opt_variable_declaration_keyword identifier ','
-  variable_identifier_list
+  identifier_list
 {
     int readonly = $1;
     DNODE *closure_var_list = dnode_append( $2, $4 );
@@ -10076,7 +10719,6 @@ closure_initialisation
     assert( closure_tnode );
 
     current_expr = top_expr;
-    // closure_var_list = dnode_list_invert( closure_var_list );
     foreach_reverse_dnode( var, closure_var_list ) {
         TNODE *expr_type = current_expr ?
             share_tnode( enode_type( current_expr )) : NULL;
@@ -10095,7 +10737,6 @@ closure_initialisation
         dnode_append_type( var, expr_type );
         current_expr = current_expr ? enode_next( current_expr ) : NULL;
     }
-    // closure_var_list = dnode_list_invert( closure_var_list );
 
     tnode_insert_fields( closure_tnode, closure_var_list );
 
@@ -10115,7 +10756,6 @@ closure_initialisation
 
     // len = 0;
     i = 0;
-    // closure_var_list = dnode_list_invert( closure_var_list );
     foreach_reverse_dnode( var, closure_var_list ) {
         i ++;
         if( i > len ) break;
@@ -10138,7 +10778,6 @@ closure_initialisation
             compiler_compile_sti( compiler, px );
         }
     }
-    // closure_var_list = dnode_list_invert( closure_var_list );
 
     compiler_emit( compiler, px, "\tc\n", RFROMR );
 }
@@ -10538,18 +11177,18 @@ arithmetic_expression
 /*
   | '<' __IDENTIFIER '>' expression %prec __UNARY
       {
-       compiler_compile_type_conversion( compiler, /*target_name* /$2, px );
+       compiler_compile_named_type_conversion( compiler, /*target_name* /$2, px );
       }
 */
 
   | expression '@' __IDENTIFIER
       {
-       compiler_compile_type_conversion( compiler, /*target_name*/$3, px );
+       compiler_compile_named_type_conversion( compiler, /*target_name*/$3, px );
       }
 
   | expression '@' '(' var_type_description ')'
       {
-       compiler_compile_type_conversion( compiler, NULL, px );
+       compiler_compile_named_type_conversion( compiler, NULL, px );
       }
 
   | expression '?'
@@ -11161,7 +11800,6 @@ argument
 
   | opt_readonly var_type_description uninitialised_var_declarator_list
       {
-        // $$ = dnode_list_append_type( dnode_list_invert( $3 ), $2 );
 	$$ = dnode_list_append_type( $3, $2 );
 	if( $1 ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
@@ -11406,9 +12044,9 @@ opt_method_interface
   }
   | '@' module_list __COLON_COLON __IDENTIFIER
   {
-      char *module_name = $2;
+      DNODE *module = $2;
       char *interface_name = $4;
-      $$ = compiler_lookup_tnode( compiler, module_name,
+      $$ = compiler_lookup_tnode( compiler, module,
                                   interface_name, "interface" );
   }
   | /* empty */

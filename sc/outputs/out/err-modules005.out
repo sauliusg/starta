@@ -1,0 +1,11 @@
+./sl: inputs/modules/dir2/Mod2.slib(15,16): ERROR, symbol 'M1' already declared in the current scope
+end module Mod1;
+               ^
+./sl: inputs/err-modules005.snl(14,3): ERROR, module 'M2' is not available in the current scope
+M2::f();
+  ^
+./sl: inputs/err-modules005.snl(14,6): ERROR, name 'f' is imported more than once -- please use explicit module name for disambiguation
+M2::f();
+     ^
+./sl: 3 error(s) detected
+

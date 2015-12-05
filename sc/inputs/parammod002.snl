@@ -1,0 +1,19 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+use ParUser1;
+use ParUser2;
+
+. ParUser1::geti();
+. ParUser2::geti();
+
+ParUser1::seti( 1000000000L );
+
+. ParUser1::geti(); // Should print "1000000000"
+. ParUser2::geti(); // Should also print "1000000000", since "i" is in
+                    // the same module in both cases.

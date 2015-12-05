@@ -6,7 +6,7 @@ load "libraries/arraymath/libarraymath.so.0.01";
 
 inline bytecode function asum( a : array of float ): float
 {
-    libarraymath::FSUM
+    libarraymath:FSUM
 }
 
 end package ArrayMath;

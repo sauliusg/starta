@@ -198,6 +198,7 @@ static void storeCurrentLine( char *line, int length );
 addressof   { MARK; return _ADDRESSOF; }
 and         { MARK; return _AND; }
 array       { MARK; return _ARRAY; }
+as          { MARK; return _AS; }
 assert      { MARK; return _ASSERT; }
 begin       { MARK; return '{'; }
 blob        { MARK; return _BLOB; }
@@ -225,6 +226,7 @@ from        { MARK; return _FROM; }
 function    { MARK; return _FUNCTION; }
 if          { MARK; return _IF; }
 implements  { MARK; return _IMPLEMENTS; }
+import      { MARK; return _IMPORT; }
 in          { MARK; return _IN; }
 include     { MARK; return _INCLUDE; }
 inline      { MARK; return _INLINE; }

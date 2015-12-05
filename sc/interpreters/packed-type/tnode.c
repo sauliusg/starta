@@ -1115,6 +1115,9 @@ const char *tnode_kind_name( TNODE *tnode )
 {
     static char buffer[80];
 
+    if( !tnode )
+        return "(null)";
+
     switch( tnode->kind ) {
         case TK_NONE:          return "<no kind>";
         case TK_BOOL:          return "bool";
@@ -1135,6 +1138,7 @@ const char *tnode_kind_name( TNODE *tnode )
         case TK_REF:           return "ref";
         case TK_FUNCTION_REF:  return "functionref";
         case TK_NULLREF:       return "nullref";
+        case TK_TYPE:          return "type";
         default:
             snprintf( buffer, sizeof(buffer)-1, "type kind %d", tnode->kind );
             buffer[sizeof(buffer)-1] = '\0';

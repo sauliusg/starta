@@ -1,0 +1,11 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+use * from Parametrised( int, fluffy ) as P;
+
+. P::parallel( 10, 30 );

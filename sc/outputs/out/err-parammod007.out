@@ -1,0 +1,20 @@
+./sl: inputs/err-parammod007.snl(11,17): ERROR, variable 'table' is not declared in the current scope
+. length( table );
+                ^
+./sl: inputs/err-parammod007.snl(11,17): ERROR, incompatible types for function 'length' argument nr. 1
+. length( table );
+                ^
+./sl: inputs/err-parammod007.snl(12,8): ERROR, variable 'table' is not declared in the current scope
+. table[0];
+       ^
+./sl: inputs/err-parammod007.snl(12,11): ERROR, not enough values on the stack for indexing operator
+. table[0];
+          ^
+./sl: inputs/err-parammod007.snl(12,11): ERROR, incompatible type of argument 1 for operator '[]'
+. table[0];
+          ^
+./sl: inputs/err-parammod007.snl(12,11): ERROR, can not index array with unknown element type
+. table[0];
+          ^
+./sl: 6 error(s) detected
+
