@@ -75,8 +75,8 @@ static VAR_NODE *new_var_node_linked( VAR_NODE *next, cexception_t *ex )
 static void delete_var_node( VAR_NODE *node )
 {
     if( node ) {
-        freex( node->name );
 	delete_dnode( node->dnode );
+        freex( node->name );
         /* freex( node ); */
         free_var_node( node );
     }
@@ -198,6 +198,51 @@ void vartab_insert( VARTAB *table, const char *name,
     }
 }
 
+static
+VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
+                                        char *name, SYMTAB *symtab );
+
+void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
+                           SYMTAB *st, cexception_t *ex )
+{
+    VAR_NODE * volatile node = NULL;
+    int count = 0;
+    assert( table );
+
+    vartab_lookup_silently( table, name, &count, /* &s_imported = */ NULL );
+
+    if( (node = vartab_lookup_module_varnode( table, module, name, st ))
+        != NULL ) {
+        if( node->scope == table->current_scope &&
+            (node->flags & VNF_IS_IMPORTED) == 0 ) {
+            yyerrorf( "symbol '%s' already declared in the current scope",
+                      name );
+            table->duplicates =
+                new_var_node_linked( table->duplicates, ex );
+            table->duplicates->dnode = module;
+        }
+    }
+    if( !node || node->scope != table->current_scope ||
+        (node->flags & VNF_IS_IMPORTED) != 0 ) {
+        table->node = new_var_node( module, name,
+                                    table->current_scope,
+                                    table->current_subscope,
+#if 1
+                                    /* count = */ count + 1,
+#else
+                                    1,
+#endif
+                                    table->node, ex );
+    }
+}
+
+void vartab_insert_named_module( VARTAB *table, DNODE *module,
+                                 SYMTAB *st, cexception_t *ex )
+{
+    char *name = dnode_name( module );
+    vartab_insert_module( table, module, name, st, ex );
+}
+
 void vartab_insert_modules_name( VARTAB *table, const char *name,
                                  DNODE *dnode, cexception_t *ex )
 {
@@ -258,9 +303,52 @@ DNODE *vartab_lookup( VARTAB *table, const char *name )
     VAR_NODE *node = vartab_lookup_varnode( table, name );
     if( node && node->count > 1 ) {
         yyerrorf( "name '%s' is imported more than once -- "
-                  "please use explicit package name for disambiguation",
+                  "please use explicit module name for disambiguation",
                   name );
     }
+    return node ? node->dnode : NULL;
+}
+
+static
+VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
+                                        char *name, SYMTAB *symtab )
+{
+    VAR_NODE *node;
+    char *module_name = name ? name : dnode_name( module );
+    char *module_filename = module ? dnode_filename( module ) : NULL;
+
+#if 0
+    printf( "\n>>>> %s():\n", __FUNCTION__ );
+#endif
+
+    assert( table );
+    for( node = table->node; node != NULL; node = node->next ) {
+        char *table_filename =
+            node->dnode ? dnode_filename( node->dnode ) : NULL;
+#if 0
+        printf( "vartab>>> now checking module '%s' (node name '%s'), "
+                "filename '%s'\n",
+                dnode_name( node->dnode ), node->name, 
+                dnode_filename( node->dnode ));
+#endif
+        if( strcmp( module_name, node->name ) == 0 &&
+            ( (!module_filename && !table_filename) ||
+              (module_filename && table_filename &&
+               strcmp( module_filename, table_filename ) == 0 ))) {
+	    assert( node->dnode );
+            if( dnode_module_args_are_identical( node->dnode, module,
+                                                 symtab ) ) {
+                return node;
+            }
+	}
+    }
+    return NULL;
+}
+
+DNODE *vartab_lookup_module( VARTAB *table, DNODE *module, SYMTAB *symtab )
+{
+    VAR_NODE *node =
+        vartab_lookup_module_varnode( table, module, NULL, symtab );
     return node ? node->dnode : NULL;
 }
 
@@ -268,11 +356,11 @@ DNODE *vartab_lookup_silently( VARTAB *table, const char *name,
                                int *count, int *is_imported )
 {
     VAR_NODE *node = vartab_lookup_varnode( table, name );
-    assert( count );
-    assert( is_imported );
     if( node ) {
-        *count = node->count;
-        *is_imported = ((node->flags & VNF_IS_IMPORTED) != 0);
+        if( count )
+            *count = node->count;
+        if( is_imported ) 
+            *is_imported = ((node->flags & VNF_IS_IMPORTED) != 0);
     }
     return node ? node->dnode : NULL;
 }
@@ -281,6 +369,8 @@ static VAR_NODE *vartab_lookup_varnode( VARTAB *table, const char *name )
 {
     VAR_NODE *node;
     assert( table );
+    if( !name )
+        return NULL;
     for( node = table->node; node != NULL; node = node->next ) {
         if( strcmp( name, node->name ) == 0 ) {
 	    assert( node->dnode );

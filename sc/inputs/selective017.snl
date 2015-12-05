@@ -2,7 +2,7 @@
 // Compiler tests
 //
 
-use std;
+import std;
 use type array from std;
 use type int, string from std;
 use function length from std;

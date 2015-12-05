@@ -4,8 +4,8 @@ INTERFACE[1]: vmt offset = 2533
 VMT[0]: 0
 INTERFACE[2]: vmt offset = 2537
 VMT[0]: 2
-VMT[1]: 1072
-VMT[2]: 1083
+VMT[1]: 1078
+VMT[2]: 1089
 INTERFACE[3]: vmt offset = 2549
 VMT[0]: 1
-VMT[1]: 1096
+VMT[1]: 1102

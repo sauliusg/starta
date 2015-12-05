@@ -1,0 +1,14 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test modules with identical names from different files:
+
+use std;
+
+import Mod1 in "modules/dir1/Mod1.slib" as M1;
+import Mod1 in "modules/dir2/Mod2.slib" as M2;
+
+M1::f();
+M2::f();
+

@@ -13,7 +13,7 @@ function three_values( x : int ) : float, long, int
     return x @ float, x @ long, x;
 };
 
-( x, l, i ) = three_values( 23 );
+x, l, i = three_values( 23 );
 . x;
 . l;
 . i;

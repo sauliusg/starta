@@ -11,6 +11,6 @@ var perl_code = "$a = 10.4; $b = 12.7; print \"from Perl: \", $a + $b, \"\\n\";"
 
 . perl_code;
 
-bytecode { PLD %perl_code libPerl::RUN }
+bytecode { PLD %perl_code libPerl:RUN }
 
-bytecode { libPerl::FINISH }
+bytecode { libPerl:FINISH }

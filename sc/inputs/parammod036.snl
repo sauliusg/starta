@@ -1,0 +1,12 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use std;
+
+use ConstParam( 100, int ) as P;
+
+. length( P::table );
+. P::table[0];

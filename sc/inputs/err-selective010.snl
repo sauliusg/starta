@@ -5,9 +5,9 @@
 // Check whether specific names can be imported from selected
 // packages:
 
-use * from std;
+use std;
 
-use P1; use P2;
+import P1; import P2;
 
 use * from P1;
 use * from P2;

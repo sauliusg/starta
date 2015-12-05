@@ -1,0 +1,16 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+const N = 100;
+var v = 23.9;
+
+procedure add( double x, y ): double { return x + y }
+
+use ParamConstVarProc( N, V, add ) as P;
+
+. P::pp( 10 );

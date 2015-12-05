@@ -60,8 +60,9 @@ void delete_enode( ENODE* node )
 ENODE *enode_make_type_to_element_type( ENODE *enode )
 {
     assert( enode );
-    enode->value.expr_type =
-	tnode_convert_to_element_type( enode->value.expr_type );
+    if( enode->value.expr_type )
+        enode->value.expr_type =
+            tnode_convert_to_element_type( enode->value.expr_type );
     return enode;
 }
 

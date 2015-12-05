@@ -1,0 +1,20 @@
+// --*- Java -*--
+// An example of a module parametrised with two types.
+
+module PTypeOnly1( type T, type X )
+
+use * from std;
+
+use TypeParam( double, long ) as PT;
+
+procedure set_inner( i : double )
+{
+    PT::inner = i
+}
+
+function get_inner(): double
+{
+    return PT::inner
+}
+
+end module PTypeOnly1;

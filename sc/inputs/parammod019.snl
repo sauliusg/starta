@@ -1,0 +1,32 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+const N1 = 100;
+const N2 = 200;
+const N3 = 300;
+
+use C( N1 ) as C1;
+use C( N2 ) as C2;
+use C( N1 ) as C3;
+
+. C1::x;
+C1::x = 11;
+. C1::x;
+
+. C2::x;
+C2::x = 12;
+. C2::x;
+
+. C3::x;
+C3::x = 13;
+. C3::x;
+
+. "==================";
+. C1::x;
+. C2::x;
+. C3::x;

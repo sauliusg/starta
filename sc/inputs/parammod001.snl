@@ -1,0 +1,18 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+use * from Parametrised( int, float ) as IF_Paramatrised;
+
+i = 34;
+
+var x = parallel( 2.3, 4.8 );
+
+. 'i =', i;
+. 'x =', x;
+
+. "In the main program";

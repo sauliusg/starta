@@ -53,7 +53,7 @@ function add_and_sub( x, y : int ) : int, int
 
 var p, m : int;
 
-(p, m) = add_and_sub( a, b );
+p, m = add_and_sub( a, b );
 
 writeln( p );
 writeln( m );
