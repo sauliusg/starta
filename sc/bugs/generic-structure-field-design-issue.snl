@@ -16,7 +16,7 @@ procedure generic_procedure( s : null struct { int i; type T x };
 }
 
 try {
-    p = new null struct { int i; string name };
+    var p = new null struct { int i; string name };
     p.name = "Struct p";
     generic_procedure( p, printer );
 }
