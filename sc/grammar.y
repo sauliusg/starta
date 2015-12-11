@@ -8825,7 +8825,7 @@ var_type_description
   | undelimited_or_structure_description
   | _ARRAY
     { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
-  | type_identifier dimension_list
+  | delimited_type_description dimension_list
     {
         $$ = tnode_append_element_type( $2, share_tnode( $1 ));
     }

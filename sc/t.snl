@@ -6,5 +6,10 @@
 
 use std;
 
-procedure sort( a : array of <T>; cmp : function ( a, b : <T> ) -> (bool) ): array of <T>;
+procedure sort( a : array of <T>; cmp : function ( a, b : <T> ) -> (bool) ): array of <T>
+{
+    var <T>[] t;
+
+    return a;
+}
 
