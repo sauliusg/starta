@@ -8935,6 +8935,17 @@ delimited_type_description
 	$$ = share_tnode( tnode );
     }
 
+  | '<' __IDENTIFIER '>'
+    {
+	char *type_name = $2;
+	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
+	if( !tnode ) {
+	    tnode = new_tnode_placeholder( type_name, px );
+	    typetab_insert( compiler->typetab, type_name, tnode, px );
+	}
+	$$ = share_tnode( tnode );
+    }
+
   | function_or_procedure_type_keyword '(' argument_list ')'
     {
 	int is_function = $1;

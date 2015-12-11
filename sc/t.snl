@@ -2,23 +2,9 @@
 // Compiler tests
 //
 
-// Test nested modules.
-
-module M;
+// Test generic types implemented using type erasure.
 
 use std;
 
-module I1;
-   use std;
-   var i : int;
-   function ff(): string { return "I am M::I1::ff()" }
-   function gg() { . ff() }
-end module I1;
+procedure sort( a : array of <T>; cmp : function ( a, b : <T> ) -> (bool) ): array of <T>;
 
-end module M;
-
-use std;
-use M;
-
-. M::I1::ff();
-. I1::ff();
