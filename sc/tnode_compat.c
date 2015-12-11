@@ -134,20 +134,27 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
             ( t1, placeholder_implementation->base_type,
               generic_types, ex );
     } else {
-        cexception_t inner;
-        cexception_guard( inner ) {
-            placeholder_implementation =
-                new_tnode_placeholder( t2->name, ex );
-            tnode_insert_base_type( placeholder_implementation,
-                                    share_tnode( t1 ));
-            typetab_insert( generic_types, t2->name,
-                            placeholder_implementation, &inner );
+        if( !tnode_is_reference( t2 ) || tnode_is_reference( t1 )) {
+            cexception_t inner;
+            cexception_guard( inner ) {
+                placeholder_implementation =
+                    new_tnode_placeholder( t2->name, ex );
+                tnode_insert_base_type( placeholder_implementation,
+                                        share_tnode( t1 ));
+                typetab_insert( generic_types, t2->name,
+                                placeholder_implementation, &inner );
+            }
+            cexception_catch {
+                delete_tnode( placeholder_implementation );
+                cexception_reraise( inner, ex );
+            }
+            return 1;
+        } else {
+            yyerrorf( "can not implement reference placeholder '%s' "
+                      "with a non-reference type '%s'",
+                      tnode_name( t2 ), tnode_name( t1 ));
+            return 0;
         }
-        cexception_catch {
-            delete_tnode( placeholder_implementation );
-            cexception_reraise( inner, ex );
-        }
-        return 1;
     }
 }
 
@@ -501,6 +508,12 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
             typetab_lookup( generic_types, abstract->name );
 
         if( !placeholder_implementation ) {
+            if( tnode_is_reference( abstract ) &&
+                !tnode_is_reference( concrete )) {
+                yyerrorf( "can not implement reference placeholder '%s' "
+                          "with a non-reference type '%s'",
+                          tnode_name( abstract ), tnode_name( concrete ));
+            }
             cexception_t inner;
             cexception_guard( inner ) {
                 placeholder_implementation =
@@ -515,8 +528,8 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                 delete_tnode( placeholder_implementation );
                 cexception_reraise( inner, ex );
             }
+            return placeholder_implementation;
         }
-        return placeholder_implementation;
     }
     return abstract;
 }
