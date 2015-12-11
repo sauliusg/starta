@@ -10797,14 +10797,22 @@ closure_initialisation
 ;
 
 function_expression_header
-:   function_or_procedure_keyword '(' argument_list ')'
+:   opt_function_attributes function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
+        int is_function = $2;
         dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
-                                 /* parameters = */ $3,
-                                 /* return_values = */ $5,
+                                 /* parameters = */ $4,
+                                 /* return_values = */ $6,
                                  px );
+        if( $1 & DF_BYTECODE )
+            dnode_set_flags( $$, DF_BYTECODE );
+        if( $1 & DF_INLINE )
+            dnode_set_flags( $$, DF_INLINE );
+        if( is_function ) {
+            compiler_set_function_arguments_readonly( dnode_type( $$ ));
+        }
     }
 ;
 
