@@ -2,7 +2,7 @@
 // Compiler tests
 //
 
-// Test contunuations implemented as closures.
+// Test continuations implemented as closures.
 
 use std;
 
