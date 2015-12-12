@@ -5762,7 +5762,8 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
             compiler_check_and_drop_function_args( cc, funct, generic_types,
                                                    &inner );
             compiler_emit_function_call( cc, funct, NULL, "\n", &inner );
-            if( tnode_kind( fn_type ) == TK_FUNCTION_REF ) {
+            if( tnode_kind( fn_type ) == TK_FUNCTION_REF ||
+                tnode_kind( fn_type ) == TK_CLOSURE ) {
                 compiler_drop_top_expression( cc );
             }
             compiler_push_function_retvals( cc, funct, generic_types, &inner );
