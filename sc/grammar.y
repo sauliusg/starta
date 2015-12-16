@@ -1982,8 +1982,10 @@ static void compiler_push_operator_retvals( COMPILER *cc,
     }
 
     if( generic_types ) {
+#if 0
     // if( 0 ) {
         // CHECK MEMORY USAGE HERE!!! S.G.
+#endif
         retval_type = new_tnode_implementation( retval_type, generic_types, ex );
     }
 
@@ -4986,7 +4988,6 @@ static void compiler_begin_module( COMPILER *c,
     compiler_push_symbol_tables( c, ex );
     vartab_insert_named_module( c->compiled_modules, module, 
                                 /* SYMTAB *st = */ NULL,
-                                // stlist_data( c->symtab_stack ),
                                 ex );
     vartab_insert_named( c->vartab, share_dnode( module ), ex );
     dlist_push_dnode( &c->current_module_stack, &c->current_module, ex );
@@ -9437,7 +9438,6 @@ delimited_type_declaration
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
-            // ntype =  $4;            
             compiler_compile_type_declaration( compiler, ntype, &inner );
         }
         cexception_catch {
@@ -9445,7 +9445,7 @@ delimited_type_declaration
             cexception_reraise( inner, px );
         }
       }
-  | type_declaration_start '=' delimited_type_description /*type_*/initialiser
+  | type_declaration_start '=' delimited_type_description initialiser
       {
         compiler_compile_drop( compiler, px );
 	compiler_end_scope( compiler, px );
@@ -10767,7 +10767,6 @@ closure_initialisation
         }
     }
 
-    // len = 0;
     i = 0;
     foreach_reverse_dnode( var, closure_var_list ) {
         i ++;
