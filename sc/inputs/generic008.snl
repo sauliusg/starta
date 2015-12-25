@@ -3,7 +3,7 @@
 // This file illustrates a problem with the current generic type
 // design. When a structure is declared with the field of generic
 // type, the assumptions about the field alignment, offset and
-// position hold only when a generic type field is teh last field in
+// position hold only when a generic type field is the last field in
 // the structure.
 
 use * from std;
