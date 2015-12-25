@@ -700,7 +700,18 @@ int GLDI( INSTRUCTION_FN_ARGS )
 
         istate.ep[0].num.offs = 0;
 
-        memcpy( &istate.ep[0].num, num_ptr, sizeof(istate.ep[0].num));
+        ssize_t size = src_header->size;
+        ssize_t nref = src_header->nref;
+        if( nref < 0 ) {
+            size += nref * REF_SIZE;
+        }
+
+        ssize_t copy_size = sizeof(istate.ep[0].num);
+        ssize_t left_size = size - pos_offset;
+        if( copy_size < left_size )
+            copy_size = left_size;
+        if( pos_offset < size )
+            memcpy( &istate.ep[0].num, num_ptr, copy_size );
 
         if( neg_offset < 0 ) {
             istate.ep[0].PTR = *ref_ptr;
