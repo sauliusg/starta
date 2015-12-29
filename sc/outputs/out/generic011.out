@@ -1,0 +1,11 @@
+./sl: inputs/generic011.snl(32,55): ERROR, offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( struct DS { i => 2, f => 3.14 }, dprinter );
+                                                      ^
+./sl: inputs/generic011.snl(32,66): ERROR, offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( struct DS { i => 2, f => 3.14 }, dprinter );
+                                                                 ^
+./sl: inputs/generic011.snl(32,66): ERROR, incompatible types for function 'generic_procedure' argument nr. 1
+    generic_procedure( struct DS { i => 2, f => 3.14 }, dprinter );
+                                                                 ^
+./sl: 3 error(s) detected
+
