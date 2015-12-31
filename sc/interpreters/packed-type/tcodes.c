@@ -1188,18 +1188,31 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nref = array[-1].nref;
     nele = array[-1].length;
 
+#if 0
     if( nele >= 0 ) {
         assert( nref == 0 || nref == nele );
         ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
     } else {
         ptr = bcalloc( size, element_size, -1, nref );
     }
+#else
+    /* printf( ">>> size = %d, esize = %d, nele = %d, nref = %d\n",
+       size, element_size, nele, nref ); */
+    ptr = bcalloc( size, element_size, nele, nref );
+#endif
 
     BC_CHECK_PTR( ptr );
 
+#if 0
     memcpy( ptr, array,
             nele >= 0 ? (ssize_t)element_size * (ssize_t)nele :
             size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
+#else
+    ssize_t copy_size = nref > 0 ?
+        size : (size - (ssize_t)(-nref)*(ssize_t)REF_SIZE);
+
+    memcpy( ptr, array, copy_size );
+#endif
 
     ptr[-1].vmt_offset = array[-1].vmt_offset;
 

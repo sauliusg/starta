@@ -19,5 +19,6 @@ void alloccell_set_values( alloccell_t *hdr, ssize_t element_size,
     hdr->flags |= AF_USED;
     hdr->length = len;
     hdr->element_size = element_size;
+    hdr->size = element_size * (len < 0 ? 1 : len);
 }
 
