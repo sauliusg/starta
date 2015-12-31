@@ -1236,7 +1236,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             ssize_t old_offset = tnode->nextnumoffs;
             field_size = sizeof(union stackunion);
 #if 1
-            field_align = sizeof(float);
+            field_align = sizeof(int);
             ALIGN_NUMBER( tnode->nextnumoffs, field_align );
 #endif
             /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
