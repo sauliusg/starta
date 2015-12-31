@@ -1689,9 +1689,10 @@ static void compiler_compile_return( COMPILER *cc,
 	available_type = enode_type( expr );
 
 	/* if( !tnode_types_are_identical( returned_type, available_type )) { */
+        char msg[300] = "";
 	if( !tnode_types_are_assignment_compatible
             ( returned_type, available_type, NULL /* generic type table */,
-              ex )) {
+              msg, sizeof(msg)-1, ex )) {
             char *returned_type_name = returned_type ?
                 tnode_name( returned_type ) : NULL;
             if( available_type && returned_type_name && 
@@ -1704,9 +1705,16 @@ static void compiler_compile_return( COMPILER *cc,
                     available_type = enode_type( expr );
                 }
             } else {
-                yyerrorf( "incompatible types of returned value %d "
-                          "of function '%s'",
-                          nretvals - i, dnode_name( cc->current_function ));
+                if( msg[0] ) {
+                    yyerrorf( "incompatible types of returned value %d "
+                              "of function '%s' - %s",
+                              nretvals - i, dnode_name( cc->current_function ),
+                              msg );
+                } else {
+                    yyerrorf( "incompatible types of returned value %d "
+                              "of function '%s'",
+                              nretvals - i, dnode_name( cc->current_function ));
+                }
             }
 	}
 
@@ -1896,13 +1904,20 @@ static void compiler_check_operator_args( COMPILER *cc,
                treatment: */
             TNODE *arg_type = op_args ? dnode_type( op_args ) : NULL;
 
+            char msg[300] = "";
             if( !arg_type ||
                 !tnode_types_are_assignment_compatible( dnode_type( op_args ),
                                                         od->containing_type,
                                                         generic_types,
+                                                        msg, sizeof(msg)-1,
                                                         ex )) {
-                yyerrorf( "incompatible type of an argument "
-                          "for operator '%s'", od->name );
+                if( msg[0] ) {
+                    yyerrorf( "incompatible type of an argument "
+                              "for operator '%s' - %s", od->name, msg );
+                } else {
+                    yyerrorf( "incompatible type of an argument "
+                              "for operator '%s'", od->name );
+                }
             }
         } else {
             expr = cc->e_stack;
@@ -2106,7 +2121,8 @@ static int compiler_test_top_types_are_assignment_compatible(
 	TNODE *type2 = enode_type( expr2 );
 
 	if( !tnode_types_are_assignment_compatible
-            ( type1, type2, NULL /* generic type table */, ex )) {
+            ( type1, type2, NULL /* generic type table */,
+              NULL /* msg */, 0 /* msglen */, ex )) {
 	    return 0;
 	} else {
 	    return 1;
@@ -2372,8 +2388,10 @@ static void compiler_compile_variable_assignment_or_init(
         /* TYPETAB *generic_types = new_typetab( ex ); */
         TYPETAB *generic_types = NULL;
         int has_errors = 0;
+        char msg[300] = "";
         if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
-                                                    generic_types, ex )) {
+                                                    generic_types,
+                                                    msg, sizeof(msg)-1, ex )) {
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( expr_type && dst_name &&
 		tnode_lookup_conversion( var_type, expr_type )) {
@@ -2382,10 +2400,21 @@ static void compiler_compile_variable_assignment_or_init(
 		expr_type = enode_type( expr );
 	    } else {
 		if( var_name ) {
-		    yyerrorf( "incompatible types for assignment to variable "
-			      "'%s'", var_name );
+                    if( msg[0] ) {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable '%s' - %s", var_name, msg );
+                    } else {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable '%s'", var_name );
+                    }
 		} else {
-		    yyerrorf( "incompatible types for assignment to variable" );
+                    if( msg[0] ) {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable - %s", msg );
+                    } else {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable" );
+                    }
 		}
                 has_errors = 1;
 	    }
@@ -2575,11 +2604,13 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		addr_type ? tnode_element_type( addr_type ) : NULL;
 	    operator_description_t od;
 
+            char msg[300] = "";
 	    if( element_type && expr_type ) {
 		/* if( !tnode_types_are_identical( element_type, expr_type )) {
 		 */
 		if( !tnode_types_are_assignment_compatible
-                    ( element_type, expr_type, NULL /* generic_type_table*/, ex )) {
+                    ( element_type, expr_type, NULL /* generic_type_table*/,
+                      msg, sizeof(msg)-1, ex )) {
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
 			tnode_lookup_conversion( element_type, expr_type )) {
@@ -2587,7 +2618,12 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 			expr = cc->e_stack;
                         expr_type = enode_type( expr );
 		    } else {
-			yyerrorf( "incompatible types for assignment" );
+                        if( msg[0] ) {
+                            yyerrorf( "incompatible types for assignment - %s",
+                                      msg );
+                        } else {
+                            yyerrorf( "incompatible types for assignment" );
+                        }
 		    }
 		}
             }
@@ -3564,11 +3600,19 @@ static void compiler_check_and_drop_function_args( COMPILER *cc,
             formal_type = dnode_type( formal_arg );
             actual_type = enode_type( actual_arg );
             /* if( !tnode_types_are_identical( formal_type, actual_type )) { */
+            char msg[300] = "";
             if( !tnode_types_are_assignment_compatible
-                ( formal_type, actual_type, generic_types, ex )) {
-                yyerrorf( "incompatible types for function '%s' argument "
-                          "nr. %d"/* " (%s)" */, dnode_name( function ),
-                          nargs - n, dnode_name( formal_arg ));
+                ( formal_type, actual_type, generic_types,
+                  msg, sizeof(msg), ex )) {
+                if( msg[0] ) {
+                    yyerrorf( "incompatible types for function '%s' argument "
+                              "nr. %d - %s", dnode_name( function ),
+                              nargs - n, /* dnode_name( formal_arg ),  */msg );
+                } else {
+                    yyerrorf( "incompatible types for function '%s' argument "
+                              "nr. %d"/* " (%s)" */, dnode_name( function ),
+                              nargs - n, dnode_name( formal_arg ));
+                }
             }
             if( !enode_is_readonly_compatible_for_param( actual_arg,
                                                          formal_arg )) {
@@ -4654,7 +4698,8 @@ static void compiler_convert_function_argument( COMPILER *cc,
     if( arg_type && exp_type ) {
 	if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
 	    !tnode_types_are_assignment_compatible( arg_type, exp_type,
-                                                    NULL, ex )) {
+                                                    NULL, NULL /* msg */,
+                                                    0 /* msglen */, ex )) {
             char *arg_type_name = tnode_name( arg_type );
             if( arg_type_name ) {
                 compiler_compile_type_conversion
