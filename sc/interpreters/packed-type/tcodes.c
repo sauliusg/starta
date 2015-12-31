@@ -761,7 +761,18 @@ int GSTI( INSTRUCTION_FN_ARGS )
         num_ptr = (char*)istate.ep[1].PTR + pos_offset;
         ref_ptr = (void**)((char*)istate.ep[1].PTR + neg_offset);
 
-        memcpy( num_ptr, &istate.ep[0].num, sizeof(istate.ep[0].num) );
+        ssize_t size = dst_header->size;
+        ssize_t nref = dst_header->nref;
+        if( nref < 0 ) {
+            size += nref * REF_SIZE;
+        }
+
+        ssize_t copy_size = sizeof(istate.ep[0].num);
+        ssize_t left_size = size - pos_offset;
+        if( copy_size > left_size )
+            copy_size = left_size;
+        if( pos_offset < size )
+            memcpy( num_ptr, &istate.ep[0].num, copy_size );
 
         if( neg_offset < 0 ) {
             *ref_ptr = istate.ep[0].PTR;
