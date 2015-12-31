@@ -1158,6 +1158,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nref = array[-1].nref;
     nele = array[-1].length;
 
+#if 0
     if( nele >= 0 ) {
         assert( nref == 0 || nref == nele );
         ptr = bcalloc_array( array[-1].nref == 0 ?
@@ -1166,6 +1167,9 @@ int CLONE( INSTRUCTION_FN_ARGS )
     } else {
         ptr = bcalloc( size, -1, nref );
     }
+#else
+    ptr = bcalloc( size, nele, nref );
+#endif
 
     BC_CHECK_PTR( ptr );
 
