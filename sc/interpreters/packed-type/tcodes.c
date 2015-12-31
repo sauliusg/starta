@@ -708,7 +708,7 @@ int GLDI( INSTRUCTION_FN_ARGS )
 
         ssize_t copy_size = sizeof(istate.ep[0].num);
         ssize_t left_size = size - pos_offset;
-        if( copy_size < left_size )
+        if( copy_size > left_size )
             copy_size = left_size;
         if( pos_offset < size )
             memcpy( &istate.ep[0].num, num_ptr, copy_size );
