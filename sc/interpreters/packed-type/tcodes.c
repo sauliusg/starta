@@ -757,7 +757,6 @@ int GSTI( INSTRUCTION_FN_ARGS )
     } else {
 
         /* printf( ">>> pos = %d, neg = %d\n", pos_offset, neg_offset ); */
-        /* exit(0); */
 
         num_ptr = (char*)istate.ep[1].PTR + pos_offset;
         ref_ptr = (void**)((char*)istate.ep[1].PTR + neg_offset);
