@@ -2794,14 +2794,9 @@ static void compiler_check_and_compile_top_2_operator( COMPILER *cc,
 	    tnode2 = tnode_element_type( tnode2 );
 	}
 	if( compiler_lookup_operator( cc, tnode2, operator, arity, ex )) {
-#if 0
-	    TNODE *element_type = tnode_element_type( tnode2 );
-	    key_value_t *fixup_values = element_type ?
-		make_tnode_key_value_list( element_type ) : NULL;
-#else
 	    key_value_t *fixup_values =
                 make_tnode_key_value_list( tnode2, NULL );
-#endif
+
 	    compiler_check_and_compile_operator( cc, tnode2, operator, arity,
                                                  fixup_values, ex );
 	} else {
@@ -3191,21 +3186,11 @@ static void compiler_compile_alloc( COMPILER *cc,
 		  "(e.g. 'a = new int[20]')" );
     }
 
-    /* if( tnode_has_operator( cc, "new", 1, ex )) { */
     if ( compiler_lookup_operator( cc, alloc_type, "new",
                                    /* arity = */ 0, ex )) {
-	/* compiler_drop_top_expression( cc ); */
-#if 0
-        // This branch is buggy! S.G.
-        TNODE *element_type =
-            alloc_type && tnode_kind( alloc_type ) == TK_COMPOSITE ?
-            tnode_element_type( alloc_type ) : NULL;
-        key_value_t *fixup_values =
-            make_tnode_key_value_list( element_type ? element_type : alloc_type );
-#else
         key_value_t *fixup_values =
             make_tnode_key_value_list( alloc_type, NULL );
-#endif
+
 	compiler_check_and_compile_operator( cc, alloc_type, "new",
                                              /* arity = */ 0, 
                                              fixup_values, ex );
@@ -4299,11 +4284,7 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 
 	    array_expr = cc->e_stack;
 
-#if 0
-	    fixup_values = make_tnode_key_value_list( element_type );
-#else
 	    fixup_values = make_tnode_key_value_list( array_type, NULL );
-#endif
 
 	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
                                                       "", &inner );
