@@ -2,23 +2,30 @@
 // Compiler tests
 //
 
-// Test nested modules.
-
-module M;
+// Test destructors.
 
 use std;
 
-module I1;
-   use std;
-   var i : int;
-   function ff(): string { return "I am M::I1::ff()" }
-   function gg() { . ff() }
-end module I1;
+class C {
+    string name;
+    int count;
 
-end module M;
+    constructor C( string name = "default C"; int count = -1 )
+    {
+        self.name = name;
+        self.count = count;
+    }
 
-use std;
-use M;
+    destructor C
+    {
+        . "Finita la comedia!"
+    }
 
-. M::I1::ff();
-. I1::ff();
+    method print() { . self.name, self.count }
+}
+
+var c1 = new C();
+var c2 = new C( "c2", count => 10 );
+
+c1->print();
+c2->print();

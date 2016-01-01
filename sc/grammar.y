@@ -3694,7 +3694,7 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 	if( !tnode_function_prototypes_match_msg( fn_tnode,
 					          dnode_type( fn_proto ),
 					          msg, sizeof( msg ))) {
-	    yyerrorf( "prototype of constructir %s() does not match "
+	    yyerrorf( "prototype of constructor %s() does not match "
 		      "previous definition - %s", dnode_name( fn_proto ),
 		      msg );
 	}
@@ -6538,6 +6538,7 @@ static cexception_t *px; /* parser exception */
 %token _CONSTRUCTOR
 %token _CONTINUE
 %token _DEBUG
+%token _DESTRUCTOR
 %token _DO
 %token _ELSE
 %token _ELSIF
@@ -6622,6 +6623,8 @@ static cexception_t *px; /* parser exception */
 %type <dnode> constructor_header
 %type <dnode> constructor_definition
 %type <tnode> dimension_list
+%type <dnode> destructor_header
+%type <dnode> destructor_definition
 %type <dnode> enum_member
 %type <tnode> enum_member_list
 %type <i>     expression_list
@@ -9291,6 +9294,8 @@ struct_operator
   | method_header
   | constructor_definition
   | constructor_header
+  | destructor_header
+  | destructor_definition
   ;
 
 interface_type_placeholder
@@ -11964,6 +11969,13 @@ constructor_definition
     function_or_operator_end
   ;
 
+destructor_definition
+  : destructor_header
+    function_or_operator_start
+    function_or_operator_body
+    function_or_operator_end
+  ;
+
 function_definition
   : function_header
     function_or_operator_start
@@ -12339,6 +12351,47 @@ constructor_header
 	  }
 	  cexception_catch {
 	      delete_dnode( parameter_list );
+	      delete_dnode( funct );
+	      $$ = NULL;
+	      cexception_reraise( inner, px );
+	  }
+	}
+  ;
+
+destructor_header
+  : opt_function_attributes function_code_start _DESTRUCTOR __IDENTIFIER
+        {
+	  cexception_t inner;
+	  DNODE *volatile funct = NULL;
+          DNODE *volatile self_dnode = NULL;
+          
+          int function_attributes = $1;
+          char *destructor_name = $4;
+
+    	  cexception_guard( inner ) {
+              TNODE *class_tnode = compiler->current_type;
+
+              assert( class_tnode );
+              self_dnode = new_dnode_name( "self", &inner );
+              dnode_insert_type( self_dnode, share_tnode( class_tnode ));
+
+	      $$ = funct = new_dnode_destructor( destructor_name,
+                                                 self_dnode, &inner );
+
+              self_dnode = NULL;
+
+              dnode_set_scope( funct, compiler_current_scope( compiler ));
+
+              tnode_insert_destructor( class_tnode, share_dnode( funct ));
+              
+	      dnode_set_flags( funct, DF_FNPROTO );
+	      if( function_attributes & DF_BYTECODE )
+	          dnode_set_flags( funct, DF_BYTECODE );
+	      if( function_attributes & DF_INLINE )
+	          dnode_set_flags( funct, DF_INLINE );
+	  }
+	  cexception_catch {
+	      delete_dnode( self_dnode );
 	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );
