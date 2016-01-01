@@ -18,6 +18,7 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 
 int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                            TYPETAB *generic_types,
+                                           char *msg, ssize_t msglen,
                                            cexception_t *ex );
 
 int tnode_types_are_identical( TNODE *t1, TNODE *t2,

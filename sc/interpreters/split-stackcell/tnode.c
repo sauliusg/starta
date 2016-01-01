@@ -1187,6 +1187,18 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 	field_type = dnode_type( current );
 	field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
 
+        /* This check is not strictly necessary here, the split
+           stackcell representation will work correctly without it,
+           but it is used to maintain compatibility with the packed
+           type represenation: */
+        DNODE *last_field =
+            tnode->fields ? dnode_list_last( tnode->fields ) : NULL;
+        TNODE *last_type = last_field ? dnode_type( last_field ) : NULL;
+        if( last_type && tnode_kind( last_type ) == TK_PLACEHOLDER ) {
+            yyerrorf( "A generic field ('%s') must be a single last "
+                      "field in a structure", dnode_name( last_field ));
+        }
+
 	if( field_kind != TK_FUNCTION ) {
             if( tnode_is_reference( field_type ) ||
                 field_kind == TK_PLACEHOLDER ) {

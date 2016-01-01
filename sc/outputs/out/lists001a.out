@@ -1,20 +1,5 @@
-./sl: Unhandled exception 123 in the bytecode interpreter: attempting to take head of a null list
-one
-one
-one
-one
-one
-two
-alpha
----
-one
----
-1
-2
-1
-2
-2
-one
-#========================================================================
-123
-45
+./sl: inputs/lists001a.snl(12,21): ERROR, A generic field ('value') must be a single last field in a structure
+    next : list of T;
+                    ^
+./sl: 1 error(s) detected
+

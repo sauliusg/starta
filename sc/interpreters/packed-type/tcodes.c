@@ -708,7 +708,7 @@ int GLDI( INSTRUCTION_FN_ARGS )
 
         ssize_t copy_size = sizeof(istate.ep[0].num);
         ssize_t left_size = size - pos_offset;
-        if( copy_size < left_size )
+        if( copy_size > left_size )
             copy_size = left_size;
         if( pos_offset < size )
             memcpy( &istate.ep[0].num, num_ptr, copy_size );
@@ -757,12 +757,22 @@ int GSTI( INSTRUCTION_FN_ARGS )
     } else {
 
         /* printf( ">>> pos = %d, neg = %d\n", pos_offset, neg_offset ); */
-        /* exit(0); */
 
         num_ptr = (char*)istate.ep[1].PTR + pos_offset;
         ref_ptr = (void**)((char*)istate.ep[1].PTR + neg_offset);
 
-        memcpy( num_ptr, &istate.ep[0].num, sizeof(istate.ep[0].num) );
+        ssize_t size = dst_header->size;
+        ssize_t nref = dst_header->nref;
+        if( nref < 0 ) {
+            size += nref * REF_SIZE;
+        }
+
+        ssize_t copy_size = sizeof(istate.ep[0].num);
+        ssize_t left_size = size - pos_offset;
+        if( copy_size > left_size )
+            copy_size = left_size;
+        if( pos_offset < size )
+            memcpy( num_ptr, &istate.ep[0].num, copy_size );
 
         if( neg_offset < 0 ) {
             *ref_ptr = istate.ep[0].PTR;
@@ -1178,18 +1188,31 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nref = array[-1].nref;
     nele = array[-1].length;
 
+#if 0
     if( nele >= 0 ) {
         assert( nref == 0 || nref == nele );
         ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
     } else {
         ptr = bcalloc( size, element_size, -1, nref );
     }
+#else
+    /* printf( ">>> size = %d, esize = %d, nele = %d, nref = %d\n",
+       size, element_size, nele, nref ); */
+    ptr = bcalloc( size, element_size, nele, nref );
+#endif
 
     BC_CHECK_PTR( ptr );
 
+#if 0
     memcpy( ptr, array,
             nele >= 0 ? (ssize_t)element_size * (ssize_t)nele :
             size - (ssize_t)abs(nref) * (ssize_t)REF_SIZE );
+#else
+    ssize_t copy_size = nref > 0 ?
+        size : (size - (ssize_t)(-nref)*(ssize_t)REF_SIZE);
+
+    memcpy( ptr, array, copy_size );
+#endif
 
     ptr[-1].vmt_offset = array[-1].vmt_offset;
 

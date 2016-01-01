@@ -6,7 +6,7 @@
 \*---------------------------------------------------------------------------*/
 
 /* tnode -- representation of the type definition parse tree */
-/* tnode tree is built by the parser (hlc.y) */
+/* tnode tree is built by the parser (grammar.y) */
 /* from this tnode tree a type symbol table is built */
 
 /* exports: */
@@ -1196,6 +1196,14 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             ( field_type ? tnode_size( field_type ) : 0 );
         field_align = field_type ? tnode_align( field_type ) : 0;
 
+        DNODE *last_field =
+            tnode->fields ? dnode_list_last( tnode->fields ) : NULL;
+        TNODE *last_type = last_field ? dnode_type( last_field ) : NULL;
+        if( last_type && tnode_kind( last_type ) == TK_PLACEHOLDER ) {
+            yyerrorf( "A generic field ('%s') must be a single last "
+                      "field in a structure", dnode_name( last_field ));
+        }
+
 	if( field_kind != TK_FUNCTION ) {
             if( tnode_is_reference( field_type ) ||
                 field_kind == TK_PLACEHOLDER ) {
@@ -1228,7 +1236,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             ssize_t old_offset = tnode->nextnumoffs;
             field_size = sizeof(union stackunion);
 #if 1
-            field_align = sizeof(float);
+            field_align = sizeof(int);
             ALIGN_NUMBER( tnode->nextnumoffs, field_align );
 #endif
             /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
@@ -1250,6 +1258,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                                  tnode->nextnumoffs );
             tnode->nextnumoffs += field_size;
             tnode->size += tnode->nextnumoffs - old_offset;
+            tnode_set_flags( tnode, TF_HAS_PLACEHOLDER );
         }
         if( field_size == 0 && field_type && field_kind != TK_FUNCTION &&
             field_kind != TK_PLACEHOLDER ) {

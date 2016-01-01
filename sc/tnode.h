@@ -31,6 +31,7 @@ typedef enum {
     TF_IS_IMMUTABLE    = 0x20,
     TF_NON_NULL        = 0x40,
     TF_IS_EQUIVALENT   = 0x80,
+    TF_HAS_PLACEHOLDER = 0x100,
     last_TYPE_FLAG
 } type_flag_t;
 
