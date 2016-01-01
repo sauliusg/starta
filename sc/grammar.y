@@ -2275,15 +2275,6 @@ static void compiler_compile_binop( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static key_value_t *make_array_element_key_value_list( TNODE *array )
-{
-    TNODE *element_type = array ? tnode_element_type( array ) : NULL;
-
-    if( !element_type ) return NULL;
-
-    return make_tnode_key_value_list( NULL, element_type );
-}
-
 static void compiler_compile_unop( COMPILER *cc,
                                    char *unop_name,
                                    cexception_t *ex )
@@ -2303,7 +2294,7 @@ static void compiler_compile_unop( COMPILER *cc,
 	    operator_description_t od;
 	    key_value_t *fixup_values = NULL;
             if( expr_type && tnode_kind( expr_type ) == TK_ARRAY ) {
-		fixup_values = make_array_element_key_value_list( expr_type );
+		fixup_values = make_tnode_key_value_list( expr_type, NULL );
             } else {
                 fixup_values =
                     make_compiler_tnode_key_value_list( cc, expr_type, ex );
