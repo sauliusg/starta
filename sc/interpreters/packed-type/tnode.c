@@ -49,6 +49,7 @@ void delete_tnode( TNODE *tnode )
 	delete_tnode( tnode->element_type );
         delete_tlist( tnode->interfaces );
 	delete_dnode( tnode->constructor );
+	delete_dnode( tnode->destructor );
 	delete_tnode( tnode->next );
 	free_tnode( tnode );
     }
@@ -460,6 +461,15 @@ TNODE *new_tnode_constructor( char *name,
 {
     return new_tnode_function_or_operator( name, parameters, return_dnodes,
 					   TK_CONSTRUCTOR, ex );
+}
+
+TNODE *new_tnode_destructor( char *name,
+                             DNODE *parameters,
+                             DNODE *return_dnodes,
+                             cexception_t *ex )
+{
+    return new_tnode_function_or_operator( name, parameters, return_dnodes,
+					   TK_DESTRUCTOR, ex );
 }
 
 TNODE *new_tnode_method( char *name,
@@ -1293,6 +1303,20 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
             delete_dnode( tnode->constructor );
             tnode->constructor = constructor;
         }
+    }
+    return tnode;
+}
+
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor )
+{
+    assert( tnode );
+    assert( destructor );
+
+    if( !tnode->destructor || tnode->destructor == destructor ) {
+        tnode->destructor = destructor;
+    } else {
+        yyerrorf( "destructor is already declared for class '%s'", 
+                  tnode_name( tnode ));
     }
     return tnode;
 }

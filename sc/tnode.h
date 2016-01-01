@@ -54,6 +54,7 @@ typedef enum {
     TK_CLOSURE,
     TK_METHOD, /* class (virtual) methods, or virtual functions */
     TK_CONSTRUCTOR,
+    TK_DESTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
     TK_DERIVED,     /* A new derived type inherits implementation and
@@ -106,6 +107,11 @@ TNODE *new_tnode_constructor( char *name,
                               DNODE *parameters,
                               DNODE *return_dnodes,
                               cexception_t *ex );
+
+TNODE *new_tnode_destructor( char *name,
+                             DNODE *parameters,
+                             DNODE *return_dnodes,
+                             cexception_t *ex );
 
 TNODE *new_tnode_method( char *name, DNODE *parameters, DNODE *return_dnodes,
                          cexception_t *ex );
@@ -213,6 +219,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value_list( TNODE *tnode, DNODE *list );
 TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor );
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor );
 ssize_t tnode_max_vmt_offset( TNODE *tnode );
 ssize_t tnode_vmt_offset( TNODE *tnode );
 ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset );
