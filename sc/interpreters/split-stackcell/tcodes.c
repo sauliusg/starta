@@ -670,7 +670,18 @@ int GLDI( INSTRUCTION_FN_ARGS )
 
         istate.ep[0].num.offs = 0;
 
-        memcpy( &istate.ep[0].num, num_ptr, sizeof(istate.ep[0].num));
+        ssize_t size = src_header->size;
+        ssize_t nref = src_header->nref;
+        if( nref < 0 ) {
+            size += nref * REF_SIZE;
+        }
+
+        ssize_t copy_size = sizeof(istate.ep[0].num);
+        ssize_t left_size = size - pos_offset;
+        if( copy_size > left_size )
+            copy_size = left_size;
+        if( pos_offset < size )
+            memcpy( &istate.ep[0].num, num_ptr, copy_size );
 
         if( neg_offset < 0 ) {
             istate.ep[0].PTR = *ref_ptr;
@@ -717,7 +728,18 @@ int GSTI( INSTRUCTION_FN_ARGS )
         num_ptr = (char*)istate.ep[1].PTR + pos_offset;
         ref_ptr = (void**)((char*)istate.ep[1].PTR + neg_offset);
 
-        memcpy( num_ptr, &istate.ep[0].num, sizeof(istate.ep[0].num) );
+        ssize_t size = dst_header->size;
+        ssize_t nref = dst_header->nref;
+        if( nref < 0 ) {
+            size += nref * REF_SIZE;
+        }
+
+        ssize_t copy_size = sizeof(istate.ep[0].num);
+        ssize_t left_size = size - pos_offset;
+        if( copy_size > left_size )
+            copy_size = left_size;
+        if( pos_offset < size )
+            memcpy( num_ptr, &istate.ep[0].num, copy_size );
 
         if( neg_offset < 0 ) {
             *ref_ptr = istate.ep[0].PTR;
@@ -1136,6 +1158,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nref = array[-1].nref;
     nele = array[-1].length;
 
+#if 0
     if( nele >= 0 ) {
         assert( nref == 0 || nref == nele );
         ptr = bcalloc_array( array[-1].nref == 0 ?
@@ -1144,6 +1167,9 @@ int CLONE( INSTRUCTION_FN_ARGS )
     } else {
         ptr = bcalloc( size, -1, nref );
     }
+#else
+    ptr = bcalloc( size, nele, nref );
+#endif
 
     BC_CHECK_PTR( ptr );
 

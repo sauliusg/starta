@@ -1294,7 +1294,8 @@ static ssize_t lookup_ssize_value( key_value_t *dict, char *name )
     return 0;
 }
 
-static key_value_t *make_tnode_key_value_list( TNODE *tnode )
+static key_value_t *make_tnode_key_value_list( TNODE *tnode,
+                                               TNODE *element_tnode )
 {
     static key_value_t empty_list[1] = {{ NULL }};
     static key_value_t list[] = {
@@ -1307,25 +1308,36 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
 	{ NULL },
     };
 
-    if( !tnode ) return empty_list;
+    if( !tnode && !element_tnode ) return empty_list;
 
-    list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
-    list[1].val = tnode_is_reference( tnode ) ? 
-        REF_SIZE : tnode_size( tnode );
-    list[2].val = tnode_align( tnode );
+    if( !element_tnode )
+        element_tnode = tnode_element_type( tnode );
 
-    list[3].val = tnode_number_of_references( tnode );
-    list[4].val = tnode_size( tnode );
-    list[5].val = tnode_vmt_offset( tnode );
+    if( element_tnode ) {
+        /* For placeholders, we just in case allocate arrays thay say
+           they contain references. This is necessary so that GC does
+           not collect allocated elements in case the generic type is
+           indeed a reference, and we assign them as elements to an
+           allocated array of generic type: */
 
-    /* For placeholders, we just in case allocate arrays thay say they
-       contain references. This is necessary so that GC does not
-       collect allocated elements in case the generic type is indeed a
-       reference, and we assign them as elements to an allocated array
-       of generic type: */
+        list[0].val = tnode_is_reference( element_tnode ) ? 1 : 
+            (tnode_kind(element_tnode) == TK_PLACEHOLDER ? 1 : 0);
 
-    list[0].val = tnode_is_reference( tnode ) ? 1 : 
-        (tnode_kind(tnode) == TK_PLACEHOLDER ? 1 : 0);
+        list[1].val = tnode_is_reference( element_tnode ) ? 
+            REF_SIZE : tnode_size( element_tnode );
+        list[2].val = tnode_align( element_tnode );
+
+    } else {
+        list[0].val = list[1].val = list[2].val = 0;
+    }
+
+    if( tnode ) {
+        list[3].val = tnode_number_of_references( tnode );
+        list[4].val = tnode_size( tnode );
+        list[5].val = tnode_vmt_offset( tnode );
+    } else {
+        list[3].val = list[4].val = list[5].val = 0;
+    }
 
     return list;
 }
@@ -1689,9 +1701,10 @@ static void compiler_compile_return( COMPILER *cc,
 	available_type = enode_type( expr );
 
 	/* if( !tnode_types_are_identical( returned_type, available_type )) { */
+        char msg[300] = "";
 	if( !tnode_types_are_assignment_compatible
             ( returned_type, available_type, NULL /* generic type table */,
-              ex )) {
+              msg, sizeof(msg)-1, ex )) {
             char *returned_type_name = returned_type ?
                 tnode_name( returned_type ) : NULL;
             if( available_type && returned_type_name && 
@@ -1704,9 +1717,16 @@ static void compiler_compile_return( COMPILER *cc,
                     available_type = enode_type( expr );
                 }
             } else {
-                yyerrorf( "incompatible types of returned value %d "
-                          "of function '%s'",
-                          nretvals - i, dnode_name( cc->current_function ));
+                if( msg[0] ) {
+                    yyerrorf( "incompatible types of returned value %d "
+                              "of function '%s' - %s",
+                              nretvals - i, dnode_name( cc->current_function ),
+                              msg );
+                } else {
+                    yyerrorf( "incompatible types of returned value %d "
+                              "of function '%s'",
+                              nretvals - i, dnode_name( cc->current_function ));
+                }
             }
 	}
 
@@ -1896,13 +1916,20 @@ static void compiler_check_operator_args( COMPILER *cc,
                treatment: */
             TNODE *arg_type = op_args ? dnode_type( op_args ) : NULL;
 
+            char msg[300] = "";
             if( !arg_type ||
                 !tnode_types_are_assignment_compatible( dnode_type( op_args ),
                                                         od->containing_type,
                                                         generic_types,
+                                                        msg, sizeof(msg)-1,
                                                         ex )) {
-                yyerrorf( "incompatible type of an argument "
-                          "for operator '%s'", od->name );
+                if( msg[0] ) {
+                    yyerrorf( "incompatible type of an argument "
+                              "for operator '%s' - %s", od->name, msg );
+                } else {
+                    yyerrorf( "incompatible type of an argument "
+                              "for operator '%s'", od->name );
+                }
             }
         } else {
             expr = cc->e_stack;
@@ -1982,8 +2009,10 @@ static void compiler_push_operator_retvals( COMPILER *cc,
     }
 
     if( generic_types ) {
+#if 0
     // if( 0 ) {
         // CHECK MEMORY USAGE HERE!!! S.G.
+#endif
         retval_type = new_tnode_implementation( retval_type, generic_types, ex );
     }
 
@@ -2104,7 +2133,8 @@ static int compiler_test_top_types_are_assignment_compatible(
 	TNODE *type2 = enode_type( expr2 );
 
 	if( !tnode_types_are_assignment_compatible
-            ( type1, type2, NULL /* generic type table */, ex )) {
+            ( type1, type2, NULL /* generic type table */,
+              NULL /* msg */, 0 /* msglen */, ex )) {
 	    return 0;
 	} else {
 	    return 1;
@@ -2245,15 +2275,6 @@ static void compiler_compile_binop( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static key_value_t *make_array_element_key_value_list( TNODE *array )
-{
-    TNODE *element_type = array ? tnode_element_type( array ) : NULL;
-
-    if( !element_type ) return NULL;
-
-    return make_tnode_key_value_list( element_type );
-}
-
 static void compiler_compile_unop( COMPILER *cc,
                                    char *unop_name,
                                    cexception_t *ex )
@@ -2273,7 +2294,7 @@ static void compiler_compile_unop( COMPILER *cc,
 	    operator_description_t od;
 	    key_value_t *fixup_values = NULL;
             if( expr_type && tnode_kind( expr_type ) == TK_ARRAY ) {
-		fixup_values = make_array_element_key_value_list( expr_type );
+		fixup_values = make_tnode_key_value_list( expr_type, NULL );
             } else {
                 fixup_values =
                     make_compiler_tnode_key_value_list( cc, expr_type, ex );
@@ -2370,8 +2391,10 @@ static void compiler_compile_variable_assignment_or_init(
         /* TYPETAB *generic_types = new_typetab( ex ); */
         TYPETAB *generic_types = NULL;
         int has_errors = 0;
+        char msg[300] = "";
         if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
-                                                    generic_types, ex )) {
+                                                    generic_types,
+                                                    msg, sizeof(msg)-1, ex )) {
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( expr_type && dst_name &&
 		tnode_lookup_conversion( var_type, expr_type )) {
@@ -2380,10 +2403,21 @@ static void compiler_compile_variable_assignment_or_init(
 		expr_type = enode_type( expr );
 	    } else {
 		if( var_name ) {
-		    yyerrorf( "incompatible types for assignment to variable "
-			      "'%s'", var_name );
+                    if( msg[0] ) {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable '%s' - %s", var_name, msg );
+                    } else {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable '%s'", var_name );
+                    }
 		} else {
-		    yyerrorf( "incompatible types for assignment to variable" );
+                    if( msg[0] ) {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable - %s", msg );
+                    } else {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable" );
+                    }
 		}
                 has_errors = 1;
 	    }
@@ -2573,11 +2607,13 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		addr_type ? tnode_element_type( addr_type ) : NULL;
 	    operator_description_t od;
 
+            char msg[300] = "";
 	    if( element_type && expr_type ) {
 		/* if( !tnode_types_are_identical( element_type, expr_type )) {
 		 */
 		if( !tnode_types_are_assignment_compatible
-                    ( element_type, expr_type, NULL /* generic_type_table*/, ex )) {
+                    ( element_type, expr_type, NULL /* generic_type_table*/,
+                      msg, sizeof(msg)-1, ex )) {
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
 			tnode_lookup_conversion( element_type, expr_type )) {
@@ -2585,7 +2621,12 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 			expr = cc->e_stack;
                         expr_type = enode_type( expr );
 		    } else {
-			yyerrorf( "incompatible types for assignment" );
+                        if( msg[0] ) {
+                            yyerrorf( "incompatible types for assignment - %s",
+                                      msg );
+                        } else {
+                            yyerrorf( "incompatible types for assignment" );
+                        }
 		    }
 		}
             }
@@ -2722,9 +2763,9 @@ static void compiler_check_and_compile_top_operator( COMPILER *cc,
 }
 
 static void compiler_check_and_compile_top_2_operator( COMPILER *cc,
-						    char * operator,
-						    int arity,
-						    cexception_t *ex )
+                                                       char * operator,
+                                                       int arity,
+                                                       cexception_t *ex )
 {
     ENODE *expr = cc->e_stack;
     ENODE *expr2 = cc->e_stack ? enode_next( cc->e_stack ) : NULL;
@@ -2744,15 +2785,14 @@ static void compiler_check_and_compile_top_2_operator( COMPILER *cc,
 	    tnode2 = tnode_element_type( tnode2 );
 	}
 	if( compiler_lookup_operator( cc, tnode2, operator, arity, ex )) {
-	    TNODE *element_type = tnode_element_type( tnode2 );
-	    key_value_t *fixup_values = element_type ?
-		make_tnode_key_value_list( element_type ) : NULL;
+	    key_value_t *fixup_values =
+                make_tnode_key_value_list( tnode2, NULL );
 
 	    compiler_check_and_compile_operator( cc, tnode2, operator, arity,
-					      fixup_values, ex );
+                                                 fixup_values, ex );
 	} else {
 	    compiler_check_and_compile_operator( cc, tnode, operator, arity, 
-					      /*fixup_values:*/ NULL, ex );
+                                                 /*fixup_values:*/ NULL, ex );
 	}
     }
 }
@@ -3137,18 +3177,14 @@ static void compiler_compile_alloc( COMPILER *cc,
 		  "(e.g. 'a = new int[20]')" );
     }
 
-    /* if( tnode_has_operator( cc, "new", 1, ex )) { */
     if ( compiler_lookup_operator( cc, alloc_type, "new",
-                                   /* arity = */0, ex )) {
-	/* compiler_drop_top_expression( cc ); */
-        TNODE *element_type =
-            alloc_type && tnode_kind( alloc_type ) == TK_COMPOSITE ?
-            tnode_element_type( alloc_type ) : NULL;
+                                   /* arity = */ 0, ex )) {
         key_value_t *fixup_values =
-            make_tnode_key_value_list( element_type ? element_type : alloc_type );
+            make_tnode_key_value_list( alloc_type, NULL );
+
 	compiler_check_and_compile_operator( cc, alloc_type, "new",
-                                          /* arity = */0, 
-                                          fixup_values, ex );
+                                             /* arity = */ 0, 
+                                             fixup_values, ex );
     } else {
 	ssize_t alloc_size = tnode_size( alloc_type );
 	ssize_t alloc_nref = tnode_number_of_references( alloc_type );
@@ -3201,15 +3237,15 @@ static char *compiler_make_typed_operator_name( TNODE *index_type1,
 }
 
 static char* compiler_indexing_operator_name( TNODE *index_type,
-					   cexception_t *ex )
+                                              cexception_t *ex )
 {
     return compiler_make_typed_operator_name( index_type, NULL, "[%s]", ex );
 }
 
 static void compiler_compile_composite_alloc_operator( COMPILER *cc,
-						    TNODE *composite_type,
-						    key_value_t *fixup_values,
-						    cexception_t *ex )
+                                                       TNODE *composite_type,
+                                                       key_value_t *fixup_values,
+                                                       cexception_t *ex )
 {
     ENODE *volatile top_expr = cc->e_stack;
     TNODE *volatile top_type = top_expr ? enode_type( top_expr ) : NULL;
@@ -3235,12 +3271,13 @@ static void compiler_compile_composite_alloc_operator( COMPILER *cc,
 }
 
 static void compiler_compile_composite_alloc( COMPILER *cc,
-					   TNODE *composite_type,
-					   TNODE *element_type,
-					   cexception_t *ex )
+                                              TNODE *composite_type,
+                                              TNODE *element_type,
+                                              cexception_t *ex )
 {
     TNODE *allocated_type = NULL;
-    key_value_t *fixup_values = make_tnode_key_value_list( element_type );
+    key_value_t *fixup_values = 
+        make_tnode_key_value_list( composite_type, element_type );
 
     allocated_type = new_tnode_composite_synonim( composite_type, element_type,
 						  ex );
@@ -3280,7 +3317,7 @@ static void compiler_compile_array_alloc( COMPILER *cc,
                                           TNODE *element_type,
                                           cexception_t *ex )
 {
-    key_value_t *fixup_values = make_tnode_key_value_list( element_type );
+    key_value_t *fixup_values = make_tnode_key_value_list( NULL, element_type );
 
     if( element_type && tnode_kind( element_type ) != TK_PLACEHOLDER ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
@@ -3562,11 +3599,19 @@ static void compiler_check_and_drop_function_args( COMPILER *cc,
             formal_type = dnode_type( formal_arg );
             actual_type = enode_type( actual_arg );
             /* if( !tnode_types_are_identical( formal_type, actual_type )) { */
+            char msg[300] = "";
             if( !tnode_types_are_assignment_compatible
-                ( formal_type, actual_type, generic_types, ex )) {
-                yyerrorf( "incompatible types for function '%s' argument "
-                          "nr. %d"/* " (%s)" */, dnode_name( function ),
-                          nargs - n, dnode_name( formal_arg ));
+                ( formal_type, actual_type, generic_types,
+                  msg, sizeof(msg), ex )) {
+                if( msg[0] ) {
+                    yyerrorf( "incompatible types for function '%s' argument "
+                              "nr. %d - %s", dnode_name( function ),
+                              nargs - n, /* dnode_name( formal_arg ),  */msg );
+                } else {
+                    yyerrorf( "incompatible types for function '%s' argument "
+                              "nr. %d"/* " (%s)" */, dnode_name( function ),
+                              nargs - n, dnode_name( formal_arg ));
+                }
             }
             if( !enode_is_readonly_compatible_for_param( actual_arg,
                                                          formal_arg )) {
@@ -4211,15 +4256,15 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 	if( compiler_lookup_operator( cc, array_type, idx_name,
                                       idx_arity, ex )) {
 	    compiler_init_operator_description( &od, cc, array_type, idx_name,
-					     idx_arity, ex );
+                                                idx_arity, ex );
 	} else {
 	    compiler_init_operator_description( &od, cc, index_type, "[]",
-                                             idx_arity, ex );
+                                                idx_arity, ex );
 	}
 
 	if( od.operator ) {
 	    compiler_check_operator_args( cc, &od, generic_types,
-                                       &inner );
+                                          &inner );
 	}
 
 	index_expr = enode_list_pop( &cc->e_stack );
@@ -4230,10 +4275,10 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 
 	    array_expr = cc->e_stack;
 
-	    fixup_values = make_tnode_key_value_list( element_type );
+	    fixup_values = make_tnode_key_value_list( array_type, NULL );
 
 	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
-						   "", &inner );
+                                                      "", &inner );
 
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
@@ -4282,7 +4327,6 @@ static void compiler_compile_subarray( COMPILER *cc,
     TNODE *index_type1 = NULL;
     TNODE *index_type2 = NULL;
     TNODE *array_type = NULL;
-    TNODE *element_type = NULL;
     char *idx_name = NULL;
     operator_description_t od;
     const int idx_arity = 3;
@@ -4317,7 +4361,6 @@ static void compiler_compile_subarray( COMPILER *cc,
 	    if( array_type && tnode_kind( array_type ) == TK_ADDRESSOF ) {
 		array_type = tnode_element_type( array_type );
 	    }
-	    element_type = array_type ? tnode_element_type( array_type ) : NULL;
 	}
 
 	if( !array_type ) {
@@ -4328,18 +4371,18 @@ static void compiler_compile_subarray( COMPILER *cc,
 	if( compiler_lookup_operator( cc, array_type, idx_name,
                                       idx_arity, &inner )) {
 	    compiler_init_operator_description( &od, cc, array_type, idx_name,
-					     idx_arity, &inner );
+                                                idx_arity, &inner );
 	} else if( tnode_lookup_operator( index_type1, idx_name, idx_arity )) {
 	    compiler_init_operator_description( &od, cc, index_type1, "[..]",
-                                             idx_arity, &inner );
+                                                idx_arity, &inner );
 	} else {
             compiler_init_operator_description( &od, cc, index_type2, "[..]",
-                                             idx_arity, &inner );
+                                                idx_arity, &inner );
         }
 
 	if( od.operator ) {
 	    compiler_check_operator_args( cc, &od, generic_types,
-                                       &inner );
+                                          &inner );
 	}
 
 	index_expr1 = enode_list_pop( &cc->e_stack );
@@ -4351,10 +4394,10 @@ static void compiler_compile_subarray( COMPILER *cc,
 
 	    array_expr = cc->e_stack;
 
-	    fixup_values = make_tnode_key_value_list( element_type );
+	    fixup_values = make_tnode_key_value_list( array_type, NULL );
 
 	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
-						   "", &inner );
+                                                      "", &inner );
 
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
@@ -4652,7 +4695,8 @@ static void compiler_convert_function_argument( COMPILER *cc,
     if( arg_type && exp_type ) {
 	if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
 	    !tnode_types_are_assignment_compatible( arg_type, exp_type,
-                                                    NULL, ex )) {
+                                                    NULL, NULL /* msg */,
+                                                    0 /* msglen */, ex )) {
             char *arg_type_name = tnode_name( arg_type );
             if( arg_type_name ) {
                 compiler_compile_type_conversion
@@ -4986,7 +5030,6 @@ static void compiler_begin_module( COMPILER *c,
     compiler_push_symbol_tables( c, ex );
     vartab_insert_named_module( c->compiled_modules, module, 
                                 /* SYMTAB *st = */ NULL,
-                                // stlist_data( c->symtab_stack ),
                                 ex );
     vartab_insert_named( c->vartab, share_dnode( module ), ex );
     dlist_push_dnode( &c->current_module_stack, &c->current_module, ex );
@@ -5762,7 +5805,8 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
             compiler_check_and_drop_function_args( cc, funct, generic_types,
                                                    &inner );
             compiler_emit_function_call( cc, funct, NULL, "\n", &inner );
-            if( tnode_kind( fn_type ) == TK_FUNCTION_REF ) {
+            if( tnode_kind( fn_type ) == TK_FUNCTION_REF ||
+                tnode_kind( fn_type ) == TK_CLOSURE ) {
                 compiler_drop_top_expression( cc );
             }
             compiler_push_function_retvals( cc, funct, generic_types, &inner );
@@ -9424,7 +9468,6 @@ delimited_type_declaration
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
-            // ntype =  $4;            
             compiler_compile_type_declaration( compiler, ntype, &inner );
         }
         cexception_catch {
@@ -9432,7 +9475,7 @@ delimited_type_declaration
             cexception_reraise( inner, px );
         }
       }
-  | type_declaration_start '=' delimited_type_description /*type_*/initialiser
+  | type_declaration_start '=' delimited_type_description initialiser
       {
         compiler_compile_drop( compiler, px );
 	compiler_end_scope( compiler, px );
@@ -10754,7 +10797,6 @@ closure_initialisation
         }
     }
 
-    // len = 0;
     i = 0;
     foreach_reverse_dnode( var, closure_var_list ) {
         i ++;
