@@ -12,11 +12,13 @@
 #include <tnode.ci>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h> /* for CHAR_BIT */
 #include <yy.h>
 #include <assert.h>
 
 static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
 					    TYPETAB *generic_types,
+                                            char *msg, ssize_t msglen,
 					    cexception_t *ex )
 {
     DNODE *f1, *f2;
@@ -27,6 +29,32 @@ static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
     while( f1 && f2 ) {
 	tf1 = dnode_type( f1 );
 	tf2 = dnode_type( f2 );
+        if( tf1 && tf2 && 
+            ( tnode_kind( tf1 ) == TK_PLACEHOLDER ||
+              tnode_kind( tf2 ) == TK_PLACEHOLDER )) {
+            ssize_t bytes = sizeof(ssize_t);
+            ssize_t bits = (CHAR_BIT * bytes)/2;
+            size_t mask = ~(~0 << bits);
+            ssize_t offs1 = dnode_offset( f1 );
+            ssize_t offs2 = dnode_offset( f2 );
+            //printf( ">>> mask = 0x%08X\n", mask );
+            if( tnode_kind( tf1 ) == TK_PLACEHOLDER ) {
+                offs1 &= mask;
+            }
+            if( tnode_kind( tf2 ) == TK_PLACEHOLDER ) {
+                offs2 &= mask;
+            }
+            //printf( ">>> f1 offset = %d\n", offs1 );
+            //printf( ">>> f2 offset = %d\n\n", offs2 );
+            if( offs1 > 0 && offs2 > 0 && offs1 != offs2 ) {
+                if( msg && msglen != 0 ) {
+                    snprintf( msg, msglen, "offset of the generic field '%s' "
+                              "is incompatible with the concrete implementation",
+                              dnode_name( f1 ));
+                }
+                return 0;
+            }
+        }
 	if( !tnode_types_are_compatible( tf1, tf2, generic_types, ex )) {
 	    return 0;
 	}
@@ -45,6 +73,7 @@ int tnode_function_prototypes_match_msg( TNODE *f1, TNODE *f2,
 
 static int tnode_classes_are_compatible( TNODE *t1, TNODE *t2,
 					 TYPETAB *generic_types,
+                                         char *msg, int msglen ,
 					 cexception_t *ex )
 {
     DNODE *t1_method, *t2_method;
@@ -87,9 +116,10 @@ static int tnode_classes_are_compatible( TNODE *t1, TNODE *t2,
     }
 
     return
-        tnode_structures_are_compatible( t1, t2, generic_types, ex ) &&
+        tnode_structures_are_compatible( t1, t2, generic_types, 
+                                         msg, msglen, ex ) &&
         tnode_classes_are_compatible( t1->base_type, t2->base_type,
-				      generic_types, ex );
+				      generic_types, msg, msglen, ex );
 }
 
 static int tnode_structures_are_identical( TNODE *t1, TNODE *t2,
@@ -366,6 +396,7 @@ static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
 
 int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                            TYPETAB *generic_types,
+                                           char *msg, ssize_t msglen,
                                            cexception_t *ex )
 {
     if( !t1 || !t2 ) return 0;
@@ -373,11 +404,11 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
         return tnode_types_are_assignment_compatible
-            ( t1->base_type, t2, generic_types, ex );
+            ( t1->base_type, t2, generic_types, msg, msglen, ex );
     }
     if( t2->kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
         return tnode_types_are_assignment_compatible
-            ( t1, t2->base_type, generic_types, ex );
+            ( t1, t2->base_type, generic_types, msg, msglen, ex );
     }
 
     if( tnode_is_non_null_reference( t1 ) &&
@@ -387,7 +418,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( t1->kind == TK_DERIVED ) {
         return tnode_types_are_assignment_compatible
-            ( t1->base_type, t2, generic_types, ex );
+            ( t1->base_type, t2, generic_types, msg, msglen, ex );
     }
 
     if( t1->kind == TK_REF ) {
@@ -409,27 +440,34 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     }
 
     if( t1->kind == TK_STRUCT && t2->kind == TK_STRUCT ) {
-	return tnode_structures_are_compatible( t1, t2, generic_types, ex ) ||
+	return tnode_structures_are_compatible( t1, t2, generic_types, 
+                                                msg, msglen, ex ) ||
             tnode_structures_are_compatible( t1, t2->base_type,
-                                             generic_types, ex ) ||
+                                             generic_types,
+                                             msg, msglen, ex ) ||
             tnode_types_are_assignment_compatible( t1, t2->base_type,
-                                                   generic_types, ex );
+                                                   generic_types, msg, msglen,
+                                                   ex );
     }
 
     if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
         return (!t1->name && tnode_classes_are_compatible( t1, t2,
 							   generic_types,
+                                                           msg, msglen,
 							   ex )) ||
             tnode_types_are_assignment_compatible( t1, t2->base_type,
-                                                   generic_types, ex );
+                                                   generic_types,
+                                                   msg, msglen, ex );
     }
 
     if( t1->kind == TK_INTERFACE && t2->kind == TK_INTERFACE ) {
         return (!t1->name && tnode_classes_are_compatible( t1, t2,
 							   generic_types,
+                                                           msg, msglen,
 							   ex )) ||
             tnode_types_are_assignment_compatible( t1, t2->base_type,
-                                                   generic_types, ex );
+                                                   generic_types,
+                                                   msg, msglen, ex );
     }
 
     if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
@@ -456,14 +494,15 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                 t1->base_type ) {
                 return
                     tnode_types_are_assignment_compatible
-                    ( t1->base_type, t2, generic_types, ex );                
+                    ( t1->base_type, t2, generic_types, msg, msglen, ex );
             } else {
                 return (!t1->name || !t2->name ||
                         strcmp( t1->name, t2->name ) == 0) &&
                     /* tnode_types_are_identical( t1->element_type,
                        t2->element_type ); */
                     tnode_types_are_assignment_compatible
-                    ( t1->element_type, t2->element_type, generic_types, ex );
+                    ( t1->element_type, t2->element_type, generic_types,
+                      msg, msglen, ex );
             }
         }
     }
@@ -486,7 +525,8 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	    return t2->kind == TK_ARRAY;
 	} else {
 	    return tnode_types_are_assignment_compatible
-                ( t1->element_type, t2->element_type, generic_types, ex );
+                ( t1->element_type, t2->element_type, generic_types,
+                  msg, msglen, ex );
 	}
     }
 
