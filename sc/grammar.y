@@ -1294,7 +1294,8 @@ static ssize_t lookup_ssize_value( key_value_t *dict, char *name )
     return 0;
 }
 
-static key_value_t *make_tnode_key_value_list( TNODE *tnode )
+static key_value_t *make_tnode_key_value_list( TNODE *tnode,
+                                               TNODE *element_tnode )
 {
     static key_value_t empty_list[1] = {{ NULL }};
     static key_value_t list[] = {
@@ -1307,25 +1308,36 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode )
 	{ NULL },
     };
 
-    if( !tnode ) return empty_list;
+    if( !tnode && !element_tnode ) return empty_list;
 
-    list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
-    list[1].val = tnode_is_reference( tnode ) ? 
-        REF_SIZE : tnode_size( tnode );
-    list[2].val = tnode_align( tnode );
+    if( !element_tnode )
+        element_tnode = tnode_element_type( tnode );
 
-    list[3].val = tnode_number_of_references( tnode );
-    list[4].val = tnode_size( tnode );
-    list[5].val = tnode_vmt_offset( tnode );
+    if( element_tnode ) {
+        /* For placeholders, we just in case allocate arrays thay say
+           they contain references. This is necessary so that GC does
+           not collect allocated elements in case the generic type is
+           indeed a reference, and we assign them as elements to an
+           allocated array of generic type: */
 
-    /* For placeholders, we just in case allocate arrays thay say they
-       contain references. This is necessary so that GC does not
-       collect allocated elements in case the generic type is indeed a
-       reference, and we assign them as elements to an allocated array
-       of generic type: */
+        list[0].val = tnode_is_reference( element_tnode ) ? 1 : 
+            (tnode_kind(element_tnode) == TK_PLACEHOLDER ? 1 : 0);
 
-    list[0].val = tnode_is_reference( tnode ) ? 1 : 
-        (tnode_kind(tnode) == TK_PLACEHOLDER ? 1 : 0);
+        list[1].val = tnode_is_reference( element_tnode ) ? 
+            REF_SIZE : tnode_size( element_tnode );
+        list[2].val = tnode_align( element_tnode );
+
+    } else {
+        list[0].val = list[1].val = list[2].val = 0;
+    }
+
+    if( tnode ) {
+        list[3].val = tnode_number_of_references( tnode );
+        list[4].val = tnode_size( tnode );
+        list[5].val = tnode_vmt_offset( tnode );
+    } else {
+        list[3].val = list[4].val = list[5].val = 0;
+    }
 
     return list;
 }
@@ -2269,7 +2281,7 @@ static key_value_t *make_array_element_key_value_list( TNODE *array )
 
     if( !element_type ) return NULL;
 
-    return make_tnode_key_value_list( element_type );
+    return make_tnode_key_value_list( NULL, element_type );
 }
 
 static void compiler_compile_unop( COMPILER *cc,
@@ -2760,9 +2772,9 @@ static void compiler_check_and_compile_top_operator( COMPILER *cc,
 }
 
 static void compiler_check_and_compile_top_2_operator( COMPILER *cc,
-						    char * operator,
-						    int arity,
-						    cexception_t *ex )
+                                                       char * operator,
+                                                       int arity,
+                                                       cexception_t *ex )
 {
     ENODE *expr = cc->e_stack;
     ENODE *expr2 = cc->e_stack ? enode_next( cc->e_stack ) : NULL;
@@ -2782,15 +2794,19 @@ static void compiler_check_and_compile_top_2_operator( COMPILER *cc,
 	    tnode2 = tnode_element_type( tnode2 );
 	}
 	if( compiler_lookup_operator( cc, tnode2, operator, arity, ex )) {
+#if 0
 	    TNODE *element_type = tnode_element_type( tnode2 );
 	    key_value_t *fixup_values = element_type ?
 		make_tnode_key_value_list( element_type ) : NULL;
-
+#else
+	    key_value_t *fixup_values =
+                make_tnode_key_value_list( tnode2, NULL );
+#endif
 	    compiler_check_and_compile_operator( cc, tnode2, operator, arity,
-					      fixup_values, ex );
+                                                 fixup_values, ex );
 	} else {
 	    compiler_check_and_compile_operator( cc, tnode, operator, arity, 
-					      /*fixup_values:*/ NULL, ex );
+                                                 /*fixup_values:*/ NULL, ex );
 	}
     }
 }
@@ -3177,16 +3193,22 @@ static void compiler_compile_alloc( COMPILER *cc,
 
     /* if( tnode_has_operator( cc, "new", 1, ex )) { */
     if ( compiler_lookup_operator( cc, alloc_type, "new",
-                                   /* arity = */0, ex )) {
+                                   /* arity = */ 0, ex )) {
 	/* compiler_drop_top_expression( cc ); */
+#if 0
+        // This branch is buggy! S.G.
         TNODE *element_type =
             alloc_type && tnode_kind( alloc_type ) == TK_COMPOSITE ?
             tnode_element_type( alloc_type ) : NULL;
         key_value_t *fixup_values =
             make_tnode_key_value_list( element_type ? element_type : alloc_type );
+#else
+        key_value_t *fixup_values =
+            make_tnode_key_value_list( alloc_type, NULL );
+#endif
 	compiler_check_and_compile_operator( cc, alloc_type, "new",
-                                          /* arity = */0, 
-                                          fixup_values, ex );
+                                             /* arity = */ 0, 
+                                             fixup_values, ex );
     } else {
 	ssize_t alloc_size = tnode_size( alloc_type );
 	ssize_t alloc_nref = tnode_number_of_references( alloc_type );
@@ -3239,15 +3261,15 @@ static char *compiler_make_typed_operator_name( TNODE *index_type1,
 }
 
 static char* compiler_indexing_operator_name( TNODE *index_type,
-					   cexception_t *ex )
+                                              cexception_t *ex )
 {
     return compiler_make_typed_operator_name( index_type, NULL, "[%s]", ex );
 }
 
 static void compiler_compile_composite_alloc_operator( COMPILER *cc,
-						    TNODE *composite_type,
-						    key_value_t *fixup_values,
-						    cexception_t *ex )
+                                                       TNODE *composite_type,
+                                                       key_value_t *fixup_values,
+                                                       cexception_t *ex )
 {
     ENODE *volatile top_expr = cc->e_stack;
     TNODE *volatile top_type = top_expr ? enode_type( top_expr ) : NULL;
@@ -3273,12 +3295,13 @@ static void compiler_compile_composite_alloc_operator( COMPILER *cc,
 }
 
 static void compiler_compile_composite_alloc( COMPILER *cc,
-					   TNODE *composite_type,
-					   TNODE *element_type,
-					   cexception_t *ex )
+                                              TNODE *composite_type,
+                                              TNODE *element_type,
+                                              cexception_t *ex )
 {
     TNODE *allocated_type = NULL;
-    key_value_t *fixup_values = make_tnode_key_value_list( element_type );
+    key_value_t *fixup_values = 
+        make_tnode_key_value_list( composite_type, element_type );
 
     allocated_type = new_tnode_composite_synonim( composite_type, element_type,
 						  ex );
@@ -3318,7 +3341,7 @@ static void compiler_compile_array_alloc( COMPILER *cc,
                                           TNODE *element_type,
                                           cexception_t *ex )
 {
-    key_value_t *fixup_values = make_tnode_key_value_list( element_type );
+    key_value_t *fixup_values = make_tnode_key_value_list( NULL, element_type );
 
     if( element_type && tnode_kind( element_type ) != TK_PLACEHOLDER ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
@@ -4257,15 +4280,15 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 	if( compiler_lookup_operator( cc, array_type, idx_name,
                                       idx_arity, ex )) {
 	    compiler_init_operator_description( &od, cc, array_type, idx_name,
-					     idx_arity, ex );
+                                                idx_arity, ex );
 	} else {
 	    compiler_init_operator_description( &od, cc, index_type, "[]",
-                                             idx_arity, ex );
+                                                idx_arity, ex );
 	}
 
 	if( od.operator ) {
 	    compiler_check_operator_args( cc, &od, generic_types,
-                                       &inner );
+                                          &inner );
 	}
 
 	index_expr = enode_list_pop( &cc->e_stack );
@@ -4276,10 +4299,14 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 
 	    array_expr = cc->e_stack;
 
+#if 0
 	    fixup_values = make_tnode_key_value_list( element_type );
+#else
+	    fixup_values = make_tnode_key_value_list( array_type, NULL );
+#endif
 
 	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
-						   "", &inner );
+                                                      "", &inner );
 
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
@@ -4328,7 +4355,6 @@ static void compiler_compile_subarray( COMPILER *cc,
     TNODE *index_type1 = NULL;
     TNODE *index_type2 = NULL;
     TNODE *array_type = NULL;
-    TNODE *element_type = NULL;
     char *idx_name = NULL;
     operator_description_t od;
     const int idx_arity = 3;
@@ -4363,7 +4389,6 @@ static void compiler_compile_subarray( COMPILER *cc,
 	    if( array_type && tnode_kind( array_type ) == TK_ADDRESSOF ) {
 		array_type = tnode_element_type( array_type );
 	    }
-	    element_type = array_type ? tnode_element_type( array_type ) : NULL;
 	}
 
 	if( !array_type ) {
@@ -4374,18 +4399,18 @@ static void compiler_compile_subarray( COMPILER *cc,
 	if( compiler_lookup_operator( cc, array_type, idx_name,
                                       idx_arity, &inner )) {
 	    compiler_init_operator_description( &od, cc, array_type, idx_name,
-					     idx_arity, &inner );
+                                                idx_arity, &inner );
 	} else if( tnode_lookup_operator( index_type1, idx_name, idx_arity )) {
 	    compiler_init_operator_description( &od, cc, index_type1, "[..]",
-                                             idx_arity, &inner );
+                                                idx_arity, &inner );
 	} else {
             compiler_init_operator_description( &od, cc, index_type2, "[..]",
-                                             idx_arity, &inner );
+                                                idx_arity, &inner );
         }
 
 	if( od.operator ) {
 	    compiler_check_operator_args( cc, &od, generic_types,
-                                       &inner );
+                                          &inner );
 	}
 
 	index_expr1 = enode_list_pop( &cc->e_stack );
@@ -4397,10 +4422,10 @@ static void compiler_compile_subarray( COMPILER *cc,
 
 	    array_expr = cc->e_stack;
 
-	    fixup_values = make_tnode_key_value_list( element_type );
+	    fixup_values = make_tnode_key_value_list( array_type, NULL );
 
 	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
-						   "", &inner );
+                                                      "", &inner );
 
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
