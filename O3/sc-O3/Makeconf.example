@@ -6,6 +6,8 @@ INTERPRETER_DIR = interpreters/packed-type
 OTHER_DIRS = ../../common ../../lists ${INTERPRETER_DIR}
 LIB_DIRS   = ../../getoptions ../../cexceptions
 
+## LIBFLAGS = -ldl -lduma
+## LIBFLAGS = -ldl -lefence
 LIBFLAGS = -lm -ldl
 
 OPTFLAGS = -O3 \
