@@ -24,7 +24,7 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types005.snl(22,32): ERROR, default value is not compatible with the function argument 'i'
     constructor A( int i = 100 ) { self.i = i }
                                ^
-./sl: inputs/err-types005.snl(22,32): ERROR, prototype of constructir A() does not match previous definition - old or new prototype has undefined argument 2
+./sl: inputs/err-types005.snl(22,32): ERROR, prototype of constructor A() does not match previous definition - old or new prototype has undefined argument 2
     constructor A( int i = 100 ) { self.i = i }
                                ^
 ./sl: inputs/err-types005.snl(25,5): ERROR, type 'int' is not declared in the current scope
