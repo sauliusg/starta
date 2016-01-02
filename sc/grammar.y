@@ -5859,31 +5859,47 @@ itable[]:                       |
              +---------------+  |
 vmt_address: | n_interfaces  |<-/
              +---------------+
-             |class VMT offs.|
+             |class VMT offs.|->--\
+             +---------------+    |
+             |i-face 1 VMT o.|>-\ |
+             +---------------+  | |
+             |i-face 2 VMT o.|  | |
+             +---------------+  | |
+             |               |  | |
+             | ...           |  | |
+             +---------------+  | |
+             |i-face n VMT o.|  | |
+             +---------------+  | |
+                                | |
+vtable[]:                       | |
+---------                       | |
+static data +                   | |
+i-face 1 VMT offs.:             | |
+             +---------------+  | |
+           0 | nr of methods |<-/ |
+             +---------------+    |
+           1 | method 1 offs.|    |
+             +---------------+    |
+             |               |    |
+             | ...           |    |
+             +---------------+    |
+           k | method k offs.|    | k = nr of methods
+             +---------------+    |
+                                  |
+                                  |
+             +---------------+    |
+           0 | nr of methods |<---/
              +---------------+
-             |i-face 1 VMT o.|>-\
-             +---------------+  |
-             |i-face 2 VMT o.|  |
-             +---------------+  |
-             |               |  |
-             | ...           |  |
-             +---------------+  |
-             |i-face n VMT o.|  |
-             +---------------+  |
-                                |
-vtable[]:                       |
----------                       |
-static data +                   |
-i-face 1 VMT offs.:             |
-             +---------------+  |
-             | nr of methods |<-/
+           1 | destructor of.|
              +---------------+
-             | method 1 offs.|
+           2 | method 1 offs.|
+             +---------------+
+           3 | method 2 offs.|
              +---------------+
              |               |
              | ...           |
              +---------------+
-             | method k offs.| k = nr of methods 
+           l | method l offs.| l = nr of methods 
              +---------------+
 
 */
@@ -12224,8 +12240,10 @@ method_header
                       dnode_set_offset( funct, method_offset );
                       tnode_set_interface_nr( implemented_method_type,
                                               interface_nr );
-                      /* printf( ">>> interface = %d, method = %d\n",
-                         interface_nr, method_offset ); */
+#if 0
+                      printf( ">>> interface = %d, method = %d ('%s')\n",
+                              interface_nr, method_offset, method_name );
+#endif
                   }
               }
 
