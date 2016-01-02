@@ -138,7 +138,7 @@ TNODE *new_tnode( cexception_t *ex )
 {
     TNODE *tnode = alloc_tnode( ex );
     tnode->rcount = 1;
-    return tnode;
+   return tnode;
 }
 
 TNODE *new_tnode_forward( char *name, cexception_t *ex )
@@ -1358,6 +1358,15 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	    method_offset = dnode_offset( inherited_method );
 	} else {
             if( method_interface_nr == 0 ) {
+                if( tnode->max_vmt_offset == 0 &&
+                    tnode->kind != TK_INTERFACE ) {
+                    /* Reserve the 0-th offset of the VMT for the
+                       destructor: */
+#if 0
+                    printf( ">>> reserving offset 0 for destructor\n" );
+#endif
+                    tnode->max_vmt_offset++;
+                }
                 tnode->max_vmt_offset++;
 #if 0
                 printf( ">>> advancing VMT offset to %d for type '%s'\n",
@@ -1371,8 +1380,8 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	tnode->methods = dnode_append( method, tnode->methods );
         if( method_interface_nr == 0 ) {
 #if 0
-            printf( ">>> setting offset %d for method '%s'\n",
-                    method_offset, dnode_name( method ));
+            printf( ">>> setting offset %d for method '%s', interface no. %d\n",
+                    method_offset, dnode_name( method ), method_interface_nr );
 #endif
             dnode_set_offset( method, method_offset );
         }
