@@ -34,7 +34,7 @@ static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
               tnode_kind( tf2 ) == TK_PLACEHOLDER )) {
             ssize_t bytes = sizeof(ssize_t);
             ssize_t bits = (CHAR_BIT * bytes)/2;
-            size_t mask = ~(~0 << bits);
+            size_t mask = ~(~((ssize_t)0) << bits);
             ssize_t offs1 = dnode_offset( f1 );
             ssize_t offs2 = dnode_offset( f2 );
             //printf( ">>> mask = 0x%08X\n", mask );
