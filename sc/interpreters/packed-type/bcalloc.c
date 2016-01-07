@@ -290,7 +290,7 @@ ssize_t bccollect( void )
                 ssize_t vtable_offset = curr->vmt_offset[1];
                 ssize_t *vtable =
                     (ssize_t*)(istate.static_data + vtable_offset);
-                if( vtable[1] != 0 ) {
+                if( vtable[0] > 0 && vtable[1] != 0 ) {
                     printf( ">>> garbage collector should call destructor "
                             "at offset %d\n", vtable[1] );
                 }
