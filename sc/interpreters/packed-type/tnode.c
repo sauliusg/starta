@@ -495,6 +495,11 @@ static int tnode_is_constructor( TNODE *tnode )
     return tnode && tnode->kind == TK_CONSTRUCTOR;
 }
 
+static int tnode_is_destructor( TNODE *tnode )
+{
+    return tnode && tnode->kind == TK_DESTRUCTOR;
+}
+
 static int tnode_is_method( TNODE *tnode )
 {
     return tnode && tnode->kind == TK_METHOD;
@@ -1433,6 +1438,9 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member )
         } else
 	if( tnode_is_constructor( member_type )) {
 	    tnode_insert_constructor( tnode, member );
+        } else
+	if( tnode_is_destructor( member_type )) {
+	    tnode_insert_destructor( tnode, member );
 	} else {
 	    tnode_insert_fields( tnode, member );
 	}
@@ -1809,6 +1817,12 @@ DNODE *tnode_constructor( TNODE *tnode )
 {
     assert( tnode );
     return tnode->constructor;
+}
+
+DNODE *tnode_destructor( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->destructor;
 }
 
 TNODE *tnode_next( TNODE* list )

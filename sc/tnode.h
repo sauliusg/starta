@@ -275,6 +275,8 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 
 DNODE *tnode_constructor( TNODE *tnode );
 
+DNODE *tnode_destructor( TNODE *tnode );
+
 TNODE *tnode_next( TNODE* list );
 
 TNODE *tnode_drop_last_argument( TNODE *tnode );
