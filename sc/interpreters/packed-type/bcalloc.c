@@ -285,6 +285,17 @@ ssize_t bccollect( void )
 	        prev = allocated = next;
 	    }
 	    reclamed += curr->element_size * length;
+#if 1
+            if( curr->vmt_offset != 0 ) {
+                ssize_t vtable_offset = curr->vmt_offset[1];
+                ssize_t *vtable =
+                    (ssize_t*)(istate.static_data + vtable_offset);
+                if( vtable[1] != 0 ) {
+                    printf( ">>> garbage collector should call destructor "
+                            "at offset %d\n", vtable[1] );
+                }
+            }
+#endif
 	    bcfree( curr );
 	} else {
 	    curr->prev = prev;

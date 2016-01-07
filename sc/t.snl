@@ -6,7 +6,7 @@
 
 use std;
 
-class C {
+null class C {
     string name;
     int count;
 
@@ -25,7 +25,9 @@ class C {
 }
 
 var c1 = new C();
+c1 = null;
 var c2 = new C( "c2", count => 10 );
+c1 = new C;
 
 c1->print();
 c2->print();
