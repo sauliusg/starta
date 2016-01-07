@@ -6038,8 +6038,17 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
         ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
     }
 
-    /* Now, fill the VMT table with the real method addresses: */
+    /* Add destructor address if present: */
     itable = (ssize_t*)(cc->static_data + vmt_address);
+
+    DNODE *destructor = tnode_destructor( class_descr );
+    if( destructor ) {
+        vtable = (ssize_t*)(cc->static_data + itable[1]);
+        ssize_t destructor_address = dnode_offset( destructor );
+        vtable[1] = destructor_address;
+    }
+
+    /* Now, fill the VMT table with the real method addresses: */
     foreach_tnode_base_class( base, class_descr ) {
 	DNODE *methods = tnode_methods( base );
 	foreach_dnode( method, methods ) {
@@ -12401,7 +12410,7 @@ destructor_header
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
               tnode_insert_destructor( class_tnode, share_dnode( funct ));
-              
+
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
