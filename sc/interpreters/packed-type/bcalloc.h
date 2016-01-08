@@ -36,5 +36,6 @@ void *bcalloc_mdarray( void **array, ssize_t element_size,
 		       ssize_t nref, ssize_t length, int level );
 int bcalloc_is_in_heap( void *p );
 void bcalloc_reset_allocated_nodes( void );
+void bcalloc_run_all_destructors();
 
 #endif

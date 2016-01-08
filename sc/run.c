@@ -129,6 +129,7 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 {
     make_istate( &istate, code, argc, argv, env, ex );
     run( ex );
+    bcalloc_run_all_destructors();
 }
 
 static int realloc_eval_stack( cexception_t * ex )
