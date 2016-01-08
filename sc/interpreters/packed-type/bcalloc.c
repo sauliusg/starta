@@ -301,6 +301,14 @@ ssize_t bccollect( void )
     return reclamed;
 }
 
+void bcalloc_run_all_destructors()
+{
+    alloccell_t *curr;
+    for( curr = allocated; curr != NULL; curr = curr->next ) {
+        thrcode_run_destructor_if_needed( &istate, curr );
+    }
+}
+
 int bcalloc_is_in_heap( void *p )
 {
     return p >= alloc_min && p <= alloc_max;
