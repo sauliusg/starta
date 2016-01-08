@@ -285,7 +285,7 @@ ssize_t bccollect( void )
 	        prev = allocated = next;
 	    }
 	    reclamed += curr->element_size * length;
-#if 1
+#if 0
             if( curr->vmt_offset != 0 ) {
                 ssize_t vtable_offset = curr->vmt_offset[1];
                 ssize_t *vtable =
@@ -295,6 +295,8 @@ ssize_t bccollect( void )
                             "at offset %d\n", vtable[1] );
                 }
             }
+#else
+            thrcode_run_destructor_if_needed( &istate, curr );
 #endif
 	    bcfree( curr );
 	} else {
