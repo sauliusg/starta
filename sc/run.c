@@ -117,6 +117,8 @@ static void make_istate( istate_t *new_istate, THRCODE *code,
     new_istate->code = thrcode_instructions( code );
     new_istate->code_length = thrcode_length( code );
     new_istate->static_data = thrcode_static_data( code, &istate.static_data_size );
+
+    new_istate->ip = 0;
 }
 
 void *interpret_alloc( istate_t *is, ssize_t size )
@@ -296,7 +298,6 @@ void run( cexception_t *ex )
 
     // istate.ex = &inner;
     istate.ex = ex;
-    istate.ip = 0;
 
     function = istate.code[0].fn;
 
@@ -569,6 +570,33 @@ void thrcode_gc_mark_and_sweep( void )
 	printf( ">>> Finished mark & sweep\n" );
 }
 
+void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset, 
+                             cexception_t *ex )
+{
+    istate_t save_istate = *istate;
+
+    /* push the return address, an address of a '0' opcode that will
+       cause a sub-interpreter to terminate: */
+    (--istate->sp)->num.ssize = istate->code_length - 1;
+    /* push old frame pointer: */
+    (--istate->sp)->ptr = istate->fp;
+    /* set the frame pointer for the called procedure: */
+    istate->fp = istate->sp;
+    STACKCELL_ZERO_PTR( istate->sp[1] );
+
+    /* Set the IP to the address of the called subroutine: */
+    istate->ip = code_offset;
+
+    /* Invoke the sub-interpreter: */
+    /* int old_trace = trace; */
+    run( ex );
+    /* trace = old_trace; */
+
+    /* Restore the previous interpreter state: */
+    istate->xp = save_istate.xp;
+    istate->ip = save_istate.ip;
+}
+
 void thrcode_run_destructor_if_needed( istate_t *istate,
                                        alloccell_t *hdr )
 {
@@ -577,8 +605,23 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
         ssize_t *vtable =
             (ssize_t*)(istate->static_data + vtable_offset);
         if( vtable[0] > 0 && vtable[1] != 0 ) {
-                    printf( ">>> garbage collector should call destructor "
-                            "at offset %d\n", vtable[1] );
+#if 0
+            printf( ">>> garbage collector should call destructor "
+                    "at offset %d\n", vtable[1] );
+#endif
+            /* Push the 'self' reference to the destructued object
+               onto the stack: */
+            istate->ep--;
+            STACKCELL_SET_ADDR( istate->ep[0], hdr+1 );
+            /* Invoke the destructor: */
+            ssize_t code_offset = vtable[1];
+            cexception_t inner;
+            cexception_guard( inner ) {
+                thrcode_run_subroutine( istate, code_offset, &inner );
+            }
+            cexception_catch {
+                fprintf( stderr, "!!! exception raised in destructor\n" );
+            }
         }
     }
 }

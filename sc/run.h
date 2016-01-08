@@ -216,4 +216,7 @@ void thrcode_gc_mark_and_sweep( void );
 void thrcode_run_destructor_if_needed( istate_t *istate,
                                        alloccell_t *hdr );
 
+void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
+                             cexception_t *ex );
+
 #endif
