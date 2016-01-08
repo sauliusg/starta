@@ -567,3 +567,17 @@ void thrcode_gc_mark_and_sweep( void )
     if( gc_debug )
 	printf( ">>> Finished mark & sweep\n" );
 }
+
+void thrcode_run_destructor_if_needed( istate_t *istate,
+                                       alloccell_t *hdr )
+{
+    if( hdr->vmt_offset != 0 ) {
+        ssize_t vtable_offset = hdr->vmt_offset[1];
+        ssize_t *vtable =
+            (ssize_t*)(istate->static_data + vtable_offset);
+        if( vtable[0] > 0 && vtable[1] != 0 ) {
+                    printf( ">>> garbage collector should call destructor "
+                            "at offset %d\n", vtable[1] );
+        }
+    }
+}
