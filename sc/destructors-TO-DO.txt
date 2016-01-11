@@ -1,0 +1,3 @@
+-- implement calls of super-class destructors (chained destructors);
+-- suppers garbage collector calls from destructor allocations;
+-- implement checks of destructor (and constructor) names.\;
