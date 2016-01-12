@@ -5856,14 +5856,19 @@ VMT layout:                     |
                                 |
 itable[]:                       |
 ---------                       |
+                                |
+             +---------------+  |
+          -2 |base2 VMT offs.|  | VMT of the super-super-class
+             +---------------+  |
+          -1 |base  VMT offs.|  | VMT of the super-class
              +---------------+  |
 vmt_address: | n_interfaces  |<-/
              +---------------+
-             |class VMT offs.|
+           1 |class VMT offs.|
              +---------------+
-             |i-face 1 VMT o.|>-\
+           2 |i-face 1 VMT o.|>-\
              +---------------+  |
-             |i-face 2 VMT o.|  |
+           3 |i-face 2 VMT o.|  |
              +---------------+  |
              |               |  |
              | ...           |  |
