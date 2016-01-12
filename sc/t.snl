@@ -2,23 +2,62 @@
 // Compiler tests
 //
 
-// Test nested modules.
-
-module M;
+// Test calls to superclass methods.
 
 use std;
 
-module I1;
-   use std;
-   var i : int;
-   function ff(): string { return "I am M::I1::ff()" }
-   function gg() { . ff() }
-end module I1;
+class A {
+    int count;
+    string name;
+    string className;
 
-end module M;
+    constructor A( string name; int count = 0 )
+    {
+        self.className = "class A";
+        self.name = name;
+        self.count = count;
+    }
 
-use std;
-use M;
+    method toA(): A
+    {
+        return new A( self.name, self.count )
+    }
 
-. M::I1::ff();
-. I1::ff();
+    method toString() -> string
+    {
+        return
+            "This is %s object " %% self.className _
+            "named '%s' " %% self.name _
+            "counted %d times" %% self.count;
+    }
+}
+
+class B: A {
+    int i;
+
+    constructor B( string name; int count = 0; int i = -1 )
+        super( name, count )
+    {
+        self.className = "class B";
+        self.i = i;
+    }
+
+    method toString(): string
+    {
+        return
+            // super::self->toString() _
+            self->toA()->toString() _
+            " with i = %d" %% self.i;
+    }
+}
+
+var a = new A( "First A", 10 );
+
+. a->toString();
+
+a = new B( "First B", i => -22 );
+
+var b = new B( name => "Second B", count => 20, i => -23 );
+
+. a->toString();
+. b->toString();

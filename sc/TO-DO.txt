@@ -1,3 +1,4 @@
+-- improvement: reduce number of spurious error messages when a function argument is misspelled.
 -- FIX BUG: implement correct updates of exception data structures after stack reallocations.
 -- Implement calls of super-class methods.
 ++ Implement selective import of operators.
