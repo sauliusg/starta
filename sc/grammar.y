@@ -5922,6 +5922,20 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
 
     compiler_assemble_static_data( cc, NULL,
 				   (1+interface_nr) * sizeof(ssize_t), ex );
+
+    /* Populate base class VMT references at negative offsets: */
+
+    if( base_class_nr > 0 ) {
+        ssize_t base_class_nr = -1;
+        TNODE *base_class = tnode_base_type( class_descr );
+        ssize_t *vmt = (ssize_t*)(cc->static_data + vmt_address);
+        while( base_class ) {
+            ssize_t base_vmt_offset = tnode_vmt_offset( base_class );
+            vmt[base_class_nr] = base_vmt_offset;
+            base_class = tnode_base_type( base_class );
+            base_class_nr --;
+        }
+    }
 }
  
 static void compiler_lookup_interface_method( COMPILER *cc, 
