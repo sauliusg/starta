@@ -10167,23 +10167,32 @@ multivalue_function_call
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
                 assert( interface_name );
-                class_has_interface =
-                    tnode_lookup_interface( object_type, interface_name )
-                    != NULL;
-                if( !class_has_interface ) {
-                    char *class_name =
-                        object_type ? tnode_name( object_type ) : NULL;
-                    if( class_name ) {
-                        yyerrorf( "the caller class '%s' does not "
-                                  "implement interface '%s'",
-                                  class_name, interface_name );
-                    } else {
-                        yyerrorf( "the caller class does not implement "
-                                  "interface '%s'",
-                                  interface_name );
+                if( interface_type && tnode_kind( interface_type ) == TK_CLASS &&
+                    tnode_has_flags( interface_type, TF_IS_FORWARD )) {
+                    delete_tnode( interface_type );
+                    interface_type = NULL;
+                    if( object_type ) {
+                        method = tnode_lookup_method( object_type, method_name );
                     }
                 } else {
-                    method = tnode_lookup_method( interface_type, method_name );
+                    class_has_interface =
+                        tnode_lookup_interface( object_type, interface_name )
+                        != NULL;
+                    if( !class_has_interface ) {
+                        char *class_name =
+                            object_type ? tnode_name( object_type ) : NULL;
+                        if( class_name ) {
+                            yyerrorf( "the caller class '%s' does not "
+                                      "implement interface '%s'",
+                                      class_name, interface_name );
+                        } else {
+                            yyerrorf( "the caller class does not implement "
+                                      "interface '%s'",
+                                      interface_name );
+                        }
+                    } else {
+                        method = tnode_lookup_method( interface_type, method_name );
+                    }
                 }
             } else {
                 if( object_type ) {
@@ -10277,23 +10286,29 @@ multivalue_function_call
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
                 assert( interface_name );
-                class_has_interface =
-                    tnode_lookup_interface( object_type, interface_name )
-                    != NULL;
-                if( !class_has_interface ) {
-                    char *class_name =
-                        object_type ? tnode_name( object_type ) : NULL;
-                    if( class_name ) {
-                        yyerrorf( "the caller class '%s' does not "
-                                  "implement interface '%s'",
-                                  class_name, interface_name );
-                    } else {
-                        yyerrorf( "the caller class does not implement "
-                                  "interface '%s'",
-                                  interface_name );
-                    }
+                if( interface_type && tnode_kind( interface_type ) == TK_CLASS &&
+                    tnode_has_flags( interface_type, TF_IS_FORWARD )) {
+                    delete_tnode( interface_type );
+                    interface_type = NULL;
                 } else {
-                    method = tnode_lookup_method( interface_type, method_name );
+                    class_has_interface =
+                        tnode_lookup_interface( object_type, interface_name )
+                        != NULL;
+                    if( !class_has_interface ) {
+                        char *class_name =
+                            object_type ? tnode_name( object_type ) : NULL;
+                        if( class_name ) {
+                            yyerrorf( "the caller class '%s' does not "
+                                      "implement interface '%s'",
+                                      class_name, interface_name );
+                        } else {
+                            yyerrorf( "the caller class does not implement "
+                                      "interface '%s'",
+                                      interface_name );
+                        }
+                    } else {
+                        method = tnode_lookup_method( interface_type, method_name );
+                    }
                 }
             } else {
                 if( object_type ) {
@@ -12105,8 +12120,17 @@ opt_method_interface
   : '@' __IDENTIFIER
   {
       char *interface_name = $2;
-      $$ = compiler_lookup_tnode( compiler, /*module_name =*/ NULL,
-                                  interface_name, "interface" );
+      TNODE *interface_tnode = NULL;
+
+      interface_tnode =
+          compiler_lookup_tnode( compiler, /* module_name = */ NULL,
+                                 interface_name, "interface" );
+
+      if( !interface_tnode ) {
+          interface_tnode = new_tnode_forward_class( interface_name, px );
+      }
+
+      $$ = interface_tnode;
   }
   | '@' module_list __COLON_COLON __IDENTIFIER
   {
@@ -12134,6 +12158,12 @@ method_header
           DNODE *volatile parameter_list = $7;
           DNODE *volatile return_values = $9;
 	  int is_function = 0, class_has_interface = 1;
+
+          if( interface_type && tnode_kind( interface_type ) == TK_CLASS &&
+              tnode_has_flags( interface_type, TF_IS_FORWARD )) {
+              delete_tnode( interface_type );
+              interface_type = NULL;
+          }
 
           assert( current_class );
     	  cexception_guard( inner ) {
