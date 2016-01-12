@@ -5898,7 +5898,7 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
                                                  cexception_t *ex )
 {
     ssize_t vmt_address;
-    ssize_t interface_nr;
+    ssize_t interface_nr, base_class_nr;
 
     assert( class_descr );
 
@@ -5906,10 +5906,15 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
         return;
     }
 
+    base_class_nr = tnode_base_class_count( class_descr );
+
     interface_nr = tnode_max_interface( class_descr );
 
     compiler_assemble_static_alloc_hdr( cc, sizeof(ssize_t),
                                         sizeof(ssize_t), ex );
+
+    if( base_class_nr > 0 )
+        compiler_assemble_static_data( cc, NULL, base_class_nr * sizeof(ssize_t), ex );
 
     vmt_address = compiler_assemble_static_ssize_t( cc, 1 + interface_nr, ex );
 
