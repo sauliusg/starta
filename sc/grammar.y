@@ -163,6 +163,10 @@ typedef struct {
 				being processed. */
     DLIST *current_call_stack;
 
+    ssize_t current_interface_nr;
+    ssize_t *current_interface_nr_stack;
+    int current_interface_nr_stack_size;
+
     DNODE *current_arg;        /* formal function argument that is currently
 				  being processed. NOTE! this field
 				  must not be deleted in delete_compiler() */
@@ -254,6 +258,7 @@ static void delete_compiler( COMPILER *c )
 
 	delete_dlist( c->current_call_stack );
         assert( !c->current_arg_stack );
+        freex( c->current_interface_nr_stack );
 
 	delete_dlist( c->current_module_stack );
 
@@ -1538,6 +1543,9 @@ static void compiler_emit_function_call( COMPILER *cc,
 	    char *fn_name = dnode_name( function );
 	    ssize_t fn_address = dnode_offset( function );
 	    ssize_t interface_nr = tnode_interface_number( fn_tnode );
+            if( cc->current_interface_nr < 0 ) {
+                interface_nr = cc->current_interface_nr - 1;
+            }
 	    compiler_emit( cc, ex, "\tceeN\n", VCALL,
 			&interface_nr, &fn_address, fn_name );
 	} else {
@@ -5753,6 +5761,10 @@ static void compiler_check_and_push_function_name( COMPILER *cc,
     TNODE *fn_tnode = NULL;
     type_kind_t fn_kind;
 
+    push_ssize_t( &cc->current_interface_nr_stack,
+                  &cc->current_interface_nr_stack_size,
+                  cc->current_interface_nr, ex );
+
     dlist_push_dnode( &cc->current_call_stack,
 		      &cc->current_call, ex );
 
@@ -5830,6 +5842,12 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
 
     delete_dnode( cc->current_call );
 
+    // printf( ">>> depth %d\n", cc->current_interface_nr_stack_size );
+    if( cc->current_interface_nr_stack_size > 0 )
+        cc->current_interface_nr =
+            pop_ssize_t( &cc->current_interface_nr_stack,
+                         &cc->current_interface_nr_stack_size,
+                         ex );
     cc->current_call =
 	dlist_pop_data( &cc->current_call_stack );
     cc->current_arg =
@@ -5920,15 +5938,18 @@ static void compiler_start_virtual_method_table( COMPILER *cc,
     compiler_assemble_static_data( cc, NULL,
 				   (1+interface_nr) * sizeof(ssize_t), ex );
 
-    /* Populate base class VMT references at negative offsets: */
+    /* Populate base class VMT references at negative offsets. The
+       following code assumes that the virtual method tables of the
+       base classes have been finished already: */
 
     if( base_class_nr > 0 ) {
         ssize_t base_class_nr = -1;
         TNODE *base_class = tnode_base_type( class_descr );
         ssize_t *vmt = (ssize_t*)(cc->static_data + vmt_address);
-        while( base_class ) {
+        while( base_class && tnode_kind( base_class ) == TK_CLASS ) {
             ssize_t base_vmt_offset = tnode_vmt_offset( base_class );
-            vmt[base_class_nr] = base_vmt_offset;
+            ssize_t *itable = (ssize_t*)(cc->static_data + base_vmt_offset);
+            vmt[base_class_nr] = itable[1];
             base_class = tnode_base_type( base_class );
             base_class_nr --;
         }
@@ -10126,6 +10147,12 @@ multivalue_function_call
 	  fn_tnode = compiler->e_stack ?
 	      enode_type( compiler->e_stack ) : NULL;
 
+          push_ssize_t( &compiler->current_interface_nr_stack,
+                        &compiler->current_interface_nr_stack_size,
+                        compiler->current_interface_nr, px );
+
+          compiler->current_interface_nr = 0;
+
 	  dlist_push_dnode( &compiler->current_call_stack,
 			    &compiler->current_call, px );
 
@@ -10160,27 +10187,57 @@ multivalue_function_call
             TNODE *interface_type = $4;
             DNODE *method = NULL;
             int class_has_interface = 1;
+            ssize_t interface_nr = 0;
 
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
                 assert( interface_name );
-                class_has_interface =
-                    tnode_lookup_interface( object_type, interface_name )
-                    != NULL;
-                if( !class_has_interface ) {
-                    char *class_name =
-                        object_type ? tnode_name( object_type ) : NULL;
-                    if( class_name ) {
-                        yyerrorf( "the caller class '%s' does not "
-                                  "implement interface '%s'",
-                                  class_name, interface_name );
+                if( tnode_kind( interface_type ) == TK_CLASS ) {
+                    /* Look-up the base class used as an interface: */
+                    ssize_t interface_count = 0;
+                    TNODE *base_type = object_type;
+                    while( (base_type = tnode_base_type( base_type ))
+                           != NULL ) {
+                        interface_count--;
+                        if( base_type == interface_type ) {
+                            interface_nr = interface_count;
+                            break;
+                        }
+                    }
+                    if( interface_nr == 0 ) {
+                        char *class_name =
+                            object_type ? tnode_name( object_type ) : NULL;
+                        if( class_name ) {
+                            yyerrorf( "the caller class '%s' does not "
+                                      "inherit class '%s'",
+                                      class_name, interface_name );
+                        } else {
+                            yyerrorf( "the caller class does not "
+                                      "inherit class '%s'",
+                                      interface_name );
+                        }
                     } else {
-                        yyerrorf( "the caller class does not implement "
-                                  "interface '%s'",
-                                  interface_name );
+                        method = tnode_lookup_method( interface_type, method_name );
                     }
                 } else {
-                    method = tnode_lookup_method( interface_type, method_name );
+                    class_has_interface =
+                        tnode_lookup_interface( object_type, interface_name )
+                        != NULL;
+                    if( !class_has_interface ) {
+                        char *class_name =
+                            object_type ? tnode_name( object_type ) : NULL;
+                        if( class_name ) {
+                            yyerrorf( "the caller class '%s' does not "
+                                      "implement interface '%s'",
+                                      class_name, interface_name );
+                        } else {
+                            yyerrorf( "the caller class does not implement "
+                                      "interface '%s'",
+                                      interface_name );
+                        }
+                    } else {
+                        method = tnode_lookup_method( interface_type, method_name );
+                    }
                 }
             } else {
                 if( object_type ) {
@@ -10190,6 +10247,12 @@ multivalue_function_call
 
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
+
+                push_ssize_t( &compiler->current_interface_nr_stack,
+                              &compiler->current_interface_nr_stack_size,
+                              compiler->current_interface_nr, px );
+
+                compiler->current_interface_nr = interface_nr;
 
                 dlist_push_dnode( &compiler->current_call_stack,
                                   &compiler->current_call, px );
@@ -10265,6 +10328,7 @@ multivalue_function_call
             TNODE *interface_type = $5;
             DNODE *method = NULL;
             int class_has_interface = 1;
+            ssize_t interface_nr = 0;
 
             if( !object_expr ) {
                 yyerrorf( "too little values on the evaluation stack "
@@ -10274,23 +10338,52 @@ multivalue_function_call
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
                 assert( interface_name );
-                class_has_interface =
-                    tnode_lookup_interface( object_type, interface_name )
-                    != NULL;
-                if( !class_has_interface ) {
-                    char *class_name =
-                        object_type ? tnode_name( object_type ) : NULL;
-                    if( class_name ) {
-                        yyerrorf( "the caller class '%s' does not "
-                                  "implement interface '%s'",
-                                  class_name, interface_name );
+                if( tnode_kind( interface_type ) == TK_CLASS ) {
+                    /* Look-up the base class used as an interface: */
+                    ssize_t interface_count = 0;
+                    TNODE *base_type = object_type;
+                    while( (base_type = tnode_base_type( base_type ))
+                           != NULL ) {
+                        interface_count--;
+                        if( base_type == interface_type ) {
+                            interface_nr = interface_count;
+                            break;
+                        }
+                    }
+                    if( interface_nr == 0 ) {
+                        char *class_name =
+                            object_type ? tnode_name( object_type ) : NULL;
+                        if( class_name ) {
+                            yyerrorf( "the caller class '%s' does not "
+                                      "inherit class '%s'",
+                                      class_name, interface_name );
+                        } else {
+                            yyerrorf( "the caller class does not "
+                                      "inherit class '%s'",
+                                      interface_name );
+                        }
                     } else {
-                        yyerrorf( "the caller class does not implement "
-                                  "interface '%s'",
-                                  interface_name );
+                        method = tnode_lookup_method( interface_type, method_name );
                     }
                 } else {
-                    method = tnode_lookup_method( interface_type, method_name );
+                    class_has_interface =
+                        tnode_lookup_interface( object_type, interface_name )
+                        != NULL;
+                    if( !class_has_interface ) {
+                        char *class_name =
+                            object_type ? tnode_name( object_type ) : NULL;
+                        if( class_name ) {
+                            yyerrorf( "the caller class '%s' does not "
+                                      "implement interface '%s'",
+                                      class_name, interface_name );
+                        } else {
+                            yyerrorf( "the caller class does not implement "
+                                  "interface '%s'",
+                                      interface_name );
+                        }
+                    } else {
+                        method = tnode_lookup_method( interface_type, method_name );
+                    }
                 }
             } else {
                 if( object_type ) {
@@ -10300,6 +10393,12 @@ multivalue_function_call
 
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
+
+                push_ssize_t( &compiler->current_interface_nr_stack,
+                              &compiler->current_interface_nr_stack_size,
+                              compiler->current_interface_nr, px );
+
+                compiler->current_interface_nr = interface_nr;
 
 		dlist_push_dnode( &compiler->current_call_stack,
 				  &compiler->current_call, px );
@@ -11367,7 +11466,13 @@ generator_new
           constructor_dnode = $2 ? tnode_constructor( $2 ) : NULL;
 
           if( constructor_dnode ) {
-              /* --- function (constructir) call generation starts here: */
+              /* --- function (constructor) call generation starts here: */
+
+              push_ssize_t( &compiler->current_interface_nr_stack,
+                            &compiler->current_interface_nr_stack_size,
+                            compiler->current_interface_nr, px );
+
+              compiler->current_interface_nr = 0;
 
               dlist_push_dnode( &compiler->current_call_stack,
                                 &compiler->current_call, px );
@@ -11411,6 +11516,12 @@ generator_new
           compiler_compile_alloc( compiler, type_tnode, px );
 
           /* --- function call generation starts here: */
+
+          push_ssize_t( &compiler->current_interface_nr_stack,
+                        &compiler->current_interface_nr_stack_size,
+                        compiler->current_interface_nr, px );
+
+          compiler->current_interface_nr = 0;
 
           dlist_push_dnode( &compiler->current_call_stack,
                             &compiler->current_call, px );
@@ -12282,6 +12393,12 @@ opt_base_class_initialisation
 
         assert( type_tnode );
         compiler_emit( compiler, px, "T\n", "# Initialising base class:" );
+
+        push_ssize_t( &compiler->current_interface_nr_stack,
+                      &compiler->current_interface_nr_stack_size,
+                      compiler->current_interface_nr, px );
+
+        compiler->current_interface_nr = 0;
 
         dlist_push_dnode( &compiler->current_call_stack,
                           &compiler->current_call, px );
