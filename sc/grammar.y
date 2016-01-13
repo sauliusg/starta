@@ -187,13 +187,9 @@ typedef struct {
     DNODE *loops;
     DLIST *loop_stack;
 
-    /* track down exception declared in each module or in the main
-       program; start from the beginning in each new module and
-       restore the previous value when the compilation of the module
-       is finished: */
+    /* number sequentially all exceptions declared in each module or
+       in the main program: */
     int latest_exception_nr;
-    int *latest_exception_stack;
-    int latest_exception_stack_size;
 
     /* the following variables describe nesting try{} blocks */
     int try_block_level;
@@ -252,7 +248,6 @@ static void delete_compiler( COMPILER *c )
 	freex( c->addr_stack );
 	delete_elist( c->saved_estacks );
 	delete_enode( c->e_stack );
-	freex( c->latest_exception_stack );
         freex( c->try_variable_stack );
 
 	delete_dnode( c->current_call );
