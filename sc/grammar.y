@@ -789,6 +789,8 @@ static void push_ssize_t( ssize_t **array, int *size, ssize_t value,
 
 static ssize_t pop_ssize_t( ssize_t **array, int *size, cexception_t *ex )
 {
+    assert( size );
+    assert( *size > 0 );
     (*size) --;
     return (*array)[*size];
 }
