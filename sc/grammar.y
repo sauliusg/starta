@@ -5771,6 +5771,26 @@ static void compiler_push_current_call( COMPILER *cc,
                       &cc->current_arg, ex );
 }
 
+static void compiler_pop_current_interface_nr( COMPILER *cc,
+                                               cexception_t *ex )
+{
+    // printf( ">>> depth %d\n", cc->current_interface_nr_stack_size );
+    if( cc->current_interface_nr_stack_size > 0 )
+        cc->current_interface_nr =
+            pop_ssize_t( &cc->current_interface_nr_stack,
+                         &cc->current_interface_nr_stack_size,
+                         ex );
+}
+
+static void compiler_pop_current_call( COMPILER *cc,
+                                       cexception_t *ex )
+{
+    cc->current_call =
+	dlist_pop_data( &cc->current_call_stack );
+    cc->current_arg =
+	dlist_pop_data( &cc->current_arg_stack );
+}
+
 static void compiler_check_and_push_function_name( COMPILER *cc,
                                                    DNODE *module,
                                                    char *function_name,
@@ -5853,6 +5873,7 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
 
     delete_dnode( cc->current_call );
 
+#if 0
     // printf( ">>> depth %d\n", cc->current_interface_nr_stack_size );
     if( cc->current_interface_nr_stack_size > 0 )
         cc->current_interface_nr =
@@ -5863,6 +5884,10 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
 	dlist_pop_data( &cc->current_call_stack );
     cc->current_arg =
 	dlist_pop_data( &cc->current_arg_stack );
+#else
+    compiler_pop_current_interface_nr( cc, ex );
+    compiler_pop_current_call( cc, ex );
+#endif
 
     return rval_nr;
 }
