@@ -46,6 +46,22 @@ class B: A {
 
 var a = new A( "First A", 10 );
 
+var c = new class: A { 
+    float x;
+
+    constructor c ( name = "Anonymous c"; int count = -1;
+                    float x = -1.0  )
+        super( name, count )
+    {
+        self.x = x
+    }
+
+    method toString(): string
+    {
+        return "An anonymous class with x = %f" %% self.x;
+    }
+};
+
 . a->toString();
 
 a = new B( "First B", i => -22 );
@@ -54,3 +70,4 @@ var b = new B( name => "Second B", count => 20, i => -23 );
 
 . a->toString();
 . b->toString();
+. c->toString();
