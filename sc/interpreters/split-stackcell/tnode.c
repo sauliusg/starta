@@ -162,9 +162,9 @@ TNODE *new_tnode_forward_struct( char *name, cexception_t *ex )
     cexception_t inner;
     TNODE * volatile node = new_tnode( ex );
 
-    assert( name );
     cexception_guard( inner ) {
-	node->name = strdupx( name, &inner );
+        if( name )
+            node->name = strdupx( name, &inner );
 	node->kind = TK_STRUCT;
 	tnode_set_flags( node, TF_IS_FORWARD | TF_IS_REF );
     }
@@ -180,9 +180,9 @@ TNODE *new_tnode_forward_class( char *name, cexception_t *ex )
     cexception_t inner;
     TNODE * volatile node = new_tnode( ex );
 
-    assert( name );
     cexception_guard( inner ) {
-	node->name = strdupx( name, &inner );
+        if( name )
+            node->name = strdupx( name, &inner );
 	node->kind = TK_CLASS;
 	tnode_set_flags( node, TF_IS_FORWARD | TF_IS_REF );
     }
@@ -1048,6 +1048,21 @@ ssize_t tnode_max_interface( TNODE *class_descr )
     }
 
     return max_interface;
+}
+
+ssize_t tnode_base_class_count( TNODE *tnode )
+{
+    ssize_t count = 0;
+
+    if( !tnode )
+        return 0;
+
+    while( tnode->base_type && tnode->base_type->kind == TK_CLASS ) {
+        count ++;
+        tnode = tnode->base_type;
+    }
+
+    return count;
 }
 
 /* The full stackcell implementation does not need to align fields --
