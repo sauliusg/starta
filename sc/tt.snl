@@ -18,11 +18,6 @@ class A {
         self.count = count;
     }
 
-    method toA(): A
-    {
-        return new A( self.name, self.count )
-    }
-
     method toString() -> string
     {
         return
@@ -45,9 +40,7 @@ class B: A {
     method toString(): string
     {
         return
-            self->toString@A() _
-            // self->toA()->toString() _
-            " with i = %d" %% self.i;
+            self->toString@A() _ " with i = %d" %% self.i;
     }
 }
 
