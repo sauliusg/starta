@@ -1,11 +1,11 @@
 -- improvement: reduce number of spurious error messages when a function argument is misspelled.
 -- FIX BUG: implement correct updates of exception data structures after stack reallocations.
--- Implement calls of super-class methods.
+-+ Implement calls of super-class methods.
 -- Implement inheritance for anonymous classes.
 ++ Implement selective import of operators.
 -- Think how to ensure readonliness of function arguments
 -- Think abou thow to implement interactive interpreter and interactive "notebooks" (as in ipython or octave?)
--- Implement destructors (branches/saulius-destructors)
+-+ Implement destructors (branches/saulius-destructors)
 -- Implement two-stack overlaping frame runtime (branches/saulius-2stacks)
 -- Implement Unix pipe constructs -- this may be a killer feature.
 -- Think about convenient interface to use modules in my language in other languages
