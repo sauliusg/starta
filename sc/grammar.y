@@ -5753,6 +5753,24 @@ static void compiler_load_library( COMPILER *compiler,
     freex( library_name );
 }
 
+static void compiler_push_current_interface_nr( COMPILER *cc,
+                                                cexception_t *ex )
+{
+    push_ssize_t( &cc->current_interface_nr_stack,
+                  &cc->current_interface_nr_stack_size,
+                  cc->current_interface_nr, ex );
+}
+
+static void compiler_push_current_call( COMPILER *cc,
+                                        cexception_t *ex )
+{
+    dlist_push_dnode( &cc->current_call_stack,
+                      &cc->current_call, ex );
+
+    dlist_push_dnode( &cc->current_arg_stack,
+                      &cc->current_arg, ex );
+}
+
 static void compiler_check_and_push_function_name( COMPILER *cc,
                                                    DNODE *module,
                                                    char *function_name,
@@ -5761,15 +5779,8 @@ static void compiler_check_and_push_function_name( COMPILER *cc,
     TNODE *fn_tnode = NULL;
     type_kind_t fn_kind;
 
-    push_ssize_t( &cc->current_interface_nr_stack,
-                  &cc->current_interface_nr_stack_size,
-                  cc->current_interface_nr, ex );
-
-    dlist_push_dnode( &cc->current_call_stack,
-		      &cc->current_call, ex );
-
-    dlist_push_dnode( &cc->current_arg_stack,
-		      &cc->current_arg, ex );
+    compiler_push_current_interface_nr( cc, ex );
+    compiler_push_current_call( cc, ex );
 
     cc->current_call = 
 	share_dnode( compiler_lookup_dnode( cc, module, function_name,
@@ -10147,19 +10158,13 @@ multivalue_function_call
 	  fn_tnode = compiler->e_stack ?
 	      enode_type( compiler->e_stack ) : NULL;
 
-          push_ssize_t( &compiler->current_interface_nr_stack,
-                        &compiler->current_interface_nr_stack_size,
-                        compiler->current_interface_nr, px );
+          compiler_push_current_interface_nr( compiler, px );
+          compiler_push_current_call( compiler, px );
 
           compiler->current_interface_nr = 0;
 
-	  dlist_push_dnode( &compiler->current_call_stack,
-			    &compiler->current_call, px );
-
-	  dlist_push_dnode( &compiler->current_arg_stack,
-			    &compiler->current_arg, px );
-
 	  compiler->current_call = new_dnode( px );
+
 	  if( fn_tnode ) {
 	      dnode_insert_type( compiler->current_call,
 				 share_tnode( fn_tnode ));
@@ -10248,17 +10253,10 @@ multivalue_function_call
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-                push_ssize_t( &compiler->current_interface_nr_stack,
-                              &compiler->current_interface_nr_stack_size,
-                              compiler->current_interface_nr, px );
+                compiler_push_current_interface_nr( compiler, px );
+                compiler_push_current_call( compiler, px );
 
                 compiler->current_interface_nr = interface_nr;
-
-                dlist_push_dnode( &compiler->current_call_stack,
-                                  &compiler->current_call, px );
-
-                dlist_push_dnode( &compiler->current_arg_stack,
-                                  &compiler->current_arg, px );
 
 		if( fn_tnode && tnode_kind( fn_tnode ) != TK_METHOD ) {
 		    yyerrorf( "called field is not a method" );
@@ -10394,17 +10392,10 @@ multivalue_function_call
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
 
-                push_ssize_t( &compiler->current_interface_nr_stack,
-                              &compiler->current_interface_nr_stack_size,
-                              compiler->current_interface_nr, px );
+                compiler_push_current_interface_nr( compiler, px );
+                compiler_push_current_call( compiler, px );
 
                 compiler->current_interface_nr = interface_nr;
-
-		dlist_push_dnode( &compiler->current_call_stack,
-				  &compiler->current_call, px );
-
-		dlist_push_dnode( &compiler->current_arg_stack,
-				  &compiler->current_arg, px );
 
 		compiler->current_call = share_dnode( method );
 
@@ -11468,17 +11459,10 @@ generator_new
           if( constructor_dnode ) {
               /* --- function (constructor) call generation starts here: */
 
-              push_ssize_t( &compiler->current_interface_nr_stack,
-                            &compiler->current_interface_nr_stack_size,
-                            compiler->current_interface_nr, px );
+              compiler_push_current_interface_nr( compiler, px );
+              compiler_push_current_call( compiler, px );
 
               compiler->current_interface_nr = 0;
-
-              dlist_push_dnode( &compiler->current_call_stack,
-                                &compiler->current_call, px );
-
-              dlist_push_dnode( &compiler->current_arg_stack,
-                                &compiler->current_arg, px );
 
               constructor_tnode = constructor_dnode ?
                   dnode_type( constructor_dnode ) : NULL;
@@ -11517,17 +11501,10 @@ generator_new
 
           /* --- function call generation starts here: */
 
-          push_ssize_t( &compiler->current_interface_nr_stack,
-                        &compiler->current_interface_nr_stack_size,
-                        compiler->current_interface_nr, px );
+          compiler_push_current_interface_nr( compiler, px );
+          compiler_push_current_call( compiler, px );
 
           compiler->current_interface_nr = 0;
-
-          dlist_push_dnode( &compiler->current_call_stack,
-                            &compiler->current_call, px );
-
-          dlist_push_dnode( &compiler->current_arg_stack,
-                            &compiler->current_arg, px );
 
           constructor_dnode = type_tnode ?
               tnode_constructor( type_tnode ) : NULL;
@@ -12394,17 +12371,10 @@ opt_base_class_initialisation
         assert( type_tnode );
         compiler_emit( compiler, px, "T\n", "# Initialising base class:" );
 
-        push_ssize_t( &compiler->current_interface_nr_stack,
-                      &compiler->current_interface_nr_stack_size,
-                      compiler->current_interface_nr, px );
+        compiler_push_current_interface_nr( compiler, px );
+        compiler_push_current_call( compiler, px );
 
         compiler->current_interface_nr = 0;
-
-        dlist_push_dnode( &compiler->current_call_stack,
-                          &compiler->current_call, px );
-
-        dlist_push_dnode( &compiler->current_arg_stack,
-                          &compiler->current_arg, px );
 
         constructor_dnode = base_type_tnode ?
             tnode_constructor( base_type_tnode ) : NULL;
