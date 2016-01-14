@@ -5774,12 +5774,10 @@ static void compiler_push_current_call( COMPILER *cc,
 static void compiler_pop_current_interface_nr( COMPILER *cc,
                                                cexception_t *ex )
 {
-    // printf( ">>> depth %d\n", cc->current_interface_nr_stack_size );
-    if( cc->current_interface_nr_stack_size > 0 )
-        cc->current_interface_nr =
-            pop_ssize_t( &cc->current_interface_nr_stack,
-                         &cc->current_interface_nr_stack_size,
-                         ex );
+    cc->current_interface_nr =
+        pop_ssize_t( &cc->current_interface_nr_stack,
+                     &cc->current_interface_nr_stack_size,
+                     ex );
 }
 
 static void compiler_pop_current_call( COMPILER *cc,
@@ -10262,11 +10260,11 @@ multivalue_function_call
                 }
             }
 
+            compiler_push_current_interface_nr( compiler, px );
+            compiler_push_current_call( compiler, px );
+
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
-
-                compiler_push_current_interface_nr( compiler, px );
-                compiler_push_current_call( compiler, px );
 
                 compiler->current_interface_nr = interface_nr;
 
@@ -10401,11 +10399,11 @@ multivalue_function_call
                 }
             }
 
+            compiler_push_current_interface_nr( compiler, px );
+            compiler_push_current_call( compiler, px );
+
 	    if( method ) {
 		TNODE *fn_tnode = dnode_type( method );
-
-                compiler_push_current_interface_nr( compiler, px );
-                compiler_push_current_call( compiler, px );
 
                 compiler->current_interface_nr = interface_nr;
 
