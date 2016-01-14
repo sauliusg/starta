@@ -163,9 +163,9 @@ TNODE *new_tnode_forward_struct( char *name, cexception_t *ex )
     cexception_t inner;
     TNODE * volatile node = new_tnode( ex );
 
-    assert( name );
     cexception_guard( inner ) {
-	node->name = strdupx( name, &inner );
+        if( name )
+            node->name = strdupx( name, &inner );
 	node->kind = TK_STRUCT;
 	tnode_set_flags( node, TF_IS_FORWARD | TF_IS_REF );
     }
@@ -181,9 +181,9 @@ TNODE *new_tnode_forward_class( char *name, cexception_t *ex )
     cexception_t inner;
     TNODE * volatile node = new_tnode( ex );
 
-    assert( name );
     cexception_guard( inner ) {
-	node->name = strdupx( name, &inner );
+        if( name )
+            node->name = strdupx( name, &inner );
 	node->kind = TK_CLASS;
 	tnode_set_flags( node, TF_IS_FORWARD | TF_IS_REF );
     }
