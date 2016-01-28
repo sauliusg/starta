@@ -779,7 +779,8 @@ static TNODE *tnode_finish_struct_or_class( TNODE * volatile node,
 {
     node->kind = type_kind;
     node->flags |= TF_IS_REF;
-    if( node->base_type && node->base_type->destructor ) {
+    if( node->base_type && node->base_type->destructor &&
+        !node->destructor ) {
         node->destructor = share_dnode( node->base_type->destructor );
     }
     return node;
