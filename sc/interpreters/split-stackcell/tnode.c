@@ -48,6 +48,7 @@ void delete_tnode( TNODE *tnode )
 	delete_tnode( tnode->element_type );
         delete_tlist( tnode->interfaces );
 	delete_dnode( tnode->constructor );
+	delete_dnode( tnode->destructor );
 	delete_tnode( tnode->next );
 	free_tnode( tnode );
     }
@@ -461,6 +462,15 @@ TNODE *new_tnode_constructor( char *name,
 					   TK_CONSTRUCTOR, ex );
 }
 
+TNODE *new_tnode_destructor( char *name,
+                             DNODE *parameters,
+                             DNODE *return_dnodes,
+                             cexception_t *ex )
+{
+    return new_tnode_function_or_operator( name, parameters, return_dnodes,
+					   TK_DESTRUCTOR, ex );
+}
+
 TNODE *new_tnode_method( char *name,
                          DNODE *parameters,
                          DNODE *return_dnodes,
@@ -482,6 +492,11 @@ TNODE *new_tnode_operator( char *name,
 static int tnode_is_constructor( TNODE *tnode )
 {
     return tnode && tnode->kind == TK_CONSTRUCTOR;
+}
+
+static int tnode_is_destructor( TNODE *tnode )
+{
+    return tnode && tnode->kind == TK_DESTRUCTOR;
 }
 
 static int tnode_is_method( TNODE *tnode )
@@ -763,6 +778,10 @@ static TNODE *tnode_finish_struct_or_class( TNODE * volatile node,
 {
     node->kind = type_kind;
     node->flags |= TF_IS_REF;
+    if( node->base_type && node->base_type->destructor &&
+        !node->destructor ) {
+        node->destructor = share_dnode( node->base_type->destructor );
+    }
     return node;
 }
 
@@ -1269,6 +1288,20 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
     return tnode;
 }
 
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor )
+{
+    assert( tnode );
+    assert( destructor );
+
+    if( !tnode->destructor || tnode->destructor == destructor ) {
+        tnode->destructor = destructor;
+    } else {
+        yyerrorf( "destructor is already declared for class '%s'", 
+                  tnode_name( tnode ));
+    }
+    return tnode;
+}
+
 TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 {
     DNODE *existing_method;
@@ -1306,6 +1339,12 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	    method_offset = dnode_offset( inherited_method );
 	} else {
             if( method_interface_nr == 0 ) {
+                if( tnode->max_vmt_offset == 0 &&
+                    tnode->kind != TK_INTERFACE ) {
+                    /* Reserve the 0-th offset of the VMT for the
+                       destructor: */
+                    tnode->max_vmt_offset++;
+                }
                 tnode->max_vmt_offset++;
 #if 0
                 printf( ">>> advancing VMT offset to %d for type '%s'\n",
@@ -1372,6 +1411,9 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member )
         } else
 	if( tnode_is_constructor( member_type )) {
 	    tnode_insert_constructor( tnode, member );
+	} else
+	if( tnode_is_destructor( member_type )) {
+	    tnode_insert_destructor( tnode, member );
 	} else {
 	    tnode_insert_fields( tnode, member );
 	}
@@ -1745,6 +1787,12 @@ DNODE *tnode_constructor( TNODE *tnode )
 {
     assert( tnode );
     return tnode->constructor;
+}
+
+DNODE *tnode_destructor( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode->destructor;
 }
 
 TNODE *tnode_next( TNODE* list )
