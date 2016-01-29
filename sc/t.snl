@@ -12,6 +12,7 @@ null class A {
 
     destructor A
     {
+        var dummy = new long[100000];
         . "This is class A destructor for object '" _ self.name _ "'";
     }
 

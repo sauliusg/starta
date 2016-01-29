@@ -557,15 +557,24 @@ static void thrcode_traverse_stack( stackcell_t *stack,
     }
 }
 
+static int in_gc = 0;
+
 void thrcode_gc_mark_and_sweep( void )
 {
     if( gc_debug )
 	printf( ">>> Starting mark & sweep\n" );
+
+    if( in_gc )
+        return;
+
+    in_gc = 1;
     bcalloc_reset_allocated_nodes();
     bctraverse( istate.xp );
     thrcode_traverse_stack( istate.sp, istate.bottom );
     thrcode_traverse_stack( istate.ep, istate.ep_bottom );
     bccollect();
+    in_gc = 0;
+
     if( gc_debug )
 	printf( ">>> Finished mark & sweep\n" );
 }
