@@ -11963,6 +11963,24 @@ function_or_operator_end
 
 	  compiler_get_inline_code( compiler, funct, px );
 
+          if( funct_tnode && tnode_kind( funct_tnode ) == TK_DESTRUCTOR ) {
+              DNODE *first_arg = tnode_args( funct_tnode ); /* The 'self' arg */
+              TNODE *class_tnode = first_arg ? dnode_type( first_arg ) : NULL;
+              TNODE *base_class =
+                  class_tnode ? tnode_base_type( class_tnode ) : NULL;
+              DNODE *base_destructor =
+                  base_class ? tnode_destructor( base_class ) : NULL;
+              if( base_destructor ) {
+                  /* Generate code to pass control to the base
+                     classe's destructor: */
+                  ssize_t self_offset = dnode_offset( first_arg );
+                  ssize_t destructor_offset =
+                      dnode_offset( base_destructor );
+                  compiler_emit( compiler, px, "\tce\n", PLD, &self_offset );
+                  compiler_emit( compiler, px, "\tce\n", CALL, &destructor_offset );
+              }
+          }
+
 	  if( thrcode_last_opcode( compiler->thrcode ).fn != RET ) {
 	      compiler_emit( compiler, px, "\tc\n", RET );
 	  }
