@@ -618,19 +618,21 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
             printf( ">>> garbage collector should call destructor "
                     "at offset %d\n", vtable[1] );
 #endif
-            /* Push the 'self' reference to the destructued object
+            /* Push the 'self' reference to the destructed object
                onto the stack: */
             istate->ep--;
             STACKCELL_SET_ADDR( istate->ep[0], hdr+1 );
             /* Invoke the destructor: */
             ssize_t code_offset = vtable[1];
             cexception_t inner;
+#if 1
             cexception_guard( inner ) {
                 thrcode_run_subroutine( istate, code_offset, &inner );
             }
             cexception_catch {
                 fprintf( stderr, "!!! exception raised in destructor\n" );
             }
+#endif
         }
     }
 }
