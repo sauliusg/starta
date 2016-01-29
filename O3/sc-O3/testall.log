@@ -91,65 +91,65 @@ Makefile:209: .pack.d: No such file or directory
 Makefile:209: .tcodes.d: No such file or directory
 Makefile:209: .tnode.d: No such file or directory
 Makefile:209: programs/.sl.d: No such file or directory
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/packed-type/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/typecode.c | sed -e 's,^typecode.o:,./obj/typecode.o:,' > .typecode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -M -MG \
 	anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
 make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/O3/sc-O3'
 make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/O3/sc-O3'
@@ -169,34 +169,34 @@ sed -f interpreters/packed-type/ifunctions/llong.sed interpreters/packed-type/if
 sed -f interpreters/packed-type/ifunctions/float.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/packed-type/ifunctions/double.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/packed-type/ifunctions/ldouble.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c anode.c -o obj/anode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c dnode.c -o obj/dnode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c enode.c -o obj/enode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c run.c -o obj/run.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c vartab.c -o obj/vartab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c run.c -o obj/run.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c yy.c -o obj/yy.o
 ar cr libsc-O3.a ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c ../../common/common.c -o obj/common.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c ../../common/formats.c -o obj/formats.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c ../../common/typecode.c -o obj/typecode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c ../../lists/sllist.c -o obj/sllist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/bctraverse.c -o obj/bctraverse.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/implementation.c -o obj/implementation.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/pack.c -o obj/pack.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c ../../common/common.c -o obj/common.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c ../../common/formats.c -o obj/formats.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c ../../common/typecode.c -o obj/typecode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c ../../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/implementation.c -o obj/implementation.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/pack.c -o obj/pack.o
 awk '/^ *int /{print $2}' generated/byte_integer.h \
 	| sed -e 's/(//' \
 	| awk '{print "{ "$1", \""$1"\" },"}' > generated/byte_integer.tab.c
@@ -264,14 +264,14 @@ sed -f interpreters/packed-type/ifunctions/llong.sed interpreters/packed-type/if
 sed -f interpreters/packed-type/ifunctions/float.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/packed-type/ifunctions/double.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/packed-type/ifunctions/ldouble.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/tcodes.c -o obj/tcodes.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\"" -c interpreters/packed-type/tnode.c -o obj/tnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\"" -c interpreters/packed-type/tnode.c -o obj/tnode.o
 bison -y -v -d grammar.y
 grammar.y: warning: 1 shift/reduce conflict [-Wconflicts-sr]
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\""   -c -o grammar.tab.o grammar.tab.c
 y.tab.c: In function ‘yyparse’:
 grammar.y:7583:19: warning: ‘module’ may be used uninitialized in this function [-Wmaybe-uninitialized]
      $$ = module;
@@ -281,10 +281,10 @@ grammar.y:7576:12: note: ‘module’ was declared here
             ^
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2640:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2690:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3439M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/packed-type -DSVN_VERSION="\"3441M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -ldl -lefence
 make OPTFLAGS="-O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move " INTERPRETER_DIR="interpreters/packed-type" \
 		-C libraries CC=gcc LD=ld
 make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries'
@@ -332,7 +332,7 @@ gcc -I. -I../../ -fPIC -M -MG just-so.c > .just-so.d
 make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 gcc -c -I. -I../../ -fPIC -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -o just-so.o just-so.c
-ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl
+ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl -lefence
 make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/math'
 Makefile:42: .opcodes.d: No such file or directory
@@ -1193,7 +1193,14 @@ namedargs004:                  OK
 namedargs005:                  OK
 nestedmod001:                  OK
 nestedmod002:                  OK
-nomem001:                      OK
+nomem001:                      Segmentation fault
+FAILED:
+1c1,2
+< ./sl: Unhandled exception 8 in the bytecode interpreter: could not allocate memory
+---
+> 
+> ElectricFence Exiting: mmap() failed: 
+\ No newline at end of file
 nullcheck001:                  OK
 nullcheck002:                  OK
 nullinit001:                   OK
@@ -1513,7 +1520,10 @@ deep002:                       OK
 deep003:                       OK
 deep004:                       OK
 deep005:                       OK
-env001:                        OK
+env001:                        FAILED:
+0a1,2
+> 
+>   Electric Fence 2.2 Copyright (C) 1987-1999 Bruce Perens <bruce@perens.com>
 exit001:                       OK
 libpath001:                    OK
 libpath002:                    OK
@@ -1521,7 +1531,10 @@ libpath003:                    OK
 libpath004:                    OK
 libpath005:                    OK
 lineio001:                     OK
-progenv001:                    OK
+progenv001:                    FAILED:
+0a1,2
+> 
+>   Electric Fence 2.2 Copyright (C) 1987-1999 Bruce Perens <bruce@perens.com>
 program001:                    OK
 readline001:                   OK
 readmtz001:                    OK
@@ -1633,65 +1646,65 @@ Makefile:209: .pack.d: No such file or directory
 Makefile:209: .tcodes.d: No such file or directory
 Makefile:209: .tnode.d: No such file or directory
 Makefile:209: programs/.sl.d: No such file or directory
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/full-stackcell/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/typecode.c | sed -e 's,^typecode.o:,./obj/typecode.o:,' > .typecode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
 make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/O3/sc-O3'
 make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/O3/sc-O3'
@@ -1711,38 +1724,38 @@ sed -f interpreters/full-stackcell/ifunctions/llong.sed interpreters/full-stackc
 sed -f interpreters/full-stackcell/ifunctions/float.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/full-stackcell/ifunctions/double.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/full-stackcell/ifunctions/ldouble.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c anode.c -o obj/anode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c dnode.c -o obj/dnode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c enode.c -o obj/enode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c run.c -o obj/run.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c run.c -o obj/run.o
 run.c: In function ‘interpret’:
 run.c:134:5: warning: implicit declaration of function ‘bcalloc_run_all_destructors’ [-Wimplicit-function-declaration]
      bcalloc_run_all_destructors();
      ^
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c vartab.c -o obj/vartab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c yy.c -o obj/yy.o
 ar cr libsc-O3.a ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c ../../common/common.c -o obj/common.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c ../../common/formats.c -o obj/formats.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c ../../common/typecode.c -o obj/typecode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c ../../lists/sllist.c -o obj/sllist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/bctraverse.c -o obj/bctraverse.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/implementation.c -o obj/implementation.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/pack.c -o obj/pack.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c ../../common/common.c -o obj/common.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c ../../common/formats.c -o obj/formats.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c ../../common/typecode.c -o obj/typecode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c ../../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/implementation.c -o obj/implementation.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/pack.c -o obj/pack.o
 awk '/^ *int /{print $2}' generated/byte_integer.h \
 	| sed -e 's/(//' \
 	| awk '{print "{ "$1", \""$1"\" },"}' > generated/byte_integer.tab.c
@@ -1810,14 +1823,14 @@ sed -f interpreters/full-stackcell/ifunctions/llong.sed interpreters/full-stackc
 sed -f interpreters/full-stackcell/ifunctions/float.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/full-stackcell/ifunctions/double.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/full-stackcell/ifunctions/ldouble.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/tcodes.c -o obj/tcodes.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/full-stackcell/tnode.c -o obj/tnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/full-stackcell/tnode.c -o obj/tnode.o
 bison -y -v -d grammar.y
 grammar.y: warning: 1 shift/reduce conflict [-Wconflicts-sr]
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\""   -c -o grammar.tab.o grammar.tab.c
 y.tab.c: In function ‘yyparse’:
 grammar.y:7583:19: warning: ‘module’ may be used uninitialized in this function [-Wmaybe-uninitialized]
      $$ = module;
@@ -1827,10 +1840,10 @@ grammar.y:7576:12: note: ‘module’ was declared here
             ^
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2640:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2690:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3439M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"3441M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -ldl -lefence
 make OPTFLAGS="-O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move " INTERPRETER_DIR="interpreters/full-stackcell" \
 		-C libraries CC=gcc LD=ld
 make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries'
@@ -1878,7 +1891,7 @@ gcc -I. -I../../ -fPIC -M -MG just-so.c > .just-so.d
 make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 gcc -c -I. -I../../ -fPIC -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -o just-so.o just-so.c
-ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl
+ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl -lefence
 make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/math'
 Makefile:42: .opcodes.d: No such file or directory
@@ -2759,7 +2772,14 @@ namedargs004:                  OK
 namedargs005:                  OK
 nestedmod001:                  OK
 nestedmod002:                  OK
-nomem001:                      OK
+nomem001:                      Segmentation fault
+FAILED:
+1c1,2
+< ./sl: Unhandled exception 8 in the bytecode interpreter: could not allocate memory
+---
+> 
+> ElectricFence Exiting: mmap() failed: 
+\ No newline at end of file
 nullcheck001:                  OK
 nullcheck002:                  OK
 nullinit001:                   OK
@@ -3058,7 +3078,10 @@ deep002:                       OK
 deep003:                       OK
 deep004:                       OK
 deep005:                       OK
-env001:                        OK
+env001:                        FAILED:
+0a1,2
+> 
+>   Electric Fence 2.2 Copyright (C) 1987-1999 Bruce Perens <bruce@perens.com>
 exit001:                       OK
 libpath001:                    OK
 libpath002:                    OK
@@ -3066,7 +3089,10 @@ libpath003:                    OK
 libpath004:                    OK
 libpath005:                    OK
 lineio001:                     OK
-progenv001:                    OK
+progenv001:                    FAILED:
+0a1,2
+> 
+>   Electric Fence 2.2 Copyright (C) 1987-1999 Bruce Perens <bruce@perens.com>
 program001:                    OK
 readline001:                   OK
 readmtz001:                    OK
@@ -3178,65 +3204,65 @@ Makefile:209: .pack.d: No such file or directory
 Makefile:209: .tcodes.d: No such file or directory
 Makefile:209: .tnode.d: No such file or directory
 Makefile:209: programs/.sl.d: No such file or directory
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	interpreters/split-stackcell/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/typecode.c | sed -e 's,^typecode.o:,./obj/typecode.o:,' > .typecode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	../../common/common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -M -MG \
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -M -MG \
 	anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
 make[1]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/O3/sc-O3'
 make[1]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/O3/sc-O3'
@@ -3256,38 +3282,38 @@ sed -f interpreters/split-stackcell/ifunctions/llong.sed interpreters/split-stac
 sed -f interpreters/split-stackcell/ifunctions/float.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/split-stackcell/ifunctions/double.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/split-stackcell/ifunctions/ldouble.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c anode.c -o obj/anode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c dnode.c -o obj/dnode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c enode.c -o obj/enode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c run.c -o obj/run.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c run.c -o obj/run.o
 run.c: In function ‘interpret’:
 run.c:134:5: warning: implicit declaration of function ‘bcalloc_run_all_destructors’ [-Wimplicit-function-declaration]
      bcalloc_run_all_destructors();
      ^
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c vartab.c -o obj/vartab.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c yy.c -o obj/yy.o
 ar cr libsc-O3.a ./obj/anode.o ./obj/cvalue_t.o ./obj/dlist.o ./obj/dnode.o ./obj/elist.o ./obj/enode.o ./obj/fixup.o ./obj/run.o ./obj/stlist.o ./obj/symtab.o ./obj/thrcode.o ./obj/thrlist.o ./obj/tlist.o ./obj/tnode_compat.o ./obj/typetab.o ./obj/vartab.o ./obj/yy.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c ../../common/common.c -o obj/common.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c ../../common/formats.c -o obj/formats.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c ../../common/typecode.c -o obj/typecode.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c ../../lists/sllist.c -o obj/sllist.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/bctraverse.c -o obj/bctraverse.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/implementation.c -o obj/implementation.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/pack.c -o obj/pack.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c ../../common/common.c -o obj/common.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c ../../common/formats.c -o obj/formats.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c ../../common/typecode.c -o obj/typecode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c ../../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/implementation.c -o obj/implementation.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/pack.c -o obj/pack.o
 awk '/^ *int /{print $2}' generated/byte_integer.h \
 	| sed -e 's/(//' \
 	| awk '{print "{ "$1", \""$1"\" },"}' > generated/byte_integer.tab.c
@@ -3355,14 +3381,14 @@ sed -f interpreters/split-stackcell/ifunctions/llong.sed interpreters/split-stac
 sed -f interpreters/split-stackcell/ifunctions/float.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/split-stackcell/ifunctions/double.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/split-stackcell/ifunctions/ldouble.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/tcodes.c -o obj/tcodes.o
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\"" -c interpreters/split-stackcell/tnode.c -o obj/tnode.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\"" -c interpreters/split-stackcell/tnode.c -o obj/tnode.o
 bison -y -v -d grammar.y
 grammar.y: warning: 1 shift/reduce conflict [-Wconflicts-sr]
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\""   -c -o grammar.tab.o grammar.tab.c
 y.tab.c: In function ‘yyparse’:
 grammar.y:7583:19: warning: ‘module’ may be used uninitialized in this function [-Wmaybe-uninitialized]
      $$ = module;
@@ -3372,10 +3398,10 @@ grammar.y:7576:12: note: ‘module’ was declared here
             ^
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2640:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2690:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3439M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -lm -ldl
+gcc -Wall -g -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../../cexceptions -I../../common -I../../getoptions -I../../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"3441M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/typecode.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libsc-O3.a ../../getoptions/libgetoptions.a ../../cexceptions/libcexceptions.a -ldl -lefence
 make OPTFLAGS="-O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move " INTERPRETER_DIR="interpreters/split-stackcell" \
 		-C libraries CC=gcc LD=ld
 make[2]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries'
@@ -3423,7 +3449,7 @@ gcc -I. -I../../ -fPIC -M -MG just-so.c > .just-so.d
 make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 gcc -c -I. -I../../ -fPIC -O3 -funroll-loops -fomit-frame-pointer -foptimize-register-move  -o just-so.o just-so.c
-ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl
+ld -shared -soname libjust-so.so.0 -o libjust-so.so.0.01 just-so.o -ldl -lefence
 make[3]: Leaving directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/just-so'
 make[3]: Entering directory `/home/saulius/src/compilers/branches/saulius-destructors/sc/libraries/math'
 Makefile:42: .opcodes.d: No such file or directory
@@ -4284,7 +4310,14 @@ namedargs004:                  OK
 namedargs005:                  OK
 nestedmod001:                  OK
 nestedmod002:                  OK
-nomem001:                      OK
+nomem001:                      Segmentation fault
+FAILED:
+1c1,2
+< ./sl: Unhandled exception 8 in the bytecode interpreter: could not allocate memory
+---
+> 
+> ElectricFence Exiting: mmap() failed: 
+\ No newline at end of file
 nullcheck001:                  OK
 nullcheck002:                  OK
 nullinit001:                   OK
@@ -4586,7 +4619,10 @@ deep002:                       OK
 deep003:                       OK
 deep004:                       OK
 deep005:                       OK
-env001:                        OK
+env001:                        FAILED:
+0a1,2
+> 
+>   Electric Fence 2.2 Copyright (C) 1987-1999 Bruce Perens <bruce@perens.com>
 exit001:                       OK
 libpath001:                    OK
 libpath002:                    OK
@@ -4594,7 +4630,10 @@ libpath003:                    OK
 libpath004:                    OK
 libpath005:                    OK
 lineio001:                     OK
-progenv001:                    OK
+progenv001:                    FAILED:
+0a1,2
+> 
+>   Electric Fence 2.2 Copyright (C) 1987-1999 Bruce Perens <bruce@perens.com>
 program001:                    OK
 readline001:                   OK
 readmtz001:                    OK
