@@ -5985,6 +5985,10 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     max_vmt_entry = tnode_max_vmt_offset( class_descr );
     interface_nr = tnode_max_interface( class_descr );
 
+    if( tnode_destructor( class_descr ) && max_vmt_entry == 0 ) {
+        max_vmt_entry++;
+    }
+
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
 
