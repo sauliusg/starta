@@ -14,7 +14,6 @@ null class A {
     {
         self.name = name;
         self.count = cnt;
-
         var internal = new class {
                 name : string;
                 value : float;
@@ -30,6 +29,18 @@ null class A {
     }
 
     destructor {
+        var internal = new class {
+                name : string;
+                value : float;
+                destructor
+                {
+                    . "Finalising an anonymous class object named", self.name, 
+                        "and valued", self.value ;
+                    self.value = -1.0;
+                }
+        };
+        internal.name = "DesructorA";
+        internal.value = 100.5;
         . "Finalising class A variable", self.name;
     }
 };
