@@ -557,23 +557,16 @@ static void thrcode_traverse_stack( stackcell_t *stack,
     }
 }
 
-static int in_gc = 0;
-
 void thrcode_gc_mark_and_sweep( void )
 {
     if( gc_debug )
 	printf( ">>> Starting mark & sweep\n" );
 
-    if( in_gc )
-        return;
-
-    in_gc = 1;
     bcalloc_reset_allocated_nodes();
     bctraverse( istate.xp );
     thrcode_traverse_stack( istate.sp, istate.bottom );
     thrcode_traverse_stack( istate.ep, istate.ep_bottom );
     bccollect();
-    in_gc = 0;
 
     if( gc_debug )
 	printf( ">>> Finished mark & sweep\n" );
@@ -606,9 +599,16 @@ void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
     istate->ip = save_istate.ip;
 }
 
+static int in_gc = 0;
+
 void thrcode_run_destructor_if_needed( istate_t *istate,
                                        alloccell_t *hdr )
 {
+    if( in_gc )
+        return;
+
+    in_gc = 1;
+
     if( hdr->vmt_offset != 0 ) {
         ssize_t vtable_offset = hdr->vmt_offset[1];
         ssize_t *vtable =
@@ -635,4 +635,6 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
 #endif
         }
     }
+
+    in_gc = 0;
 }
