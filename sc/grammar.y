@@ -12404,7 +12404,7 @@ constructor_header
   ;
 
 destructor_header
-  : opt_function_attributes function_code_start _DESTRUCTOR __IDENTIFIER
+  : opt_function_attributes function_code_start _DESTRUCTOR opt_identifier
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
