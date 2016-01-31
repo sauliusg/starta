@@ -12430,6 +12430,12 @@ destructor_header
                   }
               }
 
+              if( !class_name || class_name[0] == '\0' ) {
+                  if( destructor_name && destructor_name[0] != '\0' ) {
+                      yyerrorf( "destructors of anonymous classes "
+                                "should be anonymous" );
+                  }
+              }
 
 	      $$ = funct = new_dnode_destructor( destructor_name,
                                                  self_dnode, &inner );
