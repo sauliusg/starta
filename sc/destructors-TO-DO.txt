@@ -1,4 +1,4 @@
 ++ implement calls of super-class destructors (chained destructors);
 ++ suppers garbage collector calls from destructor allocations;
--- implement checks of destructor (and constructor) names;
+++ implement checks of destructor (and constructor) names;
 ++ port destructor implementation to all type representations;
