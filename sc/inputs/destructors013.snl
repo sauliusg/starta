@@ -30,7 +30,7 @@ null class A {
     }
 
     destructor {
-        . "Finalising class A variable", self.name;
+        . "Finalising class A variable '" + self.name + "'";
     }
 };
 
