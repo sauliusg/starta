@@ -1070,6 +1070,21 @@ ssize_t tnode_max_interface( TNODE *class_descr )
     return max_interface;
 }
 
+ssize_t tnode_base_class_count( TNODE *tnode )
+{
+    ssize_t count = 0;
+
+    if( !tnode )
+        return 0;
+
+    while( tnode->base_type && tnode->base_type->kind == TK_CLASS ) {
+        count ++;
+        tnode = tnode->base_type;
+    }
+
+    return count;
+}
+
 int tnode_align( TNODE *tnode )
 {
     assert( tnode );

@@ -185,6 +185,7 @@ ssize_t tnode_number_of_references( TNODE *tnode );
 ssize_t tnode_interface_number( TNODE *tnode );
 TLIST *tnode_interface_list( TNODE *tnode );
 ssize_t tnode_max_interface( TNODE *class_descr );
+ssize_t tnode_base_class_count( TNODE *tnode );
 
 const char * tnode_kind_name( TNODE * );
 
