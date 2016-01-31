@@ -9,27 +9,24 @@ use std;
 null class A {
     var name : string;
     var count : int;
-    var inner : class {
-        name : string;
-        value : float;
-        destructor;
-    }
 
     constructor A( name : string; cnt : int = 0 )
     {
         self.name = name;
         self.count = cnt;
-        self.inner = new class {
+
+        var internal = new class {
                 name : string;
                 value : float;
                 destructor
                 {
                     . "Finalising an anonymous class object named", self.name, 
                         "and valued", self.value ;
+                    self.value = -1.0;
                 }
         };
-        self.inner.name = "InnerA";
-        self.inner.value = 100.5;
+        internal.name = "InnerA";
+        internal.value = 100.5;
     }
 
     destructor {
@@ -38,5 +35,3 @@ null class A {
 };
 
 var a = new A( "TheFirstA" );
-. a.inner.name;
-. a.inner.value;
