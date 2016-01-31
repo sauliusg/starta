@@ -12415,10 +12415,21 @@ destructor_header
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = compiler->current_type;
+              char *class_name = tnode_name( class_tnode );
 
               assert( class_tnode );
               self_dnode = new_dnode_name( "self", &inner );
               dnode_insert_type( self_dnode, share_tnode( class_tnode ));
+
+              if( destructor_name && destructor_name[0] != '\0' ) {
+                  if( class_name &&
+                      strcmp( class_name, destructor_name ) != 0 ) {
+                      yyerrorf( "destructor name '%s' does not match "
+                                "class name '%s'", destructor_name,
+                                class_name );
+                  }
+              }
+
 
 	      $$ = funct = new_dnode_destructor( destructor_name,
                                                  self_dnode, &inner );
