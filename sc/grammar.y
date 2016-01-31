@@ -9088,8 +9088,10 @@ struct_description
         TNODE * volatile tnode = NULL;
 
         cexception_guard( inner ) {
-            tnode = new_tnode( &inner );
-            tnode_set_flags( tnode, TF_IS_FORWARD );
+            tnode = new_tnode_forward_class( /* name = */ NULL, &inner );
+            if( $1 ) {
+                tnode_set_flags( tnode, TF_NON_NULL );
+            }
             compiler_push_current_type( compiler, tnode, &inner );
             tnode = NULL;
         }
@@ -9116,8 +9118,10 @@ class_description
 
         compiler_begin_subscope( compiler, px );
         cexception_guard( inner ) {
-            tnode = new_tnode( &inner );
-            tnode_set_flags( tnode, TF_IS_FORWARD );
+            tnode = new_tnode_forward_class( /* name = */ NULL, &inner );
+            if( $1 ) {
+                tnode_set_flags( tnode, TF_NON_NULL );
+            }
             compiler_push_current_type( compiler, tnode, &inner );
             tnode = NULL;
         }
