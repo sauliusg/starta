@@ -1,0 +1,40 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test destructors for nested anonymous classes.
+
+use std;
+
+null class A {
+    var name : string;
+    var count : int;
+
+    constructor A( name : string; cnt : int = 0 )
+    {
+        self.name = name;
+        self.count = cnt;
+    }
+
+    destructor {
+        var internal = new class {
+                name : string;
+                value : float;
+                destructor
+                {
+                    . "Finalising an anonymous class object named", self.name, 
+                        "and valued", self.value ;
+                    self.value = -1.0;
+                }
+        };
+        internal.name = "DestructorA";
+        internal.value = 100.5;
+        . "Finalising class A variable", self.name;
+    }
+};
+
+var a = new A( "TheFirstA" );
+
+a = null;
+
+. "-- %d --" %% 10;

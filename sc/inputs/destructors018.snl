@@ -1,0 +1,24 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test destructors for nested anonymous classes.
+
+use std;
+
+null class A {
+    var name : string;
+    var count : int;
+
+    constructor A( name : string; cnt : int = 0 )
+    {
+        self.name = name;
+        self.count = cnt;
+    }
+
+    destructor {
+        var internal = new A( "DestructorA", self.count + 1 );
+    }
+};
+
+var a = new A( "TheFirstA" );

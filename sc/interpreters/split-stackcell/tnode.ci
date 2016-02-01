@@ -75,5 +75,7 @@ struct TNODE {
 			     function */
 
     DNODE *constructor;   /* class constructor */
+    DNODE *destructor;    /* class dstructor, called from a garbage
+                             collector */
     TNODE *next;
 };

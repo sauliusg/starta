@@ -1,8 +1,8 @@
-S.f.offset (new)        = 4
-S.h.offset (overloaded) = 2
-S.g.offset (inherited)  = 1
-S.k.offset (new)        = 5
-S.t.offset (inherited)  = 3
+S.f.offset (new)        = 5
+S.h.offset (overloaded) = 3
+S.g.offset (inherited)  = 2
+S.k.offset (new)        = 6
+S.t.offset (inherited)  = 4
 -------------
 s.name offset = -10
 s.next offset = -5

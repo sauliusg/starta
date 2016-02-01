@@ -301,6 +301,7 @@ ssize_t bccollect( void )
 	        prev = allocated = next;
 	    }
 	    reclamed += curr->size;
+            thrcode_run_destructor_if_needed( &istate, curr );
 	    bcfree( curr );
 	} else {
 	    curr->prev = prev;
@@ -314,6 +315,25 @@ ssize_t bccollect( void )
 	total_allocated_bytes = 0;
     }
     return reclamed;
+}
+
+void bcalloc_run_all_destructors()
+{
+    alloccell_t *curr;
+    alloccell_t *finalised;
+    int i = 0;
+    do {
+        finalised = allocated; allocated = NULL;
+        for( curr = finalised; curr != NULL; curr = curr->next ) {
+            thrcode_run_destructor_if_needed( &istate, curr );
+        }
+        if( ++i >= 1000 ) {
+            fprintf( stderr, "%d destructor cycles did not eliminte "
+                     "unallocated objects -- bailing out...\n", i );
+            fflush( NULL );
+            exit( 98 );
+        }
+    } while( allocated );
 }
 
 int bcalloc_is_in_heap( void *p )
