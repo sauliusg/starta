@@ -1,6 +1,0 @@
-++ implement calls of super-class destructors (chained destructors);
-++ suppers garbage collector calls from destructor allocations;
-++ implement checks of destructor (and constructor) names;
-++ port destructor implementation to all type representations;
-++ check destructors for nested anonymous classes.
-++ ??? think over, implement and check destructors for objects allocated in destructors themselves.
