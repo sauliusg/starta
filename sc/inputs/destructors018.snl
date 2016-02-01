@@ -18,7 +18,6 @@ null class A {
 
     destructor {
         var internal = new A( "DestructorA", self.count + 1 );
-        . "Finalising class A variable", self.name;
     }
 };
 
