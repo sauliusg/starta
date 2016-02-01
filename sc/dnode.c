@@ -290,6 +290,15 @@ DNODE* new_dnode_constructor( char *name,
 					   new_tnode_constructor, ex );
 }
 
+DNODE* new_dnode_destructor( char *name,
+                             DNODE *parameters,
+                             cexception_t *ex )
+{
+    return new_dnode_function_or_operator( name, parameters,
+                                           /* return_values = */ NULL,
+					   new_tnode_destructor, ex );
+}
+
 DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
                          cexception_t *ex )
 {

@@ -3699,7 +3699,7 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 	if( !tnode_function_prototypes_match_msg( fn_tnode,
 					          dnode_type( fn_proto ),
 					          msg, sizeof( msg ))) {
-	    yyerrorf( "prototype of constructir %s() does not match "
+	    yyerrorf( "prototype of constructor %s() does not match "
 		      "previous definition - %s", dnode_name( fn_proto ),
 		      msg );
 	}
@@ -5900,31 +5900,47 @@ itable[]:                       |
              +---------------+  |
 vmt_address: | n_interfaces  |<-/
              +---------------+
-           1 |class VMT offs.|
+             |class VMT offs.|->--\
+             +---------------+    |
+             |i-face 1 VMT o.|>-\ |
+             +---------------+  | |
+             |i-face 2 VMT o.|  | |
+             +---------------+  | |
+             |               |  | |
+             | ...           |  | |
+             +---------------+  | |
+             |i-face n VMT o.|  | |
+             +---------------+  | |
+                                | |
+vtable[]:                       | |
+---------                       | |
+static data +                   | |
+i-face 1 VMT offs.:             | |
+             +---------------+  | |
+           0 | nr of methods |<-/ |
+             +---------------+    |
+           1 | method 1 offs.|    |
+             +---------------+    |
+             |               |    |
+             | ...           |    |
+             +---------------+    |
+           k | method k offs.|    | k = nr of methods
+             +---------------+    |
+                                  |
+                                  |
+             +---------------+    |
+           0 | nr of methods |<---/
              +---------------+
-           2 |i-face 1 VMT o.|>-\
-             +---------------+  |
-           3 |i-face 2 VMT o.|  |
-             +---------------+  |
-             |               |  |
-             | ...           |  |
-             +---------------+  |
-             |i-face n VMT o.|  |
-             +---------------+  |
-                                |
-vtable[]:                       |
----------                       |
-static data +                   |
-i-face 1 VMT offs.:             |
-             +---------------+  |
-             | nr of methods |<-/
+           1 | destructor of.|
              +---------------+
-             | method 1 offs.|
+           2 | method 1 offs.|
+             +---------------+
+           3 | method 2 offs.|
              +---------------+
              |               |
              | ...           |
              +---------------+
-             | method k offs.| k = nr of methods 
+           l | method l offs.| l = nr of methods 
              +---------------+
 
 */
@@ -6032,6 +6048,10 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
     max_vmt_entry = tnode_max_vmt_offset( class_descr );
     interface_nr = tnode_max_interface( class_descr );
 
+    if( tnode_destructor( class_descr ) && max_vmt_entry == 0 ) {
+        max_vmt_entry++;
+    }
+
     vmt_start =
 	compiler_assemble_static_ssize_t( cc, max_vmt_entry, ex );
 
@@ -6085,8 +6105,17 @@ static void compiler_finish_virtual_method_table( COMPILER *cc,
         ((ssize_t*)(cc->static_data + itable[i]))[0] = method_count;
     }
 
-    /* Now, fill the VMT table with the real method addresses: */
+    /* Add destructor address if present: */
     itable = (ssize_t*)(cc->static_data + vmt_address);
+
+    DNODE *destructor = tnode_destructor( class_descr );
+    if( destructor ) {
+        vtable = (ssize_t*)(cc->static_data + itable[1]);
+        ssize_t destructor_address = dnode_offset( destructor );
+        vtable[1] = destructor_address;
+    }
+
+    /* Now, fill the VMT table with the real method addresses: */
     foreach_tnode_base_class( base, class_descr ) {
 	DNODE *methods = tnode_methods( base );
 	foreach_dnode( method, methods ) {
@@ -6601,6 +6630,7 @@ static cexception_t *px; /* parser exception */
 %token _CONSTRUCTOR
 %token _CONTINUE
 %token _DEBUG
+%token _DESTRUCTOR
 %token _DO
 %token _ELSE
 %token _ELSIF
@@ -6685,6 +6715,8 @@ static cexception_t *px; /* parser exception */
 %type <dnode> constructor_header
 %type <dnode> constructor_definition
 %type <tnode> dimension_list
+%type <dnode> destructor_header
+%type <dnode> destructor_definition
 %type <dnode> enum_member
 %type <tnode> enum_member_list
 %type <i>     expression_list
@@ -9119,7 +9151,7 @@ struct_description
         TNODE * volatile tnode = NULL;
 
         cexception_guard( inner ) {
-            tnode = new_tnode_forward_class( NULL, &inner );
+            tnode = new_tnode_forward_struct( /* name = */ NULL, &inner );
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
@@ -9149,7 +9181,7 @@ class_description
 
         compiler_begin_subscope( compiler, px );
         cexception_guard( inner ) {
-            tnode = new_tnode_forward_class( NULL, &inner );
+            tnode = new_tnode_forward_class( /* name = */ NULL, &inner );
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
@@ -9358,6 +9390,8 @@ struct_operator
   | method_header
   | constructor_definition
   | constructor_header
+  | destructor_header
+  | destructor_definition
   ;
 
 interface_type_placeholder
@@ -12056,6 +12090,24 @@ function_or_operator_end
 
 	  compiler_get_inline_code( compiler, funct, px );
 
+          if( funct_tnode && tnode_kind( funct_tnode ) == TK_DESTRUCTOR ) {
+              DNODE *first_arg = tnode_args( funct_tnode ); /* The 'self' arg */
+              TNODE *class_tnode = first_arg ? dnode_type( first_arg ) : NULL;
+              TNODE *base_class =
+                  class_tnode ? tnode_base_type( class_tnode ) : NULL;
+              DNODE *base_destructor =
+                  base_class ? tnode_destructor( base_class ) : NULL;
+              if( base_destructor ) {
+                  /* Generate code to pass control to the base
+                     classe's destructor: */
+                  ssize_t self_offset = dnode_offset( first_arg );
+                  ssize_t destructor_offset =
+                      dnode_offset( base_destructor );
+                  compiler_emit( compiler, px, "\tce\n", PLD, &self_offset );
+                  compiler_emit( compiler, px, "\tce\n", CALL, &destructor_offset );
+              }
+          }
+
 	  if( thrcode_last_opcode( compiler->thrcode ).fn != RET ) {
 	      compiler_emit( compiler, px, "\tc\n", RET );
 	  }
@@ -12083,6 +12135,13 @@ constructor_definition
   : constructor_header
     function_or_operator_start
     opt_base_class_initialisation
+    function_or_operator_body
+    function_or_operator_end
+  ;
+
+destructor_definition
+  : destructor_header
+    function_or_operator_start
     function_or_operator_body
     function_or_operator_end
   ;
@@ -12335,8 +12394,10 @@ method_header
                       dnode_set_offset( funct, method_offset );
                       tnode_set_interface_nr( implemented_method_type,
                                               interface_nr );
-                      /* printf( ">>> interface = %d, method = %d\n",
-                         interface_nr, method_offset ); */
+#if 0
+                      printf( ">>> interface = %d, method = %d ('%s')\n",
+                              interface_nr, method_offset, method_name );
+#endif
                   }
               }
 
@@ -12461,6 +12522,64 @@ constructor_header
 	  }
 	  cexception_catch {
 	      delete_dnode( parameter_list );
+	      delete_dnode( funct );
+	      $$ = NULL;
+	      cexception_reraise( inner, px );
+	  }
+	}
+  ;
+
+destructor_header
+  : opt_function_attributes function_code_start _DESTRUCTOR opt_identifier
+        {
+	  cexception_t inner;
+	  DNODE *volatile funct = NULL;
+          DNODE *volatile self_dnode = NULL;
+          
+          int function_attributes = $1;
+          char *destructor_name = $4;
+
+    	  cexception_guard( inner ) {
+              TNODE *class_tnode = compiler->current_type;
+              char *class_name = tnode_name( class_tnode );
+
+              assert( class_tnode );
+              self_dnode = new_dnode_name( "self", &inner );
+              dnode_insert_type( self_dnode, share_tnode( class_tnode ));
+
+              if( destructor_name && destructor_name[0] != '\0' ) {
+                  if( class_name &&
+                      strcmp( class_name, destructor_name ) != 0 ) {
+                      yyerrorf( "destructor name '%s' does not match "
+                                "class name '%s'", destructor_name,
+                                class_name );
+                  }
+              }
+
+              if( !class_name || class_name[0] == '\0' ) {
+                  if( destructor_name && destructor_name[0] != '\0' ) {
+                      yyerrorf( "destructors of anonymous classes "
+                                "should be anonymous" );
+                  }
+              }
+
+	      $$ = funct = new_dnode_destructor( destructor_name,
+                                                 self_dnode, &inner );
+
+              self_dnode = NULL;
+
+              dnode_set_scope( funct, compiler_current_scope( compiler ));
+
+              tnode_insert_destructor( class_tnode, share_dnode( funct ));
+
+	      dnode_set_flags( funct, DF_FNPROTO );
+	      if( function_attributes & DF_BYTECODE )
+	          dnode_set_flags( funct, DF_BYTECODE );
+	      if( function_attributes & DF_INLINE )
+	          dnode_set_flags( funct, DF_INLINE );
+	  }
+	  cexception_catch {
+	      delete_dnode( self_dnode );
 	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );

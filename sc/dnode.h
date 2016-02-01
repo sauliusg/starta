@@ -64,6 +64,9 @@ DNODE* new_dnode_constructor( char *name, DNODE *parameters,
                               DNODE *return_values, 
                               cexception_t *ex );
 
+DNODE* new_dnode_destructor( char *name, DNODE *parameters,
+                             cexception_t *ex );
+
 DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
                          cexception_t *ex );
 
