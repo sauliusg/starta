@@ -54,6 +54,7 @@ typedef enum {
     TK_CLOSURE,
     TK_METHOD, /* class (virtual) methods, or virtual functions */
     TK_CONSTRUCTOR,
+    TK_DESTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
     TK_DERIVED,     /* A new derived type inherits implementation and
@@ -106,6 +107,11 @@ TNODE *new_tnode_constructor( char *name,
                               DNODE *parameters,
                               DNODE *return_dnodes,
                               cexception_t *ex );
+
+TNODE *new_tnode_destructor( char *name,
+                             DNODE *parameters,
+                             DNODE *return_dnodes,
+                             cexception_t *ex );
 
 TNODE *new_tnode_method( char *name, DNODE *parameters, DNODE *return_dnodes,
                          cexception_t *ex );
@@ -179,6 +185,7 @@ ssize_t tnode_number_of_references( TNODE *tnode );
 ssize_t tnode_interface_number( TNODE *tnode );
 TLIST *tnode_interface_list( TNODE *tnode );
 ssize_t tnode_max_interface( TNODE *class_descr );
+ssize_t tnode_base_class_count( TNODE *tnode );
 
 const char * tnode_kind_name( TNODE * );
 
@@ -213,6 +220,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value_list( TNODE *tnode, DNODE *list );
 TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor );
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor );
 ssize_t tnode_max_vmt_offset( TNODE *tnode );
 ssize_t tnode_vmt_offset( TNODE *tnode );
 ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset );
@@ -267,6 +275,8 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 				   const char *attr_value, cexception_t *ex );
 
 DNODE *tnode_constructor( TNODE *tnode );
+
+DNODE *tnode_destructor( TNODE *tnode );
 
 TNODE *tnode_next( TNODE* list );
 

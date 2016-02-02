@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stackcell.h>
+#include <alloccell.h>
 #include <cexceptions.h>
 #include <thrcode_t.h>
 #include <thrcode.h>
@@ -211,5 +212,11 @@ void interpret_raise_exception( int error_code,
 				cexception_t *ex );
 
 void thrcode_gc_mark_and_sweep( void );
+
+void thrcode_run_destructor_if_needed( istate_t *istate,
+                                       alloccell_t *hdr );
+
+void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
+                             cexception_t *ex );
 
 #endif

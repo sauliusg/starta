@@ -1,0 +1,9 @@
+./sl: inputs/anonymous-classes002.snl(52,26): ERROR, type 'name' is not declared in the current scope
+    constructor c ( name = "Anonymous c"; int count = -1;
+                         ^
+./sl: inputs/anonymous-classes002.snl(52,26): ERROR, incorrect syntax
+    constructor c ( name = "Anonymous c"; int count = -1;
+                         ^
+./sl: compiler could not recover from errors, quitting now
+2 error(s) detected
+

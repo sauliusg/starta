@@ -212,6 +212,7 @@ constructor { MARK; return _CONSTRUCTOR; }
 continue    { MARK; return _CONTINUE; }
 debug       { MARK; return _DEBUG; }
 do          { MARK; return _DO; }
+destructor  { MARK; return _DESTRUCTOR; }
 else        { MARK; return _ELSE; }
 elsif       { MARK; return _ELSIF; }
 end         { MARK; return '}'; }
