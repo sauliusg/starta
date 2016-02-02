@@ -2207,7 +2207,8 @@ static void compiler_check_top_2_expressions_and_drop( COMPILER *cc,
 						       cexception_t *ex )
 {
     compiler_check_top_2_expressions_are_identical( cc, binop_name, ex );
-    compiler_drop_top_expression( cc );
+    if( cc->e_stack )
+        compiler_drop_top_expression( cc );
 }
 
 /*
@@ -5297,8 +5298,8 @@ static void compiler_compile_array_expression( COMPILER* cc,
     if( nexpr > 0 ) {
 	ENODE *top = enode_list_pop( &cc->e_stack );
 	TNODE *top_type = enode_type( top );
-	ssize_t element_size = tnode_size( top_type );
-	ssize_t nrefs = tnode_is_reference( top_type ) ? 1 : 0;
+	ssize_t element_size = top_type ? tnode_size( top_type ) : 0;
+	ssize_t nrefs = top_type && tnode_is_reference( top_type ) ? 1 : 0;
 
 	for( i = 1; i < nexpr; i++ ) {
 	    ENODE *curr = enode_list_pop( &cc->e_stack );
