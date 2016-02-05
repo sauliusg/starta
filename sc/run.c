@@ -626,14 +626,15 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
             /* Invoke the destructor: */
             ssize_t code_offset = vtable[1];
             cexception_t inner;
-#if 1
+
             cexception_guard( inner ) {
                 thrcode_run_subroutine( istate, code_offset, &inner );
             }
             cexception_catch {
-                fprintf( stderr, "!!! exception raised in destructor\n" );
+                /* fprintf( stderr, "!!! exception raised in destructor\n" ); */
+                in_gc = 0;
+                cexception_reraise( inner, ex );
             }
-#endif
         }
     }
 
