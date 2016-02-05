@@ -226,6 +226,7 @@ void *bcrealloc_blob( void *memory, size_t size )
 	allocated = ptr;
 	assert( ptr->magic == BC_MAGIC );
         ptr->length = size;
+        ptr->size = size;
 	if( !alloc_min || alloc_min > (void*)ptr )
 	    alloc_min = ptr;
 	if( !alloc_max || alloc_max < (void*)ptr + size + sizeof(ptr[0]) )
@@ -273,8 +274,9 @@ ssize_t bccollect( void )
 	    } else {
 		printf( "leaving    " );
 	    }
-	    printf( "%p (%p) (%ld bytes)\n",
-		    curr, curr+1, (long)curr->element_size * length );
+	    printf( "%p (%p) (size = %ld bytes, esize * length = %ld bytes)\n",
+		    curr, curr+1, (long)curr->size, 
+                    (long)curr->element_size * (long)length );
 	}
         if( (curr->flags & AF_USED) == 0 ) {
 	    if( curr != allocated ) {
@@ -284,7 +286,7 @@ ssize_t bccollect( void )
 	    } else {
 	        prev = allocated = next;
 	    }
-	    reclamed += curr->element_size * length;
+	    reclamed += curr->size;
             thrcode_run_destructor_if_needed( &istate, curr );
 	    bcfree( curr );
 	} else {
@@ -295,6 +297,9 @@ ssize_t bccollect( void )
     }
     total_allocated_bytes -= reclamed;
     if( total_allocated_bytes < 0 ) {
+#if 0
+        printf( ">>> total = %d, reclaimed = %d\n", total_allocated_bytes, reclamed );
+#endif
 	assert( total_allocated_bytes >= 0 );
 	total_allocated_bytes = 0;
     }
