@@ -211,10 +211,11 @@ void interpret_raise_exception( int error_code,
 				int exception_id,
 				cexception_t *ex );
 
-void thrcode_gc_mark_and_sweep( void );
+void thrcode_gc_mark_and_sweep( cexception_t *ex );
 
 void thrcode_run_destructor_if_needed( istate_t *istate,
-                                       alloccell_t *hdr );
+                                       alloccell_t *hdr,
+                                       cexception_t *ex );
 
 void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
                              cexception_t *ex );

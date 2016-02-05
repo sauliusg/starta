@@ -529,7 +529,7 @@ int @PREFIX@SPRINTF( INSTRUCTION_FN_ARGS )
 
     snprintf( buffer, sizeof(buffer), format, istate.ep[0].I );
 
-    ptr = bcalloc_blob( strlen(buffer)+1 );
+    ptr = bcalloc_blob( strlen(buffer)+1, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[1], ptr );

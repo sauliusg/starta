@@ -332,7 +332,7 @@ int @PREFIX1@BLOB( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_blob( size );
+    ptr = bcalloc_blob( size, EXCEPTION );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -358,7 +358,7 @@ int @PREFIX1@AALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( elem_size, n_elem, elem_nref );
+    ptr = bcalloc_array( elem_size, n_elem, elem_nref, EXCEPTION );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -384,7 +384,7 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     ptr = bcalloc_mdarray( STACKCELL_PTR( istate.ep[1] ), element_size, nref,
-			   length, level );
+			   length, level, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[1], ptr );
@@ -425,10 +425,11 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
 #if 0
         /* ssize_t alloc_size = (element_size + hash_key_ptr_size) * n_elem; */
         ptr = bcalloc( element_size * n_elem, element_size,
-                       /* length = */ n_elem, /* nref = */ -n_elem );
+                       /* length = */ n_elem, /* nref = */ -n_elem,
+                       EXCEPTION );
 #else
         ssize_t alloc_size = element_size + hash_key_ptr_size;
-        ptr = bcalloc_array( alloc_size, n_elem, 1 );
+        ptr = bcalloc_array( alloc_size, n_elem, 1, EXCEPTION );
 #endif
     } else {
         /* one reference is for key, another is for a value which is
@@ -437,7 +438,8 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
         assert( element_size == REF_SIZE );
         ptr = bcalloc( /* size = */ n_elem * element_size * 2,
                        /* element_size = */ element_size * 2,
-                       /* length = */ n_elem, /* nref = */ n_elem * 2 );
+                       /* length = */ n_elem, /* nref = */ n_elem * 2,
+                       EXCEPTION );
     }
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
@@ -734,7 +736,8 @@ int @PREFIX1@SUBARRAY( INSTRUCTION_FN_ARGS )
             length = upper_bound - lower_bound + 1;
             nref = array_header->nref;
 
-            subarray = bcalloc_array( esize, length, nref > 0 ? 1 : 0 );
+            subarray = bcalloc_array( esize, length, nref > 0 ? 1 : 0,
+                                      EXCEPTION );
             BC_CHECK_PTR( subarray );
 
             memcpy( subarray, (char*)array + lower_bound * esize,
@@ -830,7 +833,8 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
         } else {
             length = upper_bound - lower_bound + 1;
 
-            substr = bcalloc_array( element_sz, length + 1, 0 );
+            substr = bcalloc_array( element_sz, length + 1, 0,
+                                    EXCEPTION );
             BC_CHECK_PTR( substr );
 
             strncpy( substr, &str[lower_bound], element_sz * length );
