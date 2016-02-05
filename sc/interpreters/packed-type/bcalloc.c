@@ -259,13 +259,11 @@ ssize_t bccollect( void )
 {
     alloccell_t *curr, *prev, *next;
     ssize_t reclaimed = 0;
-    ssize_t length;
 
     prev = NULL;
     curr = allocated;
 
     while( curr != NULL ) {
-        length = curr->length >= 0 ? curr->length : 1;
         next = curr->next;
 	/* printf( "%p %ld\n", curr, curr->rcount ); */
 	if( thrcode_heapdebug_is_on()) {
@@ -274,9 +272,8 @@ ssize_t bccollect( void )
 	    } else {
 		printf( "leaving    " );
 	    }
-	    printf( "%p (%p) (size = %ld bytes, esize * length = %ld bytes)\n",
-		    curr, curr+1, (long)curr->size, 
-                    (long)curr->element_size * (long)length );
+	    printf( "%p (%p) (size = %ld bytes)\n",
+                    curr, curr+1, (long)curr->size );
 	}
         if( (curr->flags & AF_USED) == 0 ) {
 	    if( curr != allocated ) {
