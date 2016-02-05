@@ -60,7 +60,8 @@ int @PREFIX1@VADD( INSTRUCTION_FN_ARGS )
     }
 
     if( !vres ) {
-	vres = bcalloc_array( sizeof(@type@), length, /* nref = */ 0 );
+	vres = bcalloc_array( sizeof(@type@), length, /* nref = */ 0,
+                              EXCEPTION );
 	BC_CHECK_PTR( vres );
 	STACKCELL_SET_ADDR( istate.ep[0], vres );
     } else {

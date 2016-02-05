@@ -55,17 +55,18 @@ static struct {
 #endif
 
 void *bcalloc( ssize_t size, ssize_t element_size,
-               ssize_t length, ssize_t nref )
+               ssize_t length, ssize_t nref,
+               cexception_t *ex )
 {
     alloccell_t *ptr = NULL;
     // ssize_t size = (length < 0 ? 1 : length) * element_size;
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {
-	    thrcode_gc_mark_and_sweep();
+	    thrcode_gc_mark_and_sweep( ex );
 	} else {
 	    if( total_allocated_bytes + size > byte_allocation_limit ) {
-		thrcode_gc_mark_and_sweep();
+		thrcode_gc_mark_and_sweep( ex );
 		byte_allocation_limit = (total_allocated_bytes + size) * 2;
 	    }
 	}
@@ -99,19 +100,19 @@ void *bcalloc( ssize_t size, ssize_t element_size,
     }
 }
 
-void *bcalloc_blob( size_t size )
+void *bcalloc_blob( size_t size, cexception_t *ex )
 {
-    return bcalloc_array( 1, size, 0 );
+    return bcalloc_array( 1, size, 0, ex );
 }
 
-char* bcstrdup( char *str )
+char* bcstrdup( char *str, cexception_t *ex )
 {
     char *ptr = NULL;
     ssize_t len;
 
     if( str ) {
 	len = strlen( str );
-	ptr = bcalloc_array( sizeof(str[0]), len+1, 0 );
+	ptr = bcalloc_array( sizeof(str[0]), len+1, 0, ex );
 	if( ptr ) {
 	    strcpy( ptr, str );
 	}
@@ -119,12 +120,13 @@ char* bcstrdup( char *str )
     return ptr;
 }
 
-void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
+void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref,
+                     cexception_t *ex )
 {
     alloccell_t *ptr;
     assert( nref == 1 || nref == 0 );
     ptr = bcalloc( element_size * length, element_size,
-                   length, nref * length );
+                   length, nref * length, ex );
     if( ptr && nref != 0 ) {
         ptr[-1].flags |= AF_HAS_REFS;
     }
@@ -132,10 +134,11 @@ void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
 }
 
 void *bcalloc_mdarray( void **array, ssize_t element_size,
-		       ssize_t nref, ssize_t length, int level )
+		       ssize_t nref, ssize_t length, int level,
+                       cexception_t *ex )
 {
     if( level == 0 ) {
-	return bcalloc_array( element_size, length, nref );
+	return bcalloc_array( element_size, length, nref, ex );
     } else {
 	alloccell_t *header = (alloccell_t*)array;
 	ssize_t layer_len = header[-1].length;
@@ -148,7 +151,7 @@ void *bcalloc_mdarray( void **array, ssize_t element_size,
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> allocating element %d of layer %d\n", i, level ); */
 	    array[i] = bcalloc_mdarray( array[i], element_size, nref, length,
-					level - 1 );
+					level - 1, ex );
 	    if( !array[i] ) {
 		return NULL;
 	    }
@@ -184,13 +187,13 @@ void *bcalloc_mdarray( void **array, ssize_t element_size,
   2012.01.06
  */
 
-void *bcrealloc_blob( void *memory, size_t size )
+void *bcrealloc_blob( void *memory, size_t size, cexception_t *ex )
 {
     alloccell_t *ptr, *old;
     ssize_t old_size;
 
     if( !memory ) 
-        return bcalloc_blob( size );
+        return bcalloc_blob( size, ex );
 
     old = memory;
     old --;
@@ -255,7 +258,7 @@ static void bcfree( void *mem )
 
 #include <stdio.h>
 
-ssize_t bccollect( void )
+ssize_t bccollect( cexception_t *ex )
 {
     alloccell_t *curr, *prev, *next;
     ssize_t reclaimed = 0;
@@ -284,7 +287,7 @@ ssize_t bccollect( void )
 	        prev = allocated = next;
 	    }
 	    reclaimed += curr->size;
-            thrcode_run_destructor_if_needed( &istate, curr );
+            thrcode_run_destructor_if_needed( &istate, curr, ex );
 	    bcfree( curr );
 	} else {
 	    curr->prev = prev;
@@ -303,7 +306,7 @@ ssize_t bccollect( void )
     return reclaimed;
 }
 
-void bcalloc_run_all_destructors()
+void bcalloc_run_all_destructors( cexception_t *ex )
 {
     alloccell_t *curr;
     alloccell_t *finalised;
@@ -311,7 +314,7 @@ void bcalloc_run_all_destructors()
     do {
         finalised = allocated; allocated = NULL;
         for( curr = finalised; curr != NULL; curr = curr->next ) {
-            thrcode_run_destructor_if_needed( &istate, curr );
+            thrcode_run_destructor_if_needed( &istate, curr, ex );
         }
         if( ++i >= 1000 ) {
             fprintf( stderr, "%d destructor cycles did not eliminte "

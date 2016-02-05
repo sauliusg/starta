@@ -131,7 +131,7 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 {
     make_istate( &istate, code, argc, argv, env, ex );
     run( ex );
-    bcalloc_run_all_destructors();
+    bcalloc_run_all_destructors( ex );
 }
 
 static int realloc_eval_stack( cexception_t * ex )
@@ -374,7 +374,7 @@ void interpret_raise_exception_with_bcalloc_message( int error_code,
 						     int exception_id,
 						     cexception_t *ex )
 {
-    char *msg = bcalloc_blob( strlen(message) + 1 );
+    char *msg = bcalloc_blob( strlen(message) + 1, ex );
 
     if( msg ) {
 	strcpy( msg, message );
@@ -557,7 +557,7 @@ static void thrcode_traverse_stack( stackcell_t *stack,
     }
 }
 
-void thrcode_gc_mark_and_sweep( void )
+void thrcode_gc_mark_and_sweep( cexception_t *ex )
 {
     if( gc_debug )
 	printf( ">>> Starting mark & sweep\n" );
@@ -566,7 +566,7 @@ void thrcode_gc_mark_and_sweep( void )
     bctraverse( istate.xp );
     thrcode_traverse_stack( istate.sp, istate.bottom );
     thrcode_traverse_stack( istate.ep, istate.ep_bottom );
-    bccollect();
+    bccollect( ex );
 
     if( gc_debug )
 	printf( ">>> Finished mark & sweep\n" );
@@ -602,7 +602,8 @@ void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
 static int in_gc = 0;
 
 void thrcode_run_destructor_if_needed( istate_t *istate,
-                                       alloccell_t *hdr )
+                                       alloccell_t *hdr,
+                                       cexception_t * ex )
 {
     if( in_gc )
         return;
