@@ -45,7 +45,7 @@ try {
     a = null;
     a = new A( "new A" );
 
-    . "After the A allocation";
+    // . "After the A allocation";
 }
 catch(var message : string) {
     . "caught exception:", message;
