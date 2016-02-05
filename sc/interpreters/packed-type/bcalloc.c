@@ -225,8 +225,8 @@ void *bcrealloc_blob( void *memory, size_t size )
 	ptr->next = allocated;
 	allocated = ptr;
 	assert( ptr->magic == BC_MAGIC );
-        ptr->length = size;
         ptr->size = size;
+        ptr->length = size;
 	if( !alloc_min || alloc_min > (void*)ptr )
 	    alloc_min = ptr;
 	if( !alloc_max || alloc_max < (void*)ptr + size + sizeof(ptr[0]) )
@@ -258,7 +258,7 @@ static void bcfree( void *mem )
 ssize_t bccollect( void )
 {
     alloccell_t *curr, *prev, *next;
-    ssize_t reclamed = 0;
+    ssize_t reclaimed = 0;
     ssize_t length;
 
     prev = NULL;
@@ -286,7 +286,7 @@ ssize_t bccollect( void )
 	    } else {
 	        prev = allocated = next;
 	    }
-	    reclamed += curr->size;
+	    reclaimed += curr->size;
             thrcode_run_destructor_if_needed( &istate, curr );
 	    bcfree( curr );
 	} else {
@@ -295,15 +295,15 @@ ssize_t bccollect( void )
 	}
         curr = next;
     }
-    total_allocated_bytes -= reclamed;
+    total_allocated_bytes -= reclaimed;
     if( total_allocated_bytes < 0 ) {
 #if 0
-        printf( ">>> total = %d, reclaimed = %d\n", total_allocated_bytes, reclamed );
+        printf( ">>> total = %d, reclaimed = %d\n", total_allocated_bytes, reclaimed );
 #endif
 	assert( total_allocated_bytes >= 0 );
 	total_allocated_bytes = 0;
     }
-    return reclamed;
+    return reclaimed;
 }
 
 void bcalloc_run_all_destructors()
