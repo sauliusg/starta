@@ -293,43 +293,20 @@ static void check_runtime_stacks( cexception_t * ex )
 
 void run( cexception_t *ex )
 {
-    cexception_t inner;
     register int (*function)( void );
 
-    // istate.ex = &inner;
     istate.ex = ex;
 
     function = istate.code[0].fn;
 
     while( function ) {
-
-	cexception_guard( inner ) {
-
-	    while( function ) {
-		int ret = (*function)();
-		istate.ip += ret;
-		function = istate.code[istate.ip].fn;
-		if( thrcode_stackdebug_is_on()) {
-		    thrcode_print_stack();
-		}
-		check_runtime_stacks( ex );
-	    }
-	}
-	cexception_catch {
-	    char *message = (char*)cexception_message( &inner );
-	    int error_code = cexception_error_code( &inner );
-	    if( message ) {
-		interpret_raise_exception_with_static_message(
-				       error_code, message,
-				       /* module = */ NULL,
-				       SL_EXCEPTION_EXTERNAL_LIB_ERROR, ex );
-	    } else {
-		interpret_raise_exception(
-				       error_code, /* err_message = */ NULL,
-				       /* module = */ NULL,
-				       SL_EXCEPTION_EXTERNAL_LIB_ERROR, ex );
-	    }
-	}
+        int ret = (*function)();
+        istate.ip += ret;
+        function = istate.code[istate.ip].fn;
+        if( thrcode_stackdebug_is_on()) {
+            thrcode_print_stack();
+        }
+        check_runtime_stacks( ex );
     }
 }
 
