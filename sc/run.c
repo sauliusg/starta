@@ -567,7 +567,7 @@ void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
     istate->ip = code_offset;
 
     /* Invoke the sub-interpreter: */
-    /* int old_trace = trace; */
+    /* int old_trace = trace; trace = 1; */
     run( ex );
     /* trace = old_trace; */
 
