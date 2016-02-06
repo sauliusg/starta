@@ -574,6 +574,7 @@ void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
     /* Restore the previous interpreter state: */
     istate->xp = save_istate.xp;
     istate->ip = save_istate.ip;
+    istate->ex = save_istate.ex;
 }
 
 static int in_gc = 0;
