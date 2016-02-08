@@ -408,21 +408,6 @@ void interpret_raise_exception( int error_code,
             ex->exception_id = exception_id;
             ex->module_id = module_id;
         }
-#if 0
-	if( message ) {
-	    cexception_raise_in( ex, interpret_subsystem,
-				 INTERPRET_UNHANDLED_EXCEPTION,
-				 cxprintf( "Unhandled exception %d in the "
-					   "bytecode interpreter: %s",
-					   error_code, message ));
-	} else {
-	    cexception_raise_in( ex, interpret_subsystem,
-				 INTERPRET_UNHANDLED_EXCEPTION,
-				 cxprintf( "Unhandled exception %d in the "
-					   "bytecode interpreter",
-					   error_code ));
-	}
-#else
 	if( message ) {
 	    cexception_raise_in( ex, interpret_subsystem,
 				 error_code, message );
@@ -433,7 +418,6 @@ void interpret_raise_exception( int error_code,
 	    cexception_raise_in( ex, interpret_subsystem,
 				 error_code, err_message.text );
 	}
-#endif
     }
 
     rg_store = istate.xp;
@@ -478,21 +462,6 @@ void interpret_reraise_exception( cexception_t old_ex,
             ex->exception_id = exception_id;
             ex->module_id = module_id;
         }
-#if 0
-	if( message ) {
-	    cexception_raise_in( ex, interpret_subsystem,
-				 INTERPRET_UNHANDLED_EXCEPTION,
-				 cxprintf( "Unhandled exception %d in the "
-					   "bytecode interpreter: %s",
-					   error_code, message ));
-	} else {
-	    cexception_raise_in( ex, interpret_subsystem,
-				 INTERPRET_UNHANDLED_EXCEPTION,
-				 cxprintf( "Unhandled exception %d in the "
-					   "bytecode interpreter",
-					   error_code ));
-	}
-#else
 	if( message ) {
 	    cexception_raise_in( ex, interpret_subsystem,
 				 error_code, message );
@@ -503,7 +472,6 @@ void interpret_reraise_exception( cexception_t old_ex,
 	    cexception_raise_in( ex, interpret_subsystem,
 				 error_code, err_message.text );
 	}
-#endif
     }
 
     rg_store = istate.xp;
