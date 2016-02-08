@@ -15,6 +15,8 @@ typedef struct cexception_s {
     const void *subsystem_tag;
     const char *message;
     const char *source_file;
+    const char *module_id;
+    int exception_id;
     int line;
     jmp_buf jmp_buffer;
 } cexception_t;
@@ -70,5 +72,8 @@ const void *cexception_subsystem_tag( cexception_t *ex );
 const char *cexception_source_file( cexception_t *ex );
 int cexception_error_code( cexception_t *ex );
 int cexception_source_line( cexception_t *ex );
+
+const char *cexception_module_id( cexception_t *ex );
+int cexception_exception_id( cexception_t *ex );
 
 #endif
