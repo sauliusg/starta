@@ -668,30 +668,21 @@ void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
     istate->save_xp = istate->xp;
     istate->xp = NULL;
 
-#if 0
-#define TRACE_SUBINTERPRETER 1
-#endif
     /* Invoke the sub-interpreter: */
-#if TRACE_SUBINTERPRETER
-    int old_trace = trace; trace = 1;
-#endif
+    /* int old_trace = trace; trace = 1; */
     cexception_t inner;
     cexception_guard( inner ) {
         run( &inner );
     }
     cexception_catch {
-#if TRACE_SUBINTERPRETER
-        trace = old_trace;
-#endif
+        /* trace = old_trace; */
         istate->xp = save_istate.xp;
         istate->save_xp = NULL;
         istate->ip = save_istate.ip;
         istate->ex = save_istate.ex;
         cexception_reraise( inner, ex );
     }
-#if TRACE_SUBINTERPRETER
-    trace = old_trace;
-#endif
+    /* trace = old_trace; */
 
     /* Restore the previous interpreter state: */
     istate->xp = save_istate.xp;
