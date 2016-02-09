@@ -304,20 +304,29 @@ static void check_runtime_stacks( cexception_t * ex )
 
 void run( cexception_t *ex )
 {
+    cexception_t inner;
     register int (*function)( void );
 
-    istate.ex = ex;
+    istate.ex = &inner;
 
     function = istate.code[0].fn;
 
     while( function ) {
-        int ret = (*function)();
-        istate.ip += ret;
-        function = istate.code[istate.ip].fn;
-        if( thrcode_stackdebug_is_on()) {
-            thrcode_print_stack();
-        }
-        check_runtime_stacks( ex );
+	cexception_guard( inner ) {
+	    while( function ) {
+		int ret = (*function)();
+		istate.ip += ret;
+		function = istate.code[istate.ip].fn;
+		if( thrcode_stackdebug_is_on()) {
+		    thrcode_print_stack();
+		}
+		check_runtime_stacks( &inner );
+	    }
+	}
+	cexception_catch {
+            interpret_reraise_exception( inner, ex );
+            function = istate.code[istate.ip].fn;
+	}
     }
 }
 

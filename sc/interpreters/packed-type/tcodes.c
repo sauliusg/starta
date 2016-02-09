@@ -867,15 +867,8 @@ int ALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    cexception_t inner;
-    cexception_guard( inner ) {
-        ptr = bcalloc( size, /* element_size = */ -1, /* length = */ -1, nref,
-                       &inner );
-    }
-    cexception_catch {
-        interpret_reraise_exception( inner, EXCEPTION );
-        return 0;
-    }
+    ptr = bcalloc( size, /* element_size = */ -1, /* length = */ -1, nref,
+                   EXCEPTION );
 
     BC_CHECK_PTR( ptr );
 
@@ -905,14 +898,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    cexception_t inner;
-    cexception_guard( inner ) {
-        ptr = bcalloc( size, size, -1, nref, &inner );
-    }
-    cexception_catch {
-        interpret_reraise_exception( inner, EXCEPTION );
-        return 0;
-    }
+    ptr = bcalloc( size, size, -1, nref, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
 
