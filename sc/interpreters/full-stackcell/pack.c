@@ -255,7 +255,7 @@ int unpack_array_values( byte *blob, stackcell_t *array_stackcell,
 	    description++;
     }
 
-    array_ptr = bcalloc_array( sizeof(stackcell_t), count, 1 );
+    array_ptr = bcalloc_array( sizeof(stackcell_t), count, 1, ex );
     BC_CHECK_PTR( array_ptr, ex );
     STACKCELL_SET_ADDR( *array_stackcell, array_ptr );
 
