@@ -696,7 +696,7 @@ int ALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, /* length */ -1, nref );
+    ptr = bcalloc( size, /* length */ -1, nref, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
 
@@ -726,7 +726,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc( size, /* length */ -1, nref );
+    ptr = bcalloc( size, /* length */ -1, nref, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
 
@@ -760,7 +760,7 @@ int MKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), nele, nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), nele, nref, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
 
@@ -793,7 +793,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), nele, 1 );
+    ptr = bcalloc_array( sizeof(stackcell_t), nele, 1, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
 
@@ -847,7 +847,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
             if( (length + 1) * element_size > size ) {
                 /* need to reallocate the array: */
                 ssize_t new_size = element_size * (length + 1) * 2;
-                void *new_array = bcalloc( new_size, length, nref );
+                void *new_array = bcalloc( new_size, length, nref, EXCEPTION );
                 BC_CHECK_PTR( new_array );
                 memcpy( new_array, array, length * element_size );
                 array = new_array;
@@ -970,7 +970,7 @@ int TRIM( INSTRUCTION_FN_ARGS )
                 /* need to reallocate the array: */
                 ssize_t nref = array[-1].nref;
                 ssize_t new_size = element_size * length;
-                void *new_array = bcalloc( new_size, length, nref );
+                void *new_array = bcalloc( new_size, length, nref, EXCEPTION );
                 BC_CHECK_PTR( new_array );
                 memcpy( new_array, array, new_size );
                 STACKCELL_SET_ADDR( istate.ep[0], new_array );
@@ -1006,11 +1006,11 @@ int CLONE( INSTRUCTION_FN_ARGS )
     nref = array[-1].nref;
     nele = array[-1].length;
 
-    ptr = bcalloc( size, nele, nref );
-
-    ptr[-1].vmt_offset = array[-1].vmt_offset;
+    ptr = bcalloc( size, nele, nref, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
+
+    ptr[-1].vmt_offset = array[-1].vmt_offset;
 
     memcpy( ptr, array, size );
 
@@ -1020,7 +1020,8 @@ int CLONE( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * DEEPCLONE  Clone object on the top of the stack, up to the 'nlevels' levels deep.
+ * DEEPCLONE Clone object on the top of the stack, up to the 'nlevels'
+ * levels deep.
  *
  * bytecode:
  * DEEPCLONE
@@ -1055,10 +1056,11 @@ static int deep_clone( alloccell_t *ptr, int level )
                 // printf( ">>> length = %2d, size = %d, nref = %d, flags & AF_HAS_REFS = %d\n",
                 //        length, size, nref, element[-1].flags & AF_HAS_REFS );
                 ptr = bcalloc_array( element_size, length,
-                                     element[-1].flags & AF_HAS_REFS ? 1 : 0 );
+                                     element[-1].flags & AF_HAS_REFS ? 1 : 0,
+                                     EXCEPTION );
                 // nref == 0 ? 0 : 1 );
             } else {
-                ptr = bcalloc( size, -1, nref );
+                ptr = bcalloc( size, -1, nref, EXCEPTION );
             }
 
             BC_CHECK_PTR( ptr );
@@ -1099,9 +1101,10 @@ int DEEPCLONE( INSTRUCTION_FN_ARGS )
 
     if( nele >= 0 ) {
         assert( nref == 0 || nref == nele );
-        ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1 );
+        ptr = bcalloc_array( element_size, nele, nref == 0 ? 0 : 1,
+                             EXCEPTION );
     } else {
-        ptr = bcalloc( size, -1, nref );
+        ptr = bcalloc( size, -1, nref, EXCEPTION );
     }
 
     BC_CHECK_PTR( ptr );
@@ -1169,7 +1172,7 @@ int ZAALLOC( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref );
+    ptr = bcalloc_array( sizeof(stackcell_t), n_elem, elem_nref, EXCEPTION );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -1588,13 +1591,14 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
     if( istate.argc >= 0 && istate.argv != NULL ) {
 
-	argv = bcalloc_array( sizeof(stackcell_t), istate.argc + 1, 1 );
+        argv = bcalloc_array( sizeof(stackcell_t), istate.argc + 1, 1,
+                              EXCEPTION );
 
 	BC_CHECK_PTR( argv );
 	STACKCELL_SET_ADDR( istate.ep[0], argv );
 
 	for( i = 0; i <= istate.argc; i++ ) {
-	    argv[i].ptr = bcalloc_blob( strlen(istate.argv[i]) + 1 );
+            argv[i].ptr = bcalloc_blob( strlen(istate.argv[i]) + 1, EXCEPTION );
 	    BC_CHECK_PTR( argv[i].ptr );
 	    strcpy( argv[i].ptr, istate.argv[i] );
 	}
@@ -1628,13 +1632,14 @@ int ALLOCENV( INSTRUCTION_FN_ARGS )
 	    n++;
 	}
 	if( n > 0 ) {
-	    env = bcalloc_array( sizeof(stackcell_t), n, 1 );
+	    env = bcalloc_array( sizeof(stackcell_t), n, 1, EXCEPTION );
 
 	    BC_CHECK_PTR( env );
 	    STACKCELL_SET_ADDR( istate.ep[0], env );
 	    
 	    for( i = 0; i < n; i++ ) {
-		env[i].ptr = bcalloc_blob( strlen( istate.env[i]) + 1 );
+		env[i].ptr = bcalloc_blob( strlen( istate.env[i]) + 1,
+                                           EXCEPTION );
 		BC_CHECK_PTR( env[i].ptr );
 		strcpy( env[i].ptr, istate.env[i] );
 	    }
@@ -1655,7 +1660,8 @@ int TRY( INSTRUCTION_FN_ARGS )
     ssize_t offset = istate.code[istate.ip+1].ssizeval;
     ssize_t tryreg = istate.code[istate.ip+2].ssizeval;
     interpret_exception_t *rg_store =
-	bcalloc( sizeof(interpret_exception_t), -1, INTERPRET_EXCEPTION_PTRS );
+        bcalloc( sizeof(interpret_exception_t), -1, INTERPRET_EXCEPTION_PTRS,
+                 EXCEPTION );
 
     TRACE_FUNCTION();
 
@@ -2013,7 +2019,7 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 	if( char_count >= length ) {
 	    length += delta_length;
 	    assert( !buff || ((alloccell_t*)buff)[-1].magic == BC_MAGIC );
-	    buff = bcrealloc_blob( buff, length + 1 );
+	    buff = bcrealloc_blob( buff, length + 1, EXCEPTION );
 	    BC_CHECK_PTR( buff );
 	    STACKCELL_SET_ADDR( istate.ep[0], buff );
 	}
@@ -2023,12 +2029,12 @@ int STDREAD( INSTRUCTION_FN_ARGS )
     }
 
     if( buff ) {
-	buff = bcrealloc_blob( buff, char_count+1 );
+	buff = bcrealloc_blob( buff, char_count+1, EXCEPTION );
 	BC_CHECK_PTR( buff );
 	buff[char_count] = '\0';
     } else {
 	if( ch == '\n' ) {
-	    buff = bcrealloc_blob( buff, 1 );
+	    buff = bcrealloc_blob( buff, 1, EXCEPTION );
 	    BC_CHECK_PTR( buff );
 	    buff[char_count] = '\0';
 	}
@@ -2064,14 +2070,15 @@ int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    files = bcalloc_array( sizeof(stackcell_t), n, 1 );
+    files = bcalloc_array( sizeof(stackcell_t), n, 1, EXCEPTION );
     BC_CHECK_PTR( files );
     STACKCELL_SET_ADDR( istate.ep[0], files );
 
     for( i = 0; i < n; i++ ) {
         bytecode_file_hdr_t* current_file;
 	files[i].ptr =
-            bcalloc( sizeof(bytecode_file_hdr_t), -1, INTERPRET_FILE_PTRS );
+            bcalloc( sizeof(bytecode_file_hdr_t), -1, INTERPRET_FILE_PTRS,
+                     EXCEPTION );
 	BC_CHECK_PTR( files[i].ptr );
         current_file = (bytecode_file_hdr_t*)files[i].ptr;
 
@@ -2079,15 +2086,15 @@ int ALLOCSTDIO( INSTRUCTION_FN_ARGS )
 	switch(i) {
 	case 0:
 	    current_file->fp = stdin;
-	    current_file->filename.ptr = bcstrdup( "-" );
+	    current_file->filename.ptr = bcstrdup( "-", EXCEPTION );
 	    break;
 	case 1:
 	    current_file->fp = stdout;
-	    current_file->filename.ptr = bcstrdup( "-" );
+	    current_file->filename.ptr = bcstrdup( "-", EXCEPTION );
 	    break;
 	case 2:
 	    current_file->fp = stderr;
-	    current_file->filename.ptr = bcstrdup( "<stderr>" );
+	    current_file->filename.ptr = bcstrdup( "<stderr>", EXCEPTION );
 	    break;
 	default:
 	    assert( 0 );
@@ -2117,7 +2124,8 @@ int FDFILE( INSTRUCTION_FN_ARGS )
 
     istate.ep --;
 
-    file = bcalloc( sizeof(bytecode_file_hdr_t), -1, INTERPRET_FILE_PTRS );
+    file = bcalloc( sizeof(bytecode_file_hdr_t), -1, INTERPRET_FILE_PTRS,
+                    EXCEPTION );
     BC_CHECK_PTR( file );
     STACKCELL_SET_ADDR( istate.ep[0], file );
 
@@ -2125,15 +2133,15 @@ int FDFILE( INSTRUCTION_FN_ARGS )
     switch(fd) {
     case 0:
         file->fp = stdin;
-        file->filename.ptr = bcstrdup( "-" );
+        file->filename.ptr = bcstrdup( "-", EXCEPTION );
         break;
     case 1:
         file->fp = stdout;
-        file->filename.ptr = bcstrdup( "-" );
+        file->filename.ptr = bcstrdup( "-", EXCEPTION );
         break;
     case 2:
         file->fp = stderr;
-        file->filename.ptr = bcstrdup( "<stderr>" );
+        file->filename.ptr = bcstrdup( "<stderr>", EXCEPTION );
         break;
     default:
         assert( 0 );
@@ -2189,7 +2197,8 @@ int FOPEN( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    file = bcalloc( sizeof(*file), -1, INTERPRET_FILE_PTRS );
+    file = bcalloc( sizeof(*file), -1, INTERPRET_FILE_PTRS,
+                    EXCEPTION );
 
     BC_CHECK_PTR( file );
     fp = fopen( name, mode );
@@ -3282,7 +3291,7 @@ int SFILESCAN( INSTRUCTION_FN_ARGS )
 
 	assert( !buff || ((alloccell_t*)buff)[-1].magic == BC_MAGIC );
 
-	buff = bcrealloc_blob( buff, length + 1 );
+	buff = bcrealloc_blob( buff, length + 1, EXCEPTION );
 	BC_CHECK_PTR( buff );
 	STACKCELL_SET_ADDR( istate.ep[0], buff );
 
@@ -3297,7 +3306,7 @@ int SFILESCAN( INSTRUCTION_FN_ARGS )
     length = strlen( buff );
 
     if( length > 0 ) {
-	buff = bcrealloc_blob( buff, length+1 );
+	buff = bcrealloc_blob( buff, length+1, EXCEPTION );
 	BC_CHECK_PTR( buff );
     } else {
 	buff = NULL;
@@ -3372,7 +3381,7 @@ int SFILEREADLN( INSTRUCTION_FN_ARGS )
 	if( char_count >= length ) {
 	    length += delta_length;
 	    assert( !buff || ((alloccell_t*)buff)[-1].magic == BC_MAGIC );
-	    buff = bcrealloc_blob( buff, length + 1 );
+	    buff = bcrealloc_blob( buff, length + 1, EXCEPTION );
 	    BC_CHECK_PTR( buff );
 	    STACKCELL_SET_ADDR( istate.ep[0], buff );
 	}
@@ -3382,12 +3391,12 @@ int SFILEREADLN( INSTRUCTION_FN_ARGS )
     }
 
     if( buff ) {
-	buff = bcrealloc_blob( buff, char_count+1 );
+	buff = bcrealloc_blob( buff, char_count+1, EXCEPTION );
 	BC_CHECK_PTR( buff );
 	buff[char_count] = '\0';
     } else {
 	if( ch == eol_char ) {
-	    buff = bcrealloc_blob( buff, 1 );
+	    buff = bcrealloc_blob( buff, 1, EXCEPTION );
 	    BC_CHECK_PTR( buff );
 	    buff[char_count] = '\0';
 	}
@@ -3919,7 +3928,7 @@ int STRCAT( INSTRUCTION_FN_ARGS )
     len2 = str2 ? strlen( str2 ) : 0;
     length = len1 + len2;
 
-    dst = bcalloc( length + 1, length + 1, 0 );
+    dst = bcalloc( length + 1, length + 1, 0, EXCEPTION );
     BC_CHECK_PTR( dst );
     STACKCELL_SET_ADDR( istate.ep[1], dst );
     STACKCELL_ZERO_PTR( istate.ep[0] );
@@ -4626,7 +4635,7 @@ int SSPRINTF( INSTRUCTION_FN_ARGS )
 
     length = strlen( format ) + strlen( str ) + 1;
 
-    buffer = bcalloc_blob( length + 1 );
+    buffer = bcalloc_blob( length + 1, EXCEPTION );
     STACKCELL_SET_ADDR( istate.ep[1], buffer ); /* Prevent 'buffer' from
 						   being garbage collected
 						   upon realloc */
@@ -4634,7 +4643,7 @@ int SSPRINTF( INSTRUCTION_FN_ARGS )
     if( buffer ) {
 	needed = snprintf( buffer, length, format, str );
 	if( needed > length - 1 ) {
-	    buffer = bcrealloc_blob( buffer, needed + 1 );
+	    buffer = bcrealloc_blob( buffer, needed + 1, EXCEPTION );
 	    if( buffer ) {
 		snprintf( buffer, needed + 1, format, str );
 	    }
@@ -4644,7 +4653,7 @@ int SSPRINTF( INSTRUCTION_FN_ARGS )
 	       snprintf for testing purposes... S.G. */
 	    while( needed < 0 ) {
 		length *= 2;
-		buffer = bcrealloc_blob( buffer, length );
+		buffer = bcrealloc_blob( buffer, length, EXCEPTION );
 		STACKCELL_SET_ADDR( istate.ep[1], buffer );
 		if( buffer ) {
 		    needed = snprintf( buffer, length, format, str );
@@ -5004,7 +5013,7 @@ unpack_string_value( stackcell_t *stackcell, char typechar,
 	return 0;
     }
 
-    value = bcalloc( size + 1, size + 1, 0 );
+    value = bcalloc( size + 1, size + 1, 0, EXCEPTION );
     if( !value ) return 0;
 
     STACKCELL_SET_ADDR( *stackcell, value );
