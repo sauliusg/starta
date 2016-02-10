@@ -336,7 +336,7 @@ int @PREFIX1@BLOB( INSTRUCTION_FN_ARGS )
 
     TRACE_FUNCTION();
 
-    ptr = bcalloc_blob( size );
+    ptr = bcalloc_blob( size, EXCEPTION );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -362,7 +362,7 @@ int @PREFIX1@AALLOC( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     ptr = bcalloc_array( elem_nref == 0 ? sizeof(stackunion_t) : REF_SIZE,
-                         n_elem, elem_nref );
+                         n_elem, elem_nref, EXCEPTION );
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
@@ -387,7 +387,7 @@ int @PREFIX1@MDALLOCC( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     ptr = bcalloc_layer( STACKCELL_PTR( istate.ep[1] ), length,
-                         nref, level );
+                         nref, level, EXCEPTION );
 
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[1], ptr );
@@ -424,7 +424,8 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
            with negative offsets, and numbers -- with positive
            offsets: */
         ptr = bcalloc( /* size = */ n_elem * (sizeof(stackunion_t) + REF_SIZE),
-                       /* length = */ n_elem, /* nref = */ -n_elem );
+                       /* length = */ n_elem, /* nref = */ -n_elem,
+                       EXCEPTION );
     } else {
         /* Hash elements are references: in this case, we allocate
            twice as many references as is needed for hash length (for
@@ -432,7 +433,8 @@ int @PREFIX1@HASHALLOC( INSTRUCTION_FN_ARGS )
            for an associated value). Both keys and values are
            allcoated in the positive directions: */
         ptr = bcalloc( /* size = */ n_elem * 2 * REF_SIZE,
-                       /* length = */ n_elem, /* nref = */ 2 * n_elem );
+                       /* length = */ n_elem, /* nref = */ 2 * n_elem,
+                       EXCEPTION );
     }
     BC_CHECK_PTR( ptr );
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
@@ -730,8 +732,9 @@ int @PREFIX1@SUBARRAY( INSTRUCTION_FN_ARGS )
             nref = array_header->nref;
 
             subarray = bcalloc_array( nref == 0 ?
-                                          sizeof(stackunion_t) : REF_SIZE,
-                                      length, nref > 0 ? 1 : 0 );
+                                      sizeof(stackunion_t) : REF_SIZE,
+                                      length, nref > 0 ? 1 : 0,
+                                      EXCEPTION );
             BC_CHECK_PTR( subarray );
 
             if( nref > 0 ) {
@@ -831,7 +834,7 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
         } else {
             length = upper_bound - lower_bound + 1;
 
-            substr = bcalloc_blob( (length + 1) * element_sz );
+            substr = bcalloc_blob( (length + 1) * element_sz, EXCEPTION );
             BC_CHECK_PTR( substr );
 
             strncpy( substr, &str[lower_bound], element_sz * length );

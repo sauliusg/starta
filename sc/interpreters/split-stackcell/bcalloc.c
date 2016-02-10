@@ -54,7 +54,8 @@ static struct {
 };
 #endif
 
-void *bcalloc( size_t size, ssize_t length, ssize_t nref )
+void *bcalloc( size_t size, ssize_t length, ssize_t nref,
+               cexception_t *ex )
 {
     alloccell_t *ptr = NULL;
 
@@ -68,10 +69,10 @@ void *bcalloc( size_t size, ssize_t length, ssize_t nref )
 
     if( gc_policy != GC_NEVER ) {
 	if( gc_policy == GC_ALWAYS ) {
-	    thrcode_gc_mark_and_sweep();
+	    thrcode_gc_mark_and_sweep( ex );
 	} else {
 	    if( total_allocated_bytes + size > byte_allocation_limit ) {
-		thrcode_gc_mark_and_sweep();
+		thrcode_gc_mark_and_sweep( ex );
 		byte_allocation_limit = (total_allocated_bytes + size) * 2;
 	    }
 	}
@@ -104,19 +105,19 @@ void *bcalloc( size_t size, ssize_t length, ssize_t nref )
     }
 }
 
-void *bcalloc_blob( size_t size )
+void *bcalloc_blob( size_t size, cexception_t *ex )
 {
-    return bcalloc( size, size, 0 );
+    return bcalloc( size, size, 0, ex );
 }
 
-char* bcstrdup( char *str )
+char* bcstrdup( char *str, cexception_t *ex )
 {
     char *ptr = NULL;
     ssize_t len;
 
     if( str ) {
 	len = strlen( str );
-	ptr = bcalloc_blob( sizeof(str[0]) * (len+1) );
+	ptr = bcalloc_blob( sizeof(str[0]) * (len+1), ex );
 	if( ptr ) {
 	    strcpy( ptr, str );
 	}
@@ -124,9 +125,9 @@ char* bcstrdup( char *str )
     return ptr;
 }
 
-void *bcalloc_stackcells( ssize_t length, ssize_t nref )
+void *bcalloc_stackcells( ssize_t length, ssize_t nref, cexception_t *ex )
 {
-    return bcalloc( sizeof(stackcell_t) * length, length, nref );
+    return bcalloc( sizeof(stackcell_t) * length, length, nref, ex );
 }
 
 /* In this implementation, the 'element_size' is ignored since all
@@ -134,26 +135,28 @@ void *bcalloc_stackcells( ssize_t length, ssize_t nref )
    maintain interface compatibility with the packed-type
    representation: */
 
-void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref )
+void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref,
+                     cexception_t *ex )
 {
     assert( nref == 1 || nref == 0 );
     if( nref > 0 ) {
-        alloccell_t *ptr = bcalloc( REF_SIZE * length, length, length );
+        alloccell_t *ptr = bcalloc( REF_SIZE * length, length, length, ex );
         if( ptr && nref != 0 ) {
             ptr[-1].flags |= AF_HAS_REFS;
         }
         return ptr;
     } else {
-        return bcalloc( sizeof(stackunion_t) * length, length, 0 );
+        return bcalloc( sizeof(stackunion_t) * length, length, 0, ex );
     }
 }
 
 void *bcalloc_layer( void **array, ssize_t length,
-                     ssize_t nref, int level )
+                     ssize_t nref, int level,
+                     cexception_t *ex )
 {
     assert( nref == 1 || nref == 0 );
     if( level == 0 ) {
-	return bcalloc_array( REF_SIZE, length, nref );
+        return bcalloc_array( REF_SIZE, length, nref, ex );
     } else {
 	alloccell_t *header = (alloccell_t*)array;
 	ssize_t layer_len = header[-1].length;
@@ -166,7 +169,7 @@ void *bcalloc_layer( void **array, ssize_t length,
 	for( i = 0; i < layer_len; i++ ) {
 	    /* printf( ">>> allocating element %d of layer %d\n", i, level ); */
 	    array[i] = bcalloc_layer( array[i], length, nref,
-                                      level - 1 );
+                                      level - 1, ex );
 	    if( !array[i] ) {
 		return NULL;
 	    }
@@ -202,13 +205,13 @@ void *bcalloc_layer( void **array, ssize_t length,
   2012.01.06
  */
 
-void *bcrealloc_blob( void *memory, size_t size )
+void *bcrealloc_blob( void *memory, size_t size, cexception_t *ex )
 {
     alloccell_t *ptr, *old;
     ssize_t old_size;
 
     if( !memory ) 
-        return bcalloc_blob( size );
+        return bcalloc_blob( size, ex );
 
     old = memory;
     old --;
@@ -273,7 +276,7 @@ static void bcfree( void *mem )
 
 #include <stdio.h>
 
-ssize_t bccollect( void )
+ssize_t bccollect( cexception_t *ex )
 {
     alloccell_t *curr, *prev, *next;
     ssize_t reclaimed = 0;
@@ -289,7 +292,7 @@ ssize_t bccollect( void )
 	    } else {
 		printf( "leaving    " );
 	    }
-	    printf( "%p (%p) (%ld bytes)\n",
+	    printf( "%p (%p) (size = %ld bytes)\n",
 		    curr, curr+1, (long)curr->size );
 	}
         if( (curr->flags & AF_USED) == 0 ) {
@@ -301,7 +304,7 @@ ssize_t bccollect( void )
 	        prev = allocated = next;
 	    }
 	    reclaimed += curr->size;
-            thrcode_run_destructor_if_needed( &istate, curr );
+            thrcode_run_destructor_if_needed( &istate, curr, ex );
 	    bcfree( curr );
 	} else {
 	    curr->prev = prev;
@@ -317,7 +320,7 @@ ssize_t bccollect( void )
     return reclaimed;
 }
 
-void bcalloc_run_all_destructors()
+void bcalloc_run_all_destructors( cexception_t *ex )
 {
     alloccell_t *curr;
     alloccell_t *finalised;
@@ -325,7 +328,7 @@ void bcalloc_run_all_destructors()
     do {
         finalised = allocated; allocated = NULL;
         for( curr = finalised; curr != NULL; curr = curr->next ) {
-            thrcode_run_destructor_if_needed( &istate, curr );
+            thrcode_run_destructor_if_needed( &istate, curr, ex );
         }
         if( ++i >= 1000 ) {
             fprintf( stderr, "%d destructor cycles did not eliminte "
