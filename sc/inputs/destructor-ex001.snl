@@ -1,0 +1,42 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test destructors for nested anonymous classes.
+
+use std;
+
+exception DestructorExceptionTest;
+
+null class A {
+    var name : string;
+    var count : int;
+
+    constructor A( name : string; cnt : int = 0 )
+    {
+        self.name = name;
+        self.count = cnt;
+    }
+
+    method inc() { self.count++ }
+    method dec() { self.count-- }
+
+    method asString(): string
+    {
+        return "Object '" _ self.name _ "', counted " _
+            "%d" %% self.count _ " times";
+    }
+
+    destructor {
+        if( self.count < 0 ) {
+            raise DestructorExceptionTest( -1, "class A count negative" );
+        }
+    }
+};
+
+var a = new A( "TheFirstA" );
+a->inc();
+. a->asString();
+
+a->dec();
+a->dec();

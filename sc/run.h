@@ -152,6 +152,12 @@ typedef struct {
     interpret_exception_t *xp;  /* exception frame pointer -- describes the
 				   most recent TRY-frame that will catch
 				   exceptions */
+    interpret_exception_t *save_xp;  /* exception frame pointer saved
+                                        when an asyncronous
+                                        interpreter is invoked --
+                                        currently this can happen from
+                                        destructors invoked by a
+                                        garbage collector. */
     cexception_t *ex;     /* exception to be raised into C-caller when
 			     no bytecode handler (in xp) is available */
     char **argv;
@@ -211,10 +217,14 @@ void interpret_raise_exception( int error_code,
 				int exception_id,
 				cexception_t *ex );
 
-void thrcode_gc_mark_and_sweep( void );
+void interpret_reraise_exception( cexception_t old_ex,
+                                  cexception_t *ex );
+
+void thrcode_gc_mark_and_sweep( cexception_t *ex );
 
 void thrcode_run_destructor_if_needed( istate_t *istate,
-                                       alloccell_t *hdr );
+                                       alloccell_t *hdr,
+                                       cexception_t *ex );
 
 void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
                              cexception_t *ex );

@@ -25,17 +25,21 @@ typedef enum {
 void bcalloc_set_gc_collector_policy( gc_policy_t new_policy );
 gc_policy_t bcalloc_gc_collector_policy( void );
 void bc_merror( cexception_t *ex );
-void *bcalloc( size_t size, ssize_t length, ssize_t nref );
-void *bcalloc_blob( size_t size );
-char* bcstrdup( char *str );
-void *bcalloc_stackcells( ssize_t length, ssize_t nref );
-void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref );
-void *bcrealloc_blob( void *memory, size_t size );
-ssize_t bccollect( void );
+void *bcalloc( size_t size, ssize_t length, ssize_t nref,
+               cexception_t *ex );
+void *bcalloc_blob( size_t size, cexception_t *ex );
+char* bcstrdup( char *str, cexception_t *ex );
+void *bcalloc_stackcells( ssize_t length, ssize_t nref, cexception_t *ex );
+void *bcalloc_array( size_t element_size, ssize_t length, ssize_t nref,
+                     cexception_t *ex );
+void *bcrealloc_blob( void *memory, size_t size, cexception_t *ex );
+ssize_t bccollect( cexception_t *ex );
 void *bcalloc_stackcell_layer( stackcell_t *array, ssize_t length,
-                               ssize_t nref, int level );
+                               ssize_t nref, int level,
+                               cexception_t *ex );
 
 int bcalloc_is_in_heap( void *p );
 void bcalloc_reset_allocated_nodes( void );
+void bcalloc_run_all_destructors( cexception_t *ex );
 
 #endif

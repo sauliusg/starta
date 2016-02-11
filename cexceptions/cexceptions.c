@@ -47,6 +47,8 @@ void cexception_reraise( cexception_t old_cexception,
 	new_cexception->error_code = old_cexception.error_code;
 	new_cexception->source_file = old_cexception.source_file;
 	new_cexception->line = old_cexception.line;
+        new_cexception->exception_id = old_cexception.exception_id;
+        new_cexception->module_id = old_cexception.module_id;
 	longjmp( new_cexception->jmp_buffer, new_cexception->error_code );
     } else {
         fputs( old_cexception.message, stderr );
@@ -83,4 +85,22 @@ int cexception_source_line( cexception_t *ex )
 {
     assert( ex );
     return ex->line;
+}
+
+const char *cexception_module_id( cexception_t *ex )
+{
+    if( ex ) {
+        return ex->module_id;
+    } else {
+        return NULL;
+    }
+}
+
+int cexception_exception_id( cexception_t *ex )
+{
+    if( ex ) {
+        return ex->exception_id;
+    } else {
+        return 0;
+    }
 }

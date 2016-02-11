@@ -130,8 +130,19 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
 		cexception_t *ex )
 {
     make_istate( &istate, code, argc, argv, env, ex );
-    run( ex );
-    bcalloc_run_all_destructors();
+    cexception_t inner;
+    cexception_guard( inner ) {
+        run( &inner );
+        bcalloc_run_all_destructors( &inner );
+    }
+    cexception_catch {
+        int error_code = cexception_error_code( &inner );
+        const char *message = cexception_message( &inner );
+        inner.message = cxprintf( "Unhandled exception %d in the "
+                                  "bytecode interpreter: %s",
+                                  error_code, message );
+        cexception_reraise( inner, ex );
+    }
 }
 
 static int realloc_eval_stack( cexception_t * ex )
@@ -296,15 +307,12 @@ void run( cexception_t *ex )
     cexception_t inner;
     register int (*function)( void );
 
-    // istate.ex = &inner;
-    istate.ex = ex;
+    istate.ex = &inner;
 
     function = istate.code[0].fn;
 
     while( function ) {
-
 	cexception_guard( inner ) {
-
 	    while( function ) {
 		int ret = (*function)();
 		istate.ip += ret;
@@ -312,23 +320,12 @@ void run( cexception_t *ex )
 		if( thrcode_stackdebug_is_on()) {
 		    thrcode_print_stack();
 		}
-		check_runtime_stacks( ex );
+		check_runtime_stacks( &inner );
 	    }
 	}
 	cexception_catch {
-	    char *message = (char*)cexception_message( &inner );
-	    int error_code = cexception_error_code( &inner );
-	    if( message ) {
-		interpret_raise_exception_with_static_message(
-				       error_code, message,
-				       /* module = */ NULL,
-				       SL_EXCEPTION_EXTERNAL_LIB_ERROR, ex );
-	    } else {
-		interpret_raise_exception(
-				       error_code, /* err_message = */ NULL,
-				       /* module = */ NULL,
-				       SL_EXCEPTION_EXTERNAL_LIB_ERROR, ex );
-	    }
+            interpret_reraise_exception( inner, ex );
+            function = istate.code[istate.ip].fn;
 	}
     }
 }
@@ -374,7 +371,7 @@ void interpret_raise_exception_with_bcalloc_message( int error_code,
 						     int exception_id,
 						     cexception_t *ex )
 {
-    char *msg = bcalloc_blob( strlen(message) + 1 );
+    char *msg = bcalloc_blob( strlen(message) + 1, ex );
 
     if( msg ) {
 	strcpy( msg, message );
@@ -416,18 +413,19 @@ void interpret_raise_exception( int error_code,
     assert( !message || ((alloccell_t*)message)[-1].magic == BC_MAGIC );
 
     if( istate.xp == 0 ) {
+        if( ex ) {
+            ex->exception_id = exception_id;
+            ex->module_id = module_id;
+        }
 	if( message ) {
 	    cexception_raise_in( ex, interpret_subsystem,
-				 INTERPRET_UNHANDLED_EXCEPTION,
-				 cxprintf( "Unhandled exception %d in the "
-					   "bytecode interpreter: %s",
-					   error_code, message ));
+				 error_code, message );
 	} else {
+            snprintf( err_message.text, sizeof(err_message.text)-1,
+                      "Unhandled exception %d in the bytecode interpreter",
+                      error_code );
 	    cexception_raise_in( ex, interpret_subsystem,
-				 INTERPRET_UNHANDLED_EXCEPTION,
-				 cxprintf( "Unhandled exception %d in the "
-					   "bytecode interpreter",
-					   error_code ));
+				 error_code, err_message.text );
 	}
     }
 
@@ -435,6 +433,60 @@ void interpret_raise_exception( int error_code,
     rg_store->error_code = error_code;
     rg_store->message.ptr = message;
     rg_store->module = module_id;
+    rg_store->exception_id = exception_id;
+
+#if 1
+    memset( istate.ep, 0, (rg_store->ep - istate.ep) * sizeof(istate.ep[0]) );
+#else
+    {
+	ssize_t i;
+	ssize_t limit = rg_store->ep - istate.ep;
+
+	for( i = 0; i < limit; i ++ ) {
+	    STACKCELL_ZERO_PTR( istate.ep[i] );
+	}
+    }
+#endif
+
+    istate.xp = rg_store->old_xp.ptr;
+    istate.ip = rg_store->ip + rg_store->catch_offset;
+    istate.sp = rg_store->sp;
+    istate.ep = rg_store->ep;
+    istate.fp = rg_store->fp;
+}
+
+void interpret_reraise_exception( cexception_t old_ex,
+                                  cexception_t *ex )
+{
+    interpret_exception_t *rg_store;
+    int error_code = cexception_error_code( &old_ex );
+    const char *message = cexception_message( &old_ex );
+    const char *module_id = cexception_module_id( &old_ex );
+    int exception_id = cexception_exception_id( &old_ex );
+
+    assert( !message || ((alloccell_t*)message)[-1].magic == BC_MAGIC );
+
+    if( istate.xp == 0 ) {
+        if( ex ) {
+            ex->exception_id = exception_id;
+            ex->module_id = module_id;
+        }
+	if( message ) {
+	    cexception_raise_in( ex, interpret_subsystem,
+				 error_code, message );
+	} else {
+            snprintf( err_message.text, sizeof(err_message.text)-1,
+                      "Unhandled exception %d in the bytecode interpreter",
+                      error_code );
+	    cexception_raise_in( ex, interpret_subsystem,
+				 error_code, err_message.text );
+	}
+    }
+
+    rg_store = istate.xp;
+    rg_store->error_code = error_code;
+    rg_store->message.ptr = (char*)message;
+    rg_store->module = (char*)module_id;
     rg_store->exception_id = exception_id;
 
 #if 1
@@ -557,16 +609,17 @@ static void thrcode_traverse_stack( stackcell_t *stack,
     }
 }
 
-void thrcode_gc_mark_and_sweep( void )
+void thrcode_gc_mark_and_sweep( cexception_t *ex )
 {
     if( gc_debug )
 	printf( ">>> Starting mark & sweep\n" );
 
     bcalloc_reset_allocated_nodes();
     bctraverse( istate.xp );
+    bctraverse( istate.save_xp );
     thrcode_traverse_stack( istate.sp, istate.bottom );
     thrcode_traverse_stack( istate.ep, istate.ep_bottom );
-    bccollect();
+    bccollect( ex );
 
     if( gc_debug )
 	printf( ">>> Finished mark & sweep\n" );
@@ -588,21 +641,38 @@ void thrcode_run_subroutine( istate_t *istate, ssize_t code_offset,
 
     /* Set the IP to the address of the called subroutine: */
     istate->ip = code_offset;
+    assert( !istate->save_xp );
+    istate->save_xp = istate->xp;
+    istate->xp = NULL;
 
     /* Invoke the sub-interpreter: */
-    /* int old_trace = trace; */
-    run( ex );
+    /* int old_trace = trace; trace = 1; */
+    cexception_t inner;
+    cexception_guard( inner ) {
+        run( &inner );
+    }
+    cexception_catch {
+        /* trace = old_trace; */
+        istate->xp = save_istate.xp;
+        istate->save_xp = NULL;
+        istate->ip = save_istate.ip;
+        istate->ex = save_istate.ex;
+        cexception_reraise( inner, ex );
+    }
     /* trace = old_trace; */
 
     /* Restore the previous interpreter state: */
     istate->xp = save_istate.xp;
+    istate->save_xp = NULL;
     istate->ip = save_istate.ip;
+    istate->ex = save_istate.ex;
 }
 
 static int in_gc = 0;
 
 void thrcode_run_destructor_if_needed( istate_t *istate,
-                                       alloccell_t *hdr )
+                                       alloccell_t *hdr,
+                                       cexception_t * ex )
 {
     if( in_gc )
         return;
@@ -625,14 +695,15 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
             /* Invoke the destructor: */
             ssize_t code_offset = vtable[1];
             cexception_t inner;
-#if 1
+
             cexception_guard( inner ) {
                 thrcode_run_subroutine( istate, code_offset, &inner );
             }
             cexception_catch {
-                fprintf( stderr, "!!! exception raised in destructor\n" );
+                /* fprintf( stderr, "!!! exception raised in destructor\n" ); */
+                in_gc = 0;
+                cexception_reraise( inner, ex );
             }
-#endif
         }
     }
 
