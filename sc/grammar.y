@@ -7569,6 +7569,30 @@ pragma_statement
    {
        compiler_set_pragma( compiler, $2, $3 );
    }
+
+| _PRAGMA __IDENTIFIER _CONST type_identifier
+   {
+       TNODE *default_type = $4;
+       char *type_kind_name = $2;
+
+       if( default_type ) {
+           if( type_kind_name && strcmp( type_kind_name, "integer" ) == 0 ) {
+               typetab_override_suffix( compiler->typetab, /*name*/ "",
+                                        TS_INTEGER_SUFFIX,
+                                        share_tnode( default_type ),
+                                        px );
+           } else if( type_kind_name && 
+                      strcmp( type_kind_name, "real" ) == 0 ) {
+               typetab_override_suffix( compiler->typetab, /*name*/ "",
+                                        TS_FLOAT_SUFFIX, 
+                                        share_tnode( default_type ),
+                                        px );
+           } else {
+               yyerror( "only \"integer\" and \"real\" constant kinds "
+                        "can be assigned to default types by this pragma" );
+           }
+       }
+   }
 ;
 
 opt_identifier
