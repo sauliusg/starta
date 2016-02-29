@@ -13,6 +13,7 @@ RC_FILE = ${RC_DIR}/slc.rc
 install: ${TARGET}
 	mkdir -p ${BINDIR} ${LIBDIR} ${RC_DIR}
 	cp -av ${TARGET} ${BINDIR}
+	cp -av starta ${BINDIR}
 	strip ${BINDIR}/$(notdir ${TARGET})
 	cp -av modules/*.slib ${LIBDIR}
 	rsync -avL libraries ${LIBDIR} \
