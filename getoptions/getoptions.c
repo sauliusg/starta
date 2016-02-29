@@ -33,8 +33,10 @@ static void get_float_array  ( int argc, char **argv, int *i, option_t* option,
 			       cexception_t* ex );
 
 
-char **get_optionsx( int argc, char *argv[], option_t options[],
-		     cexception_t *ex )
+static char **
+_get_optionsx_( int argc, char *argv[], option_t options[],
+                int first_file_terminates_options,
+                cexception_t *ex )
 {
     cexception_t inner;
     int i, f;
@@ -49,8 +51,11 @@ char **get_optionsx( int argc, char *argv[], option_t options[],
 	        files[f++] = argv[i];
 		continue;
 	    }
-	    if( strcmp( argv[i], "--" ) == 0 ) {
-	        i++; while( i < argc ) files[f++] = argv[i++];
+	    if( strcmp( argv[i], "--" ) == 0 ||
+                (first_file_terminates_options && *argv[i] != '-' )) {
+                if( !first_file_terminates_options )
+                    i++;
+                while( i < argc ) files[f++] = argv[i++];
 		break;
 	    }
 	    option = find_option( options, argv[i], &inner );
@@ -101,6 +106,21 @@ char **get_optionsx( int argc, char *argv[], option_t options[],
 	cexception_reraise( inner, ex );
     }
     return files;
+}
+
+char **get_optionsx( int argc, char *argv[], option_t options[],
+		     cexception_t *ex )
+{
+    return _get_optionsx_( argc, argv, options,
+                           /*first_file_terminates_options=*/0, ex );
+}
+
+char **get_optionsx_until_first_file( int argc, char *argv[],
+                                      option_t options[],
+                                      cexception_t *ex )
+{
+    return _get_optionsx_( argc, argv, options,
+                           /*first_file_terminates_options=*/1, ex );
 }
 
 static  option_t* find_option( option_t options[], char *arg,

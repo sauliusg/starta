@@ -242,18 +242,35 @@ static int argv_has_dashes( int argc, char *argv[] )
 }
 
 char *progname;
+char *progtail;
 
 int main( int argc, char *argv[], char *env[] )
 {
   cexception_t inner;
   char ** volatile files = NULL;
   THRCODE * volatile code = NULL;
-  int i;
+  int i, called_as_starta = 0;
 
   progname = argv[0];
 
+  progtail = progname + strlen( progname );
+  while( *progtail != '/' && progtail >= progname )
+      progtail --;
+  progtail ++;
+
+  /* If the compiler is called as 'starta', only options up to the
+     first file name will be considered as compiler options, the rest
+     will be passed to the executed program: */
+  if( strcmp( progtail, "starta" ) == 0 ) {
+      called_as_starta = 1;
+  }
+
   cexception_guard( inner ) {
-      files = get_optionsx( argc, argv, options, &inner );
+      if( called_as_starta ) {
+          files = get_optionsx_until_first_file( argc, argv, options, &inner );
+      } else {
+          files = get_optionsx( argc, argv, options, &inner );
+      }
   }
   cexception_catch {
       fprintf( stderr, "%s: %s\n", progname, cexception_message( &inner ));
@@ -297,7 +314,7 @@ int main( int argc, char *argv[], char *env[] )
           push_environment_paths( &include_paths, "SL_INCLUDE_PATHS", &inner );
       }
 
-      if( argv_has_dashes( argc, argv )) {
+      if( argv_has_dashes( argc, argv ) || called_as_starta ) {
 	  for( i = 0; files[i] != NULL; ) {
 	      i++;
 	  }
