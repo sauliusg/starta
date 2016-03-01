@@ -4225,7 +4225,7 @@ int STRLEN( INSTRUCTION_FN_ARGS )
 {
     char *str = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *block = istate.ep[0].PTR;
-    ssize_t size = block[-1].size;
+    ssize_t size = block ? block[-1].size : 0;
 
     TRACE_FUNCTION();
 
