@@ -59,6 +59,10 @@ char ** get_options( int argc, char *argv[], option_t options[] );
 char ** get_optionsx( int argc, char *argv[], option_t options[],
 		      cexception_t *ex );
 
+char **get_optionsx_until_first_file( int argc, char *argv[],
+                                      option_t options[],
+                                      cexception_t *ex );
+
 void delete_getoptions_file_list( char** files );
 
 typedef enum {

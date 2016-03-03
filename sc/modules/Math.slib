@@ -118,6 +118,36 @@ inline bytecode function atan2l( ldouble x, y ) : ldouble
     libmath:LDCALL2 libmath:atan2l
 }
 
+inline bytecode function acosf( float x ): float
+{
+    libmath:FCALL libmath:acosf
+}
+
+inline bytecode function acos( double x ): double
+{
+    libmath:DCALL libmath:acos
+}
+
+inline bytecode function acosl( ldouble x ): ldouble
+{
+    libmath:LDCALL libmath:acosl
+}
+
+inline bytecode function asinf( float x ): float
+{
+    libmath:FCALL libmath:asinf
+}
+
+inline bytecode function asin( double x ): double
+{
+    libmath:DCALL libmath:asin
+}
+
+inline bytecode function asinl( ldouble x ): ldouble
+{
+    libmath:LDCALL libmath:asinl
+}
+
 inline bytecode function sqrtf( float x ) : float
 {
     libmath:FCALL libmath:sqrtf
