@@ -16,7 +16,7 @@ DECIMAL_DIGIT  [0-9]
 NAME	       [a-zA-Z$_][a-zA-Z0-9_]*
 INTEGER	       {DECIMAL_DIGIT}+
 FIXED	       ({DECIMAL_DIGIT}+"."{DECIMAL_DIGIT}*)|("."{DECIMAL_DIGIT}+)
-REAL           {FIXED}([eE]([-+]?)[0-9]+)?
+REAL           ({FIXED}|{INTEGER})([eE]([-+]?)[0-9]+)?
 
  /* Double and single quoted strings */
 
