@@ -11440,6 +11440,7 @@ arithmetic_expression
 */
   | '(' arithmetic_expression ')'
   | '(' simple_expression ')'
+  | '(' function_call ')'
 
   | __QQ expression  %prec __UNARY
   {
