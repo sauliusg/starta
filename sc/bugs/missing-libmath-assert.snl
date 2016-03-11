@@ -1,0 +1,10 @@
+// --*- C -*--
+
+// Test Starta expressions
+
+use std
+use Math
+
+var a, b = 3, 5;
+
+. a, b;
