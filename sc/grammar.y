@@ -10083,7 +10083,10 @@ opcode
   : __IDENTIFIER
       { compiler_emit( compiler, px, "\tC\n", $1 ); }
   | module_list __COLON_COLON __IDENTIFIER
-      { compiler_emit( compiler, px, "\tMC\n", dnode_name($1), $3 ); }
+      {
+          compiler_emit( compiler, px, "\tMC\n", 
+                         $1 ? dnode_name($1) : "???", $3 );
+      }
   | __IDENTIFIER ':' __IDENTIFIER
       { compiler_emit( compiler, px, "\tMC\n", $1, $3 ); }
   ;
