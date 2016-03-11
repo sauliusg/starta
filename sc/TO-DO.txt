@@ -1,3 +1,5 @@
+-- Implement 'pragma path' to manage include, module an library paths
+-- Implement variables $0 (script name), $D (script directory name) and $P (path) for directory management
 -- improvement: reduce number of spurious error messages when a function argument is misspelled.
 -- FIX BUG: implement correct updates of exception data structures after stack reallocations.
 -+ Implement calls of super-class methods.
