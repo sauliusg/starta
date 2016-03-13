@@ -11722,7 +11722,13 @@ index_expression
   | expression __DOT_DOT expression
     { $$ = 2; }
   
+  | expression ':' expression
+    { $$ = 2; }
+  
   | expression __DOT_DOT 
+    { $$ = -1; }
+  
+  | expression ':'
     { $$ = -1; }
   
   | expression __THREE_DOTS 

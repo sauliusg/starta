@@ -1,0 +1,18 @@
+#
+# Snail language compiler tests
+#
+# Test substrings
+#
+
+use * from std;
+
+var s = "Abrakadabra";
+
+var n = s[2:4];
+
+. n;
+. s[3:-3];
+. s[1:-2];
+. s[1:-1];
+. s[0:-1];
+. s[-5:-2];
