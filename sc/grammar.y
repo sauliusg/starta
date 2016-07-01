@@ -6240,6 +6240,37 @@ static void compiler_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
+static ssize_t string_count( char **strings )
+{
+    ssize_t len = 0;
+
+    if( strings )
+      while( strings[len] )
+	len ++;
+
+    return len;
+}
+
+static void push_string( char ***array, char *string, cexception_t *ex )
+{
+    ssize_t len = string_count( *array );
+
+    *array = reallocx( *array, sizeof((*array)[0]) * (len + 2), ex );
+    (*array)[len+1] = NULL;
+    (*array)[len] = string;
+}
+
+static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
+                                        char *value, cexception_t *ex )
+{
+    if( strcmp( pragma_name, "path" ) == 0 ) {
+        /* printf( "Will set path to '%s'\n", value ); */
+        push_string( &c->include_paths, strdupx( value, ex ), ex );
+    } else {
+        yyerrorf( "unknown pragma '%s' with string value", pragma_name );
+    }
+}
+
 static void compiler_set_integer_pragma( COMPILER *c, char *pragma_name,
                                          ssize_t value )
 {
@@ -6261,16 +6292,6 @@ static void compiler_set_integer_pragma( COMPILER *c, char *pragma_name,
         }
     } else {
         yyerrorf( "unknown pragma '%s' with integer value", pragma_name );
-    }
-}
-
-static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
-                                        char *value )
-{
-    if( strcmp( pragma_name, "path" ) == 0 ) {
-        printf( "Will set path to '%s'\n", value );
-    } else {
-        yyerrorf( "unknown pragma '%s' with string value", pragma_name );
     }
 }
 
@@ -7584,7 +7605,7 @@ pragma_statement
            compiler_set_integer_pragma( compiler, $2, ival );
        } else {
            char *sval = const_value_string( &$3 );
-           compiler_set_string_pragma( compiler, $2, sval );
+           compiler_set_string_pragma( compiler, $2, sval, px );
        }
    }
 
