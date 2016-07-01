@@ -6260,7 +6260,17 @@ static void compiler_set_integer_pragma( COMPILER *c, char *pragma_name,
             interpret_stack_delta( old_value );
         }
     } else {
-        yyerrorf( "unknown pragma '%s'", pragma_name );
+        yyerrorf( "unknown pragma '%s' with integer value", pragma_name );
+    }
+}
+
+static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
+                                        char *value )
+{
+    if( strcmp( pragma_name, "path" ) == 0 ) {
+        printf( "Will set path to '%s'\n", value );
+    } else {
+        yyerrorf( "unknown pragma '%s' with string value", pragma_name );
     }
 }
 
@@ -7573,8 +7583,8 @@ pragma_statement
            long ival = const_value_integer( &$3 );
            compiler_set_integer_pragma( compiler, $2, ival );
        } else {
-           yyerrorf( "Only integer constants are at the "
-                     "moment supported in pragmas" );
+           char *sval = const_value_string( &$3 );
+           compiler_set_string_pragma( compiler, $2, sval );
        }
    }
 
