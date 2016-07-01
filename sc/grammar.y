@@ -7565,9 +7565,16 @@ pragma_statement
                                     px );
        }
    }
-| _PRAGMA __IDENTIFIER constant_integer_expression
+
+| _PRAGMA __IDENTIFIER constant_expression
    {
-       compiler_set_pragma( compiler, $2, $3 );
+       if( const_value_type( &$3 ) == VT_INTMAX ) {
+           long ival = const_value_integer( &$3 );
+           compiler_set_pragma( compiler, $2, ival );
+       } else {
+           yyerrorf( "Only integer constants are at the "
+                     "moment supported in pragmas" );
+       }
    }
 
 | _PRAGMA __IDENTIFIER _CONST type_identifier
