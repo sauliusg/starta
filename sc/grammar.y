@@ -6264,7 +6264,10 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
                                         char *value, cexception_t *ex )
 {
     if( strcmp( pragma_name, "path" ) == 0 ) {
-        /* printf( "Will set path to '%s'\n", value ); */
+        freex( c->include_paths );
+        c->include_paths = NULL;
+        push_string( &c->include_paths, strdupx( value, ex ), ex );
+    } else if( strcmp( pragma_name, "append" ) == 0 ) {
         push_string( &c->include_paths, strdupx( value, ex ), ex );
     } else {
         yyerrorf( "unknown pragma '%s' with string value", pragma_name );
