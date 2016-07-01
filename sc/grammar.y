@@ -6240,7 +6240,8 @@ static void compiler_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
-static void compiler_set_pragma( COMPILER *c, char *pragma_name, ssize_t value )
+static void compiler_set_integer_pragma( COMPILER *c, char *pragma_name,
+                                         ssize_t value )
 {
     ssize_t old_value;
 
@@ -7570,7 +7571,7 @@ pragma_statement
    {
        if( const_value_type( &$3 ) == VT_INTMAX ) {
            long ival = const_value_integer( &$3 );
-           compiler_set_pragma( compiler, $2, ival );
+           compiler_set_integer_pragma( compiler, $2, ival );
        } else {
            yyerrorf( "Only integer constants are at the "
                      "moment supported in pragmas" );
