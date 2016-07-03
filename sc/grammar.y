@@ -6274,14 +6274,33 @@ static char *interpolate_string( char *path, char *filename,
 
     cexception_guard( inner ) {
         while( pos != NULL ) {
-            if( pos[1] == 'D' ) {
+            if( pos[1] == 'D' || pos[1] == 'P' ) {
                 char *dirend = rindex( filename, '/' );
+                if( pos[1] == 'P' && dirend > filename ) {
+                    dirend --;
+                    while( dirend > filename && *dirend != '/' ) {
+                        dirend --;
+                    }
+                    if( dirend == filename && *dirend != '/' ) {
+                        dirend = NULL;
+                    }
+                }
                 char *dirname;
                 if( dirend != NULL ) {
-                    dirname = filename;
+                    if( dirend == filename && *dirend == '/' ) {
+                        dirname = "/";
+                        dirend = dirname + 1;
+                    } else {
+                        dirname = filename;
+                    }
                 } else {
-                    dirname = ".";
-                    dirend = dirname + 1;
+                    if( pos[1] == 'D' ) {
+                        dirname = ".";
+                        dirend = dirname + 1;
+                    } else {
+                        dirname = "..";
+                        dirend = dirname + 2;
+                    }
                 }
                 ssize_t dirlen = dirend - dirname;
                 intsize += dirlen;
