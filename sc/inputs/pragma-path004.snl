@@ -2,7 +2,7 @@
 
 // Test Starta 'path' pragmas
 
-pragma path "$D/inputs/my";
+pragma path "./$D/my";
 pragma append "./modules";
 
 use std;

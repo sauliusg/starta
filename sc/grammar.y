@@ -6260,15 +6260,65 @@ static void push_string( char ***array, char *string, cexception_t *ex )
     (*array)[len] = string;
 }
 
+static char *interpolate_string( char *path, char *filename,
+                                 cexception_t *ex )
+{
+    char * volatile interpolated = NULL;
+    char * volatile newint = NULL;
+    ssize_t intsize = 0;
+    char *pos = index( path, '$' );
+    cexception_t inner;
+    
+    interpolated = strdupx( path, ex );
+    intsize = strlen( interpolated + 1 );
+
+    cexception_guard( inner ) {
+        while( pos != NULL ) {
+            if( pos[1] == 'D' ) {
+                char *dirend = rindex( filename, '/' );
+                char *dirname;
+                if( dirend != NULL ) {
+                    dirname = filename;
+                } else {
+                    dirname = ".";
+                    dirend = dirname + 1;
+                }
+                ssize_t dirlen = dirend - dirname;
+                intsize += dirlen;
+                newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
+                strncpy( newint, interpolated, pos - path );
+                strncpy( newint + (pos - path), dirname, dirlen );
+                strncpy( newint + (pos - path) + dirlen,
+                         pos + 2, strlen(interpolated) - (pos+2-path) + 1 );
+                freex( interpolated );
+                interpolated = newint;
+                newint = NULL;
+            }
+            pos = index( pos+1, '$' );
+        } 
+    }
+    cexception_catch {
+        freex( interpolated );
+        freex( newint );
+        cexception_reraise( inner, ex );
+    }
+
+    return interpolated;
+}
+
 static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
                                         char *value, cexception_t *ex )
 {
     if( strcmp( pragma_name, "path" ) == 0 ) {
         freex( c->include_paths );
         c->include_paths = NULL;
-        push_string( &c->include_paths, strdupx( value, ex ), ex );
+        char *interpolated = interpolate_string( value, c->filename, ex );
+        /* printf( ">>> path = '%s'\n>>> interpolated = '%s'\n", value, interpolated ); */
+        push_string( &c->include_paths, interpolated, ex );
     } else if( strcmp( pragma_name, "append" ) == 0 ) {
-        push_string( &c->include_paths, strdupx( value, ex ), ex );
+        char *interpolated = interpolate_string( value, c->filename, ex );
+        /* printf( ">>> path = '%s'\n>>> interpolated = '%s'\n", value, interpolated ); */
+        push_string( &c->include_paths, interpolated, ex );
     } else {
         yyerrorf( "unknown pragma '%s' with string value", pragma_name );
     }
