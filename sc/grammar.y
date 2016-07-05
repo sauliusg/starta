@@ -6313,11 +6313,11 @@ static char *interpolate_string( char *path, char *filename,
                             dirend = dirname + 1;
                         }
                     }
+#if 0
+                    printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
+#endif
                 }
 
-#if 0
-                printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
-#endif
                 ssize_t dirlen = dirend - dirname;
                 intsize += dirlen;
                 newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
