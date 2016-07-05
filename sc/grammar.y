@@ -6276,15 +6276,6 @@ static char *interpolate_string( char *path, char *filename,
         while( pos != NULL ) {
             if( pos[1] == 'D' || pos[1] == 'P' ) {
                 char *dirend = rindex( filename, '/' );
-                if( pos[1] == 'P' && dirend > filename ) {
-                    dirend --;
-                    while( dirend > filename && *dirend != '/' ) {
-                        dirend --;
-                    }
-                    if( dirend == filename && *dirend != '/' ) {
-                        dirend = NULL;
-                    }
-                }
                 char *dirname;
                 if( dirend != NULL ) {
                     if( dirend == filename && *dirend == '/' ) {
@@ -6294,14 +6285,39 @@ static char *interpolate_string( char *path, char *filename,
                         dirname = filename;
                     }
                 } else {
-                    if( pos[1] == 'D' ) {
-                        dirname = ".";
-                        dirend = dirname + 1;
-                    } else {
-                        dirname = "..";
-                        dirend = dirname + 2;
+                    dirname = ".";
+                    dirend = dirname + 1;
+                }
+
+#if 0
+                printf( ">>> $D = '%s' till '%s'\n", dirname, dirend );
+#endif
+                if( pos[1] == 'P' ) {
+                    char *dirnow = dirname;
+                    if( dirend > dirnow ) dirend--;
+                    while( dirend > dirnow && *dirend != '/' ) {
+                        dirend --;
+                    }
+                    if( dirend == dirnow ) {
+                        if( *dirnow == '/' ) {
+                            dirname = "/";
+                            dirend = dirname + 1;
+                        } else if( *dirnow == '.' && dirnow[1] == '.' ) {
+                            dirname = "../..";
+                            dirend = dirname + 5;
+                        } else if( *dirnow == '.' && dirnow[1] == '\0' ) {
+                            dirname = "..";
+                            dirend = dirname + 2;
+                        } else {
+                            dirname = ".";
+                            dirend = dirname + 1;
+                        }
                     }
                 }
+
+#if 0
+                printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
+#endif
                 ssize_t dirlen = dirend - dirname;
                 intsize += dirlen;
                 newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
