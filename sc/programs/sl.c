@@ -51,9 +51,16 @@ static void push_string( char ***array, char *string, cexception_t *ex )
 static void push_path( int argc, char *argv[], int *i,
 		       option_t *opt, cexception_t *ex )
 {
+    cexception_t inner;
     if( *i < argc - 1 ) {
-	/* printf( "Pushing '%s'\n", argv[*i+1] ); */
-	push_string( &include_paths, argv[*i+1], ex );
+        char * volatile path = strdupx( argv[*i+1], ex );
+        cexception_guard( inner ) {
+            push_string( &include_paths, path, &inner );
+        }
+        cexception_catch {
+            freex( path );
+            cexception_reraise( inner, ex );
+        }
 	(*i) ++;
     } else {
 	cexception_raise( ex, SL_EXCEPTION_MISSING_INCLUDE_PATH,
@@ -67,6 +74,7 @@ static void push_environment_paths( char ***include_paths,
                                     cexception_t *ex )
 {
     char *env_value;
+    cexception_t inner;
 
     env_value = getenv( env_varname );
 
@@ -77,7 +85,13 @@ static void push_environment_paths( char ***include_paths,
         if( end && *end == ':' )
             *end = '\0';
 
-        push_string( include_paths, value, ex );
+        cexception_guard( inner ) {
+            push_string( include_paths, value, &inner );
+        }
+        cexception_catch {
+            freex( value );
+            cexception_reraise( inner, ex );
+        }
 
         env_value = strchr( env_value, ':' );
         if( env_value && *env_value == ':' ) env_value++;
