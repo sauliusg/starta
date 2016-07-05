@@ -2,11 +2,9 @@
 
 // Test Starta 'path' pragmas
 
-pragma prepend "$P/sc/inputs/my";
-pragma prepend "./modules";
-
 use std;
 
+pragma append "./inputs/my";
 
 use Mano in "packages.slib";
 

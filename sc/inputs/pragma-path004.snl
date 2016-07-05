@@ -2,8 +2,8 @@
 
 // Test Starta 'path' pragmas
 
-pragma prepend "$P/sc/inputs/my";
-pragma prepend "./modules";
+pragma path "./$D/my";
+pragma append "./modules";
 
 use std;
 
