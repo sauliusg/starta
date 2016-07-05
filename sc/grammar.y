@@ -261,6 +261,20 @@ typedef struct {
 
 } COMPILER;
 
+static void delete_string_array( char ***array )
+{
+    assert( array );
+
+    if( *array ) {
+        ssize_t i;
+        for( i = 0; (*array)[i]; i++ ) {
+            freex( (*array)[i] );
+        }
+        freex( *array );
+    }
+    *array = NULL;
+}
+
 static void compiler_drop_include_file( COMPILER *c );
 
 static void delete_compiler( COMPILER *c )
@@ -317,13 +331,7 @@ static void delete_compiler( COMPILER *c )
         freex( c->module_filename );
         delete_dnode( c->requested_module );
 
-        if( c->include_paths ) {
-            ssize_t i;
-            for( i = 0; c->include_paths[i]; i++ ) {
-                freex( c->include_paths[i] );
-            }
-            freex( c->include_paths );
-        }
+        delete_string_array( &c->include_paths );
 
         freex( c );
     }
@@ -432,14 +440,7 @@ void compiler_pop_compiler_state( COMPILER *c )
     assert( !c->filename );
     c->filename = top->filename;
 
-    if( c->include_paths ) {
-        ssize_t i;
-        for( i = 0; c->include_paths[i]; i ++ ) {
-            freex( c->include_paths[i] );
-        }
-        freex( c->include_paths );
-    }
-
+    delete_string_array( &c->include_paths );
     c->include_paths = top->include_paths;
 
     delete_compiler_state( top );
@@ -6460,8 +6461,7 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
 {
     cexception_t inner;
     if( strcmp( pragma_name, "path" ) == 0 ) {
-        freex( c->include_paths );
-        c->include_paths = NULL;
+        delete_string_array( &c->include_paths );
         char *volatile spath = simplify_path( c->filename, ex );
         char *volatile interpolated = NULL;
         cexception_guard( inner ) {
