@@ -6260,6 +6260,19 @@ static void push_string( char ***array, char *string, cexception_t *ex )
     (*array)[len] = string;
 }
 
+static void unshift_string( char ***array, char *string, cexception_t *ex )
+{
+    ssize_t len = string_count( *array );
+    ssize_t i;
+
+    *array = reallocx( *array, sizeof((*array)[0]) * (len + 2), ex );
+    for( i = len; i > 0; i-- ) {
+        (*array)[i] = (*array)[i-1];
+    }
+    (*array)[len+1] = NULL;
+    (*array)[0] = string;
+}
+
 static char *interpolate_string( char *path, char *filename,
                                  cexception_t *ex )
 {
@@ -6422,6 +6435,23 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
                     ">>> interpolated = '%s'\n", value, spath, interpolated );
 #endif
             push_string( &c->include_paths, interpolated, &inner );
+        }
+        cexception_catch {
+            freex( interpolated );
+            cexception_reraise( inner, ex );
+        }
+        freex( spath );
+    } else if( strcmp( pragma_name, "prepend" ) == 0 ) {
+        char *volatile spath = simplify_path( c->filename, ex );
+        char *volatile interpolated = NULL;
+        cexception_guard( inner ) {
+            interpolated = interpolate_string( value, spath, &inner );
+#if 0
+            printf( ">>> path = '%s'\n>>> spath = '%s'\n"
+                    ">>> interpolated = '%s'\n", value, spath, interpolated );
+#endif
+            push_string( &c->include_paths, interpolated, &inner );
+            unshift_string( &c->include_paths, interpolated, &inner );
         }
         cexception_catch {
             freex( interpolated );
