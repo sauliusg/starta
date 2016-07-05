@@ -6325,19 +6325,93 @@ static char *interpolate_string( char *path, char *filename,
     return interpolated;
 }
 
+/*
+  A simplified path will not contain multiple '/' characters, and will
+  not contain substrings "./". E.g.:
+
+  Original path:                   Simplified path:
+  "./././this///is/a////path//" -> "this/is/a/path/"
+*/
+
+static char *simplify_path( char *path, cexception_t *ex )
+{
+    char *spath = strdupx( path, ex ); /* Simplified path */
+
+    /* Remove duplicated '/' occurences: */
+    char *src, *dst;
+    src = dst = spath;
+    while( *src ) {
+        *dst++ = *src;
+        if( *src == '/' ) {
+            /* Skip repeated '/' occurences: */
+            while( *src == '/' ) src++;
+        } else {
+            /* otherwise, move to the next character: */
+            src ++;
+        }
+    }
+    *dst = '\0';
+
+    /* Remove './' occurences: */
+    src = dst = spath;
+    while( *src ) {
+        if( src[0] == '.' && src[1] == '/' ) {
+            /* Skip the "./" construct: */
+            src += 2;
+            continue;
+        }
+        if( *src == '.' ) {
+            /* Copy '..' directory names: */
+            while( *src == '.' ) {
+                *dst ++ = *src ++;
+            }
+        } else {
+            /* Copy any other characters as they are: */
+            *dst++ = *src++;
+        }
+    }
+    *dst = '\0';
+    return spath;
+}
+
 static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
                                         char *value, cexception_t *ex )
 {
+    cexception_t inner;
     if( strcmp( pragma_name, "path" ) == 0 ) {
         freex( c->include_paths );
         c->include_paths = NULL;
-        char *interpolated = interpolate_string( value, c->filename, ex );
-        /* printf( ">>> path = '%s'\n>>> interpolated = '%s'\n", value, interpolated ); */
-        push_string( &c->include_paths, interpolated, ex );
+        char *volatile spath = simplify_path( c->filename, ex );
+        char *volatile interpolated = NULL;
+        cexception_guard( inner ) {
+            interpolated = interpolate_string( value, spath, &inner );
+#if 0
+            printf( ">>> path = '%s'\n>>> spath = '%s'\n"
+                    ">>> interpolated = '%s'\n", value, spath, interpolated );
+#endif
+            push_string( &c->include_paths, interpolated, &inner );
+        }
+        cexception_catch {
+            freex( interpolated );
+            cexception_reraise( inner, ex );
+        }
+        freex( spath );
     } else if( strcmp( pragma_name, "append" ) == 0 ) {
-        char *interpolated = interpolate_string( value, c->filename, ex );
-        /* printf( ">>> path = '%s'\n>>> interpolated = '%s'\n", value, interpolated ); */
-        push_string( &c->include_paths, interpolated, ex );
+        char *volatile spath = simplify_path( c->filename, ex );
+        char *volatile interpolated = NULL;
+        cexception_guard( inner ) {
+            interpolated = interpolate_string( value, spath, &inner );
+#if 0
+            printf( ">>> path = '%s'\n>>> spath = '%s'\n"
+                    ">>> interpolated = '%s'\n", value, spath, interpolated );
+#endif
+            push_string( &c->include_paths, interpolated, &inner );
+        }
+        cexception_catch {
+            freex( interpolated );
+            cexception_reraise( inner, ex );
+        }
+        freex( spath );
     } else {
         yyerrorf( "unknown pragma '%s' with string value", pragma_name );
     }
