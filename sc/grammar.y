@@ -61,6 +61,7 @@ typedef struct COMPILER_STATE {
     FILE *yyin;
     ssize_t line_no;
     ssize_t column_no;
+    char **include_paths;
     struct COMPILER_STATE *next;
 } COMPILER_STATE;
 
@@ -71,6 +72,43 @@ static void delete_compiler_state( COMPILER_STATE *state )
     }
 }
 
+static ssize_t string_count( char **strings )
+{
+    ssize_t len = 0;
+
+    if( strings )
+      while( strings[len] )
+	len ++;
+
+    return len;
+}
+
+static char** clone_string_array( char **str_array, cexception_t *ex )
+{
+    char ** volatile cloned;
+    ssize_t array_length = string_count( str_array );
+    cexception_t inner;
+    ssize_t i;
+
+    if( !str_array ) return NULL;
+
+    cloned = callocx( sizeof(cloned[0]), array_length + 1, ex );
+    cexception_guard( inner ) {
+        for( i = 0; i < array_length; i ++ ) {
+            cloned[i] = strdupx( str_array[i], &inner );
+        }
+    }
+    cexception_catch {
+        for( i = 0; i < array_length; i ++ ) {
+            if( cloned[i] )
+                freex( cloned[i] );
+        }
+        freex( cloned );
+        cexception_reraise( inner, ex );
+    }
+    return cloned;
+}
+
 static COMPILER_STATE *new_compiler_state( char *filename,
 					   char *use_module_name,
 					   char *module_filename,
@@ -78,10 +116,20 @@ static COMPILER_STATE *new_compiler_state( char *filename,
 					   FILE *file,
 					   ssize_t line_no,
 					   ssize_t column_no,
+                                           char **include_paths,
 					   COMPILER_STATE *next,
 					   cexception_t *ex )
 {
+    cexception_t inner;
     COMPILER_STATE * volatile state = callocx( sizeof( *state ), 1, ex );
+
+    cexception_guard( inner ) {
+        state->include_paths = clone_string_array( include_paths, &inner );
+    }
+    cexception_catch {
+        freex( state );
+        cexception_reraise( inner, ex );
+    }
 
     state->filename = filename;
     state->use_module_name = use_module_name;
@@ -132,11 +180,7 @@ typedef struct {
     ssize_t *addr_stack;
 
     /* Paths to search for included files, modules, and libraries: */
-    char **include_paths; /* these paths are reused between different
-			     compiler instances, can be in the static
-			     memory and therefore should not be
-			     deleted (freed) in
-			     delete_compiler()... */
+    char **include_paths;
 
     /* The following fields are used to process include files and
        modules: */
@@ -273,6 +317,14 @@ static void delete_compiler( COMPILER *c )
         freex( c->module_filename );
         delete_dnode( c->requested_module );
 
+        if( c->include_paths ) {
+            ssize_t i;
+            for( i = 0; c->include_paths[i]; i++ ) {
+                freex( c->include_paths[i] );
+            }
+            freex( c->include_paths );
+        }
+
         freex( c );
     }
 }
@@ -350,6 +402,7 @@ static void compiler_push_compiler_state( COMPILER *c,
                                  c->yyin,
 				 compiler_flex_current_line_number(),
 				 compiler_flex_current_position(),
+                                 c->include_paths,
 				 c->include_files, ex );
 
     c->filename = NULL;
@@ -378,6 +431,16 @@ void compiler_pop_compiler_state( COMPILER *c )
     c->include_files = top->next;
     assert( !c->filename );
     c->filename = top->filename;
+
+    if( c->include_paths ) {
+        ssize_t i;
+        for( i = 0; c->include_paths[i]; i ++ ) {
+            freex( c->include_paths[i] );
+        }
+        freex( c->include_paths );
+    }
+
+    c->include_paths = top->include_paths;
 
     delete_compiler_state( top );
 }
@@ -6240,17 +6303,6 @@ static void compiler_check_type_contains_non_null_ref( TNODE *tnode )
     }
 }
 
-static ssize_t string_count( char **strings )
-{
-    ssize_t len = 0;
-
-    if( strings )
-      while( strings[len] )
-	len ++;
-
-    return len;
-}
-
 static void push_string( char ***array, char *string, cexception_t *ex )
 {
     ssize_t len = string_count( *array );
@@ -6431,7 +6483,7 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
         cexception_guard( inner ) {
             interpolated = interpolate_string( value, spath, &inner );
 #if 0
-            printf( ">>> path = '%s'\n>>> spath = '%s'\n"
+            printf( ">>> appending path = '%s'\n>>> spath = '%s'\n"
                     ">>> interpolated = '%s'\n", value, spath, interpolated );
 #endif
             push_string( &c->include_paths, interpolated, &inner );
@@ -6447,10 +6499,9 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
         cexception_guard( inner ) {
             interpolated = interpolate_string( value, spath, &inner );
 #if 0
-            printf( ">>> path = '%s'\n>>> spath = '%s'\n"
+            printf( ">>> prepending path = '%s'\n>>> spath = '%s'\n"
                     ">>> interpolated = '%s'\n", value, spath, interpolated );
 #endif
-            push_string( &c->include_paths, interpolated, &inner );
             unshift_string( &c->include_paths, interpolated, &inner );
         }
         cexception_catch {
