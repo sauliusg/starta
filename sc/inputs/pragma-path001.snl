@@ -1,0 +1,11 @@
+// --*- C -*--
+
+// Test Starta 'path' pragmas
+
+use std;
+
+pragma append "./inputs/my";
+
+use Mano in "packages.slib";
+
+. Mano::greeting( "Starta" );
