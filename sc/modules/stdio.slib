@@ -46,19 +46,20 @@ inline bytecode function feof( f : file ) : bool
     FEOF
 }
 
-inline bytecode function arguments() :  array of string
+inline bytecode function arguments( long first = 0;
+                                    long last = -1 ) : array of string
 {
     ALLOCARGV
 }
 
 inline bytecode function argument( int i ) :  string
 {
-    ALLOCARGV SWAP INDEX PLDI
+    LDC 0 LDC -1 ALLOCARGV SWAP INDEX PLDI
 }
 
 inline bytecode function narguments() :  int
 {
-    ALLOCARGV LENGTH
+    LDC 0 LDC -1 ALLOCARGV LENGTH
 }
 
 inline bytecode function environment() :  array of string
