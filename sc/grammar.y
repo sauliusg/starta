@@ -4650,6 +4650,8 @@ static int compiler_check_and_emit_program_arguments( COMPILER *cc,
 		retval = 0;
 	    }
 	    if( n == 1 ) {
+                compiler_emit( cc, ex, "\tcI\n", LDC, 0 );
+                compiler_emit( cc, ex, "\tcI\n", LDC, -1 );
 		compiler_emit( cc, ex, "\tcT\n", ALLOCARGV, "(* argv *)" );
 	    } else {
 		compiler_emit( cc, ex, "\tcT\n", ALLOCENV, "(* env *)" );

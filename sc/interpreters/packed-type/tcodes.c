@@ -1790,30 +1790,37 @@ int JMP( INSTRUCTION_FN_ARGS )
  ALLOCARGV
 
  stack:
- --> array of string
+ first, last --> array of string
  
  */
 
 int ALLOCARGV( INSTRUCTION_FN_ARGS )
 {
+    ssize_t first = istate.ep[1].num.ssize;
+    ssize_t last = istate.ep[0].num.ssize;
     char **ptr = NULL;
-    int i;
+    ssize_t i;
 
     TRACE_FUNCTION();
 
-    istate.ep --;
+    istate.ep ++;
 
-    if( istate.argc >= 0 && istate.argv != NULL ) {
+    if( first < 0 ) first = 0;
+    if( last < 0 || last > istate.argc ) last = istate.argc;
 
-	ptr = bcalloc_array( REF_SIZE, istate.argc + 1, 1, EXCEPTION );
+    if( last >= first && istate.argv != NULL ) {
+
+        ssize_t length = last - first + 1;
+	ptr = bcalloc_array( REF_SIZE, length, 1, EXCEPTION );
 
 	BC_CHECK_PTR( ptr );
 	STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
-	for( i = 0; i <= istate.argc; i++ ) {
-	    ptr[i] = bcalloc_blob( strlen( istate.argv[i]) + 1, EXCEPTION );
-	    BC_CHECK_PTR( ptr[i] );
-	    strcpy( ptr[i], istate.argv[i] );
+	for( i = first; i <= last; i++ ) {
+            ssize_t k = i - first;
+	    ptr[k] = bcalloc_blob( strlen( istate.argv[i]) + 1, EXCEPTION );
+	    BC_CHECK_PTR( ptr[k] );
+	    strcpy( ptr[k], istate.argv[i] );
 	}
     }
 
