@@ -1,0 +1,19 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author$
+//$Date$ 
+//$Revision$
+//$URL$
+//---------------------------------------------------------------------------*/
+//*
+// Matrix inversion using pivoted Gauss-Jordan elimination.
+//**
+
+module LDMatInvGJ
+
+use * from std;
+
+type melement = ldouble;
+
+include "MatInvGJ.inc" ;
+
+end module LDMatInvGJ;
