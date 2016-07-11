@@ -4526,7 +4526,6 @@ static void compiler_compile_type_declaration( COMPILER *cc,
                                                cexception_t *ex )
 {
     cexception_t inner;
-    ANODE * volatile suffix = NULL;
     TNODE *tnode = NULL;
     char * volatile type_name = NULL;
 
@@ -4545,9 +4544,7 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	} else if( type_descr != cc->current_type ) {
 	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
 				    type_name, &inner );
-	    suffix = new_anode_string_attribute( "suffix", tnode_name( tnode ),
-						 &inner );
-	    tnode_set_attribute( tnode, suffix, &inner );
+            tnode_set_suffix( tnode, tnode_name( tnode ), &inner );
 	} else {
 	    tnode = type_descr;
 	}
@@ -4561,10 +4558,8 @@ static void compiler_compile_type_declaration( COMPILER *cc,
     }
     cexception_catch {
 	freex( type_name );
-	delete_anode( suffix );
 	cexception_reraise( inner, ex );
     }
-    delete_anode( suffix );
 }
 
 static ssize_t compiler_native_type_size( const char *name )
