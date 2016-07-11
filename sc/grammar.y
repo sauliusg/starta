@@ -9885,6 +9885,37 @@ delimited_type_declaration
             cexception_reraise( inner, px );
         }
       }
+
+  | type_declaration_start '=' _NEW var_type_description struct_or_class_body
+      {
+        cexception_t inner;
+        TNODE * type_description = $4;
+        TNODE * volatile ntype = NULL; /* new type */
+	compiler_end_scope( compiler, px );
+        cexception_guard( inner ) {
+            ntype = new_tnode_derived( type_description, &inner );
+            assert( compiler->current_type );
+#if 0
+            tnode_set_name( ntype, tnode_name( compiler->current_type ),
+                            &inner );
+#endif
+
+            tnode_move_operators( ntype, $5 );
+
+            if( tnode_suffix( $5 )) {
+                tnode_set_suffix( ntype, tnode_suffix( $5 ), px );
+            }
+
+            delete_tnode( $5 );
+            $5 = NULL;
+            compiler_compile_type_declaration( compiler, ntype, &inner );
+        }
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
+      }
+
   | type_declaration_start '=' delimited_type_description initialiser
       {
         compiler_compile_drop( compiler, px );
