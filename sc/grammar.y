@@ -9899,6 +9899,8 @@ delimited_type_declaration
 
             if( tnode_suffix( $5 )) {
                 tnode_set_suffix( ntype, tnode_suffix( $5 ), px );
+            } else {
+                tnode_set_suffix( ntype, tnode_name( compiler->current_type ), px );
             }
 
             delete_tnode( $5 );
