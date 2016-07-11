@@ -7,7 +7,7 @@
 
 use * from std;
 
-type cm = like float {
+type cm = new float {
     inline bytecode operator "/" ( c1, c2 : cm ) : float
         {
           SLDC "This is the cm \"/\" operator\n"
