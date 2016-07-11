@@ -29,3 +29,7 @@ var float x = c1/c2;
 var a, b : cm = 1.1, 2.2;
 
 . a + b;
+
+. a + x;
+. a / x;
+. a / b;

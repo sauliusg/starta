@@ -1,0 +1,40 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+type cell = new int;
+type voxel = new float {suffix = "vx"};
+type pixel = new float {suffix = "px"};
+
+// Types 'voxel' and 'pixel' should be identical to 'float'
+
+var x, y, z : float;
+var v1, v2, v3 : voxel;
+var p1, p2, p3 : pixel = 1.1 pixel, 2.2 pixel, 3.3 pixel;
+
+v1 = v2 = 10. voxel;
+v3 = 1.13E1 vx;
+
+// x = v1; // ERROR, incompatible types.
+v1 = p3 = y; // OK?
+
+// v1 = p3; // ERROR
+
+var m = new voxel[100];
+var n : array of pixel;
+
+m = [ 20.7 , 30.1, 40.11 ];
+
+// n = m; // ERROR, incompatible types.
+n = new pixel[100];
+n[1] = 11.1 px;
+n := [ 10.0 px, 11.2 px, 12.4 px];
+
+z = m[0] + v2 + p3 + x;
+
+z += n[0] + v2 + p3 + x;
+
+. n[1];
+. "%3.4f" %% z;
