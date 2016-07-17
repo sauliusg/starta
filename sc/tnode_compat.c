@@ -327,7 +327,7 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 	return 1;
     }
 
-#if 0
+#if 1
     if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
         return tnode_types_are_identical( t1->base_type, t2, 
                                           generic_types, ex );
