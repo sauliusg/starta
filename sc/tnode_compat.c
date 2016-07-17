@@ -368,7 +368,7 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
-#if 1
+#if 0
     if( t1->kind == TK_DERIVED && t2->kind != TK_DERIVED ) {
 	return tnode_types_are_compatible( t1->base_type, t2,
 					   generic_types, ex );
