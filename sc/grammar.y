@@ -4513,7 +4513,13 @@ static void compiler_compile_indexing( COMPILER *cc,
             enode_reset_flags( cc->e_stack, EF_IS_READONLY );
         }
     } else if( expr_count == -1 ) {
-	assert( 0 );
+        int one = 1;
+        TNODE *top_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
+        compiler_emit( cc, ex, "\tc\n", OVER );
+        compiler_emit( cc, ex, "\tc\n", LENGTH );
+        compiler_emit( cc, ex, "\tcec\n", LDC, &one, SUB );
+        compiler_push_typed_expression( cc, share_tnode( top_type ), ex );
+        compiler_compile_subarray( cc, ex );
     } else if( expr_count == 2 ) {
         compiler_compile_subarray( cc, ex );
     } else {
@@ -4526,7 +4532,6 @@ static void compiler_compile_type_declaration( COMPILER *cc,
                                                cexception_t *ex )
 {
     cexception_t inner;
-    ANODE * volatile suffix = NULL;
     TNODE *tnode = NULL;
     char * volatile type_name = NULL;
 
@@ -4545,9 +4550,7 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	} else if( type_descr != cc->current_type ) {
 	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
 				    type_name, &inner );
-	    suffix = new_anode_string_attribute( "suffix", tnode_name( tnode ),
-						 &inner );
-	    tnode_set_attribute( tnode, suffix, &inner );
+            tnode_set_suffix( tnode, tnode_name( tnode ), &inner );
 	} else {
 	    tnode = type_descr;
 	}
@@ -4561,10 +4564,8 @@ static void compiler_compile_type_declaration( COMPILER *cc,
     }
     cexception_catch {
 	freex( type_name );
-	delete_anode( suffix );
 	cexception_reraise( inner, ex );
     }
-    delete_anode( suffix );
 }
 
 static ssize_t compiler_native_type_size( const char *name )
