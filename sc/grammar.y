@@ -4516,6 +4516,7 @@ static void compiler_compile_indexing( COMPILER *cc,
         int one = 1;
         TNODE *top_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
         compiler_emit( cc, ex, "\tc\n", OVER );
+#warning "FIXME: make sure the LENGTH type is compatible with the top of the stack, use the 'length' operator. S.G."
         compiler_emit( cc, ex, "\tc\n", LENGTH );
         compiler_emit( cc, ex, "\tcec\n", LDC, &one, SUB );
         compiler_push_typed_expression( cc, share_tnode( top_type ), ex );
