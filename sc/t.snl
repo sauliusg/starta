@@ -27,4 +27,9 @@ x = a; // ERROR
 a = t; // ERROR
 
 x = y + k; // OK
+x = y + z; // OK
+
+a = b + c; // OK
+t = u + v; // OK
+
 c = b + j; // ERROR
