@@ -1,35 +1,17 @@
-#
-# Snail compiler tests
-#
-#
-# Test compatibility of synonims with overriden operators.
-#
+// --*- C -*--
 
-use * from std;
+// Test derived types.
 
-type cm = new float {
-    inline bytecode operator "/" ( c1, c2 : cm ) : float
-        {
-          SLDC "This is the cm \"/\" operator\n"
-          SPRINT
-          FDIV
-        }
-};
+use std;
 
-var c1, c2 : cm;
+type synint = int;
+type newint = new int;
+type newint2 = new int;
 
-c1 = 5 cm;
-c2 = 2 cm;
+var i, j, k : int;
+var x, y, z : synint;
+var a, b, c : newint;
+var t, u, v : newint2;
 
-var float x = c1/c2;
-. x;
-
-. c1 + c2, "cm";
-
-var a, b : cm = 1.1, 2.2;
-
-. a + b;
-
-. a + x;
-. a / x;
-. a / b;
+t = a + t; // ERROR
+t = t + a; // ERROR

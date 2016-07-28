@@ -1,14 +1,29 @@
+./sl: inputs/err-syntype002.snl(20,6): ERROR, incompatible types for assignment to variable 'c'
+c = f; // ERROR, new derived type is NOT compatible with the base type
+     ^
 ./sl: inputs/err-syntype002.snl(21,6): ERROR, incompatible types for assignment to variable 'f'
 f = c; // ERROR if there is not conversion '@float', OK otherwise
+     ^
+./sl: inputs/err-syntype002.snl(23,6): ERROR, incompatible types for assignment to variable 'v'
+v = f; // ERROR, new derived type is NOT compatible with the base type
      ^
 ./sl: inputs/err-syntype002.snl(24,6): ERROR, incompatible types for assignment to variable 'f'
 f = v; // ERROR if there is not conversion '@float', OK otherwise
      ^
+./sl: inputs/err-syntype002.snl(27,14): ERROR, incompatible types for assignment to variable 'c'
+c = a + b + f; # ERROR, 'float' is not the same as 'cell'
+             ^
+./sl: inputs/err-syntype002.snl(30,10): ERROR, incompatible types for assignment to variable 'v'
+v = u + g; # ERROR, 'voxel' and 'float' are different types
+         ^
 ./sl: inputs/err-syntype002.snl(31,14): ERROR, incompatible types for assignment to variable 'v'
 v = u + f + c; # ERROR, 'float' and 'voxel' are different types
              ^
 ./sl: inputs/err-syntype002.snl(33,10): ERROR, incompatible types for assignment to variable 'c'
 c = a + v; // ERROR, 'cell' and 'voxel' are incompatible
+         ^
+./sl: inputs/err-syntype002.snl(34,10): ERROR, incompatible types for assignment to variable 'v'
+v = w + b; // ERROR, 'cell' and 'voxel' are incompatible
          ^
 ./sl: inputs/err-syntype002.snl(36,6): ERROR, incompatible types for assignment to variable 'v'
 v = c; // ERROR, 'voxel' and 'cell' are assignment-incompatible
@@ -16,5 +31,5 @@ v = c; // ERROR, 'voxel' and 'cell' are assignment-incompatible
 ./sl: inputs/err-syntype002.snl(37,6): ERROR, incompatible types for assignment to variable 'c'
 c = v; // ERROR, 'cell' and 'voxel' are assignment-incompatible
      ^
-./sl: 6 error(s) detected
+./sl: 11 error(s) detected
 
