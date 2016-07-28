@@ -2010,7 +2010,7 @@ static void compiler_check_operator_args( COMPILER *cc,
                 TNODE *expr_type;
 
                 if( !expr ) {
-                    yyerrorf( "too little values in the stack for operator '%s'",
+                    yyerrorf( "too little values on the stack for the operator '%s'",
                               dnode_name( od->operator ));
                     break;
                 }
