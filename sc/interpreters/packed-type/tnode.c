@@ -762,11 +762,9 @@ TNODE *tnode_move_operators( TNODE *dst, TNODE *src )
 {
     assert( dst );
     assert( src );
-    assert( !dst->operators );
-    assert( !dst->conversions );
 
-    dst->operators = src->operators;
-    dst->conversions = src->conversions;
+    dst->operators = dnode_append( src->operators, dst->operators );
+    dst->conversions = dnode_append( src->conversions, dst->conversions );
     src->operators = NULL;
     src->conversions = NULL;
 
