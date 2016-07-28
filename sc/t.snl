@@ -1,22 +1,30 @@
 // --*- C -*--
 
-// Test the anhanced "arguments()" function
+// Test derived types.
 
 use std;
 
-// Operator for printing out array of srings:
-operator "<" ( a : array of string )
-{
-    for var s in a do
-        < "\"" _ s _ "\" "
-    enddo
-}
+type synint = int;
+type newint = new int;
+type newint2 = new int;
 
-operator "." ( a : array of string ) { < a }
+var i, j, k : int;
+var x, y, z : synint;
+var a, b, c : newint;
+var t, u, v : newint2;
 
-. arguments();
-. arguments(1);
-. arguments(2,3);
-. arguments(2,30);
-. arguments(-10,30);
-. arguments(-10,-1);
+x = i; // OK
+j = y; // OK
+
+i = a; // ERROR
+a = i; // ERROR
+
+x = 1; // OK
+a = 2; // ERROR
+a = 2 newint; // OK, explicit constant type
+
+x = a; // ERROR
+a = t; // ERROR
+
+x = y + k; // OK
+c = b + j; // ERROR
