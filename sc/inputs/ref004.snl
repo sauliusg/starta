@@ -1,12 +1,7 @@
 
-// Actually, this program should be diagnosed as errorneous, since
-// class 'C' defaults to a non-null class, but its constructor does
-// not initialise the field 'next'. However, such check is not yet
-// implemented for constructors. S.G.
-
 use * from std;
 
-class C {
+null class C {
     var i : int;
     var next : C;
 
@@ -22,7 +17,7 @@ class C {
 
     method list()
     {
-        < self.i;
+        < self.i, "";
         if !self.next then
             . ""
         else

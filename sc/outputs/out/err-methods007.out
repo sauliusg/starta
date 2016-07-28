@@ -1,14 +1,8 @@
-./sl: inputs/err-methods007.snl(28,12): ERROR, incompatible class method 'getx' ('getx'): old prototype argument 1 has anonymous type, but new prototype has type 'C'
-a.c = new C;
-           ^
-./sl: inputs/err-methods007.snl(28,12): ERROR, incompatible types for assignment
-a.c = new C;
-           ^
 ./sl: inputs/err-methods007.snl(33,8): ERROR, object 'a' does not have method 'setx'
 a->setx( 20 );
        ^
 ./sl: inputs/err-methods007.snl(34,10): ERROR, object 'a' does not have method 'getx'
 . a->getx();
          ^
-./sl: 4 error(s) detected
+./sl: 2 error(s) detected
 
