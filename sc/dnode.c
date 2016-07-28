@@ -148,6 +148,7 @@ DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex )
     delete_tnode( dst->tnode );
     dst->tnode = share_tnode( src->tnode );
 
+    if( dst->code ) freex( dst->code );
     dst->code = callocx( sizeof(dst->code[0]), src->code_length, ex );
     memcpy( dst->code, src->code, sizeof(dst->code[0]) * src->code_length );
     dst->code_length = src->code_length;
