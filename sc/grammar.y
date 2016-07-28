@@ -9899,10 +9899,8 @@ delimited_type_declaration
         cexception_guard( inner ) {
             ntype = new_tnode_derived( type_description, &inner );
             assert( compiler->current_type );
-#if 1
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
-#endif
 
             tnode_copy_operators( ntype, $4, &inner );
             tnode_move_operators( ntype, $5 );
