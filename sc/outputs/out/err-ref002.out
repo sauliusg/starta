@@ -1,0 +1,5 @@
+./sl: inputs/err-ref002.snl(21,23): ERROR, incompatible type of argument 1 for operator '!'
+        if !self.next then
+                      ^
+./sl: 1 error(s) detected
+
