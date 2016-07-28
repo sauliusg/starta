@@ -5,12 +5,12 @@
 use std;
 
 type synint = int;
-type newint = new int;
+type newint1 = new int;
 type newint2 = new int;
 
 var i, j, k : int;
 var x, y, z : synint;
-var a, b, c : newint;
+var a, b, c : newint1;
 var t, u, v : newint2;
 
 t = a + t; // ERROR
