@@ -1,3 +1,4 @@
+-- Implement check to see if constructors initialise non-null fields in classes.
 -- Implement 'pragma path' to manage include, module an library paths
 -- Implement variables $0 (script name), $D (script directory name) and $P (path) for directory management
 -- improvement: reduce number of spurious error messages when a function argument is misspelled.
