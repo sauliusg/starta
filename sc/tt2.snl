@@ -13,5 +13,5 @@ var x, y, z : synint;
 var a, b, c : newint1;
 var t, u, v : newint2;
 
-t = x + t; // ERROR
-t = t + x; // ERROR
+t = i + t; // ERROR
+t = t + i; // ERROR
