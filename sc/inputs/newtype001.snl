@@ -4,10 +4,10 @@
 
 use * from std;
 
-type cell = new int;
-type voxel = new float {suffix = "vx"};
-type pixel = new float {suffix = "px"};
-
+type cell = int;
+type voxel = like float {suffix = "vx"};
+type pixel = like float {suffix = "px"};
+;
 // Types 'voxel' and 'pixel' should be identical to 'float'
 
 var x, y, z : float;
@@ -18,7 +18,7 @@ v1 = v2 = 10. voxel;
 v3 = 1.13E1 vx;
 
 // x = v1; // ERROR, incompatible types.
-v1 = p3 = y; // OK?
+v1 = p3 = y; // OK
 
 // v1 = p3; // ERROR
 

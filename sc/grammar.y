@@ -9343,12 +9343,20 @@ delimited_type_description
     }
     struct_or_class_body
     {
-	$$ = new_tnode_derived( share_tnode( $2 ), px );
+	/* $$ = new_tnode_derived( share_tnode( $2 ), px ); */
+	$$ = new_tnode_equivalent( share_tnode( $2 ), px );
+
+	assert( compiler->current_type );
+        assert( $4 );
+        if( tnode_suffix( $4 )) {
+            tnode_set_suffix( $$, tnode_suffix( $4 ), px );
+        } else {
+            tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
+        }
+
 	$$ = tnode_move_operators( $$, $4 );
 	delete_tnode( $4 );
 	$4 = NULL;
-	assert( compiler->current_type );
-	tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
     }
 
   | type_identifier _OF delimited_type_description
