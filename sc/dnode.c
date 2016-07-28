@@ -158,6 +158,51 @@ DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex )
     return dst;
 }
 
+DNODE* clone_dnode( DNODE *dnode, cexception_t *ex )
+{
+    DNODE * volatile ret = new_dnode( ex );
+    cexception_t inner;
+
+    ret->scope = dnode->scope;
+
+    cexception_guard( inner ) {
+        dnode_shallow_copy( ret, dnode, &inner );
+    }
+    cexception_catch{
+        delete_dnode( ret );
+        cexception_reraise( inner, ex );
+    }
+
+    return ret;
+}
+
+DNODE *clone_dnode_list_with_replaced_types( DNODE *dl, TNODE *old, TNODE *new,
+                                             cexception_t *ex )
+{
+    DNODE * volatile newlist = NULL;
+    DNODE * volatile newnode = NULL;
+    DNODE * curr;
+    cexception_t inner;
+
+    cexception_guard( inner ) {
+        for( curr = dl; curr != NULL; curr = curr->next ) {
+            newnode = clone_dnode( curr, &inner );
+            if( dnode_type( newnode ) == old ) {
+                dnode_replace_type( newnode, share_tnode( new ));
+            }
+            newlist = dnode_append( newlist, newnode );
+            newnode = NULL;
+        }
+    }
+    cexception_catch{
+        delete_dnode( newlist );
+        delete_dnode( newnode );
+        cexception_reraise( inner, ex );
+    }
+
+    return newlist;
+}
+
 DNODE* new_dnode( cexception_t *ex )
 {
     DNODE *node = alloc_dnode( ex );

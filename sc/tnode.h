@@ -133,6 +133,8 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
 
 TNODE *tnode_move_operators( TNODE *dst, TNODE *src );
 
+TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex );
+
 TNODE *tnode_finish_struct( TNODE * volatile node,
 			    cexception_t *ex );
 
