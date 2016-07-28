@@ -9881,7 +9881,7 @@ delimited_type_declaration
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
-            tnode_copy_operators( ntype, $4 );
+            tnode_copy_operators( ntype, $4, &inner );
             compiler_compile_type_declaration( compiler, ntype, &inner );
         }
         cexception_catch {
