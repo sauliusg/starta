@@ -336,25 +336,10 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
                                           generic_types, ex );
     }
 
-#if 1
     if( (t1->kind == TK_NULLREF && tnode_is_non_null_reference( t2 )) ||
         (t2->kind == TK_NULLREF && tnode_is_non_null_reference( t1 ))) {
         return 0;
     }
-#endif
-
-#if 0
-    if( t1->kind != TK_PLACEHOLDER &&
-        tnode_is_non_null_reference( t1 ) !=
-        tnode_is_non_null_reference( t2 )) {
-#if 0
-        printf( ">>> type t1 (%p), \"%s\"\n", t1, tnode_name( t1 ));
-        printf( ">>> type t2 (%p), \"%s\"\n", t2, tnode_name( t2 ));
-        putchar( '\n' );
-#endif
-        return 0;
-    }
-#endif
 
     return tnode_check_type_identity( t1, t2, generic_types, ex );
 }
