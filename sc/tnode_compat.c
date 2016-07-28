@@ -351,7 +351,11 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
 
-#if 1
+    if( tnode_types_are_identical( t1, t2, generic_types, ex )) {
+        return 1;
+    }
+
+#if 0
     if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
         return tnode_types_are_compatible( t1->base_type, t2, 
                                            generic_types, ex );
@@ -377,7 +381,8 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 					  generic_types, ex );
     }
 
-    return tnode_check_type_identity( t1, t2, generic_types, ex );
+    //return tnode_check_type_identity( t1, t2, generic_types, ex );
+    return 0;
 }
 
 static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,

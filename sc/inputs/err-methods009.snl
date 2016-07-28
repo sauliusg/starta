@@ -1,7 +1,7 @@
 
 use * from std;
 
-class C {
+null class C {
     var i : int;
     var next : C;
 
