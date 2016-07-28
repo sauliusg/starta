@@ -1,17 +1,47 @@
-// --*- C -*--
 
-// Test derived types.
+use * from std;
 
-use std;
+class C {
+    var i : int;
+    var next : C;
 
-type synint = int;
-type newint1 = new int {};
-type newint2 = new int {};
+    // constructor C( int x );
 
-var i, j, k : int;
-var x, y, z : synint;
-var a, b, c : newint1;
-var t, u, v : newint2;
+    constructor C( int x )
+    {
+        if x > 0 then
+           self.next = new C( x - 1 );
+        endif;
+        self.i = x;
+    }
 
-t = x + t; // ERROR
-t = t + x; // ERROR
+    method list()
+    {
+        < self.i;
+        if !self.next then
+            . ""
+        else
+            self.next->list()
+        endif
+    }
+}
+
+class D : C {
+    var j : int;
+
+    constructor D( int x )
+        super( x + 3 );
+    {
+        self.j = x;
+    }
+}
+
+
+var c = new C( 5 );
+var d = new D( 5 );
+
+. c.i;
+c->list();
+
+. d.i;
+d->list();
