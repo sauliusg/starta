@@ -9883,7 +9883,7 @@ delimited_type_declaration
                             &inner );
             tnode_copy_operators( ntype, $4, &inner );
             compiler_compile_type_declaration( compiler, ntype, &inner );
-        }
+            ;        }
         cexception_catch {
             delete_tnode( ntype );
             cexception_reraise( inner, px );
@@ -9899,11 +9899,12 @@ delimited_type_declaration
         cexception_guard( inner ) {
             ntype = new_tnode_derived( type_description, &inner );
             assert( compiler->current_type );
-#if 0
+#if 1
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
 #endif
 
+            tnode_copy_operators( ntype, $4, &inner );
             tnode_move_operators( ntype, $5 );
 
             if( tnode_suffix( $5 )) {
