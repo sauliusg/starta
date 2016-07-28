@@ -354,17 +354,6 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
         return 1;
     }
 
-#if 0
-    if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
-        return tnode_types_are_compatible( t1->base_type, t2, 
-                                           generic_types, ex );
-    }
-    if( t2->kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
-        return tnode_types_are_compatible( t1, t2->base_type, 
-                                           generic_types, ex );
-    }
-#endif
-
     if( tnode_is_non_null_reference( t1 )) {
         if( !tnode_is_non_null_reference( t2 )) {
             return 0;
@@ -380,7 +369,6 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 					  generic_types, ex );
     }
 
-    //return tnode_check_type_identity( t1, t2, generic_types, ex );
     return 0;
 }
 
