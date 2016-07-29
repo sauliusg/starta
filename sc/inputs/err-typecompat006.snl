@@ -15,22 +15,22 @@ type matrix = array [][] of float;
 type imperial = array [][] of inches;
 
 var m : matrix = new float[10][20]; // OK
-var a : landmarks = [ [10.0, 10.0], [20.0, 30.0, 40.0] ]; // OK?
-var b : landmarks = new float[10][20]; // OK?
+var a : landmarks = [ [10.0, 10.0], [20.0, 30.0, 40.0] ]; // ERROR
+var b : landmarks = new float[10][20]; // ERROR
 var z : imperial;
 
-b = new float[10][20]; // OK?
-a = new float[10][20]; // OK?
+b = new float[10][20]; // ERROR
+a = new float[10][20]; // ERROR
 z = new inches[10][20]; // OK
-z = new inches[20]; // incompatible
-z = new cm[2][2]; // incompatible
+z = new inches[20]; // ERROR, wrong dimensions
+z = new cm[2][2]; // ERROR, incompatible
 
-m = z; // incompatible
+m = z; // ERROR, incompatible
 
 var mm : array [][] of cm;
 var nn : array [][] of inches;
 
-nn = mm; // incompatible;
+nn = mm; // ERROR, incompatible;
 
 nn = z; // OK
 mm = a; // OK

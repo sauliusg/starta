@@ -1,7 +1,12 @@
 
+// Actually, this program should be diagnosed as errorneous, since
+// class 'C' defaults to a non-null class, but its constructor does
+// not initialise the field 'next'. However, such check is not yet
+// implemented for constructors. S.G.
+
 use * from std;
 
-null class C {
+class C {
     var i : int;
     var next : C;
 
@@ -44,4 +49,4 @@ var d = new D( 5 );
 c->list();
 
 . d.i;
-s->list();
+d->list();
