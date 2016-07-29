@@ -2010,7 +2010,7 @@ static void compiler_check_operator_args( COMPILER *cc,
                 TNODE *expr_type;
 
                 if( !expr ) {
-                    yyerrorf( "too little values in the stack for operator '%s'",
+                    yyerrorf( "too little values on the stack for the operator '%s'",
                               dnode_name( od->operator ));
                     break;
                 }
@@ -7951,7 +7951,7 @@ module_list
 | module_list __COLON_COLON __IDENTIFIER
 {
     DNODE *container = $1;
-    DNODE *module;
+    DNODE *module = NULL;
     if( container ) {
         module = dnode_vartab_lookup_var( container, $3 );
         if( !module ) {
@@ -9350,12 +9350,20 @@ delimited_type_description
     }
     struct_or_class_body
     {
-	$$ = new_tnode_derived( share_tnode( $2 ), px );
+	/* $$ = new_tnode_derived( share_tnode( $2 ), px ); */
+	$$ = new_tnode_equivalent( share_tnode( $2 ), px );
+
+	assert( compiler->current_type );
+        assert( $4 );
+        if( tnode_suffix( $4 )) {
+            tnode_set_suffix( $$, tnode_suffix( $4 ), px );
+        } else {
+            tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
+        }
+
 	$$ = tnode_move_operators( $$, $4 );
 	delete_tnode( $4 );
 	$4 = NULL;
-	assert( compiler->current_type );
-	tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
     }
 
   | type_identifier _OF delimited_type_description
@@ -9880,6 +9888,38 @@ delimited_type_declaration
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
+            tnode_copy_operators( ntype, $4, &inner );
+            compiler_compile_type_declaration( compiler, ntype, &inner );
+            ;        }
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
+      }
+
+  | type_declaration_start '=' _NEW var_type_description struct_or_class_body
+      {
+        cexception_t inner;
+        TNODE * type_description = $4;
+        TNODE * volatile ntype = NULL; /* new type */
+	compiler_end_scope( compiler, px );
+        cexception_guard( inner ) {
+            ntype = new_tnode_derived( type_description, &inner );
+            assert( compiler->current_type );
+            tnode_set_name( ntype, tnode_name( compiler->current_type ),
+                            &inner );
+
+            tnode_copy_operators( ntype, $4, &inner );
+            tnode_move_operators( ntype, $5 );
+
+            if( tnode_suffix( $5 )) {
+                tnode_set_suffix( ntype, tnode_suffix( $5 ), px );
+            } else {
+                tnode_set_suffix( ntype, tnode_name( compiler->current_type ), px );
+            }
+
+            delete_tnode( $5 );
+            $5 = NULL;
             compiler_compile_type_declaration( compiler, ntype, &inner );
         }
         cexception_catch {
@@ -9887,6 +9927,7 @@ delimited_type_declaration
             cexception_reraise( inner, px );
         }
       }
+
   | type_declaration_start '=' delimited_type_description initialiser
       {
         compiler_compile_drop( compiler, px );
