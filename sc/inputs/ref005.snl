@@ -1,7 +1,7 @@
 
 use * from std;
 
-null class C {
+class C {
     var i : int;
     var next : C;
 
@@ -11,6 +11,8 @@ null class C {
     {
         if x > 0 then
            self.next = new C( x - 1 );
+        else
+           self.next = self;
         endif;
         self.i = x;
     }
@@ -18,7 +20,7 @@ null class C {
     method list()
     {
         < self.i;
-        if !self.next then
+        if self.next == self then
             . ""
         else
             self.next->list()
@@ -44,4 +46,4 @@ var d = new D( 5 );
 c->list();
 
 . d.i;
-s->list();
+d->list();
