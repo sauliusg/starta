@@ -761,13 +761,62 @@ TNODE *tnode_move_operators( TNODE *dst, TNODE *src )
 {
     assert( dst );
     assert( src );
+
+    dst->operators = dnode_append( src->operators, dst->operators );
+    dst->conversions = dnode_append( src->conversions, dst->conversions );
+    src->operators = NULL;
+    src->conversions = NULL;
+
+    return dst;
+}
+
+TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    DNODE *dnow = NULL;
+    DNODE * volatile newop = NULL;
+    TNODE * volatile newtype = NULL;
+    DNODE * volatile newargs = NULL;
+    DNODE * volatile newretvals = NULL;
+    cexception_t inner;
+
+    assert( dst );
+    assert( src );
     assert( !dst->operators );
     assert( !dst->conversions );
 
-    dst->operators = src->operators;
-    dst->conversions = src->conversions;
-    src->operators = NULL;
-    src->conversions = NULL;
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    cexception_guard( inner ) {
+        for( dnow = src->operators; dnow != NULL; dnow = dnode_next( dnow )) {
+            TNODE *old_type = dnode_type( dnow );
+            newop = clone_dnode( dnow, &inner );
+
+            newargs =
+                clone_dnode_list_with_replaced_types( tnode_args( old_type ),
+                                                      src, dst, &inner );
+
+            newretvals =
+                clone_dnode_list_with_replaced_types( tnode_retvals( old_type ),
+                                                      src, dst, &inner );
+
+            newtype = new_tnode_operator( tnode_name(old_type), newargs, 
+                                          newretvals, &inner );
+
+            newretvals = newargs = NULL;
+            dnode_replace_type( newop, newtype );
+            newtype = NULL;
+            tnode_insert_single_operator( dst, newop );
+            newop = NULL;
+        }
+    }
+    cexception_catch {
+        delete_dnode( newop );
+        delete_tnode( newtype );
+        delete_dnode( newargs );
+        delete_dnode( newretvals );
+        cexception_reraise( inner, ex );
+    }
 
     return dst;
 }
