@@ -11,7 +11,7 @@ var f : float;
 var v, v1, v2 : voxel;
 var p, p1, p2 : pixel;
 
-p = f;
+p = f; // ERROR, new type is incompatible with its base type
 
 p = p1 + p2; // OK
 

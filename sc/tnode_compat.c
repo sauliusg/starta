@@ -338,9 +338,8 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
                                           generic_types, ex );
     }
 
-    if( t1->kind != TK_PLACEHOLDER &&
-        tnode_is_non_null_reference( t1 ) !=
-        tnode_is_non_null_reference( t2 )) {
+    if( (t1->kind == TK_NULLREF && tnode_is_non_null_reference( t2 )) ||
+        (t2->kind == TK_NULLREF && tnode_is_non_null_reference( t1 ))) {
         return 0;
     }
 
@@ -353,28 +352,14 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
 
-    if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
-        return tnode_types_are_compatible( t1->base_type, t2, 
-                                           generic_types, ex );
-    }
-    if( t2->kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
-        return tnode_types_are_compatible( t1, t2->base_type, 
-                                           generic_types, ex );
+    if( tnode_types_are_identical( t1, t2, generic_types, ex )) {
+        return 1;
     }
 
     if( tnode_is_non_null_reference( t1 )) {
         if( !tnode_is_non_null_reference( t2 )) {
             return 0;
         }
-    }
-
-    if( t1->kind == TK_DERIVED && t2->kind != TK_DERIVED ) {
-	return tnode_types_are_compatible( t1->base_type, t2,
-					   generic_types, ex );
-    }
-    if( t2->kind == TK_DERIVED && t1->kind != TK_DERIVED ) {
-	return tnode_types_are_compatible( t1, t2->base_type,
-					   generic_types, ex );
     }
 
     if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
@@ -386,7 +371,7 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 					  generic_types, ex );
     }
 
-    return tnode_check_type_identity( t1, t2, generic_types, ex );
+    return 0;
 }
 
 static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
@@ -414,11 +399,6 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     if( tnode_is_non_null_reference( t1 ) &&
         !tnode_is_non_null_reference( t2 )) {
         return 0;
-    }
-
-    if( t1->kind == TK_DERIVED ) {
-        return tnode_types_are_assignment_compatible
-            ( t1->base_type, t2, generic_types, msg, msglen, ex );
     }
 
     if( t1->kind == TK_REF ) {

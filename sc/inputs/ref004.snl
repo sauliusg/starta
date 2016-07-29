@@ -17,7 +17,7 @@ null class C {
 
     method list()
     {
-        < self.i;
+        < self.i, "";
         if !self.next then
             . ""
         else
@@ -44,4 +44,4 @@ var d = new D( 5 );
 c->list();
 
 . d.i;
-s->list();
+d->list();
