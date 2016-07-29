@@ -7951,7 +7951,7 @@ module_list
 | module_list __COLON_COLON __IDENTIFIER
 {
     DNODE *container = $1;
-    DNODE *module;
+    DNODE *module = NULL;
     if( container ) {
         module = dnode_vartab_lookup_var( container, $3 );
         if( !module ) {
