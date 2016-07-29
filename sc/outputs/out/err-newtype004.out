@@ -1,0 +1,11 @@
+./sl: inputs/err-newtype004.snl(16,10): ERROR, incompatible type of argument 1 for operator '+'
+t = x + t; // ERROR
+         ^
+./sl: inputs/err-newtype004.snl(17,10): ERROR, incompatible type of argument 1 for operator '+'
+t = t + x; // ERROR
+         ^
+./sl: inputs/err-newtype004.snl(17,10): ERROR, incompatible types for assignment to variable 't'
+t = t + x; // ERROR
+         ^
+./sl: 3 error(s) detected
+

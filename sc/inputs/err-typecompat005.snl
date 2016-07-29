@@ -15,11 +15,11 @@ var i : inches;
 var x : float;
 
 i = 10; // ERROR
-i = 10@float; // OK, float is compatible with its derived types.
-i = 1.; // OK, constant 1. has type 'float' and is compatible with 'inches'.
+i = 10@float; // ERROR
+i = 1.; // ERROR
 i = c; // ERROR
 c = i; // ERROR
-c = x; // OK, base type can be assigned to the synonim
-i = x; // OK, base type can be assigned to the synonim
+c = x; // ERROR
+i = x; // ERROR
 x = i; // ERROR?
 x = c; // ERROR?

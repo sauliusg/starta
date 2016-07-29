@@ -37,6 +37,11 @@ void delete_dnode( DNODE *node );
 
 DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex );
 
+DNODE* clone_dnode( DNODE *dnode, cexception_t *ex );
+
+DNODE *clone_dnode_list_with_replaced_types( DNODE *dl, TNODE *old, TNODE *new,
+                                             cexception_t *ex );
+
 DNODE *new_dnode( cexception_t *ex );
 
 DNODE *new_dnode_name( char *name, cexception_t *ex );

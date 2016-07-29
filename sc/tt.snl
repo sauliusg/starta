@@ -1,9 +1,0 @@
-// --*- C -*--
-
-// Test Starta constants
-
-use std;
-
-type integer = like int { kind = integer; suffix = E };
-
-. 1 E - 2;
