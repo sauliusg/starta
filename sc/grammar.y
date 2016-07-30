@@ -3753,7 +3753,7 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 
     assert( class_tnode );
 
-    fn_dnode = tnode_constructor( class_tnode );
+    fn_dnode = tnode_default_constructor( class_tnode );
 
     if( fn_dnode ) {
 	fn_tnode = dnode_type( fn_dnode );
@@ -11858,7 +11858,7 @@ generator_new
           compiler_check_type_contains_non_null_ref( $2 );
           compiler_compile_alloc( compiler, $2, px );
 
-          constructor_dnode = $2 ? tnode_constructor( $2 ) : NULL;
+          constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
 
           if( constructor_dnode ) {
               /* --- function (constructor) call generation starts here: */
@@ -11911,7 +11911,7 @@ generator_new
           compiler->current_interface_nr = 0;
 
           constructor_dnode = type_tnode ?
-              tnode_constructor( type_tnode ) : NULL;
+              tnode_default_constructor( type_tnode ) : NULL;
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
@@ -12814,7 +12814,7 @@ opt_base_class_initialisation
         compiler->current_interface_nr = 0;
 
         constructor_dnode = base_type_tnode ?
-            tnode_constructor( base_type_tnode ) : NULL;
+            tnode_default_constructor( base_type_tnode ) : NULL;
 
         constructor_tnode = constructor_dnode ?
             dnode_type( constructor_dnode ) : NULL;
