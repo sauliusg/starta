@@ -1887,6 +1887,23 @@ DNODE *tnode_default_constructor( TNODE *tnode )
     return tnode->constructor;
 }
 
+DNODE *tnode_lookup_constructor( TNODE *tnode, const char *name )
+{
+    DNODE *curr;
+
+    if( !name ) return NULL;
+
+    assert( tnode );
+    for( curr = tnode->constructor; curr != NULL; curr = dnode_next( curr )) {
+        char *curr_name = dnode_name( curr );
+        if( curr_name && strcmp( curr_name, name ) == 0 ) {
+            return curr;
+        }
+    }
+
+    return NULL;
+}
+
 DNODE *tnode_destructor( TNODE *tnode )
 {
     assert( tnode );
