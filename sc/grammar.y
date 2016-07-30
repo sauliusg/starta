@@ -11857,8 +11857,8 @@ generator_new
 
           compiler_check_type_contains_non_null_ref( $2 );
           /* The share_tnode($2) is not needed here, since the
-             'compact_type_description' rule already returned an
-             allocated or shated TNODE: */
+             'compact_type_description' rule already returnes an
+             allocated or shared TNODE: */
           compiler_compile_alloc( compiler, $2, px );
 
           constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
@@ -11918,9 +11918,6 @@ generator_new
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
-
-          printf( ">>> type_tnode '%s' rcount = %d\n", tnode_name(type_tnode), tnode_rcount( type_tnode ) );
-          printf( ">>> constructor_tnode rcount = %d\n", tnode_rcount( constructor_tnode ) );
 
           compiler->current_call = share_dnode( constructor_dnode );
 
