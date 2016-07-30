@@ -537,6 +537,14 @@ type int = {
 
     inline bytecode operator "nth-byte"( int i; int index ): byte
         { NthBYTE };
+
+    /* The "last" operator provides teh index of the last array "a"
+    element is is necessary to compile an 'a[i:]' construct with the
+    correct type of the upper limit (the type must be the same as of
+    variable 'i': */
+
+    inline bytecode operator "last"( a : array ): int
+        { LENGTH DEC }
 }
 
 type long = {
@@ -661,6 +669,14 @@ type long = {
 
     inline bytecode operator "nth-byte"( long i; int index ): byte
         { LNthBYTE };
+
+    /* The "last" operator provides teh index of the last array "a"
+    element is is necessary to compile an 'a[i:]' construct with the
+    correct type of the upper limit (the type must be the same as of
+    variable 'i': */
+
+    inline bytecode operator "last"( a : array ): long
+        { LLENGTH LDEC }
 }
 
 type llong = {
