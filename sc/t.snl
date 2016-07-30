@@ -11,16 +11,28 @@ null class C {
     }
 }
 
-var a = new C;
-var b = new C;
-b = new C;
+// var a = new C(1);
+// var b = new C;
+// b = new C(10);
+// a = new C;
+// var c = new C( 3 );
+// var d = new C;
+// var e = new C( 2 );
+// var f = new C( 3 );
+
+var a, b, c, d, e, f, g: C;
+
+a = new C(1);
+b = new C(2);
+c = new C(3);
+d = new C(4);
+
 a = new C;
-var c = new C( 3 );
-var d = new C( 1 );
-var e = new C( 2 );
-var f = new C( 3 );
+b = new C;
+c = new C;
+d = new C;
 
-procedure p( a, b, c, d, e, f: C = null ) {}
-
-p();
-p( new C(0), new C(1), new C(3), new C(4), new C, new C );
+// procedure p( a, b, c, d, e, f: C = null ) {}
+// 
+// p();
+// p( new C(0), new C(1), new C(3), new C, new C );
