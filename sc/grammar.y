@@ -11856,6 +11856,9 @@ generator_new
           DNODE *constructor_dnode;
 
           compiler_check_type_contains_non_null_ref( $2 );
+          /* The share_tnode($2) is not needed here, since the
+             'compact_type_description' rule already returned an
+             allocated or shated TNODE: */
           compiler_compile_alloc( compiler, $2, px );
 
           constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
