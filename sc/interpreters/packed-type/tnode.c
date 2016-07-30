@@ -1881,7 +1881,7 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
     return NULL;
 }
 
-DNODE *tnode_constructor( TNODE *tnode )
+DNODE *tnode_default_constructor( TNODE *tnode )
 {
     assert( tnode );
     return tnode->constructor;
