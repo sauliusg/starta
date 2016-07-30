@@ -1335,13 +1335,28 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
     assert( tnode );
     assert( constructor );
 
-    if( !tnode->constructor || tnode->constructor == constructor ) {
-        tnode->constructor = constructor;
+    char *constructor_name = dnode_name( constructor );
+    DNODE *current_constructor =
+        tnode_lookup_constructor( tnode, constructor_name );
+
+    if( current_constructor == constructor ) {
+        return tnode;
+    }
+
+    if( !current_constructor ) {
+        if( constructor_name && *constructor_name != '\0' ) {
+            /* constructor_name is not "": */
+            tnode->constructor =
+                dnode_append( tnode->constructor, constructor );
+        } else {
+            tnode->constructor =
+                dnode_append( constructor, tnode->constructor );
+        }
     } else {
         if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,
                                                   msg, sizeof(msg))) {
-            yyerrorf( "Prototype of method %s() does not match "
-                      "inherited definition:\n%s", dnode_name( constructor ),
+            yyerrorf( "Prototype of constructor %s() does not match "
+                      "inherited definition -- %s", dnode_name( constructor ),
                       msg );
             delete_dnode( constructor );
         } else {
@@ -1847,10 +1862,27 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
     return NULL;
 }
 
-DNODE *tnode_constructor( TNODE *tnode )
+DNODE *tnode_default_constructor( TNODE *tnode )
 {
     assert( tnode );
     return tnode->constructor;
+}
+
+DNODE *tnode_lookup_constructor( TNODE *tnode, const char *name )
+{
+    DNODE *curr;
+
+    if( !name ) return NULL;
+
+    assert( tnode );
+    for( curr = tnode->constructor; curr != NULL; curr = dnode_next( curr )) {
+        char *curr_name = dnode_name( curr );
+        if( curr_name && strcmp( curr_name, name ) == 0 ) {
+            return curr;
+        }
+    }
+
+    return NULL;
 }
 
 DNODE *tnode_destructor( TNODE *tnode )
