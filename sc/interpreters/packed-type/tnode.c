@@ -55,6 +55,12 @@ void delete_tnode( TNODE *tnode )
     }
 }
 
+int tnode_rcount( TNODE *t )
+{
+    assert( t );
+    return t->rcount;
+}
+
 static void tnode_update_self_parameter_type( TNODE *new_tnode,
 					      TNODE *old_tnode )
 {
