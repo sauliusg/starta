@@ -12840,7 +12840,7 @@ opt_base_class_initialisation
 
 constructor_header
   : opt_function_attributes function_code_start _CONSTRUCTOR
-    __IDENTIFIER '(' argument_list ')'
+    opt_identifier '(' argument_list ')'
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
@@ -12868,16 +12868,22 @@ constructor_header
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
+#if 0
               tnode_insert_constructor( class_tnode, share_dnode( funct ));
-              
+#endif
+
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
+#if 1
 	      funct = $$ =
 		  compiler_check_and_set_constructor( class_tnode, funct, px );
               share_dnode( funct );
+#else
+              $$ = funct;
+#endif
 
               /* Constructors are always functions (?): */
               /* compiler_set_function_arguments_readonly( dnode_type( funct )); */

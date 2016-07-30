@@ -1368,8 +1368,8 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
     } else {
         if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,
                                                   msg, sizeof(msg))) {
-            yyerrorf( "Prototype of method %s() does not match "
-                      "inherited definition:\n%s", dnode_name( constructor ),
+            yyerrorf( "Prototype of constructor %s() does not match "
+                      "inherited definition -- %s", dnode_name( constructor ),
                       msg );
             delete_dnode( constructor );
         } else {
