@@ -3753,7 +3753,7 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 
     assert( class_tnode );
 
-    fn_dnode = tnode_default_constructor( class_tnode );
+    fn_dnode = tnode_lookup_constructor( class_tnode, dnode_name( fn_proto ));
 
     if( fn_dnode ) {
 	fn_tnode = dnode_type( fn_dnode );
@@ -7027,6 +7027,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> operator_header
 %type <s>     opt_as_identifier
 %type <s>     opt_default_module_parameter
+%type <s>     opt_dot_name
 %type <s>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
@@ -11849,6 +11850,13 @@ boolean_expression
   | '(' boolean_expression ')'
   ;
 
+opt_dot_name
+  : '.' __IDENTIFIER
+  { $$ = $2; }
+  | /* empty */
+  { $$ = ""; }
+;
+
 generator_new
   : _NEW compact_type_description
       {
@@ -11897,11 +11905,12 @@ generator_new
           }
       }
 
-  | _NEW type_identifier
+  | _NEW type_identifier opt_dot_name
       {
 	  DNODE *constructor_dnode;
           TNODE *constructor_tnode;
           TNODE *type_tnode = $2;
+          char  *constructor_name = $3;
 
           compiler_check_type_contains_non_null_ref( type_tnode );
           compiler_compile_alloc( compiler, share_tnode( type_tnode ), px );
@@ -11914,7 +11923,14 @@ generator_new
           compiler->current_interface_nr = 0;
 
           constructor_dnode = type_tnode ?
-              tnode_default_constructor( type_tnode ) : NULL;
+              tnode_lookup_constructor( type_tnode, constructor_name ) : NULL;
+
+          if( !constructor_dnode && type_tnode && 
+              constructor_name && *constructor_name == '\0' ) {
+              constructor_dnode =
+                  tnode_lookup_constructor( type_tnode, 
+                                            tnode_name( type_tnode ));
+          }
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
