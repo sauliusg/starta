@@ -29,8 +29,6 @@
 
 void delete_tnode( TNODE *tnode )
 {
-    static int n;
-
     if( tnode ) {
         if( tnode->rcount <= 0 ) {
 	    printf( "!!! tnode->rcount = %ld (%s) !!!\n",
