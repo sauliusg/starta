@@ -2,30 +2,23 @@
 
 use * from std;
 
-class C {
+null class C {
     var i : int;
-
-    (*
-    constructor () {
-        self.i = 1;
-    }
-    *)
-
-    constructor C( int x );
 
     constructor C( int x )
     {
         self.i = x;
     }
-
-    method get_i(): int { return self.i }
 }
 
-var c = new C( 5 );
-var d = new C( 6 );
+var a = new C( 1 );
+var b = new C( 2 );
+var c = new C( 3 );
+var d = new C( 1 );
+var e = new C( 2 );
+var f = new C( 3 );
 
-. c.i;
-. c->get_i();
+procedure p( a, b, c, d, e, f: C = null ) {}
 
-. d.i;
-. d->get_i();
+p();
+p( new C(0), new C(1), new C(3), new C(4) );

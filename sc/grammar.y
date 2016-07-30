@@ -9369,7 +9369,7 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      $$ = new_tnode_derived( share_tnode( composite ), px );
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
     }
@@ -9534,7 +9534,7 @@ undelimited_type_description
   | type_identifier _OF undelimited_or_structure_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      $$ = new_tnode_derived( share_tnode( composite ), px );
       tnode_insert_element_type( $$, $3 );
     }
 
@@ -11576,7 +11576,7 @@ struct_expression
 
   | _TYPE type_identifier _OF delimited_type_description
      {
-	 TNODE *composite = new_tnode_derived( $2, px );
+	 TNODE *composite = new_tnode_derived( share_tnode( $2 ), px );
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
@@ -11856,7 +11856,7 @@ generator_new
           DNODE *constructor_dnode;
 
           compiler_check_type_contains_non_null_ref( $2 );
-          compiler_compile_alloc( compiler, $2, px );
+          compiler_compile_alloc( compiler, share_tnode( $2 ), px );
 
           constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
 
@@ -11901,7 +11901,7 @@ generator_new
           TNODE *type_tnode = $2;
 
           compiler_check_type_contains_non_null_ref( type_tnode );
-          compiler_compile_alloc( compiler, type_tnode, px );
+          compiler_compile_alloc( compiler, share_tnode( type_tnode ), px );
 
           /* --- function call generation starts here: */
 
@@ -11915,6 +11915,9 @@ generator_new
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
+
+          printf( ">>> type_tnode rcount = %d\n", tnode_rcount( type_tnode ) );
+          printf( ">>> constructor_tnode rcount = %d\n", tnode_rcount( constructor_tnode ) );
 
           compiler->current_call = share_dnode( constructor_dnode );
 
@@ -12853,6 +12856,8 @@ constructor_header
     	  cexception_guard( inner ) {
               TNODE *class_tnode = compiler->current_type;
 
+              // share_tnode( class_tnode );
+
               assert( class_tnode );
               self_dnode = new_dnode_name( "self", &inner );
               dnode_insert_type( self_dnode, share_tnode( class_tnode ));
@@ -13026,7 +13031,7 @@ field_designator
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
         TNODE *composite = $2;
-        composite = new_tnode_derived( composite, px );
+        composite = new_tnode_derived( share_tnode( composite ), px );
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
