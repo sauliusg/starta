@@ -5,29 +5,36 @@ use * from std;
 class C {
     var i : int;
 
-    constructor C( int x = 1 )
+    constructor ( int x = 10 ) {
+        self.i = x;
+    }
+
+    constructor C( int x );
+
+    constructor C( int x )
     {
         self.i = x;
     }
 
-    method pi() { . self.i }
+    constructor negative()
+    {
+        self.i = -1;
+    }
+
+    method get_i(): int { return self.i }
 }
 
-var a = new C(1);
-var b = new C;
-a->pi();
-b->pi();
+var a = new C;
+var b = new C();
+var c = new C(11);
 
-a = new C(10);
-b = new C(11);
-var c = new C( 3 );
-var d = new C( 4 );
-var e = new C( 2 );
-var f = new C( 3 );
-
-a->pi();
-b->pi();
-c->pi();
-d->pi();
-e->pi();
-f->pi();
+var d = new C.C( 22 );
+var e = new C.C( 33 );
+var f = new C.negative();
+ 
+. a->get_i();
+. b->get_i();
+. c->get_i();
+. d->get_i();
+. e->get_i();
+. f->get_i();
