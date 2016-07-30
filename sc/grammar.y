@@ -3753,7 +3753,7 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 
     assert( class_tnode );
 
-    fn_dnode = tnode_constructor( class_tnode );
+    fn_dnode = tnode_lookup_constructor( class_tnode, dnode_name( fn_proto ));
 
     if( fn_dnode ) {
 	fn_tnode = dnode_type( fn_dnode );
@@ -7024,6 +7024,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> operator_header
 %type <s>     opt_as_identifier
 %type <s>     opt_default_module_parameter
+%type <s>     opt_dot_name
 %type <s>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
@@ -9366,7 +9367,7 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      $$ = new_tnode_derived( share_tnode( composite ), px );
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
     }
@@ -9531,7 +9532,7 @@ undelimited_type_description
   | type_identifier _OF undelimited_or_structure_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      $$ = new_tnode_derived( share_tnode( composite ), px );
       tnode_insert_element_type( $$, $3 );
     }
 
@@ -11573,7 +11574,7 @@ struct_expression
 
   | _TYPE type_identifier _OF delimited_type_description
      {
-	 TNODE *composite = new_tnode_derived( $2, px );
+	 TNODE *composite = new_tnode_derived( share_tnode( $2 ), px );
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
@@ -11846,6 +11847,13 @@ boolean_expression
   | '(' boolean_expression ')'
   ;
 
+opt_dot_name
+  : '.' __IDENTIFIER
+  { $$ = $2; }
+  | /* empty */
+  { $$ = ""; }
+;
+
 generator_new
   : _NEW compact_type_description
       {
@@ -11853,9 +11861,12 @@ generator_new
           DNODE *constructor_dnode;
 
           compiler_check_type_contains_non_null_ref( $2 );
+          /* The share_tnode($2) is not needed here, since the
+             'compact_type_description' rule already returnes an
+             allocated or shared TNODE: */
           compiler_compile_alloc( compiler, $2, px );
 
-          constructor_dnode = $2 ? tnode_constructor( $2 ) : NULL;
+          constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
 
           if( constructor_dnode ) {
               /* --- function (constructor) call generation starts here: */
@@ -11891,14 +11902,15 @@ generator_new
           }
       }
 
-  | _NEW type_identifier
+  | _NEW type_identifier opt_dot_name
       {
 	  DNODE *constructor_dnode;
           TNODE *constructor_tnode;
           TNODE *type_tnode = $2;
+          char  *constructor_name = $3;
 
           compiler_check_type_contains_non_null_ref( type_tnode );
-          compiler_compile_alloc( compiler, type_tnode, px );
+          compiler_compile_alloc( compiler, share_tnode( type_tnode ), px );
 
           /* --- function call generation starts here: */
 
@@ -11908,7 +11920,14 @@ generator_new
           compiler->current_interface_nr = 0;
 
           constructor_dnode = type_tnode ?
-              tnode_constructor( type_tnode ) : NULL;
+              tnode_lookup_constructor( type_tnode, constructor_name ) : NULL;
+
+          if( !constructor_dnode && type_tnode && 
+              constructor_name && *constructor_name == '\0' ) {
+              constructor_dnode =
+                  tnode_lookup_constructor( type_tnode, 
+                                            tnode_name( type_tnode ));
+          }
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
@@ -12811,7 +12830,7 @@ opt_base_class_initialisation
         compiler->current_interface_nr = 0;
 
         constructor_dnode = base_type_tnode ?
-            tnode_constructor( base_type_tnode ) : NULL;
+            tnode_default_constructor( base_type_tnode ) : NULL;
 
         constructor_tnode = constructor_dnode ?
             dnode_type( constructor_dnode ) : NULL;
@@ -12837,7 +12856,7 @@ opt_base_class_initialisation
 
 constructor_header
   : opt_function_attributes function_code_start _CONSTRUCTOR
-    __IDENTIFIER '(' argument_list ')'
+    opt_identifier '(' argument_list ')'
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
@@ -12849,6 +12868,8 @@ constructor_header
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = compiler->current_type;
+
+              // share_tnode( class_tnode );
 
               assert( class_tnode );
               self_dnode = new_dnode_name( "self", &inner );
@@ -12865,16 +12886,22 @@ constructor_header
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
+#if 0
               tnode_insert_constructor( class_tnode, share_dnode( funct ));
-              
+#endif
+
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
+#if 1
 	      funct = $$ =
 		  compiler_check_and_set_constructor( class_tnode, funct, px );
               share_dnode( funct );
+#else
+              $$ = funct;
+#endif
 
               /* Constructors are always functions (?): */
               /* compiler_set_function_arguments_readonly( dnode_type( funct )); */
@@ -13017,7 +13044,7 @@ field_designator
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
         TNODE *composite = $2;
-        composite = new_tnode_derived( composite, px );
+        composite = new_tnode_derived( share_tnode( composite ), px );
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         

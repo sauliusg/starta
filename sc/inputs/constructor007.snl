@@ -1,0 +1,22 @@
+//--*- C -*--
+
+use * from std;
+
+class C {
+    var i : int;
+
+    constructor C( int x = -1 )
+    {
+        self.i = x;
+    }
+
+    method get_i(): int { return self.i }
+}
+
+var a = new C;
+var b = new C();
+var c = new C(11);
+
+. a->get_i();
+. b->get_i();
+. c->get_i();

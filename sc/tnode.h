@@ -276,7 +276,9 @@ TNODE *tnode_set_integer_attribute( TNODE *tnode, const char *attr_name,
 TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 				   const char *attr_value, cexception_t *ex );
 
-DNODE *tnode_constructor( TNODE *tnode );
+DNODE *tnode_default_constructor( TNODE *tnode );
+
+DNODE *tnode_lookup_constructor( TNODE *tnode, const char *name );
 
 DNODE *tnode_destructor( TNODE *tnode );
 

@@ -1,0 +1,33 @@
+//--*- C -*--
+
+use * from std;
+
+class C {
+    var i : int;
+
+    constructor C( int x = 1 )
+    {
+        self.i = x;
+    }
+
+    method pi() { . self.i }
+}
+
+var a = new C(1);
+var b = new C;
+a->pi();
+b->pi();
+
+a = new C(10);
+b = new C(11);
+var c = new C( 3 );
+var d = new C( 4 );
+var e = new C( 2 );
+var f = new C( 3 );
+
+a->pi();
+b->pi();
+c->pi();
+d->pi();
+e->pi();
+f->pi();
