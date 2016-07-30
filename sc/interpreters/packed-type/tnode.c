@@ -32,9 +32,6 @@ void delete_tnode( TNODE *tnode )
     static int n;
 
     if( tnode ) {
-        if( tnode == 0x81011f0 ) {
-            printf( ">>> %d: deleting TNODE %p, rcount = %d\n", ++n, tnode, tnode->rcount );
-        }
         if( tnode->rcount <= 0 ) {
 	    printf( "!!! tnode->rcount = %ld (%s) !!!\n",
 		    tnode->rcount, tnode_kind_name(tnode) );
@@ -58,12 +55,6 @@ void delete_tnode( TNODE *tnode )
 	delete_tnode( tnode->next );
 	free_tnode( tnode );
     }
-}
-
-int tnode_rcount( TNODE *t )
-{
-    assert( t );
-    return t->rcount;
 }
 
 static void tnode_update_self_parameter_type( TNODE *new_tnode,
