@@ -4513,16 +4513,10 @@ static void compiler_compile_indexing( COMPILER *cc,
             enode_reset_flags( cc->e_stack, EF_IS_READONLY );
         }
     } else if( expr_count == -1 ) {
-        // int one = 1;
         TNODE *top_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
-        // compiler_emit( cc, ex, "\tc\n", OVER );
         compiler_compile_over( cc, ex );
-#warning "FIXME: make sure the LENGTH type is compatible with the top of the stack, use the 'length' operator. S.G."        
-        // compiler_emit( cc, ex, "\tc\n", LENGTH );
-        // compiler_emit( cc, ex, "\tcec\n", LDC, &one, SUB );
         compiler_check_and_compile_operator( cc, top_type, "last", 1,
                                              /* fixups = */ NULL, ex );
-        // compiler_push_typed_expression( cc, share_tnode( top_type ), ex );
         compiler_compile_subarray( cc, ex );
     } else if( expr_count == 2 ) {
         compiler_compile_subarray( cc, ex );
