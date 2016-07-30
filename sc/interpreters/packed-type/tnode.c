@@ -29,7 +29,12 @@
 
 void delete_tnode( TNODE *tnode )
 {
+    static int n;
+
     if( tnode ) {
+        if( tnode == 0x81011f0 ) {
+            printf( ">>> %d: deleting TNODE %p, rcount = %d\n", ++n, tnode, tnode->rcount );
+        }
         if( tnode->rcount <= 0 ) {
 	    printf( "!!! tnode->rcount = %ld (%s) !!!\n",
 		    tnode->rcount, tnode_kind_name(tnode) );

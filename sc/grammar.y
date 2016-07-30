@@ -11856,7 +11856,7 @@ generator_new
           DNODE *constructor_dnode;
 
           compiler_check_type_contains_non_null_ref( $2 );
-          compiler_compile_alloc( compiler, share_tnode( $2 ), px );
+          compiler_compile_alloc( compiler, $2, px );
 
           constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
 
@@ -11916,7 +11916,7 @@ generator_new
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
 
-          printf( ">>> type_tnode rcount = %d\n", tnode_rcount( type_tnode ) );
+          printf( ">>> type_tnode '%s' rcount = %d\n", tnode_name(type_tnode), tnode_rcount( type_tnode ) );
           printf( ">>> constructor_tnode rcount = %d\n", tnode_rcount( constructor_tnode ) );
 
           compiler->current_call = share_dnode( constructor_dnode );

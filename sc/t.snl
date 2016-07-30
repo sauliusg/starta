@@ -5,14 +5,16 @@ use * from std;
 null class C {
     var i : int;
 
-    constructor C( int x )
+    constructor C( int x = 1 )
     {
         self.i = x;
     }
 }
 
-var a = new C( 1 );
-var b = new C( 2 );
+var a = new C;
+var b = new C;
+b = new C;
+a = new C;
 var c = new C( 3 );
 var d = new C( 1 );
 var e = new C( 2 );
@@ -21,4 +23,4 @@ var f = new C( 3 );
 procedure p( a, b, c, d, e, f: C = null ) {}
 
 p();
-p( new C(0), new C(1), new C(3), new C(4) );
+p( new C(0), new C(1), new C(3), new C(4), new C, new C );
