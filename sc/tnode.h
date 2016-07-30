@@ -278,6 +278,8 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 
 DNODE *tnode_default_constructor( TNODE *tnode );
 
+DNODE *tnode_lookup_constructor( TNODE *tnode, const char *name );
+
 DNODE *tnode_destructor( TNODE *tnode );
 
 TNODE *tnode_next( TNODE* list );
