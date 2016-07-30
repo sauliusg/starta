@@ -18,8 +18,6 @@ class C {
         self.i = x;
     }
 
-    constructor C( int x );
-
     method get_i(): int { return self.i }
 }
 
