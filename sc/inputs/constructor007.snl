@@ -5,7 +5,7 @@ use * from std;
 class C {
     var i : int;
 
-    constructor( int x = -1 )
+    constructor C( int x = -1 )
     {
         self.i = x;
     }
