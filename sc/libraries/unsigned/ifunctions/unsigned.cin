@@ -21,6 +21,656 @@
 #define I    num.@field@
 #define CVAL @codeval@
 
+/* ADD* and SUB* operations are the same for unsigned values as they
+   are for signed values in the 2-complement arithmetic. */
+
+int @PREFIX1@MUL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I *= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@DIV( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I /= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I < istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LE( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I <= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I > istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GE( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I >= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@EQ( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I == istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@NE( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I != istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LTBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I < istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LEBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I <= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GTBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I > istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GEBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I >= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@EQBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I == istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@NEBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I != istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
+ LDC (load constant)
+
+ bytcode:
+ LDC int_value
+
+ stack:
+ --> int_value
+
+ 'int_value', an integer constant, is taken from the bytecode and loaded
+ onto the stack.
+
+ */
+
+int @PREFIX1@LDC( INSTRUCTION_FN_ARGS )
+{
+    @type@ value = @cval_star@istate.code[istate.ip+1].CVAL;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    istate.ep[0].I = value;
+
+    return 2;
+}
+
+/*
+ * PRINT (print integer value from the top of stack)
+ * 
+ * bytecode:
+ * PRINT
+ * 
+ * stack:
+ * value -->
+ * 
+ * Print an integer value from the top of stack and remove it.
+ */
+
+int @PREFIX@PRINT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    printf( "%@printformat@", istate.ep[0].I );
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * SPRINTF (String Print Formatted)
+ * 
+ * bytecode:
+ * SPRINTF
+ * 
+ * stack:
+ * value --> string
+ * 
+ * Print a value from the top of stack into a string, and * leave that
+ * string on the top of the stack
+ */
+
+int @PREFIX@SPRINTF( INSTRUCTION_FN_ARGS )
+{
+    void *ptr;
+    char *format;
+    char buffer[100]; /* should be large enough for any reasonable
+			 numeric value */
+
+    TRACE_FUNCTION();
+
+    format = STACKCELL_PTR(istate.ep[1]);
+
+    snprintf( buffer, sizeof(buffer), format, istate.ep[0].I );
+
+    ptr = bcalloc_blob( strlen(buffer)+1, EXCEPTION );
+
+    BC_CHECK_PTR( ptr );
+    STACKCELL_SET_ADDR( istate.ep[1], ptr );
+
+    strcpy( STACKCELL_PTR(istate.ep[1]), buffer );
+
+    istate.ep ++;
+
+    return 1;
+}
+
+/*---------------------------------------------------------------------------*/
+
+static int
+pack_@field@( void *value_ptr, char typechar, ssize_t size,
+              ssize_t *offset, byte *blob )
+{
+    int i;
+    @type@ *value = value_ptr;
+
+    switch( typechar ) {
+    case 'u':
+    case 'i':
+	for( i = 0; i < size; i++ ) {
+	    *(blob + *offset + i) = *value & 0xFF;
+	    *value >>= 8;
+	}
+	break;
+    case 'U':
+    case 'I':
+	for( i = size - 1; i >= 0; i-- ) {
+	    *(blob + *offset + i) = *value & 0xFF;
+	    *value >>= 8;
+	}
+	break;
+    default:
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */
+              (char*)
+              cxprintf( "unsupported pack type '%c' for type '@type@'",
+                        typechar ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+        break;
+    }
+
+    *offset += size;
+
+    return 1;
+}
+
+static int
+unpack_@field@( void *value_ptr, char typechar, ssize_t size,
+                ssize_t *offset, byte *blob, cexception_t *ex )
+{
+    @type@ value;
+    int i;
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    value = 0;
+
+    if( blob_header->length < size + *offset ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "attempting to unpack values past the end of a blob",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_OVERFLOW,
+	      ex );
+	return 0;
+    }
+
+    switch( typechar ) {
+    case 'u':
+        for( i = size - 1; i >= 0; i-- ) {
+            value <<= 8;
+            value |= *(blob + *offset + i);
+        }
+        break;
+    case 'U':
+        for( i = 0; i < size; i++ ) {
+            value <<= 8;
+            value |= *(blob + *offset + i);
+        }
+        break;
+    case 'i':
+	if( *(signed char*)(blob + *offset + size - 1) < 0 ) {
+	    value = ~0;
+	}
+        for( i = size - 1; i >= 0; i-- ) {
+            value <<= 8;
+            value |= *(blob + *offset + i);
+        }
+        break;
+    case 'I':
+	if( *(signed char*)(blob + *offset) < 0 ) {
+	    value = ~0;
+	}
+        for( i = 0; i < size; i++ ) {
+            value <<= 8;
+            value |= *(blob + *offset + i);
+        }
+        break;
+    default:
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */
+              (char*)
+              cxprintf( "unsupported unpack type '%c' for type '@type@'",
+                        typechar ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              ex );
+	return 0;
+        break;
+    }
+
+    *(@type@*)value_ptr = value;
+
+    *offset += size;
+
+    return 1;
+}
+
+/*
+ * PACK (pack a value into a blob (an unstructured array of bytes))
+ * 
+ * bytecode:
+ * PACK
+ * 
+ * stack:
+ * ..., blob, offset, description, value --> ...
+ * 
+ */
+
+int @PREFIX1@PACK( INSTRUCTION_FN_ARGS )
+{
+    char *description = STACKCELL_PTR( istate.ep[1] );
+    ssize_t offset = istate.ep[2].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[3] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+    char typechar;
+    ssize_t size;
+
+    TRACE_FUNCTION();
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "pack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    typechar = description[0];
+
+    if( description[0] != '\0' ) {
+        size = atol( description + 1 );
+    } else {
+        size = 0;
+    }
+
+    if( pack_value( &istate.ep[0], typechar, size, &offset, 
+                    blob, pack_@field@, EXCEPTION ) == 0 ) {
+	return 0;
+    }
+
+    istate.ep += 4;
+    return 1;
+}
+
+/*
+ * PACKARRAY (pack an array into a blob (an unstructured array of bytes))
+ * 
+ * bytecode:
+ * PACKARRAY
+ * 
+ * stack:
+ * ..., blob, offset, description, value --> ...
+ * 
+ */
+
+int @PREFIX1@PACKARRAY( INSTRUCTION_FN_ARGS )
+{
+    void **array = STACKCELL_PTR( istate.ep[0] );
+    char *description = STACKCELL_PTR( istate.ep[1] );
+    ssize_t offset = istate.ep[2].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[3] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    TRACE_FUNCTION();
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "pack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    if( !pack_array_values( blob, array, description,
+                            &offset, pack_@field@, EXCEPTION )) {
+	return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
+    STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero description string reference */
+    STACKCELL_ZERO_PTR( istate.ep[3] ); /* zero blob reference */
+    istate.ep += 4;
+    return 1;
+}
+
+/*
+ * PACKMDARRAY (pack a multidimentional array into a blob)
+ * 
+ * bytecode:
+ * PACKMDARRAY level
+ * 
+ * stack:
+ * ..., blob, offset, description, md_array_value --> ...
+ * 
+ */
+
+int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS )
+{
+    int level = istate.code[istate.ip+1].ssizeval - 1;
+
+    void **array = STACKCELL_PTR( istate.ep[0] );
+    char *description = STACKCELL_PTR( istate.ep[1] );
+    ssize_t offset = istate.ep[2].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[3] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    TRACE_FUNCTION();
+
+    if( !blob ) {
+	STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
+	STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero descrition string ref. */
+	STACKCELL_ZERO_PTR( istate.ep[3] ); /* zero blob reference */
+	istate.ep += 4;
+	return 2;
+    }
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "pack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    if( !pack_array_layer( blob, array, description, &offset,
+                           level, pack_@field@, EXCEPTION )) {
+	return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
+    STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero description string reference */
+    STACKCELL_ZERO_PTR( istate.ep[3] ); /* zero blob reference */
+    istate.ep += 4;
+    return 2;
+}
+
+/*
+ * UNPACK (unpack a value from a blob )
+ * 
+ * bytecode:
+ * UNPACK
+ * 
+ * stack:
+ * blob, offset, description --> value
+ * 
+ */
+
+int @PREFIX1@UNPACK( INSTRUCTION_FN_ARGS )
+{
+    char *description = STACKCELL_PTR( istate.ep[0] );
+    ssize_t size;
+    char typechar;
+    ssize_t offset = istate.ep[1].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[2] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    TRACE_FUNCTION();
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "unpack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    typechar = description[0];
+
+    if( description[0] != '\0' ) {
+        size = atol( description + 1 );
+    } else {
+        size = 0;
+    }
+
+    if( unpack_value( &istate.ep[2], typechar, size, &offset, blob,
+                      unpack_@field@, EXCEPTION ) == 0 ) {
+	return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
+ * UNPACKARRAY (unpack an array of values from a blob )
+ * 
+ * bytecode:
+ * UNPACKARRAY
+ * 
+ * stack:
+ * blob, offset, description --> array_value
+ * 
+ */
+
+int @PREFIX1@UNPACKARRAY( INSTRUCTION_FN_ARGS )
+{
+    char *description = STACKCELL_PTR( istate.ep[0] );
+    ssize_t offset = istate.ep[1].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[2] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    TRACE_FUNCTION();
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */ "unpack description not specified",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+	      EXCEPTION );
+        return 0;
+    }
+
+    if( !unpack_array_values( blob, &istate.ep[2].ptr,
+                              /* element_size = */ sizeof(@type@),
+                              /* element_nref = */ 0,
+                              description,
+                              &offset, unpack_@field@,
+                              EXCEPTION )) {
+        return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+#if USE_OFFSETTED_POINTERS
+    istate.ep[2].num.offs = 0;
+#endif
+
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
+ * UNPACKMDARRAY (unpack an array of values from a blob )
+ * 
+ * bytecode:
+ * UNPACKMDARRAY level
+ * 
+ * stack:
+ * dstptr, blob, offset, description --> dstptr
+ * 
+ */
+
+int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS )
+{
+    int level = istate.code[istate.ip+1].ssizeval;
+
+    char *description = STACKCELL_PTR( istate.ep[0] );
+    ssize_t offset = istate.ep[1].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[2] );
+    stackcell_t *array = &istate.ep[3];
+
+    TRACE_FUNCTION();
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */ "unpack description not specified",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+	      EXCEPTION );        
+    }
+
+    if( !unpack_array_layer( blob, &array->ptr,
+                             /* element_size = */ sizeof(@type@),
+                             /* element_nref = */ 0,
+                             description,
+                             &offset, level,
+                             unpack_@field@, EXCEPTION )) {
+        return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 3;
+
+    return 2;
+}
+
 /*
  LDCS (load constant)
 
@@ -74,26 +724,6 @@ int @PREFIX1@MOD( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.ep[1].I %= istate.ep[0].I;
-    istate.ep ++;
-
-    return 1;
-}
-
-int @PREFIX1@SHL( INSTRUCTION_FN_ARGS )
-{
-    TRACE_FUNCTION();
-
-    istate.ep[1].I <<= istate.ep[0].I;
-    istate.ep ++;
-
-    return 1;
-}
-
-int @PREFIX1@SHR( INSTRUCTION_FN_ARGS )
-{
-    TRACE_FUNCTION();
-
-    istate.ep[1].I >>= istate.ep[0].I;
     istate.ep ++;
 
     return 1;
@@ -823,121 +1453,3 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 #undef strtoi
 #undef strtos
 #undef strtob
-
-/*---------------------------------------------------------------------------*/
-
-static int
-pack_@field@( void *value_ptr, char typechar, ssize_t size,
-              ssize_t *offset, byte *blob )
-{
-    int i;
-    @type@ *value = value_ptr;
-
-    switch( typechar ) {
-    case 'u':
-    case 'i':
-	for( i = 0; i < size; i++ ) {
-	    *(blob + *offset + i) = *value & 0xFF;
-	    *value >>= 8;
-	}
-	break;
-    case 'U':
-    case 'I':
-	for( i = size - 1; i >= 0; i-- ) {
-	    *(blob + *offset + i) = *value & 0xFF;
-	    *value >>= 8;
-	}
-	break;
-    default:
-        interpret_raise_exception_with_bcalloc_message
-            ( /* err_code = */ -1,
-              /* message = */
-              (char*)
-              cxprintf( "unsupported pack type '%c' for type '@type@'",
-                        typechar ),
-              /* module_id = */ 0,
-              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
-              EXCEPTION );        
-	return 0;
-        break;
-    }
-
-    *offset += size;
-
-    return 1;
-}
-
-static int
-unpack_@field@( void *value_ptr, char typechar, ssize_t size,
-                ssize_t *offset, byte *blob, cexception_t *ex )
-{
-    @type@ value;
-    int i;
-    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
-
-    assert( blob_header->magic == BC_MAGIC );
-
-    value = 0;
-
-    if( blob_header->length < size + *offset ) {
-	interpret_raise_exception_with_bcalloc_message
-	    ( /* err_code = */ -1,
-	      /* message = */
-	      "attempting to unpack values past the end of a blob",
-	      /* module_id = */ 0,
-	      /* exception_id = */ SL_EXCEPTION_BLOB_OVERFLOW,
-	      ex );
-	return 0;
-    }
-
-    switch( typechar ) {
-    case 'u':
-        for( i = size - 1; i >= 0; i-- ) {
-            value <<= 8;
-            value |= *(blob + *offset + i);
-        }
-        break;
-    case 'U':
-        for( i = 0; i < size; i++ ) {
-            value <<= 8;
-            value |= *(blob + *offset + i);
-        }
-        break;
-    case 'i':
-	if( *(signed char*)(blob + *offset + size - 1) < 0 ) {
-	    value = ~0;
-	}
-        for( i = size - 1; i >= 0; i-- ) {
-            value <<= 8;
-            value |= *(blob + *offset + i);
-        }
-        break;
-    case 'I':
-	if( *(signed char*)(blob + *offset) < 0 ) {
-	    value = ~0;
-	}
-        for( i = 0; i < size; i++ ) {
-            value <<= 8;
-            value |= *(blob + *offset + i);
-        }
-        break;
-    default:
-        interpret_raise_exception_with_bcalloc_message
-            ( /* err_code = */ -1,
-              /* message = */
-              (char*)
-              cxprintf( "unsupported unpack type '%c' for type '@type@'",
-                        typechar ),
-              /* module_id = */ 0,
-              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
-              ex );
-	return 0;
-        break;
-    }
-
-    *(@type@*)value_ptr = value;
-
-    *offset += size;
-
-    return 1;
-}
