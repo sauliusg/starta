@@ -16,7 +16,6 @@
 #define INSTRUCTION_FN_ARGS void
 #endif
 
-#include "locally-generated/arithm_uint.h"
 #include "locally-generated/unsigned_uint.h"
 
 #endif

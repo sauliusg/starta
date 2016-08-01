@@ -17,12 +17,6 @@ ${GEN_DIR}/unsigned_%.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/unsigned.hin
 ${GEN_DIR}/unsigned_%.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/unsigned.cin
 	sed -f $^ > $@
 
-${GEN_DIR}/arithm_%.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arithm.hin
-	sed -f $^ > $@
-
-${GEN_DIR}/arithm_%.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arithm.cin
-	sed -f $^ > $@
-
 #-----------------------------------------------------------------------------
 
 cleanlocal:
