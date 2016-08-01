@@ -15,7 +15,7 @@ null class A {
         . "This is class A destructor for object '" _ self.name _ "'";
     }
 
-    constructor C( string name = "default A"; int count = -1 )
+    constructor ( string name = "default A"; int count = -1 )
     {
         self.name = name;
         self.count = count;
@@ -37,7 +37,7 @@ null class B: A {
         . "This is class **B** destructor for object '" _ self.name _ "'";
     }
 
-    constructor B( int i = 0; int c = -2; string name = "default B" )
+    constructor ( int i = 0; int c = -2; string name = "default B" )
         super( name, c );
     {
         self.i = i;

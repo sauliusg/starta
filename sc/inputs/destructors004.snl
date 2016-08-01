@@ -10,12 +10,12 @@ null class A {
     string name;
     int count;
 
-    destructor A
+    destructor
     {
         . "This is class A destructor for object '", self.name, "'";
     }
 
-    constructor C( string name = "default A"; int count = -1 )
+    constructor( string name = "default A"; int count = -1 )
     {
         self.name = name;
         self.count = count;
@@ -32,12 +32,12 @@ null class A {
 null class B: A {
     int i;
 
-    destructor B
+    destructor
     {
         . "This is class **B** destructor for object '", self.name, "'";
     }
 
-    constructor B( int i = 0; int c = -2; string name = "default B" )
+    constructor( int i = 0; int c = -2; string name = "default B" )
         super( name, c );
     {
         self.i = i;

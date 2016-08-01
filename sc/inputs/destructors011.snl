@@ -16,7 +16,7 @@ null class A {
         method print() {};
     }
 
-    constructor A( name : string; cnt : int = 0 )
+    constructor( name : string; cnt : int = 0 )
     {
         self.name = name;
         self.count = cnt;

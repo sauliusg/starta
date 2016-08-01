@@ -15,7 +15,7 @@ null class C {
         . "Finita la commedia!"
     }
 
-    constructor C( string name = "default C"; int count = -1 )
+    constructor( string name = "default C"; int count = -1 )
     {
         self.name = name;
         self.count = count;

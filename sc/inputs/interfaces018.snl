@@ -23,7 +23,7 @@ interface I3: I1 {
 class A implements I2, I3 {
     int i;
 
-    constructor A( int i = 100 ) { self.i = i }
+    constructor ( int i = 100 ) { self.i = i }
 
     method mm@I1(): int {
         return self.i + 1
@@ -44,7 +44,7 @@ class A implements I2, I3 {
 class A2 implements I2, I1 {
     int i;
 
-    constructor A( int i = 100 ) { self.i = i }
+    constructor ( int i = 100 ) { self.i = i }
 
     method mm@I1(): int {
         return self.i + 1

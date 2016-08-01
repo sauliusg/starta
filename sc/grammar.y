@@ -3758,8 +3758,14 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
     if( fn_dnode ) {
 	fn_tnode = dnode_type( fn_dnode );
 	if( !dnode_is_function_prototype( fn_dnode )) {
-	    yyerrorf( "constructor '%s' is already declared in this scope",
-		      dnode_name( fn_proto ));
+            char *constructor_name = dnode_name( fn_proto );
+            if( constructor_name && *constructor_name ) {
+                yyerrorf( "constructor '%s' is already declared in this scope",
+                          constructor_name );
+            } else {
+                yyerrorf( "default constructor is already declared in this scope",
+                          constructor_name );
+            }
 	} else
 	if( !tnode_function_prototypes_match_msg( fn_tnode,
 					          dnode_type( fn_proto ),
@@ -11921,13 +11927,6 @@ generator_new
 
           constructor_dnode = type_tnode ?
               tnode_lookup_constructor( type_tnode, constructor_name ) : NULL;
-
-          if( !constructor_dnode && type_tnode && 
-              constructor_name && *constructor_name == '\0' ) {
-              constructor_dnode =
-                  tnode_lookup_constructor( type_tnode, 
-                                            tnode_name( type_tnode ));
-          }
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;

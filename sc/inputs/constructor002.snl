@@ -4,7 +4,7 @@ use * from std;
 class C {
     var i : int;
 
-    constructor C( int x )
+    constructor ( int x )
     {
         self.i = x;
     }
@@ -13,7 +13,7 @@ class C {
 class D : C {
     var j : int;
 
-    constructor D( int x )
+    constructor ( int x )
         super( x + 3 );
     {
         self.j = x;
