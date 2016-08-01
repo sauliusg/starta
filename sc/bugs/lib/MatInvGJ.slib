@@ -1,0 +1,19 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2015-08-21 22:26:03 +0300 (Fri, 21 Aug 2015) $ 
+//$Revision: 74 $
+//$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/sgem-xray/trunk/lib/MatInvGJ.slib $
+//---------------------------------------------------------------------------*/
+//*
+// Matrix inversion using pivoted Gauss-Jordan elimination.
+//**
+
+module MatInvGJ
+
+use * from std;
+
+type melement = float;
+
+include "MatInvGJ.inc" ;
+
+end module MatInvGJ;

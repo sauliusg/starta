@@ -1,0 +1,64 @@
+package MarTIFF
+
+use * from std;
+
+struct TagDescription {
+    tag  : int;
+    name : string
+}
+
+function lookup_tag_name( int tag; TagDescription[] table ) : string
+{
+    for var int i = 0 to last(table) do
+        if table[i].tag == tag then
+            return table[i].name
+        endif
+    enddo
+    return "";
+}
+
+var TIIF_tag_names = [
+    /* Tag names from FileFormat.Info, page "The TIFF File Format": */
+    struct TagDescription { tag => 254, name => "NewSubfileType" },
+    struct TagDescription { tag => 255, name => "SubfileType" },
+    struct TagDescription { tag => 256, name => "ImageWidth" },
+    struct TagDescription { tag => 257, name => "ImageLength" },
+    struct TagDescription { tag => 258, name => "BitsPerSample" },
+    struct TagDescription { tag => 259, name => "Compression" },
+    struct TagDescription { tag => 262, name => "PhotometricInterpretation" },
+    struct TagDescription { tag => 263, name => "Threshholding" },
+    struct TagDescription { tag => 269, name => "DocumentName" },
+    struct TagDescription { tag => 270, name => "ImageDescription" },
+    struct TagDescription { tag => 271, name => "Make" },
+    struct TagDescription { tag => 272, name => "Model" },
+    struct TagDescription { tag => 273, name => "StripOffsets" },
+    struct TagDescription { tag => 274, name => "Orientation" },
+    struct TagDescription { tag => 277, name => "SamplesPerPixel" },
+    struct TagDescription { tag => 278, name => "RowsPerStrip" },
+    struct TagDescription { tag => 279, name => "StripByteCounts" },
+    struct TagDescription { tag => 282, name => "XResolution" },
+    struct TagDescription { tag => 283, name => "YResolution" },
+    struct TagDescription { tag => 284, name => "PlanarConfiguration" },
+    struct TagDescription { tag => 285, name => "PageName" },
+    struct TagDescription { tag => 286, name => "XPosition" },
+    struct TagDescription { tag => 287, name => "YPosition" },
+    struct TagDescription { tag => 290, name => "GrayResponseUnit" },
+    struct TagDescription { tag => 291, name => "GrayResponseCurve" },
+    struct TagDescription { tag => 292, name => "Group3Options" },
+    struct TagDescription { tag => 293, name => "Group4Options" },
+    struct TagDescription { tag => 296, name => "ResolutionUnit" },
+    struct TagDescription { tag => 297, name => "PageNumber" },
+    struct TagDescription { tag => 301, name => "ColorResponseCurves" },
+    struct TagDescription { tag => 305, name => "Software" },
+    struct TagDescription { tag => 306, name => "DateTime" },
+    struct TagDescription { tag => 315, name => "Artist" },
+    struct TagDescription { tag => 316, name => "HostComputer" },
+    struct TagDescription { tag => 317, name => "Predictor" },
+    struct TagDescription { tag => 318, name => "ColorImageType" }, /* ???? */
+    struct TagDescription { tag => 318, name => "White Point" },    /* ???? */
+    struct TagDescription { tag => 319, name => "ColorList" },
+    struct TagDescription { tag => 329, name => "PrimaryChromaticities" },
+    struct TagDescription { tag => 320, name => "ColorMap" },
+];
+
+end package MarTIFF;
