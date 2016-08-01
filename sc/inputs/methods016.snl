@@ -38,7 +38,7 @@ class Gamma: Beta {
 
 var a = new Gamma;
 
-. a.i;
+. a.i;          // Should print "3"
 . a->i();       // Should print "3"
 . a->i@Gamma(); // Should print "3"
 . a->i@Beta();  // Should print "5"
