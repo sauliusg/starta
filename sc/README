@@ -1,11 +1,4 @@
 
-This is SNAIL.
+This is Starta.
 
-Snail is a language that sacrifices ortogonality of the HLC (see *HLC*) type
-system for simplicity of the compiler.
-
-The name "Snail" reflects the fact that this language has no ambitions to be
-fast and optimisable; insted it tries to be simple (from compiler writer's
-point of view) and correct.
-
-Snail compiles to a threaded code over a pure stack machine.
+Starta compiles to a threaded code over a pure stack machine.
