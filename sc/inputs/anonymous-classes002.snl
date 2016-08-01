@@ -11,7 +11,7 @@ class A {
     string name;
     string className;
 
-    constructor A( string name; int count = 0 )
+    constructor ( string name; int count = 0 )
     {
         self.className = "class A";
         self.name = name;
@@ -30,7 +30,7 @@ class A {
 class B: A {
     int i;
 
-    constructor B( string name; int count = 0; int i = -1 )
+    constructor ( string name; int count = 0; int i = -1 )
         super( name, count )
     {
         self.className = "class B";

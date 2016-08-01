@@ -4,7 +4,7 @@ use * from std;
 class C {
     int i;
 
-    constructor C( int x )
+    constructor ( int x )
     {
         self.i = x;
     }

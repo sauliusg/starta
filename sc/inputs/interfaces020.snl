@@ -27,8 +27,8 @@ class Atom implements IChemAtom, IDrawAtom {
     float r;
     int color[];
 
-    constructor Atom( chemtype : string = "C";
-                      float x = 0; float y = 0; float z = 0 )
+    constructor ( chemtype : string = "C";
+                  float x = 0; float y = 0; float z = 0 )
     {
         self.chemtype = chemtype;
         self.x = x;
@@ -48,8 +48,8 @@ class CrystalAtom implements IChemAtom {
     string chemtype;
     float x, y, z;
 
-    constructor CrystalAtom( chemtype : string = "C";
-                             float x = 0; float y = 0; float z = 0 )
+    constructor ( chemtype : string = "C";
+                  float x = 0; float y = 0; float z = 0 )
     {
         self.chemtype = chemtype;
         self.x = x;
@@ -64,7 +64,7 @@ class DrawAtom implements IDrawAtom {
     float r;
     int color[];
 
-    constructor DrawAtom()
+    constructor ()
     {
         self.r = 10;
         self.color = [ 1, 1, 1 ];

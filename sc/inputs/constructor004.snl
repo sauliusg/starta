@@ -5,9 +5,9 @@ null class C {
     var i : int;
     var next : C;
 
-    constructor C( int x );
+    constructor ( int x );
 
-    constructor C( int x )
+    constructor ( int x )
     {
         if x > 0 then
            self.next = new C( x - 1 );
@@ -43,7 +43,7 @@ null class C {
 null class D : C {
     var j : int;
 
-    constructor D( int x )
+    constructor ( int x )
         super( x + 3 );
     {
         self.j = x;

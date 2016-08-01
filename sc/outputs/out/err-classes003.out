@@ -10,9 +10,9 @@
 ./sl: inputs/err-classes003.snl(39,10): ERROR, field 'i' already defined in type 'A'
     int i;
          ^
-./sl: inputs/err-classes003.snl(41,32): ERROR, constructor 'A' is already declared in this scope
-    constructor A( int i = 100 ) { self.i = i }
-                               ^
+./sl: inputs/err-classes003.snl(41,30): ERROR, default constructor is already declared in this scope
+    constructor( int i = 100 ) { self.i = i }
+                             ^
 ./sl: inputs/err-classes003.snl(43,25): ERROR, method 'mm@I1' already defined in type 'A'
     method mm@I1(): int {
                         ^

@@ -19,8 +19,8 @@ class Atom implements IChemAtom {
     string chemtype;
     float x, y, z;
 
-    constructor Atom( chemtype : string = "C";
-                      float x = 0; float y = 0; float z = 0 )
+    constructor ( chemtype : string = "C";
+                  float x = 0; float y = 0; float z = 0 )
     {
         self.chemtype = chemtype;
         self.x = x;
