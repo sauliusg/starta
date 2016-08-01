@@ -1,6 +1,6 @@
 // --*- C -*--
 
-pragma prepend "$D/lib";
+pragma prepend "$D/typeconv012-lib";
 
 use * from std;
 use * from MatAlg( ldouble );
