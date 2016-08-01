@@ -10606,17 +10606,17 @@ multivalue_function_call
                 assert( interface_name );
                 if( tnode_kind( interface_type ) == TK_CLASS ) {
                     /* Look-up the base class used as an interface: */
-                    ssize_t interface_count = 0;
+                    ssize_t interface_count = 1;
                     TNODE *base_type = object_type;
-                    while( (base_type = tnode_base_type( base_type ))
-                           != NULL ) {
+                    while( base_type ) {
                         interface_count--;
                         if( base_type == interface_type ) {
                             interface_nr = interface_count;
                             break;
                         }
+                        base_type = tnode_base_type( base_type );
                     }
-                    if( interface_nr == 0 ) {
+                    if( interface_nr > 0 ) {
                         char *class_name =
                             object_type ? tnode_name( object_type ) : NULL;
                         if( class_name ) {
@@ -10745,17 +10745,17 @@ multivalue_function_call
                 assert( interface_name );
                 if( tnode_kind( interface_type ) == TK_CLASS ) {
                     /* Look-up the base class used as an interface: */
-                    ssize_t interface_count = 0;
+                    ssize_t interface_count = 1;
                     TNODE *base_type = object_type;
-                    while( (base_type = tnode_base_type( base_type ))
-                           != NULL ) {
+                    while( base_type ) {
                         interface_count--;
                         if( base_type == interface_type ) {
                             interface_nr = interface_count;
                             break;
                         }
+                        base_type = tnode_base_type( base_type );
                     }
-                    if( interface_nr == 0 ) {
+                    if( interface_nr > 0 ) {
                         char *class_name =
                             object_type ? tnode_name( object_type ) : NULL;
                         if( class_name ) {

@@ -36,10 +36,10 @@ class Gamma: Beta {
     method i(): int { return self.i }
 }
 
-var a = new Gamma;
+var a: Gamma[] = new Gamma * new[10];
 
-. a.i;          // Should print "3"
-. a->i();       // Should print "3"
-. a->i@Gamma(); // Should print "3"
-. a->i@Beta();  // Should print "5"
-. a->i@Alpha(); // Should print "1"
+. a[0].i;          // Should print "3"
+. a[0]->i();       // Should print "3"
+. a[0]->i@Gamma(); // Should print "3"
+. a[0]->i@Beta();  // Should print "5"
+. a[0]->i@Alpha(); // Should print "1"
