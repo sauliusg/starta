@@ -1,0 +1,152 @@
+package unsigned;
+
+use * from std;
+
+load "libraries/unsigned/libunsigned.so.0.01";
+
+type uint = {
+    size = sizeof native "int";
+    kind = integer;
+
+    inline bytecode operator "+" ( i : uint ) : uint
+        { /* do nothing */ };
+    inline bytecode operator "-" ( i : uint ) : uint
+        { NEG };
+
+    inline bytecode operator "+" ( i : uint; j : uint ) : uint
+        { ADD };
+    inline bytecode operator "-" ( i : uint; j : uint ) : uint
+        { SUB };
+    inline bytecode operator "*" ( i : uint; j : uint ) : uint
+        { MUL };
+    inline bytecode operator "/" ( i : uint; j : uint ) : uint
+        { DIV };
+    inline bytecode operator "%" ( i : uint; j : uint ) : uint
+        { MOD };
+
+    bytecode inline operator "<" ( x, y : uint ) : bool
+        { LTBOOL };
+    bytecode inline operator ">" ( x, y : uint ) : bool
+        { GTBOOL };
+    bytecode inline operator "<=" ( x, y : uint ) : bool
+        { LEBOOL };
+    bytecode inline operator ">=" ( x, y : uint ) : bool
+        { GEBOOL };
+    bytecode inline operator "==" ( x, y : uint ) : bool
+        { EQBOOL };
+    bytecode inline operator "!=" ( x, y : uint ) : bool
+        { NEBOOL };
+
+    bytecode inline operator "shl" ( x, y : uint ) : uint
+	{ SHL };
+    bytecode inline operator "shr" ( x, y : uint ) : uint
+	{ SHR };
+    bytecode inline operator "&" ( x, y : uint ) : uint
+	{ AND };
+    bytecode inline operator "|" ( x, y : uint ) : uint
+	{ OR };
+    bytecode inline operator "^" ( x, y : uint ) : uint
+	{ XOR };
+
+    inline bytecode operator "++" ( i : uint ) : uint
+        { INC };
+    inline bytecode operator "--" ( i : uint ) : uint
+        { DEC };
+    inline bytecode operator "incvar" ()
+        { INCVAR };
+    inline bytecode operator "decvar" ()
+        { DECVAR };
+    inline bytecode operator "." ( i : uint )
+        { IPRINT };
+    inline bytecode operator "<" ( i : uint )
+        { IPRINT };
+
+    inline bytecode operator "@uint" ( i : byte ) : uint
+        { BEXTEND HEXTEND };
+
+    inline bytecode operator "@uint" ( i : short ) : uint
+        { HEXTEND };
+
+    inline bytecode operator "<<" ( f : file; i : uint ) : file
+    	{ FILEPRINT };
+
+    inline bytecode operator ">>" ( f : file ) : uint
+    	{ FILESCAN };
+
+    inline bytecode operator "%%" ( format : string; x : uint ) : string
+        { ISPRINTF };
+
+    inline bytecode operator "%%" ( x : uint ) : string
+        { SLDC "%d" SWAP ISPRINTF };
+
+    bytecode inline operator "jnz" ( x : uint )
+        { JNZ };
+    bytecode inline operator "jz" ( x : uint )
+        { JZ };
+
+    inline bytecode operator "ldc" () : uint
+        { LDCS };
+
+    inline bytecode operator "loop" ( counter : addressof; range : uint )
+        { LOOP };
+
+    inline bytecode operator "[]" ( a : array; i : uint ) : addressof
+        { INDEX };
+
+    inline bytecode operator "[..]" ( a : array; lower, upper : uint ) : array
+        { SUBARRAY };
+
+    inline bytecode operator "new[]" ( i : uint ) : array
+        { AALLOC %%element_size %%element_nref };
+
+    inline bytecode operator "blob[]" ( i : uint ) : blob
+        { BLOB };
+
+    inline bytecode operator "new[][]" ( i : uint ) : array
+        { MDALLOCC %%element_size %%element_nref %%level };
+
+    inline bytecode operator "exceptionval" ( p : ref ) : uint
+        { ERRORCODE };
+
+    inline bytecode operator "exceptionset" ( i : uint ) : uint
+        { /* empty */ };
+
+    inline bytecode operator "pack"( blob b; uint offset;
+                                     string description; uint value )
+        { PACK };
+
+    inline bytecode operator "packarray"( blob b; uint offset;
+                                     	  string description; 
+				     	  array of uint value )
+        { PACKARRAY };
+
+    inline bytecode operator "packmdarray"( blob b; uint offset;
+                                     	    string description; 
+				     	    array value )
+        { PACKMDARRAY %%level };
+
+    inline bytecode operator "unpack"( blob b; uint offset;
+                                       string description ) : uint
+        { UNPACK };
+
+    inline bytecode operator "unpackarray"( blob b; uint offset;
+                                       	    string description ) : array of uint
+        { UNPACKARRAY };
+
+    inline bytecode operator "unpackmdarray"( blob b; uint offset;
+                                      	      string description ) : array
+        { UNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( uint i; uint index ): byte
+        { NthBYTE };
+
+    /* The "last" operator provides teh index of the last array "a"
+    element is is necessary to compile an 'a[i:]' construct with the
+    correct type of the upper limit (the type must be the same as of
+    variable 'i': */
+
+    inline bytecode operator "last"( a : array ): uint
+        { LENGTH DEC }
+}
+
+end package unsigned;
