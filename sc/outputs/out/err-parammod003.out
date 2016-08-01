@@ -4,8 +4,8 @@ module ParamConstVarProc( const C, var X, procedure P )
 ./sl: inputs/ParamConstVarProc.slib(11,25): ERROR, variable 'X' is not declared in the current scope
     var double s = c + X@double;
                         ^
-./sl: inputs/ParamConstVarProc.slib(11,26): ERROR, type 'double' has no conversion from the given type
+./sl: inputs/ParamConstVarProc.slib(11,32): ERROR, type 'double' has no conversion from the given type
     var double s = c + X@double;
-                         ^
+                               ^
 ./sl: 3 error(s) detected
 

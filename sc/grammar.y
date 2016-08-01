@@ -11746,6 +11746,20 @@ arithmetic_expression
        compiler_compile_named_type_conversion( compiler, /*target_name*/$3, px );
       }
 
+  | expression '@' module_list __COLON_COLON __IDENTIFIER
+      {
+          DNODE *module = $3;
+          char *target_name = $5;
+          TNODE *target_type = NULL;
+
+          if( module ) {
+              target_type = dnode_typetab_lookup_type( module, target_name );
+          }
+
+          compiler_compile_type_conversion( compiler, target_type, 
+                                            target_name, px );
+      }
+
   | expression '@' '(' var_type_description ')'
       {
        compiler_compile_named_type_conversion( compiler, NULL, px );

@@ -35,9 +35,9 @@ function divide( floattype x; inttype i ): floattype
 ./sl: inputs/Parametrised.slib(17,1): ERROR, type 'floattype' is not declared in the current scope
 {
 ^
-./sl: inputs/Parametrised.slib(18,16): ERROR, type conversion impossible - target type 'floattype' not defined in the current scope
+./sl: inputs/Parametrised.slib(18,25): ERROR, type conversion impossible - target type 'floattype' not defined in the current scope
     return x/i@floattype;
-               ^
+                        ^
 ./sl: inputs/Parametrised.slib(18,25): ERROR, incompatible types of returned value 1 of function 'divide'
     return x/i@floattype;
                         ^
