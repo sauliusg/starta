@@ -1,6 +1,6 @@
 // --*- C -*--
 
-// Test access of superclass fields:
+// Test unsigned integre arithmetic.
 
 use std;
 use unsigned;
