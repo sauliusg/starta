@@ -7,6 +7,7 @@ load "libraries/unsigned/libunsigned.so.0.01";
 type uint = {
     size = sizeof native "int";
     kind = integer;
+    suffix = "U";
 
     inline bytecode operator "+" ( i : uint ) : uint
         { /* do nothing */ };
@@ -45,6 +46,8 @@ type uint = {
 	{ OR };
     bytecode inline operator "^" ( x, y : uint ) : uint
 	{ XOR };
+    bytecode inline operator "~" ( x: uint ) : uint
+	{ NOT };
 
     inline bytecode operator "++" ( i : uint ) : uint
         { INC };
