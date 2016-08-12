@@ -25,6 +25,7 @@ void *module_id = &module_id;
 char *OPCODES[] = {
 
 #include "locally-generated/unsigned_uint.tab.c"
+#include "locally-generated/unsigned_ulong.tab.c"
 
     NULL
 };
@@ -86,3 +87,4 @@ int trace_on( int trace_flag )
 }
 
 #include <locally-generated/unsigned_uint.c>
+#include <locally-generated/unsigned_ulong.c>
