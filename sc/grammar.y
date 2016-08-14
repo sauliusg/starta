@@ -1660,6 +1660,13 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
     }
 }
 
+static DNODE* compiler_lookup_conversion( COMPILER *cc,
+                                          TNODE *tnode,
+                                          TNODE *target_type )
+{
+    return tnode_lookup_conversion( tnode, target_type );
+}
+
 static void compiler_compile_type_conversion( COMPILER *cc,
                                               TNODE *target_type,
                                               char *target_name,
@@ -1682,7 +1689,7 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 	} else {
 	    DNODE *conversion =
 		target_type ?
-                tnode_lookup_conversion( target_type, expr_type ) :
+                compiler_lookup_conversion( cc, target_type, expr_type ) :
                 NULL;
 	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
 	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
@@ -1778,8 +1785,8 @@ static void compiler_compile_return( COMPILER *cc,
                 tnode_name( returned_type ) : NULL;
             if( available_type && returned_type_name && 
                 i == 0 &&
-                tnode_lookup_conversion( returned_type,
-                                         available_type  )) {
+                compiler_lookup_conversion( cc, returned_type,
+                                            available_type  )) {
                 compiler_compile_named_type_conversion( cc, returned_type_name, ex );
                 expr = cc->e_stack;
                 if( expr ) {
@@ -2467,7 +2474,7 @@ static void compiler_compile_variable_assignment_or_init(
                                                     msg, sizeof(msg)-1, ex )) {
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( expr_type && dst_name &&
-		tnode_lookup_conversion( var_type, expr_type )) {
+		compiler_lookup_conversion( cc, var_type, expr_type )) {
 		compiler_compile_named_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
@@ -2686,7 +2693,8 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
                       msg, sizeof(msg)-1, ex )) {
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
-			tnode_lookup_conversion( element_type, expr_type )) {
+			compiler_lookup_conversion( cc, element_type, 
+                                                    expr_type )) {
 			compiler_compile_named_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
                         expr_type = enode_type( expr );
