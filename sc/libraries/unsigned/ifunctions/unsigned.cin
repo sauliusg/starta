@@ -8,6 +8,7 @@
 #include <pack.h>
 #include <refsize.h>
 #include <alloccell.h>
+#include <assert.h>
 /* #include <hashcell.h> */
 
 #ifdef I

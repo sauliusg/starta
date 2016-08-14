@@ -112,33 +112,33 @@ type ushort = {
     inline bytecode operator "exceptionset" ( i : ushort ) : ushort
         { /* empty */ };
 
-    inline bytecode operator "pack"( blob b; ushort offset;
+    inline bytecode operator "pack"( blob b; int offset;
                                      string description; ushort value )
         { libunsigned:UHPACK };
 
-    inline bytecode operator "packarray"( blob b; ushort offset;
+    inline bytecode operator "packarray"( blob b; int offset;
                                      	  string description; 
 				     	  array of ushort value )
         { libunsigned:UHPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; ushort offset;
+    inline bytecode operator "packmdarray"( blob b; int offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:UHPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; ushort offset;
+    inline bytecode operator "unpack"( blob b; int offset;
                                        string description ) : ushort
         { libunsigned:UHUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; ushort offset;
+    inline bytecode operator "unpackarray"( blob b; int offset;
                                        	    string description ) : array of ushort
         { libunsigned:UHUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; ushort offset;
+    inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { libunsigned:UHUNPACKMDARRAY %%level };
 
-    inline bytecode operator "nth-byte"( ushort i; ushort index ): byte
+    inline bytecode operator "nth-byte"( ushort i; int index ): byte
         { libunsigned:UHNthBYTE };
 
     /* The "last" operator provides the index of the last array "a"
@@ -258,33 +258,33 @@ type uint = {
     inline bytecode operator "exceptionset" ( i : uint ) : uint
         { /* empty */ };
 
-    inline bytecode operator "pack"( blob b; uint offset;
+    inline bytecode operator "pack"( blob b; int offset;
                                      string description; uint value )
         { libunsigned:UPACK };
 
-    inline bytecode operator "packarray"( blob b; uint offset;
+    inline bytecode operator "packarray"( blob b; int offset;
                                      	  string description; 
 				     	  array of uint value )
         { libunsigned:UPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; uint offset;
+    inline bytecode operator "packmdarray"( blob b; int offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:UPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; uint offset;
+    inline bytecode operator "unpack"( blob b; int offset;
                                        string description ) : uint
         { libunsigned:UUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; uint offset;
+    inline bytecode operator "unpackarray"( blob b; int offset;
                                        	    string description ) : array of uint
         { libunsigned:UUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; uint offset;
+    inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { libunsigned:UUNPACKMDARRAY %%level };
 
-    inline bytecode operator "nth-byte"( uint i; uint index ): byte
+    inline bytecode operator "nth-byte"( uint i; int index ): byte
         { libunsigned:UNthBYTE };
 
     /* The "last" operator provides the index of the last array "a"
@@ -404,33 +404,33 @@ type ulong = {
     inline bytecode operator "exceptionset" ( i : ulong ) : ulong
         { /* empty */ };
 
-    inline bytecode operator "pack"( blob b; ulong offset;
+    inline bytecode operator "pack"( blob b; int offset;
                                      string description; ulong value )
         { libunsigned:ULPACK };
 
-    inline bytecode operator "packarray"( blob b; ulong offset;
+    inline bytecode operator "packarray"( blob b; int offset;
                                      	  string description; 
 				     	  array of ulong value )
         { libunsigned:ULPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; ulong offset;
+    inline bytecode operator "packmdarray"( blob b; int offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:ULPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; ulong offset;
+    inline bytecode operator "unpack"( blob b; int offset;
                                        string description ) : ulong
         { libunsigned:ULUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; ulong offset;
+    inline bytecode operator "unpackarray"( blob b; int offset;
                                        	    string description ) : array of ulong
         { libunsigned:ULUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; ulong offset;
+    inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { libunsigned:ULUNPACKMDARRAY %%level };
 
-    inline bytecode operator "nth-byte"( ulong i; ulong index ): byte
+    inline bytecode operator "nth-byte"( ulong i; int index ): byte
         { libunsigned:ULNthBYTE };
 
     /* The "last" operator provides the index of the last array "a"
@@ -550,33 +550,33 @@ type ullong = {
     inline bytecode operator "exceptionset" ( i : ullong ) : ullong
         { /* empty */ };
 
-    inline bytecode operator "pack"( blob b; ullong offset;
+    inline bytecode operator "pack"( blob b; int offset;
                                      string description; ullong value )
         { libunsigned:ULLPACK };
 
-    inline bytecode operator "packarray"( blob b; ullong offset;
+    inline bytecode operator "packarray"( blob b; int offset;
                                      	  string description; 
 				     	  array of ullong value )
         { libunsigned:ULLPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; ullong offset;
+    inline bytecode operator "packmdarray"( blob b; int offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:ULLPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; ullong offset;
+    inline bytecode operator "unpack"( blob b; int offset;
                                        string description ) : ullong
         { libunsigned:ULLUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; ullong offset;
+    inline bytecode operator "unpackarray"( blob b; int offset;
                                        	    string description ) : array of ullong
         { libunsigned:ULLUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; ullong offset;
+    inline bytecode operator "unpackmdarray"( blob b; int offset;
                                       	      string description ) : array
         { libunsigned:ULLUNPACKMDARRAY %%level };
 
-    inline bytecode operator "nth-byte"( ullong i; ullong index ): byte
+    inline bytecode operator "nth-byte"( ullong i; int index ): byte
         { libunsigned:ULLNthBYTE };
 
     /* The "last" operator provides the index of the last array "a"

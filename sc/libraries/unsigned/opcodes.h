@@ -16,6 +16,8 @@
 #define INSTRUCTION_FN_ARGS void
 #endif
 
+extern istate_t *istate_ptr;
+
 #include "locally-generated/unsigned_ushort.h"
 #include "locally-generated/unsigned_uint.h"
 #include "locally-generated/unsigned_ulong.h"
