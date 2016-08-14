@@ -27,6 +27,14 @@ int UEXTEND( INSTRUCTION_FN_ARGS );
 int UHEXTEND( INSTRUCTION_FN_ARGS );
 int ULEXTEND( INSTRUCTION_FN_ARGS );
 
+/* Unsigned -> signed conversions: you can always convert an unsigned
+   integer to a signed integre of larger size. */
+
+int UB2S( INSTRUCTION_FN_ARGS );
+int US2I( INSTRUCTION_FN_ARGS );
+int UI2L( INSTRUCTION_FN_ARGS );
+int UL2LL( INSTRUCTION_FN_ARGS );
+
 #include "locally-generated/unsigned_ubyte.h"
 #include "locally-generated/unsigned_ushort.h"
 #include "locally-generated/unsigned_uint.h"

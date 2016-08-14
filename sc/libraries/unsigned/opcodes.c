@@ -179,6 +179,93 @@ int ULEXTEND( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+/* Unsigned -> signed conversions: you can always convert an unsigned
+   integer to a signed integre of larger size: */
+
+/*
+ * UB2S convert unsigned byte to short integer.
+ * 
+ * bytecode:
+ * UB2S
+ * 
+ * stack:
+ * ubyte -> short
+ * 
+ */
+
+int UB2S( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    assert( sizeof(istate.ep[0].num.s) > sizeof(istate.ep[0].num.c) );
+    istate.ep[0].num.s = istate.ep[0].num.c;
+
+    return 1;
+}
+
+/*
+ * US2I convert unsigned short to integer.
+ * 
+ * bytecode:
+ * US2I
+ * 
+ * stack:
+ * ushort -> int
+ * 
+ */
+
+int US2I( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    assert( sizeof(istate.ep[0].num.i) > sizeof(istate.ep[0].num.us) );
+    istate.ep[0].num.i = istate.ep[0].num.us;
+
+    return 1;
+}
+
+/*
+ * UI2L convert unsigned int to long.
+ * 
+ * bytecode:
+ * UI2L
+ * 
+ * stack:
+ * uint -> long
+ * 
+ */
+
+int UI2L( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    assert( sizeof(istate.ep[0].num.l) > sizeof(istate.ep[0].num.ui) );
+    istate.ep[0].num.l = istate.ep[0].num.ui;
+
+    return 1;
+}
+
+/*
+ * UL2LL convert unsigned long to long long.
+ * 
+ * bytecode:
+ * UL2LL
+ * 
+ * stack:
+ * ulong -> llong
+ * 
+ */
+
+int UL2LL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    assert( sizeof(istate.ep[0].num.ll) > sizeof(istate.ep[0].num.ul) );
+    istate.ep[0].num.l = istate.ep[0].num.ul;
+
+    return 1;
+}
+
 #include <locally-generated/unsigned_ubyte.c>
 #include <locally-generated/unsigned_ushort.c>
 #include <locally-generated/unsigned_uint.c>

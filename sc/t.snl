@@ -1,46 +1,31 @@
 // --*- C -*--
 
-// Test unsigned values
+// Test unsigned -- signed conversions
 
 use std;
 use unsigned;
 
-var b: ubyte;
-var s: ushort;
-var u: uint;
-var l: ulong;
-var ll: ullong;
+var ub: ubyte;
+var us: ushort;
+var ui: uint;
+var ul: ulong;
+var ull: ullong;
+
+var b: byte;
+var s: short;
 var i: int;
+var l: long;
+var ll: long;
 
-b = ~0 ubyte;
-;. b;
-s = b;
-. s;
-u = b;
-. u;
-l = b;
-. l;
-ll = b;
-. ll;
-ll = s;
-. ll;
-. "";
+ub = ~0 UB/2 UB;
 
-s = ~0 UH;
-. s;
-u = s;
-. u;
-l = s;
-. l;
-ll = s;
-. ll;
-ll = u;
-. ll;
-. "";
+. ub;
 
-u = ~0 U;
-. u;
-l = u;
-. l;
-ll = u;
-. ll;
+b = 127 B;
+. b;
+
+. ub + 1UB;
+. b + 1B;
+
+i = ub@int;
+// ui = b;
