@@ -62,11 +62,8 @@ type ushort = {
     inline bytecode operator "<" ( i : ushort )
         { libunsigned:UHPRINT };
 
-    inline bytecode operator "@ushort" ( i : byte ) : ushort
-        { BEXTEND HEXTEND };
-
-    inline bytecode operator "@ushort" ( i : short ) : ushort
-        { HEXTEND };
+    inline bytecode operator "@ushort" ( i : char ) : ushort
+        { libunsigned:UBEXTEND };
 
     inline bytecode operator "<<" ( f : file; i : ushort ) : file
     	{ libunsigned:UHFILEPRINT };
@@ -354,11 +351,15 @@ type ulong = {
     inline bytecode operator "<" ( i : ulong )
         { libunsigned:ULPRINT };
 
-    inline bytecode operator "@ulong" ( i : byte ) : ulong
-        { BEXTEND HEXTEND };
+    inline bytecode operator "@ulong" ( i : char ) : ulong
+        { libunsigned:UBEXTEND libunsigned:UHEXTEND
+          libunsigned:UEXTEND };
 
-    inline bytecode operator "@ulong" ( i : short ) : ulong
-        { HEXTEND };
+    inline bytecode operator "@ulong" ( i : ushort ) : ulong
+        { libunsigned:UHEXTEND libunsigned:UEXTEND };
+
+    inline bytecode operator "@ulong" ( i : uint ) : ulong
+        { libunsigned:UEXTEND };
 
     inline bytecode operator "<<" ( f : file; i : ulong ) : file
     	{ libunsigned:ULFILEPRINT };
@@ -500,11 +501,19 @@ type ullong = {
     inline bytecode operator "<" ( i : ullong )
         { libunsigned:ULLPRINT };
 
-    inline bytecode operator "@ullong" ( i : byte ) : ullong
-        { BEXTEND HEXTEND };
+    inline bytecode operator "@ullong" ( i : char ) : ullong
+        { libunsigned:UBEXTEND libunsigned:UHEXTEND
+          libunsigned:UEXTEND libunsigned:ULEXTEND };
 
-    inline bytecode operator "@ullong" ( i : short ) : ullong
-        { HEXTEND };
+    inline bytecode operator "@ullong" ( i : ushort ) : ullong
+        { libunsigned:UHEXTEND
+          libunsigned:UEXTEND libunsigned:ULEXTEND };
+
+    inline bytecode operator "@ullong" ( i : uint ) : ullong
+        { libunsigned:UEXTEND libunsigned:ULEXTEND };
+
+    inline bytecode operator "@ullong" ( i : ulong ) : ullong
+        { libunsigned:ULEXTEND };
 
     inline bytecode operator "<<" ( f : file; i : ullong ) : file
     	{ libunsigned:ULLFILEPRINT };
