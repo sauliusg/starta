@@ -27,6 +27,7 @@ int UEXTEND( INSTRUCTION_FN_ARGS );
 int UHEXTEND( INSTRUCTION_FN_ARGS );
 int ULEXTEND( INSTRUCTION_FN_ARGS );
 
+#include "locally-generated/unsigned_ubyte.h"
 #include "locally-generated/unsigned_ushort.h"
 #include "locally-generated/unsigned_uint.h"
 #include "locally-generated/unsigned_ulong.h"
