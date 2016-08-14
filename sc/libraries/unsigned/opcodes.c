@@ -34,7 +34,7 @@ char *OPCODES[] = {
 
 int trace = 0;
 
-static istate_t *istate_ptr;
+istate_t *istate_ptr;
 
 #define istate (*istate_ptr)
 
