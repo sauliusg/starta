@@ -5,6 +5,14 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
+/*
+  FIXME: this is a copy of the code from the main interpreter and thus
+  brings in a log of code duplication. Something should be done about
+  it. S.G. 2016-08-14
+*/
+
+#warning Remove code duplication that this file brings. S.G. 2016-08-14
+
 /* exports: */
 #include <bcalloc.h>
 
