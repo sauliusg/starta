@@ -4,6 +4,146 @@ use * from std;
 
 load "libraries/unsigned/libunsigned.so.0.01";
 
+type ubyte = {
+    size = sizeof native "char";
+    kind = integer;
+    suffix = "UB";
+
+    inline bytecode operator "+" ( i : ubyte ) : ubyte
+        { /* do nothing */ };
+
+    inline bytecode operator "+" ( i : ubyte; j : ubyte ) : ubyte
+        { LADD };
+    inline bytecode operator "-" ( i : ubyte; j : ubyte ) : ubyte
+        { LSUB };
+    inline bytecode operator "*" ( i : ubyte; j : ubyte ) : ubyte
+        { libunsigned:UBMUL };
+    inline bytecode operator "/" ( i : ubyte; j : ubyte ) : ubyte
+        { libunsigned:UBDIV };
+    inline bytecode operator "%" ( i : ubyte; j : ubyte ) : ubyte
+        { libunsigned:UBMOD };
+
+    bytecode inline operator "<" ( x, y : ubyte ) : bool
+        { libunsigned:UBLTBOOL };
+    bytecode inline operator ">" ( x, y : ubyte ) : bool
+        { libunsigned:UBGTBOOL };
+    bytecode inline operator "<=" ( x, y : ubyte ) : bool
+        { libunsigned:UBLEBOOL };
+    bytecode inline operator ">=" ( x, y : ubyte ) : bool
+        { libunsigned:UBGEBOOL };
+    bytecode inline operator "==" ( x, y : ubyte ) : bool
+        { libunsigned:UBEQBOOL };
+    bytecode inline operator "!=" ( x, y : ubyte ) : bool
+        { libunsigned:UBNEBOOL };
+
+    bytecode inline operator "shl" ( x, y : ubyte ) : ubyte
+	{ LSHL };
+    bytecode inline operator "shr" ( x, y : ubyte ) : ubyte
+	{ LSHR };
+    bytecode inline operator "&" ( x, y : ubyte ) : ubyte
+	{ LAND };
+    bytecode inline operator "|" ( x, y : ubyte ) : ubyte
+	{ LOR };
+    bytecode inline operator "^" ( x, y : ubyte ) : ubyte
+	{ LXOR };
+    bytecode inline operator "~" ( x: ubyte ) : ubyte
+	{ LNOT };
+
+    inline bytecode operator "++" ( i : ubyte ) : ubyte
+        { LINC };
+    inline bytecode operator "--" ( i : ubyte ) : ubyte
+        { LDEC };
+    inline bytecode operator "incvar" ()
+        { LINCVAR };
+    inline bytecode operator "decvar" ()
+        { LDECVAR };
+    inline bytecode operator "." ( i : ubyte )
+        { libunsigned:UBPRINT };
+    inline bytecode operator "<" ( i : ubyte )
+        { libunsigned:UBPRINT };
+
+    inline bytecode operator "<<" ( f : file; i : ubyte ) : file
+    	{ libunsigned:UBFILEPRINT };
+
+    inline bytecode operator ">>" ( f : file ) : ubyte
+    	{ libunsigned:UBFILESCAN };
+
+    inline bytecode operator "%%" ( format : string; x : ubyte ) : string
+        { libunsigned:UBSPRINTF };
+
+    inline bytecode operator "%%" ( x : ubyte ) : string
+        { SLDC "%d" SWAP ISPRINTF };
+
+    bytecode inline operator "jnz" ( x : ubyte )
+        { JNZ };
+    bytecode inline operator "jz" ( x : ubyte )
+        { JZ };
+
+    inline bytecode operator "ldc" () : ubyte
+        { libunsigned:UBLDCS };
+
+    inline bytecode operator "loop" ( counter : addressof; range : ubyte )
+        { libunsigned:UBLOOP };
+
+    inline bytecode operator "[]" ( a : array; i : ubyte ) : addressof
+        { libunsigned:UBINDEX };
+
+    inline bytecode operator "[..]" ( a : array; lower, upper : ubyte ) : array
+        { libunsigned:UBSUBARRAY };
+
+    inline bytecode operator "new[]" ( i : ubyte ) : array
+        { libunsigned:UBAALLOC %%element_size %%element_nref };
+
+    inline bytecode operator "blob[]" ( i : ubyte ) : blob
+        { libunsigned:UBBLOB };
+
+    inline bytecode operator "new[][]" ( i : ubyte ) : array
+        { libunsigned:UBMDALLOCC %%element_size %%element_nref %%level };
+
+    inline bytecode operator "exceptionval" ( p : ref ) : ubyte
+        { ERRORCODE };
+
+    inline bytecode operator "exceptionset" ( i : ubyte ) : ubyte
+        { /* empty */ };
+
+    inline bytecode operator "pack"( blob b; int offset;
+                                     string description; ubyte value )
+        { libunsigned:UBPACK };
+
+    inline bytecode operator "packarray"( blob b; int offset;
+                                     	  string description; 
+				     	  array of ubyte value )
+        { libunsigned:UBPACKARRAY };
+
+    inline bytecode operator "packmdarray"( blob b; int offset;
+                                     	    string description; 
+				     	    array value )
+        { libunsigned:UBPACKMDARRAY %%level };
+
+    inline bytecode operator "unpack"( blob b; int offset;
+                                       string description ) : ubyte
+        { libunsigned:UBUNPACK };
+
+    inline bytecode operator "unpackarray"( blob b; int offset;
+                                       	    string description ) : array of ubyte
+        { libunsigned:UBUNPACKARRAY };
+
+    inline bytecode operator "unpackmdarray"( blob b; int offset;
+                                      	      string description ) : array
+        { libunsigned:UBUNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( ubyte i; int index ): byte
+        { libunsigned:UBNthBYTE };
+
+    /* The "last" operator provides the index of the last array "a"
+    element is is necessary to compile an 'a[i:]' construct with the
+    correct type of the upper limit (the type must be the same as of
+    variable 'i': */
+
+    inline bytecode operator "last"( a : array ): ubyte
+        { libunsigned:UBLENGTH DEC }
+}
+
 type ushort = {
     size = sizeof native "short";
     kind = integer;
@@ -62,7 +202,7 @@ type ushort = {
     inline bytecode operator "<" ( i : ushort )
         { libunsigned:UHPRINT };
 
-    inline bytecode operator "@ushort" ( i : char ) : ushort
+    inline bytecode operator "@ushort" ( i : ubyte ) : ushort
         { libunsigned:UBEXTEND };
 
     inline bytecode operator "<<" ( f : file; i : ushort ) : file
@@ -205,7 +345,7 @@ type uint = {
     inline bytecode operator "<" ( i : uint )
         { libunsigned:UPRINT };
 
-    inline bytecode operator "@uint" ( i : char ) : uint
+    inline bytecode operator "@uint" ( i : ubyte ) : uint
         { libunsigned:UBEXTEND libunsigned:UHEXTEND };
 
     inline bytecode operator "@uint" ( i : ushort ) : uint
@@ -351,7 +491,7 @@ type ulong = {
     inline bytecode operator "<" ( i : ulong )
         { libunsigned:ULPRINT };
 
-    inline bytecode operator "@ulong" ( i : char ) : ulong
+    inline bytecode operator "@ulong" ( i : ubyte ) : ulong
         { libunsigned:UBEXTEND libunsigned:UHEXTEND
           libunsigned:UEXTEND };
 
@@ -501,7 +641,7 @@ type ullong = {
     inline bytecode operator "<" ( i : ullong )
         { libunsigned:ULLPRINT };
 
-    inline bytecode operator "@ullong" ( i : char ) : ullong
+    inline bytecode operator "@ullong" ( i : ubyte ) : ullong
         { libunsigned:UBEXTEND libunsigned:UHEXTEND
           libunsigned:UEXTEND libunsigned:ULEXTEND };
 

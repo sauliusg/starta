@@ -24,6 +24,7 @@ void *module_id = &module_id;
 
 char *OPCODES[] = {
 
+#include "locally-generated/unsigned_ubyte.tab.c"
 #include "locally-generated/unsigned_ushort.tab.c"
 #include "locally-generated/unsigned_uint.tab.c"
 #include "locally-generated/unsigned_ulong.tab.c"
@@ -178,6 +179,7 @@ int ULEXTEND( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+#include <locally-generated/unsigned_ubyte.c>
 #include <locally-generated/unsigned_ushort.c>
 #include <locally-generated/unsigned_uint.c>
 #include <locally-generated/unsigned_ulong.c>
