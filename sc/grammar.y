@@ -5790,12 +5790,14 @@ static void compiler_load_library( COMPILER *compiler,
 
 	if( !lib ) {
 	    char *errmsg = dlerror();
+            /*
 	    errmsg = rindex( errmsg, ':' );
 	    if( errmsg ) errmsg ++;
 	    if( errmsg && *errmsg == ' ' ) errmsg ++;
+            */
 	    if( errmsg && *errmsg ) {
-		yyerrorf( "could not open shared library '%s' - %c%s",
-			  library_filename, tolower(*errmsg), errmsg+1 );
+		yyerrorf( "could not open shared library %c%s",
+			  tolower(*errmsg), errmsg+1 );
 	    } else {
 		yyerrorf( "could not open shared library '%s'",
                           library_filename );
