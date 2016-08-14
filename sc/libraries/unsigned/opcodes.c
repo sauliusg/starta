@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include <stackcell.h>
 #include <alloccell.h>
 #include <bcalloc.h>
@@ -199,6 +200,7 @@ int UB2S( INSTRUCTION_FN_ARGS )
 
     assert( sizeof(istate.ep[0].num.s) > sizeof(istate.ep[0].num.c) );
     istate.ep[0].num.s = istate.ep[0].num.c;
+    printf( ">>> UB2S: c = %hu, s = %hi\n", istate.ep[0].num.c, istate.ep[0].num.s );
 
     return 1;
 }

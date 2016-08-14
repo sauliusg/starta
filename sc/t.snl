@@ -27,5 +27,8 @@ b = 127 B;
 . ub + 1UB;
 . b + 1B;
 
+. ub;
 i = ub@int;
+. i
+
 // ui = b;

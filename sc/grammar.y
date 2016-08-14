@@ -1661,10 +1661,29 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
 }
 
 static DNODE* compiler_lookup_conversion( COMPILER *cc,
-                                          TNODE *tnode,
-                                          TNODE *target_type )
+                                          TNODE *target_type,
+                                          TNODE *src_type )
 {
-    return tnode_lookup_conversion( tnode, target_type );
+    TLIST *conversion_argument = NULL;
+    TNODE *source_type = src_type;
+    cexception_t *ex = NULL; /* FIXME: make 'ex' an argument */
+
+    printf( ">>> looking up conversion from '%s' to '%s'\n",
+            target_type ? tnode_name(src_type) : "<null>",
+            target_type ? tnode_name(target_type) : "<null>" );
+
+    tlist_push_tnode( &conversion_argument, &source_type, ex );
+
+    DNODE *conversion_dnode =
+        src_type ?
+        vartab_lookup_operator( cc->operators, tnode_name( src_type ),
+                                conversion_argument ) : NULL;
+
+    if( conversion_dnode ) {
+        return conversion_dnode;
+    } else {
+        return tnode_lookup_conversion( target_type, src_type );
+    }
 }
 
 static void compiler_compile_type_conversion( COMPILER *cc,
