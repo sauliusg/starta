@@ -18,6 +18,15 @@
 
 extern istate_t *istate_ptr;
 
+/*
+** Type conversion opcodes:
+*/
+
+int UBEXTEND( INSTRUCTION_FN_ARGS );
+int UEXTEND( INSTRUCTION_FN_ARGS );
+int UHEXTEND( INSTRUCTION_FN_ARGS );
+int ULEXTEND( INSTRUCTION_FN_ARGS );
+
 #include "locally-generated/unsigned_ushort.h"
 #include "locally-generated/unsigned_uint.h"
 #include "locally-generated/unsigned_ulong.h"

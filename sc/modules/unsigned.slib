@@ -208,11 +208,11 @@ type uint = {
     inline bytecode operator "<" ( i : uint )
         { libunsigned:UPRINT };
 
-    inline bytecode operator "@uint" ( i : byte ) : uint
-        { BEXTEND HEXTEND };
+    inline bytecode operator "@uint" ( i : char ) : uint
+        { libunsigned:UBEXTEND libunsigned:UHEXTEND };
 
-    inline bytecode operator "@uint" ( i : short ) : uint
-        { HEXTEND };
+    inline bytecode operator "@uint" ( i : ushort ) : uint
+        { libunsigned:UHEXTEND };
 
     inline bytecode operator "<<" ( f : file; i : uint ) : file
     	{ libunsigned:UFILEPRINT };

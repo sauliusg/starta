@@ -29,6 +29,8 @@ char *OPCODES[] = {
 #include "locally-generated/unsigned_ulong.tab.c"
 #include "locally-generated/unsigned_ullong.tab.c"
 
+#include "locally-generated/opcodes.tab.c"
+
     NULL
 };
 
@@ -86,6 +88,94 @@ int trace_on( int trace_flag )
     int old_trace_flag = trace;
     trace = trace_flag;
     return old_trace_flag;
+}
+
+/*
+** Type conversion opcodes:
+*/
+
+/*
+ * UBEXTEND converts unsigned byte value on the top of the stack to
+ * short unsigned integer
+ * 
+ * bytecode:
+ * UBEXTEND
+ * 
+ * stack:
+ * ubyte (char) -> ushort
+ * 
+ */
+
+int UBEXTEND( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.us = istate.ep[0].num.c;
+
+    return 1;
+}
+
+/*
+ * UEXTEND converts unsigned integer value on the top of the stack to
+ * unsignde long integer
+ * 
+ * bytecode:
+ * UEXTEND
+ * 
+ * stack:
+ * uint -> ulong
+ * 
+ */
+
+int UEXTEND( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.ul = istate.ep[0].num.ui;
+
+    return 1;
+}
+
+/*
+ * UHEXTEND converts unsigned short integer value on the top of the
+ * stack into unsigned integer
+ * 
+ * bytecode:
+ * UHEXTEND
+ * 
+ * stack:
+ * ushort -> uint
+ * 
+ */
+
+int UHEXTEND( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.ui = istate.ep[0].num.us;
+
+    return 1;
+}
+
+/*
+ * ULEXTEND converts unsigned long integer value on the top of the
+ * stack to a unsigned long long integer
+ * 
+ * bytecode:
+ * ULEXTEND
+ * 
+ * stack:
+ * ulong -> ullong
+ * 
+ */
+
+int ULEXTEND( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.ull = istate.ep[0].num.ul;
+
+    return 1;
 }
 
 #include <locally-generated/unsigned_ushort.c>
