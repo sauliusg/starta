@@ -287,6 +287,9 @@ type ushort = {
         { libunsigned:UHLENGTH DEC }
 }
 
+inline bytecode operator "@short" ( i : ubyte ) : short
+{ libunsigned:UB2S }
+
 type uint = {
     size = sizeof native "int";
     kind = integer;
@@ -432,6 +435,12 @@ type uint = {
     inline bytecode operator "last"( a : array ): uint
         { libunsigned:ULENGTH DEC }
 }
+
+inline bytecode operator "@int" ( i : ubyte ) : int
+{ libunsigned:UB2S HEXTEND }
+
+inline bytecode operator "@int" ( i : ushort ) : int
+{ libunsigned:US2I }
 
 type ulong = {
     size = sizeof native "long";
