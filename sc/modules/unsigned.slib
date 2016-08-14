@@ -4,6 +4,152 @@ use * from std;
 
 load "libraries/unsigned/libunsigned.so.0.01";
 
+type ushort = {
+    size = sizeof native "short";
+    kind = integer;
+    suffix = "UH";
+
+    inline bytecode operator "+" ( i : ushort ) : ushort
+        { /* do nothing */ };
+
+    inline bytecode operator "+" ( i : ushort; j : ushort ) : ushort
+        { LADD };
+    inline bytecode operator "-" ( i : ushort; j : ushort ) : ushort
+        { LSUB };
+    inline bytecode operator "*" ( i : ushort; j : ushort ) : ushort
+        { libunsigned:UHMUL };
+    inline bytecode operator "/" ( i : ushort; j : ushort ) : ushort
+        { libunsigned:UHDIV };
+    inline bytecode operator "%" ( i : ushort; j : ushort ) : ushort
+        { libunsigned:UHMOD };
+
+    bytecode inline operator "<" ( x, y : ushort ) : bool
+        { libunsigned:UHLTBOOL };
+    bytecode inline operator ">" ( x, y : ushort ) : bool
+        { libunsigned:UHGTBOOL };
+    bytecode inline operator "<=" ( x, y : ushort ) : bool
+        { libunsigned:UHLEBOOL };
+    bytecode inline operator ">=" ( x, y : ushort ) : bool
+        { libunsigned:UHGEBOOL };
+    bytecode inline operator "==" ( x, y : ushort ) : bool
+        { libunsigned:UHEQBOOL };
+    bytecode inline operator "!=" ( x, y : ushort ) : bool
+        { libunsigned:UHNEBOOL };
+
+    bytecode inline operator "shl" ( x, y : ushort ) : ushort
+	{ LSHL };
+    bytecode inline operator "shr" ( x, y : ushort ) : ushort
+	{ LSHR };
+    bytecode inline operator "&" ( x, y : ushort ) : ushort
+	{ LAND };
+    bytecode inline operator "|" ( x, y : ushort ) : ushort
+	{ LOR };
+    bytecode inline operator "^" ( x, y : ushort ) : ushort
+	{ LXOR };
+    bytecode inline operator "~" ( x: ushort ) : ushort
+	{ LNOT };
+
+    inline bytecode operator "++" ( i : ushort ) : ushort
+        { LINC };
+    inline bytecode operator "--" ( i : ushort ) : ushort
+        { LDEC };
+    inline bytecode operator "incvar" ()
+        { LINCVAR };
+    inline bytecode operator "decvar" ()
+        { LDECVAR };
+    inline bytecode operator "." ( i : ushort )
+        { libunsigned:UHPRINT };
+    inline bytecode operator "<" ( i : ushort )
+        { libunsigned:UHPRINT };
+
+    inline bytecode operator "@ushort" ( i : byte ) : ushort
+        { BEXTEND HEXTEND };
+
+    inline bytecode operator "@ushort" ( i : short ) : ushort
+        { HEXTEND };
+
+    inline bytecode operator "<<" ( f : file; i : ushort ) : file
+    	{ libunsigned:UHFILEPRINT };
+
+    inline bytecode operator ">>" ( f : file ) : ushort
+    	{ libunsigned:UHFILESCAN };
+
+    inline bytecode operator "%%" ( format : string; x : ushort ) : string
+        { libunsigned:UHSPRINTF };
+
+    inline bytecode operator "%%" ( x : ushort ) : string
+        { SLDC "%d" SWAP ISPRINTF };
+
+    bytecode inline operator "jnz" ( x : ushort )
+        { JNZ };
+    bytecode inline operator "jz" ( x : ushort )
+        { JZ };
+
+    inline bytecode operator "ldc" () : ushort
+        { libunsigned:UHLDCS };
+
+    inline bytecode operator "loop" ( counter : addressof; range : ushort )
+        { libunsigned:UHLOOP };
+
+    inline bytecode operator "[]" ( a : array; i : ushort ) : addressof
+        { libunsigned:UHINDEX };
+
+    inline bytecode operator "[..]" ( a : array; lower, upper : ushort ) : array
+        { libunsigned:UHSUBARRAY };
+
+    inline bytecode operator "new[]" ( i : ushort ) : array
+        { libunsigned:UHAALLOC %%element_size %%element_nref };
+
+    inline bytecode operator "blob[]" ( i : ushort ) : blob
+        { libunsigned:UHBLOB };
+
+    inline bytecode operator "new[][]" ( i : ushort ) : array
+        { libunsigned:UHMDALLOCC %%element_size %%element_nref %%level };
+
+    inline bytecode operator "exceptionval" ( p : ref ) : ushort
+        { ERRORCODE };
+
+    inline bytecode operator "exceptionset" ( i : ushort ) : ushort
+        { /* empty */ };
+
+    inline bytecode operator "pack"( blob b; ushort offset;
+                                     string description; ushort value )
+        { libunsigned:UHPACK };
+
+    inline bytecode operator "packarray"( blob b; ushort offset;
+                                     	  string description; 
+				     	  array of ushort value )
+        { libunsigned:UHPACKARRAY };
+
+    inline bytecode operator "packmdarray"( blob b; ushort offset;
+                                     	    string description; 
+				     	    array value )
+        { libunsigned:UHPACKMDARRAY %%level };
+
+    inline bytecode operator "unpack"( blob b; ushort offset;
+                                       string description ) : ushort
+        { libunsigned:UHUNPACK };
+
+    inline bytecode operator "unpackarray"( blob b; ushort offset;
+                                       	    string description ) : array of ushort
+        { libunsigned:UHUNPACKARRAY };
+
+    inline bytecode operator "unpackmdarray"( blob b; ushort offset;
+                                      	      string description ) : array
+        { libunsigned:UHUNPACKMDARRAY %%level };
+
+    inline bytecode operator "nth-byte"( ushort i; ushort index ): byte
+        { libunsigned:UHNthBYTE };
+
+    /* The "last" operator provides the index of the last array "a"
+    element is is necessary to compile an 'a[i:]' construct with the
+    correct type of the upper limit (the type must be the same as of
+    variable 'i': */
+
+    inline bytecode operator "last"( a : array ): ushort
+        { libunsigned:UHLENGTH DEC }
+}
+
 type uint = {
     size = sizeof native "int";
     kind = integer;
