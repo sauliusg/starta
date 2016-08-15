@@ -76,7 +76,7 @@ SO_MINOR = 01
 SO_VERSION = ${SO_MAJOR}.${SO_MINOR}
 
 LOCAL_LIB := ${addprefix lib, ${addsuffix .a, ${notdir ${shell pwd}} }}
-LOCAL_SO  := ${addprefix lib, ${addsuffix .so, ${notdir ${shell pwd}} }}
+LOCAL_SO  := ${addprefix lib, ${addsuffix .so, ${subst -O3,,${notdir ${shell pwd}}} }}
 LOCAL_SOV := ${LOCAL_SO}.${SO_VERSION}
 
 #
@@ -419,6 +419,7 @@ cleanAll distclean: clean ${LOCAL_CLEAN_TARGETS}
 	rm -f ${EXE_FILES} ${TST_DRIVERS}
 	rm -f ${DEPEND_FILES}
 	rm -f ${LOCAL_LIB}
+	rm -f ${LOCAL_SO} ${LOCAL_SO}.${SO_MAJOR} ${LOCAL_SOV}
 
 #------------------------------------------------------------------------------
 
