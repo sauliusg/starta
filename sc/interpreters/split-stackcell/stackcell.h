@@ -18,6 +18,12 @@ typedef union stackunion {
   int i;
   long l;
   llong ll;
+
+  unsigned short us;
+  unsigned int ui;
+  unsigned long ul;
+  unsigned long long ull;
+
   void *ptr;
   float f;
   double d;
