@@ -20,7 +20,7 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 ${GEN_DIR}/unsigned_%.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/unsigned.hin
 	sed -f $^ > $@
 
-${GEN_DIR}/unsigned_%.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/unsigned.cin
+${GEN_DIR}/unsigned_%.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/$(notdir ${INTERPRETER_DIR})/unsigned.cin
 	sed -f $^ > $@
 
 #-----------------------------------------------------------------------------
