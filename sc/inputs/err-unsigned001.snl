@@ -12,4 +12,4 @@ var ll: ullong;
 var i: int;
 
 i = u; // ERROR, incomplatible types
-i = s; // ERROR, incomplatible types
+i = l; // ERROR, incomplatible types

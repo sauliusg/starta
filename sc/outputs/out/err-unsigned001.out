@@ -2,7 +2,7 @@
 i = u; // ERROR, incomplatible types
      ^
 ./sl: inputs/err-unsigned001.snl(15,6): ERROR, incompatible types for assignment to variable 'i'
-i = s; // ERROR, incomplatible types
+i = l; // ERROR, incomplatible types
      ^
 ./sl: 2 error(s) detected
 

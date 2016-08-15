@@ -200,7 +200,6 @@ int UB2S( INSTRUCTION_FN_ARGS )
 
     assert( sizeof(istate.ep[0].num.s) > sizeof(istate.ep[0].num.c) );
     istate.ep[0].num.s = istate.ep[0].num.c;
-    printf( ">>> UB2S: c = %hu, s = %hi\n", istate.ep[0].num.c, istate.ep[0].num.s );
 
     return 1;
 }
