@@ -70,7 +70,14 @@ LOCAL_CFILES := ${filter-out %.tab.c lex.yy.c %.lex.c, ${LOCAL_CFILES}}
 LOCAL_OBJS    = ${LOCAL_CFILES:%.c=${OBJDIR}/%.o}
 LOCAL_DEPENDS = ${LOCAL_CFILES:%.c=.%.d}
 
+SO_MAJOR = 0
+SO_MINOR = 01
+
+SO_VERSION = ${SO_MAJOR}.${SO_MINOR}
+
 LOCAL_LIB := ${addprefix lib, ${addsuffix .a, ${notdir ${shell pwd}} }}
+LOCAL_SO  := ${addprefix lib, ${addsuffix .so, ${notdir ${shell pwd}} }}
+LOCAL_SOV := ${LOCAL_SO}.${SO_VERSION}
 
 #
 # ./testprogs directory contains test drivers, each of them containing
@@ -174,7 +181,7 @@ LINK_OBJ_FILES = ${YYOBJ} ${FLEXOBJ} ${OTHER_OBJS}
 
 .PHONY: all lib libs clean distclean cleanAll FORCE
 
-all: ${LOCAL_LIB} ${EXE_FILES} ${TST_DRIVERS}
+all: ${LOCAL_LIB} ${LOCAL_SO} ${EXE_FILES} ${TST_DRIVERS}
 
 lib libs: ${LIB_DIRS}
 
@@ -198,6 +205,15 @@ FORCE:;
 ${LOCAL_LIB}: ${LOCAL_OBJS}
 	ar cr ${LOCAL_LIB} ${LOCAL_OBJS}
 
+${LOCAL_SOV}: ${LOCAL_OBJS} ${LINK_OBJ_FILES}
+	${LD} -shared -soname ${LOCAL_SO}.${SO_MAJOR} -o $@ $^ ${LIBFLAGS} -lc_nonshared
+
+${LOCAL_SO}: ${LOCAL_SO}.${SO_MAJOR}
+	ln -sf $< $@
+
+${LOCAL_SO}.${SO_MAJOR}: ${LOCAL_SOV}
+	ln -sf $< $@
+
 #------------------------------------------------------------------------------
 
 MAKELOCAL_FILES = ${filter-out %~, ${wildcard Makelocal*}}
@@ -219,6 +235,9 @@ ${OBJDIR}/%.o: %.c
 
 %: ${PROGDIR}/%.c ${LINK_OBJ_FILES} ${LOCAL_LIB} ${LIB_FILES}
 	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^ ${LIBFLAGS}
+
+## %: ${PROGDIR}/%.c ${LOCAL_SO}
+## 	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^ ${LIBFLAGS}
 
 ${TST_EXE_DIR}/%: ${TST_PRG_DIR}/%.c ${LINK_OBJ_FILES} \
                   ${LOCAL_LIB} ${LIB_FILES}

@@ -255,7 +255,7 @@ static int argv_has_dashes( int argc, char *argv[] )
     return 0;
 }
 
-char *progname;
+extern char *progname;
 char *progtail;
 
 int main( int argc, char *argv[], char *env[] )

@@ -48,6 +48,8 @@
 #include <implementation.h>
 #include <assert.h>
 
+char *progname;
+
 static char *compiler_version = "0.0";
 
 /* COMPILER_STATE contains necessary compiler state that must be
