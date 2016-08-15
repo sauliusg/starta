@@ -1668,15 +1668,17 @@ static DNODE* compiler_lookup_conversion( COMPILER *cc,
     TNODE *source_type = src_type;
     cexception_t *ex = NULL; /* FIXME: make 'ex' an argument */
 
+#if 0
     printf( ">>> looking up conversion from '%s' to '%s'\n",
             target_type ? tnode_name(src_type) : "<null>",
             target_type ? tnode_name(target_type) : "<null>" );
+#endif
 
     tlist_push_tnode( &conversion_argument, &source_type, ex );
 
     DNODE *conversion_dnode =
-        src_type ?
-        vartab_lookup_operator( cc->operators, tnode_name( src_type ),
+        target_type ?
+        vartab_lookup_operator( cc->operators, tnode_name( target_type ),
                                 conversion_argument ) : NULL;
 
     if( conversion_dnode ) {
@@ -7305,10 +7307,26 @@ undelimited_simple_statement
   | function_definition
   | operator_definition
     {
-        vartab_insert_named_operator( compiler->operators, $1, px );
-        if( compiler->current_module && dnode_scope( $1 ) == 0 ) {
-            dnode_optab_insert_named_operator( compiler->current_module,
-                                               share_dnode( $1 ), px );
+#if 0
+        printf( ">>>> receiving operator '%s', tnode name '%s'\n", dnode_name($1), tnode_name(dnode_type($1)));
+#endif
+        DNODE *operator = $1;
+        TNODE *optype = operator ? dnode_type( operator ) : NULL;
+        char *opname = operator ? dnode_name( operator ) : NULL;
+
+        if( optype && tnode_is_conversion( optype )) {
+            opname = tnode_name( optype );
+            if( opname && opname[0] == '@' ) {
+                opname ++; /* Skip the '@' symbol */
+            }
+        }
+#if 0
+        printf( ">>>> inserting operator '%s'\n", opname );
+#endif
+        vartab_insert_operator( compiler->operators, opname, operator, px );
+        if( compiler->current_module && dnode_scope( operator ) == 0 ) {
+            dnode_optab_insert_operator( compiler->current_module, opname,
+                                         share_dnode( operator ), px );
         }
     }
   | compound_statement

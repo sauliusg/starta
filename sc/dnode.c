@@ -1052,6 +1052,13 @@ void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
     vartab_insert_named_operator( dnode->operators, operator, ex );
 }
 
+void dnode_optab_insert_operator( DNODE *dnode, char *opname, DNODE *operator,
+                                  cexception_t *ex )
+{
+    assert( dnode->vartab );
+    vartab_insert_operator( dnode->operators, opname, operator, ex );
+}
+
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name )
 {
     assert( dnode->vartab );
