@@ -19,6 +19,12 @@
 extern istate_t *istate_ptr;
 
 /*
+ * Setting flags
+ */
+
+int STRICT( INSTRUCTION_FN_ARGS );
+
+/*
 ** Type conversion opcodes:
 */
 

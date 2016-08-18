@@ -4,6 +4,11 @@ use * from std;
 
 load "libraries/unsigned/libunsigned.so.0.01";
 
+inline bytecode function strict( bool strict ): bool
+{
+      libunsigned:STRICT
+}
+
 type ubyte = {
     size = sizeof native "char";
     kind = integer;
