@@ -36,6 +36,21 @@ char *OPCODES[] = {
     NULL
 };
 
+/* If 'strict_unsigned_conversions' is true, the UI2L opcodes will
+   never convert an unsigned value to an integer value if the signed
+   value is the same size or smaller. If 'strict_unsigned_conversions'
+   is false, the opcodes will convert an unsigned value into a signed
+   value if the value fits the destination.
+
+   Users will prefer the 'strict_unsigned_conversions = 0' (false),
+   but developers might find it easier to test software when
+   'strict_unsigned_conversions = 1' (true) is set.
+
+   USE the 'STRICT' opcode from this library to set and query the
+   'strict_unsigned_conversions' flag. */
+
+static int strict_unsigned_conversions = 0;
+
 int trace = 0;
 
 istate_t *istate_ptr;
@@ -90,6 +105,32 @@ int trace_on( int trace_flag )
     int old_trace_flag = trace;
     trace = trace_flag;
     return old_trace_flag;
+}
+
+/*
+ * Setting flags
+ */
+
+/*
+ * STRICT  Set and query the 'strict_unsigned_conversions' flag.
+ *
+ * bytecode:
+ * STRICT
+ *
+ * stack:
+ * bool -> bool
+*/
+
+int STRICT( INSTRUCTION_FN_ARGS )
+{
+    unsigned char strict = istate.ep[0].num.c;
+
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.c = strict_unsigned_conversions;
+    strict_unsigned_conversions = strict;
+
+    return 1;
 }
 
 /*
@@ -240,7 +281,34 @@ int UI2L( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-    assert( sizeof(istate.ep[0].num.l) > sizeof(istate.ep[0].num.ui) );
+    if( strict_unsigned_conversions ) {
+        if( sizeof(istate.ep[0].num.l) <= sizeof(istate.ep[0].num.ui) ) {
+            interpret_raise_exception_with_bcalloc_message
+                ( /* err_code = */ -3,
+                  /* message = */ (char*)cxprintf
+                  ( "%s - the target type 'long' (%d bytes) is not larger "
+                    "than the original 'unsigned integer' (%d bytes)",
+                    __FUNCTION__,
+                    sizeof(istate.ep[0].num.ui), sizeof(istate.ep[0].num.l) ),
+                  /* module_id = */ 0,
+                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+                  EXCEPTION );
+            return 0;
+        }
+    } else {
+        if( istate.ep[0].num.ui > ( ((unsigned long)(-1L)) >> 1 ) ) {
+            interpret_raise_exception_with_bcalloc_message
+                ( /* err_code = */ -3,
+                  /* message = */ (char*)cxprintf
+                  ( "%s - unsigned int value '%u' does not fit long integer",
+                    __FUNCTION__, istate.ep[0].num.ui ),
+                  /* module_id = */ 0,
+                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+                  EXCEPTION );
+            return 0;
+        }
+    }
+
     istate.ep[0].num.l = istate.ep[0].num.ui;
 
     return 1;
