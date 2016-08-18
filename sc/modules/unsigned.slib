@@ -592,6 +592,15 @@ type ulong = {
         { libunsigned:ULLENGTH DEC }
 }
 
+inline bytecode operator "@long" ( i : ubyte ) : long
+{ libunsigned:UB2S HEXTEND EXTEND }
+
+inline bytecode operator "@long" ( i : ushort ) : long
+{ libunsigned:US2I EXTEND }
+
+inline bytecode operator "@long" ( i : uint ) : long
+{ libunsigned:UI2L }
+
 type ullong = {
     size = sizeof native "llong";
     kind = integer;
@@ -745,5 +754,17 @@ type ullong = {
     inline bytecode operator "last"( a : array ): ullong
         { libunsigned:ULLLENGTH DEC }
 }
+
+inline bytecode operator "@llong" ( i : ubyte ) : llong
+{ libunsigned:UB2S HEXTEND EXTEND LEXTEND }
+
+inline bytecode operator "@llong" ( i : ushort ) : llong
+{ libunsigned:US2I EXTEND LEXTEND }
+
+inline bytecode operator "@llong" ( i : uint ) : llong
+{ libunsigned:UI2L LEXTEND }
+
+inline bytecode operator "@llong" ( i : ulong ) : llong
+{ libunsigned:UL2LL }
 
 end package unsigned;
