@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h> /* for the ..._MAX constants */
 #include <errno.h>
 #include <assert.h>
 #include <stackcell.h>
@@ -272,7 +273,10 @@ int UB2S( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
+    /* The ..._MAX constants come from the 'limits.h' */
+#if SHRT_MAX < UCHAR_MAX
     CHECK_SIZES( short, unsigned char, istate.ep[0].num.s, istate.ep[0].num.c );
+#endif
 
     istate.ep[0].num.s = istate.ep[0].num.c;
 
@@ -294,7 +298,9 @@ int US2I( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
+#if INT_MAX < USHRT_MAX
     CHECK_SIZES( int, unsigned short, istate.ep[0].num.i, istate.ep[0].num.us );
+#endif
 
     istate.ep[0].num.i = istate.ep[0].num.us;
 
@@ -316,7 +322,9 @@ int UI2L( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
+#if LONG_MAX < UINT_MAX
     CHECK_SIZES( long, unsigned int, istate.ep[0].num.l, istate.ep[0].num.ui );
+#endif
 
     istate.ep[0].num.l = istate.ep[0].num.ui;
 
@@ -338,7 +346,9 @@ int UL2LL( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
+#if LLONG_MAX < ULONG_MAX
     CHECK_SIZES( long long, unsigned long, istate.ep[0].num.ll, istate.ep[0].num.ul );
+#endif
 
     istate.ep[0].num.ll = istate.ep[0].num.ul;
 
