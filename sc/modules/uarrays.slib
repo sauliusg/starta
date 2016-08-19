@@ -1,0 +1,8 @@
+
+package uarrays
+
+use unsigned;
+
+load "libraries/uarrays/libuarrays.so.0.01";
+
+end package uarrays;
