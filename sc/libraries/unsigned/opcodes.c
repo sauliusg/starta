@@ -294,7 +294,8 @@ int US2I( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-    assert( sizeof(istate.ep[0].num.i) > sizeof(istate.ep[0].num.us) );
+    CHECK_SIZES( int, unsigned short, istate.ep[0].num.i, istate.ep[0].num.us );
+
     istate.ep[0].num.i = istate.ep[0].num.us;
 
     return 1;
