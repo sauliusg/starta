@@ -338,8 +338,9 @@ int UL2LL( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-    assert( sizeof(istate.ep[0].num.ll) > sizeof(istate.ep[0].num.ul) );
-    istate.ep[0].num.l = istate.ep[0].num.ul;
+    CHECK_SIZES( long long, unsigned long, istate.ep[0].num.ll, istate.ep[0].num.ul );
+
+    istate.ep[0].num.ll = istate.ep[0].num.ul;
 
     return 1;
 }
