@@ -314,37 +314,7 @@ int UI2L( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-#if 0
-    if( strict_unsigned_conversions ) {
-        if( sizeof(istate.ep[0].num.l) <= sizeof(istate.ep[0].num.ui) ) {
-            interpret_raise_exception_with_bcalloc_message
-                ( /* err_code = */ -3,
-                  /* message = */ (char*)cxprintf
-                  ( "%s - the target type 'long' (%d bytes) is not larger "
-                    "than the original 'unsigned integer' (%d bytes)",
-                    __FUNCTION__,
-                    sizeof(istate.ep[0].num.ui), sizeof(istate.ep[0].num.l) ),
-                  /* module_id = */ 0,
-                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
-                  EXCEPTION );
-            return 0;
-        }
-    } else {
-        if( istate.ep[0].num.ui > ( ((unsigned long)(-1L)) >> 1 ) ) {
-            interpret_raise_exception_with_bcalloc_message
-                ( /* err_code = */ -3,
-                  /* message = */ (char*)cxprintf
-                  ( "%s - unsigned int value '%u' does not fit long integer",
-                    __FUNCTION__, istate.ep[0].num.ui ),
-                  /* module_id = */ 0,
-                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
-                  EXCEPTION );
-            return 0;
-        }
-    }
-#else
     CHECK_SIZES( long, unsigned int, istate.ep[0].num.l, istate.ep[0].num.ui );
-#endif
 
     istate.ep[0].num.l = istate.ep[0].num.ui;
 
