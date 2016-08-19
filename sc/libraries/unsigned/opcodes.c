@@ -272,7 +272,8 @@ int UB2S( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
-    assert( sizeof(istate.ep[0].num.s) > sizeof(istate.ep[0].num.c) );
+    CHECK_SIZES( short, unsigned char, istate.ep[0].num.s, istate.ep[0].num.c );
+
     istate.ep[0].num.s = istate.ep[0].num.c;
 
     return 1;
