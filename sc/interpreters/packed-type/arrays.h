@@ -13,6 +13,4 @@
 
 #define ARRAY_ELEMENT(a) (a)
 
-#define SET_ARRAY( a, i, v ) ((a)[i] = (v))
-
 #endif

@@ -9,7 +9,7 @@
 
 char *OPCODES[] = {
 
-#include "locally-generated/opcodes.tab.c"
+#include <locally-generated/opcodes.tab.c>
 
     NULL
 };
@@ -106,10 +106,6 @@ int trace_on( int trace_flag )
 #error ARRAY_ELEMENT unset! Please check if 'arrays.h' from the interpreter dir is included.
 #endif
 
-#ifndef SET_ARRAY
-#error SET_ARRAY unset! Please check if 'arrays.h' from the interpreter dir is included.
-#endif
-
 /*
  * ARRAY_US2I convert unsigned short to integer.
  * 
@@ -124,8 +120,16 @@ int trace_on( int trace_flag )
 int ARRAY_US2I( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
+#ifdef packed_type
     unsigned short *src_array = STACKCELL_PTR( istate.ep[1] );
     int *dst_array = STACKCELL_PTR( istate.ep[0] );
+#elif full_stackcell
+    stackcell_t *src_array = STACKCELL_PTR( istate.ep[1] );
+    stackcell_t *dst_array = STACKCELL_PTR( istate.ep[0] );
+#elif split_stackcell
+    stackunion_t *src_array = STACKCELL_PTR( istate.ep[1] );
+    stackunion_t *dst_array = STACKCELL_PTR( istate.ep[0] );
+#endif
     alloccell_t *src_hdr = (alloccell_t*)src_array;
     alloccell_t *dst_hdr = (alloccell_t*)dst_array;
 
@@ -141,7 +145,13 @@ int ARRAY_US2I( INSTRUCTION_FN_ARGS )
                          ARRAY_ELEMENT(dst_array[i]),
                          ARRAY_ELEMENT(src_array[i]) );
 #endif
-            SET_ARRAY( dst_array, i, ARRAY_ELEMENT(src_array[i]) );
+#ifdef packed_type
+            dst_array[i] = src_array[i];
+#elif full_stackcell
+            dst_array[i].num.i = src_array[i].num.us;
+#elif split_stackcell
+            dst_array[i].i = src_array[i].us;
+#endif
         }
     }
 
