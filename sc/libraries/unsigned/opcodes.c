@@ -222,7 +222,40 @@ int ULEXTEND( INSTRUCTION_FN_ARGS )
 }
 
 /* Unsigned -> signed conversions: you can always convert an unsigned
-   integer to a signed integre of larger size: */
+   integer to a signed integer of larger size: */
+
+/* Type size checks: */
+
+#define CHECK_SIZES( DST_TYPE, SRC_TYPE, DST_VAL, SRC_VAL ) \
+    if( strict_unsigned_conversions ) {                                     \
+        if( sizeof(DST_VAL) <= sizeof(SRC_VAL) ) {                          \
+            interpret_raise_exception_with_bcalloc_message                  \
+                ( /* err_code = */ -3,                                      \
+                  /* message = */ (char*)cxprintf                           \
+                  ( "%s - the target type '" #DST_TYPE                      \
+                    "' (%d bytes) is not larger "                           \
+                    "than the original '" #SRC_TYPE "' (%d bytes)",         \
+                    __FUNCTION__,                                           \
+                    sizeof(DST_VAL), sizeof(SRC_VAL) ),                     \
+                  /* module_id = */ 0,                                      \
+                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,      \
+                  EXCEPTION );                                              \
+            return 0;                                                       \
+        }                                                                   \
+    } else {                                                                \
+          if( SRC_VAL > ( ((unsigned DST_TYPE)((DST_TYPE)-1)) >> 1 ) ) {    \
+            interpret_raise_exception_with_bcalloc_message                  \
+                ( /* err_code = */ -3,                                      \
+                  /* message = */ (char*)cxprintf                           \
+                  ( "%s - " #SRC_TYPE " value '%u' does not fit '"          \
+                    #DST_TYPE "' value",                                    \
+                    __FUNCTION__, SRC_VAL ),                                \
+                  /* module_id = */ 0,                                      \
+                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,      \
+                  EXCEPTION );                                              \
+            return 0;                                                       \
+        }                                                                   \
+    }
 
 /*
  * UB2S convert unsigned byte to short integer.
@@ -281,6 +314,7 @@ int UI2L( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();
 
+#if 0
     if( strict_unsigned_conversions ) {
         if( sizeof(istate.ep[0].num.l) <= sizeof(istate.ep[0].num.ui) ) {
             interpret_raise_exception_with_bcalloc_message
@@ -308,6 +342,9 @@ int UI2L( INSTRUCTION_FN_ARGS )
             return 0;
         }
     }
+#else
+    CHECK_SIZES( long, unsigned int, istate.ep[0].num.l, istate.ep[0].num.ui );
+#endif
 
     istate.ep[0].num.l = istate.ep[0].num.ui;
 
