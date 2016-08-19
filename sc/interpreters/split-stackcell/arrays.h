@@ -13,4 +13,6 @@
 
 #define ARRAY_ELEMENT(a) ((a).I)
 
+#define SET_ARRAY( a, i, v ) ((a)[i].I = (v))
+
 #endif
