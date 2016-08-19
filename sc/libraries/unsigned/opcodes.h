@@ -5,8 +5,8 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
-#ifndef __TCODES_H
-#define __TCODES_H
+#ifndef __OPCODES_H
+#define __OPCODES_H
 
 #include <run.h>
 
