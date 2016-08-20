@@ -1447,7 +1447,7 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 	istate.ep[1].I = 0;
         istate.ep[0].num.ssize = -1;
     } else {
-        llong value;
+        ullong value;
         errno = 0;
         value = strto@field@( str, &endptr, base );
         if( errno || value > @type_max@ ) {
