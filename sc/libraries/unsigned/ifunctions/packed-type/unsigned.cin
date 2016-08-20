@@ -1508,6 +1508,7 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+#undef strtoc
 #undef strtoui
 #undef strtous
 #undef strtoub
