@@ -1,0 +1,14 @@
+// --*- C -*--
+
+// Test unsigned number library
+
+use std;
+use unsigned;
+
+var x = ~0 UB;
+
+. x;
+. %% x;
+
+. x shr 1UB;
+. %% (x shr 1UB);
