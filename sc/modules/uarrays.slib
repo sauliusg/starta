@@ -26,4 +26,9 @@ inline bytecode procedure array_ui2l( long out[]; uint inp[] ): long[]
     libuarrays:ARRAY_UI2L
 }
 
+inline bytecode procedure array_ui2ll( llong out[]; uint inp[] ): llong[]
+{
+    libuarrays:ARRAY_UI2LL
+}
+
 end package uarrays;
