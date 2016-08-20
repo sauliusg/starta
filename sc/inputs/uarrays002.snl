@@ -21,13 +21,7 @@ for var i = 0 to last(ia) {
 }
 . "----------------------------------------------------------------------";
 
-// S.G. 2016-08-20:
-//
-// Is the following behaviour a bug or a feature?
-//
-// The first (index 0) element of this array overflows when converting
-// the constant to the 'unsigned byte', and yields 0:
-var ub = [ 256 UB, 255 UB, 250UB, 128UB ];
+var ub = [ 254 UB, 255 UB, 250UB, 128UB ];
 
 for var i = 0 to last(ub) {
     . ub[i];
