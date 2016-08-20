@@ -708,7 +708,7 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.ep --;
-    istate.ep[0].I = strtol( istate.static_data + offset, NULL, 0 );
+    istate.ep[0].I = strtoll( istate.static_data + offset, NULL, 0 );
 
     return 2;
 }
@@ -724,7 +724,7 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
     istate.code[istate.ip].fn = @PREFIX1@LDC;
 
     istate.code[istate.ip+1].CVAL =
-        strtol( istate.static_data + offset, NULL, 0 );
+        strtoll( istate.static_data + offset, NULL, 0 );
 
     return 0;
 }
