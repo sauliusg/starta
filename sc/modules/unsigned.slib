@@ -158,9 +158,9 @@ type ushort = {
         { /* do nothing */ };
 
     inline bytecode operator "+" ( i : ushort; j : ushort ) : ushort
-        { LADD };
+        { HADD };
     inline bytecode operator "-" ( i : ushort; j : ushort ) : ushort
-        { LSUB };
+        { HSUB };
     inline bytecode operator "*" ( i : ushort; j : ushort ) : ushort
         { libunsigned:UHMUL };
     inline bytecode operator "/" ( i : ushort; j : ushort ) : ushort
@@ -182,26 +182,26 @@ type ushort = {
         { libunsigned:UHNEBOOL };
 
     bytecode inline operator "shl" ( x, y : ushort ) : ushort
-	{ LSHL };
+	{ libunsigned:UHSHL };
     bytecode inline operator "shr" ( x, y : ushort ) : ushort
-	{ LSHR };
+	{ libunsigned:UHSHR };
     bytecode inline operator "&" ( x, y : ushort ) : ushort
-	{ LAND };
+	{ HAND };
     bytecode inline operator "|" ( x, y : ushort ) : ushort
-	{ LOR };
+	{ HOR };
     bytecode inline operator "^" ( x, y : ushort ) : ushort
-	{ LXOR };
+	{ HXOR };
     bytecode inline operator "~" ( x: ushort ) : ushort
-	{ LNOT };
+	{ HNOT };
 
     inline bytecode operator "++" ( i : ushort ) : ushort
-        { LINC };
+        { HINC };
     inline bytecode operator "--" ( i : ushort ) : ushort
-        { LDEC };
+        { HDEC };
     inline bytecode operator "incvar" ()
-        { LINCVAR };
+        { HINCVAR };
     inline bytecode operator "decvar" ()
-        { LDECVAR };
+        { HDECVAR };
     inline bytecode operator "." ( i : ushort )
         { libunsigned:UHPRINT };
     inline bytecode operator "<" ( i : ushort )
@@ -220,12 +220,12 @@ type ushort = {
         { libunsigned:UHSPRINTF };
 
     inline bytecode operator "%%" ( x : ushort ) : string
-        { SLDC "%d" SWAP ISPRINTF };
+        { SLDC "%u" SWAP libunsigned:UHSPRINTF };
 
     bytecode inline operator "jnz" ( x : ushort )
-        { JNZ };
+        { HJNZ };
     bytecode inline operator "jz" ( x : ushort )
-        { JZ };
+        { HJZ };
 
     inline bytecode operator "ldc" () : ushort
         { libunsigned:UHLDCS };
