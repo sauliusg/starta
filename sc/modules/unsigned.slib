@@ -615,9 +615,9 @@ type ullong = {
         { libunsigned:ULLNEBOOL };
 
     bytecode inline operator "shl" ( x, y : ullong ) : ullong
-	{ LLSHL };
+	{ libunsigned:ULLSHL };
     bytecode inline operator "shr" ( x, y : ullong ) : ullong
-	{ LLSHR };
+	{ libunsigned:ULLSHR };
     bytecode inline operator "&" ( x, y : ullong ) : ullong
 	{ LLAND };
     bytecode inline operator "|" ( x, y : ullong ) : ullong
