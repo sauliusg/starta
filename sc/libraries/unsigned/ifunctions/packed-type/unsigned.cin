@@ -756,8 +756,6 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
         strtoll( istate.static_data + offset, NULL, 0 );
     return 0;
 #endif
-
-    return 0;
 }
 
 #endif
