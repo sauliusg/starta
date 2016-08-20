@@ -114,7 +114,7 @@ int STRICT( INSTRUCTION_FN_ARGS )
 
 #define CHECK_SIZES( DST_TYPE, SRC_TYPE, DST_VAL, SRC_VAL ) \
     if( strict_unsigned_conversions ) {                                     \
-        if( sizeof(DST_VAL) <= sizeof(SRC_VAL) ) {                          \
+        if( sizeof(DST_TYPE) <= sizeof(SRC_TYPE) ) {                        \
             interpret_raise_exception_with_bcalloc_message                  \
                 ( /* err_code = */ -3,                                      \
                   /* message = */ (char*)cxprintf                           \
@@ -129,7 +129,8 @@ int STRICT( INSTRUCTION_FN_ARGS )
             return 0;                                                       \
         }                                                                   \
     } else {                                                                \
-          if( SRC_VAL > ( ((unsigned DST_TYPE)((DST_TYPE)-1)) >> 1 ) ) {    \
+        if( (SRC_TYPE)(SRC_VAL) >                                           \
+                ( ((unsigned DST_TYPE)((DST_TYPE)-1)) >> 1 ) ) {            \
             interpret_raise_exception_with_bcalloc_message                  \
                 ( /* err_code = */ -3,                                      \
                   /* message = */ (char*)cxprintf                           \
@@ -158,6 +159,15 @@ int STRICT( INSTRUCTION_FN_ARGS )
  * 
  */
 
+#ifdef I
+#undef I
+#endif
+
+/* The 'I' macro must be defined to name the *larger* member of the
+   stackunion; so, if we convert from 'int' to 'long', the stackunion
+   member to be used must be 'l' (long) and not 'i' (int): */
+#define I i
+
 int ARRAY_UB2I( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
@@ -184,7 +194,7 @@ int ARRAY_UB2I( INSTRUCTION_FN_ARGS )
 #if INT_MAX < UCHAR_MAX
             CHECK_SIZES( int, unsigned char, 
                          ARRAY_ELEMENT(dst_array[i]),
-                         ARRAY_ELEMENT(src_array[i]) );
+                         ARRAY_ELEMENT(src_array[i]));
 #endif
 #ifdef packed_type
             dst_array[i] = src_array[i];
@@ -213,6 +223,15 @@ int ARRAY_UB2I( INSTRUCTION_FN_ARGS )
  * 
  */
 
+#ifdef I
+#undef I
+#endif
+
+/* The 'I' macro must be defined to name the *larger* member of the
+   stackunion; so, if we convert from 'int' to 'long', the stackunion
+   member to be used must be 'l' (long) and not 'i' (int): */
+#define I i
+
 int ARRAY_US2I( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
@@ -239,7 +258,7 @@ int ARRAY_US2I( INSTRUCTION_FN_ARGS )
 #if INT_MAX < USHRT_MAX
             CHECK_SIZES( int, unsigned short, 
                          ARRAY_ELEMENT(dst_array[i]),
-                         ARRAY_ELEMENT(src_array[i]) );
+                         ARRAY_ELEMENT(src_array[i]));
 #endif
 #ifdef packed_type
             dst_array[i] = src_array[i];
@@ -268,6 +287,15 @@ int ARRAY_US2I( INSTRUCTION_FN_ARGS )
  * 
  */
 
+#ifdef I
+#undef I
+#endif
+
+/* The 'I' macro must be defined to name the *larger* member of the
+   stackunion; so, if we convert from 'int' to 'long', the stackunion
+   member to be used must be 'l' (long) and not 'i' (int): */
+#define I l
+
 int ARRAY_UI2L( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
@@ -294,7 +322,7 @@ int ARRAY_UI2L( INSTRUCTION_FN_ARGS )
 #if LONG_MAX < UINT_MAX
             CHECK_SIZES( long, unsigned int, 
                          ARRAY_ELEMENT(dst_array[i]),
-                         ARRAY_ELEMENT(src_array[i]) );
+                         ARRAY_ELEMENT(src_array[i]));
 #endif
 #ifdef packed_type
             dst_array[i] = src_array[i];
@@ -323,6 +351,15 @@ int ARRAY_UI2L( INSTRUCTION_FN_ARGS )
  * 
  */
 
+#ifdef I
+#undef I
+#endif
+
+/* The 'I' macro must be defined to name the *larger* member of the
+   stackunion; so, if we convert from 'int' to 'long', the stackunion
+   member to be used must be 'l' (long) and not 'i' (int): */
+#define I ll
+
 int ARRAY_UI2LL( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
@@ -349,7 +386,7 @@ int ARRAY_UI2LL( INSTRUCTION_FN_ARGS )
 #if LONG_MAX < UINT_MAX
             CHECK_SIZES( long long, unsigned int, 
                          ARRAY_ELEMENT(dst_array[i]),
-                         ARRAY_ELEMENT(src_array[i]) );
+                         ARRAY_ELEMENT(src_array[i]));
 #endif
 #ifdef packed_type
             dst_array[i] = src_array[i];
