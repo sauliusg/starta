@@ -140,7 +140,7 @@ int ARRAY_UB2I( INSTRUCTION_FN_ARGS )
             src_hdr[-1].length : dst_hdr[-1].length;
 
         for( i = 0; i < length; i++ ) {
-#if INT_MAX < USHRT_MAX
+#if INT_MAX < UCHAR_MAX
             CHECK_SIZES( int, unsigned char, 
                          ARRAY_ELEMENT(dst_array[i]),
                          ARRAY_ELEMENT(src_array[i]) );
