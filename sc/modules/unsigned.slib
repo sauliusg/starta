@@ -316,9 +316,9 @@ type uint = {
         { libunsigned:UNEBOOL };
 
     bytecode inline operator "shl" ( x, y : uint ) : uint
-	{ SHL };
+	{ libunsigned:USHL };
     bytecode inline operator "shr" ( x, y : uint ) : uint
-	{ SHR };
+	{ libunsigned:USHR };
     bytecode inline operator "&" ( x, y : uint ) : uint
 	{ AND };
     bytecode inline operator "|" ( x, y : uint ) : uint
@@ -357,7 +357,7 @@ type uint = {
         { libunsigned:USPRINTF };
 
     inline bytecode operator "%%" ( x : uint ) : string
-        { SLDC "%d" SWAP ISPRINTF };
+        { SLDC "%u" SWAP libunsigned:USPRINTF };
 
     bytecode inline operator "jnz" ( x : uint )
         { JNZ };
