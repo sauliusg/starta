@@ -1,4 +1,8 @@
 include ../../Makeconf
 
 CFLAGS = -I. -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions
-LIBFLAGS = -lm
+
+LIBFLAGS = \
+../../libsc.so \
+../../../getoptions/libgetoptions.a \
+../../../cexceptions/libcexceptions.a

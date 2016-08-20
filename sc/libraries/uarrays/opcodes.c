@@ -14,6 +14,21 @@ char *OPCODES[] = {
     NULL
 };
 
+/* If 'strict_unsigned_conversions' is true, the UI2L opcodes will
+   never convert an unsigned value to an integer value if the signed
+   value is the same size or smaller. If 'strict_unsigned_conversions'
+   is false, the opcodes will convert an unsigned value into a signed
+   value if the value fits the destination.
+
+   Users will prefer the 'strict_unsigned_conversions = 0' (false),
+   but developers might find it easier to test software when
+   'strict_unsigned_conversions = 1' (true) is set.
+
+   USE the 'STRICT' opcode from this library to set and query the
+   'strict_unsigned_conversions' flag. */
+
+static int strict_unsigned_conversions = 0;
+
 int trace = 0;
 
 static istate_t *istate_ptr;
@@ -62,6 +77,32 @@ int trace_on( int trace_flag )
     int old_trace_flag = trace;
     trace = trace_flag;
     return old_trace_flag;
+}
+
+/*
+ * Setting flags
+ */
+
+/*
+ * STRICT  Set and query the 'strict_unsigned_conversions' flag.
+ *
+ * bytecode:
+ * STRICT
+ *
+ * stack:
+ * bool -> bool
+*/
+
+int STRICT( INSTRUCTION_FN_ARGS )
+{
+    unsigned char strict = istate.ep[0].num.c;
+
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.c = strict_unsigned_conversions;
+    strict_unsigned_conversions = strict;
+
+    return 1;
 }
 
 /* Unsigned array to signed array conversion opcodes: */

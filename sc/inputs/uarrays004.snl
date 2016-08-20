@@ -6,7 +6,7 @@ use std;
 use unsigned;
 use uarrays;
 
-var ui = [ 10 U, 20 U, ~0U/2U, 0U ];
+var ui = [ 10 U, 20 U, ~0U, 0U ];
 var ia = new long[ length(ui) + 1 ];
 
 try {

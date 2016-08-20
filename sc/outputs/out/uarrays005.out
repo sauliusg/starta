@@ -1,0 +1,19 @@
+10
+20
+2147483647
+0
+
+10
+20
+2147483647
+0
+0
+----------------------------------------------------------------------
+FALSE
+
+10
+20
+2147483647
+0
+
+ARRAY_UI2L - the target type 'long' (4 bytes) is not larger than the original 'unsigned int' (4 bytes)
