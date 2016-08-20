@@ -107,7 +107,7 @@ int trace_on( int trace_flag )
 #endif
 
 /*
- * ARRAY_UB2I convert unsigned byte to integer.
+ * ARRAY_UB2I convert unsigned byte array to integer array.
  * 
  * bytecode:
  * ARRAY_UB2I
@@ -162,7 +162,7 @@ int ARRAY_UB2I( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * ARRAY_US2I convert unsigned short to integer.
+ * ARRAY_US2I convert unsigned short array to integer array.
  * 
  * bytecode:
  * ARRAY_US2I
