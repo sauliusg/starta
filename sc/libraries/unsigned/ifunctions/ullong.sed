@@ -1,4 +1,5 @@
 s/@type@/unsigned long long/g;
+s/@type_max@/ULLONG_MAX/g;
 s/@PREFIX@/ULL/g;
 s/@PREFIX1@/ULL/g;
 s/@field@/ull/g;

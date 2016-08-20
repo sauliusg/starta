@@ -1,4 +1,5 @@
 s/@type@/unsigned int/g;
+s/@type_max@/UINT_MAX/g;
 s/@PREFIX@/U/g;
 s/@PREFIX1@/U/g;
 s/@field@/ui/g;
