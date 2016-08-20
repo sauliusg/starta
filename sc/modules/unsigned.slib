@@ -77,7 +77,7 @@ type ubyte = {
         { libunsigned:UBSPRINTF };
 
     inline bytecode operator "%%" ( x : ubyte ) : string
-        { SLDC "%d" SWAP libunsigned:UBSPRINTF };
+        { SLDC "%u" SWAP libunsigned:UBSPRINTF };
 
     bytecode inline operator "jnz" ( x : ubyte )
         { BJNZ };
