@@ -462,9 +462,9 @@ type ulong = {
         { libunsigned:ULNEBOOL };
 
     bytecode inline operator "shl" ( x, y : ulong ) : ulong
-	{ LSHL };
+	{ libunsigned:ULSHL };
     bytecode inline operator "shr" ( x, y : ulong ) : ulong
-	{ LSHR };
+	{ libunsigned:ULSHR };
     bytecode inline operator "&" ( x, y : ulong ) : ulong
 	{ LAND };
     bytecode inline operator "|" ( x, y : ulong ) : ulong
@@ -507,12 +507,12 @@ type ulong = {
         { libunsigned:ULSPRINTF };
 
     inline bytecode operator "%%" ( x : ulong ) : string
-        { SLDC "%d" SWAP ISPRINTF };
+        { SLDC "%lu" SWAP libunsigned:ULSPRINTF };
 
     bytecode inline operator "jnz" ( x : ulong )
-        { JNZ };
+        { LJNZ };
     bytecode inline operator "jz" ( x : ulong )
-        { JZ };
+        { LJZ };
 
     inline bytecode operator "ldc" () : ulong
         { libunsigned:ULLDCS };
