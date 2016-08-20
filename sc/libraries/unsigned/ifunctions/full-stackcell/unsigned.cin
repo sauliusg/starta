@@ -240,9 +240,9 @@ int @PREFIX@PRINT( INSTRUCTION_FN_ARGS )
  * SPRINTF
  * 
  * stack:
- * value --> string
+ * format, value --> string
  * 
- * Print a value from the top of stack into a string, and * leave that
+ * Print a value from the top of stack into a string, and leave that
  * string on the top of the stack
  */
 
