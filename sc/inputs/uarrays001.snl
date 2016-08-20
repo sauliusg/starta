@@ -14,7 +14,7 @@ for var i = 0 to last(us) {
 }
 . "";
 
-bytecode { LD %us LD %ia libuarrays:ARRAY_US2I }
+bytecode { LD %ia LD %us libuarrays:ARRAY_US2I DROP }
 
 for var i = 0 to last(ia) {
     . ia[i];
