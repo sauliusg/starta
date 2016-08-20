@@ -105,12 +105,6 @@ type ubyte = {
     inline bytecode operator "new[][]" ( i : ubyte ) : array
         { libunsigned:UBMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "exceptionval" ( p : ref ) : ubyte
-        { ERRORCODE };
-
-    inline bytecode operator "exceptionset" ( i : ubyte ) : ubyte
-        { /* empty */ };
-
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; ubyte value )
         { libunsigned:UBPACK };
@@ -247,12 +241,6 @@ type ushort = {
 
     inline bytecode operator "new[][]" ( i : ushort ) : array
         { libunsigned:UHMDALLOCC %%element_size %%element_nref %%level };
-
-    inline bytecode operator "exceptionval" ( p : ref ) : ushort
-        { ERRORCODE };
-
-    inline bytecode operator "exceptionset" ( i : ushort ) : ushort
-        { /* empty */ };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; ushort value )
@@ -396,12 +384,6 @@ type uint = {
 
     inline bytecode operator "new[][]" ( i : uint ) : array
         { libunsigned:UMDALLOCC %%element_size %%element_nref %%level };
-
-    inline bytecode operator "exceptionval" ( p : ref ) : uint
-        { ERRORCODE };
-
-    inline bytecode operator "exceptionset" ( i : uint ) : uint
-        { /* empty */ };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; uint value )
@@ -552,12 +534,6 @@ type ulong = {
 
     inline bytecode operator "new[][]" ( i : ulong ) : array
         { libunsigned:ULMDALLOCC %%element_size %%element_nref %%level };
-
-    inline bytecode operator "exceptionval" ( p : ref ) : ulong
-        { ERRORCODE };
-
-    inline bytecode operator "exceptionset" ( i : ulong ) : ulong
-        { /* empty */ };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; ulong value )
@@ -715,12 +691,6 @@ type ullong = {
 
     inline bytecode operator "new[][]" ( i : ullong ) : array
         { libunsigned:ULLMDALLOCC %%element_size %%element_nref %%level };
-
-    inline bytecode operator "exceptionval" ( p : ref ) : ullong
-        { ERRORCODE };
-
-    inline bytecode operator "exceptionset" ( i : ullong ) : ullong
-        { /* empty */ };
 
     inline bytecode operator "pack"( blob b; int offset;
                                      string description; ullong value )
