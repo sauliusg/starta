@@ -215,3 +215,58 @@ int ARRAY_US2I( INSTRUCTION_FN_ARGS )
 
     return 1;
 }
+
+/*
+ * ARRAY_UI2L convert unsigned integer array to a 'long int' array.
+ * 
+ * bytecode:
+ * ARRAY_UI2L
+ * 
+ * stack:
+ * long array, uint array -> long array
+ * 
+ */
+
+int ARRAY_UI2L( INSTRUCTION_FN_ARGS )
+{
+    ssize_t i, length;
+#ifdef packed_type
+    unsigned int *src_array = STACKCELL_PTR( istate.ep[0] );
+    long *dst_array = STACKCELL_PTR( istate.ep[1] );
+#elif full_stackcell
+    stackcell_t *src_array = STACKCELL_PTR( istate.ep[0] );
+    stackcell_t *dst_array = STACKCELL_PTR( istate.ep[1] );
+#elif split_stackcell
+    stackunion_t *src_array = STACKCELL_PTR( istate.ep[0] );
+    stackunion_t *dst_array = STACKCELL_PTR( istate.ep[1] );
+#endif
+    alloccell_t *src_hdr = (alloccell_t*)src_array;
+    alloccell_t *dst_hdr = (alloccell_t*)dst_array;
+
+    TRACE_FUNCTION();
+
+    if( src_array && dst_array ) {
+        length = src_hdr[-1].length < dst_hdr[-1].length ?
+            src_hdr[-1].length : dst_hdr[-1].length;
+
+        for( i = 0; i < length; i++ ) {
+#if LONG_MAX < UINT_MAX
+            CHECK_SIZES( long, unsigned int, 
+                         ARRAY_ELEMENT(dst_array[i]),
+                         ARRAY_ELEMENT(src_array[i]) );
+#endif
+#ifdef packed_type
+            dst_array[i] = src_array[i];
+#elif full_stackcell
+            dst_array[i].num.l = src_array[i].num.ui;
+#elif split_stackcell
+            dst_array[i].l = src_array[i].ui;
+#endif
+        }
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep++;
+
+    return 1;
+}

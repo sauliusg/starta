@@ -20,5 +20,6 @@ extern istate_t *istate_ptr;
 
 int ARRAY_UB2I( INSTRUCTION_FN_ARGS );
 int ARRAY_US2I( INSTRUCTION_FN_ARGS );
+int ARRAY_UI2L( INSTRUCTION_FN_ARGS );
 
 #endif
