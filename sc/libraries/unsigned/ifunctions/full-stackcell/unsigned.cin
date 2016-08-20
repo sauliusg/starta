@@ -25,6 +25,26 @@
 /* ADD* and SUB* operations are the same for unsigned values as they
    are for signed values in the 2-complement arithmetic. */
 
+int @PREFIX1@SHL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I <<= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@SHR( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I >>= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
 int @PREFIX1@MUL( INSTRUCTION_FN_ARGS )
 {
     TRACE_FUNCTION();

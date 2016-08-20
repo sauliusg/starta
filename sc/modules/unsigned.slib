@@ -42,26 +42,26 @@ type ubyte = {
         { libunsigned:UBNEBOOL };
 
     bytecode inline operator "shl" ( x, y : ubyte ) : ubyte
-	{ LSHL };
+	{ libunsigned:UBSHL };
     bytecode inline operator "shr" ( x, y : ubyte ) : ubyte
-	{ LSHR };
+	{ libunsigned:UBSHR };
     bytecode inline operator "&" ( x, y : ubyte ) : ubyte
-	{ LAND };
+	{ BAND };
     bytecode inline operator "|" ( x, y : ubyte ) : ubyte
-	{ LOR };
+	{ BOR };
     bytecode inline operator "^" ( x, y : ubyte ) : ubyte
-	{ LXOR };
+	{ BXOR };
     bytecode inline operator "~" ( x: ubyte ) : ubyte
-	{ LNOT };
+	{ BNOT };
 
     inline bytecode operator "++" ( i : ubyte ) : ubyte
-        { LINC };
+        { BINC };
     inline bytecode operator "--" ( i : ubyte ) : ubyte
-        { LDEC };
+        { BDEC };
     inline bytecode operator "incvar" ()
-        { LINCVAR };
+        { BINCVAR };
     inline bytecode operator "decvar" ()
-        { LDECVAR };
+        { BDECVAR };
     inline bytecode operator "." ( i : ubyte )
         { libunsigned:UBPRINT };
     inline bytecode operator "<" ( i : ubyte )
@@ -77,12 +77,12 @@ type ubyte = {
         { libunsigned:UBSPRINTF };
 
     inline bytecode operator "%%" ( x : ubyte ) : string
-        { SLDC "%d" SWAP ISPRINTF };
+        { SLDC "%d" SWAP libunsigned:UBSPRINTF };
 
     bytecode inline operator "jnz" ( x : ubyte )
-        { JNZ };
+        { BJNZ };
     bytecode inline operator "jz" ( x : ubyte )
-        { JZ };
+        { BJZ };
 
     inline bytecode operator "ldc" () : ubyte
         { libunsigned:UBLDCS };

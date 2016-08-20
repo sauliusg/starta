@@ -5,6 +5,9 @@
 **$URL$
 \*---------------------------------------------------------------------------*/
 
+int @PREFIX1@SHL( INSTRUCTION_FN_ARGS );
+int @PREFIX1@SHR( INSTRUCTION_FN_ARGS );
+
 int @PREFIX1@MUL( INSTRUCTION_FN_ARGS );
 int @PREFIX1@DIV( INSTRUCTION_FN_ARGS );
 
