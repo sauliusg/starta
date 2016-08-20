@@ -18,9 +18,9 @@ type ubyte = {
         { /* do nothing */ };
 
     inline bytecode operator "+" ( i : ubyte; j : ubyte ) : ubyte
-        { LADD };
+        { BADD };
     inline bytecode operator "-" ( i : ubyte; j : ubyte ) : ubyte
-        { LSUB };
+        { BSUB };
     inline bytecode operator "*" ( i : ubyte; j : ubyte ) : ubyte
         { libunsigned:UBMUL };
     inline bytecode operator "/" ( i : ubyte; j : ubyte ) : ubyte
