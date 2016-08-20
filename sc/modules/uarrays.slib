@@ -6,9 +6,14 @@ use unsigned;
 
 load "libraries/uarrays/libuarrays.so.0.01";
 
-inline bytecode procedure array_ub2i( ubyte inp[]; int out[] ): int[]
+inline bytecode procedure array_ub2i( int out[]; ubyte inp[] ): int[]
 {
     libuarrays:ARRAY_UB2I
+}
+
+inline bytecode procedure array_us2i( int out[]; ushort inp[] ): int[]
+{
+    libuarrays:ARRAY_US2I
 }
 
 end package uarrays;
