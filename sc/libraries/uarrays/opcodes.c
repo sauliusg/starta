@@ -107,13 +107,68 @@ int trace_on( int trace_flag )
 #endif
 
 /*
+ * ARRAY_UB2I convert unsigned byte to integer.
+ * 
+ * bytecode:
+ * ARRAY_UB2I
+ * 
+ * stack:
+ * int array, ubyte array -> int array
+ * 
+ */
+
+int ARRAY_UB2I( INSTRUCTION_FN_ARGS )
+{
+    ssize_t i, length;
+#ifdef packed_type
+    unsigned char *src_array = STACKCELL_PTR( istate.ep[0] );
+    int *dst_array = STACKCELL_PTR( istate.ep[1] );
+#elif full_stackcell
+    stackcell_t *src_array = STACKCELL_PTR( istate.ep[0] );
+    stackcell_t *dst_array = STACKCELL_PTR( istate.ep[1] );
+#elif split_stackcell
+    stackunion_t *src_array = STACKCELL_PTR( istate.ep[0] );
+    stackunion_t *dst_array = STACKCELL_PTR( istate.ep[1] );
+#endif
+    alloccell_t *src_hdr = (alloccell_t*)src_array;
+    alloccell_t *dst_hdr = (alloccell_t*)dst_array;
+
+    TRACE_FUNCTION();
+
+    if( src_array && dst_array ) {
+        length = src_hdr[-1].length < dst_hdr[-1].length ?
+            src_hdr[-1].length : dst_hdr[-1].length;
+
+        for( i = 0; i < length; i++ ) {
+#if INT_MAX < USHRT_MAX
+            CHECK_SIZES( int, unsigned char, 
+                         ARRAY_ELEMENT(dst_array[i]),
+                         ARRAY_ELEMENT(src_array[i]) );
+#endif
+#ifdef packed_type
+            dst_array[i] = src_array[i];
+#elif full_stackcell
+            dst_array[i].num.i = src_array[i].num.c;
+#elif split_stackcell
+            dst_array[i].i = src_array[i].c;
+#endif
+        }
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep++;
+
+    return 1;
+}
+
+/*
  * ARRAY_US2I convert unsigned short to integer.
  * 
  * bytecode:
  * ARRAY_US2I
  * 
  * stack:
- * ushort array, int array ->
+ * int array, ushort array -> int array
  * 
  */
 
@@ -121,14 +176,14 @@ int ARRAY_US2I( INSTRUCTION_FN_ARGS )
 {
     ssize_t i, length;
 #ifdef packed_type
-    unsigned short *src_array = STACKCELL_PTR( istate.ep[1] );
-    int *dst_array = STACKCELL_PTR( istate.ep[0] );
+    unsigned short *src_array = STACKCELL_PTR( istate.ep[0] );
+    int *dst_array = STACKCELL_PTR( istate.ep[1] );
 #elif full_stackcell
-    stackcell_t *src_array = STACKCELL_PTR( istate.ep[1] );
-    stackcell_t *dst_array = STACKCELL_PTR( istate.ep[0] );
+    stackcell_t *src_array = STACKCELL_PTR( istate.ep[0] );
+    stackcell_t *dst_array = STACKCELL_PTR( istate.ep[1] );
 #elif split_stackcell
-    stackunion_t *src_array = STACKCELL_PTR( istate.ep[1] );
-    stackunion_t *dst_array = STACKCELL_PTR( istate.ep[0] );
+    stackunion_t *src_array = STACKCELL_PTR( istate.ep[0] );
+    stackunion_t *dst_array = STACKCELL_PTR( istate.ep[1] );
 #endif
     alloccell_t *src_hdr = (alloccell_t*)src_array;
     alloccell_t *dst_hdr = (alloccell_t*)dst_array;
@@ -155,8 +210,8 @@ int ARRAY_US2I( INSTRUCTION_FN_ARGS )
         }
     }
 
-    STACKCELL_ZERO_PTR( istate.ep[1] );
     STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep++;
 
     return 1;
 }

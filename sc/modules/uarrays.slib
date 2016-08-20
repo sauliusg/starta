@@ -1,8 +1,14 @@
 
 package uarrays
 
+use std;
 use unsigned;
 
 load "libraries/uarrays/libuarrays.so.0.01";
+
+inline bytecode procedure array_ub2i( ubyte inp[]; int out[] ): int[]
+{
+    libuarrays:ARRAY_UB2I
+}
 
 end package uarrays;
