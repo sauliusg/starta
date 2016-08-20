@@ -1466,9 +1466,10 @@ int ATO@PREFIX@( INSTRUCTION_FN_ARGS )
  * ..., str, base -> ..., integer, ssize
  */
 
-#define strtoi strtol
-#define strtos strtol
-#define strtob strtol
+#define strtoc  strtoul
+#define strtoui strtoul
+#define strtous strtoul
+#define strtoub strtoul
 
 int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 {
@@ -1491,6 +1492,6 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
-#undef strtoi
-#undef strtos
-#undef strtob
+#undef strtoui
+#undef strtous
+#undef strtoub
