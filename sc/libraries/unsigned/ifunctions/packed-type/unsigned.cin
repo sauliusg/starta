@@ -708,11 +708,6 @@ int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS )
 
  */
 
-#define strtoc  strtoul
-#define strtoui strtoul
-#define strtous strtoul
-#define strtoub strtoul
-
 #if DO_NOT_USE_LDCS_OPTIMISATION
 
 int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
@@ -740,7 +735,7 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
     errno = 0;
     value = strtoull( istate.static_data + offset, NULL, 0 );
     if( errno || value > @type_max@ ) {
-        char *errmsg = errno ? strerror(errno) : "unsigned value too large";
+        char *errmsg = errno ? strerror(errno) : "unsigned constant too large";
         interpret_raise_exception_with_bcalloc_message
             ( /* err_code = */ -3,
               /* message = */ (char*)cxprintf
