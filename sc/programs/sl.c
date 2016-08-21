@@ -201,8 +201,11 @@ static void usage( int argc, char *argv[], int *i, option_t *option,
 static void version( int argc, char *argv[], int *i, option_t *option,
                      cexception_t * ex )
 {
+    char url_keyword[6] = ".URL.";
+    url_keyword[0] = '$';
+    url_keyword[4] = '$';
     printf( "%s %s\n", argv[0], SVN_VERSION );
-    if( strcmp( source_URL, "$URL$" ) != 0 ) {
+    if( strcmp( source_URL, url_keyword ) != 0 ) {
         printf( "%s\n", source_URL );
     }
     exit( 0 );
