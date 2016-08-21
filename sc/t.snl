@@ -7,16 +7,73 @@ use std;
 var m: string;
 
 try {
-    var b = 127B;
-    . b;
+    var x = 32767S;
+    . x;
 }
 catch( m ) {
     . m
 }
 
 try {
-    var b = const(-128)B;
-    . b;
+    var x = const(-32768)S;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = 2147483647;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = const(-2147483648);
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = 2147483647L;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = const(-2147483648)L;
+    . x;
+}
+catch( m ) {
+    . m
+}
+. "";
+
+try {
+    var x = 9223372036854775807 LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = -9223372036854775807LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = const(-9223372036854775808)LL;
+    . x;
 }
 catch( m ) {
     . m

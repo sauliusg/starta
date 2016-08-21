@@ -13130,7 +13130,7 @@ constant_expression
 
   | __INTEGER_CONST
       {
-	  $$ = make_const_value( px, VT_INTMAX, (intmax_t)atol( $1 ));
+	  $$ = make_const_value( px, VT_INTMAX, (intmax_t)atoll( $1 ));
       }
 
   | __REAL_CONST
@@ -13151,7 +13151,7 @@ constant_expression
   | __IDENTIFIER
       {
 	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $1,
-						    "constant" );
+                                                       "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
 	    const_value_copy( &$$, dnode_value( const_dnode ), px );
