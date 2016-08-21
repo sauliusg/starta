@@ -187,7 +187,7 @@ void const_value_to_string( const_value_t *x, cexception_t *ex )
 
 void const_value_to_int( const_value_t *x )
 {
-    long l;
+    intmax_t l;
     switch( x->value_type ) {
         case VT_INTMAX:
 	    break;
@@ -195,7 +195,7 @@ void const_value_to_int( const_value_t *x )
 	    x->value.i = /* ceill( x->value.f - 0.5 ); */ (int)( x->value.f - 0.5 );
 	    break;
         case VT_STRING:
-	    l = atol( x->value.s );
+	    l = atoll( x->value.s );
 	    const_value_free( x );
 	    x->value.i = l;
 	    break;
