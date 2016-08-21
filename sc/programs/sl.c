@@ -201,8 +201,10 @@ static void usage( int argc, char *argv[], int *i, option_t *option,
 static void version( int argc, char *argv[], int *i, option_t *option,
                      cexception_t * ex )
 {
-    printf( "%s svnversion %s\n", argv[0], SVN_VERSION );
-    printf( "%s\n", source_URL );
+    printf( "%s %s\n", argv[0], SVN_VERSION );
+    if( strcmp( source_URL, "$URL$" ) != 0 ) {
+        printf( "%s\n", source_URL );
+    }
     exit( 0 );
 }
 
