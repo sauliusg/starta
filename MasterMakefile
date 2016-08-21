@@ -157,13 +157,19 @@ INCLUDES = -I. ${addprefix -I, ${sort ${SRC_DIR} ${OTHER_DIRS} ${LIB_DIRS}}}
 ## LIBFLAGS = -lm
 
 SVN_VERSION := $(shell svnversion)
+SVN_MESSAGE := SVN revision ${SVN_VERSION}
+
+ifeq (${SVN_VERSION},Unversioned directory)
+    SVN_VERSION := $(shell git log --format='%h' -1)
+    SVN_MESSAGE := GIT commit ${SVN_VERSION}
+endif
 
 ifeq (${CC},gcc)
     CFLAGS = -Wall -g ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
-	-DSVN_VERSION="\"${SVN_VERSION}\""
+	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 else
     CFLAGS = ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
-	-DSVN_VERSION="\"${SVN_VERSION}\""
+	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 endif
 
 #------------------------------------------------------------------------------
