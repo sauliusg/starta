@@ -13130,7 +13130,17 @@ constant_expression
 
   | __INTEGER_CONST
       {
-	  $$ = make_const_value( px, VT_INTMAX, (intmax_t)atoll( $1 ));
+          intmax_t value;
+
+          errno = 0;
+          value = strtoll( $1, NULL, 0 );
+          if( errno ) {
+              char *message = strerror(errno);
+              yyerrorf( "when converting integer constant '%s' - %c%s",
+                        $1, tolower(message[0]),
+                        *message == '\0' ? "" : message+1 );
+          }
+	  $$ = make_const_value( px, VT_INTMAX, value );
       }
 
   | __REAL_CONST
