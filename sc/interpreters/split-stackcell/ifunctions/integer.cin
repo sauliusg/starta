@@ -911,8 +911,26 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 	istate.ep[1].I = 0;
         istate.ep[0].num.ssize = -1;
     } else {
-        istate.ep[1].I = strto@field@( str, &endptr, base );
+        llong value;
+        errno = 0;
+        value = strto@field@( str, &endptr, base );
+        if( errno || value > @type_max@ || value < @type_min@ ) {
+            char *errmsg = errno ? strerror(errno) : 
+                "'@type@' value too ";
+            interpret_raise_exception_with_bcalloc_message
+                ( /* err_code = */ -3,
+                  /* message = */ (char*)cxprintf
+                  ( "%s - '%s' %c%s%s", __FUNCTION__,
+                    str, tolower(errmsg[0]),
+                    errmsg[0] ? errmsg+1 : "",
+                    !errno ? (value > @type_max@ ? "large" : "small") : "" ),
+                  /* module_id = */ 0,
+                  /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+                  EXCEPTION );
+            return 0;
+        }
         istate.ep[0].num.ssize = endptr - str;
+        istate.ep[1].I = value;
     }
 
     return 1;

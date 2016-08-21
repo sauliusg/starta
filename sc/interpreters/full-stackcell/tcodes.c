@@ -15,6 +15,7 @@
 
 /* uses: */
 #include <stdio.h>
+#include <limits.h> /* for INT_MAX, INT_MIN and other constans */
 #include <errno.h>
 #define __USE_GNU
 #include <string.h>

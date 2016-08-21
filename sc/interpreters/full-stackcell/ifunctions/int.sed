@@ -1,4 +1,6 @@
 s/@type@/int/g;
+s/@type_min@/INT_MIN/g;
+s/@type_max@/INT_MAX/g;
 s/@PREFIX@/I/g;
 s/@PREFIX1@//g;
 s/@field@/i/g;
