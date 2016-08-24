@@ -1,0 +1,49 @@
+// --*- C -*--
+
+// Test number conversions (strtol)
+
+use std;
+
+var m: string;
+
+pragma stacksize 100;
+
+function ack( m, n : int ) : int;
+
+try {
+    try {
+        try {
+            try {
+                try {
+                    try {
+                        try {
+                            // force stack reallocation in the try{} block:
+                            . ack( 3, 8 );
+                            // cause an exception:
+                            . 255 B;
+                        }
+                        catch {reraise;}
+                    }
+                    catch( m ) {
+                        . "Intermediate 2:", m;
+                        reraise;
+                    }
+                }
+                catch {reraise}
+            }
+            catch {reraise}
+        }
+        catch {reraise}
+    }
+    catch {reraise}
+}
+catch( m ) {
+    . m
+}
+
+function ack( m, n : int ) : int
+{
+    if m == 0 then return n + 1 endif;
+    if n == 0 then return ack( m - 1, 1 ) endif;
+    return ack( m - 1, ack( m, n - 1 ));
+}
