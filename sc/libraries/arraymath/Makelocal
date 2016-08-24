@@ -20,6 +20,22 @@ ${GEN_DIR}/%_arrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.cin
 	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
+${GEN_DIR}/%_farrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/farrays.hin
+	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	| sed -f $< > $@
+
+${GEN_DIR}/%_farrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/farrays.cin
+	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	| sed -f $< > $@
+
+${GEN_DIR}/%_iarrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/iarrays.hin
+	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	| sed -f $< > $@
+
+${GEN_DIR}/%_iarrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/iarrays.cin
+	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	| sed -f $< > $@
+
 #-----------------------------------------------------------------------------
 
 cleanlocal:

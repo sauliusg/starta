@@ -42,4 +42,186 @@ inline bytecode function llsum( a : array of llong ): llong
     libarraymath:LLSUM
 }
 
+// Summing arrays into larger values:
+
+// 'int' sum:
+
+inline bytecode function basumi( a : array of byte ): int
+{
+    libarraymath:BASUMI
+}
+
+inline bytecode function hasumi( a : array of short ): int
+{
+    libarraymath:HASUMI
+}
+
+inline bytecode function asumi( a : array of int ): int
+{
+    libarraymath:ASUMI
+}
+
+inline bytecode function lasumi( a : array of long ): int
+{
+    libarraymath:LASUMI
+}
+
+inline bytecode function llasumi( a : array of llong ): int
+{
+    libarraymath:LLASUMI
+}
+
+// 'llong' sum:
+
+inline bytecode function basumll( a : array of byte ): llong
+{
+    libarraymath:BASUMLL
+}
+
+inline bytecode function hasumll( a : array of short ): llong
+{
+    libarraymath:HASUMLL
+}
+
+inline bytecode function asumll( a : array of int ): llong
+{
+    libarraymath:ASUMLL
+}
+
+inline bytecode function lasumll( a : array of long ): llong
+{
+    libarraymath:LASUMLL
+}
+
+inline bytecode function llasumll( a : array of llong ): llong
+{
+    libarraymath:LLASUMLL
+}
+
+// 'float' sum:
+
+inline bytecode function basumf( a : array of byte ): float
+{
+    libarraymath:BASUMF
+}
+
+inline bytecode function hasumf( a : array of short ): float
+{
+    libarraymath:HASUMF
+}
+
+inline bytecode function asumf( a : array of int ): float
+{
+    libarraymath:ASUMF
+}
+
+inline bytecode function lasumf( a : array of long ): float
+{
+    libarraymath:LASUMF
+}
+
+inline bytecode function llasumf( a : array of llong ): float
+{
+    libarraymath:LLASUMF
+}
+
+inline bytecode function fasumf( a : array of float ): float
+{
+    libarraymath:FASUMF
+}
+
+inline bytecode function dasumf( a : array of double ): float
+{
+    libarraymath:DASUMF
+}
+
+inline bytecode function ldasumf( a : array of ldouble ): float
+{
+    libarraymath:LDASUMF
+}
+
+// 'double' sum:
+
+inline bytecode function basumd( a : array of byte ): double
+{
+    libarraymath:BASUMD
+}
+
+inline bytecode function hasumd( a : array of short ): double
+{
+    libarraymath:HASUMD
+}
+
+inline bytecode function asumd( a : array of int ): double
+{
+    libarraymath:ASUMD
+}
+
+inline bytecode function lasumd( a : array of long ): double
+{
+    libarraymath:LASUMD
+}
+
+inline bytecode function llasumd( a : array of llong ): double
+{
+    libarraymath:LLASUMD
+}
+
+inline bytecode function fasumd( a : array of float ): double
+{
+    libarraymath:FASUMD
+}
+
+inline bytecode function dasumd( a : array of double ): double
+{
+    libarraymath:DASUMD
+}
+
+inline bytecode function ldasumd( a : array of ldouble ): double
+{
+    libarraymath:LDASUMD
+}
+
+// 'ldouble' sum:
+
+inline bytecode function basumld( a : array of byte ): ldouble
+{
+    libarraymath:BASUMLD
+}
+
+inline bytecode function hasumld( a : array of short ): ldouble
+{
+    libarraymath:HASUMLD
+}
+
+inline bytecode function asumld( a : array of int ): ldouble
+{
+    libarraymath:ASUMLD
+}
+
+inline bytecode function lasumld( a : array of long ): ldouble
+{
+    libarraymath:LASUMLD
+}
+
+inline bytecode function llasumld( a : array of llong ): ldouble
+{
+    libarraymath:LLASUMLD
+}
+
+inline bytecode function fasumld( a : array of float ): ldouble
+{
+    libarraymath:FASUMLD
+}
+
+inline bytecode function dasumld( a : array of double ): ldouble
+{
+    libarraymath:DASUMLD
+}
+
+inline bytecode function ldasumld( a : array of ldouble ): ldouble
+{
+    libarraymath:LDASUMLD
+}
+
 end package ArrayMath;
