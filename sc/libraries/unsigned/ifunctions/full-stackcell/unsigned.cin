@@ -1486,3 +1486,65 @@ int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
 #undef strtoui
 #undef strtous
 #undef strtoub
+
+/* Conversion to floating-point numbers: */
+
+/*
+ * U2F converts integer value on the top of the stack to a ldouble 
+ * 
+ * bytecode:
+ * U2F
+ * 
+ * stack:
+ * unsigned integer -> float
+ * 
+ */
+
+int @PREFIX1@2F( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.f = istate.ep[0].I;
+
+    return 1;
+}
+
+/*
+ * U2D converts integer value on the top of the stack to a ldouble 
+ * 
+ * bytecode:
+ * U2D
+ * 
+ * stack:
+ * unsigned integer -> double
+ * 
+ */
+
+int @PREFIX1@2D( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.d = istate.ep[0].I;
+
+    return 1;
+}
+
+/*
+ * U2LD converts integer value on the top of the stack to a ldouble 
+ * 
+ * bytecode:
+ * U2LD
+ * 
+ * stack:
+ * unsigned integer -> double
+ * 
+ */
+
+int @PREFIX1@2LD( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].num.ld = istate.ep[0].I;
+
+    return 1;
+}
