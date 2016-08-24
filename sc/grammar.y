@@ -12,6 +12,7 @@
 /* uses: */
 #include <stdio.h>
 #include <stdarg.h>
+#include <limits.h>
 #include <string.h>
 #include <ctype.h>
 #include <dlfcn.h>
@@ -13135,10 +13136,25 @@ constant_expression
           errno = 0;
           value = strtoll( $1, NULL, 0 );
           if( errno ) {
-              char *message = strerror(errno);
-              yyerrorf( "when converting integer constant '%s' - %c%s",
-                        $1, tolower(message[0]),
-                        *message == '\0' ? "" : message+1 );
+              int errnoll = errno;
+              errno = 0;
+              value = strtoull( $1, NULL, 0 );
+              if( errno ) {
+                  char *message = strerror(errno);
+                  yyerrorf( "when converting integer constant '%s' - %c%s",
+                            $1, tolower(message[0]),
+                            *message == '\0' ? "" : message+1 );
+              } else {
+                  if( value == LLONG_MIN ) {
+                      fprintf( stderr, "%s: WARNING, value '%s' converts to "
+                               "a negative number\n", progname, $1 );
+                  } else {
+                      char *message = strerror(errnoll);
+                      yyerrorf( "when converting signed integer constant "
+                                "'%s' - %c%s", $1, tolower(message[0]),
+                                *message == '\0' ? "" : message+1 );
+                  }
+              }
           }
 	  $$ = make_const_value( px, VT_INTMAX, value );
       }

@@ -1,0 +1,5 @@
+./sl: inputs/const011.snl(10,19): ERROR, when converting integer constant '18446744073709551616' - numerical result out of range
+    var x = const(18446744073709551616)LL;
+                  ^
+./sl: 1 error(s) detected
+
