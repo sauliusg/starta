@@ -4,8 +4,8 @@ s/@type_max@/LLONG_MAX/g;
 s/@PREFIX@/LL/g;
 s/@PREFIX1@/LL/g;
 s/@field@/ll/g;
-s/@codeval@/lval/g;
+s/@codeval@/llptr/g;
 s/@format@/lld/g;
 s/@printformat@/lld/g;
 s/@strtobin@/atoll/g;
-s/@cval_star@//g
+s/@cval_star@/*/g
