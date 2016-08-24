@@ -1,8 +1,6 @@
-inputs/const008.snl: WARNING, value '9223372036854775808' converts to a negative number
-inputs/const008.snl: WARNING, value '9223372036854775808' converts to a negative number
 -9223372036854775807
--9223372036854775808
--9223372036854775808
-LLLDCS - for signed '9223372036854775809', numerical result out of range
-LLLDCS - for integer '92233720368547758090', numerical result out of range
+LLLDCS - '9223372036854775808' numerical result out of range
+LLLDCS - '9223372036854775808' numerical result out of range
+LLLDCS - '9223372036854775809' numerical result out of range
+LLLDCS - '92233720368547758090' numerical result out of range
 9223372036854775809
