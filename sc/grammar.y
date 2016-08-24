@@ -9015,7 +9015,7 @@ control_statement
   | labeled_for '(' lvariable
       {
         compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 1, px );
+                            /* ncounters = */ 2, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
         /* stack now: ..., lvariable_address */
       }

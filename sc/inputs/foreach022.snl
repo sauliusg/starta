@@ -5,10 +5,12 @@ use std;
 var a = [ "vienas", "du" ];
 var b = [ "eins", "zwei", "drei", "vier", "fünf" ];
 
-for ( var l => a ) {
+var l: string;
+for ( l => a ) {
     . l;
     var count = 0;
-    for ( var m in b ) {
+    var m: string;
+    for ( m in b ) {
         . "   ", m;
         count++;
         if( count > 2 ) { break }
