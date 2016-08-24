@@ -57,15 +57,47 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
 int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
 {
     ssize_t offset = istate.code[istate.ip+1].ssizeval;
+    llong value;
 
     TRACE_FUNCTION();
+    /* convert and check the value for errors: */
+    errno = 0;
+    value = strtoll( istate.static_data + offset, NULL, 0 );
+    if( errno || value > @type_max@ || value < @type_min@ ) {
+        char *errmsg = errno ? strerror(errno) : "integer constant too ";
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -3,
+              /* message = */ (char*)cxprintf
+              ( "%s - '%s' %c%s%s", __FUNCTION__,
+                istate.static_data + offset, tolower(errmsg[0]),
+                errmsg[0] ? errmsg+1 : "",
+                !errno ? (value > @type_max@ ? "large" : "small") : "" ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_TRUNCATED_INTEGER,
+              EXCEPTION );
+        return 0;
+    }
 
+#if 2@cval_star@3 == 6
+
+    istate.code[istate.ip+1].CVAL = interpret_alloc( &istate, sizeof( @type@ ));
+    if( istate.code[istate.ip+1].CVAL ) {
+        istate.code[istate.ip].fn = @PREFIX@LDC;
+        @cval_star@istate.code[istate.ip+1].CVAL = value;
+        return 0;
+    } else {
+        /* If allocation failed, use a fallback to the old
+           behaviour: */
+        istate.ep --;
+        istate.ep[0].I = value;
+        return 2;
+    }
+
+#else
     istate.code[istate.ip].fn = @PREFIX1@LDC;
-
-    istate.code[istate.ip+1].CVAL =
-        strtol( istate.static_data + offset, NULL, 0 );
-
+    istate.code[istate.ip+1].CVAL = value;
     return 0;
+#endif
 }
 
 #endif
