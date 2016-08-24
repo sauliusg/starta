@@ -1,0 +1,19 @@
+//--*- C -*--
+
+use std;
+
+var a = [ "vienas", "du" ];
+var b = [ "eins", "zwei", "drei", "vier", "fünf" ];
+
+var l: string;
+for l in a do
+    . l;
+    var count = 0;
+    var m: string;
+    for m in b  {
+        . "   ", m;
+        count++;
+        if( count > 2 ) { break }
+    }   
+    . "";
+enddo
