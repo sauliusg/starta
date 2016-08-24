@@ -3193,8 +3193,8 @@ static void compiler_compile_jz( COMPILER *c,
 }
 
 static void compiler_compile_loop( COMPILER *c,
-				ssize_t offset,
-				cexception_t *ex )
+                                   ssize_t offset,
+                                   cexception_t *ex )
 {
     ENODE * volatile limit_enode = c->e_stack;
     TNODE * volatile limit_tnode = limit_enode ?
@@ -3255,10 +3255,16 @@ static void compiler_compile_next( COMPILER *c,
 	    tnode_report_missing_operator( counter_tnode, "next", 1 );
 	}
     }
-    
-    ncounters = dnode_loop_counters( c->loops );
+
+    /* One loop counter is removed by the "next" operator; the rest
+       must be dropped explicitly: */
+    ncounters = dnode_loop_counters( c->loops ) - 1;
     if( ncounters > 0 ) {
-        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+        if( ncounters == 1 ) {
+            compiler_emit( c, ex, "\tc\n", PDROP );
+        } else {
+            compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+        }
     }
     for( i = 0; i < ncounters; i ++ ) {
         compiler_drop_top_expression( c );
@@ -8755,7 +8761,7 @@ control_statement
 	    dnode_set_flags( $3, DF_IS_READONLY );
 	}
 	compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 0, px );
+                            /* ncounters = */ 1, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     _IN expression
@@ -8849,7 +8855,7 @@ control_statement
   | labeled_for lvariable _IN
       {
         compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 1, px );
+                            /* ncounters = */ 2, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
         /* stack now: ..., lvariable_address */
       }
@@ -8915,7 +8921,7 @@ control_statement
 	    dnode_set_flags( $4, DF_IS_READONLY );
 	}
 	compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 0, px );
+                            /* ncounters = */ 1, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     in_loop_separator expression ')'
