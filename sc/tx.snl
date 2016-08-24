@@ -7,7 +7,7 @@ use std;
 var m: string;
 
 try {
-    var x = const(-9223372036854775810000)LL;
+    var x = const(-9223372036854775808)LL;
     . x;
 }
 catch( m ) {
