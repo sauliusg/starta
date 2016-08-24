@@ -165,7 +165,7 @@ ifeq (${SVN_VERSION},Unversioned directory)
 endif
 
 ifeq (${CC},gcc)
-    CFLAGS = -Wall -g ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
+    CFLAGS = -Wall -g -fPIC ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
 	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 else
     CFLAGS = ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
