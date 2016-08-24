@@ -7,6 +7,10 @@
 
 char *OPCODES[] = {
 
+#include "locally-generated/int_arrays.tab.c"
+#include "locally-generated/long_arrays.tab.c"
+#include "locally-generated/llong_arrays.tab.c"
+
 #include "locally-generated/float_arrays.tab.c"
 #include "locally-generated/double_arrays.tab.c"
 #include "locally-generated/ldouble_arrays.tab.c"
@@ -63,6 +67,10 @@ int trace_on( int trace_flag )
     trace = trace_flag;
     return old_trace_flag;
 }
+
+#include <locally-generated/int_arrays.c>
+#include <locally-generated/long_arrays.c>
+#include <locally-generated/llong_arrays.c>
 
 #include <locally-generated/float_arrays.c>
 #include <locally-generated/double_arrays.c>
