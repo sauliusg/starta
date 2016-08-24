@@ -742,4 +742,24 @@ inline bytecode operator "@llong" ( i : uint ) : llong
 inline bytecode operator "@llong" ( i : ulong ) : llong
 { libunsigned:UL2LL }
 
+// Conversion to floating point numbers:
+
+inline bytecode operator "@float"( i: ubyte ): float { libunsigned:UB2F }
+inline bytecode operator "@float"( i: ushort ): float { libunsigned:UH2F }
+inline bytecode operator "@float"( i: uint ): float { libunsigned:U2F }
+inline bytecode operator "@float"( i: ulong ): float { libunsigned:UL2F }
+inline bytecode operator "@float"( i: ullong ): float { libunsigned:ULL2F }
+
+inline bytecode operator "@double"( i: ubyte ): double { libunsigned:UB2D }
+inline bytecode operator "@double"( i: ushort ): double { libunsigned:UH2D }
+inline bytecode operator "@double"( i: uint ): double { libunsigned:U2D }
+inline bytecode operator "@double"( i: ulong ): double { libunsigned:UL2D }
+inline bytecode operator "@double"( i: ullong ): double { libunsigned:ULL2D }
+
+inline bytecode operator "@ldouble"( i: ubyte ): ldouble { libunsigned:UB2LD }
+inline bytecode operator "@ldouble"( i: ushort ): ldouble { libunsigned:UH2LD }
+inline bytecode operator "@ldouble"( i: uint ): ldouble { libunsigned:U2LD }
+inline bytecode operator "@ldouble"( i: ulong ): ldouble { libunsigned:UL2LD }
+inline bytecode operator "@ldouble"( i: ullong ): ldouble { libunsigned:ULL2LD }
+
 end package unsigned;
