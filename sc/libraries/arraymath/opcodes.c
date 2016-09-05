@@ -7,6 +7,8 @@
 
 char *OPCODES[] = {
 
+#include "locally-generated/byte_arrays.tab.c"
+#include "locally-generated/short_arrays.tab.c"
 #include "locally-generated/int_arrays.tab.c"
 #include "locally-generated/long_arrays.tab.c"
 #include "locally-generated/llong_arrays.tab.c"
@@ -84,6 +86,8 @@ int trace_on( int trace_flag )
     return old_trace_flag;
 }
 
+#include <locally-generated/byte_arrays.c>
+#include <locally-generated/short_arrays.c>
 #include <locally-generated/int_arrays.c>
 #include <locally-generated/long_arrays.c>
 #include <locally-generated/llong_arrays.c>

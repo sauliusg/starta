@@ -1,0 +1,54 @@
+//--*- C -*--
+
+use std;
+use Math;
+use ArrayMath;
+
+type integer = short;
+
+pragma integer const short;
+
+function meanvar( array of integer a ): float, float
+{
+    var mean, variance = ArrayMath::hmeanvar( a );
+    return mean, variance;
+}
+
+function mean( array of integer a ): float
+{
+    var mean, variance = meanvar( a );
+    return mean;
+}
+
+function variance( array of integer a ): float
+{
+    var mean, variance = meanvar( a );
+    return variance;
+}
+
+function sd( array of integer a ): float
+{
+    var mean, variance = meanvar( a );
+    return sqrtf( variance );
+}
+
+operator "<" ( array of integer a ) { for var e in a do < %%e _ ", " enddo }
+operator "." ( array of integer a ) { < a }
+
+var a1 = [1,2,3,4,5,6,7];
+var a2 = [10,20,30,40,50];
+
+. a1; . a2;
+. "";
+
+. meanvar( a1 );
+. mean( a1 );
+. variance( a1 );
+. sd( a1 );
+
+. variance([4]);
+
+var population_mean, population_variance =
+    ArrayMath::hmeanvar( a1, correction => 0 );
+
+. population_variance;

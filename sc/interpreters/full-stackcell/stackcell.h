@@ -60,6 +60,10 @@ typedef struct stackcell {
 #define PTR num.ptr
 #endif
 
+#define STACKCELL_INT( s ) ((s).num.i)
+#define STACKCELL_LONG( s ) ((s).num.l)
+#define STACKCELL_LLONG( s ) ((s).num.ll)
+
 #if USE_OFFSETTED_POINTERS
 
 #define STACKCELL_PTR( s )            ((s).PTR + (s).num.offs)

@@ -13,4 +13,7 @@
 
 #define ARRAY_ELEMENT(a) (a)
 
+#define GET_ARRAY_ELEMENT(a,i) ((a)[i])
+#define SET_ARRAY_ELEMENT(a,i,v) (a)[i] = (v)
+
 #endif
