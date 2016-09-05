@@ -6,4 +6,5 @@
 \*---------------------------------------------------------------------------*/
 
 int @PREFIX1@ASUMI( INSTRUCTION_FN_ARGS );
+int @PREFIX1@ASUML( INSTRUCTION_FN_ARGS );
 int @PREFIX1@ASUMLL( INSTRUCTION_FN_ARGS );

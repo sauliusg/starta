@@ -6,6 +6,200 @@ use * from std;
 
 load "libraries/arraymath/libarraymath.so.0.01";
 
+// Copy elements of one array into the other:
+
+inline bytecode procedure acopy( a1: array of type T;
+                                 readonly a2: array of type T;
+                                 long start1 = 0; long start2 = 0;
+                                 long length = -1 ) : array of type T
+{
+    libarraymath:ACOPY
+}
+
+inline bytecode procedure acopyl( a1: array of type T;
+                                  readonly a2: array of type T;
+                                  long start1 = 0; long start2 = 0;
+                                  long length = -1 ) : array of type T
+{
+    libarraymath:ACOPYL
+}
+
+inline bytecode procedure acopyll( a1: array of type T;
+                                   readonly a2: array of type T;
+                                   llong start1 = 0; llong start2 = 0;
+                                   llong length = -1 ) : array of type T
+{
+    libarraymath:ACOPYLL
+}
+
+// Find minimum and maximum element in an arra:
+
+inline bytecode function bminmax( byte[] a ): byte, byte, int, int
+{
+    libarraymath:BAMINMAX
+}
+
+inline bytecode function hminmax( short[] a ): short, short, int, int
+{
+    libarraymath:HAMINMAX
+}
+
+inline bytecode function minmax( int[] a ): int, int, int, int
+{
+    libarraymath:AMINMAX
+}
+
+inline bytecode function lminmax( long[] a ): long, long, int, int
+{
+    libarraymath:LAMINMAX
+}
+
+inline bytecode function llminmax( llong[] a ): llong, llong, int, int
+{
+    libarraymath:LLAMINMAX
+}
+
+inline bytecode function fminmax( float[] a ): float, float, int, int
+{
+    libarraymath:FAMINMAX
+}
+
+inline bytecode function dminmax( double[] a ): double, double, int, int
+{
+    libarraymath:DAMINMAX
+}
+
+inline bytecode function ldminmax( ldouble[] a ): ldouble, ldouble, int, int
+{
+    libarraymath:LDAMINMAX
+}
+
+// Find mean and variance of an array, 'float' results:
+
+inline bytecode function bmeanvar( byte a[]; int correction = 1 ): float, float
+{
+    libarraymath:BAMEANVAR
+}
+
+inline bytecode function hmeanvar( short a[]; int correction = 1 ): float, float
+{
+    libarraymath:HAMEANVAR
+}
+
+inline bytecode function meanvar( int a[]; int correction = 1 ): float, float
+{
+    libarraymath:AMEANVAR
+}
+
+inline bytecode function lmeanvar( long a[]; int correction = 1 ): float, float
+{
+    libarraymath:LAMEANVAR
+}
+
+inline bytecode function llmeanvar( llong a[]; int correction = 1 ): float, float
+{
+    libarraymath:LLAMEANVAR
+}
+
+inline bytecode function fmeanvar( float a[]; int correction = 1 ): float, float
+{
+    libarraymath:FAMEANVAR
+}
+
+inline bytecode function dmeanvar( double a[]; int correction = 1 ): float, float
+{
+    libarraymath:DAMEANVAR
+}
+
+inline bytecode function ldmeanvar( ldouble a[]; int correction = 1 ): float, float
+{
+    libarraymath:LDAMEANVAR
+}
+
+// Find mean and variance of an array, 'double' results:
+
+inline bytecode function bmeanvard( byte a[]; int correction = 1 ): double, double
+{
+    libarraymath:BAMEANVARD
+}
+
+inline bytecode function hmeanvard( short a[]; int correction = 1 ): double, double
+{
+    libarraymath:HAMEANVARD
+}
+
+inline bytecode function meanvard( int a[]; int correction = 1 ): double, double
+{
+    libarraymath:AMEANVARD
+}
+
+inline bytecode function lmeanvard( long a[]; int correction = 1 ): double, double
+{
+    libarraymath:LAMEANVARD
+}
+
+inline bytecode function llmeanvard( llong a[]; int correction = 1 ): double, double
+{
+    libarraymath:LLAMEANVARD
+}
+
+inline bytecode function fmeanvard( float a[]; int correction = 1 ): double, double
+{
+    libarraymath:FAMEANVARD
+}
+
+inline bytecode function dmeanvard( double a[]; int correction = 1 ): double, double
+{
+    libarraymath:DAMEANVARD
+}
+
+inline bytecode function ldmeanvard( ldouble a[]; int correction = 1 ): double, double
+{
+    libarraymath:LDAMEANVARD
+}
+
+// Find mean and variance of an array, 'ldouble' results:
+
+inline bytecode function bmeanvarld( byte a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:BAMEANVARLD
+}
+
+inline bytecode function hmeanvarld( short a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:HAMEANVARLD
+}
+
+inline bytecode function meanvarld( int a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:AMEANVARLD
+}
+
+inline bytecode function lmeanvarld( long a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:LAMEANVARLD
+}
+
+inline bytecode function llmeanvarld( llong a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:LLAMEANVARLD
+}
+
+inline bytecode function fmeanvarld( float a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:FAMEANVARLD
+}
+
+inline bytecode function dmeanvarld( double a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:DAMEANVARLD
+}
+
+inline bytecode function ldmeanvarld( ldouble a[]; int correction = 1 ): ldouble, ldouble
+{
+    libarraymath:LDAMEANVARLD
+}
+
 // Add up all elements in an array:
 
 // Floating point array sums:
@@ -69,6 +263,33 @@ inline bytecode function lasumi( a : array of long ): int
 inline bytecode function llasumi( a : array of llong ): int
 {
     libarraymath:LLASUMI
+}
+
+// 'long' sum:
+
+inline bytecode function basuml( a : array of byte ): long
+{
+    libarraymath:BASUML
+}
+
+inline bytecode function hasuml( a : array of short ): long
+{
+    libarraymath:HASUML
+}
+
+inline bytecode function asuml( a : array of int ): long
+{
+    libarraymath:ASUML
+}
+
+inline bytecode function lasuml( a : array of long ): long
+{
+    libarraymath:LASUML
+}
+
+inline bytecode function llasuml( a : array of llong ): long
+{
+    libarraymath:LLASUML
 }
 
 // 'llong' sum:

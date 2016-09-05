@@ -3,13 +3,13 @@
 use std;
 use ArrayMath;
 
-type integer = llong;
+type integer = long;
 
-pragma integer const llong;
+pragma integer const long;
 
 function minmax( array of integer a ): integer, integer, int, int
 {
-    var min, max, i, j = ArrayMath::llminmax( a );
+    var min, max, i, j = ArrayMath::lminmax( a );
     return min, max, i, j;
 }
 
@@ -39,7 +39,7 @@ var a2 = [10,20,30,40,50];
 
 {
     . "";
-    . acopy( a1[], a2, start1 => 1L, start2 => 2L, length => 3L );
-    var min, max, i, j = minmax( acopy( a1[], a2, 1L, 2L, length =>3L ));
+    . acopy( a1[], a2, start1 => 1, start2 => 2, length => 3 );
+    var min, max, i, j = minmax( acopy( a1[], a2, 1, 2, length =>3 ));
     . min, max, i, j;
 }

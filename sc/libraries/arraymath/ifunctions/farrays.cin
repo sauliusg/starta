@@ -68,7 +68,7 @@ int @PREFIX1@ASUMD( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * ASUMD  Sum values in an array, give an 'ldouble' sum
+ * ASUMLD  Sum values in an array, give an 'ldouble' sum
  * 
  * array -> sum
  */
