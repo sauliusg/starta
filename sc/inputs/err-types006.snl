@@ -1,0 +1,19 @@
+// --*- C -*--
+
+// Test ArrayMAth
+
+use std;
+use ArrayMath;
+
+var x = [1,2,3];
+var y = [5,6,7];
+var f = [ 1.0, 2.0, 3.0, 4.0, 5.0, 6. ];
+var d = [ 1.0D, 2.0D, 3.0D, 4.0D, 5.0D, 6.D ];
+var ld = [ 1.0LD, 2.0LD, 3.0LD, 4.0LD, 5.0LD, 6.0LD ];
+
+operator "<" ( array of integer a ) { for var e in a do < e, "" enddo }
+operator "." ( array of integer a ) { < a }
+
+acopy( x, y );
+
+. x;

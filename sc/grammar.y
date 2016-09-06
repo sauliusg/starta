@@ -4971,7 +4971,7 @@ static void compiler_emit_default_arguments( COMPILER *cc,
 	}
 	arg = dnode_next( arg );
     }
-    if( arg == NULL && arg_name != NULL ) {
+    if( arg == NULL && arg_name != NULL && cc->current_call ) {
 	yyerrorf( "function '%s' has no argument '%s' to emit",
 		  dnode_name( cc->current_call ), arg_name );
     }
@@ -8804,6 +8804,7 @@ control_statement
         compiler_make_stack_top_addressof( compiler, px );
         if( aggregate_expression_type &&
             tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+            element_type &&
             tnode_kind( element_type ) != TK_PLACEHOLDER ) {
             compiler_compile_ldi( compiler, px );
         } else {
