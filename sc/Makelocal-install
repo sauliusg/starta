@@ -1,12 +1,14 @@
 # --*- Makefile -*--
 
-INSTALL_DIR ?= ${HOME}/install/slc
-PREFIX ?= ${INSTALL_DIR}/slc-r${SVN_VERSION}
+PACKAGE = starta
+
+INSTALL_DIR ?= ${HOME}/install/${PACKAGE}
+PREFIX ?= ${INSTALL_DIR}/${PACKAGE}-r${SVN_VERSION}
 
 BINDIR = ${PREFIX}/bin
-LIBDIR = ${PREFIX}/lib/slc
+LIBDIR = ${PREFIX}/lib/${PACKAGE}
 RC_DIR = ${PREFIX}/rc
-RC_FILE = ${RC_DIR}/slc.rc
+RC_FILE = ${RC_DIR}/${PACKAGE}.rc
 
 .PHONY: install
 
