@@ -1,0 +1,28 @@
+#
+# Snail language compiler tests
+#
+# Test number syntax recognition
+#
+
+use std;
+
+# All statements below should print '3456':
+
+. 3456;
+. +3456;
+. -(-3456);
+. + 3456;
+. -(- 3456);
+
+# Leave a blank line:
+. "";
+
+# The statements below should print out '-3456':
+. -3456;
+. -(3456);
+. (-3456);
+. - 3456;
+. - (3456);
+. (- 3456);
+. - ( 3456 );
+. ( - 3456);
