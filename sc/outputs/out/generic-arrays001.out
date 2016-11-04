@@ -1,256 +1,256 @@
-53.500000
-2.500000
+53.5
+2.5
 >>> computed 3 simplex points
 >>> computed 3 energies
 
 Step: 0
 Simplex:
-0  1.000000 2.000000 energy = 53.500000 distances:  2.000000  2.000000
-1  3.000000 2.000000 energy = 53.500000 distances:  2.828427
-2  1.000000 4.000000 energy = 101.500000 distances:
+0  1 2 energy = 53.5 distances:  2  2
+1  3 2 energy = 53.5 distances:  2.82843
+2  1 4 energy = 101.5 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 1
 Simplex:
-0  1.000000 2.000000 energy = 53.500000 distances:  2.000000  5.000000
-1  3.000000 2.000000 energy = 53.500000 distances:  4.123106
-2  4.000000 -2.000000 energy = 8.500000 distances:
+0  1 2 energy = 53.5 distances:  2  5
+1  3 2 energy = 53.5 distances:  4.12311
+2  4 -2 energy = 8.5 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 2
 Simplex:
-0  1.000000 2.000000 energy = 53.500000 distances:  4.123106  5.000000
-1  2.000000 -2.000000 energy = 4.500000 distances:  2.000000
-2  4.000000 -2.000000 energy = 8.500000 distances:
+0  1 2 energy = 53.5 distances:  4.12311  5
+1  2 -2 energy = 4.5 distances:  2
+2  4 -2 energy = 8.5 distances:
 ilow, inext, ihigh = 1 2 0
 
 Step: 3
 Simplex:
-0  4.000000 -4.000000 energy = 8.500000 distances:  2.828427  2.000000
-1  2.000000 -2.000000 energy = 4.500000 distances:  2.000000
-2  4.000000 -2.000000 energy = 8.500000 distances:
+0  4 -4 energy = 8.5 distances:  2.82843  2
+1  2 -2 energy = 4.5 distances:  2
+2  4 -2 energy = 8.5 distances:
 ilow, inext, ihigh = 1 2 0
 
 Step: 4
 Simplex:
-0  3.500000 -3.000000 energy = 4.750000 distances:  1.802776  1.118034
-1  2.000000 -2.000000 energy = 4.500000 distances:  2.000000
-2  4.000000 -2.000000 energy = 8.500000 distances:
+0  3.5 -3 energy = 4.75 distances:  1.80278  1.11803
+1  2 -2 energy = 4.5 distances:  2
+2  4 -2 energy = 8.5 distances:
 ilow, inext, ihigh = 1 0 2
 
 Step: 5
 Simplex:
-0  3.500000 -3.000000 energy = 4.750000 distances:  1.802776  2.000000
-1  2.000000 -2.000000 energy = 4.500000 distances:  1.118034
-2  1.500000 -3.000000 energy = 2.750000 distances:
+0  3.5 -3 energy = 4.75 distances:  1.80278  2
+1  2 -2 energy = 4.5 distances:  1.11803
+2  1.5 -3 energy = 2.75 distances:
 ilow, inext, ihigh = 2 1 0
 
 Step: 6
 Simplex:
-0  2.625000 -2.750000 energy = 3.015625 distances:  0.976281  1.152443
-1  2.000000 -2.000000 energy = 4.500000 distances:  1.118034
-2  1.500000 -3.000000 energy = 2.750000 distances:
+0  2.625 -2.75 energy = 3.01562 distances:  0.976281  1.15244
+1  2 -2 energy = 4.5 distances:  1.11803
+2  1.5 -3 energy = 2.75 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 7
 Simplex:
-0  2.625000 -2.750000 energy = 3.015625 distances:  0.773714  1.152443
-1  2.093750 -3.312500 energy = 2.704102 distances:  0.670966
-2  1.500000 -3.000000 energy = 2.750000 distances:
+0  2.625 -2.75 energy = 3.01562 distances:  0.773714  1.15244
+1  2.09375 -3.3125 energy = 2.7041 distances:  0.670966
+2  1.5 -3 energy = 2.75 distances:
 ilow, inext, ihigh = 1 2 0
 
 Step: 8
 Simplex:
-0  2.210938 -2.953125 energy = 2.548889 distances:  0.377999  0.712481
-1  2.093750 -3.312500 energy = 2.704102 distances:  0.670966
-2  1.500000 -3.000000 energy = 2.750000 distances:
+0  2.21094 -2.95312 energy = 2.54889 distances:  0.377999  0.712481
+1  2.09375 -3.3125 energy = 2.7041 distances:  0.670966
+2  1.5 -3 energy = 2.75 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 9
 Simplex:
-0  2.210938 -2.953125 energy = 2.548889 distances:  0.377999  0.401095
-1  2.093750 -3.312500 energy = 2.704102 distances:  0.363538
-2  1.826172 -3.066406 energy = 2.539036 distances:
+0  2.21094 -2.95312 energy = 2.54889 distances:  0.377999  0.401095
+1  2.09375 -3.3125 energy = 2.7041 distances:  0.363538
+2  1.82617 -3.06641 energy = 2.53904 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 10
 Simplex:
-0  2.210938 -2.953125 energy = 2.548889 distances:  0.248725  0.401095
-1  1.980957 -2.858398 energy = 2.540465 distances:  0.259279
-2  1.826172 -3.066406 energy = 2.539036 distances:
+0  2.21094 -2.95312 energy = 2.54889 distances:  0.248725  0.401095
+1  1.98096 -2.8584 energy = 2.54046 distances:  0.259279
+2  1.82617 -3.06641 energy = 2.53904 distances:
 ilow, inext, ihigh = 2 1 0
 
 Step: 11
 Simplex:
-0  2.057251 -2.957764 energy = 2.506845 distances:  0.125277  0.255344
-1  1.980957 -2.858398 energy = 2.540465 distances:  0.259279
-2  1.826172 -3.066406 energy = 2.539036 distances:
+0  2.05725 -2.95776 energy = 2.50685 distances:  0.125277  0.255344
+1  1.98096 -2.8584 energy = 2.54046 distances:  0.259279
+2  1.82617 -3.06641 energy = 2.53904 distances:
 ilow, inext, ihigh = 0 2 1
 
 Step: 12
 Simplex:
-0  2.057251 -2.957764 energy = 2.506845 distances:  0.098525  0.255344
-1  1.961334 -2.935242 energy = 2.509882 distances:  0.188343
-2  1.826172 -3.066406 energy = 2.539036 distances:
+0  2.05725 -2.95776 energy = 2.50685 distances:  0.0985254  0.255344
+1  1.96133 -2.93524 energy = 2.50988 distances:  0.188343
+2  1.82617 -3.06641 energy = 2.53904 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 13
 Simplex:
-0  2.057251 -2.957764 energy = 2.506845 distances:  0.098525  0.147771
-1  1.961334 -2.935242 energy = 2.509882 distances:  0.083501
-2  1.917732 -3.006454 energy = 2.506851 distances:
+0  2.05725 -2.95776 energy = 2.50685 distances:  0.0985254  0.147771
+1  1.96133 -2.93524 energy = 2.50988 distances:  0.0835008
+2  1.91773 -3.00645 energy = 2.50685 distances:
 ilow, inext, ihigh = 0 2 1
 
 Step: 14
 Simplex:
-0  2.057251 -2.957764 energy = 2.506845 distances:  0.083501  0.147771
-1  2.013649 -3.028976 energy = 2.501866 distances:  0.098525
-2  1.917732 -3.006454 energy = 2.506851 distances:
+0  2.05725 -2.95776 energy = 2.50685 distances:  0.0835008  0.147771
+1  2.01365 -3.02898 energy = 2.50187 distances:  0.0985254
+2  1.91773 -3.00645 energy = 2.50685 distances:
 ilow, inext, ihigh = 1 0 2
 
 Step: 15
 Simplex:
-0  2.057251 -2.957764 energy = 2.506845 distances:  0.083501  0.091008
-1  2.013649 -3.028976 energy = 2.501866 distances:  0.047096
-2  1.976591 -2.999912 energy = 2.500548 distances:
+0  2.05725 -2.95776 energy = 2.50685 distances:  0.0835008  0.0910083
+1  2.01365 -3.02898 energy = 2.50187 distances:  0.0470958
+2  1.97659 -2.99991 energy = 2.50055 distances:
 ilow, inext, ihigh = 2 1 0
 
 Step: 16
 Simplex:
-0  2.026186 -2.986104 energy = 2.501072 distances:  0.044668  0.051481
-1  2.013649 -3.028976 energy = 2.501866 distances:  0.047096
-2  1.976591 -2.999912 energy = 2.500548 distances:
+0  2.02619 -2.9861 energy = 2.50107 distances:  0.0446678  0.0514808
+1  2.01365 -3.02898 energy = 2.50187 distances:  0.0470958
+2  1.97659 -2.99991 energy = 2.50055 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 17
 Simplex:
-0  2.026186 -2.986104 energy = 2.501072 distances:  0.031111  0.051481
-1  2.007519 -3.010992 energy = 2.500298 distances:  0.032853
-2  1.976591 -2.999912 energy = 2.500548 distances:
+0  2.02619 -2.9861 energy = 2.50107 distances:  0.0311107  0.0514808
+1  2.00752 -3.01099 energy = 2.5003 distances:  0.0328525
+2  1.97659 -2.99991 energy = 2.50055 distances:
 ilow, inext, ihigh = 1 2 0
 
 Step: 18
 Simplex:
-0  2.009120 -2.995778 energy = 2.500119 distances:  0.015298  0.032791
-1  2.007519 -3.010992 energy = 2.500298 distances:  0.032853
-2  1.976591 -2.999912 energy = 2.500548 distances:
+0  2.00912 -2.99578 energy = 2.50012 distances:  0.0152983  0.0327908
+1  2.00752 -3.01099 energy = 2.5003 distances:  0.0328525
+2  1.97659 -2.99991 energy = 2.50055 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 19
 Simplex:
-0  2.009120 -2.995778 energy = 2.500119 distances:  0.015298  0.017669
-1  2.007519 -3.010992 energy = 2.500298 distances:  0.017726
-2  1.992455 -3.001649 energy = 2.500062 distances:
+0  2.00912 -2.99578 energy = 2.50012 distances:  0.0152983  0.0176688
+1  2.00752 -3.01099 energy = 2.5003 distances:  0.0177261
+2  1.99246 -3.00165 energy = 2.50006 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 20
 Simplex:
-0  2.009120 -2.995778 energy = 2.500119 distances:  0.010345  0.017669
-1  2.004153 -3.004853 energy = 2.500064 distances:  0.012129
-2  1.992455 -3.001649 energy = 2.500062 distances:
+0  2.00912 -2.99578 energy = 2.50012 distances:  0.0103451  0.0176688
+1  2.00415 -3.00485 energy = 2.50006 distances:  0.0121289
+2  1.99246 -3.00165 energy = 2.50006 distances:
 ilow, inext, ihigh = 2 1 0
 
 Step: 21
 Simplex:
-0  2.003712 -2.999514 energy = 2.500014 distances:  0.005357  0.011457
-1  2.004153 -3.004853 energy = 2.500064 distances:  0.012129
-2  1.992455 -3.001649 energy = 2.500062 distances:
+0  2.00371 -2.99951 energy = 2.50001 distances:  0.00535662  0.0114575
+1  2.00415 -3.00485 energy = 2.50006 distances:  0.0121289
+2  1.99246 -3.00165 energy = 2.50006 distances:
 ilow, inext, ihigh = 0 2 1
 
 Step: 22
 Simplex:
-0  2.003712 -2.999514 energy = 2.500014 distances:  0.004121  0.011457
-1  2.001118 -3.002717 energy = 2.500016 distances:  0.008729
-2  1.992455 -3.001649 energy = 2.500062 distances:
+0  2.00371 -2.99951 energy = 2.50001 distances:  0.00412125  0.0114575
+1  2.00112 -3.00272 energy = 2.50002 distances:  0.0087288
+2  1.99246 -3.00165 energy = 2.50006 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 23
 Simplex:
-0  2.003712 -2.999514 energy = 2.500014 distances:  0.004121  0.006549
-1  2.001118 -3.002717 energy = 2.500016 distances:  0.003918
-2  1.997435 -3.001382 energy = 2.500010 distances:
+0  2.00371 -2.99951 energy = 2.50001 distances:  0.00412125  0.00654903
+1  2.00112 -3.00272 energy = 2.50002 distances:  0.00391757
+2  1.99744 -3.00138 energy = 2.50001 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 24
 Simplex:
-0  2.003712 -2.999514 energy = 2.500014 distances:  0.003918  0.006549
-1  2.000029 -2.998179 energy = 2.500007 distances:  0.004121
-2  1.997435 -3.001382 energy = 2.500010 distances:
+0  2.00371 -2.99951 energy = 2.50001 distances:  0.00391777  0.00654903
+1  2.00003 -2.99818 energy = 2.50001 distances:  0.00412136
+2  1.99744 -3.00138 energy = 2.50001 distances:
 ilow, inext, ihigh = 1 2 0
 
 Step: 25
 Simplex:
-0  2.001222 -2.999648 energy = 2.500002 distances:  0.001892  0.004165
-1  2.000029 -2.998179 energy = 2.500007 distances:  0.004121
-2  1.997435 -3.001382 energy = 2.500010 distances:
+0  2.00122 -2.99965 energy = 2.5 distances:  0.00189195  0.00416534
+1  2.00003 -2.99818 energy = 2.50001 distances:  0.00412136
+2  1.99744 -3.00138 energy = 2.50001 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 26
 Simplex:
-0  2.001222 -2.999648 energy = 2.500002 distances:  0.001892  0.002248
-1  2.000029 -2.998179 energy = 2.500007 distances:  0.002207
-2  1.999030 -3.000148 energy = 2.500001 distances:
+0  2.00122 -2.99965 energy = 2.5 distances:  0.00189195  0.00224813
+1  2.00003 -2.99818 energy = 2.50001 distances:  0.00220715
+2  1.99903 -3.00015 energy = 2.5 distances:
 ilow, inext, ihigh = 2 0 1
 
 Step: 27
 Simplex:
-0  2.001222 -2.999648 energy = 2.500002 distances:  0.001525  0.002248
-1  2.000175 -3.000757 energy = 2.500001 distances:  0.001297
-2  1.999030 -3.000148 energy = 2.500001 distances:
+0  2.00122 -2.99965 energy = 2.5 distances:  0.00152533  0.00224813
+1  2.00017 -3.00076 energy = 2.5 distances:  0.00129654
+2  1.99903 -3.00015 energy = 2.5 distances:
 ilow, inext, ihigh = 2 1 0
 
 Step: 28
 Simplex:
-0  2.000412 -3.000050 energy = 2.500000 distances:  0.000746  0.001386
-1  2.000175 -3.000757 energy = 2.500001 distances:  0.001297
-2  1.999030 -3.000148 energy = 2.500001 distances:
+0  2.00041 -3.00005 energy = 2.5 distances:  0.000745504  0.00138556
+1  2.00017 -3.00076 energy = 2.5 distances:  0.00129654
+2  1.99903 -3.00015 energy = 2.5 distances:
 ilow, inext, ihigh = 0 2 1
 
 Step: 29
 Simplex:
-0  2.000412 -3.000050 energy = 2.500000 distances:  0.000598  0.001386
-1  1.999948 -3.000428 energy = 2.500000 distances:  0.000960
-2  1.999030 -3.000148 energy = 2.500001 distances:
+0  2.00041 -3.00005 energy = 2.5 distances:  0.000598419  0.00138556
+1  1.99995 -3.00043 energy = 2.5 distances:  0.000959639
+2  1.99903 -3.00015 energy = 2.5 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 30
 Simplex:
-0  2.000412 -3.000050 energy = 2.500000 distances:  0.000598  0.000820
-1  1.999948 -3.000428 energy = 2.500000 distances:  0.000415
-2  1.999605 -3.000193 energy = 2.500000 distances:
+0  2.00041 -3.00005 energy = 2.5 distances:  0.000598419  0.000819786
+1  1.99995 -3.00043 energy = 2.5 distances:  0.000415394
+2  1.99961 -3.00019 energy = 2.5 distances:
 ilow, inext, ihigh = 0 0 1
 
 Step: 31
 Simplex:
-0  2.000412 -3.000050 energy = 2.500000 distances:  0.000416  0.000820
-1  2.000069 -2.999815 energy = 2.500000 distances:  0.000598
-2  1.999605 -3.000193 energy = 2.500000 distances:
+0  2.00041 -3.00005 energy = 2.5 distances:  0.000415627  0.000819786
+1  2.00007 -2.99982 energy = 2.5 distances:  0.000598477
+2  1.99961 -3.00019 energy = 2.5 distances:
 ilow, inext, ihigh = 1 2 0
 
 Step: 32
 Simplex:
-0  2.000125 -3.000027 energy = 2.500000 distances:  0.000219  0.000546
-1  2.000069 -2.999815 energy = 2.500000 distances:  0.000598
-2  1.999605 -3.000193 energy = 2.500000 distances:
+0  2.00012 -3.00003 energy = 2.5 distances:  0.000218882  0.000545558
+1  2.00007 -2.99982 energy = 2.5 distances:  0.000598477
+2  1.99961 -3.00019 energy = 2.5 distances:
 ilow, inext, ihigh = 0 1 2
 
 Step: 33
 Simplex:
-0  2.000125 -3.000027 energy = 2.500000 distances:  0.000219  0.000275
-1  2.000069 -2.999815 energy = 2.500000 distances:  0.000326
-2  1.999851 -3.000057 energy = 2.500000 distances:
+0  2.00012 -3.00003 energy = 2.5 distances:  0.000218882  0.000275348
+1  2.00007 -2.99982 energy = 2.5 distances:  0.000325633
+2  1.99985 -3.00006 energy = 2.5 distances:
 ilow, inext, ihigh = 0 0 1
-2.500000 2.500000
-2.000125  -3.000027  
+2.5 2.5
+2.00012  -3.00003  
 >>> computed 3 simplex points
 >>> computed 3 energies
-2.500000 32
-1.999851  -3.000057  
+2.5 32
+1.99985  -3.00006  
 >>> computed 3 simplex points
 >>> computed 3 energies
-2.500000 41
-1.999970  -3.000086  
+2.5 41
+1.99997  -3.00009  
 >>> computed 3 simplex points
 >>> computed 3 energies
-2.500000 45
-1.999768  -3.000003  
+2.5 45
+1.99977  -3  
