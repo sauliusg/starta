@@ -317,7 +317,7 @@ ${DIFF_FILES}: ${TARGET}
 ${DIFFIL_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
-	./$^ ${TEST_OPTIONS} 2>&1 | diff ${OUTPUT_DIR}/$*.out - > $@ ; \
+	./$^ ${TEST_OPTIONS} 2>&1 | diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 ${OUTPUT_DIR}/%.out: ${TARGET} ${TEST_DIR}/%${EXT}
@@ -335,7 +335,7 @@ ${TST_OUT_DIR}/%.out: ${TST_EXE_DIR}/%
 ${TST_DIF_DIR}/%.diff: ${TST_EXE_DIR}/%
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
-	./$< 2>&1 | diff ${TST_OUT_DIR}/$*.out - > $@ ; \
+	./$< 2>&1 | diff -u ${TST_OUT_DIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 .PHONY: shoutpus shout shtests shtest
@@ -353,7 +353,7 @@ ${SHELL_OUTDIR}/%.out: ${SHELL_TSTDIR}/%.sh ${TARGET}
 ${SHELL_DIFDIR}/%.diff: ${SHELL_TSTDIR}/%.sh ${TARGET}
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
-	$< 2>&1 | diff ${SHELL_OUTDIR}/$*.out - > $@ ; \
+	$< 2>&1 | diff -u ${SHELL_OUTDIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 .PHONY: tests alltests
