@@ -1,10 +1,10 @@
 11
-1.100000
+1.1
 
 0
-0.000000
-This is method g() of class S object with x = 2.300000 , name = "class S" and i = 6
+0
+This is method g() of class S object with x = 2.3 , name = "class S" and i = 6
 
 11
-1.100000
-This is method g() of class P object with x = 3.100000 and i = 4
+1.1
+This is method g() of class P object with x = 3.1 and i = 4
