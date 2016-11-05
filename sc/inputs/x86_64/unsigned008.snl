@@ -1,0 +1,92 @@
+// --*- C -*--
+
+// Test unsigned -- signed conversions
+
+use std;
+use unsigned;
+
+var ub: ubyte;
+var us: ushort;
+var ui: uint;
+var ul: ulong;
+var ull: ullong;
+
+var b: byte;
+var s: short;
+var i: int;
+var l: long;
+var ll: llong;
+
+ul = ~0UL / 2UL;
+
+. unsigned::strict( true ) ? "TRUE" : "FALSE";
+. "";
+
+try {
+    . ul;
+    ll = ul;
+    . ll;
+    . -ll;
+}
+catch( var m : string ) {
+    . m
+}
+. "";
+
+try {
+    . ul;
+    ll = ul + 1UL;
+    . ll;
+    . -ll;
+}
+catch( var m : string ) {
+    . m
+}
+. "";
+
+try {
+    . ul;
+    ll = ul*2UL;
+    . ll;
+    . -ll;
+}
+catch( var m : string ) {
+    . m
+}
+. "";
+
+. unsigned::strict( false ) ? "TRUE" : "FALSE";
+. "";
+
+try {
+    . ul;
+    ll = ul;
+    . ll;
+    . -ll;
+}
+catch( var m : string ) {
+    . m
+}
+. "";
+
+try {
+    . ul;
+    ll = ul + 1UL;
+    . ll;
+    . -ll;
+}
+catch( var m : string ) {
+    . m
+}
+. "";
+
+try {
+    . ul;
+    ll = ul * 2UL;
+    . ll;
+    . -ll;
+}
+catch( var m : string ) {
+    . m
+}
+. "";

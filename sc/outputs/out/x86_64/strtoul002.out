@@ -1,0 +1,11 @@
+STRTOUB - '256' unsigned value too large
+
+STRTOUH - '65536' unsigned value too large
+
+STRTOU - '4294967296' unsigned value too large
+
+10
+4294967296
+
+STRTOULL - '18446744073709551616' numerical result out of range
+
