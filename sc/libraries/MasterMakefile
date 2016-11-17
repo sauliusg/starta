@@ -48,7 +48,7 @@ include ${DEPEND_FILES}
 	${CC} -c ${CFLAGS} -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1 ${OPTFLAGS} -o $@ $<
 
 %.so.${SO_VERSION}: ${OFILES}
-	${LD} -shared -soname $*.so.${SO_MAJOR} -o $@ $^ ${LIBFLAGS}
+	${GCC} -shared -Xlinker -soname=$*.so.${SO_MAJOR} -o $@ $^ ${LIBFLAGS}
 
 clean:
 	rm -f ${OFILES}

@@ -1,6 +1,6 @@
 include ../../Makeconf
 
-CFLAGS = -I. -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions -fno-stack-protector
+CFLAGS = -I. -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions
 
 LIBFLAGS = \
 ../../libsc.so \
