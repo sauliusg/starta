@@ -474,9 +474,12 @@ static char *make_full_file_name( char *filename, char *path,
         if( version ) {
             n = snprintf( full_path, full_path_size, "%s/%s/%s",
                           path, version, filename );
-        } else {
+        } else if( path ) {
             n = snprintf( full_path, full_path_size, "%s/%s",
                           path, filename );
+        } else {
+            n = snprintf( full_path, full_path_size, "%s",
+                          filename );
         }
 	if( n > -1 && n < full_path_size ) {
 	    return full_path;
@@ -584,17 +587,171 @@ static int rscandir( DIR *dp, char *filename,
     return 0;
 }
 
+/*
+  A simplified path will not contain multiple '/' characters, and will
+  not contain substrings "./". E.g.:
+
+  Original path:                   Simplified path:
+  "./././this///is/a////path//" -> "this/is/a/path/"
+*/
+
+static char *simplify_path( char *path, cexception_t *ex )
+{
+    char *spath = strdupx( path, ex ); /* Simplified path */
+
+    /* Remove duplicated '/' occurences: */
+    char *src, *dst;
+    src = dst = spath;
+    while( *src ) {
+        *dst++ = *src;
+        if( *src == '/' ) {
+            /* Skip repeated '/' occurences: */
+            while( *src == '/' ) src++;
+        } else {
+            /* otherwise, move to the next character: */
+            src ++;
+        }
+    }
+    *dst = '\0';
+
+    /* Remove './' occurences: */
+    src = dst = spath;
+    while( *src ) {
+        if( src[0] == '.' && src[1] == '/' ) {
+            /* Skip the "./" construct: */
+            src += 2;
+            continue;
+        }
+        if( *src == '.' ) {
+            /* Copy '..' directory names: */
+            while( *src == '.' ) {
+                *dst ++ = *src ++;
+            }
+        } else {
+            /* Copy any other characters as they are: */
+            *dst++ = *src++;
+        }
+    }
+    *dst = '\0';
+    return spath;
+}
+
+static char *interpolate_string( char *path, char *filename,
+                                 cexception_t *ex )
+{
+    char * volatile interpolated = NULL;
+    char * volatile newint = NULL;
+    ssize_t intsize = 0;
+    char *pos = index( path, '$' );
+    cexception_t inner;
+    
+    interpolated = strdupx( path, ex );
+    intsize = strlen( interpolated + 1 );
+
+    cexception_guard( inner ) {
+        while( pos != NULL ) {
+            if( pos[1] == 'D' || pos[1] == 'P' ) {
+                char *dirend = rindex( filename, '/' );
+                char *dirname;
+                if( dirend != NULL ) {
+                    if( dirend == filename && *dirend == '/' ) {
+                        dirname = "/";
+                        dirend = dirname + 1;
+                    } else {
+                        dirname = filename;
+                    }
+                } else {
+                    dirname = ".";
+                    dirend = dirname + 1;
+                }
+
+#if 0
+                printf( ">>> $D = '%s' till '%s'\n", dirname, dirend );
+#endif
+                if( pos[1] == 'P' ) {
+                    char *dirnow = dirname;
+                    if( dirend > dirnow ) dirend--;
+                    while( dirend > dirnow && *dirend != '/' ) {
+                        dirend --;
+                    }
+                    if( dirend == dirnow ) {
+                        if( *dirnow == '/' ) {
+                            dirname = "/";
+                            dirend = dirname + 1;
+                        } else if( *dirnow == '.' && dirnow[1] == '.' ) {
+                            dirname = "../..";
+                            dirend = dirname + 5;
+                        } else if( *dirnow == '.' && dirnow[1] == '\0' ) {
+                            dirname = "..";
+                            dirend = dirname + 2;
+                        } else {
+                            dirname = ".";
+                            dirend = dirname + 1;
+                        }
+                    }
+#if 0
+                    printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
+#endif
+                }
+
+                ssize_t dirlen = dirend - dirname;
+                intsize += dirlen;
+                newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
+                strncpy( newint, interpolated, pos - path );
+                strncpy( newint + (pos - path), dirname, dirlen );
+                strncpy( newint + (pos - path) + dirlen,
+                         pos + 2, strlen(interpolated) - (pos+2-path) + 1 );
+                freex( interpolated );
+                interpolated = newint;
+                newint = NULL;
+            }
+            pos = index( pos+1, '$' );
+        } 
+    }
+    cexception_catch {
+        freex( interpolated );
+        freex( newint );
+        cexception_reraise( inner, ex );
+    }
+
+    return interpolated;
+}
+
 static char *compiler_find_include_file( COMPILER *c, char *filename,
 					 cexception_t *ex )
 {
     char **path;
     char *full_path;
     char *version = compiler_version;
+    char *dollar;
 
     assert( c );
 
     if( !filename ) {
 	return make_full_file_name( NULL, NULL, NULL, ex );
+    }
+
+    if( (dollar = strchr( filename, '$' )) != NULL && 
+        (dollar[1] == 'D' || dollar[1] == 'P') ) {
+        cexception_t inner;
+        char *volatile spath = simplify_path( c->filename, ex );
+        char *volatile interpolated = NULL;
+        char *volatile full_name = NULL;
+        cexception_guard( inner ) {
+            interpolated = interpolate_string( filename, spath, &inner );
+            /* printf( ">>> %s\n", interpolated ); */
+            full_name =  make_full_file_name( interpolated /*filename*/,
+                                              NULL /*path*/, NULL /*version*/,
+                                              &inner );
+            freex( interpolated );
+            freex( spath );
+            return full_name;
+        }
+        cexception_catch {
+            freex( interpolated );
+            freex( spath );
+            cexception_reraise( inner, ex );
+        }
     }
 
     if( !c->include_paths ) {
@@ -6373,136 +6530,6 @@ static void unshift_string( char ***array, char *string, cexception_t *ex )
     (*array)[0] = string;
 }
 
-static char *interpolate_string( char *path, char *filename,
-                                 cexception_t *ex )
-{
-    char * volatile interpolated = NULL;
-    char * volatile newint = NULL;
-    ssize_t intsize = 0;
-    char *pos = index( path, '$' );
-    cexception_t inner;
-    
-    interpolated = strdupx( path, ex );
-    intsize = strlen( interpolated + 1 );
-
-    cexception_guard( inner ) {
-        while( pos != NULL ) {
-            if( pos[1] == 'D' || pos[1] == 'P' ) {
-                char *dirend = rindex( filename, '/' );
-                char *dirname;
-                if( dirend != NULL ) {
-                    if( dirend == filename && *dirend == '/' ) {
-                        dirname = "/";
-                        dirend = dirname + 1;
-                    } else {
-                        dirname = filename;
-                    }
-                } else {
-                    dirname = ".";
-                    dirend = dirname + 1;
-                }
-
-#if 0
-                printf( ">>> $D = '%s' till '%s'\n", dirname, dirend );
-#endif
-                if( pos[1] == 'P' ) {
-                    char *dirnow = dirname;
-                    if( dirend > dirnow ) dirend--;
-                    while( dirend > dirnow && *dirend != '/' ) {
-                        dirend --;
-                    }
-                    if( dirend == dirnow ) {
-                        if( *dirnow == '/' ) {
-                            dirname = "/";
-                            dirend = dirname + 1;
-                        } else if( *dirnow == '.' && dirnow[1] == '.' ) {
-                            dirname = "../..";
-                            dirend = dirname + 5;
-                        } else if( *dirnow == '.' && dirnow[1] == '\0' ) {
-                            dirname = "..";
-                            dirend = dirname + 2;
-                        } else {
-                            dirname = ".";
-                            dirend = dirname + 1;
-                        }
-                    }
-#if 0
-                    printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
-#endif
-                }
-
-                ssize_t dirlen = dirend - dirname;
-                intsize += dirlen;
-                newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
-                strncpy( newint, interpolated, pos - path );
-                strncpy( newint + (pos - path), dirname, dirlen );
-                strncpy( newint + (pos - path) + dirlen,
-                         pos + 2, strlen(interpolated) - (pos+2-path) + 1 );
-                freex( interpolated );
-                interpolated = newint;
-                newint = NULL;
-            }
-            pos = index( pos+1, '$' );
-        } 
-    }
-    cexception_catch {
-        freex( interpolated );
-        freex( newint );
-        cexception_reraise( inner, ex );
-    }
-
-    return interpolated;
-}
-
-/*
-  A simplified path will not contain multiple '/' characters, and will
-  not contain substrings "./". E.g.:
-
-  Original path:                   Simplified path:
-  "./././this///is/a////path//" -> "this/is/a/path/"
-*/
-
-static char *simplify_path( char *path, cexception_t *ex )
-{
-    char *spath = strdupx( path, ex ); /* Simplified path */
-
-    /* Remove duplicated '/' occurences: */
-    char *src, *dst;
-    src = dst = spath;
-    while( *src ) {
-        *dst++ = *src;
-        if( *src == '/' ) {
-            /* Skip repeated '/' occurences: */
-            while( *src == '/' ) src++;
-        } else {
-            /* otherwise, move to the next character: */
-            src ++;
-        }
-    }
-    *dst = '\0';
-
-    /* Remove './' occurences: */
-    src = dst = spath;
-    while( *src ) {
-        if( src[0] == '.' && src[1] == '/' ) {
-            /* Skip the "./" construct: */
-            src += 2;
-            continue;
-        }
-        if( *src == '.' ) {
-            /* Copy '..' directory names: */
-            while( *src == '.' ) {
-                *dst ++ = *src ++;
-            }
-        } else {
-            /* Copy any other characters as they are: */
-            *dst++ = *src++;
-        }
-    }
-    *dst = '\0';
-    return spath;
-}
-
 static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
                                         char *value, cexception_t *ex )
 {
@@ -6521,6 +6548,7 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
         }
         cexception_catch {
             freex( interpolated );
+            freex( spath );
             cexception_reraise( inner, ex );
         }
         freex( spath );
