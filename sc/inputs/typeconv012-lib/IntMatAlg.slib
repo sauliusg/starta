@@ -1,0 +1,19 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2015-07-11 19:29:05 +0300 (Sat, 11 Jul 2015) $ 
+//$Revision: 57 $
+//$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/sgem-xray/trunk/lib/IntMatAlg.slib $
+//---------------------------------------------------------------------------*/
+//*
+// Provides simple functions for matrix operator algebra.
+//**
+
+module IntMatAlg
+
+use * from std;
+
+type melement = int;
+
+include "MatAlg.inc" ;
+
+end module IntMatAlg;

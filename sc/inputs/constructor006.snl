@@ -10,7 +10,7 @@ use * from std;
 class Atom {
     float x, y, z;
 
-    constructor Atom( float xyz[] )
+    constructor ( float xyz[] )
     {
         self.x = xyz[0];
         self.y = xyz[1];

@@ -1,0 +1,39 @@
+// --*- C -*--
+
+// Test number conversions (strtol)
+
+use std;
+
+var m: string;
+
+try {
+    var x = -32768S;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = const(-32768)S;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = -9223372036854775808LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = const(-9223372036854775808)LL;
+    . x;
+}
+catch( m ) {
+    . m
+}

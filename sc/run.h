@@ -76,22 +76,16 @@ typedef enum {
 extern void *interpret_subsystem;
 
 struct interpret_exception_t {
-  stackcell_t old_xp;    /* old value of the exception pointer
-				    xp, which must be restored to the
-				    bytecode interpreter's xp
-				    "register" when the current
-				    try-scope is left */
+  stackcell_t old_xp;    /* old value of the exception pointer xp,
+                            which must be restored to the bytecode
+                            interpreter's xp "register" when the
+                            current try-scope is left */
   stackcell_t message;   /* human-readable message describing what has
 			    happened */
   ssize_t ip;            /* saved bytecode instruction pointer */
   stackcell_t *fp;       /* saved function/procedure call frame
                             pointer */
   stackcell_t *sp;       /* saved stack pointer */
-#if 0
-  stackcell_t *gp;       /* Global pointer, or ground pointer --
-			    points to the stack frame of the main
-			    program (the very first stack frame) */
-#endif
   stackcell_t *ep;       /* saved evalueation stack pointer */
   ssize_t catch_offset;  /* offset to the catch code (exception
 			    handler), relative to the ip value saved

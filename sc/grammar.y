@@ -12,6 +12,7 @@
 /* uses: */
 #include <stdio.h>
 #include <stdarg.h>
+#include <limits.h>
 #include <string.h>
 #include <ctype.h>
 #include <dlfcn.h>
@@ -47,6 +48,8 @@
 #include <alloccell.h>
 #include <implementation.h>
 #include <assert.h>
+
+char *progname;
 
 static char *compiler_version = "0.0";
 
@@ -471,9 +474,12 @@ static char *make_full_file_name( char *filename, char *path,
         if( version ) {
             n = snprintf( full_path, full_path_size, "%s/%s/%s",
                           path, version, filename );
-        } else {
+        } else if( path ) {
             n = snprintf( full_path, full_path_size, "%s/%s",
                           path, filename );
+        } else {
+            n = snprintf( full_path, full_path_size, "%s",
+                          filename );
         }
 	if( n > -1 && n < full_path_size ) {
 	    return full_path;
@@ -581,17 +587,171 @@ static int rscandir( DIR *dp, char *filename,
     return 0;
 }
 
+/*
+  A simplified path will not contain multiple '/' characters, and will
+  not contain substrings "./". E.g.:
+
+  Original path:                   Simplified path:
+  "./././this///is/a////path//" -> "this/is/a/path/"
+*/
+
+static char *simplify_path( char *path, cexception_t *ex )
+{
+    char *spath = strdupx( path, ex ); /* Simplified path */
+
+    /* Remove duplicated '/' occurences: */
+    char *src, *dst;
+    src = dst = spath;
+    while( *src ) {
+        *dst++ = *src;
+        if( *src == '/' ) {
+            /* Skip repeated '/' occurences: */
+            while( *src == '/' ) src++;
+        } else {
+            /* otherwise, move to the next character: */
+            src ++;
+        }
+    }
+    *dst = '\0';
+
+    /* Remove './' occurences: */
+    src = dst = spath;
+    while( *src ) {
+        if( src[0] == '.' && src[1] == '/' ) {
+            /* Skip the "./" construct: */
+            src += 2;
+            continue;
+        }
+        if( *src == '.' ) {
+            /* Copy '..' directory names: */
+            while( *src == '.' ) {
+                *dst ++ = *src ++;
+            }
+        } else {
+            /* Copy any other characters as they are: */
+            *dst++ = *src++;
+        }
+    }
+    *dst = '\0';
+    return spath;
+}
+
+static char *interpolate_string( char *path, char *filename,
+                                 cexception_t *ex )
+{
+    char * volatile interpolated = NULL;
+    char * volatile newint = NULL;
+    ssize_t intsize = 0;
+    char *pos = index( path, '$' );
+    cexception_t inner;
+    
+    interpolated = strdupx( path, ex );
+    intsize = strlen( interpolated + 1 );
+
+    cexception_guard( inner ) {
+        while( pos != NULL ) {
+            if( pos[1] == 'D' || pos[1] == 'P' ) {
+                char *dirend = rindex( filename, '/' );
+                char *dirname;
+                if( dirend != NULL ) {
+                    if( dirend == filename && *dirend == '/' ) {
+                        dirname = "/";
+                        dirend = dirname + 1;
+                    } else {
+                        dirname = filename;
+                    }
+                } else {
+                    dirname = ".";
+                    dirend = dirname + 1;
+                }
+
+#if 0
+                printf( ">>> $D = '%s' till '%s'\n", dirname, dirend );
+#endif
+                if( pos[1] == 'P' ) {
+                    char *dirnow = dirname;
+                    if( dirend > dirnow ) dirend--;
+                    while( dirend > dirnow && *dirend != '/' ) {
+                        dirend --;
+                    }
+                    if( dirend == dirnow ) {
+                        if( *dirnow == '/' ) {
+                            dirname = "/";
+                            dirend = dirname + 1;
+                        } else if( *dirnow == '.' && dirnow[1] == '.' ) {
+                            dirname = "../..";
+                            dirend = dirname + 5;
+                        } else if( *dirnow == '.' && dirnow[1] == '\0' ) {
+                            dirname = "..";
+                            dirend = dirname + 2;
+                        } else {
+                            dirname = ".";
+                            dirend = dirname + 1;
+                        }
+                    }
+#if 0
+                    printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
+#endif
+                }
+
+                ssize_t dirlen = dirend - dirname;
+                intsize += dirlen;
+                newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
+                strncpy( newint, interpolated, pos - path );
+                strncpy( newint + (pos - path), dirname, dirlen );
+                strncpy( newint + (pos - path) + dirlen,
+                         pos + 2, strlen(interpolated) - (pos+2-path) + 1 );
+                freex( interpolated );
+                interpolated = newint;
+                newint = NULL;
+            }
+            pos = index( pos+1, '$' );
+        } 
+    }
+    cexception_catch {
+        freex( interpolated );
+        freex( newint );
+        cexception_reraise( inner, ex );
+    }
+
+    return interpolated;
+}
+
 static char *compiler_find_include_file( COMPILER *c, char *filename,
 					 cexception_t *ex )
 {
     char **path;
     char *full_path;
     char *version = compiler_version;
+    char *dollar;
 
     assert( c );
 
     if( !filename ) {
 	return make_full_file_name( NULL, NULL, NULL, ex );
+    }
+
+    if( (dollar = strchr( filename, '$' )) != NULL && 
+        (dollar[1] == 'D' || dollar[1] == 'P') ) {
+        cexception_t inner;
+        char *volatile spath = simplify_path( c->filename, ex );
+        char *volatile interpolated = NULL;
+        char *volatile full_name = NULL;
+        cexception_guard( inner ) {
+            interpolated = interpolate_string( filename, spath, &inner );
+            /* printf( ">>> %s\n", interpolated ); */
+            full_name =  make_full_file_name( interpolated /*filename*/,
+                                              NULL /*path*/, NULL /*version*/,
+                                              &inner );
+            freex( interpolated );
+            freex( spath );
+            return full_name;
+        }
+        cexception_catch {
+            freex( interpolated );
+            freex( spath );
+            cexception_reraise( inner, ex );
+        }
     }
 
     if( !c->include_paths ) {
@@ -1660,6 +1820,34 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
     }
 }
 
+static DNODE* compiler_lookup_conversion( COMPILER *cc,
+                                          TNODE *target_type,
+                                          TNODE *src_type )
+{
+    TLIST *conversion_argument = NULL;
+    TNODE *source_type = src_type;
+    cexception_t *ex = NULL; /* FIXME: make 'ex' an argument */
+
+#if 0
+    printf( ">>> looking up conversion from '%s' to '%s'\n",
+            target_type ? tnode_name(src_type) : "<null>",
+            target_type ? tnode_name(target_type) : "<null>" );
+#endif
+
+    tlist_push_tnode( &conversion_argument, &source_type, ex );
+
+    DNODE *conversion_dnode =
+        target_type ?
+        vartab_lookup_operator( cc->operators, tnode_name( target_type ),
+                                conversion_argument ) : NULL;
+
+    if( conversion_dnode ) {
+        return conversion_dnode;
+    } else {
+        return tnode_lookup_conversion( target_type, src_type );
+    }
+}
+
 static void compiler_compile_type_conversion( COMPILER *cc,
                                               TNODE *target_type,
                                               char *target_name,
@@ -1682,7 +1870,7 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 	} else {
 	    DNODE *conversion =
 		target_type ?
-                tnode_lookup_conversion( target_type, expr_type ) :
+                compiler_lookup_conversion( cc, target_type, expr_type ) :
                 NULL;
 	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
 	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
@@ -1778,8 +1966,8 @@ static void compiler_compile_return( COMPILER *cc,
                 tnode_name( returned_type ) : NULL;
             if( available_type && returned_type_name && 
                 i == 0 &&
-                tnode_lookup_conversion( returned_type,
-                                         available_type  )) {
+                compiler_lookup_conversion( cc, returned_type,
+                                            available_type  )) {
                 compiler_compile_named_type_conversion( cc, returned_type_name, ex );
                 expr = cc->e_stack;
                 if( expr ) {
@@ -2467,7 +2655,7 @@ static void compiler_compile_variable_assignment_or_init(
                                                     msg, sizeof(msg)-1, ex )) {
 	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
 	    if( expr_type && dst_name &&
-		tnode_lookup_conversion( var_type, expr_type )) {
+		compiler_lookup_conversion( cc, var_type, expr_type )) {
 		compiler_compile_named_type_conversion( cc, dst_name, ex );
 		expr = cc->e_stack;
 		expr_type = enode_type( expr );
@@ -2686,7 +2874,8 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
                       msg, sizeof(msg)-1, ex )) {
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
-			tnode_lookup_conversion( element_type, expr_type )) {
+			compiler_lookup_conversion( cc, element_type, 
+                                                    expr_type )) {
 			compiler_compile_named_type_conversion( cc, dst_name, ex );
 			expr = cc->e_stack;
                         expr_type = enode_type( expr );
@@ -3161,8 +3350,8 @@ static void compiler_compile_jz( COMPILER *c,
 }
 
 static void compiler_compile_loop( COMPILER *c,
-				ssize_t offset,
-				cexception_t *ex )
+                                   ssize_t offset,
+                                   cexception_t *ex )
 {
     ENODE * volatile limit_enode = c->e_stack;
     TNODE * volatile limit_tnode = limit_enode ?
@@ -3223,10 +3412,16 @@ static void compiler_compile_next( COMPILER *c,
 	    tnode_report_missing_operator( counter_tnode, "next", 1 );
 	}
     }
-    
-    ncounters = dnode_loop_counters( c->loops );
+
+    /* One loop counter is removed by the "next" operator; the rest
+       must be dropped explicitly: */
+    ncounters = dnode_loop_counters( c->loops ) - 1;
     if( ncounters > 0 ) {
-        compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+        if( ncounters == 1 ) {
+            compiler_emit( c, ex, "\tc\n", PDROP );
+        } else {
+            compiler_emit( c, ex, "\tce\n", PDROPN, &ncounters );
+        }
     }
     for( i = 0; i < ncounters; i ++ ) {
         compiler_drop_top_expression( c );
@@ -3753,13 +3948,19 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
 
     assert( class_tnode );
 
-    fn_dnode = tnode_constructor( class_tnode );
+    fn_dnode = tnode_lookup_constructor( class_tnode, dnode_name( fn_proto ));
 
     if( fn_dnode ) {
 	fn_tnode = dnode_type( fn_dnode );
 	if( !dnode_is_function_prototype( fn_dnode )) {
-	    yyerrorf( "constructor '%s' is already declared in this scope",
-		      dnode_name( fn_proto ));
+            char *constructor_name = dnode_name( fn_proto );
+            if( constructor_name && *constructor_name ) {
+                yyerrorf( "constructor '%s' is already declared in this scope",
+                          constructor_name );
+            } else {
+                yyerrorf( "default constructor is already declared in this scope",
+                          constructor_name );
+            }
 	} else
 	if( !tnode_function_prototypes_match_msg( fn_tnode,
 					          dnode_type( fn_proto ),
@@ -4513,13 +4714,10 @@ static void compiler_compile_indexing( COMPILER *cc,
             enode_reset_flags( cc->e_stack, EF_IS_READONLY );
         }
     } else if( expr_count == -1 ) {
-        int one = 1;
         TNODE *top_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
-        compiler_emit( cc, ex, "\tc\n", OVER );
-#warning "FIXME: make sure the LENGTH type is compatible with the top of the stack, use the 'length' operator. S.G."
-        compiler_emit( cc, ex, "\tc\n", LENGTH );
-        compiler_emit( cc, ex, "\tcec\n", LDC, &one, SUB );
-        compiler_push_typed_expression( cc, share_tnode( top_type ), ex );
+        compiler_compile_over( cc, ex );
+        compiler_check_and_compile_operator( cc, top_type, "last", 1,
+                                             /* fixups = */ NULL, ex );
         compiler_compile_subarray( cc, ex );
     } else if( expr_count == 2 ) {
         compiler_compile_subarray( cc, ex );
@@ -4930,7 +5128,7 @@ static void compiler_emit_default_arguments( COMPILER *cc,
 	}
 	arg = dnode_next( arg );
     }
-    if( arg == NULL && arg_name != NULL ) {
+    if( arg == NULL && arg_name != NULL && cc->current_call ) {
 	yyerrorf( "function '%s' has no argument '%s' to emit",
 		  dnode_name( cc->current_call ), arg_name );
     }
@@ -5787,12 +5985,14 @@ static void compiler_load_library( COMPILER *compiler,
 
 	if( !lib ) {
 	    char *errmsg = dlerror();
+            /*
 	    errmsg = rindex( errmsg, ':' );
 	    if( errmsg ) errmsg ++;
 	    if( errmsg && *errmsg == ' ' ) errmsg ++;
+            */
 	    if( errmsg && *errmsg ) {
-		yyerrorf( "could not open shared library '%s' - %c%s",
-			  library_filename, tolower(*errmsg), errmsg+1 );
+		yyerrorf( "could not open shared library %c%s",
+			  tolower(*errmsg), errmsg+1 );
 	    } else {
 		yyerrorf( "could not open shared library '%s'",
                           library_filename );
@@ -6330,136 +6530,6 @@ static void unshift_string( char ***array, char *string, cexception_t *ex )
     (*array)[0] = string;
 }
 
-static char *interpolate_string( char *path, char *filename,
-                                 cexception_t *ex )
-{
-    char * volatile interpolated = NULL;
-    char * volatile newint = NULL;
-    ssize_t intsize = 0;
-    char *pos = index( path, '$' );
-    cexception_t inner;
-    
-    interpolated = strdupx( path, ex );
-    intsize = strlen( interpolated + 1 );
-
-    cexception_guard( inner ) {
-        while( pos != NULL ) {
-            if( pos[1] == 'D' || pos[1] == 'P' ) {
-                char *dirend = rindex( filename, '/' );
-                char *dirname;
-                if( dirend != NULL ) {
-                    if( dirend == filename && *dirend == '/' ) {
-                        dirname = "/";
-                        dirend = dirname + 1;
-                    } else {
-                        dirname = filename;
-                    }
-                } else {
-                    dirname = ".";
-                    dirend = dirname + 1;
-                }
-
-#if 0
-                printf( ">>> $D = '%s' till '%s'\n", dirname, dirend );
-#endif
-                if( pos[1] == 'P' ) {
-                    char *dirnow = dirname;
-                    if( dirend > dirnow ) dirend--;
-                    while( dirend > dirnow && *dirend != '/' ) {
-                        dirend --;
-                    }
-                    if( dirend == dirnow ) {
-                        if( *dirnow == '/' ) {
-                            dirname = "/";
-                            dirend = dirname + 1;
-                        } else if( *dirnow == '.' && dirnow[1] == '.' ) {
-                            dirname = "../..";
-                            dirend = dirname + 5;
-                        } else if( *dirnow == '.' && dirnow[1] == '\0' ) {
-                            dirname = "..";
-                            dirend = dirname + 2;
-                        } else {
-                            dirname = ".";
-                            dirend = dirname + 1;
-                        }
-                    }
-#if 0
-                    printf( ">>> $P = '%s' till '%s'\n", dirname, dirend );
-#endif
-                }
-
-                ssize_t dirlen = dirend - dirname;
-                intsize += dirlen;
-                newint = mallocx( dirlen + strlen(interpolated) + 1, &inner );
-                strncpy( newint, interpolated, pos - path );
-                strncpy( newint + (pos - path), dirname, dirlen );
-                strncpy( newint + (pos - path) + dirlen,
-                         pos + 2, strlen(interpolated) - (pos+2-path) + 1 );
-                freex( interpolated );
-                interpolated = newint;
-                newint = NULL;
-            }
-            pos = index( pos+1, '$' );
-        } 
-    }
-    cexception_catch {
-        freex( interpolated );
-        freex( newint );
-        cexception_reraise( inner, ex );
-    }
-
-    return interpolated;
-}
-
-/*
-  A simplified path will not contain multiple '/' characters, and will
-  not contain substrings "./". E.g.:
-
-  Original path:                   Simplified path:
-  "./././this///is/a////path//" -> "this/is/a/path/"
-*/
-
-static char *simplify_path( char *path, cexception_t *ex )
-{
-    char *spath = strdupx( path, ex ); /* Simplified path */
-
-    /* Remove duplicated '/' occurences: */
-    char *src, *dst;
-    src = dst = spath;
-    while( *src ) {
-        *dst++ = *src;
-        if( *src == '/' ) {
-            /* Skip repeated '/' occurences: */
-            while( *src == '/' ) src++;
-        } else {
-            /* otherwise, move to the next character: */
-            src ++;
-        }
-    }
-    *dst = '\0';
-
-    /* Remove './' occurences: */
-    src = dst = spath;
-    while( *src ) {
-        if( src[0] == '.' && src[1] == '/' ) {
-            /* Skip the "./" construct: */
-            src += 2;
-            continue;
-        }
-        if( *src == '.' ) {
-            /* Copy '..' directory names: */
-            while( *src == '.' ) {
-                *dst ++ = *src ++;
-            }
-        } else {
-            /* Copy any other characters as they are: */
-            *dst++ = *src++;
-        }
-    }
-    *dst = '\0';
-    return spath;
-}
-
 static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
                                         char *value, cexception_t *ex )
 {
@@ -6478,6 +6548,7 @@ static void compiler_set_string_pragma( COMPILER *c, char *pragma_name,
         }
         cexception_catch {
             freex( interpolated );
+            freex( spath );
             cexception_reraise( inner, ex );
         }
         freex( spath );
@@ -7027,6 +7098,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> operator_header
 %type <s>     opt_as_identifier
 %type <s>     opt_default_module_parameter
+%type <s>     opt_dot_name
 %type <s>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
@@ -7272,10 +7344,26 @@ undelimited_simple_statement
   | function_definition
   | operator_definition
     {
-        vartab_insert_named_operator( compiler->operators, $1, px );
-        if( compiler->current_module && dnode_scope( $1 ) == 0 ) {
-            dnode_optab_insert_named_operator( compiler->current_module,
-                                               share_dnode( $1 ), px );
+#if 0
+        printf( ">>>> receiving operator '%s', tnode name '%s'\n", dnode_name($1), tnode_name(dnode_type($1)));
+#endif
+        DNODE *operator = $1;
+        TNODE *optype = operator ? dnode_type( operator ) : NULL;
+        char *opname = operator ? dnode_name( operator ) : NULL;
+
+        if( optype && tnode_is_conversion( optype )) {
+            opname = tnode_name( optype );
+            if( opname && opname[0] == '@' ) {
+                opname ++; /* Skip the '@' symbol */
+            }
+        }
+#if 0
+        printf( ">>>> inserting operator '%s'\n", opname );
+#endif
+        vartab_insert_operator( compiler->operators, opname, operator, px );
+        if( compiler->current_module && dnode_scope( operator ) == 0 ) {
+            dnode_optab_insert_operator( compiler->current_module, opname,
+                                         share_dnode( operator ), px );
         }
     }
   | compound_statement
@@ -8701,7 +8789,7 @@ control_statement
 	    dnode_set_flags( $3, DF_IS_READONLY );
 	}
 	compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 0, px );
+                            /* ncounters = */ 1, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     _IN expression
@@ -8744,6 +8832,7 @@ control_statement
         compiler_make_stack_top_addressof( compiler, px );
         if( aggregate_expression_type &&
             tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+            element_type &&
             tnode_kind( element_type ) != TK_PLACEHOLDER ) {
             compiler_compile_ldi( compiler, px );
         } else {
@@ -8795,7 +8884,7 @@ control_statement
   | labeled_for lvariable _IN
       {
         compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 1, px );
+                            /* ncounters = */ 2, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
         /* stack now: ..., lvariable_address */
       }
@@ -8861,7 +8950,7 @@ control_statement
 	    dnode_set_flags( $4, DF_IS_READONLY );
 	}
 	compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 0, px );
+                            /* ncounters = */ 1, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
       }
     in_loop_separator expression ')'
@@ -8955,7 +9044,7 @@ control_statement
   | labeled_for '(' lvariable
       {
         compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 1, px );
+                            /* ncounters = */ 2, px );
 	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
         /* stack now: ..., lvariable_address */
       }
@@ -9369,7 +9458,7 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      $$ = new_tnode_derived( share_tnode( composite ), px );
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
     }
@@ -9546,7 +9635,7 @@ undelimited_type_description
   | type_identifier _OF undelimited_or_structure_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      $$ = new_tnode_derived( share_tnode( composite ), px );
       tnode_insert_element_type( $$, $3 );
     }
 
@@ -10614,17 +10703,17 @@ multivalue_function_call
                 assert( interface_name );
                 if( tnode_kind( interface_type ) == TK_CLASS ) {
                     /* Look-up the base class used as an interface: */
-                    ssize_t interface_count = 0;
+                    ssize_t interface_count = 1;
                     TNODE *base_type = object_type;
-                    while( (base_type = tnode_base_type( base_type ))
-                           != NULL ) {
+                    while( base_type ) {
                         interface_count--;
                         if( base_type == interface_type ) {
                             interface_nr = interface_count;
                             break;
                         }
+                        base_type = tnode_base_type( base_type );
                     }
-                    if( interface_nr == 0 ) {
+                    if( interface_nr > 0 ) {
                         char *class_name =
                             object_type ? tnode_name( object_type ) : NULL;
                         if( class_name ) {
@@ -10753,17 +10842,17 @@ multivalue_function_call
                 assert( interface_name );
                 if( tnode_kind( interface_type ) == TK_CLASS ) {
                     /* Look-up the base class used as an interface: */
-                    ssize_t interface_count = 0;
+                    ssize_t interface_count = 1;
                     TNODE *base_type = object_type;
-                    while( (base_type = tnode_base_type( base_type ))
-                           != NULL ) {
+                    while( base_type ) {
                         interface_count--;
                         if( base_type == interface_type ) {
                             interface_nr = interface_count;
                             break;
                         }
+                        base_type = tnode_base_type( base_type );
                     }
-                    if( interface_nr == 0 ) {
+                    if( interface_nr > 0 ) {
                         char *class_name =
                             object_type ? tnode_name( object_type ) : NULL;
                         if( class_name ) {
@@ -11596,7 +11685,7 @@ struct_expression
 
   | _TYPE type_identifier _OF delimited_type_description
      {
-	 TNODE *composite = new_tnode_derived( $2, px );
+	 TNODE *composite = new_tnode_derived( share_tnode( $2 ), px );
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
@@ -11762,6 +11851,20 @@ arithmetic_expression
        compiler_compile_named_type_conversion( compiler, /*target_name*/$3, px );
       }
 
+  | expression '@' module_list __COLON_COLON __IDENTIFIER
+      {
+          DNODE *module = $3;
+          char *target_name = $5;
+          TNODE *target_type = NULL;
+
+          if( module ) {
+              target_type = dnode_typetab_lookup_type( module, target_name );
+          }
+
+          compiler_compile_type_conversion( compiler, target_type, 
+                                            target_name, px );
+      }
+
   | expression '@' '(' var_type_description ')'
       {
        compiler_compile_named_type_conversion( compiler, NULL, px );
@@ -11869,6 +11972,13 @@ boolean_expression
   | '(' boolean_expression ')'
   ;
 
+opt_dot_name
+  : '.' __IDENTIFIER
+  { $$ = $2; }
+  | /* empty */
+  { $$ = ""; }
+;
+
 generator_new
   : _NEW compact_type_description
       {
@@ -11876,9 +11986,12 @@ generator_new
           DNODE *constructor_dnode;
 
           compiler_check_type_contains_non_null_ref( $2 );
+          /* The share_tnode($2) is not needed here, since the
+             'compact_type_description' rule already returnes an
+             allocated or shared TNODE: */
           compiler_compile_alloc( compiler, $2, px );
 
-          constructor_dnode = $2 ? tnode_constructor( $2 ) : NULL;
+          constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
 
           if( constructor_dnode ) {
               /* --- function (constructor) call generation starts here: */
@@ -11914,14 +12027,15 @@ generator_new
           }
       }
 
-  | _NEW type_identifier
+  | _NEW type_identifier opt_dot_name
       {
 	  DNODE *constructor_dnode;
           TNODE *constructor_tnode;
           TNODE *type_tnode = $2;
+          char  *constructor_name = $3;
 
           compiler_check_type_contains_non_null_ref( type_tnode );
-          compiler_compile_alloc( compiler, type_tnode, px );
+          compiler_compile_alloc( compiler, share_tnode( type_tnode ), px );
 
           /* --- function call generation starts here: */
 
@@ -11931,7 +12045,7 @@ generator_new
           compiler->current_interface_nr = 0;
 
           constructor_dnode = type_tnode ?
-              tnode_constructor( type_tnode ) : NULL;
+              tnode_lookup_constructor( type_tnode, constructor_name ) : NULL;
 
           constructor_tnode = constructor_dnode ?
               dnode_type( constructor_dnode ) : NULL;
@@ -12834,7 +12948,7 @@ opt_base_class_initialisation
         compiler->current_interface_nr = 0;
 
         constructor_dnode = base_type_tnode ?
-            tnode_constructor( base_type_tnode ) : NULL;
+            tnode_default_constructor( base_type_tnode ) : NULL;
 
         constructor_tnode = constructor_dnode ?
             dnode_type( constructor_dnode ) : NULL;
@@ -12860,7 +12974,7 @@ opt_base_class_initialisation
 
 constructor_header
   : opt_function_attributes function_code_start _CONSTRUCTOR
-    __IDENTIFIER '(' argument_list ')'
+    opt_identifier '(' argument_list ')'
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
@@ -12872,6 +12986,8 @@ constructor_header
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = compiler->current_type;
+
+              // share_tnode( class_tnode );
 
               assert( class_tnode );
               self_dnode = new_dnode_name( "self", &inner );
@@ -12888,16 +13004,22 @@ constructor_header
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
+#if 0
               tnode_insert_constructor( class_tnode, share_dnode( funct ));
-              
+#endif
+
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
+#if 1
 	      funct = $$ =
 		  compiler_check_and_set_constructor( class_tnode, funct, px );
               share_dnode( funct );
+#else
+              $$ = funct;
+#endif
 
               /* Constructors are always functions (?): */
               /* compiler_set_function_arguments_readonly( dnode_type( funct )); */
@@ -13040,7 +13162,7 @@ field_designator
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
         TNODE *composite = $2;
-        composite = new_tnode_derived( composite, px );
+        composite = new_tnode_derived( share_tnode( composite ), px );
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
@@ -13064,7 +13186,32 @@ constant_expression
 
   | __INTEGER_CONST
       {
-	  $$ = make_const_value( px, VT_INTMAX, (intmax_t)atol( $1 ));
+          intmax_t value;
+
+          errno = 0;
+          value = strtoll( $1, NULL, 0 );
+          if( errno ) {
+              int errnoll = errno;
+              errno = 0;
+              value = strtoull( $1, NULL, 0 );
+              if( errno ) {
+                  char *message = strerror(errno);
+                  yyerrorf( "when converting integer constant '%s' - %c%s",
+                            $1, tolower(message[0]),
+                            *message == '\0' ? "" : message+1 );
+              } else {
+                  if( value == LLONG_MIN ) {
+                      fprintf( stderr, "%s: WARNING, value '%s' converts to "
+                               "a negative number\n", progname, $1 );
+                  } else {
+                      char *message = strerror(errnoll);
+                      yyerrorf( "when converting signed integer constant "
+                                "'%s' - %c%s", $1, tolower(message[0]),
+                                *message == '\0' ? "" : message+1 );
+                  }
+              }
+          }
+	  $$ = make_const_value( px, VT_INTMAX, value );
       }
 
   | __REAL_CONST
@@ -13085,7 +13232,7 @@ constant_expression
   | __IDENTIFIER
       {
 	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $1,
-						    "constant" );
+                                                       "constant" );
 	$$ = make_zero_const_value();
 	if( const_dnode ) {
 	    const_value_copy( &$$, dnode_value( const_dnode ), px );

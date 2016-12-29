@@ -5684,6 +5684,8 @@ int ADVANCE( INSTRUCTION_FN_ARGS )
         istate.ep[0].num.offs = element_offset;
     }
 
+    // printf( ">>> %s: array_ref = %p, offset = %d\n", __FUNCTION__, array_ref, element_offset );
+
     if( !array_ref ) {
         /* No array pointer -- go over to the next opcode, no jump: */
         istate.ep ++;

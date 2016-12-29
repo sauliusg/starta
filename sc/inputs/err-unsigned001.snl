@@ -1,0 +1,15 @@
+// --*- C -*--
+
+// Test unsigned values
+
+use std;
+use unsigned;
+
+var s: ushort;
+var u: uint;
+var l: ulong;
+var ll: ullong;
+var i: int;
+
+i = u; // ERROR, incomplatible types
+i = l; // ERROR, incomplatible types

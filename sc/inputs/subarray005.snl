@@ -1,0 +1,25 @@
+// --*- C -*--
+
+// Test open-ended array slices:
+
+use std;
+
+// Operator for printing out array of srings:
+operator "<" ( a : array of string )
+{
+    < "[ ";
+    for var s in a do
+        < "\"" _ s _ "\" "
+    enddo
+    < "]";
+}
+
+operator "." ( a : array of string ) { < a }
+
+var a = [ "one", "of", "a", "kind" ];
+
+. a;
+. a[1:3];
+. a[0:1];
+. a[1L:];
+. a[1:];

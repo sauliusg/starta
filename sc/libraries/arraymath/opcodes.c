@@ -7,9 +7,31 @@
 
 char *OPCODES[] = {
 
+#include "locally-generated/byte_arrays.tab.c"
+#include "locally-generated/short_arrays.tab.c"
+#include "locally-generated/int_arrays.tab.c"
+#include "locally-generated/long_arrays.tab.c"
+#include "locally-generated/llong_arrays.tab.c"
+
 #include "locally-generated/float_arrays.tab.c"
 #include "locally-generated/double_arrays.tab.c"
 #include "locally-generated/ldouble_arrays.tab.c"
+
+#include "locally-generated/byte_iarrays.tab.c"
+#include "locally-generated/short_iarrays.tab.c"
+#include "locally-generated/int_iarrays.tab.c"
+#include "locally-generated/long_iarrays.tab.c"
+#include "locally-generated/llong_iarrays.tab.c"
+
+#include "locally-generated/byte_farrays.tab.c"
+#include "locally-generated/short_farrays.tab.c"
+#include "locally-generated/int_farrays.tab.c"
+#include "locally-generated/long_farrays.tab.c"
+#include "locally-generated/llong_farrays.tab.c"
+
+#include "locally-generated/float_farrays.tab.c"
+#include "locally-generated/double_farrays.tab.c"
+#include "locally-generated/ldouble_farrays.tab.c"
 
     NULL
 };
@@ -64,6 +86,28 @@ int trace_on( int trace_flag )
     return old_trace_flag;
 }
 
+#include <locally-generated/byte_arrays.c>
+#include <locally-generated/short_arrays.c>
+#include <locally-generated/int_arrays.c>
+#include <locally-generated/long_arrays.c>
+#include <locally-generated/llong_arrays.c>
+
 #include <locally-generated/float_arrays.c>
 #include <locally-generated/double_arrays.c>
 #include <locally-generated/ldouble_arrays.c>
+
+#include <locally-generated/byte_iarrays.c>
+#include <locally-generated/short_iarrays.c>
+#include <locally-generated/int_iarrays.c>
+#include <locally-generated/long_iarrays.c>
+#include <locally-generated/llong_iarrays.c>
+
+#include <locally-generated/byte_farrays.c>
+#include <locally-generated/short_farrays.c>
+#include <locally-generated/int_farrays.c>
+#include <locally-generated/long_farrays.c>
+#include <locally-generated/llong_farrays.c>
+
+#include <locally-generated/float_farrays.c>
+#include <locally-generated/double_farrays.c>
+#include <locally-generated/ldouble_farrays.c>

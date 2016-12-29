@@ -7,8 +7,9 @@
 
 MAKECONF_EXAMPLES = ${filter-out %~, ${wildcard Makeconf*.example}}
 
-MAKECONF_FILES = ${filter-out %~, ${wildcard Makeconf*}} \
-	${MAKECONF_EXAMPLES:%.example=%}
+MAKECONF_FILES = $(sort ${filter-out ${MAKECONF_EXAMPLES}, \
+	${filter-out %~, ${wildcard Makeconf*}}} \
+	${MAKECONF_EXAMPLES:%.example=%})
 
 ifneq ("${MAKECONF_FILES}","")
 include ${MAKECONF_FILES}
@@ -70,7 +71,14 @@ LOCAL_CFILES := ${filter-out %.tab.c lex.yy.c %.lex.c, ${LOCAL_CFILES}}
 LOCAL_OBJS    = ${LOCAL_CFILES:%.c=${OBJDIR}/%.o}
 LOCAL_DEPENDS = ${LOCAL_CFILES:%.c=.%.d}
 
+SO_MAJOR = 0
+SO_MINOR = 01
+
+SO_VERSION = ${SO_MAJOR}.${SO_MINOR}
+
 LOCAL_LIB := ${addprefix lib, ${addsuffix .a, ${notdir ${shell pwd}} }}
+LOCAL_SO  := ${addprefix lib, ${addsuffix .so, ${subst -O3,,${notdir ${shell pwd}}} }}
+LOCAL_SOV := ${LOCAL_SO}.${SO_VERSION}
 
 #
 # ./testprogs directory contains test drivers, each of them containing
@@ -149,13 +157,19 @@ INCLUDES = -I. ${addprefix -I, ${sort ${SRC_DIR} ${OTHER_DIRS} ${LIB_DIRS}}}
 ## LIBFLAGS = -lm
 
 SVN_VERSION := $(shell svnversion)
+SVN_MESSAGE := SVN revision ${SVN_VERSION}
+
+ifeq (${SVN_VERSION},Unversioned directory)
+    SVN_VERSION := $(shell git log --format='%h' -1)
+    SVN_MESSAGE := GIT commit ${SVN_VERSION}
+endif
 
 ifeq (${CC},gcc)
-    CFLAGS = -Wall -g ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
-	-DSVN_VERSION="\"${SVN_VERSION}\""
+    CFLAGS = -Wall -g -fPIC ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
+	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 else
     CFLAGS = ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
-	-DSVN_VERSION="\"${SVN_VERSION}\""
+	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 endif
 
 #------------------------------------------------------------------------------
@@ -174,7 +188,7 @@ LINK_OBJ_FILES = ${YYOBJ} ${FLEXOBJ} ${OTHER_OBJS}
 
 .PHONY: all lib libs clean distclean cleanAll FORCE
 
-all: ${LOCAL_LIB} ${EXE_FILES} ${TST_DRIVERS}
+all: ${LOCAL_LIB} ${LOCAL_SO} ${EXE_FILES} ${TST_DRIVERS}
 
 lib libs: ${LIB_DIRS}
 
@@ -198,6 +212,15 @@ FORCE:;
 ${LOCAL_LIB}: ${LOCAL_OBJS}
 	ar cr ${LOCAL_LIB} ${LOCAL_OBJS}
 
+${LOCAL_SOV}: ${LOCAL_OBJS} ${LINK_OBJ_FILES}
+	${LD} -shared -soname ${LOCAL_SO}.${SO_MAJOR} -o $@ $^ ${LIBFLAGS} -lc_nonshared
+
+${LOCAL_SO}: ${LOCAL_SO}.${SO_MAJOR}
+	ln -sf $< $@
+
+${LOCAL_SO}.${SO_MAJOR}: ${LOCAL_SOV}
+	ln -sf $< $@
+
 #------------------------------------------------------------------------------
 
 MAKELOCAL_FILES = ${filter-out %~, ${wildcard Makelocal*}}
@@ -219,6 +242,9 @@ ${OBJDIR}/%.o: %.c
 
 %: ${PROGDIR}/%.c ${LINK_OBJ_FILES} ${LOCAL_LIB} ${LIB_FILES}
 	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^ ${LIBFLAGS}
+
+## %: ${PROGDIR}/%.c ${LOCAL_SO}
+## 	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $^ ${LIBFLAGS}
 
 ${TST_EXE_DIR}/%: ${TST_PRG_DIR}/%.c ${LINK_OBJ_FILES} \
                   ${LOCAL_LIB} ${LIB_FILES}
@@ -291,7 +317,7 @@ ${DIFF_FILES}: ${TARGET}
 ${DIFFIL_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
-	./$^ ${TEST_OPTIONS} 2>&1 | diff ${OUTPUT_DIR}/$*.out - > $@ ; \
+	./$^ ${TEST_OPTIONS} 2>&1 | diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 ${OUTPUT_DIR}/%.out: ${TARGET} ${TEST_DIR}/%${EXT}
@@ -309,7 +335,7 @@ ${TST_OUT_DIR}/%.out: ${TST_EXE_DIR}/%
 ${TST_DIF_DIR}/%.diff: ${TST_EXE_DIR}/%
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
-	./$< 2>&1 | diff ${TST_OUT_DIR}/$*.out - > $@ ; \
+	./$< 2>&1 | diff -u ${TST_OUT_DIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 .PHONY: shoutpus shout shtests shtest
@@ -327,7 +353,7 @@ ${SHELL_OUTDIR}/%.out: ${SHELL_TSTDIR}/%.sh ${TARGET}
 ${SHELL_DIFDIR}/%.diff: ${SHELL_TSTDIR}/%.sh ${TARGET}
 	-@printf "%-30s " "$*:" ; \
 	unset SL_INCLUDE_PATHS; \
-	$< 2>&1 | diff ${SHELL_OUTDIR}/$*.out - > $@ ; \
+	$< 2>&1 | diff -u ${SHELL_OUTDIR}/$*.out - > $@ ; \
 	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
 
 .PHONY: tests alltests
@@ -400,6 +426,7 @@ cleanAll distclean: clean ${LOCAL_CLEAN_TARGETS}
 	rm -f ${EXE_FILES} ${TST_DRIVERS}
 	rm -f ${DEPEND_FILES}
 	rm -f ${LOCAL_LIB}
+	rm -f ${LOCAL_SO} ${LOCAL_SO}.${SO_MAJOR} ${LOCAL_SOV}
 
 #------------------------------------------------------------------------------
 

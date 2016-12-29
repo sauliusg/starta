@@ -1,0 +1,16 @@
+// --*- C -*--
+
+// Test access of superclass fields:
+
+use std;
+use unsigned;
+
+var u: ushort;
+
+u = ~0 UH;
+
+. u;
+
+u ++;
+
+. u;

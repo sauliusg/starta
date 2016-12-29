@@ -1,0 +1,46 @@
+// --*- C -*--
+
+// Test unsigned values
+
+use std;
+use unsigned;
+
+var b: ubyte;
+var s: ushort;
+var u: uint;
+var l: ulong;
+var ll: ullong;
+var i: int;
+
+b = ~0 ubyte;
+;. b;
+s = b;
+. s;
+u = b;
+. u;
+l = b;
+. l;
+ll = b;
+. ll;
+ll = s;
+. ll;
+. "";
+
+s = ~0 UH;
+. s;
+u = s;
+. u;
+l = s;
+. l;
+ll = s;
+. ll;
+ll = u;
+. ll;
+. "";
+
+u = ~0 U;
+. u;
+l = u;
+. l;
+ll = u;
+. ll;

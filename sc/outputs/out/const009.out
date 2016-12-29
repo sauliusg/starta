@@ -1,0 +1,5 @@
+./sl: inputs/const009.snl(10,20): ERROR, when converting signed integer constant '9223372036854775809' - numerical result out of range
+    var x = const(-9223372036854775809)LL;
+                   ^
+./sl: 1 error(s) detected
+

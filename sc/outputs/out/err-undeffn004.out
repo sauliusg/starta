@@ -1,0 +1,5 @@
+./sl: inputs/err-undeffn004.snl(36,14): ERROR, function 'acopy' is not declared in the current scope
+        acopy( x, y, start1 => 1 );
+             ^
+./sl: 1 error(s) detected
+

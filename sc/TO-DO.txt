@@ -1,17 +1,18 @@
+-- Add pragma to warn about unused return value for functions, very important for 'push()'.
 -- Implement check to see if constructors initialise non-null fields in classes.
--- Implement 'pragma path' to manage include, module an library paths
--- Implement variables $0 (script name), $D (script directory name) and $P (path) for directory management
+++ Implement 'pragma path' to manage include, module and library paths
+++ Implement names $D (script directory name) and $P (path) for directory management
 -- improvement: reduce number of spurious error messages when a function argument is misspelled.
--- FIX BUG: implement correct updates of exception data structures after stack reallocations.
+++ FIX BUG: implement correct updates of exception data structures after stack reallocations.
 -+ Implement calls of super-class methods.
 -- Implement inheritance for anonymous classes.
 ++ Implement selective import of operators.
 -- Think how to ensure readonliness of function arguments
--- Think abou thow to implement interactive interpreter and interactive "notebooks" (as in ipython or octave?)
+-- Think about how to implement interactive interpreter and interactive "notebooks" (as in R, ipython or octave?)
 ++ Implement destructors (branches/saulius-destructors)
 -- Implement two-stack overlaping frame runtime (branches/saulius-2stacks)
 -- Implement Unix pipe constructs -- this may be a killer feature.
--- Think about convenient interface to use modules in my language in other languages
+-+ Think about convenient interface to use modules in my language in other languages
 -- Implement 'language' constructs -- this will be a killer feature (branches/saulius-foreighn-languages)
 ++ Implement parametrised modules (branches/saulius-parmetrised-modules)
 -- Implement structure/class field set/get methods
@@ -19,10 +20,9 @@
 -- Implement 'ref T' and 'num T' generic types.
 -- Implement public, protected and private members.
 -- Diagnose missing 'return expr' statements for subroutines that return values
--- Think how to implement parameterised modules.
--- Think about convenient use of modules written in other languages in my language programs.
+++ Think how to implement parameterised modules.
 -- Think about more generic iterators/continuations
--- Think if we can do return type inference from 'return' statements
+xx Think if we can do return type inference from 'return' statements
 -- Think about more consise closure (lambda-function) notation.
 -- Implement generatiom of a real threaded code?
 -- Implement generation to the native code, with optimisations.
@@ -33,7 +33,6 @@
 -- Implement generic types with the Type<K,E> syntax
 -- Implement generic types with the Type<K:Iface1,E:Iface2> syntax
 -- Implement module download from the Internet.
--- Add pragma to warn about unused return value for functions, very important for 'push()'.
 -- Implement possibility to use constants with type suffixes as default function parameter values.
 -- Implement regular expressions.
 -- Implement 'mmap'.
@@ -47,7 +46,7 @@
 -- Implement compile-time checks of uncaught exceptions
 -- Implement '--use' and '--import' options to specify used/imported modules on the command line.
 -- print out nice labels in human-readable code (produced by '-d code')
--- ideally, make output of 'sl -d code' compilable by sl itself
+-- ideally, make output of 'sl -d code' compilable by starta itself
 -- Write comments explaining compiler design considerations.
 -- Think about functions with variable number of args.
 -- Think about adding two and three return values for operators "dup" and "over", respectively.

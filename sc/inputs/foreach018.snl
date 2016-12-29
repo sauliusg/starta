@@ -1,0 +1,15 @@
+//--*- C -*--
+
+use std;
+
+var a = [ "vienas", "du" ];
+var b = [ "eins", "zwei", "drei", "vier", "fünf" ];
+
+for ( var l in b ) do
+    . l;
+enddo
+. "";
+
+for ( var l => b ) do
+    . l;
+enddo

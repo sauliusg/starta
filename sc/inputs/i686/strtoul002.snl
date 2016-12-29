@@ -1,0 +1,46 @@
+// --*- C -*--
+
+// Test unsigned arithmetics (strtol)
+
+use std;
+use unsigned;
+
+try {
+    . bytecode : ubyte { SLDC "256" LDC 10 libunsigned:STRTOUB IPRINT NEWLINE };
+}
+catch( var string m ) {
+    . m;
+}
+. "";
+
+try {
+    . bytecode : ushort { SLDC "65536" LDC 10 libunsigned:STRTOUH IPRINT NEWLINE };
+}
+catch( var string m ) {
+    . m;
+}
+. "";
+
+try {
+    . bytecode : uint { SLDC "4294967296" LDC 10 libunsigned:STRTOU IPRINT NEWLINE };
+}
+catch( var string m ) {
+    . m;
+}
+. "";
+
+try {
+    . bytecode : ulong { SLDC "4294967296" LDC 10 libunsigned:STRTOUL IPRINT NEWLINE };
+}
+catch( var string m ) {
+    . m;
+}
+. "";
+
+try {
+    . bytecode : ullong { SLDC "18446744073709551616" LDC 10 libunsigned:STRTOULL IPRINT NEWLINE };
+}
+catch( var string m ) {
+    . m;
+}
+. "";

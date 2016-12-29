@@ -16,9 +16,9 @@ module Parametrised( type inttype, type floattype = double )
 ./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no binary operator named '*'
     return x * 2 floattype;
                           ^
-./sl: inputs/Parametrised.slib(18,16): ERROR, type 'floattype' has no conversion from type 'inttype'
+./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no conversion from type 'inttype'
     return x/i@floattype;
-               ^
+                        ^
 ./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no binary operator named '/'
     return x/i@floattype;
                         ^

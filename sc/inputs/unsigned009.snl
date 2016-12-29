@@ -1,0 +1,24 @@
+// --*- C -*--
+
+// Test unsigned arithmetics (shifts)
+
+use std;
+use unsigned;
+
+var x = ~0 UB;
+
+. x;
+. x shr 1UB;
+. x shr 2UB;
+. x / 2UB;
+. x / 4UB;
+
+. "";
+x = 255 UB;
+
+. x;
+. x shr 1UB;
+. x shr 2UB;
+. x / 2UB;
+. x / 4UB;
+

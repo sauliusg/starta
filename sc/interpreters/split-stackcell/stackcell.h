@@ -18,6 +18,12 @@ typedef union stackunion {
   int i;
   long l;
   llong ll;
+
+  unsigned short us;
+  unsigned int ui;
+  unsigned long ul;
+  unsigned long long ull;
+
   void *ptr;
   float f;
   double d;
@@ -53,6 +59,10 @@ typedef struct stackcell {
 #else
 #define PTR num.ptr
 #endif
+
+#define STACKCELL_INT( s ) ((s).num.i)
+#define STACKCELL_LONG( s ) ((s).num.l)
+#define STACKCELL_LLONG( s ) ((s).num.ll)
 
 #if USE_OFFSETTED_POINTERS
 

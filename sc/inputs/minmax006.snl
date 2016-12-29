@@ -1,0 +1,45 @@
+//--*- C -*--
+
+use std;
+use ArrayMath;
+
+type integer = int;
+
+pragma integer const int;
+
+function minmax( array of integer a ): integer, integer, int, int
+{
+    var min, max, i, j = ArrayMath::minmax( a );
+    return min, max, i, j;
+}
+
+operator "<" ( array of integer a ) { for var e in a do < e, "" enddo }
+operator "." ( array of integer a ) { < a }
+
+var a1 = [1,2,3,4,5,6,7];
+var a2 = [10,20,30,40,50];
+
+. a1; . a2;
+. "";
+
+. minmax( a1 );
+. minmax( a2 );
+
+{
+    . "";
+    var min, max = minmax( a1 );
+    . min, max;
+}
+
+{
+    . "";
+    var min, max, i, j = minmax( a2 );
+    . min, max, i, j;
+}
+
+{
+    . "";
+    . acopy( a1[], a2, start1 => 1, start2 => 2, length => 3 );
+    var min, max, i, j = minmax( acopy( a1[], a2, 1, 2, length =>3 ));
+    . min, max, i, j;
+}

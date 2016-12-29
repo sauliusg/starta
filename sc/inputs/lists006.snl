@@ -11,7 +11,7 @@ class S
 { 
   int x
 
-  constructor S( x : int = 111 )
+  constructor ( x : int = 111 )
   { self.x = x }
 }
 

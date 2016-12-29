@@ -1,0 +1,10 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+int @PREFIX1@ASUMF( INSTRUCTION_FN_ARGS );
+int @PREFIX1@ASUMD( INSTRUCTION_FN_ARGS );
+int @PREFIX1@ASUMLD( INSTRUCTION_FN_ARGS );

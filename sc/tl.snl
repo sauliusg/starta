@@ -1,0 +1,36 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test generic types implemented using type erasure.
+
+use std;
+
+procedure sort( a : array of type T; cmp : function ( a, b : type T ) -> (int) ): type T[]
+{
+    var swapped = false;
+    repeat {
+        swapped = false;
+        for var i = 0 to last(a) - 1 {
+            if( cmp( a[i], a[i+1] ) > 0 ) {
+                a[i], a[i+1] = a[i+1], a[i];
+                swapped = true;
+            }
+        }
+    } while( swapped );
+
+    return a;
+}
+
+operator "<" ( string a[] ) { for var s in a { < s, "" } }
+operator "." ( string a[] ) { < a }
+operator "<" ( int a[] ) { for var s in a { < s, "" } }
+operator "." ( int a[] ) { < a }
+
+var a = [ "mene", "mene", "tekel", "parsin", "foo", "bar" ];
+. a;
+. sort( a, bytecode function( a, b: string ): int { STRGT BEXTEND HEXTEND } );
+
+var b = [ 4, 3, 1, 2, 5 ];
+. b;
+. sort( b, function( a, b: int ): int { return a > b ? 1 : 0 } );

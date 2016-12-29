@@ -1,4 +1,6 @@
 s/@type@/long/g;
+s/@type_min@/LONG_MIN/g;
+s/@type_max@/LONG_MAX/g;
 s/@PREFIX@/L/g;
 s/@PREFIX1@/L/g;
 s/@field@/l/g;

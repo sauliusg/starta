@@ -236,6 +236,9 @@ void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *vars,
 void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
                                         cexception_t *ex );
 
+void dnode_optab_insert_operator( DNODE *dnode, char *opname, DNODE *operator,
+                                  cexception_t *ex );
+
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name );
 
 void dnode_consttab_insert_consts( DNODE *dnode, DNODE *consts,

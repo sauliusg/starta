@@ -201,8 +201,13 @@ static void usage( int argc, char *argv[], int *i, option_t *option,
 static void version( int argc, char *argv[], int *i, option_t *option,
                      cexception_t * ex )
 {
-    printf( "%s svnversion %s\n", argv[0], SVN_VERSION );
-    printf( "%s\n", source_URL );
+    char url_keyword[6] = ".URL.";
+    url_keyword[0] = '$';
+    url_keyword[4] = '$';
+    printf( "%s %s\n", argv[0], SVN_VERSION );
+    if( strcmp( source_URL, url_keyword ) != 0 ) {
+        printf( "%s\n", source_URL );
+    }
     exit( 0 );
 }
 
@@ -255,7 +260,7 @@ static int argv_has_dashes( int argc, char *argv[] )
     return 0;
 }
 
-char *progname;
+extern char *progname;
 char *progtail;
 
 int main( int argc, char *argv[], char *env[] )

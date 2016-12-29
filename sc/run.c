@@ -179,6 +179,14 @@ static int realloc_eval_stack( cexception_t * ex )
         istate.ep = (stackcell_t*)(((char*)istate.ep) + full_offset);
         istate.ep_top = istate.eval_stack + STACK_SAFETY_MARGIN;
 
+        struct interpret_exception_t *current_xp;
+        for( current_xp = istate.xp;
+             current_xp != NULL;
+             current_xp = current_xp->old_xp.ptr ) {
+            current_xp->ep = (stackcell_t*)((char*)(current_xp->ep) +
+                                            full_offset );
+        }
+
 #if 0
         memset( istate.eval_stack, 0xAA,
                 stack_realloc_delta * sizeof(istate.eval_stack[0]));
@@ -256,6 +264,20 @@ static int realloc_call_stack( cexception_t * ex )
         istate.sp = (stackcell_t*)((char*)(istate.sp) + full_offset);
         istate.gp = (stackcell_t*)((char*)(istate.gp) + full_offset);
         istate.top = istate.call_stack + STACK_SAFETY_MARGIN;
+
+        /* Adjust exception structure pointers: */
+        
+        struct interpret_exception_t *current_xp;
+        for( current_xp = istate.xp;
+             current_xp != NULL;
+             current_xp = current_xp->old_xp.ptr ) {
+
+            current_xp->fp = (stackcell_t*)((char*)(current_xp->fp) +
+                                            full_offset );
+
+            current_xp->sp = (stackcell_t*)((char*)(current_xp->sp) +
+                                            full_offset );
+        }
 #if 1
         memset( istate.call_stack, 0x55,
                 stack_realloc_delta * sizeof(istate.call_stack[0]));
