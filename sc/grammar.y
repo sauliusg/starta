@@ -731,6 +731,15 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
 	return make_full_file_name( NULL, NULL, NULL, ex );
     }
 
+    if( filename && filename[0] == '/' ) {
+        /* we have an absolute path -- no search or interpolation is
+           necessary: */
+        return filename;
+    }
+
+    /* If a provided 'filename' contains $D and $P directory names,
+       lets interpoate the script directory or script parent directory
+       insted of them: */
     if( (dollar = strchr( filename, '$' )) != NULL && 
         (dollar[1] == 'D' || dollar[1] == 'P') ) {
         cexception_t inner;
@@ -5991,7 +6000,7 @@ static void compiler_load_library( COMPILER *compiler,
 	    if( errmsg && *errmsg == ' ' ) errmsg ++;
             */
 	    if( errmsg && *errmsg ) {
-		yyerrorf( "could not open shared library %c%s",
+		yyerrorf( "%c%s",
 			  tolower(*errmsg), errmsg+1 );
 	    } else {
 		yyerrorf( "could not open shared library '%s'",
