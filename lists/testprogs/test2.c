@@ -58,7 +58,7 @@ static void print_string_list( SLLIST *string_list, char *trailer )
 	printf( "%2d: %s\n", n, val );
 	n++;
     }
-    if( trailer ) printf( trailer );
+    if( trailer ) printf( "%s", trailer );
 }
 
 int main( int argc, char *argv[] )
