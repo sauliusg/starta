@@ -1,10 +1,16 @@
 // --*- C -*--
 
-// Test ldouble printout
+// Test operator for linked lists:
 
 use std;
+use Lists;
 
-use Mod1 in "$D/inputs/modules/dir1/Mod1.slib";
+var l: list of string;
 
-. Mod1::uuid;
-. uuid
+l = cons( "Vienas" );
+. head(l);
+
+l = @"Du";
+
+var s = :: l;
+
