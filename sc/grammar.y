@@ -11889,6 +11889,11 @@ arithmetic_expression
        compiler_compile_unop( compiler, "@", px );
       }
   
+  | __COLON_COLON expression  %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "::", px );
+      }
+  
   | __QQ expression  %prec __UNARY
   {
       ENODE *top = compiler->e_stack;
