@@ -68,4 +68,10 @@ procedure tail( l : list of type T ) : list of type T
     }
 }
 
+// Need:
+
+# Operator 'cat': +, _
+# Operator 'const': @?
+# Operator 'head': @? ::?
+
 end package Lists;
