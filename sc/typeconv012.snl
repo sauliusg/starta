@@ -9,7 +9,7 @@ use LDMatInvGJ;
 use inverted from LDMatInvGJ;
 use Math;
 
-var m = matrix( 7 );
+var m = matrix( 9 );
 
 // Create a Hilbert matrix (https://en.wikipedia.org/wiki/Hilbert_matrix):
 for( var i = 0; i < length(m); i ++ ) {
