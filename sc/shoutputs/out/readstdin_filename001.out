@@ -1,0 +1,7 @@
+"shtests/data/text1.txt" This is a text file.
+"shtests/data/text1.txt" It has full 2 lines.
+"shtests/data/text2.txt" This is another
+"shtests/data/text2.txt" text file.
+"shtests/data/text2.txt" It has 3 lines.
+"shtests/data/text3.txt" This is a text file
+"shtests/data/text3.txt" with no newline at the end
