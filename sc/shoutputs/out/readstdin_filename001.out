@@ -1,7 +1,8 @@
-"shtests/data/text1.txt" This is a text file.
-"shtests/data/text1.txt" It has full 2 lines.
-"shtests/data/text2.txt" This is another
-"shtests/data/text2.txt" text file.
-"shtests/data/text2.txt" It has 3 lines.
-"shtests/data/text3.txt" This is a text file
-"shtests/data/text3.txt" with no newline at the end
+"shtests/data/text1.txt" FALSE This is a text file.
+"shtests/data/text1.txt" FALSE It has full 2 lines.
+"shtests/data/text2.txt" FALSE This is another
+"shtests/data/text2.txt" FALSE text file.
+"shtests/data/text2.txt" FALSE It has 3 lines.
+"shtests/data/text3.txt" FALSE This is a text file
+"shtests/data/text3.txt" TRUE with no newline at the end
+TRUE
