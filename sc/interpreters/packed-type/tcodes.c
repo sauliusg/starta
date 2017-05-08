@@ -2281,10 +2281,20 @@ int CURFILENAME( INSTRUCTION_FN_ARGS )
     char *filename = NULL;
     
     if( istate.in ) {
-        filename = bcalloc_array( 1, strlen(istate.argv[istate.argnr]) + 1, 0,
-                                  EXCEPTION );
+        if( istate.in == stdin ) {
+            filename = bcalloc_array( 1, 2, 0, EXCEPTION );
+            BC_CHECK_PTR( filename );
+            strcpy( filename, "-" );
+        } else {
+            filename = bcalloc_array( 1, strlen(istate.argv[istate.argnr]) + 1, 0,
+                                      EXCEPTION );
+            BC_CHECK_PTR( filename );
+            strcpy( filename, istate.argv[istate.argnr] );
+        }
+    } else {
+        filename = bcalloc_array( 1, 1, 0, EXCEPTION );
         BC_CHECK_PTR( filename );
-        strcpy( filename, istate.argv[istate.argnr] );
+        strcpy( filename, "" );
     }
 
     istate.ep --;
