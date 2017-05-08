@@ -4,14 +4,23 @@ use * from std;
 
 load "libraries/math/libmath.so.0.01";
 
-inline bytecode operator "**" ( i : float; j : float ) : float
+inline bytecode operator "**" ( x : float; y : float ) : float
 { libmath:FPOW }
 
-inline bytecode operator "**" ( i : double; j : double ) : double
+inline bytecode operator "**" ( x : double; y : double ) : double
 { libmath:DPOW }
 
-inline bytecode operator "**" ( i : ldouble; j : ldouble ) : ldouble
+inline bytecode operator "**" ( x : ldouble; y : ldouble ) : ldouble
 { libmath:LDPOW }
+
+inline bytecode operator "**" ( x : float; n : int ) : float
+{ I2F libmath:FPOW }
+
+inline bytecode operator "**" ( x : double; n : int ) : double
+{ I2D libmath:DPOW }
+
+inline bytecode operator "**" ( x : ldouble; n : int ) : ldouble
+{ I2LD libmath:LDPOW }
 
 inline bytecode function lroundf( float x ) : long
 {
