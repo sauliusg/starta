@@ -2265,7 +2265,8 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 }
 
 /*
-** CURFILENAME -- return the name of the file which s currently processed by STDREAD
+** CURFILENAME -- return the name of the file which is currently
+**                processed by STDREAD
 **
 ** bytecode:
 ** CURFILENAME
@@ -2281,13 +2282,38 @@ int CURFILENAME( INSTRUCTION_FN_ARGS )
     
     if( istate.in ) {
         filename = istate.argv[istate.argnr];
-        //dst = bcalloc_array( 1, length + 1, 0, EXCEPTION );
-        //BC_CHECK_PTR( dst );        
     }
 
     istate.ep --;
 
     STACKCELL_SET_ADDR( istate.ep[0], filename );
+
+    return 1;
+}
+
+/*
+** CUREOF -- return the eof flag for the currently processed STDREAD
+**           file
+**
+** bytecode:
+** CUREOF
+**
+** stack:
+** --> bool
+** 
+*/
+
+int CUREOF( INSTRUCTION_FN_ARGS )
+{
+    int eof_flag = 1;
+    
+    if( istate.in ) {
+        eof_flag = feof( istate.in );
+    }
+
+    istate.ep --;
+
+    istate.ep[0].num.b = eof_flag;
 
     return 1;
 }

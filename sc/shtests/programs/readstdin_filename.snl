@@ -6,8 +6,8 @@ pragma prepend "$D";
 
 use std;
 
-inline bytecode function currfilename(): string { CURFILENAME }
-
 while(<>) {
-    . "\"" _ "%s" %% currfilename() _ "\"", $_;
+    . "\"" _ "%s" %% currfilename() _ "\"", curreof() ? "TRUE" : "FALSE", $_;
 }
+
+. curreof() ? "TRUE" : "FALSE";
