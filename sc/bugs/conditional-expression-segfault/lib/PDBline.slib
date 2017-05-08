@@ -1,0 +1,43 @@
+// --*- Pascal -*-------------------------------------------------------------
+// $Author: saulius $
+// $Date: 2017-05-08 18:39:53 +0300 (Mon, 08 May 2017) $ 
+// $Revision: 3484 $
+// $URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/lib/PDBline.slib $
+// ---------------------------------------------------------------------------
+// 
+// A Starta module to parse a PDB line. Constructs BiomoleculeAtom out of it.
+// 
+
+module PDBline;
+
+use std;
+use BiomoleculeAtom;
+use Strings;
+
+function split( line: string ): Atom
+begin
+   var altLoc = line[16:16];
+   var insCode = line[26:26];
+
+   return new Atom.fromStrings(
+                               (*recodType     => *)
+                               Strings::split(line[0:5])[0],
+                               (*chemType      => *)
+                               Strings::split(line[76:77])[0],
+                               (*atomName      => *)
+                               Strings::split(line[12:15])[0],
+                               (*atomNumber    => *) line[6:10],
+                               (*residueName   => *) line[17:19],
+                               (*residueNumber => *) line[22:25],
+                               (*chainId       => *) line[21:21],
+                               (*x             => *) line[30:37],
+                               (*y             => *) line[38:45],
+                               (*z             => *) line[46:53],
+                               (*Bfactor       => *) line[60:65],
+                               (*occupancy     => *) line[54:59],
+                               (*altLoc        => *) altLoc == " " ? "" : altLoc,
+                               (*insCode       => *) insCode == " " ? "" : insCode
+                               );
+end
+
+end module PDBline;
