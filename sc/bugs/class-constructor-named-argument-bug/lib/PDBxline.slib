@@ -1,0 +1,35 @@
+/*--*- Pascal -*-------------------------------------------------------------*\
+**$Author: saulius $
+**$Date: 2017-05-08 16:12:02 +0300 (Mon, 08 May 2017) $ 
+**$Revision: 3477 $
+**$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/bin/pdbPr $
+\*---------------------------------------------------------------------------*/
+(*
+  A Starta module to parse a PDBx line. Constructs BiomoleculeAtom out of it.
+*)
+
+module PDBxline;
+
+use std;
+use BiomoleculeAtom;
+use Strings;
+
+function split( line: string ): Atom
+begin
+   var fields = Strings::split( line );
+   return new Atom.fromStrings(
+                               (* recodType     => *) fields[0],
+                               (* atomName      => *) fields[3],
+                               (* atomNumber    => *) fields[1],
+                               (* residueName   => *) fields[5],
+                               (* residueNumber => *) fields[8],
+                               (* chainId       => *) fields[6],
+                               (* x             => *) fields[10],
+                               (* y             => *) fields[11],
+                               (* z             => *) fields[12],
+                               (* Bfactor       => *) fields[14],
+                               (* occupancy     => *) fields[13]
+                               );
+end
+
+end module PDBxline;
