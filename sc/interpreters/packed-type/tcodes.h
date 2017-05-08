@@ -128,6 +128,7 @@ int EXCEPTIONMODULE( INSTRUCTION_FN_ARGS );
  */
 
 int STDREAD( INSTRUCTION_FN_ARGS );
+int CURFILENAME( INSTRUCTION_FN_ARGS );
 
 /*
 ** File management bytecode operators.

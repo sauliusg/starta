@@ -2265,6 +2265,34 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 }
 
 /*
+** CURFILENAME -- return the name of the file which s currently processed by STDREAD
+**
+** bytecode:
+** CURFILENAME
+**
+** stack:
+** --> string
+** 
+*/
+
+int CURFILENAME( INSTRUCTION_FN_ARGS )
+{
+    char *filename = NULL;
+    
+    if( istate.in ) {
+        filename = istate.argv[istate.argnr];
+        //dst = bcalloc_array( 1, length + 1, 0, EXCEPTION );
+        //BC_CHECK_PTR( dst );        
+    }
+
+    istate.ep --;
+
+    STACKCELL_SET_ADDR( istate.ep[0], filename );
+
+    return 1;
+}
+
+/*
 ** File management bytecode operators.
 */
 
