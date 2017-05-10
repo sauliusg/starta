@@ -11,7 +11,8 @@ generated/version.h: version.hin ${VFILE}
 
 release:
 	svn ci
-	svn cp ^/trunk ^/branches/release/v${VERSION}
+	svn cp ^/trunk ^/branches/release/v${VERSION} \
+	   -m "Preparing version ${VERSION} for release in the release branch."
 	${MAKE} minor
 
 major:
