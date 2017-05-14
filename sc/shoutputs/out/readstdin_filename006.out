@@ -1,5 +1,4 @@
-"-" 0 0 This is a text file.
-"-" 1 1 It has full 2 lines.
+"-" 1 1 A single line in a file.
 After the 'while(<>)' loop:
 curreof() == TRUE
 alleof()  == TRUE
