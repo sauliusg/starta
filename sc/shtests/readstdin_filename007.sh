@@ -10,8 +10,4 @@ PRG=${DIR}/programs/${PRG}.snl
 
 test $# -gt 0 && sl="$1 ${SL_OPTIONS}"
 
-cat shtests/data/text2.txt \
-| ${sl} -- ${PRG} \
-      shtests/data/text1.txt \
-      - \
-      shtests/data/text3.txt
+${sl} -- ${PRG} shtests/data/one-liner.txt

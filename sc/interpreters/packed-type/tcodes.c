@@ -2259,6 +2259,12 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 	}
     }
 
+    /* Set the eof() flag so that it can be sensed in the same Starta loop as
+       the last read line (S.G.): */
+    if( (ch = getc( in )) != EOF ) {
+        ungetc( ch, in );
+    }
+
     STACKCELL_SET_ADDR( istate.ep[0], buff );
 
     return 1;
@@ -2322,6 +2328,33 @@ int CUREOF( INSTRUCTION_FN_ARGS )
     
     if( istate.in ) {
         eof_flag = feof( istate.in );
+    }
+
+    istate.ep --;
+
+    istate.ep[0].num.b = eof_flag;
+
+    return 1;
+}
+
+/*
+** ALLEOF -- return the eof flag at the end of all currently processed
+**           files in the 'while(<>){ ... }' construct.
+**
+** bytecode:
+** ALLEOF
+**
+** stack:
+** --> bool
+** 
+*/
+
+int ALLEOF( INSTRUCTION_FN_ARGS )
+{
+    int eof_flag = 1;
+    
+    if( istate.in ) {
+        eof_flag = feof( istate.in ) && istate.argnr >= istate.argc;
     }
 
     istate.ep --;

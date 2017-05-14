@@ -7,7 +7,11 @@ pragma prepend "$D";
 use std;
 
 while(<>) {
-    . "\"" _ "%s" %% currfilename() _ "\"", curreof() ? "TRUE" : "FALSE", $_;
+    . "\"" _ "%s" %% currfilename() _ "\"", 
+      curreof() ? 1 : 0, alleof() ? 1 : 0, $_;
 }
 
-. curreof() ? "TRUE" : "FALSE";
+. "After the 'while(<>)' loop:";
+
+. "curreof() ==", curreof() ? "TRUE" : "FALSE";
+. "alleof()  ==", alleof() ? "TRUE" : "FALSE";

@@ -1,10 +1,9 @@
 // --*- C -*--
 
-// Test ** operator
+// Test feof() function:
 
 use std;
-use Math;
 
-. 2.0 ** 2.0;
-. 4.D ** 4.0D;
-. 2.LD ** 10.LD;
+while(<>) {
+    . curreof() ? 1 : 0, alleof() ? 1 : 0, $_;
+}
