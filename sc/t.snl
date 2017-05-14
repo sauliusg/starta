@@ -3,7 +3,13 @@
 // Test feof() function:
 
 use std;
+use Strings;
+
+var count = 0L;
 
 while(<>) {
-    . curreof() ? 1 : 0, alleof() ? 1 : 0, $_;
+    var line = fastsplit( $_ );
+    count += llength(line);
 }
+
+. count;
