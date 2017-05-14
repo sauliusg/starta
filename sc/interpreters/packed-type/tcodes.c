@@ -4260,6 +4260,77 @@ int STRCAT( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * STRSPLIT STRing SPLIT
+ *
+ * bytecode:
+ * STRSPLIT
+ * 
+ * stack:
+ * string, separator, count -> array of string
+ */
+
+int STRSPLIT( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[2] );
+    char *sep = STACKCELL_PTR( istate.ep[1] );
+    int count = istate.ep[0].num.i;
+    char **array = NULL;
+    int i = 0, j;
+    int len = str ? strlen( str ) : 0;
+    
+    if( !sep ) {
+        int start_i;
+        int n; /* number of fragments */
+        while( i < len && isspace( str[i] )) { i ++; }
+        start_i = i;
+        /* count number of splitted strings: */
+        while( i < len ) {
+            j = i;
+            while( j < len && !isspace( str[j] ) ) {
+                j++;
+            }
+            n ++;
+            while( j < len && isspace( str[j] )) {
+                j++;
+            }
+            i = j;
+        }
+        /* allocate arrays and split strings: */
+        array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
+        BC_CHECK_PTR( array );
+        STACKCELL_SET_ADDR( istate.ep[0], array );
+        i = start_i;
+        int k = 0;
+        while( i < len ) {
+            int j = i;
+            while( j < len && !isspace( str[j] ) ) {
+                j++;
+            }
+            int part_len = j - i;
+            array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
+            BC_CHECK_PTR( array );
+            strncpy( array[k], str + i, part_len );
+            while( j < len && isspace( str[j] )) {
+                j++;
+            }
+            i = j;
+            k ++;
+            assert( k <= n ); 
+        }
+    } else if( *sep == '\0' ) {
+    } else {
+    }
+
+    STACKCELL_SET_ADDR( istate.ep[2], array );
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
  * STRSTART Does a string start with the prefix 'start'? 
  *
  * bytecode:

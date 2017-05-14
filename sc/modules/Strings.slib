@@ -29,6 +29,11 @@ function isspace( c : char ): bool
     return c == ' ' char || c == '\t' char || c == '\n' char || c == '\r' char
 }
 
+inline bytecode function fastsplit( s : string; separator : string = null; long count = 0 ): array of string
+{
+    STRSPLIT
+}
+
 function split( s : string; separator : string = null; long count = 0 ): array of string
 {
     var rv = new string[0];
