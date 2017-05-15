@@ -4277,7 +4277,8 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
     char **array = NULL;
     int i = 0, j, k, start_i;
     int seplen /* separator length*/, len = str ? strlen( str ) : 0;
-    int n /* number of fragments */, part_len /* length of the splitted part*/;
+    int n = 0; /* number of fragments */
+    int part_len; /* length of the splitted part*/
 
     if( str ) {
         if( !sep ) {
