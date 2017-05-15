@@ -8,7 +8,13 @@ use Strings;
 var count = 0L;
 
 while(<>) {
-    var line = fastsplit( $_, ":" );
+    var line = split( $_, " ", 0 );
+    var separator = "";
+    for( var word in line ) {
+        < separator _ (word != null ? ("\"" _ word _ "\"") : "(null)");
+        separator = ", ";
+    }
+    . "";
     count += llength(line);
 }
 

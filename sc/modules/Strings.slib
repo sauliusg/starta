@@ -29,80 +29,10 @@ function isspace( c : char ): bool
     return c == ' ' char || c == '\t' char || c == '\n' char || c == '\r' char
 }
 
-inline bytecode function fastsplit( s : string; separator : string = null; long count = 0 ): array of string
+inline bytecode function split( s : string; separator : string = null;
+                                long count = 0 ): array of string
 {
     STRSPLIT
-}
-
-function split( s : string; separator : string = null; long count = 0 ): array of string
-{
-    var rv = new string[0];
-    var i, j : long;
-    var len = strlen( s );
-
-    pragma integer const long;
-
-    assert !separator || strlen(separator) <= 1;
-
-    if( separator == null ) {
-        while( i < len && isspace( s[i] )) { i ++ }
-        while( i < len ) {
-            j = i;
-            while( j < len && !isspace( s[j] ) ) {
-                j++;
-            }
-            rv = push( rv, s[i..j-1] );
-            while( j < len && isspace( s[j] )) {
-                j++;
-            }
-            i = j;
-        }
-        return trim( rv );
-    }
-
-    if( separator == "" ) {
-        rv = new string[len];
-        for( i = 0; i < llength(rv); i ++ ) {
-            rv[i] = s[i..i]
-        }
-        return rv;
-    }
-
-    while( i < len ) {
-        j = i;
-        // . ">>>", i, j, "'" + s[i..j] + "'";
-        while( j < len && s[j] != separator[0] ) {
-            j++;
-        }
-        if( i == j ) {
-            rv = push( rv, "" );
-        } else {
-            rv = push( rv, s[i..j-1] );
-        }
-        // . "<<<", i, j, "'%s'" %% s[i..j], "\n";
-        i = j + 1;
-    }
-
-    if( llength(s) > 1 && s[llast(s)-1] == separator[0] ) {
-        rv = push( rv, "" );
-    }
-
-    if( count == 0 ) {
-        i = j = llast( rv );
-        while( j >= 0 && rv[j] == "" ) {
-            j --;
-            // . "Decrementing j to", j;
-        }
-        if( j < i ) {
-            if( j >= 0 ) {
-                return rv[0..j];
-            } else {
-                return null;
-            }
-        }
-    }
-
-    return trim( rv );
 }
 
 end module Strings

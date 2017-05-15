@@ -4331,17 +4331,18 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
             int seplen = strlen( sep ); /* separator length */
             int n = 1; /* number of fragments */
             /* count the number of string components to split: */
-            for( i = 0; i < len-seplen; i++ ) {
+            for( i = 0; i < len; i++ ) {
                 if( strncmp( str+i, sep, seplen ) == 0 )
                     n++;
             }
+            /* printf( ">>>> n = %d, len = %d\n", n, len ); */
             /* allocate arrays and split strings: */
             array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
             BC_CHECK_PTR( array );
             STACKCELL_SET_ADDR( istate.ep[0], array );
             i = 0;
             int k = 0;
-            while( i < len-seplen ) {
+            while( i <= len ) {
                 j = i;
                 while( j < len && strncmp( str+j, sep, seplen ) != 0 ) {
                     j++;
@@ -4349,10 +4350,27 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 int part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( array );
-                assert( k < n ); 
+                assert( k < n );
+                /* printf( ">>> k = %d, i = %d, j = %d\n", k, i, j ); */
                 strncpy( array[k], str + i, part_len );
                 i = j + seplen;
                 k ++;
+            }
+
+            if( count == 0 ) {
+                i = j = n-1;
+                while( j >= 0 && array[j][0] == '\0' ) {
+                    j --;
+                }
+                if( j < i ) {
+                    if( j >= 0 ) {
+                        alloccell_t *hdr = (alloccell_t*)array;
+                        assert( hdr[-1].length > i-j );
+                        hdr[-1].length -= (i-j);
+                    } else {
+                        array = NULL;
+                    }
+                }
             }
         }
     }

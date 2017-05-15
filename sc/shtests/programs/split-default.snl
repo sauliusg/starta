@@ -11,7 +11,7 @@ var comma = ", ";
 var sep = "";
 
 while(<>) {
-    var line = fastsplit( $_ );
+    var line = split( $_ );
     sep = "";
     for( var word in line ) {
         < sep _ "\"" _ word _ "\"";
