@@ -4275,13 +4275,12 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
     char *sep = STACKCELL_PTR( istate.ep[1] );
     int count = istate.ep[0].num.i;
     char **array = NULL;
-    int i = 0, j;
-    int len = str ? strlen( str ) : 0;
-    int n; /* number of fragments */
+    int i = 0, j, k, start_i;
+    int seplen /* separator length*/, len = str ? strlen( str ) : 0;
+    int n /* number of fragments */, part_len /* length of the splitted part*/;
 
     if( str ) {
         if( !sep ) {
-            int start_i;
             while( i < len && isspace( str[i] )) { i ++; }
             start_i = i;
             /* count number of splitted strings: */
@@ -4301,13 +4300,13 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
             BC_CHECK_PTR( array );
             STACKCELL_SET_ADDR( istate.ep[0], array );
             i = start_i;
-            int k = 0;
+            k = 0;
             while( i < len ) {
-                int j = i;
+                j = i;
                 while( j < len && !isspace( str[j] ) ) {
                     j++;
                 }
-                int part_len = j - i;
+                part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( array );
                 strncpy( array[k], str + i, part_len );
@@ -4328,7 +4327,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 array[i][0] = str[i];
             }
         } else {
-            int seplen = strlen( sep );
+            seplen = strlen( sep );
             n = 1; /* number of fragments */
             /* count the number of string components to split: */
             for( i = 0; i < len-seplen; i++ ) {
@@ -4340,13 +4339,13 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
             BC_CHECK_PTR( array );
             STACKCELL_SET_ADDR( istate.ep[0], array );
             i = 0;
-            int k = 0;
+            k = 0;
             while( i < len-seplen ) {
-                int j = i;
+                j = i;
                 while( j < len && strncmp( str+j, sep, seplen ) != 0 ) {
                     j++;
                 }
-                int part_len = j - i;
+                part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( array );
                 strncpy( array[k], str + i, part_len );
