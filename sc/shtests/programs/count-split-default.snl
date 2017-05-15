@@ -8,7 +8,7 @@ use Strings;
 var count = 0L;
 
 while(<>) {
-    var line = fastsplit( $_, "" );
+    var line = fastsplit( $_ );
     count += llength(line);
 }
 

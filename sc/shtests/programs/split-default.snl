@@ -1,0 +1,21 @@
+// --*- C -*--
+
+// Test feof() function:
+
+use std;
+use Strings;
+
+var count = 0L;
+
+var comma = ", ";
+var sep = "";
+
+while(<>) {
+    var line = fastsplit( $_ );
+    sep = "";
+    for( var word in line ) {
+        < sep _ "\"" _ word _ "\"";
+        sep = comma;
+    }
+    . "";
+}
