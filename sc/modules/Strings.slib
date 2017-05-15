@@ -44,14 +44,6 @@ function split( s : string; separator : string = null; long count = 0 ): array o
 
     assert !separator || strlen(separator) <= 1;
 
-    if( separator == "" ) {
-        rv = new string[len];
-        for( i = 0; i < llength(rv); i ++ ) {
-            rv[i] = s[i..i]
-        }
-        return rv;
-    }
-
     if( separator == null ) {
         while( i < len && isspace( s[i] )) { i ++ }
         while( i < len ) {
@@ -66,6 +58,14 @@ function split( s : string; separator : string = null; long count = 0 ): array o
             i = j;
         }
         return trim( rv );
+    }
+
+    if( separator == "" ) {
+        rv = new string[len];
+        for( i = 0; i < llength(rv); i ++ ) {
+            rv[i] = s[i..i]
+        }
+        return rv;
     }
 
     while( i < len ) {

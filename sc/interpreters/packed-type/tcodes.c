@@ -4277,48 +4277,59 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
     char **array = NULL;
     int i = 0, j;
     int len = str ? strlen( str ) : 0;
-    
-    if( !sep ) {
-        int start_i;
-        int n; /* number of fragments */
-        while( i < len && isspace( str[i] )) { i ++; }
-        start_i = i;
-        /* count number of splitted strings: */
-        while( i < len ) {
-            j = i;
-            while( j < len && !isspace( str[j] ) ) {
-                j++;
+
+    if( str ) {
+        if( !sep ) {
+            int start_i;
+            int n; /* number of fragments */
+            while( i < len && isspace( str[i] )) { i ++; }
+            start_i = i;
+            /* count number of splitted strings: */
+            while( i < len ) {
+                j = i;
+                while( j < len && !isspace( str[j] ) ) {
+                    j++;
+                }
+                n ++;
+                while( j < len && isspace( str[j] )) {
+                    j++;
+                }
+                i = j;
             }
-            n ++;
-            while( j < len && isspace( str[j] )) {
-                j++;
-            }
-            i = j;
-        }
-        /* allocate arrays and split strings: */
-        array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
-        BC_CHECK_PTR( array );
-        STACKCELL_SET_ADDR( istate.ep[0], array );
-        i = start_i;
-        int k = 0;
-        while( i < len ) {
-            int j = i;
-            while( j < len && !isspace( str[j] ) ) {
-                j++;
-            }
-            int part_len = j - i;
-            array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
+            /* allocate arrays and split strings: */
+            array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
             BC_CHECK_PTR( array );
-            strncpy( array[k], str + i, part_len );
-            while( j < len && isspace( str[j] )) {
-                j++;
+            STACKCELL_SET_ADDR( istate.ep[0], array );
+            i = start_i;
+            int k = 0;
+            while( i < len ) {
+                int j = i;
+                while( j < len && !isspace( str[j] ) ) {
+                    j++;
+                }
+                int part_len = j - i;
+                array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
+                BC_CHECK_PTR( array );
+                strncpy( array[k], str + i, part_len );
+                while( j < len && isspace( str[j] )) {
+                    j++;
+                }
+                i = j;
+                k ++;
+                assert( k <= n ); 
             }
-            i = j;
-            k ++;
-            assert( k <= n ); 
+        } else if( *sep == '\0' ) {
+            array = bcalloc_array( REF_SIZE, len, 1, EXCEPTION );
+            BC_CHECK_PTR( array );
+            STACKCELL_SET_ADDR( istate.ep[0], array );
+            for( i = 0; i < len; i++ ) {
+                array[i] = bcalloc_array( 1, 2, 0, EXCEPTION );
+                BC_CHECK_PTR( array );
+                array[i][0] = str[i];
+            }
+        } else {
+            assert(0);
         }
-    } else if( *sep == '\0' ) {
-    } else {
     }
 
     STACKCELL_SET_ADDR( istate.ep[2], array );
