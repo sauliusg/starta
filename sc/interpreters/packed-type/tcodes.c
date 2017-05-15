@@ -4310,13 +4310,13 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 int part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( array );
+                assert( k < n ); 
                 strncpy( array[k], str + i, part_len );
                 while( j < len && isspace( str[j] )) {
                     j++;
                 }
                 i = j;
                 k ++;
-                assert( k <= n ); 
             }
         } else if( *sep == '\0' ) {
             array = bcalloc_array( REF_SIZE, len, 1, EXCEPTION );
@@ -4349,10 +4349,10 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 int part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( array );
+                assert( k < n ); 
                 strncpy( array[k], str + i, part_len );
                 i = j + seplen;
                 k ++;
-                assert( k <= n ); 
             }
         }
     }
