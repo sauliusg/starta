@@ -4277,11 +4277,11 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
     char **array = NULL;
     int i = 0, j;
     int len = str ? strlen( str ) : 0;
-    int n; /* number of fragments */
 
     if( str ) {
         if( !sep ) {
             int start_i;
+            int n; /* number of fragments */
             while( i < len && isspace( str[i] )) { i ++; }
             start_i = i;
             /* count number of splitted strings: */
@@ -4328,19 +4328,23 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 array[i][0] = str[i];
             }
         } else {
+#if 0
             int seplen = strlen( sep );
-            n = 1; /* number of fragments */
+            int n = 1; /* number of fragments */
             /* count the number of string components to split: */
             for( i = 0; i < len-seplen; i++ ) {
                 if( strncmp( str+i, sep, seplen ) == 0 )
                     n++;
             }
+            printf( ">>> counted %d fragments\n", n );
             /* allocate arrays and split strings: */
             array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
             BC_CHECK_PTR( array );
             STACKCELL_SET_ADDR( istate.ep[0], array );
             i = 0;
+#endif
             int k = 0;
+#if 0
             while( i < len-seplen ) {
                 int j = i;
                 while( j < len && strncmp( str+j, sep, seplen ) != 0 ) {
@@ -4354,6 +4358,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 k ++;
                 assert( k <= n ); 
             }
+#endif
         }
     }
 
