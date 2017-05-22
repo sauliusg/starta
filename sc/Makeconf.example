@@ -1,19 +1,19 @@
 
-INTERPRETER_DIR = interpreters/packed-type
+INTERPRETER_DIR ?= interpreters/packed-type
 ## INTERPRETER_DIR = interpreters/full-stackcell
 ## INTERPRETER_DIR = interpreters/split-stackcell
 
-OTHER_DIRS = ../common ../lists ${INTERPRETER_DIR}
-LIB_DIRS   = ../getoptions ../cexceptions
+OTHER_DIRS ?= ../common ../lists ${INTERPRETER_DIR}
+LIB_DIRS   ?= ../getoptions ../cexceptions
 
 ## LIBFLAGS = -ldl -lduma
 ## LIBFLAGS = -ldl -lefence
-LIBFLAGS = -ldl
+LIBFLAGS ?= -ldl
 
-EXT = .snl
-TEST_OPTIONS = -I inputs -I modules -I . -G
-SIZE_OPTIONS = -c -d dump
+EXT ?= .snl
+TEST_OPTIONS ?= -I inputs -I modules -I . -G
+SIZE_OPTIONS ?= -c -d dump
 
-LD_LIBRARY_PATH := .${LD_LIBRARY_PATH:%=:%}
+## LD_LIBRARY_PATH := .${LD_LIBRARY_PATH:%=:%}
 
 export LD_LIBRARY_PATH
