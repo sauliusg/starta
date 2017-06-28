@@ -12668,6 +12668,14 @@ operator_definition
 function_or_operator_body
   : '{' statement_list '}'
   | '{' bytecode_sequence '}'
+  | __THICK_ARROW
+  {
+      compiler_push_guarding_retval( compiler, px );
+  }
+  expression_list ';'
+  {
+      compiler_compile_return( compiler, $3, px );
+  }
   ;
 
 retval_description_list
