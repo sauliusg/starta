@@ -4272,7 +4272,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
     char *str = STACKCELL_PTR( istate.ep[2] );
     char *sep = STACKCELL_PTR( istate.ep[1] );
     int count = istate.ep[0].num.i;
-    stackcell_t *array = NULL;
+    char **array = NULL;
     int i = 0, j;
     int len = str ? strlen( str ) : 0;
 
@@ -4308,7 +4308,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 int part_len = j - i;
                 char * dest = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( dest );
-                STACKCELL_SET_ADDR( array[k], dest );
+                array[k] = dest;
                 assert( k < n ); 
                 strncpy( dest, str + i, part_len );
                 while( j < len && isspace( str[j] )) {
@@ -4324,7 +4324,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
             for( i = 0; i < len; i++ ) {
                 char *dest = bcalloc_array( 1, 2, 0, EXCEPTION );
                 BC_CHECK_PTR( dest );
-                STACKCELL_SET_ADDR( array[i], dest );
+                array[i] = dest;
                 dest[0] = str[i];
             }
         } else {
@@ -4351,7 +4351,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 char *dest = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
                 BC_CHECK_PTR( dest );
                 assert( k < n );
-                STACKCELL_SET_ADDR( array[k], dest ) ;
+                array[k] = dest;;
                 /* printf( ">>> k = %d, i = %d, j = %d\n", k, i, j ); */
                 strncpy( dest, str + i, part_len );
                 i = j + seplen;
@@ -4360,7 +4360,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
 
             if( count == 0 ) {
                 i = j = n-1;
-                while( j >= 0 && ((char*)STACKCELL_PTR( array[j] ))[0] == '\0' ) {
+                while( j >= 0 && array[j][0] == '\0' ) {
                     j --;
                 }
                 if( j < i ) {
