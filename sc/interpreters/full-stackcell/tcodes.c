@@ -2046,6 +2046,12 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 	}
     }
 
+    /* Set the eof() flag so that it can be sensed in the same Starta loop as
+       the last read line (S.G.): */
+    if( (ch = getc( in )) != EOF ) {
+        ungetc( ch, in );
+    }
+
     STACKCELL_SET_ADDR( istate.ep[0], buff );
 
     return 1;
