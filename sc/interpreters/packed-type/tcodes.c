@@ -4309,7 +4309,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 }
                 int part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
-                BC_CHECK_PTR( array );
+                BC_CHECK_PTR( array[k] );
                 assert( k < n ); 
                 strncpy( array[k], str + i, part_len );
                 while( j < len && isspace( str[j] )) {
@@ -4324,7 +4324,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
             STACKCELL_SET_ADDR( istate.ep[0], array );
             for( i = 0; i < len; i++ ) {
                 array[i] = bcalloc_array( 1, 2, 0, EXCEPTION );
-                BC_CHECK_PTR( array );
+                BC_CHECK_PTR( array[i] );
                 array[i][0] = str[i];
             }
         } else {
@@ -4349,7 +4349,7 @@ int STRSPLIT( INSTRUCTION_FN_ARGS )
                 }
                 int part_len = j - i;
                 array[k] = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
-                BC_CHECK_PTR( array );
+                BC_CHECK_PTR( array[k] );
                 assert( k < n );
                 /* printf( ">>> k = %d, i = %d, j = %d\n", k, i, j ); */
                 strncpy( array[k], str + i, part_len );
