@@ -140,3 +140,11 @@ inline bytecode function readln( inp : file;
 {
     SFILEREADLN SWAP DROP
 }
+
+#
+# while(<>) { ... } service functions:
+#
+
+inline bytecode function currfilename(): string { CURFILENAME }
+inline bytecode function curreof(): bool { CUREOF }
+inline bytecode function alleof(): bool { ALLEOF }

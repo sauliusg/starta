@@ -68,4 +68,11 @@ procedure tail( l : list of type T ) : list of type T
     }
 }
 
+// Need:
+
+# Operator 'cat': +, _
+# Operator 'cons': ::
+# Operator 'head': @
+# Operator 'tail': _ (unary)
+
 end package Lists;

@@ -1,0 +1,10 @@
+// --*- C -*--
+
+// Test feof() function:
+
+use std;
+
+exception X;
+
+raise Y( "exception Y" );
+

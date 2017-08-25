@@ -1,0 +1,10 @@
+"shtests/data/text1.txt" 0 0 This is a text file.
+"shtests/data/text1.txt" 1 0 It has full 2 lines.
+"shtests/data/text2.txt" 0 0 This is another
+"shtests/data/text2.txt" 0 0 text file.
+"shtests/data/text2.txt" 1 0 It has 3 lines.
+"shtests/data/text3.txt" 0 0 This is a text file
+"shtests/data/text3.txt" 1 1 with no newline at the end
+After the 'while(<>)' loop:
+curreof() == TRUE
+alleof()  == TRUE

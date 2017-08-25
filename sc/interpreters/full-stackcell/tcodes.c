@@ -2046,7 +2046,107 @@ int STDREAD( INSTRUCTION_FN_ARGS )
 	}
     }
 
+    /* Set the eof() flag so that it can be sensed in the same Starta loop as
+       the last read line (S.G.): */
+    if( (ch = getc( in )) != EOF ) {
+        ungetc( ch, in );
+    }
+
     STACKCELL_SET_ADDR( istate.ep[0], buff );
+
+    return 1;
+}
+
+/*
+** CURFILENAME -- return the name of the file which is currently
+**                processed by STDREAD
+**
+** bytecode:
+** CURFILENAME
+**
+** stack:
+** --> string
+** 
+*/
+
+int CURFILENAME( INSTRUCTION_FN_ARGS )
+{
+    char *filename = NULL;
+    
+    if( istate.in ) {
+        if( istate.in == stdin ) {
+            filename = bcalloc_array( 1, 2, 0, EXCEPTION );
+            BC_CHECK_PTR( filename );
+            strcpy( filename, "-" );
+        } else {
+            filename = bcalloc_array( 1, strlen(istate.argv[istate.argnr]) + 1, 0,
+                                      EXCEPTION );
+            BC_CHECK_PTR( filename );
+            strcpy( filename, istate.argv[istate.argnr] );
+        }
+    } else {
+        filename = bcalloc_array( 1, 1, 0, EXCEPTION );
+        BC_CHECK_PTR( filename );
+        strcpy( filename, "" );
+    }
+
+    istate.ep --;
+
+    STACKCELL_SET_ADDR( istate.ep[0], filename );
+
+    return 1;
+}
+
+/*
+** CUREOF -- return the eof flag for the currently processed STDREAD
+**           file
+**
+** bytecode:
+** CUREOF
+**
+** stack:
+** --> bool
+** 
+*/
+
+int CUREOF( INSTRUCTION_FN_ARGS )
+{
+    int eof_flag = 1;
+    
+    if( istate.in ) {
+        eof_flag = feof( istate.in );
+    }
+
+    istate.ep --;
+
+    istate.ep[0].num.b = eof_flag;
+
+    return 1;
+}
+
+/*
+** ALLEOF -- return the eof flag at the end of all currently processed
+**           files in the 'while(<>){ ... }' construct.
+**
+** bytecode:
+** ALLEOF
+**
+** stack:
+** --> bool
+** 
+*/
+
+int ALLEOF( INSTRUCTION_FN_ARGS )
+{
+    int eof_flag = 1;
+    
+    if( istate.in ) {
+        eof_flag = feof( istate.in ) && istate.argnr >= istate.argc;
+    }
+
+    istate.ep --;
+
+    istate.ep[0].num.b = eof_flag;
 
     return 1;
 }
@@ -3943,6 +4043,134 @@ int STRCAT( INSTRUCTION_FN_ARGS )
     if( str2 ) strcat( dst, str2 );
 
     istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * STRSPLIT STRing SPLIT
+ *
+ * bytecode:
+ * STRSPLIT
+ * 
+ * stack:
+ * string, separator, count -> array of string
+ */
+
+int STRSPLIT( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[2] );
+    char *sep = STACKCELL_PTR( istate.ep[1] );
+    int count = istate.ep[0].num.i;
+    stackcell_t *array = NULL;
+    int i = 0, j;
+    int len = str ? strlen( str ) : 0;
+
+    if( str ) {
+        if( !sep ) {
+            int start_i;
+            int n = 0; /* number of fragments */
+            while( i < len && isspace( str[i] )) { i ++; }
+            start_i = i;
+            /* count number of splitted strings: */
+            while( i < len ) {
+                j = i;
+                while( j < len && !isspace( str[j] ) ) {
+                    j++;
+                }
+                n ++;
+                while( j < len && isspace( str[j] )) {
+                    j++;
+                }
+                i = j;
+            }
+            /* allocate arrays and split strings: */
+            array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
+            BC_CHECK_PTR( array );
+            STACKCELL_SET_ADDR( istate.ep[0], array );
+            i = start_i;
+            int k = 0;
+            while( i < len ) {
+                j = i;
+                while( j < len && !isspace( str[j] ) ) {
+                    j++;
+                }
+                int part_len = j - i;
+                char * dest = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
+                BC_CHECK_PTR( dest );
+                STACKCELL_SET_ADDR( array[k], dest );
+                assert( k < n ); 
+                strncpy( dest, str + i, part_len );
+                while( j < len && isspace( str[j] )) {
+                    j++;
+                }
+                i = j;
+                k ++;
+            }
+        } else if( *sep == '\0' ) {
+            array = bcalloc_array( REF_SIZE, len, 1, EXCEPTION );
+            BC_CHECK_PTR( array );
+            STACKCELL_SET_ADDR( istate.ep[0], array );
+            for( i = 0; i < len; i++ ) {
+                char *dest = bcalloc_array( 1, 2, 0, EXCEPTION );
+                BC_CHECK_PTR( dest );
+                STACKCELL_SET_ADDR( array[i], dest );
+                dest[0] = str[i];
+            }
+        } else {
+            int seplen = strlen( sep ); /* separator length */
+            int n = 1; /* number of fragments */
+            /* count the number of string components to split: */
+            for( i = 0; i < len; i++ ) {
+                if( strncmp( str+i, sep, seplen ) == 0 )
+                    n++;
+            }
+            /* printf( ">>>> n = %d, len = %d\n", n, len ); */
+            /* allocate arrays and split strings: */
+            array = bcalloc_array( REF_SIZE, n, 1, EXCEPTION );
+            BC_CHECK_PTR( array );
+            STACKCELL_SET_ADDR( istate.ep[0], array );
+            i = 0;
+            int k = 0;
+            while( i <= len ) {
+                j = i;
+                while( j < len && strncmp( str+j, sep, seplen ) != 0 ) {
+                    j++;
+                }
+                int part_len = j - i;
+                char *dest = bcalloc_array( 1, part_len + 1, 0, EXCEPTION );
+                BC_CHECK_PTR( dest );
+                assert( k < n );
+                STACKCELL_SET_ADDR( array[k], dest ) ;
+                /* printf( ">>> k = %d, i = %d, j = %d\n", k, i, j ); */
+                strncpy( dest, str + i, part_len );
+                i = j + seplen;
+                k ++;
+            }
+
+            if( count == 0 ) {
+                i = j = n-1;
+                while( j >= 0 && ((char*)STACKCELL_PTR( array[j] ))[0] == '\0' ) {
+                    j --;
+                }
+                if( j < i ) {
+                    if( j >= 0 ) {
+                        alloccell_t *hdr = (alloccell_t*)array;
+                        assert( hdr[-1].length > i-j );
+                        hdr[-1].length -= (i-j);
+                    } else {
+                        array = NULL;
+                    }
+                }
+            }
+        }
+    }
+
+    STACKCELL_SET_ADDR( istate.ep[2], array );
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
 
     return 1;
 }

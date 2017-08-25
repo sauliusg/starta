@@ -731,6 +731,15 @@ static char *compiler_find_include_file( COMPILER *c, char *filename,
 	return make_full_file_name( NULL, NULL, NULL, ex );
     }
 
+    if( filename && filename[0] == '/' ) {
+        /* we have an absolute path -- no search or interpolation is
+           necessary: */
+        return filename;
+    }
+
+    /* If a provided 'filename' contains $D and $P directory names,
+       lets interpoate the script directory or script parent directory
+       insted of them: */
     if( (dollar = strchr( filename, '$' )) != NULL && 
         (dollar[1] == 'D' || dollar[1] == 'P') ) {
         cexception_t inner;
@@ -5991,7 +6000,7 @@ static void compiler_load_library( COMPILER *compiler,
 	    if( errmsg && *errmsg == ' ' ) errmsg ++;
             */
 	    if( errmsg && *errmsg ) {
-		yyerrorf( "could not open shared library %c%s",
+		yyerrorf( "%c%s",
 			  tolower(*errmsg), errmsg+1 );
 	    } else {
 		yyerrorf( "could not open shared library '%s'",
@@ -11895,6 +11904,26 @@ arithmetic_expression
   | '(' simple_expression ')'
   | '(' function_call ')'
 
+  | '@' expression  %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "@", px );
+      }
+
+  | ':' expression  %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "@", px );
+      }
+
+  | __COLON_COLON expression  %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "::", px );
+      }
+
+  | '_' expression  %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "@", px );
+      }
+
   | __QQ expression  %prec __UNARY
   {
       ENODE *top = compiler->e_stack;
@@ -12659,6 +12688,14 @@ operator_definition
 function_or_operator_body
   : '{' statement_list '}'
   | '{' bytecode_sequence '}'
+  | __THICK_ARROW
+  {
+      compiler_push_guarding_retval( compiler, px );
+  }
+  expression_list ';'
+  {
+      compiler_compile_return( compiler, $3, px );
+  }
   ;
 
 retval_description_list

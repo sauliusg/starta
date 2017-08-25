@@ -1,0 +1,46 @@
+// --*- C -*--
+
+// Test mumber check functions:
+
+use std;
+use NumCheck;
+
+
+var strings = [
+               "123",
+               "1234(2)",
+               "aa1234",
+               "123xx",
+               "567 ",
+
+               "+1.23",
+               "-23.55(2)",
+               " 234.3",
+               "1E1",
+               "1E1 ",
+];
+
+function check_int( s: string ): string
+{
+    return is_integer(s) ? "INT\t" : "-\t"
+}
+
+function check_precint( s: string ): string
+{
+    return is_integer_with_precision(s) ? "PINT\t" : "-\t"
+}
+
+function check_real( s: string ): string
+{
+    return is_real(s) ? "REAL\t" : "-\t"
+}
+
+function check_precreal( s: string ): string
+{
+    return is_real_with_precision(s) ? "PREAL\t" : "-\t"
+}
+
+for( var s in strings ) {
+    . ("%-12s:\t" %% ("\"" _ s _ "\"")) _ check_int(s) _ check_precint(s) _
+        check_real(s) _ check_precreal(s);
+}
