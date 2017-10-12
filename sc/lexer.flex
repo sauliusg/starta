@@ -243,6 +243,7 @@ null        { MARK; return _NULL; }
 of          { MARK; return _OF; }
 operator    { MARK; return _OPERATOR; }
 or          { MARK; return _OR; }
+otherwise   { MARK; return _OTHERWISE; }
 pack        { MARK; return _PACK; }
 package     { MARK; return _PACKAGE; }
 pragma      { MARK; return _PRAGMA; }

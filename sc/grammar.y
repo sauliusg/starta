@@ -7019,6 +7019,7 @@ static cexception_t *px; /* parser exception */
 %token _NULL
 %token _OF
 %token _OPERATOR
+%token _OTHERWISE
 %token _PACK
 %token _PACKAGE
 %token _PRAGMA
@@ -8583,6 +8584,47 @@ elsif_statement
     }
 ;
 
+otherwise_condition
+  : _OTHERWISE _IF /* expression */ {} condition
+      {
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jz( compiler, 0, px );
+      }
+  ;
+
+otherwise_branch
+:   otherwise_condition compound_statement
+      {
+        compiler_fixup_here( compiler );
+      }
+
+  | otherwise_condition compound_statement
+      {
+	ssize_t zero = 0;
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
+      }
+    otherwise_branch
+      {
+        compiler_fixup_here( compiler );
+      }
+
+  | otherwise_condition compound_statement _ELSE 
+      {
+	ssize_t zero = 0;
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
+      }
+    compound_statement
+      {
+        compiler_fixup_here( compiler );
+      }
+;
+
 labeled_for
 : opt_label _FOR
       {
@@ -8639,6 +8681,19 @@ control_statement
         compiler_fixup_here( compiler );
       }
     compound_statement
+      {
+        compiler_fixup_here( compiler );
+      }
+
+  | if_condition compound_statement
+      {
+	ssize_t zero = 0;
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
+      }
+    otherwise_branch
       {
         compiler_fixup_here( compiler );
       }
