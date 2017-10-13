@@ -1051,7 +1051,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
  *         exception if the arrayis empty or null.
  *
  * bytecode:
- * POP
+ * APOP
  *
  * stack:
  * array -> value
