@@ -1,45 +1,110 @@
-//--*- C -*--
+// --*- C -*--
+
+// Test new types passed to modules:
 
 use std;
-use ArrayMath;
 
-type integer = llong;
+type vector = array of double;
 
-pragma integer const llong;
+type point = like vector {
 
-function minmax( array of integer a ): integer, integer, int, int
+    inline bytecode operator "@point" ( v : vector ): point {}
+
+    inline bytecode operator "ldc"(): point
+    {
+        DALDCS 2
+    }
+
+    operator "+" ( vector a; vector b ): point
+    {
+        var r : vector = [ a[0]+b[0], a[1]+b[1] ];
+        return r@point;
+    }
+    
+    operator "*" ( vector a; vector b ): point
+    {
+        var r : vector = [ a[0]*b[0], a[1]*b[1] ];
+        return r@point;
+    }
+    
+    operator "-" ( vector a; vector b ): point
+    {
+        var r : vector = [ a[0]-b[0], a[1]-b[1] ]; 
+        return r@point;
+    }
+
+    inline bytecode operator "@point" ( d : double ): point
+    {
+        LDC 2 AALLOC const(double.size) 0  (*   d -- d p *)
+        SWAP                               (* d p -- p d *)
+        OVER OVER                          (* p d -- p d p d *)
+        DSTI                               (* p d p d -- p d *)
+        OVER                               (* p d -- p d p *)
+        LDC 1 INDEX SWAP                   (* p d p -- p p=&p[1] d *)
+        DSTI                               (* p p d -- p *)
+    }
+
+};
+
+operator "/" ( point a; point b ): point
 {
-    var min, max, i, j = ArrayMath::llminmax( a );
-    return min, max, i, j;
+    var r : point = [ a[0]+b[0], a[1]+b[1] ];
+    return r;
+}
+    
+operator "%" ( vector a; vector b ): vector
+{
+    var r : vector = [ a[0]+b[0], a[1]+b[1] ];
+    return r;
+}
+    
+
+use Verlet(point);
+
+var p : point = 2.3D@point;
+
+. "#", p[0], p[1];
+
+pragma real const double;
+
+var X, Y, Z: point;
+
+X = [1.0, 1.0];
+Y = [2.0, 2.0];
+
+Z = X + Y;
+. "#", Z[0], Z[1];
+
+Z = Y * Z;
+. "#", Z[0], Z[1];
+
+readonly var x0 = [ 0.0, 1.0 ];
+readonly var v0 = [ 1.0, 0.0 ];
+
+var dt = 0.01;
+var x: point;
+var t: double;
+var xprev = x0;
+
+function force( point x ): point
+{
+    return [ -x[0], -x[1] ];
 }
 
-operator "<" ( array of integer a ) { for var e in a do < e, "" enddo }
-operator "." ( array of integer a ) { < a }
+x = Verlet::start( x0, v0, force(x0), dt@point );
+t += dt;
 
-var a1 = [1,2,3,4,5,6,7];
-var a2 = [10,20,30,40,50];
+. t, x[0], x[1];
 
-. a1; . a2;
-. "";
+var int N = 1000;
 
-. minmax( a1 );
-. minmax( a2 );
+var args = arguments();
+if length(args) > 1 then
+    N = strtoi( args[1] );
+endif
 
-{
-    . "";
-    var min, max = minmax( a1 );
-    . min, max;
-}
-
-{
-    . "";
-    var min, max, i, j = minmax( a2 );
-    . min, max, i, j;
-}
-
-{
-    . "";
-    . acopy( a1[], a2, start1 => 1L, start2 => 2L, length => 3L );
-    var min, max, i, j = minmax( acopy( a1[], a2, 1L, 2L, length =>3L ));
-    . min, max, i, j;
-}
+for var int i = 1 to N do
+    x, xprev = Verlet::step( xprev, x, force(x), dt ), x;
+    t += dt;
+    . t, x[0], x[1];
+enddo;

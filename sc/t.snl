@@ -15,10 +15,10 @@ type point = like vector {
         DALDCS 2
     }
 
-    operator "+" ( vector a; vector b ): point
+    operator "+" ( point a; point b ): point
     {
-        var r : vector = [ a[0]+b[0], a[1]+b[1] ];
-        return r@point;
+        var r : point = [ a[0]+b[0], a[1]+b[1] ];
+        return r;
     }
     
     operator "*" ( vector a; vector b ): point
@@ -45,6 +45,13 @@ type point = like vector {
     }
 
 };
+
+operator "/" ( point a; point b ): point
+{
+    var r : point = [ a[0]+b[0], a[1]+b[1] ];
+    return r;
+}
+    
 
 use Verlet(point);
 
