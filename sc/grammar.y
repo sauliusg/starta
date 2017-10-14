@@ -9516,6 +9516,8 @@ delimited_type_description
 	assert( compiler->current_type );
         assert( $2 );
         tnode_insert_base_type( compiler->current_type, $2 );
+        tnode_insert_element_type( compiler->current_type,
+                                   share_tnode( tnode_element_type( $2 )));
         if( tnode_is_reference( $2 )) {
             tnode_set_flags( compiler->current_type, TF_IS_REF );
         }
