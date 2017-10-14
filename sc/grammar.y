@@ -2215,6 +2215,19 @@ static void compiler_check_operator_args( COMPILER *cc,
                 argument_type = dnode_type( arg );
                 expr_type = enode_type( expr );
 
+#if 0
+                if( strcmp( od->name, "[]" ) == 0 ) {
+                fprintf( stderr, ">>> %s(): '%s': arg = '%s', targ = '%s' (%s), "
+                         "expr = '%s' (%s)\n",
+                         cc->current_function ? dnode_name(cc->current_function):"<main>",
+                         od->name, dnode_name(arg),
+                         tnode_name(argument_type),
+                         tnode_kind_name(argument_type),
+                         tnode_name(expr_type),
+                         tnode_kind_name(expr_type)
+                );
+                }
+#endif
                 if( !tnode_types_are_compatible( argument_type, expr_type,
                                                  generic_types, ex )) {
                     yyerrorf( "incompatible type of argument %d "
@@ -9500,6 +9513,14 @@ delimited_type_description
 
   | _LIKE type_identifier
     {
+	assert( compiler->current_type );
+        assert( $2 );
+        tnode_insert_base_type( compiler->current_type, $2 );
+        if( tnode_is_reference( $2 )) {
+            tnode_set_flags( compiler->current_type, TF_IS_REF );
+        }
+        tnode_set_flags( compiler->current_type, TF_IS_EQUIVALENT );
+        tnode_set_kind( compiler->current_type, TK_DERIVED );
     }
     struct_or_class_body
     {
