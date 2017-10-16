@@ -1,0 +1,30 @@
+// --*- C -*--
+
+// Test mumber check functions:
+
+use std;
+
+var a = 1;
+var b = 1;
+
+if( a > b ) {
+    . "branch 1"
+} otherwise
+if( a > 0 ) {
+    . "branch 2"
+} otherwise
+if( b > 0 ) {
+    . "branch 3"
+} else {
+    . "branch 'else'"
+}
+
+if( a > b ) then
+    . "branch 1"
+elsif( a > 0 ) then
+    . "branch 2"
+elsif( b > 0 ) then
+    . "branch 3"
+else
+    . "branch 'else'"
+endif

@@ -1,9 +1,0 @@
-#! /usr/bin/env starta
-
-pragma prepend "$D/lib/starta";
-
-use std;
-
-while(<>) {
-    . curreof() ? "1" : ".", "\"" _ $_ _ "\""
-}

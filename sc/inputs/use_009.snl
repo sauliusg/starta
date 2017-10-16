@@ -4,7 +4,7 @@
 
 use std;
 
-type point = like (array of double) {
+type point = like array of double {
 
     inline bytecode operator "ldc"(): point
     {

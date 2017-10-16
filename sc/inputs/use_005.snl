@@ -4,28 +4,33 @@
 
 use std;
 
-type point = like (array of double) {
+type vector = array of double;
+
+type point = like vector {
+
+    inline bytecode operator "@point" ( v : vector ): point {}
 
     inline bytecode operator "ldc"(): point
     {
         DALDCS 2
     }
 
-    operator "+" ( point a; point b ): point
+    operator "+" ( vector a; vector b ): point
     {
-        var r : point = [ a[0]+b[0], a[1]+b[1] ];
-        return r;
+        var r : vector = [ a[0]+b[0], a[1]+b[1] ];
+        return r@point;
     }
-
-    operator "*" ( point a; point b ): point
+    
+    operator "*" ( vector a; vector b ): point
     {
-        var r = [ a[0]*b[0], a[1]*b[1] ];
-        return r;
+        var r : vector = [ a[0]*b[0], a[1]*b[1] ];
+        return r@point;
     }
-
-    operator "-" ( point a; point b ): point
+    
+    operator "-" ( vector a; vector b ): point
     {
-        return [ a[0]-b[0], a[1]-b[1] ]; 
+        var r : vector = [ a[0]-b[0], a[1]-b[1] ]; 
+        return r@point;
     }
 
     inline bytecode operator "@point" ( d : double ): point

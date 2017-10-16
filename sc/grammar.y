@@ -2215,6 +2215,19 @@ static void compiler_check_operator_args( COMPILER *cc,
                 argument_type = dnode_type( arg );
                 expr_type = enode_type( expr );
 
+#if 0
+                if( strcmp( od->name, "[]" ) == 0 ) {
+                fprintf( stderr, ">>> %s(): '%s': arg = '%s', targ = '%s' (%s), "
+                         "expr = '%s' (%s)\n",
+                         cc->current_function ? dnode_name(cc->current_function):"<main>",
+                         od->name, dnode_name(arg),
+                         tnode_name(argument_type),
+                         tnode_kind_name(argument_type),
+                         tnode_name(expr_type),
+                         tnode_kind_name(expr_type)
+                );
+                }
+#endif
                 if( !tnode_types_are_compatible( argument_type, expr_type,
                                                  generic_types, ex )) {
                     yyerrorf( "incompatible type of argument %d "
@@ -7019,6 +7032,7 @@ static cexception_t *px; /* parser exception */
 %token _NULL
 %token _OF
 %token _OPERATOR
+%token _OTHERWISE
 %token _PACK
 %token _PACKAGE
 %token _PRAGMA
@@ -8583,6 +8597,47 @@ elsif_statement
     }
 ;
 
+otherwise_condition
+  : _OTHERWISE _IF /* expression */ {} condition
+      {
+        compiler_push_relative_fixup( compiler, px );
+	compiler_compile_jz( compiler, 0, px );
+      }
+  ;
+
+otherwise_branch
+:   otherwise_condition compound_statement
+      {
+        compiler_fixup_here( compiler );
+      }
+
+  | otherwise_condition compound_statement
+      {
+	ssize_t zero = 0;
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
+      }
+    otherwise_branch
+      {
+        compiler_fixup_here( compiler );
+      }
+
+  | otherwise_condition compound_statement _ELSE 
+      {
+	ssize_t zero = 0;
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
+      }
+    compound_statement
+      {
+        compiler_fixup_here( compiler );
+      }
+;
+
 labeled_for
 : opt_label _FOR
       {
@@ -8639,6 +8694,19 @@ control_statement
         compiler_fixup_here( compiler );
       }
     compound_statement
+      {
+        compiler_fixup_here( compiler );
+      }
+
+  | if_condition compound_statement
+      {
+	ssize_t zero = 0;
+        compiler_push_relative_fixup( compiler, px );
+        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        compiler_swap_fixups( compiler );
+        compiler_fixup_here( compiler );
+      }
+    otherwise_branch
       {
         compiler_fixup_here( compiler );
       }
@@ -9443,8 +9511,18 @@ delimited_type_description
        $$ = share_tnode( $1 );
     }
 
-  | _LIKE type_identifier
+  | _LIKE var_type_description
     {
+	assert( compiler->current_type );
+        assert( $2 );
+        tnode_insert_base_type( compiler->current_type, $2 );
+        tnode_insert_element_type( compiler->current_type,
+                                   share_tnode( tnode_element_type( $2 )));
+        if( tnode_is_reference( $2 )) {
+            tnode_set_flags( compiler->current_type, TF_IS_REF );
+        }
+        tnode_set_flags( compiler->current_type, TF_IS_EQUIVALENT );
+        tnode_set_kind( compiler->current_type, TK_DERIVED );
     }
     struct_or_class_body
     {
