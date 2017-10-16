@@ -1911,7 +1911,14 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 			  target_name, source_name, retval_nr );
 	    }
 	    if( conversion ) {
-		compiler_emit_function_call( cc, conversion, NULL, "\n", ex );
+                key_value_t *fixup_values = NULL;
+
+                TNODE *element_tnode = tnode_element_type( target_type );
+                if( element_tnode ) {
+                    fixup_values = make_tnode_key_value_list( target_type, element_tnode );
+                }
+
+		compiler_emit_function_call( cc, conversion, fixup_values, "\n", ex );
 	    }
 
 	    if( target_type ) {
