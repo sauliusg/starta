@@ -26,7 +26,7 @@ type point = like vector {
         return [ a[0]*b[0], a[1]*b[1] ];
     }
     
-    operator "-" ( point a; point b ): point
+    operator "-" ( vector a; vector b ): point
     {
         return [ a[0]-b[0], a[1]-b[1] ]; 
     }
