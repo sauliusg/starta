@@ -30,7 +30,7 @@ type point = like (array of double) {
 
     inline bytecode operator "@point" ( d : double ): point
     {
-        LDC 2 AALLOC const(double.size) 0  (*   d -- d p *)
+        LDC 2 AALLOC %%element_size 0      (*   d -- d p *)
         SWAP                               (* d p -- p d *)
         OVER OVER                          (* p d -- p d p d *)
         DSTI                               (* p d p d -- p d *)
