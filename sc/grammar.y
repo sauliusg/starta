@@ -9511,7 +9511,7 @@ delimited_type_description
        $$ = share_tnode( $1 );
     }
 
-  | _LIKE type_identifier
+  | _LIKE var_type_description
     {
 	assert( compiler->current_type );
         assert( $2 );
