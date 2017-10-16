@@ -1061,6 +1061,7 @@ void dnode_optab_insert_operator( DNODE *dnode, char *opname, DNODE *operator,
 
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name )
 {
+    assert( dnode );
     assert( dnode->vartab );
     return vartab_lookup( dnode->vartab, name );
 }

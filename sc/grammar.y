@@ -3738,7 +3738,11 @@ static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
     if( !module ) {
 	return vartab_lookup( cc->vartab, identifier );
     } else {
-        return dnode_vartab_lookup_var( module, identifier );
+        if( dnode_vartab( module ) != NULL ) {
+            return dnode_vartab_lookup_var( module, identifier );
+        } else {
+            return NULL;
+        }
     }
 }
 
