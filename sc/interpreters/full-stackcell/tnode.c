@@ -265,9 +265,11 @@ TNODE *new_tnode_derived( TNODE *base, cexception_t *ex )
 	/* node->kind = base->kind; */
 	node->kind = TK_DERIVED;
 	/* base->name is not copied */
+#if 0
 	while( base && base->kind == TK_DERIVED &&
                tnode_has_flags( base, TF_IS_EQUIVALENT ))
 	    base = base->base_type;
+#endif
 	assert( node != base );
 	node->base_type = share_tnode( base );
 	if( base ) {
