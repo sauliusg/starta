@@ -1016,10 +1016,10 @@ int APUSH( INSTRUCTION_FN_ARGS )
 
 /*
  * APOP -- Array pop -- pop the past element from the array. Throw
- *         exception if the arrayis empty or null.
+ *         exception if the array is empty or null.
  *
  * bytecode:
- * POP
+ * APOP
  *
  * stack:
  * array -> value
