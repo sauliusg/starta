@@ -1,6 +1,6 @@
 // --*- C -*--
 
-// Test mumber check functions:
+// Test number check functions:
 
 use std;
 use NumCheck;
