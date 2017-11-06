@@ -1,0 +1,9 @@
+// --*- C -*--
+
+// Test unsigned values
+
+use std;
+
+var short i;
+
+pack null, 0, "%i2", i;
