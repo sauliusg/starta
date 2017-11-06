@@ -8,8 +8,6 @@ use * from std;
 
 package Ex
 
-use * from std;
-
 exception Ex1;
 exception Ex2;
 

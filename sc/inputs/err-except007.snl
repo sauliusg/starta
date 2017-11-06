@@ -1,6 +1,6 @@
 // --*- C -*--
 
-// Test feof() function:
+// Test undeclared exception diagnostics:
 
 use std;
 
