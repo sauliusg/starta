@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stackcell.h>
 #include <alloccell.h>
+#include <instruction_args.h>
 #include <run.h>
 
 char *OPCODES[] = {

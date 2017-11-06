@@ -5,6 +5,7 @@
 #include <alloccell.h>
 #include <bcalloc.h>
 #include <run.h>
+#include <instruction_args.h>
 #include <cxprintf.h>
 
 void *module_id = &module_id;
