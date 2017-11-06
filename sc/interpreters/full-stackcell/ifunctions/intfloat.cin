@@ -572,12 +572,23 @@ int @PREFIX1@PACK( INSTRUCTION_FN_ARGS )
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
-    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+    alloccell_t *blob_header;
     char typechar;
     ssize_t size;
 
     TRACE_FUNCTION();
 
+    if( blob == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "attempting to pack a NULL blob",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    blob_header = ((alloccell_t*)blob) - 1;
     assert( blob_header->magic == BC_MAGIC );
 
     if( !description ) {
@@ -624,10 +635,21 @@ int @PREFIX1@PACKARRAY( INSTRUCTION_FN_ARGS )
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
-    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+    alloccell_t *blob_header;
 
     TRACE_FUNCTION();
 
+    if( blob == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "attempting to pack an array into a NULL blob",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    blob_header = ((alloccell_t*)blob) - 1;
     assert( blob_header->magic == BC_MAGIC );
 
     if( !description ) {
@@ -671,10 +693,11 @@ int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS )
     char *description = STACKCELL_PTR( istate.ep[1] );
     ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
-    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+    alloccell_t *blob_header;
 
     TRACE_FUNCTION();
 
+#if 0
     if( !blob ) {
 	STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
 	STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero descrition string ref. */
@@ -682,7 +705,19 @@ int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS )
 	istate.ep += 4;
 	return 2;
     }
-
+#else
+    if( blob == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "attempting to pack a multidimensional array "
+                              "into a NULL blob",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );        
+	return 0;
+    }
+#endif
+    blob_header = ((alloccell_t*)blob) - 1;
     assert( blob_header->magic == BC_MAGIC );
 
     if( !description ) {
