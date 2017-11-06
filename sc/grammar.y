@@ -7474,15 +7474,11 @@ delimited_control_statement
 raised_exception_identifier
   : __IDENTIFIER
       {
-          $$ = vartab_lookup( compiler->vartab, $1 );
-          if( !$$ ) {
-              yyerrorf( "exception '%s' is not declared in the current scope",
-                        $1 );
-          }
+          $$ = compiler_lookup_dnode( compiler, NULL, $1, "exception" );
       }
   | module_list __COLON_COLON __IDENTIFIER
       {
-          $$ = compiler_lookup_dnode( compiler, $1, $3, "exception" );          
+          $$ = compiler_lookup_dnode( compiler, $1, $3, "exception" );
       }
   ;
 
