@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <instruction_args.h>
 #include <run.h>
 
 #include <time.h>

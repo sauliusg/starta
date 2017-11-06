@@ -5,6 +5,7 @@
 #include <stackcell.h>
 #include <alloccell.h>
 #include <run.h>
+#include <instruction_args.h>
 #include <arrays.h>
 
 char *OPCODES[] = {
