@@ -8,13 +8,9 @@ use * from std;
 
 package Ex
 
-use * from std;
-
 exception Ex1;
 exception Ex2;
 
 end package Ex;
 
-use Ex;
-
-raise Ex2( "raising exception from a package" );
+raise Ex::Ex2( "raising exception from a package" );
