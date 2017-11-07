@@ -1041,6 +1041,12 @@ TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name )
     return NULL;
 }
 
+DNODE *tnode_lookup_argument( TNODE *tnode, char *argument_name )
+{
+    assert( tnode );
+    return dnode_list_lookup( tnode->args, argument_name );
+}
+
 TNODE *tnode_set_name( TNODE* node, char *name, cexception_t *ex )
 {
     assert( node );
