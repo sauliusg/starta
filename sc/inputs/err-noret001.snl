@@ -1,4 +1,4 @@
-# Functions andn procedures in Starta
+# Functions and procedures in Starta
 
 module Bubble;
 
@@ -10,7 +10,7 @@ procedure sort( m : array of int ): array of int
     repeat {
         swapped = false;
         for var i = 0 to last(m) - 1 {
-            if( m[i] < m[i+1] ) {
+            if( m[i] > m[i+1] ) {
                 m[i], m[i+1] = m[i+1], m[i];
                 swapped = true;
             }
@@ -24,3 +24,10 @@ function sorted( int m[] ): int[]
 }
 
 end module Bubble;
+
+use Bubble;
+use std;
+
+operator "." ( a: array of int ) { for var i in a do < i, "" enddo; . "" }
+
+. sort( [ 3, 4, 2, 1 ] )
