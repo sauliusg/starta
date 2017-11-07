@@ -171,6 +171,8 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type );
 
 TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name );
 
+DNODE *tnode_lookup_argument( TNODE *function_tnode, char *agument_name );
+
 TNODE *tnode_convert_to_element_type( TNODE *tnode );
 
 TNODE *share_tnode( TNODE* node );
