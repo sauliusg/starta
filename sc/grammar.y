@@ -5145,7 +5145,7 @@ static void compiler_emit_default_arguments( COMPILER *cc,
 
 	    const_value_copy( &const_value, dnode_value( arg ), ex );
 	    compiler_compile_typed_const_value( cc, dnode_type( arg ),
-					     &const_value, ex );
+                                                &const_value, ex );
 	} else {
 	    if( arg ) {
 		if( arg_name ) {
@@ -11053,7 +11053,21 @@ actual_argument_list
       }
   | __IDENTIFIER 
       {
-	  compiler_emit_default_arguments( compiler, $1, px );
+          char *argument_name = $1;
+          TNODE *current_function_type =
+              compiler->current_call ?
+              dnode_type( compiler->current_call ) : NULL;
+
+          if( current_function_type &&
+              tnode_lookup_argument( current_function_type, argument_name )) {
+              compiler_emit_default_arguments( compiler, argument_name, px );
+          } else {
+              char *function_name =
+                  compiler->current_call ?
+                  dnode_name( compiler->current_call ) : NULL;
+              yyerrorf( "function '%s' does not have argument '%s'",
+                        function_name, argument_name );
+          }
       }
    __THICK_ARROW expression
       {
