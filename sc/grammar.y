@@ -10895,6 +10895,7 @@ multivalue_function_call
 	}
     '(' opt_actual_argument_list ')'
         {
+            compiler_emit_default_arguments( compiler, NULL, px );
 	    compiler_compile_load_variable_value( compiler, $1, px );
 	    compiler_drop_top_expression( compiler );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
