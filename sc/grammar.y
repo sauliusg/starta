@@ -13439,6 +13439,35 @@ static void compiler_compile_file( char *filename, cexception_t *ex )
     fclosex( yyin, ex );
 }
 
+static void compiler_compile_string( char *program, cexception_t *ex )
+{
+    cexception_t inner;
+    struct yy_buffer_state * volatile bstate = yy_scan_string( program );;
+    
+    cexception_guard( inner ) {
+	if( yyparse() != 0 ) {
+	    int errcount = compiler_yy_error_number();
+	    cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
+			      cxprintf( "compiler could not recover "
+					"from errors, quitting now\n"
+					"%d error(s) detected\n",
+					errcount ));
+	} else {
+	    int errcount = compiler_yy_error_number();
+	    if( errcount != 0 ) {
+	        cexception_raise( &inner, COMPILER_COMPILATION_ERROR,
+				  cxprintf( "%d error(s) detected\n",
+					    errcount ));
+	    }
+	}
+    }
+    cexception_catch {
+        yy_delete_buffer( bstate );
+	cexception_reraise( inner, ex );
+    }
+    yy_delete_buffer( bstate );
+}
+
 THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
                                 cexception_t *ex )
 {
@@ -13448,6 +13477,37 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
     compiler = new_compiler( filename, include_paths, ex );
 
     compiler_compile_file( filename, ex );
+
+    thrcode_flush_lines( compiler->thrcode );
+    code = compiler->thrcode;
+    if( compiler->thrcode == compiler->function_thrcode ) {
+	compiler->function_thrcode = NULL;
+    } else
+    if( compiler->thrcode == compiler->main_thrcode ) {
+	compiler->main_thrcode = NULL;
+    } else {
+	assert( 0 );
+    }
+    compiler->thrcode = NULL;
+
+    thrcode_insert_static_data( code, compiler->static_data,
+				compiler->static_data_size );
+    compiler->static_data = NULL;
+    delete_compiler( compiler );
+    compiler = NULL;
+
+    return code;
+}
+
+THRCODE *new_thrcode_from_string( char *program, char **include_paths,
+                                  cexception_t *ex )
+{
+    THRCODE *code;
+
+    assert( !compiler );
+    compiler = new_compiler( "-e ", include_paths, ex );
+
+    compiler_compile_string( program, ex );
 
     thrcode_flush_lines( compiler->thrcode );
     code = compiler->thrcode;
