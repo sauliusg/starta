@@ -123,6 +123,7 @@ static char *usage_text[2] = {
 "Options:\n"
 
 "  -c, --compile-only  Only compile a program, do not run it.\n"
+"  -e, --execute '. 1' Execute a Starta program.\n"
 "  -q, --quiet         Do not print file name on successful compilation.\n"
 "  -q-,--verbose       Print file name and 'OK' on successful compilation.\n"
 "\n"
@@ -218,12 +219,14 @@ static option_value_t use_environment;
 static option_value_t rstack_length;
 static option_value_t estack_length;
 static option_value_t stack_delta;
+static option_value_t program_line;
 
 static option_t options[] = {
   { "-S", "--stack-length",            OT_INT, &rstack_length },
   { "-E", "--evaluation-stack-length", OT_INT, &estack_length },
   { "-D", "--stack-delta",  OT_INT,           &stack_delta },
   { "-d", "--debug",        OT_STRING,        &debug },
+  { "-e", "--execute",      OT_STRING,        &program_line },
   { "-c", "--compile-only", OT_BOOLEAN_TRUE,  &only_compile },
   { "-q", "--quiet",        OT_BOOLEAN_FALSE, &verbose },
   { "-q-","--no-quiet",     OT_BOOLEAN_TRUE,  &verbose },
@@ -300,13 +303,15 @@ int main( int argc, char *argv[], char *env[] )
       verbose.value.bool = 1;
   }
 
+#if 0
   if( files[0] == NULL ) {
       fprintf( stderr, "%s: Usage: %s program.snl\n", progname, progname );
       fprintf( stderr, "%s: please try '%s --help' for more options\n",
                progname, progname );
       exit(2);
   }
-
+#endif
+  
   compiler_yy_debug_off();    
   compiler_flex_debug_off();    
   thrcode_debug_off();
@@ -333,6 +338,34 @@ int main( int argc, char *argv[], char *env[] )
           push_environment_paths( &include_paths, "SL_INCLUDE_PATHS", &inner );
       }
 
+      if( program_line.present ) {
+          char * program = program_line.value.s;
+          code = new_thrcode_from_string( program, include_paths, &inner );
+          if( rstack_length.present ) {
+              interpret_rstack_length( rstack_length.value.i );
+          }
+
+          if( estack_length.present ) {
+              interpret_estack_length( estack_length.value.i );
+          }
+
+          if( stack_delta.present ) {
+              interpret_stack_delta( stack_delta.value.i );
+          }
+
+	  if( debug.present && strstr(debug.value.s, "dump") != NULL ) {
+	      thrcode_dump( code );
+	  }
+	  if( !only_compile.value.bool ) {
+	      interpret( code, i - 1, files, env, &inner );
+          } else {
+              if( verbose.value.bool ) {
+                  printf( "%s: '%s' -- OK\n", progname, files[0] );
+              }
+          }
+          return 0;
+      }
+      
       if( argv_has_dashes( argc, argv ) || called_as_starta ) {
 	  for( i = 0; files[i] != NULL; ) {
 	      i++;
