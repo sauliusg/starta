@@ -339,6 +339,9 @@ int main( int argc, char *argv[], char *env[] )
       }
 
       if( program_line.present ) {
+	  for( i = 0; files[i] != NULL; ) {
+	      i++;
+	  }
           char * program = program_line.value.s;
           code = new_thrcode_from_string( program, include_paths, &inner );
           if( rstack_length.present ) {
