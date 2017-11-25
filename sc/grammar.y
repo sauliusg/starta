@@ -348,7 +348,11 @@ static COMPILER *new_compiler( char *filename,
     COMPILER *cc = callocx( 1, sizeof(COMPILER), ex );
 
     cexception_guard( inner ) {
-	cc->filename = strdupx( filename, &inner );
+        if( filename && !(strcmp( filename, "-" ) == 0) ) {
+            cc->filename = strdupx( filename, &inner );
+        } else {
+            cc->filename = strdupx( "-", &inner );
+        }
         cc->main_thrcode = new_thrcode( &inner );
         cc->function_thrcode = new_thrcode( &inner );
 
@@ -13415,7 +13419,11 @@ static void compiler_compile_file( char *filename, cexception_t *ex )
     cexception_t inner;
 
     cexception_guard( inner ) {
-        yyin = fopenx( filename, "r", ex );
+        if( filename && !(strcmp( filename, "-" ) == 0) ) {
+            yyin = fopenx( filename, "r", ex );
+        } else {
+            yyin = stdin;
+        }
 	if( yyparse() != 0 ) {
 	    int errcount = compiler_yy_error_number();
 	    cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
@@ -13433,10 +13441,12 @@ static void compiler_compile_file( char *filename, cexception_t *ex )
 	}
     }
     cexception_catch {
-        if( yyin ) fclosex( yyin, ex );
+        if( yyin && yyin != stdin )
+            fclosex( yyin, ex );
 	cexception_reraise( inner, ex );
     }
-    fclosex( yyin, ex );
+    if( yyin != stdin )
+        fclosex( yyin, ex );
 }
 
 static void compiler_compile_string( char *program, cexception_t *ex )
