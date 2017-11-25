@@ -12,6 +12,17 @@
 #include <unistd.h> /* for ssize_t */
 #include <cexceptions.h>
 
+/* A typedef and a function that are needed outpside the lexer: */
+
+typedef struct yy_buffer_state *YY_BUFFER_STATE;
+
+void yy_delete_buffer( YY_BUFFER_STATE b );
+
+YY_BUFFER_STATE yy_scan_string( const char *yy_str );
+
+/* The compiler intefrace functions to control and query the lexer
+   state: */
+
 void compiler_flex_debug_off( void );
 void compiler_flex_debug_yyflex( void );
 void compiler_flex_debug_yylval( void );
