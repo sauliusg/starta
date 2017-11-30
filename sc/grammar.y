@@ -11746,6 +11746,10 @@ array_expression
   Expression never used and unnecessary duplication:
   | '{' expression_list opt_comma '}'
 */
+  /* Array 'comprehensions' (aka array 'for' epxressions): */
+  /* FIXME: add implementation (S.G.): */
+  | '[' _FOR lvariable '=' expression _TO expression ':' expression ']'
+  | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
   ;
 
 struct_expression
