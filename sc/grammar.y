@@ -11750,6 +11750,13 @@ array_expression
   /* FIXME: add implementation (S.G.): */
   | '[' _FOR lvariable '=' expression _TO expression ':' expression ']'
   | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
+  | '[' _FOR lvariable _IN expression ':' expression ']'
+  | '[' expression ':' _FOR lvariable _IN expression ':' expression ']'
+
+  | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
+  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
+  | '[' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
+  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
   ;
 
 struct_expression
