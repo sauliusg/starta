@@ -1,1 +1,1 @@
-../../sc/anode.c
+../../starta/anode.c

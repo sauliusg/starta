@@ -1,1 +1,1 @@
-../../sc/tnode_compat.h
+../../starta/tnode_compat.h

@@ -1,1 +1,1 @@
-../../sc/fixup.c
+../../starta/fixup.c

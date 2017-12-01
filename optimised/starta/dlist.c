@@ -1,1 +1,1 @@
-../../sc/dlist.c
+../../starta/dlist.c

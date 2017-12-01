@@ -1,1 +1,1 @@
-../../sc/thrcode_t.h
+../../starta/thrcode_t.h

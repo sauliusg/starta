@@ -1,1 +1,1 @@
-../../sc/vartab.h
+../../starta/vartab.h

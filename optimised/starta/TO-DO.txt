@@ -1,1 +1,1 @@
-../../sc/TO-DO.txt
+../../starta/TO-DO.txt

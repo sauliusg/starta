@@ -1,1 +1,1 @@
-../../sc/TO-BE-TESTED.txt
+../../starta/TO-BE-TESTED.txt

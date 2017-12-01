@@ -1,1 +1,1 @@
-../../sc/yy.h
+../../starta/yy.h

@@ -1,1 +1,1 @@
-../../sc/typetab.c
+../../starta/typetab.c

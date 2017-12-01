@@ -1,1 +1,1 @@
-../../sc/symtab.h
+../../starta/symtab.h

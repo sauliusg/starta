@@ -1,1 +1,1 @@
-../../sc/dnode.c
+../../starta/dnode.c

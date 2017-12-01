@@ -1,1 +1,1 @@
-../../sc/grammar_y.h
+../../starta/grammar_y.h
