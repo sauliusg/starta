@@ -7,8 +7,10 @@ use std;
 var i : int;
 // var m = [for i = 1 to 10: i*i];
 
-var m : array of int = new int[0];
+var m = new string[0];
 
-m = push( m, 20 );
+m = push( m, "vienas" );
+m = push( m, "du" );
+m = push( m, "trys" );
 
-. m[0];
+for var e in m { . e }
