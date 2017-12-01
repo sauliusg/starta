@@ -265,9 +265,11 @@ TNODE *new_tnode_derived( TNODE *base, cexception_t *ex )
 	/* node->kind = base->kind; */
 	node->kind = TK_DERIVED;
 	/* base->name is not copied */
+#if 0
 	while( base && base->kind == TK_DERIVED &&
                tnode_has_flags( base, TF_IS_EQUIVALENT ))
 	    base = base->base_type;
+#endif
 	assert( node != base );
 	node->base_type = share_tnode( base );
 	if( base ) {
@@ -1037,6 +1039,12 @@ TNODE *tnode_lookup_interface( TNODE *class_tnode, char *name )
         }
     }
     return NULL;
+}
+
+DNODE *tnode_lookup_argument( TNODE *tnode, char *argument_name )
+{
+    assert( tnode );
+    return dnode_list_lookup( tnode->args, argument_name );
 }
 
 TNODE *tnode_set_name( TNODE* node, char *name, cexception_t *ex )

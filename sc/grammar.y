@@ -348,7 +348,11 @@ static COMPILER *new_compiler( char *filename,
     COMPILER *cc = callocx( 1, sizeof(COMPILER), ex );
 
     cexception_guard( inner ) {
-	cc->filename = strdupx( filename, &inner );
+        if( filename && !(strcmp( filename, "-" ) == 0) ) {
+            cc->filename = strdupx( filename, &inner );
+        } else {
+            cc->filename = strdupx( "-", &inner );
+        }
         cc->main_thrcode = new_thrcode( &inner );
         cc->function_thrcode = new_thrcode( &inner );
 
@@ -1911,7 +1915,14 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 			  target_name, source_name, retval_nr );
 	    }
 	    if( conversion ) {
-		compiler_emit_function_call( cc, conversion, NULL, "\n", ex );
+                key_value_t *fixup_values = NULL;
+
+                TNODE *element_tnode = tnode_element_type( target_type );
+                if( element_tnode ) {
+                    fixup_values = make_tnode_key_value_list( target_type, element_tnode );
+                }
+
+		compiler_emit_function_call( cc, conversion, fixup_values, "\n", ex );
 	    }
 
 	    if( target_type ) {
@@ -3738,7 +3749,11 @@ static DNODE* compiler_lookup_dnode_silently( COMPILER *cc,
     if( !module ) {
 	return vartab_lookup( cc->vartab, identifier );
     } else {
-        return dnode_vartab_lookup_var( module, identifier );
+        if( dnode_vartab( module ) != NULL ) {
+            return dnode_vartab_lookup_var( module, identifier );
+        } else {
+            return NULL;
+        }
     }
 }
 
@@ -5134,7 +5149,7 @@ static void compiler_emit_default_arguments( COMPILER *cc,
 
 	    const_value_copy( &const_value, dnode_value( arg ), ex );
 	    compiler_compile_typed_const_value( cc, dnode_type( arg ),
-					     &const_value, ex );
+                                                &const_value, ex );
 	} else {
 	    if( arg ) {
 		if( arg_name ) {
@@ -7463,7 +7478,7 @@ delimited_control_statement
 raised_exception_identifier
   : __IDENTIFIER
       {
-          $$ = vartab_lookup( compiler->vartab, $1 );
+          $$ = compiler_lookup_dnode( compiler, NULL, $1, "exception" );
       }
   | module_list __COLON_COLON __IDENTIFIER
       {
@@ -10896,6 +10911,7 @@ multivalue_function_call
 	}
     '(' opt_actual_argument_list ')'
         {
+            compiler_emit_default_arguments( compiler, NULL, px );
 	    compiler_compile_load_variable_value( compiler, $1, px );
 	    compiler_drop_top_expression( compiler );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
@@ -11054,7 +11070,21 @@ actual_argument_list
       }
   | __IDENTIFIER 
       {
-	  compiler_emit_default_arguments( compiler, $1, px );
+          char *argument_name = $1;
+          TNODE *current_function_type =
+              compiler->current_call ?
+              dnode_type( compiler->current_call ) : NULL;
+
+          if( current_function_type &&
+              tnode_lookup_argument( current_function_type, argument_name )) {
+              compiler_emit_default_arguments( compiler, argument_name, px );
+          } else {
+              char *function_name =
+                  compiler->current_call ?
+                  dnode_name( compiler->current_call ) : NULL;
+              yyerrorf( "function '%s' does not have argument '%s'",
+                        function_name, argument_name );
+          }
       }
    __THICK_ARROW expression
       {
@@ -11736,6 +11766,17 @@ array_expression
   Expression never used and unnecessary duplication:
   | '{' expression_list opt_comma '}'
 */
+  /* Array 'comprehensions' (aka array 'for' epxressions): */
+  /* FIXME: add implementation (S.G.): */
+  | '[' _FOR lvariable '=' expression _TO expression ':' expression ']'
+  | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
+  | '[' _FOR lvariable _IN expression ':' expression ']'
+  | '[' expression ':' _FOR lvariable _IN expression ':' expression ']'
+
+  | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
+  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
+  | '[' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
+  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
   ;
 
 struct_expression
@@ -13409,7 +13450,11 @@ static void compiler_compile_file( char *filename, cexception_t *ex )
     cexception_t inner;
 
     cexception_guard( inner ) {
-        yyin = fopenx( filename, "r", ex );
+        if( filename && !(strcmp( filename, "-" ) == 0) ) {
+            yyin = fopenx( filename, "r", ex );
+        } else {
+            yyin = stdin;
+        }
 	if( yyparse() != 0 ) {
 	    int errcount = compiler_yy_error_number();
 	    cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
@@ -13427,10 +13472,41 @@ static void compiler_compile_file( char *filename, cexception_t *ex )
 	}
     }
     cexception_catch {
-        if( yyin ) fclosex( yyin, ex );
+        if( yyin && yyin != stdin )
+            fclosex( yyin, ex );
 	cexception_reraise( inner, ex );
     }
-    fclosex( yyin, ex );
+    if( yyin != stdin )
+        fclosex( yyin, ex );
+}
+
+static void compiler_compile_string( char *program, cexception_t *ex )
+{
+    cexception_t inner;
+    struct yy_buffer_state * volatile bstate = yy_scan_string( program );;
+    
+    cexception_guard( inner ) {
+	if( yyparse() != 0 ) {
+	    int errcount = compiler_yy_error_number();
+	    cexception_raise( &inner, COMPILER_UNRECOVERABLE_ERROR,
+			      cxprintf( "compiler could not recover "
+					"from errors, quitting now\n"
+					"%d error(s) detected\n",
+					errcount ));
+	} else {
+	    int errcount = compiler_yy_error_number();
+	    if( errcount != 0 ) {
+	        cexception_raise( &inner, COMPILER_COMPILATION_ERROR,
+				  cxprintf( "%d error(s) detected\n",
+					    errcount ));
+	    }
+	}
+    }
+    cexception_catch {
+        yy_delete_buffer( bstate );
+	cexception_reraise( inner, ex );
+    }
+    yy_delete_buffer( bstate );
 }
 
 THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
@@ -13442,6 +13518,37 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
     compiler = new_compiler( filename, include_paths, ex );
 
     compiler_compile_file( filename, ex );
+
+    thrcode_flush_lines( compiler->thrcode );
+    code = compiler->thrcode;
+    if( compiler->thrcode == compiler->function_thrcode ) {
+	compiler->function_thrcode = NULL;
+    } else
+    if( compiler->thrcode == compiler->main_thrcode ) {
+	compiler->main_thrcode = NULL;
+    } else {
+	assert( 0 );
+    }
+    compiler->thrcode = NULL;
+
+    thrcode_insert_static_data( code, compiler->static_data,
+				compiler->static_data_size );
+    compiler->static_data = NULL;
+    delete_compiler( compiler );
+    compiler = NULL;
+
+    return code;
+}
+
+THRCODE *new_thrcode_from_string( char *program, char **include_paths,
+                                  cexception_t *ex )
+{
+    THRCODE *code;
+
+    assert( !compiler );
+    compiler = new_compiler( "-e ", include_paths, ex );
+
+    compiler_compile_string( program, ex );
 
     thrcode_flush_lines( compiler->thrcode );
     code = compiler->thrcode;

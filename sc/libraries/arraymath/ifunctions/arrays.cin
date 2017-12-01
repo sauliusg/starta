@@ -274,7 +274,7 @@ int @PREFIX1@ACOPY( INSTRUCTION_FN_ARGS )
 #elif split_stackcell
         const ssize_t esize1 = alloccell_has_references(hdr1[-1]) ?
             REF_SIZE : sizeof(stackunion_t);
-        const ssize_t esize2 = alloccell_has_references(hdr1[-2]) ?
+        const ssize_t esize2 = alloccell_has_references(hdr2[-1]) ?
             REF_SIZE : sizeof(stackunion_t);
 #else
 #error Unknown bytecode implementation

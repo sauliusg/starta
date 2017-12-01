@@ -1,0 +1,12 @@
+// --*- C -*--
+
+// Test undeclared exception diagnostics:
+
+use std;
+
+package Exx;
+exception X;
+end package Exx;
+
+raise Exx::Y( "exception Y" );
+

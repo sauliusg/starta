@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <instruction_args.h>
 #include <run.h>
 
 char *OPCODES[] = {

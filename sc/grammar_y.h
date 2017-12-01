@@ -33,6 +33,9 @@ typedef enum {
 THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
                                 cexception_t *ex );
 
+THRCODE *new_thrcode_from_string( char *program, char **include_paths,
+                                  cexception_t *ex );
+
 void compiler_printf( cexception_t *ex, char *format, ... );
 
 int compiler_yy_error_number( void );
