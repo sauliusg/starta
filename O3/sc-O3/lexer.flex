@@ -1,1 +1,0 @@
-../../sc/lexer.flex
