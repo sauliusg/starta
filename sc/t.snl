@@ -5,6 +5,10 @@
 use std;
 
 var i : int;
-var m = [for i = 1 to 10: i*i];
+// var m = [for i = 1 to 10: i*i];
 
-. m;
+var m : array of int = new int[0];
+
+m = push( m, 20 );
+
+. m[0];
