@@ -1100,7 +1100,6 @@ int APOP( INSTRUCTION_FN_ARGS )
             if( flags & AF_HAS_REFS ) {
                 assert( array[-1].nref > 0 );
                 array[-1].nref --;
-                array[-1].flags |= AF_HAS_REFS;
             }
             
         }
