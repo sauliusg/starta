@@ -1,5 +1,5 @@
 
-FIRST = cexceptions getoptions lists
+FIRST = cexceptions getoptions lists starta
 
 DIRS  = ${FIRST} ${filter-out ${FIRST}, ${dir ${wildcard */Makefile}}}
 
