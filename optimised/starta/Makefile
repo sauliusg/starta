@@ -1,1 +1,1 @@
-../../sc/Makefile
+../../starta/Makefile

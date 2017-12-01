@@ -1,1 +1,1 @@
-../../sc/enode.c
+../../starta/enode.c

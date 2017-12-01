@@ -1,1 +1,1 @@
-../../sc/thrlist.c
+../../starta/thrlist.c

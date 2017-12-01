@@ -1,1 +1,1 @@
-../../sc/tlist.c
+../../starta/tlist.c

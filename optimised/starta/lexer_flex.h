@@ -1,1 +1,1 @@
-../../sc/lexer_flex.h
+../../starta/lexer_flex.h

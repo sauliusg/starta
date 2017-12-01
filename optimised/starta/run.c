@@ -1,1 +1,1 @@
-../../sc/run.c
+../../starta/run.c

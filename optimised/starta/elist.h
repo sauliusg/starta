@@ -1,1 +1,1 @@
-../../sc/elist.h
+../../starta/elist.h

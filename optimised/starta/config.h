@@ -1,1 +1,1 @@
-../../sc/config.h
+../../starta/config.h

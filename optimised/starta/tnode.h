@@ -1,1 +1,1 @@
-../../sc/tnode.h
+../../starta/tnode.h

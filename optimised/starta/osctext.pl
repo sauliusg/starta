@@ -1,1 +1,1 @@
-../../sc/osctext.pl
+../../starta/osctext.pl

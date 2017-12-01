@@ -1,1 +1,1 @@
-../../sc/typesize.h
+../../starta/typesize.h
