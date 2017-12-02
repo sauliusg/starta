@@ -4,7 +4,13 @@
 
 use std;
 
-var f = bytecode function (int x) -> (int) { DUP DUP MUL MUL };
+var f = bytecode function (int x) -> (int)
+    { (* x *)
+      DUP (* x  x *)
+      DUP (* x  x  x *)
+      MUL (* x  x*x *)
+      MUL (* x*x*x *)
+    };
 
 . f(20);
 
