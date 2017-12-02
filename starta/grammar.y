@@ -11746,10 +11746,6 @@ array_expression
      {
 	 compiler_compile_array_expression( compiler, $2, px );
      }
-/*
-  Expression never used and unnecessary duplication:
-  | '{' expression_list opt_comma '}'
-*/
   /* Array 'comprehensions' (aka array 'for' epxressions): */
   /* FIXME: add implementation (S.G.): */
   | '[' _FOR lvariable '=' expression _TO expression ':' expression ']'
