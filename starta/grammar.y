@@ -3215,6 +3215,29 @@ static void compiler_compile_swap( COMPILER *cc, cexception_t *ex )
     compiler_emit( cc, ex, "\tc\n", SWAP );
 }
 
+static void compiler_compile_peek( COMPILER *cc, ssize_t offset,
+                                   cexception_t *ex )
+{
+    ENODE *expr = cc->e_stack;
+    ssize_t count = offset;
+
+    while( expr && count > 1 ) {
+        expr = enode_next( expr );
+        count --;
+    }
+
+    if( expr ) {
+        TNODE *expr_type = enode_type( expr );
+        compiler_push_typed_expression( cc, share_tnode( expr_type ), ex );
+        compiler_emit( cc, ex, "\tce\n", PEEK, &offset );
+    } else {
+        yyerrorf( "not enough expressions on the evaluation stack "
+                  "to generate PEEK" );
+        compiler_push_error_type( cc, ex );
+    }
+
+}
+
 static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr1 = cc->e_stack;
@@ -3265,9 +3288,9 @@ static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 }
 
 static int compiler_stack_top_has_operator( COMPILER *c,
-					 char *operator_name,
-					 int arity,
-                                         cexception_t *ex )
+                                            char *operator_name,
+                                            int arity,
+                                            cexception_t *ex )
 {
     ENODE *expr_enode = c ? c->e_stack : NULL;
     TNODE *expr_tnode = expr_enode ? enode_type( expr_enode ) : NULL;
@@ -11741,6 +11764,13 @@ unpack_expression
   }
   ;
 
+for_expression_push_thrcode
+:
+{
+    compiler_push_thrcode( compiler, px );
+}
+;
+
 array_expression
   : '[' expression_list opt_comma ']'
      {
@@ -11748,15 +11778,91 @@ array_expression
      }
   /* Array 'comprehensions' (aka array 'for' epxressions): */
   /* FIXME: add implementation (S.G.): */
-  | '[' _FOR lvariable '=' expression _TO expression ':' expression ']'
+  | '[' _FOR for_expression_push_thrcode lvariable
+     {
+         compiler_push_loop( compiler, /* loop_label = */NULL, 2, px );
+         dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+         compiler_compile_dup( compiler, px );
+     }
+     '=' expression
+     {
+         compiler_compile_sti( compiler, px );
+     }
+     _TO expression ':'
+     {
+         /* Compile loop termination check: */
+         compiler_compile_over( compiler, px );
+         compiler_compile_ldi( compiler, px );
+         compiler_compile_over( compiler, px );
+         if( compiler_test_top_types_are_identical( compiler, px )) {
+             compiler_compile_binop( compiler, ">", px );
+             compiler_push_relative_fixup( compiler, px );
+             compiler_compile_jnz( compiler, 0, px );
+         } else {
+             ssize_t zero = 0;
+             compiler_drop_top_expression( compiler );
+             compiler_drop_top_expression( compiler );
+             compiler_push_relative_fixup( compiler, px );
+             compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+         }
+
+         compiler_push_current_address( compiler, px );
+     }
+     expression ']'
+     {
+         /* Compile array allocation with elements of correct type;
+            swap throcdes since allocation code must be emitted
+            *before* the loop:*/
+         compiler_swap_thrcodes( compiler );
+         /* TO-DO: add emission of allocation code here (S.G.) */
+         //compiler_swap_thrcodes( compiler );
+         
+         /* Store array element:*/
+
+         /* Runtime stack configuration at this point: */
+         /* ..., array, loop_counter_addr, loop_limit, expression_value */
+         compiler_compile_peek( compiler, 4, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value, array */
+         compiler_compile_peek( compiler, 4, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value,
+            array, loop_counter_addr */
+         compiler_compile_ldi( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value,
+            array, loop_counter */
+         compiler_compile_address_of_indexed_element( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value,
+            element_address */
+         compiler_compile_swap( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit,
+            element_address, expression_value */
+         compiler_compile_sti( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit */
+         
+         /* Finish the comprehension 'for' loop: */
+         compiler_fixup_here( compiler );
+         compiler_fixup_op_continue( compiler, px );
+         compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+         compiler_fixup_op_break( compiler, px );
+         compiler_pop_loop( compiler );
+
+         compiler_merge_top_thrcodes( compiler, px );
+     }
+  
   | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
-  | '[' _FOR lvariable _IN expression ':' expression ']'
+  | '[' _FOR for_expression_push_thrcode lvariable _IN expression ':' expression ']'
   | '[' expression ':' _FOR lvariable _IN expression ':' expression ']'
 
-  | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
-  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
-  | '[' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
-  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
+  | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression
+     _TO expression ':' expression ']'
+
+  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration '='
+    expression _TO expression ':' expression ']'
+
+  | '[' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':'
+     expression ']'
+
+  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration _IN
+     expression ':' expression ']'
   ;
 
 struct_expression
