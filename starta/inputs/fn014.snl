@@ -4,6 +4,6 @@
 
 use std;
 
-function square( int x ): float => x * x;
+function cube( int x ) -> (float) => x * x * x;
 
-. square(4);
+. cube(4);
