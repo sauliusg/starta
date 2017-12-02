@@ -3215,6 +3215,23 @@ static void compiler_compile_swap( COMPILER *cc, cexception_t *ex )
     compiler_emit( cc, ex, "\tc\n", SWAP );
 }
 
+static void compiler_compile_rot( COMPILER *cc, cexception_t *ex )
+{
+    ENODE *expr1 = enode_list_pop( &cc->e_stack );
+    ENODE *expr2 = enode_list_pop( &cc->e_stack );
+    ENODE *expr3 = enode_list_pop( &cc->e_stack );
+
+    if( !expr1 || !expr2 || !expr3 ) {
+	yyerrorf( "not enough values on the stack for SWAP" );
+    }
+    
+    enode_list_push( &cc->e_stack, expr1 );
+    enode_list_push( &cc->e_stack, expr3 );
+    enode_list_push( &cc->e_stack, expr2 );
+
+    compiler_emit( cc, ex, "\tc\n", ROT );
+}
+
 static void compiler_compile_peek( COMPILER *cc, ssize_t offset,
                                    cexception_t *ex )
 {
@@ -3611,9 +3628,9 @@ static void compiler_compile_composite_alloc( COMPILER *cc,
 }
 
 static void compiler_compile_array_alloc_operator( COMPILER *cc,
-						char *operator_name,
-						key_value_t *fixup_values,
-						cexception_t *ex )
+                                                   char *operator_name,
+                                                   key_value_t *fixup_values,
+                                                   cexception_t *ex )
 {
     ENODE *volatile top_expr = cc->e_stack;
     TNODE *volatile top_type = top_expr ? enode_type( top_expr ) : NULL;
@@ -11764,21 +11781,13 @@ unpack_expression
   }
   ;
 
-for_expression_push_thrcode
-:
-{
-    compiler_push_thrcode( compiler, px );
-}
-;
-
 array_expression
   : '[' expression_list opt_comma ']'
      {
 	 compiler_compile_array_expression( compiler, $2, px );
      }
   /* Array 'comprehensions' (aka array 'for' epxressions): */
-  /* FIXME: add implementation (S.G.): */
-  | '[' _FOR for_expression_push_thrcode lvariable
+  | '[' _FOR lvariable
      {
          compiler_push_loop( compiler, /* loop_label = */NULL, 2, px );
          dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
@@ -11790,10 +11799,21 @@ array_expression
      }
      _TO expression ':'
      {
-         /* Compile loop termination check: */
-         compiler_compile_over( compiler, px );
+         /* ..., loop_counter_addr, loop_limit */
+         compiler_compile_dup( compiler, px );
+         /* ..., loop_counter_addr, loop_limit, loop_limit */
+         compiler_compile_peek( compiler, 3, px );
          compiler_compile_ldi( compiler, px );
-         compiler_compile_over( compiler, px );
+         /* ..., loop_counter_addr, loop_limit, loop_limit, loop_counter */
+         compiler_compile_binop( compiler, "-", px );
+         compiler_compile_unop( compiler, "++", px );
+         /* ..., loop_counter_addr, loop_limit, array_length */
+         compiler_emit( compiler, px, "\n" );
+         
+         /* Compile loop zero length check: */
+         compiler_compile_peek( compiler, 3, px );
+         compiler_compile_ldi( compiler, px );
+         compiler_compile_peek( compiler, 3, px );
          if( compiler_test_top_types_are_identical( compiler, px )) {
              compiler_compile_binop( compiler, ">", px );
              compiler_push_relative_fixup( compiler, px );
@@ -11805,18 +11825,26 @@ array_expression
              compiler_push_relative_fixup( compiler, px );
              compiler_emit( compiler, px, "\tce\n", JMP, &zero );
          }
+         compiler_emit( compiler, px, "\n" );
 
-         compiler_push_current_address( compiler, px );
+         compiler_push_thrcode( compiler, px );
      }
      expression ']'
      {
-         /* Compile array allocation with elements of correct type;
-            swap throcdes since allocation code must be emitted
-            *before* the loop:*/
+         /* Compile array allocation: */
+         ENODE *element_expr = compiler->e_stack;
+         TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
          compiler_swap_thrcodes( compiler );
-         /* TO-DO: add emission of allocation code here (S.G.) */
-         //compiler_swap_thrcodes( compiler );
-         
+         compiler_compile_array_alloc( compiler, element_type, px );
+         /* ..., loop_counter_addr, loop_limit, array */
+         compiler_compile_rot( compiler, px );
+         compiler_emit( compiler, px, "\n" );
+         /* ..., array, loop_counter_addr, loop_limit */
+         compiler_push_current_address( compiler, px );
+         compiler_merge_top_thrcodes( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit, element_expression */
+         compiler_emit( compiler, px, "\n" );
+
          /* Store array element:*/
 
          /* Runtime stack configuration at this point: */
@@ -11844,12 +11872,10 @@ array_expression
          compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
          compiler_fixup_op_break( compiler, px );
          compiler_pop_loop( compiler );
-
-         compiler_merge_top_thrcodes( compiler, px );
      }
   
   | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
-  | '[' _FOR for_expression_push_thrcode lvariable _IN expression ':' expression ']'
+  | '[' _FOR lvariable _IN expression ':' expression ']'
   | '[' expression ':' _FOR lvariable _IN expression ':' expression ']'
 
   | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression
