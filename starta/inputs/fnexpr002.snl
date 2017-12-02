@@ -22,11 +22,11 @@ f = function (int x) -> (int) { LD %x DUP DUP DUP MUL MUL MUL };
 
 . f(3);
 
-f = function (int x) -> (int) { bytecode {LD %x DUP DUP DUP MUL MUL MUL }};
+f = function (int x) -> (int) { bytecode {LD %x DUP DUP DUP MUL MUL MUL} };
 
 . f(3);
 
-f = function (int x) -> int => bytecode: int {LD %x DUP DUP DUP MUL MUL MUL } ;;
+f = function (int x) -> int => bytecode: int {LD %x DUP DUP DUP MUL MUL MUL} ;;
 
 . f(3);
 
