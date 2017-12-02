@@ -1181,6 +1181,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
     memcpy( ptr, array, copy_size );
 
     ptr[-1].vmt_offset = array[-1].vmt_offset;
+    ptr[-1].flags = array[-1].flags;
 
     if( nref < 0 ) {
         ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;
