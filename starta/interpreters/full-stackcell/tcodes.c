@@ -1012,6 +1012,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
     BC_CHECK_PTR( ptr );
 
     ptr[-1].vmt_offset = array[-1].vmt_offset;
+    ptr[-1].flags = array[-1].flags;
 
     memcpy( ptr, array, size );
 
