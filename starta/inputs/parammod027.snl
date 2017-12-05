@@ -6,8 +6,14 @@
 
 use * from std;
 
-use PT1;
-use PT2;
+var x : float;
+var i : int;
+
+procedure g(): int { return 1 }
+procedure h(): int { return 2 }
+
+use PT1(1,int,x,g);
+use PT2(2,short,i,h);
 
 . PT1::pp( 10 ); // 100 + 30.5 + 10 = 140.5
 . PT2::pp( 10 ); // 100 + 30.5 + 10 = 140.5
