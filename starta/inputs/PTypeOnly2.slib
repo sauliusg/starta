@@ -1,7 +1,7 @@
 // --*- Java -*--
 // An example of a module parametrised with two types.
 
-module PTypeOnly2( type T, type X )
+module PTypeOnly2( type T = float, type X = double )
 
 use * from std;
 

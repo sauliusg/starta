@@ -3,9 +3,8 @@
 // Test array comprehension syntax
 
 use std;
-use APrint(int);
+use APrint;
 
-var i : int;
-var m = [for i = 0 to 10: i*i];
+var m = [2, 4, 8, 16];
 
 . m;
