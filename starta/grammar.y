@@ -930,19 +930,11 @@ static void compiler_close_include_file( COMPILER *c,
 {
     if( c->use_module_name ) {
 	DNODE *module = NULL;
-#if 0
-	module = vartab_lookup( c->compiled_modules, c->use_module_name );
-#else
 	module = vartab_lookup_silently( c->compiled_modules,
                                          c->use_module_name,
                                          /* count = */ NULL,
                                          /* is_imported = */ NULL );
-#endif
 	if( module ) {
-#if 0
-	    printf( ">>> module '%s' is being used\n", 
-                    c->use_module_name );
-#endif
 	    compiler_use_exported_module_names( c, module, ex );
 	} else {
 	    yyerrorf( "no module named '%s'?", c->use_module_name );
@@ -952,17 +944,7 @@ static void compiler_close_include_file( COMPILER *c,
     if( c->requested_module ) {
         cexception_t inner;
         char *synonim;
-#if 0
-        printf( ">>>> checking module synonim for module '%s'...\n",
-                dnode_name( c->requested_module ));
-#endif
         if( (synonim = dnode_synonim( c->requested_module )) != NULL ) {
-#if 0
-            printf( ">>>> inserting synonim '%s' for module '%s' "
-                    "in file '%s'\n", synonim, 
-                    dnode_name( c->requested_module ),
-                    dnode_filename( c->requested_module ));
-#endif
             TYPETAB * typetab = NULL;
             VARTAB * vartab = NULL;
             VARTAB * consttab = NULL;
@@ -977,18 +959,6 @@ static void compiler_close_include_file( COMPILER *c,
                 DNODE *compiled_module =
                     vartab_lookup_module( c->vartab, c->requested_module,
                                           symtab );
-#if 0
-                if( !compiled_module ) {
-                    printf( "!!! could not find module to insert for '%s'\n",
-                            dnode_name( c->requested_module ));
-                } else {
-                    printf( ">>>> found module '%s' to insert under synonim "
-                    "'%s' in file '%s'\n", 
-                    dnode_name( compiled_module ),
-                    synonim, 
-                    dnode_filename( compiled_module ));
-                }
-#endif
                 /* Synonim is inserted as a simple variable, not as a
                    module (i.e. only the name uniqueness is
                    considered, module arguments are not taken into
