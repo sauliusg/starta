@@ -7685,7 +7685,7 @@ module_statement
                                               px );
           }
 
-          compiler_begin_subscope( compiler, px );
+          //compiler_begin_subscope( compiler, px );
 	  compiler_begin_module( compiler, share_dnode(module_dnode), px );
 
           if( compiler->requested_module ) {
@@ -7705,7 +7705,7 @@ module_statement
 	      }
 	  }
 	  compiler_end_module( compiler, px );
-          compiler_end_subscope( compiler, px );
+          //compiler_end_subscope( compiler, px );
       }
   ;
 
