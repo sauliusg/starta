@@ -841,9 +841,6 @@ static void compiler_open_include_file( COMPILER *c, char *filename,
             ( ex, COMPILER_FILE_SEARCH_ERROR,
               "could not find required module, terminating" );
     } else {
-#if 0
-        printf( ">>> filename to open '%s'\n", full_name );
-#endif
         compiler_push_compiler_state( c, ex );
         compiler_save_flex_stream( c, full_name, ex );
     }
