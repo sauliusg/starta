@@ -962,8 +962,8 @@ static void compiler_close_include_file( COMPILER *c,
                 /* Synonim is inserted as a simple variable, not as a
                    module (i.e. only the name uniqueness is
                    considered, module arguments are not taken into
-                   account. This is necessary to ensure unique names
-                   for enamed parametrised modules, as in 'use M(int)
+                   account). This is necessary to ensure unique names
+                   for renamed parametrised modules, as in 'use M(int)
                    as M1; use M(long) as M2' */
                 if( compiled_module ) {
                     vartab_insert( c->vartab, synonim,
