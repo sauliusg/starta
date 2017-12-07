@@ -3,8 +3,11 @@
 // Test array comprehension syntax
 
 use std;
-use APrint;
+use APrint as APint;
+use APrint(long) as APlong;
 
 var m = [2, 4, 8, 16];
 
 . m;
+
+. [2L, 4L, 8L, 16L];
