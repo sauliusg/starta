@@ -1,3 +1,6 @@
+./sl: inputs/Parametrised.slib(2,60): ERROR, missing actual argument for parameter 'inttype' of module 'Parametrised' included from file 'inputs/err-parammod006.snl', line 9
+module Parametrised( type inttype, type floattype = double )
+                                                           ^
 ./sl: inputs/Parametrised.slib(4,16): ERROR, type 'inttype' is not declared in the current scope
 var i : inttype;
                ^
@@ -50,5 +53,5 @@ function divide( floattype x; inttype i ): floattype
 ./sl: inputs/err-parammod006.snl(11,23): ERROR, incompatible types for function 'parallel' argument nr. 1
 . P::parallel( 10, 30 );
                       ^
-./sl: 17 error(s) detected
+./sl: 18 error(s) detected
 
