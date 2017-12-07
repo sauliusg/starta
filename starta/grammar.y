@@ -6922,9 +6922,27 @@ static void compiler_process_module_parameters( COMPILER *cc,
                 vartab_lookup( ctab, argument_name );
             if( !argument_dnode && dnode_name( arg ) == NULL ) {
                 /* The 'arg' dnode represents a constant expression: */
-                dnode_set_name( arg, dnode_name( param ), ex );
-                argument_dnode = arg;
-                vartab_insert_named( ctab, share_dnode( arg ), ex );
+                cexception_t inner;
+                const_value_t volatile const_value = make_zero_const_value();
+
+                const_value_copy( (const_value_t*)&const_value,
+                                  dnode_value( arg ), ex );
+                
+                cexception_guard( inner ) {
+                    const_value_to_string( (const_value_t*)&const_value,
+                                           &inner );
+                    dnode_set_name( arg,
+                                    strdupx( const_value_string
+                                             ( (const_value_t*)&const_value ),
+                                             &inner ),
+                                    &inner );
+                    argument_dnode = arg;
+                    vartab_insert_named( ctab, share_dnode( arg ), &inner );
+                }
+                cexception_finally (
+                    { const_value_free( (const_value_t*)&const_value ); },
+                    { cexception_reraise( inner, ex ); }
+                );
             }
             /* Insert the constant under the module parameter name: */
             if( argument_dnode ) {
