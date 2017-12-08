@@ -11788,10 +11788,6 @@ array_expression
          /* ..., loop_counter_addr, loop_limit */
          compiler_compile_dup( compiler, px );
          /* ..., loop_counter_addr, loop_limit, loop_limit */
-         compiler_compile_peek( compiler, 3, px );
-         compiler_compile_ldi( compiler, px );
-         /* ..., loop_counter_addr, loop_limit, loop_limit, loop_counter */
-         compiler_compile_binop( compiler, "-", px );
          compiler_compile_unop( compiler, "++", px );
          /* ..., loop_counter_addr, loop_limit, array_length */
          compiler_emit( compiler, px, "\n" );
@@ -11895,10 +11891,6 @@ array_expression
         /* ..., loop_counter_addr, loop_limit */
         compiler_compile_dup( compiler, px );
         /* ..., loop_counter_addr, loop_limit, loop_limit */
-        compiler_compile_peek( compiler, 3, px );
-        compiler_compile_ldi( compiler, px );
-        /* ..., loop_counter_addr, loop_limit, loop_limit, loop_counter */
-        compiler_compile_binop( compiler, "-", px );
         compiler_compile_unop( compiler, "++", px );
         /* ..., loop_counter_addr, loop_limit, array_length */
         compiler_emit( compiler, px, "\n" );
