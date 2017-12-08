@@ -11862,7 +11862,9 @@ array_expression
      }
 /*
   | '[' expression ':' labeled_for lvariable '=' expression _TO expression ':' expression ']'
+*/
   | '[' labeled_for lvariable _IN expression ':' expression ']'
+/*
   | '[' expression ':' labeled_for lvariable _IN expression ':' expression ']'
 */
 
@@ -11968,10 +11970,12 @@ array_expression
 /*
   | '[' expression ':' labeled_for variable_declaration_keyword for_variable_declaration '='
     expression _TO expression ':' expression ']'
+*/
 
   | '[' labeled_for variable_declaration_keyword for_variable_declaration _IN expression ':'
      expression ']'
 
+/*
   | '[' expression ':' labeled_for variable_declaration_keyword for_variable_declaration _IN
      expression ':' expression ']'
 */
