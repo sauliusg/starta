@@ -11773,9 +11773,9 @@ array_expression
 	 compiler_compile_array_expression( compiler, $2, px );
      }
   /* Array 'comprehensions' (aka array 'for' epxressions): */
-  | '[' _FOR lvariable
+  | '[' labeled_for lvariable
      {
-         compiler_push_loop( compiler, /* loop_label = */NULL, 2, px );
+         compiler_push_loop( compiler, $2, 2, px );
          dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
          compiler_compile_dup( compiler, px );
      }
@@ -11858,23 +11858,124 @@ array_expression
          compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
          compiler_fixup_op_break( compiler, px );
          compiler_pop_loop( compiler );
+         compiler_end_subscope( compiler, px );
      }
+/*
   
-  | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
-  | '[' _FOR lvariable _IN expression ':' expression ']'
-  | '[' expression ':' _FOR lvariable _IN expression ':' expression ']'
+  | '[' expression ':' labeled_for lvariable '=' expression _TO expression ':' expression ']'
+  | '[' labeled_for lvariable _IN expression ':' expression ']'
+  | '[' expression ':' labeled_for lvariable _IN expression ':' expression ']'
+*/
 
-  | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression
-     _TO expression ':' expression ']'
+  | '[' labeled_for variable_declaration_keyword for_variable_declaration
+    {
+        int readonly = $3;
+	if( readonly ) {
+	    dnode_set_flags( $4, DF_IS_READONLY );
+	}
+	compiler_push_loop( compiler, $2, 2, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+    }
+  '=' expression
+    {
+	DNODE *loop_counter = $4;
 
-  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration '='
+	if( dnode_type( loop_counter ) == NULL ) {
+	    dnode_append_type( loop_counter,
+			       share_tnode( enode_type( compiler->e_stack )));
+	    dnode_assign_offset( loop_counter, &compiler->local_offset );
+	}
+	compiler_vartab_insert_named_vars( compiler, loop_counter, px );
+        compiler_compile_store_variable( compiler, loop_counter, px );
+	compiler_compile_load_variable_address( compiler, loop_counter, px );
+    }
+     _TO expression ':'
+    {
+        /* ..., loop_counter_addr, loop_limit */
+        compiler_compile_dup( compiler, px );
+        /* ..., loop_counter_addr, loop_limit, loop_limit */
+        compiler_compile_peek( compiler, 3, px );
+        compiler_compile_ldi( compiler, px );
+        /* ..., loop_counter_addr, loop_limit, loop_limit, loop_counter */
+        compiler_compile_binop( compiler, "-", px );
+        compiler_compile_unop( compiler, "++", px );
+        /* ..., loop_counter_addr, loop_limit, array_length */
+        compiler_emit( compiler, px, "\n" );
+         
+        /* Compile loop zero length check: */
+        compiler_compile_peek( compiler, 3, px );
+        compiler_compile_ldi( compiler, px );
+        compiler_compile_peek( compiler, 3, px );
+        if( compiler_test_top_types_are_identical( compiler, px )) {
+            compiler_compile_binop( compiler, ">", px );
+            compiler_push_relative_fixup( compiler, px );
+            compiler_compile_jnz( compiler, 0, px );
+        } else {
+            ssize_t zero = 0;
+            compiler_drop_top_expression( compiler );
+            compiler_drop_top_expression( compiler );
+            compiler_push_relative_fixup( compiler, px );
+            compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        }
+        compiler_emit( compiler, px, "\n" );
+
+        compiler_push_thrcode( compiler, px );
+    }
+     expression ']'
+    {
+        /* Compile array allocation: */
+        ENODE *element_expr = compiler->e_stack;
+        TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
+        compiler_swap_thrcodes( compiler );
+        compiler_compile_array_alloc( compiler, element_type, px );
+        /* ..., loop_counter_addr, loop_limit, array */
+        compiler_compile_rot( compiler, px );
+        compiler_emit( compiler, px, "\n" );
+        /* ..., array, loop_counter_addr, loop_limit */
+        compiler_push_current_address( compiler, px );
+        compiler_merge_top_thrcodes( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit, element_expression */
+        compiler_emit( compiler, px, "\n" );
+
+        /* Store array element:*/
+
+        /* Runtime stack configuration at this point: */
+        /* ..., array, loop_counter_addr, loop_limit, expression_value */
+        compiler_compile_peek( compiler, 4, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value, array */
+        compiler_compile_peek( compiler, 4, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value,
+           array, loop_counter_addr */
+        compiler_compile_ldi( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value,
+           array, loop_counter */
+        compiler_compile_address_of_indexed_element( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value,
+           element_address */
+        compiler_compile_swap( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit,
+           element_address, expression_value */
+        compiler_compile_sti( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit */
+         
+        /* Finish the comprehension 'for' loop: */
+        compiler_fixup_here( compiler );
+        compiler_fixup_op_continue( compiler, px );
+        compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+        compiler_fixup_op_break( compiler, px );
+        compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
+    }
+/*
+  | '[' expression ':' labeled_for variable_declaration_keyword for_variable_declaration '='
     expression _TO expression ':' expression ']'
 
-  | '[' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':'
+  | '[' labeled_for variable_declaration_keyword for_variable_declaration _IN expression ':'
      expression ']'
 
-  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration _IN
+  | '[' expression ':' labeled_for variable_declaration_keyword for_variable_declaration _IN
      expression ':' expression ']'
+*/
   ;
 
 struct_expression
