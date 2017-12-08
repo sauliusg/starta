@@ -11861,7 +11861,6 @@ array_expression
          compiler_end_subscope( compiler, px );
      }
 /*
-  
   | '[' expression ':' labeled_for lvariable '=' expression _TO expression ':' expression ']'
   | '[' labeled_for lvariable _IN expression ':' expression ']'
   | '[' expression ':' labeled_for lvariable _IN expression ':' expression ']'
