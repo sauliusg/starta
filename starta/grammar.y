@@ -11859,11 +11859,44 @@ array_expression
 /*
   | '[' expression ':' labeled_for lvariable '=' expression _TO expression ':' expression ']'
 */
-  | '[' labeled_for lvariable _IN expression ':' expression ']'
 /*
   | '[' expression ':' labeled_for lvariable _IN expression ':' expression ']'
 */
+  | '[' labeled_for lvariable
+  {
+        compiler_push_loop( compiler, /* loop_label = */ $2,
+                            /* ncounters = */ 2, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+        /* stack now: ..., lvariable_address */
+  }
+    _IN expression
+  {
+        /* stack now: ..., lvariable_address, array_last_ptr */
+        /* ... */
+      
 
+        compiler_push_thrcode( compiler, px );
+  }
+ ':' expression ']'
+  {
+        /* Compile array allocation: */
+        ENODE *element_expr = compiler->e_stack;
+        TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
+        compiler_swap_thrcodes( compiler );
+        compiler_compile_array_alloc( compiler, element_type, px );
+        /* ..., loop_counter_addr, loop_limit, array */
+
+        /* ... */
+        
+        /* Finish the comprehension 'for' loop: */
+        compiler_fixup_here( compiler );
+        compiler_fixup_op_continue( compiler, px );
+        compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+        compiler_fixup_op_break( compiler, px );
+        compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
+}
+  
   | '[' labeled_for variable_declaration_keyword for_variable_declaration
     {
         int readonly = $3;
