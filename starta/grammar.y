@@ -11791,7 +11791,7 @@ array_expression
          compiler_compile_unop( compiler, "++", px );
          /* ..., loop_counter_addr, loop_limit, array_length */
          compiler_emit( compiler, px, "\n" );
-         
+
          /* Compile loop zero length check: */
          compiler_compile_peek( compiler, 3, px );
          compiler_compile_ldi( compiler, px );
@@ -11822,6 +11822,7 @@ array_expression
          compiler_compile_rot( compiler, px );
          compiler_emit( compiler, px, "\n" );
          /* ..., array, loop_counter_addr, loop_limit */
+         /* Will return here in the next loop iteration: */
          compiler_push_current_address( compiler, px );
          compiler_merge_top_thrcodes( compiler, px );
          /* ..., array, loop_counter_addr, loop_limit, element_expression */
@@ -11871,30 +11872,60 @@ array_expression
   }
     _IN expression
   {
-        /* stack now: ..., lvariable_address, array_last_ptr */
-        /* ... */
-      
-
+        /* stack now: ..., lvariable_address, array_last_ptr == array */
         compiler_push_thrcode( compiler, px );
   }
  ':' expression ']'
   {
         /* Compile array allocation: */
-        ENODE *element_expr = compiler->e_stack;
-        TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
         compiler_swap_thrcodes( compiler );
-        compiler_compile_array_alloc( compiler, element_type, px );
-        /* ..., loop_counter_addr, loop_limit, array */
-
-        /* ... */
+        compiler_compile_dup( compiler, px );
+        compiler_emit( compiler, px, "\tc\n", CLONE );
+        /* ..., lvariable_address, array_last_ptr == array, new_array */
+        compiler_compile_rot( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+        /* Will return here in the next loop iteration: */
+        compiler_push_current_address( compiler, px );
         
+        /* Store the current array element into the loop variable: */
+        compiler_compile_over( compiler, px );
+        compiler_compile_over( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_ldi( compiler, px );
+        compiler_compile_sti( compiler, px );
+        
+        compiler_emit( compiler, px, "\n" );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+
+        compiler_merge_top_thrcodes( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr, expression */
+
+        /* Store array element: */
+        compiler_compile_peek( compiler, 4, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_swap( compiler, px );
+        compiler_compile_sti( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+        /* Advance the target array pointer: */
+        compiler_compile_rot( compiler, px );
+        compiler_compile_rot( compiler, px );
+        /* ..., lvariable_address, array_last_ptr, new_array */
+        compiler_emit( compiler, px, "\tcI\n", OFFSET, 1 );
+
+        compiler_compile_rot( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+
         /* Finish the comprehension 'for' loop: */
-        compiler_fixup_here( compiler );
+        // compiler_fixup_here( compiler );
         compiler_fixup_op_continue( compiler, px );
-        compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
         compiler_fixup_op_break( compiler, px );
         compiler_pop_loop( compiler );
         compiler_end_subscope( compiler, px );
+        //compiler_emit( compiler, px, "\tc\n", ZEROOFFSET );
 }
   
   | '[' labeled_for variable_declaration_keyword for_variable_declaration
