@@ -11925,7 +11925,7 @@ array_expression
         compiler_fixup_op_break( compiler, px );
         compiler_pop_loop( compiler );
         compiler_end_subscope( compiler, px );
-        //compiler_emit( compiler, px, "\tc\n", ZEROOFFSET );
+        compiler_emit( compiler, px, "\tc\n", ZEROOFFSET );
 }
   
   | '[' labeled_for variable_declaration_keyword for_variable_declaration

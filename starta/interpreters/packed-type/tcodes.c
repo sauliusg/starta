@@ -408,6 +408,26 @@ int OFFSET( INSTRUCTION_FN_ARGS )
 }
 
 /*
+ * ZEROOFFSET reset stack-cell offset to zero
+ * 
+ * bytecode:
+ * ZEROOFFSET
+ * 
+ * stack:
+ * ptr -> ptr
+ * 
+ */
+
+int ZEROOFFSET( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    STACKCELL_OFFSET(istate.ep[0]) = 0;
+
+    return 1;
+}
+
+/*
  LD (load variable)
 
  bytcode:
