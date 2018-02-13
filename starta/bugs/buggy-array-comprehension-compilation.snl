@@ -1,0 +1,7 @@
+// --*- C -*--
+
+// Test array comprehension syntax
+
+use std;
+
+var m = [for var i = 4 to 0: i*i];
