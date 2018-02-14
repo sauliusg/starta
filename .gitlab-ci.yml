@@ -24,5 +24,7 @@ build:
 # run tests using the binary built before
 test:
   stage: test
+  before_script: 
+    - apt update && apt -y install make flex bison libperl-dev
   script:
     - make test
