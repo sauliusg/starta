@@ -11917,9 +11917,14 @@ array_expression
         TNODE *element_type =
             array_type ? tnode_element_type( array_type ) : NULL;
         ssize_t element_size =
-            element_type ? tnode_size( element_type ) : 0;
+            element_type ? (tnode_is_reference( element_type ) ?
+                            REF_SIZE : tnode_size( element_type )) : 0;
 
-        compiler_emit( compiler, px, "\tce\n", OFFSET, &element_size );
+        if( implementation_has_attribute( "element_size" )) {
+            compiler_emit( compiler, px, "\tce\n", OFFSET, &element_size );
+        } else {
+            compiler_emit( compiler, px, "\tcI\n", OFFSET, sizeof(stackcell_t) );
+        }
 
         compiler_compile_rot( compiler, px );
         /* ..., new_array, lvariable_address, array_last_ptr */

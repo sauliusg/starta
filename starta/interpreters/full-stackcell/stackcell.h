@@ -73,6 +73,7 @@ typedef struct stackcell {
 #define STACKCELL_MOVE_PTR( s1, s2 )  ((s1).PTR = (s2).PTR, (s1).num.offs = (s2).num.offs)
 #define STACKCELL_OFFSET_PTR( s, o )  ((s).num.offs += (o))
 #define STACKCELL_ZERO_PTR( s )       ((s).PTR = (NULL))
+#define STACKCELL_OFFSET( s )         ((s).num.offs)
 
 #else
 
@@ -83,6 +84,7 @@ typedef struct stackcell {
 #define STACKCELL_MOVE_PTR( s1, s2 )  (s1).PTR = (s2).PTR
 #define STACKCELL_OFFSET_PTR( s, o )  ((s).PTR) += o
 #define STACKCELL_ZERO_PTR( s )
+#define STACKCELL_OFFSET( s )         (0/* ??? */)
 
 #endif
 
