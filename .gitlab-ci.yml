@@ -8,17 +8,18 @@ build:
   stage: build
   # instead of calling g++ directly you can also use some build toolkit like make
   # install the necessary build tools when needed
-  # before_script: 
-  #   - apt update && apt -y install make autoconf 
+  before_script: 
+    - apt update && apt -y install make flex bison
   script: 
     - make
   artifacts:
     paths:
       - starta
   # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
-  # cache:
-  #   paths:
-  #     - "*.o"
+  cache:
+    paths:
+      - "starta/obj/*.o"
+      - "optimised/starta/obj/*.o"
 
 # run tests using the binary built before
 test:
