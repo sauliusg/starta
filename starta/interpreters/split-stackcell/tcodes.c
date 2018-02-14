@@ -339,6 +339,18 @@ int ROT( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+int PEEK( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    istate.ep[0] = istate.ep[abs(offset)];
+
+    return 2;
+}
+
 int COPY( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *ptr0 = STACKCELL_PTR( istate.ep[0] );
@@ -387,6 +399,26 @@ int OFFSET( INSTRUCTION_FN_ARGS )
     STACKCELL_OFFSET_PTR( istate.ep[0], field_offset );
 
     return 2;
+}
+
+/*
+ * ZEROOFFSET reset stack-cell offset to zero
+ * 
+ * bytecode:
+ * ZEROOFFSET
+ * 
+ * stack:
+ * ptr -> ptr
+ * 
+ */
+
+int ZEROOFFSET( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    STACKCELL_OFFSET(istate.ep[0]) = 0;
+
+    return 1;
 }
 
 /*

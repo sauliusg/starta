@@ -11923,7 +11923,11 @@ array_expression
         if( implementation_has_attribute( "element_size" )) {
             compiler_emit( compiler, px, "\tce\n", OFFSET, &element_size );
         } else {
-            compiler_emit( compiler, px, "\tcI\n", OFFSET, sizeof(stackcell_t) );
+            if( tnode_is_reference( element_type )) {
+                compiler_emit( compiler, px, "\tcI\n", OFFSET, REF_SIZE );
+            } else {
+                compiler_emit( compiler, px, "\tcI\n", OFFSET, sizeof(stackunion_t) );
+            }
         }
 
         compiler_compile_rot( compiler, px );
