@@ -11912,7 +11912,14 @@ array_expression
         compiler_compile_rot( compiler, px );
         compiler_compile_rot( compiler, px );
         /* ..., lvariable_address, array_last_ptr, new_array */
-        compiler_emit( compiler, px, "\tcI\n", OFFSET, 1 );
+        ENODE *array_expr = compiler->e_stack;
+        TNODE *array_type = array_expr ? enode_type( array_expr ) : NULL;
+        TNODE *element_type =
+            array_type ? tnode_element_type( array_type ) : NULL;
+        ssize_t element_size =
+            element_type ? tnode_size( element_type ) : 0;
+
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &element_size );
 
         compiler_compile_rot( compiler, px );
         /* ..., new_array, lvariable_address, array_last_ptr */
