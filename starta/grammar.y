@@ -11857,13 +11857,8 @@ array_expression
          compiler_pop_loop( compiler );
          compiler_end_subscope( compiler, px );
      }
-/*
-  | '[' expression ':' labeled_for lvariable '=' expression _TO expression ':' expression ']'
-*/
-/*
-  | '[' expression ':' labeled_for lvariable _IN expression ':' expression ']'
-*/
-  | '[' labeled_for lvariable
+
+| '[' labeled_for lvariable
   {
         compiler_push_loop( compiler, /* loop_label = */ $2,
                             /* ncounters = */ 2, px );
@@ -12023,10 +12018,6 @@ array_expression
         compiler_pop_loop( compiler );
         compiler_end_subscope( compiler, px );
     }
-/*
-  | '[' expression ':' labeled_for variable_declaration_keyword for_variable_declaration '='
-    expression _TO expression ':' expression ']'
-*/
 
   | '[' labeled_for variable_declaration_keyword for_variable_declaration
     {
