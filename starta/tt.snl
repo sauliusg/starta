@@ -30,7 +30,3 @@ operator "." ( int a[] ) { < a }
 var a = [ "mene", "mene", "tekel", "parsin", "foo", "bar" ];
 . a;
 . sort( a, bytecode function( a, b: string ): int { STRGT BEXTEND HEXTEND } );
-
-var b = [ 4, 3, 1, 2, 5 ];
-. b;
-. sort( b, function( a, b: int ): int { return a > b ? 1 : 0 } );
