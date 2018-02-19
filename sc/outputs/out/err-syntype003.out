@@ -1,0 +1,8 @@
+./sl: inputs/err-syntype003.snl(14,6): ERROR, incompatible types for assignment to variable 'p'
+p = f; // ERROR, new type is incompatible with its base type
+     ^
+./sl: inputs/err-syntype003.snl(18,12): ERROR, incompatible types for assignment to variable 'p'
+p = v1 + v2; // ERROR, incompatible types for assignment
+           ^
+./sl: 2 error(s) detected
+

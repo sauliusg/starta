@@ -1,0 +1,43 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use * from std;
+
+type P = null class {
+     int x;
+     int i;
+
+     method g() : int;
+}
+
+null class S : P {
+    int i;
+    string name;
+    g : function (int i) -> (int);
+    function (int i) -> (int) ff;
+
+    inline bytecode operator "+"(S a, b) : S { };
+    inline bytecode operator "-"(S a, b) : S { }
+
+    method h() : int; 
+    method h(int x) : int { return self.i*self.i + x } // ERROR: prototype 
+                                                       // does not match ...
+    method f(int x) : int { return self.i * x }
+
+    inline bytecode operator "*"(S a, b) : S { return null };
+
+};
+
+var s = new S;
+
+. const(S.f.offset);
+. const(S.h.offset);
+
+s.i = 12;
+. s.i;
+ 
+## . s->f(5)

@@ -1,0 +1,19 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+int @PREFIX@LDCS( INSTRUCTION_FN_ARGS );
+
+int @PREFIX1@FILESCAN( INSTRUCTION_FN_ARGS );
+int @PREFIX1@FILEPRINT( INSTRUCTION_FN_ARGS );
+
+int @PREFIX1@PACK( INSTRUCTION_FN_ARGS );
+int @PREFIX1@PACKARRAY( INSTRUCTION_FN_ARGS );
+int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS );
+int @PREFIX1@UNPACK( INSTRUCTION_FN_ARGS );
+int @PREFIX1@UNPACKARRAY( INSTRUCTION_FN_ARGS );
+int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS );
+int STRTO@PREFIX@( INSTRUCTION_FN_ARGS );

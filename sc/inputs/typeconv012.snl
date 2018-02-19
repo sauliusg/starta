@@ -1,0 +1,39 @@
+// --*- C -*--
+
+pragma prepend "$D/typeconv012-lib";
+
+use * from std;
+
+use * from MatAlg( ldouble );
+use LDMatInvGJ;
+use inverted from LDMatInvGJ;
+use Math;
+
+var m = matrix( 9 );
+
+// Create a Hilbert matrix (https://en.wikipedia.org/wiki/Hilbert_matrix):
+for( var i = 0; i < length(m); i ++ ) {
+    for( var j = 0; j < length(m[i]); j ++ ) {
+        pragma LDMatInvGJ::melement;
+        m[i][j] = 1/(i@LDMatInvGJ::melement+j@LDMatInvGJ::melement+1)
+    }
+}
+
+. m;
+
+. inverted(m);
+
+operator "." (m : ldouble[][])
+{
+    . "[";
+    for (var row in m) {
+        < " [";
+        for (var e in row) {
+            < "%9.6Lf" %% ldabs(e);
+        }
+        . " ]";
+    }
+    . "]"
+}
+
+. m * inverted(m);

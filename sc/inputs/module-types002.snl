@@ -1,0 +1,8 @@
+
+use * from std;
+
+use * from Y1;
+use * from Y2;
+
+var a : T;
+. a;

@@ -1,0 +1,32 @@
+# Compiler tests.
+#
+# Test 'foreach var X in ARRAY' loops.
+#
+
+use * from std;
+
+var a = [ 11, 3, 12, 74 ];
+var i = 0;
+
+foreach var m in a do
+    . i, m;
+    m ++;
+    . i, m;
+    i ++;
+enddo
+
+. "=======================";
+i = 0;
+foreach var m in a do
+    . i, m;
+    m ++;
+    . i, m;
+    i ++;
+enddo
+
+. "=======================";
+i = 0;
+foreach var m in [ 1.1, 2.3, 4.8, 5 float ] do
+    . i, m;
+    i ++;
+enddo

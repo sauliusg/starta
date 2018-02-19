@@ -1,0 +1,5 @@
+./sl: inputs/err-interfaces020.snl(28,1): ERROR, class 'A' does not implement method 'mn' from interface 'I1'
+}
+^
+./sl: 1 error(s) detected
+

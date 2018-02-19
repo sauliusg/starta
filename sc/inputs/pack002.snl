@@ -1,0 +1,21 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var b = new blob(100);
+
+pack b,  0, "i4", [123, 45, 6, 7];
+pack b, 24, "i1x2", [10, 1];
+
+var m = unpack (array of int)( b, 0, "i4x8" );
+
+. length( m );
+
+for var int i = 0 to last( m ) {
+    . m[i];
+}

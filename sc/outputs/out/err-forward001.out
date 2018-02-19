@@ -1,0 +1,5 @@
+./sl: inputs/err-forward001.snl(28,1): ERROR, function g() declared forward but never defined
+*)
+^
+./sl: 1 error(s) detected
+

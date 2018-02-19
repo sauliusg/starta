@@ -1,0 +1,18 @@
+// --*- C -*--
+// Check module (package) implementation.
+//
+
+// Check whether specific names can be imported from selected
+// packages:
+
+import P1; import P2;
+
+use * from P1;
+use * from P2;
+
+var x : funny = new funny;
+
+fg();
+P1::ff();
+gg();
+P2::ff();

@@ -1,0 +1,59 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+var i : int;
+var s : string;
+
+. "==================================================";
+. const(i.size);
+. const(i.nref);
+. const(i.offset);
+. const(i.kind);
+. const(i.isref);
+
+. "";
+. "==================================================";
+. const(s.size);
+. const(s.nref);
+. const(s.offset);
+. const(s.kind);
+. const(s.isref);
+
+type S = struct {
+    int i, j, k;
+    float x, y, z;
+    string name;
+};
+
+. "";
+. "==================================================";
+. const(S.size);
+. const(S.nref);
+. const(S.kind);
+. const(S.isref);
+
+type R = struct {
+    int i, j, k;
+    float x, y, z;
+};
+
+. "";
+. "==================================================";
+. const(R.size);
+. const(R.nref);
+. const(R.kind);
+. const(R.isref);
+
+var m = [ "one", "two", "three" ];
+
+."";
+. "==================================================";
+. const(m.size);
+. const(m.nref);
+. const(m.offset);
+. const(m.kind);
+. const(m.isref);
+

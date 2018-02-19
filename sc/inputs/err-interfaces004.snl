@@ -1,0 +1,48 @@
+
+use * from std;
+
+interface If {
+    method f( x : int ): int;
+    method s() : string;
+}
+
+. "If.f.offset =", const(If.f.offset);
+. "If.s.offset =", const(If.s.offset);
+
+. "there";
+
+interface Ig {
+    method g( x, y, z : int ): int;
+    method s() : string;
+}
+
+class S implements If, Ig {
+    int i;
+    float k;
+
+    method g @ Ig( x, y :  int ) : int
+    {
+        return x + 2
+    }
+    method f @ If( x : int )
+    {
+        return;
+    }
+    method s @ If() -> (int)
+    {
+        return 42
+    }
+    method sg @ Module::Ig( char x ) -> (string)
+    {
+        return "This is S implementtion of Ig.s()"
+    }
+}
+
+. "S.size = ", const(S.size);
+
+var s = new S;
+
+## s->a(20);
+
+. "here";
+

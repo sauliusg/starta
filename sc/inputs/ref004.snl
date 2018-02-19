@@ -1,0 +1,47 @@
+
+use * from std;
+
+null class C {
+    var i : int;
+    var next : C;
+
+    // constructor ( int x );
+
+    constructor( int x )
+    {
+        if x > 0 then
+           self.next = new C( x - 1 );
+        endif;
+        self.i = x;
+    }
+
+    method list()
+    {
+        < self.i, "";
+        if !self.next then
+            . ""
+        else
+            self.next->list()
+        endif
+    }
+}
+
+class D : C {
+    var j : int;
+
+    constructor ( int x )
+        super( x + 3 );
+    {
+        self.j = x;
+    }
+}
+
+
+var c = new C( 5 );
+var d = new D( 5 );
+
+. c.i;
+c->list();
+
+. d.i;
+d->list();

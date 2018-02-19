@@ -1,0 +1,23 @@
+// --*- C -*--
+
+// Test number check functions:
+
+use std;
+
+type myint = like int {
+    inline bytecode operator "+" ( myint a; myint b ): myint
+    { SLDC "myint!!!\n" SPRINT ADD }
+};
+
+var myint a, b;
+
+a = 1;
+b = 2;
+
+//var c = a + b;
+
+//. c;
+
+use T(myint);
+
+. f( 2, 3 );

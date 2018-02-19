@@ -1,0 +1,56 @@
+
+// use * from std;
+
+module N
+
+    type myint = {
+        kind = integer;
+        suffix = "I";
+        size = sizeof native "int";
+
+        inline bytecode operator "ldc" () : myint
+        { LDCS }
+    };
+
+    inline bytecode operator "+" ( a, b : myint ): myint
+    { ADD }
+
+    inline bytecode operator "." ( i : myint )
+    { IPRINT }
+
+end module N;
+
+use * from N;
+
+var i = 12 I;
+
+. i;
+
+module M
+
+    use * from N;
+
+    inline bytecode operator "*"  ( a, b : myint ): myint
+    { SLDC "This is the module M definition of \"*\": " SPRINT MUL }
+
+end module M;
+
+module P
+
+    use * from N;
+
+    inline bytecode operator "*"  ( a, b : myint ): myint
+    { SLDC "This is an alternartive, module P definition of \"*\": " SPRINT MUL }
+
+end module P;
+
+use * from M;
+
+. i * i;
+
+{
+    use * from P;
+    . i * i;
+}
+
+. i * i;

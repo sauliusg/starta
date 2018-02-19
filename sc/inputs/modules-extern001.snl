@@ -1,0 +1,32 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+use M;
+
+include "stdtypes.slib"
+include "stdio.slib"
+
+const C = 100;
+
+. M::i;
+
+var int j;
+
+j = const(M::D);
+. j;
+
+j = const M::D;
+. j;
+
+. const(C * M::C);
+
+. const C * const M::C;
+
+const X = M::C + M::D;
+
+. const X;
+. const(X);

@@ -1,0 +1,35 @@
+#
+# Snail compiler tests
+#
+
+type int = {
+    size = 4; kind = integer;
+    inline bytecode operator "+" ( i : int; j : int )
+        { ADD };
+    inline bytecode operator "." ( i : int )
+        { IPRINT NEWLINE };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_nref };
+};
+
+var i : int;
+var n : array of array of int;
+
+n = new (array of int)[10];
+n[2] = new int[10];
+
+n[2][3] = 700;
+
+. n[2][3];
+
+//i += 2;
+
+. i;
+
+n[2][3] += 3;
+
+. n[2][3];

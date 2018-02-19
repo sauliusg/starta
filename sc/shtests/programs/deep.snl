@@ -1,0 +1,11 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+use P1;
+use Deep;
+use Mano in "packages.slib";
+
+Deep::hi();
+. Mano::greeting( "Dolphin" );

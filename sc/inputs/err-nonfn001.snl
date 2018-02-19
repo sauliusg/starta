@@ -1,0 +1,12 @@
+#
+# Snail compiler tests
+#
+#
+# Test diagnostics of non-function calls.
+#
+
+use * from std;
+
+var x : ref;
+
+x();

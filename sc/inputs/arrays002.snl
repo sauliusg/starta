@@ -1,0 +1,129 @@
+
+// include "stdtypes.slib"
+
+type char = {
+    size = 1;
+}
+
+type int = {
+    size = 4; kind = integer;
+
+    inline bytecode operator "+" ( i : int; j : int ) : int
+        { ADD };
+    inline bytecode operator "-" ( i : int; j : int ) : int
+        { SUB };
+    inline bytecode operator "*" ( i : int; j : int ) : int
+        { MUL };
+    inline bytecode operator "/" ( i : int; j : int ) : int
+        { DIV };
+    inline bytecode operator "%" ( i : int; j : int ) : int
+        { MOD };
+
+    bytecode inline operator "<" ( x, y : int ) : int
+        { LT };
+    bytecode inline operator ">" ( x, y : int ) : int
+        { GT };
+    bytecode inline operator "<=" ( x, y : int ) : int
+        { LE };
+    bytecode inline operator ">=" ( x, y : int ) : int
+        { GE };
+    bytecode inline operator "==" ( x, y : int ) : int
+        { EQ };
+    bytecode inline operator "!=" ( x, y : int ) : int
+        { NE };
+
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+    inline bytecode operator "--" ( i : int ) : int
+        { DEC };
+    inline bytecode operator "incvar" ()
+        { INCVAR };
+    inline bytecode operator "decvar" ()
+        { DECVAR };
+    inline bytecode operator "." ( i : int )
+        { IPRINT };
+
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_size %%element_nref };
+
+    inline bytecode operator "new[][]" ( i : int ) : array
+        { MDALLOCC %%element_size %%element_nref %%level };
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+
+    inline bytecode operator "loop" ( counter : addressof; range : int )
+        { LOOP };
+}
+
+type string = null {
+    size = 4;
+    kind = string;
+    reference;
+    suffix = "";
+
+    inline bytecode operator "." ( s : string )
+        { SPRINT };
+
+}
+
+inline bytecode function length( a : array ) : int
+{
+    LENGTH
+}
+
+inline bytecode function last( a : array ) : int
+{
+    LENGTH LDC 1 SUB
+}
+
+type R = null struct {
+    i : int;
+    n : string;
+    m : array [][] of int;
+};
+
+var p, q : R;
+
+p = new R;
+q = new R;
+
+p.m = new int[10][5];
+q.m = new int[20][6];
+
+. length( p.m );
+. length( p.m[0] );
+
+. last( q.m );
+. last( q.m[0] );
+
+var i, j : int;
+
+for i = 0 to last( p.m ) do
+    for j = 0 to last( p.m[i] ) do
+        p.m[i][j] = i * j;
+    enddo;
+enddo;
+
+for i = 0 to last( q.m ) do
+    for j = 0 to last( q.m[i] ) do
+	if i < length( p.m ) && j < length( p.m[i] ) then
+            q.m[i][j] = p.m[i][j] * 2;
+        endif
+    enddo;
+enddo;
+
+for i = 0 to last( q.m ) do
+    for j = 0 to last( q.m[i] ) do
+	. q.m[i][j];
+    enddo;
+    bytecode { NEWLINE };
+enddo;

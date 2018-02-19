@@ -1,0 +1,886 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+#include <bytecode_file.h>
+
+#ifdef I
+#undef I
+#endif
+
+#ifdef CVAL
+#undef CVAL
+#endif
+
+#define I    num.@field@
+#define CVAL @codeval@
+
+int @PREFIX1@ADD2( INSTRUCTION_FN_ARGS )
+{
+    ssize_t o1 = istate.code[istate.ip+1].ssizeval;
+    ssize_t o2 = istate.code[istate.ip+2].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.fp[o1].I += istate.fp[o2].I;
+
+    return 3;
+}
+
+int @PREFIX1@ADD( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I += istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@SUB( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I -= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@MUL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I *= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@DIV( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I /= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@NEG( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].I = -istate.ep[0].I;
+
+    return 1;
+}
+
+int @PREFIX1@LT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I < istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LE( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I <= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I > istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GE( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I >= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@EQ( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I == istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@NE( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = istate.ep[1].I != istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LTBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I < istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@LEBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I <= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GTBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I > istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@GEBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I >= istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@EQBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I == istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@NEBOOL( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].num.b = istate.ep[1].I != istate.ep[0].I;
+    istate.ep ++;
+
+    return 1;
+}
+
+int @PREFIX1@INC( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].I ++;
+    return 1;
+}
+
+int @PREFIX1@DEC( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].I --;
+    return 1;
+}
+
+int @PREFIX1@INCVAR( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.fp[offset].I ++;
+
+    return 2;
+}
+
+int @PREFIX1@DECVAR( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.fp[offset].I --;
+
+    return 2;
+}
+
+/*
+ LDC (load constant)
+
+ bytcode:
+ LDC int_value
+
+ stack:
+ --> int_value
+
+ 'int_value', an integer constant, is taken from the bytecode and loaded
+ onto the stack.
+
+ */
+
+int @PREFIX1@LDC( INSTRUCTION_FN_ARGS )
+{
+    @type@ value = @cval_star@istate.code[istate.ip+1].CVAL;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    istate.ep[0].I = value;
+
+    return 2;
+}
+
+/*
+ ALDCS (load array from a constant)
+
+ bytcode:
+ ALDCS requested_array_length address_of_a_value_in_string_representation
+
+ stack:
+ --> number_array
+
+ A requested array length, and a string representation of a constant
+ is taken from the static data area at the offset given immediately
+ after the opcode. The number is converted into number representation
+ of the machine, an array is allocated and the allocated array is
+ populated with the number value.
+
+*/
+
+int @PREFIX1@ALDCS( INSTRUCTION_FN_ARGS )
+{
+    ssize_t array_length = istate.code[istate.ip+1].ssizeval;
+    ssize_t string_offset = istate.code[istate.ip+2].ssizeval;
+    @type@ value;
+    int i;
+
+    stackcell_t *ptr;
+    ptr = bcalloc_array( sizeof(stackcell_t), array_length, /* nref = */0, EXCEPTION );
+
+    BC_CHECK_PTR( ptr );
+
+    sscanf( istate.static_data + string_offset, "%@format@", &value );
+
+    for( i = 0; i < array_length; i ++ ) {
+        ptr[i].I = value;
+    }
+
+    istate.ep --;
+    STACKCELL_SET_ADDR( istate.ep[0], ptr );
+
+    return 3;
+}
+
+/*
+ LD (load variable)
+
+ bytcode:
+ LD offset
+
+ stack:
+ --> value
+
+ 'offset' identifies local variable relative to 'istate.fp', and the value
+ of this variable is loaded onto the stack
+
+ */
+
+int @PREFIX@LD( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    istate.ep[0].I = istate.fp[offset].I;
+
+    return 2;
+}
+
+/*
+ LDA (load variable address)
+
+ bytcode:
+ LDA offset
+
+ stack:
+ --> value
+
+ 'offset' identifies local variable relative to 'istate.fp', and the ADDRESS
+ of this variable is loaded onto the stack
+
+ */
+
+int @PREFIX@LDA( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    STACKCELL_SET_ADDR( istate.ep[0], &istate.fp[offset].I );
+
+    return 2;
+}
+
+/*
+ ST (store variable)
+
+ bytcode:
+ ST offset
+
+ stack:
+ value --> 
+
+ 'offset' identifies local variable relative to 'istate.fp', and the value from
+ stack is stored to this offset.
+
+ */
+
+int @PREFIX@ST( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.fp[offset].I = istate.ep[0].I;
+    istate.ep ++;
+
+    return 2;
+}
+
+/*
+ LDG (load global variable)
+
+ bytcode:
+ LDG offset
+
+ stack:
+ --> value
+
+ 'offset' identifies a global variable relative to the 'istate.gp'
+ pointer, and the value of this variable is loaded onto the evaluation
+ stack.
+
+*/
+
+int @PREFIX@LDG( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    istate.ep[0].I = istate.gp[offset].I;
+
+    return 2;
+}
+
+/*
+ LDGA (load global variable address)
+
+ bytcode:
+ LDGA offset
+
+ stack:
+ --> address
+
+ 'offset' identifies a global variable relative to 'istate.gp', and
+ the ADDRESS of this variable is loaded onto the evaluation stack.
+
+*/
+
+int @PREFIX@LDGA( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    STACKCELL_SET_ADDR( istate.ep[0], &istate.gp[offset].I );
+
+    return 2;
+}
+
+/*
+ STG (store global variable)
+
+ bytcode:
+ STG offset
+
+ stack:
+ value --> 
+
+ 'offset' identifies local variable relative to 'istate.fp', and the value from
+ stack is stored to this offset.
+
+*/
+
+int @PREFIX@STG( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.gp[offset].I = istate.ep[0].I;
+    istate.ep ++;
+
+    return 2;
+}
+
+/*
+ STI (store indirect)
+ 
+ ..., address, value --> 
+ 
+*/
+
+int @PREFIX@STI( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    *((@type@*)STACKCELL_PTR(istate.ep[1])) = istate.ep[0].I;
+    STACKCELL_ZERO_PTR( istate.ep[1] );
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
+ LDI (load indirect)
+ 
+ address --> value
+ 
+ */
+
+int @PREFIX@LDI( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[0].I = *((@type@*)STACKCELL_PTR(istate.ep[0]));
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    return 1;
+}
+
+/*
+ * PRINT (print integer value from the top of stack)
+ * 
+ * bytecode:
+ * PRINT
+ * 
+ * stack:
+ * value -->
+ * 
+ * Print an integer value from the top of stack and remove it.
+ */
+
+int @PREFIX@PRINT( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    printf( "%@printformat@", istate.ep[0].I );
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * SPRINTF (String Print Formatted)
+ * 
+ * bytecode:
+ * SPRINTF
+ * 
+ * stack:
+ * value --> string
+ * 
+ * Print a value from the top of stack into a string, and * leave that
+ * string on the top of the stack
+ */
+
+int @PREFIX@SPRINTF( INSTRUCTION_FN_ARGS )
+{
+    void *ptr;
+    char *format;
+    char buffer[100]; /* should be large enough for any reasonable
+			 numeric value */
+
+    TRACE_FUNCTION();
+
+    format = STACKCELL_PTR(istate.ep[1]);
+
+    snprintf( buffer, sizeof(buffer), format, istate.ep[0].I );
+
+    ptr = bcalloc_blob( strlen(buffer)+1, EXCEPTION );
+
+    BC_CHECK_PTR( ptr );
+    STACKCELL_SET_ADDR( istate.ep[1], ptr );
+
+    strcpy( STACKCELL_PTR(istate.ep[1]), buffer );
+
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * PACK (pack a value into a blob (an unstructured array of bytes))
+ * 
+ * bytecode:
+ * PACK
+ * 
+ * stack:
+ * ..., blob, offset, description, value --> ...
+ * 
+ */
+
+int @PREFIX1@PACK( INSTRUCTION_FN_ARGS )
+{
+    char *description = STACKCELL_PTR( istate.ep[1] );
+    ssize_t offset = istate.ep[2].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[3] );
+    alloccell_t *blob_header;
+    char typechar;
+    ssize_t size;
+
+    TRACE_FUNCTION();
+
+    if( blob == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "attempting to pack a NULL blob",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    blob_header = ((alloccell_t*)blob) - 1;
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "pack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    typechar = description[0];
+
+    if( description[0] != '\0' ) {
+        size = atol( description + 1 );
+    } else {
+        size = 0;
+    }
+
+    if( pack_value( &istate.ep[0], typechar, size, &offset, 
+                    blob, pack_@field@, EXCEPTION ) == 0 ) {
+	return 0;
+    }
+
+    istate.ep += 4;
+    return 1;
+}
+
+/*
+ * PACKARRAY (pack an array into a blob (an unstructured array of bytes))
+ * 
+ * bytecode:
+ * PACKARRAY
+ * 
+ * stack:
+ * ..., blob, offset, description, value --> ...
+ * 
+ */
+
+int @PREFIX1@PACKARRAY( INSTRUCTION_FN_ARGS )
+{
+    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    char *description = STACKCELL_PTR( istate.ep[1] );
+    ssize_t offset = istate.ep[2].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[3] );
+    alloccell_t *blob_header;
+
+    TRACE_FUNCTION();
+
+    if( blob == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "attempting to pack an array into a NULL blob",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    blob_header = ((alloccell_t*)blob) - 1;
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "pack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    if( !pack_array_values( blob, array, description,
+                            &offset, pack_@field@, EXCEPTION )) {
+	return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
+    STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero description string reference */
+    STACKCELL_ZERO_PTR( istate.ep[3] ); /* zero blob reference */
+    istate.ep += 4;
+    return 1;
+}
+
+/*
+ * PACKMDARRAY (pack a multidimentional array into a blob)
+ * 
+ * bytecode:
+ * PACKMDARRAY level
+ * 
+ * stack:
+ * ..., blob, offset, description, md_array_value --> ...
+ * 
+ */
+
+int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS )
+{
+    int level = istate.code[istate.ip+1].ssizeval - 1;
+
+    stackcell_t *array = STACKCELL_PTR( istate.ep[0] );
+    char *description = STACKCELL_PTR( istate.ep[1] );
+    ssize_t offset = istate.ep[2].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[3] );
+    alloccell_t *blob_header;
+
+    TRACE_FUNCTION();
+
+#if 0
+    if( !blob ) {
+	STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
+	STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero descrition string ref. */
+	STACKCELL_ZERO_PTR( istate.ep[3] ); /* zero blob reference */
+	istate.ep += 4;
+	return 2;
+    }
+#else
+    if( blob == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "attempting to pack a multidimensional array "
+                              "into a NULL blob",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );        
+	return 0;
+    }
+#endif
+    blob_header = ((alloccell_t*)blob) - 1;
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "pack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    if( !pack_array_layer( blob, array, description, &offset,
+                           level, pack_@field@, EXCEPTION )) {
+	return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] ); /* zero array reference */
+    STACKCELL_ZERO_PTR( istate.ep[1] ); /* zero description string reference */
+    STACKCELL_ZERO_PTR( istate.ep[3] ); /* zero blob reference */
+    istate.ep += 4;
+    return 2;
+}
+
+/*
+ * UNPACK (unpack a value from a blob )
+ * 
+ * bytecode:
+ * UNPACK
+ * 
+ * stack:
+ * blob, offset, description --> value
+ * 
+ */
+
+int @PREFIX1@UNPACK( INSTRUCTION_FN_ARGS )
+{
+    char *description = STACKCELL_PTR( istate.ep[0] );
+    ssize_t size;
+    char typechar;
+    ssize_t offset = istate.ep[1].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[2] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    TRACE_FUNCTION();
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ "unpack description not specified",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+    }
+
+    typechar = description[0];
+
+    if( description[0] != '\0' ) {
+        size = atol( description + 1 );
+    } else {
+        size = 0;
+    }
+
+    if( unpack_value( &istate.ep[2], typechar, size, &offset, blob,
+                      unpack_@field@, EXCEPTION ) == 0 ) {
+	return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
+ * UNPACKARRAY (unpack an array of values from a blob )
+ * 
+ * bytecode:
+ * UNPACKARRAY
+ * 
+ * stack:
+ * blob, offset, description --> array_value
+ * 
+ */
+
+int @PREFIX1@UNPACKARRAY( INSTRUCTION_FN_ARGS )
+{
+    char *description = STACKCELL_PTR( istate.ep[0] );
+    ssize_t offset = istate.ep[1].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[2] );
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+
+    TRACE_FUNCTION();
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */ "unpack description not specified",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+	      EXCEPTION );
+        return 0;
+    }
+
+    if( !unpack_array_values( blob, &istate.ep[2], description,
+                              &offset, unpack_@field@,
+                              EXCEPTION )) {
+        return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 2;
+
+    return 1;
+}
+
+/*
+ * UNPACKMDARRAY (unpack an array of values from a blob )
+ * 
+ * bytecode:
+ * UNPACKMDARRAY level
+ * 
+ * stack:
+ * dstptr, blob, offset, description --> dstptr
+ * 
+ */
+
+int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS )
+{
+    int level = istate.code[istate.ip+1].ssizeval;
+
+    char *description = STACKCELL_PTR( istate.ep[0] );
+    ssize_t offset = istate.ep[1].num.ssize;
+    byte *blob = STACKCELL_PTR( istate.ep[2] );
+    stackcell_t *array = &istate.ep[3];
+
+    TRACE_FUNCTION();
+
+    if( !description ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */ "unpack description not specified",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+	      EXCEPTION );        
+    }
+
+    if( !unpack_array_layer( blob, array, description,
+                             &offset, level,
+                             unpack_@field@, EXCEPTION )) {
+        return 0;
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep += 3;
+
+    return 2;
+}

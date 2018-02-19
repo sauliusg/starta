@@ -1,0 +1,8 @@
+./sl: inputs/err-st001.snl(33,7): ERROR, incompatible type of an argument for operator 'st'
+a = 11;
+      ^
+./sl: inputs/err-st001.snl(35,6): ERROR, incompatible type of an argument for operator 'st'
+b = a;
+     ^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,33 @@
+# --*- Makefile -*--
+
+PACKAGE = starta
+
+INSTALL_DIR ?= ${HOME}/install/${PACKAGE}
+PREFIX ?= ${INSTALL_DIR}/${PACKAGE}-r${SVN_VERSION}
+
+BINDIR = ${PREFIX}/bin
+LIBDIR = ${PREFIX}/lib/${PACKAGE}
+RC_DIR = ${PREFIX}/rc
+RC_FILE = ${RC_DIR}/${PACKAGE}.rc
+
+.PHONY: install
+
+install: ${TARGET}
+	mkdir -p ${BINDIR} ${LIBDIR} ${RC_DIR}
+	cp -av ${TARGET} ${BINDIR}
+	cp -av starta ${BINDIR}
+	strip ${BINDIR}/$(notdir ${TARGET})
+	cp -av modules/*.slib ${LIBDIR}
+	rsync -avL libraries ${LIBDIR} \
+		--exclude '*.[cho]*' \
+		--exclude '*Make*' \
+		--exclude '.*' \
+		--exclude '*.sed' \
+		--exclude 'locally-generated' \
+		--exclude 'ifunctions'
+	cp -av *.so* ${LIBDIR}/libraries/
+	find ${LIBDIR} -name '*.so*' | xargs -n1 -t strip
+	echo SL_INCLUDE_PATHS=${LIBDIR} > ${RC_FILE}
+	echo export SL_INCLUDE_PATHS >> ${RC_FILE}
+	echo 'LD_LIBRARY_PATH=${LIBDIR}/libraries$${LD_LIBRARY_PATH+:$${LD_LIBRARY_PATH}}' >> ${RC_FILE}
+	echo export LD_LIBRARY_PATH >> ${RC_FILE}

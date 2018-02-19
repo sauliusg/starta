@@ -1,0 +1,5 @@
+./sl: inputs/err-strings001.snl(21,10): ERROR, type 'string' has no conversion from the given type
+print( m );
+         ^
+./sl: 1 error(s) detected
+

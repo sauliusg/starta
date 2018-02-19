@@ -1,0 +1,5 @@
+./sl: inputs/pragma002.snl(8,20): ERROR, unknown pragma 'bad_bad_bad' with integer value
+pragma bad_bad_bad 20
+                   ^
+./sl: 1 error(s) detected
+

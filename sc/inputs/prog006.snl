@@ -1,0 +1,25 @@
+
+use * from std;
+
+program mano( string argv[]; file stdio[]; string env[] ): int
+begin
+    if length(argv) > 1 then
+        . argv[0] _ ":", "Hello,", argv[1]
+    else
+        . argv[0] _ ":", "Hello Kitty!"
+    endif
+
+    return 0;
+end;
+
+program kita(): int
+begin
+    . "antra";
+    return 1;
+end;
+
+program trecia( string argv[]; file stdio[]; string env[] ): int
+begin
+    . "trecia";
+    return 0;
+end;

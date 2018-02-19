@@ -1,0 +1,29 @@
+./sl: inputs/err-interfaces017a.snl(24,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(27,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(27,25): ERROR, function 'mm@I2' is already declared in this scope
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(31,5): ERROR, interface 'I2' does not implement method 'mn'
+    {
+    ^
+./sl: inputs/err-interfaces017a.snl(36,1): ERROR, class 'A' does not implement method 'mm' from interface 'I1'
+}
+^
+./sl: inputs/err-interfaces017a.snl(36,1): ERROR, class 'A' does not implement method 'mn' from interface 'I1'
+}
+^
+./sl: inputs/err-interfaces017a.snl(43,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-interfaces017a.snl(50,5): ERROR, interface 'I2' does not implement method 'mn'
+    {
+    ^
+./sl: inputs/err-interfaces017a.snl(55,1): ERROR, class 'A2' does not implement method 'mn' from interface 'I1'
+}
+^
+./sl: 9 error(s) detected
+

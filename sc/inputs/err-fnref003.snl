@@ -1,0 +1,19 @@
+#
+# Snail compiler tests
+#
+#
+# Test function and procedure references
+#
+
+use * from std;
+
+struct S {
+    int i;
+    string name;
+    g : function (int i) -> (int);
+};
+
+var s = new S;
+
+s.i();
+s.name();

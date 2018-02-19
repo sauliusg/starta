@@ -1,0 +1,24 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+type S = struct { name : string; an: int; aw: float };
+
+var m = [
+         struct S{ name:"H",  an:1, aw:1}, struct S{ name: "He", an:2, aw:4},
+         struct S{ name:"Li", an:3},       struct S{ name: "Be", an:4},
+         struct S{ name:"B",  an => 5},    struct S{ name: "C",  an => 6, aw:12},
+        ];
+
+for ( var e in m ) {
+    . e.name, "\t", e.an, "\t", (e.aw > 0.0 ? ("%3.1f" %% e.aw) : "?")
+}
+
+var n = [ 1, 1, 2, 3, 5, 8, 13, 21 ];
+var i : int;
+
+for( i => n ) {
+    .i;
+}

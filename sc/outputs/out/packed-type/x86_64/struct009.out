@@ -1,0 +1,6 @@
+C.ii.offset = 0
+C.xx.offset = 1
+C.a.offset  = 2
+C.b.offset  = 3
+C.nn.offset = -20
+C.nm.offset = -22

@@ -1,0 +1,25 @@
+
+use * from std;
+
+type S = struct {
+     string a;
+     int b;
+     float c;
+}
+
+type R = struct {
+     string name;
+     S a1, a2;
+}
+
+var r = struct R {
+   name: "First",
+   a1: new S,
+/*
+   a2: struct S {
+       a: "Pirmas",
+       b: 10,
+       c: 1.1,
+   }
+*/
+}

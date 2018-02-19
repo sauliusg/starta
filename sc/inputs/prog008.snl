@@ -1,0 +1,26 @@
+
+use * from std;
+
+program pirma( string argv[]; file stdio[]; string env[] ): int
+begin
+    if length(argv) > 1 then
+        . argv[0] _ ":", "Hello,", argv[1]
+    else
+        . argv[0] _ ":", "Hello Kitty!"
+    endif
+    return length(argv) - 1;
+end;
+
+program kita( string argv[]; file stdio[] ): byte
+begin
+    var iret = pirma( [argv[0], "Lena"], stdio, new string[0] );
+    . "antra";
+    . "'pirma' has returned", iret;
+    return 0B;
+end;
+
+program trecia( string argv[]; file stdio[]; string env[] ): short
+begin
+    . "trecia";
+    return 0S;
+end;

@@ -1,0 +1,5 @@
+
+. "This is 'include002e1.sni'";
+
+include "inputs/include002e2.sni";
+include "inputs/include001b.sni";

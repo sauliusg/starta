@@ -1,0 +1,99 @@
+
+type char = {
+    size = 1;
+    inline bytecode operator "." ( c : char )
+        { CPRINT };
+}
+
+type int = {
+    size = 4; kind = integer;
+
+    inline bytecode operator "+" ( i : int; j : int ) : int
+        { ADD };
+    inline bytecode operator "-" ( i : int; j : int ) : int
+        { SUB };
+    inline bytecode operator "*" ( i : int; j : int ) : int
+        { MUL };
+    inline bytecode operator "/" ( i : int; j : int ) : int
+        { DIV };
+    inline bytecode operator "%" ( i : int; j : int ) : int
+        { MOD };
+
+    bytecode inline operator "<" ( x, y : int ) : int
+        { LT };
+    bytecode inline operator ">" ( x, y : int ) : int
+        { GT };
+    bytecode inline operator "<=" ( x, y : int ) : int
+        { LE };
+    bytecode inline operator ">=" ( x, y : int ) : int
+        { GE };
+    bytecode inline operator "==" ( x, y : int ) : int
+        { EQ };
+    bytecode inline operator "!=" ( x, y : int ) : int
+        { NE };
+
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+    inline bytecode operator "--" ( i : int ) : int
+        { DEC };
+    inline bytecode operator "incvar" ()
+        { INCVAR };
+    inline bytecode operator "decvar" ()
+        { DECVAR };
+    inline bytecode operator "." ( i : int )
+        { IPRINT };
+
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_nref };
+
+    inline bytecode operator "new[][]" ( i : int ) : array
+        { MDALLOCC };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+
+    inline bytecode operator "loop" ( counter : addressof; range : int )
+        { LOOP };
+}
+
+type string = ?{
+    size = 4;
+    kind = string;
+    reference;
+    suffix = "";
+
+    inline bytecode operator "." ( s : string )
+        { SPRINT };
+
+    inline bytecode operator "[int]" ( s : string; i : int ) : char
+        { PCKIDX 1 CLDI };
+
+    inline bytecode operator "ldc" () : string
+        { SLDC };
+}
+
+inline bytecode function strlen( a : string ) : int
+{
+    LENGTH LDC 1 SUB
+}
+
+var s : string;
+
+s = "ABCD EFGH";
+
+. s;
+
+
+var i : int;
+
+for i = 0 to strlen( s ) - 1 do
+    . s[i];
+enddo
+
+// s[1] = 'A';

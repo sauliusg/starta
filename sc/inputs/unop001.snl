@@ -1,0 +1,30 @@
+#
+# Test operator definitions.
+#
+
+type int = {
+	size = 4;
+	kind = integer;
+        bytecode inline operator "+" ( x : int; y : int ) : int
+		{ bytecode{ ADD }};
+        bytecode inline operator "-" ( x : int; y : int ) : int
+		{ bytecode{ SUB }};
+        bytecode inline operator "+" ( x : int ) : int
+		{ /* do nothing */ };
+        bytecode inline operator "-" ( x : int ) : int
+		{ bytecode{ NEG }};
+        bytecode inline operator "." ( i : int )
+                { IPRINT };
+	bytecode inline operator "ldc" () : int
+		{ LDCS };
+};
+
+var a, b, c : int;
+
+b = 1;
+c = 2;
+a = b + c;
+a = +a;
+a = -a;
+
+. a;

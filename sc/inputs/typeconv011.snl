@@ -1,0 +1,12 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+type etype = llong;
+
+var int i = 10;
+var etype j = 100 etype;
+
+. j + i@etype;

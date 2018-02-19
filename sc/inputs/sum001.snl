@@ -1,0 +1,12 @@
+#
+# Snail language compiler tests
+#
+# Test of array sumation
+#
+
+use * from ArrayMath;
+use * from std;
+
+var m = [ 1.0, 2.0, 3.0 ];
+
+. fsum( m );

@@ -1,0 +1,21 @@
+#
+# Snail language compiler tests
+#
+# Test of the assignment operator
+#
+
+type char = { size = 1 };
+
+type string = {
+    size = 4; kind = string;
+    inline bytecode operator "ldc" () : string
+        { SLDC };
+};
+
+var r, s : string;
+
+s = 'hello';
+
+bytecode {
+   LD %s SPRINT NEWLINE
+}

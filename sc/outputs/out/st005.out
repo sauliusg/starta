@@ -1,0 +1,7 @@
+222
+101
+closure: 30
+type 'myint' has a special ST operator in the inner scope 2
+101
+type 'myint' has a special ST operator in the inner scope 2
+closure2: 130

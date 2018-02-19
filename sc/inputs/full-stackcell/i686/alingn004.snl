@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test field alignment in classes
+#
+
+use * from std;
+
+class A {
+    name : string;
+    a : array of int;
+    char c;
+    int i;
+    char c1;
+    int i1;
+    char c2;
+    int i2;
+};
+
+. "A.name.offset=\t", const(A.name.offset);
+. "A.a.offset=\t", const(A.a.offset);
+. "A.c.offset=\t", const(A.c.offset);
+. "A.i.offset=\t", const(A.i.offset);
+. "A.c1.offset=\t", const(A.c1.offset);
+. "A.i1.offset=\t", const(A.i1.offset);
+. "A.c2.offset=\t", const(A.c2.offset);
+. "A.i2.offset=\t", const(A.i2.offset);
+
+."";
+. "A.size=\t", const(A.size);

@@ -1,0 +1,25 @@
+#
+# Snail compiler tests
+#
+#
+# Test non-integer default function parameters
+#
+
+use * from std;
+
+function f( a : array of int = null ) : int
+{
+    return last(a) + 1;
+}
+
+. f();
+. f( [2,3,4] );
+
+function g( x : float = 2.0 ) : float
+{
+    return 1.0/x;
+}
+
+. g();
+. g(4);
+. g(3.0);

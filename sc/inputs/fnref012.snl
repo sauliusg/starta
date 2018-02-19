@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test function references as struct fields
+#
+
+use * from std;
+
+struct S {
+    int x;
+    int y;
+    function(int i, j) -> (string) proc;
+}
+
+procedure make_S( 
+          int a; 
+          int b;
+          function(int i, j) -> (string) proc
+          ) : S
+begin
+    var s = new S;
+    s.x = a;
+    s.y = b;
+    s.proc = proc;
+    return s;
+end
+
+function f( x, y : int ) : string
+{
+    return "%d:" %% x _ "%d" %% y
+}
+
+var s = make_S( 1, 3, f );
+
+. s.proc( s.x, s.y );

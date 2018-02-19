@@ -1,0 +1,11 @@
+./sl: inputs/err-interfaces005.snl(21,32): ERROR, class 'C' does not implement interface 'I2'
+    method m1@I2() -> (string) { return "m1@I2()" }
+                               ^
+./sl: inputs/err-interfaces005.snl(22,1): ERROR, class 'C' does not implement method 'm1' from interface 'I1'
+}
+^
+./sl: inputs/err-interfaces005.snl(22,1): ERROR, class 'C' does not implement method 'm2' from interface 'I1'
+}
+^
+./sl: 3 error(s) detected
+

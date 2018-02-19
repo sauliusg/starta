@@ -1,0 +1,30 @@
+#
+# Snail compiler tests
+#
+#
+# Test function references as subroutine parameters
+#
+
+use * from std;
+
+procedure g( float x;
+             mutator: function (float a) -> (float)
+           )
+{
+    var results = new float[100];
+    var i : long;
+
+    while( x < 10.0 ) {
+        results[i] = mutator( x );
+        x += 1.0;
+        . results[i];
+        i ++;
+    }
+}
+
+function mutate( float f ) -> (float)
+{
+    return f * 2.0;
+}
+
+g( 3, mutate );

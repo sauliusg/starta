@@ -1,0 +1,26 @@
+// --*- C -*--
+
+// Test ArrayMAth
+
+use std;
+use ArrayMath;
+
+var x = [1,2,3,4,5];
+var f = [1.0,2.0,3.0,4.0,5.0];
+
+. isum(x);
+. lsum([1L,2L,3L,4L,5L]);
+. llsum([1LL,2LL,3LL,4LL,5LL]);
+. "";
+
+. fsum(f);
+. dsum([1.0D,2.D,3.D,4.D,5.0D]);
+. ldsum([1.0LD,2.LD,3.LD,4.LD,5.0LD]);
+
+var m = new int[10000];
+
+for var i = 0 to last(m) {
+    m[i] = i+1;
+}
+
+. isum(m);

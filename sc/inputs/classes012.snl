@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test structures...
+#
+
+use * from std;
+
+type A = class {
+     next : A;
+     prev : A;
+     name : string;
+     count: int;
+}
+
+var a = new A;
+
+a.name = "The first object of class A";
+a.count = 1234;
+a.next = a;
+a.prev = a.next;
+
+. "a name is: " _ a.name;
+. "a count is", a.count;
+. "a next name is:", a.next.name;

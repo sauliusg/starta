@@ -1,0 +1,15 @@
+# An example of a module parametrised with a constant, a variable and
+# a procedure.
+
+module ParamConstVarProc( const C, var X, procedure P )
+
+use * from std;
+
+procedure pp( double x ): double
+{
+    var double c = const(C) double;
+    var double s = c + X@double;
+    return P(s, x);
+}
+
+end module ParamConstVarProc;

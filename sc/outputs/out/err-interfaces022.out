@@ -1,0 +1,8 @@
+./sl: inputs/err-interfaces022.snl(16,24): ERROR, interface 'I2' should not override method 'add' inherited from 'I1'
+    method add( int i );
+                       ^
+./sl: inputs/err-interfaces022.snl(32,1): ERROR, class 'C' does not implement iterface method (interface 3, method 2)
+}
+^
+./sl: 2 error(s) detected
+

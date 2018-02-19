@@ -1,0 +1,11 @@
+package Mstrange
+
+const X = 4000;
+
+use * from std;
+
+var string name = "package M4";
+
+var Y : int = const(X+1);
+
+end package Mbad;

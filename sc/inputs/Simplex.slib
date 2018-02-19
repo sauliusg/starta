@@ -1,0 +1,163 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2013-09-12 09:13:30 +0300 (Thu, 12 Sep 2013) $ 
+//$Revision: 10 $
+//$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/scilib/trunk/sc/simplex-minimisation/Simplex.slib $
+//---------------------------------------------------------------------------*/
+//*
+// Minimise a multidimensional function using simplex method.
+//**
+
+package Simplex;
+
+use * from std;
+use * from Math;
+
+exception SimplexNotConverged;
+
+function maxmaxmin( a : array of float ): long, long, long;
+
+procedure minimise( point: type T;
+                    ndim: long;
+                    stepsize: float;
+                    energy: function ( point: type T ) -> (float);
+                    scale: procedure( simplex: array of T;
+                                      index: long;
+                                      factor: float );
+                    shift: function( point: T;
+                                     index: long;
+                                     shift: float )->(T);
+                    flip: function( simplex: array of T;
+                                    pivot: T;
+                                    index: long;
+                                    factor: float )-> (type T);
+                    makearray: function( length : long ) -> (array of T);
+                    makecenter: function( simplex: array of T; i: long )->(type T);
+                    ftol: float = 1.0E-15;
+                    maxsteps: long = 10000;
+                    reporter: procedure( simplex: array of T;
+                                         energies: array of float;
+                                         minindex: long;
+                                         nextindex: long;
+                                         maxindex: long;
+                                         stepnr: long
+                                        ) = null
+                  ): float, type T, long
+{
+    const tiny = 1.0E-10;
+    var long nsteps;
+    // var simplex: array [] of T = new T[ ndim + 1L ];
+    var simplex: array [] of T = makearray( ndim+1L );
+    var energies: array of float = new float[ndim+1L];
+    var center: type T;
+    var new_point: type T;
+    var new_energy, rtol: float;
+    var ihigh, inext, ilow: long;
+
+    if( ndim < 1L ) {
+        return 0.0, point, -1L;
+    }
+
+    simplex[0] = point;
+    for( var i = 1L; i < llength(simplex); i++ ) {
+        simplex[i] = shift( point, i-1L, stepsize );
+    }
+    . ">>> computed", llength(simplex) ,"simplex points";
+
+    for( var i = 0L; i < llength(energies); i++ ) {
+        energies[i] = energy( simplex[i] );
+    }
+    . ">>> computed", llength(energies) ,"energies";
+
+    while(1) {
+
+        if( maxsteps > 0L && nsteps > maxsteps ) {
+            raise SimplexNotConverged
+                ( "could not find optimum after %d steps" %% maxsteps );
+        }
+
+        ihigh, inext, ilow = maxmaxmin( energies );
+
+        if( reporter ) {
+            reporter( simplex, energies, ilow, inext, ihigh, nsteps );
+        }
+
+        rtol = 2.0 * fabs(energies[ihigh] - energies[ilow]) /
+            fabs(energies[ihigh] + energies[ilow] + const(tiny));
+
+        if( rtol < ftol ) {
+            // converged:
+            break
+        }
+        center = makecenter( simplex, ihigh );
+        new_point = flip( simplex, center, ihigh, -1.0 );
+        new_energy = energy( new_point );
+
+        if( new_energy < energies[ihigh] ) {
+            // we are better than the worst point -- lets replace the
+            // worst point:
+            energies[ihigh] = new_energy;
+            simplex[ihigh] = new_point;
+        }
+
+        if( new_energy < energies[ilow] ) {
+            // we are better than the lowest point!
+            // maybe we can get even better?
+            new_point = flip( simplex, center, ihigh, 2.0 );
+            new_energy = energy( new_point );
+            if( new_energy < energies[ihigh] ) {
+                energies[ihigh] = new_energy;
+                simplex[ihigh] = new_point;
+            }
+        } else {
+            if( new_energy >= energies[inext] ) {
+                new_point = flip( simplex, center, ihigh, 0.5 );
+                new_energy = energy( new_point );
+                if( new_energy < energies[ihigh] ) {
+                    energies[ihigh] = new_energy;
+                    simplex[ihigh] = new_point;
+                } else {
+                    scale( simplex, ilow, 0.5 );
+                }
+            }
+        }
+
+        nsteps ++;
+    }
+
+    // return energies[ilow], makecenter( simplex, -1 ), nsteps;
+    return energies[ilow], simplex[ilow], nsteps;
+}
+
+function maxmaxmin( a : array of float ): long, long, long
+{
+    var ihigh, inext, ilow: long;
+
+    if( length(a) > 2 ) {
+	if( a[0] > a[1] ) {
+	    ihigh, inext = 0, 1;
+	    ilow = 1
+	} else {
+	    ihigh, inext = 1, 0;
+	}
+    }
+
+    for( var i = 0L; i < llength(a); i++ ) {
+        if( a[i] < a[ilow] ) {
+            ilow = i;
+	    continue;
+        }
+        if( a[i] > a[ihigh] ) {
+            inext = ihigh;
+            ihigh = i;
+        } else {
+	    if( a[i] > a[inext] && i != ihigh ) {
+		inext = i
+	    }
+	}
+    }
+
+    return ihigh, inext, ilow;
+}
+
+end package Simplex

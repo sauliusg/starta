@@ -1,0 +1,14 @@
+#
+# Snail compiler tests
+#
+#
+# Test non-null references
+#
+
+include "stdtypes.slib"
+
+type S = not null struct { x, y : int; m : array of float };
+
+var s : S; // ERROR
+
+s = null; // ERROR

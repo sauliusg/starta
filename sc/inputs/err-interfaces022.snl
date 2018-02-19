@@ -1,0 +1,42 @@
+#
+# Check implementation of interfaces with the same method names.
+#
+
+# Check that interfaces can be declared with the same method names.
+
+use * from std;
+
+interface I1 {
+    method add( int i );
+    method sub( int i );
+    method get(): int;
+}
+
+interface I2: I1 {
+    method add( int i );
+    method put( int i );
+}
+
+class C implements I1, I2 {
+    value : int;
+
+    method add@I1( int i ) { self.value += i; . "This is add@I1()" }
+    method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
+    method get@I1(): int { return self.value }
+
+    method put@I2( int i )
+    {
+        self.value = i;
+        . "put@I2 implemented by A: setting self.i to", i
+    }
+}
+
+var c = new C;
+
+c->add@I1( 10 );
+c->add@I2( 5 );
+
+// bytecode { PLD %c DUMPVMT }
+// . const( I2.put.offset );
+
+c->put@I2( 33 );

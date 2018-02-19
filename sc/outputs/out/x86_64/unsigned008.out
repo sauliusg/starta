@@ -1,0 +1,23 @@
+FALSE
+
+9223372036854775807
+UL2LL - the target type 'long long' (8 bytes) is not larger than the original 'unsigned long' (8 bytes)
+
+9223372036854775807
+UL2LL - the target type 'long long' (8 bytes) is not larger than the original 'unsigned long' (8 bytes)
+
+9223372036854775807
+UL2LL - the target type 'long long' (8 bytes) is not larger than the original 'unsigned long' (8 bytes)
+
+TRUE
+
+9223372036854775807
+9223372036854775807
+-9223372036854775807
+
+9223372036854775807
+UL2LL - unsigned long value '0' does not fit 'long long' value
+
+9223372036854775807
+UL2LL - unsigned long value '4294967294' does not fit 'long long' value
+

@@ -1,0 +1,12 @@
+#
+# Snail compiler tests
+#
+#
+# Test how loop-declared 
+#
+
+use * from std;
+
+. "You will not believe it, but";
+. 2, "plus", 2, "is", 2 + 2;
+. "and in floating point, the resut is", 2.0 + 2.0;

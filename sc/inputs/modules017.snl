@@ -1,0 +1,20 @@
+
+use * from std;
+
+use * from Y1;
+use * from Y2;
+
+. Y1::t;
+. Y2::t;
+
+var x : Y1::T;
+var y : Y2::T;
+
+Y2::t = 1.25 Y2::T;
+
+y = Y2::t;
+
+. y;
+
+// var a : T;
+// . a;

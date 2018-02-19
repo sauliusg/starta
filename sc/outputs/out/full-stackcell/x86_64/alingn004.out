@@ -1,0 +1,10 @@
+A.name.offset=	 0
+A.a.offset=	 32
+A.c.offset=	 64
+A.i.offset=	 96
+A.c1.offset=	 128
+A.i1.offset=	 160
+A.c2.offset=	 192
+A.i2.offset=	 224
+
+A.size=	 256

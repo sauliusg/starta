@@ -1,0 +1,18 @@
+// --*- C -*--
+//
+// Check derived new type compatibility.
+
+use * from std;
+
+type voxel = new float;
+type pixel = new float;
+
+var f : float;
+var v, v1, v2 : voxel;
+var p, p1, p2 : pixel;
+
+p = f; // ERROR, new type is incompatible with its base type
+
+p = p1 + p2; // OK
+
+p = v1 + v2; // ERROR, incompatible types for assignment

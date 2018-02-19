@@ -1,0 +1,16 @@
+
+use * from std;
+
+use * from X1;
+use * from X2;
+
+// procedure p()
+// {
+//     . "p from main"
+// }
+
+X1::p();
+X2::p();
+p1();
+p2();
+

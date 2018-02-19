@@ -1,0 +1,8 @@
+./sl: inputs/err-struct005c.snl(13,14): ERROR, redeclaration of forward type 'A' changes non-null flag
+null struct A;
+             ^
+./sl: inputs/err-struct005c.snl(14,14): ERROR, redeclaration of forward type 'B' changes non-null flag
+null struct B;
+             ^
+./sl: 2 error(s) detected
+

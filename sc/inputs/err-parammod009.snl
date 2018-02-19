@@ -1,0 +1,22 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+use * from Parametrised( 100, float ) as ifP;
+use * from Parametrised( int, const 300+1 ) as ldP;
+
+. ifP::i;
+
+ifP::i = 23456;
+
+. ifP::i;
+
+. ldP::i;
+
+ldP::i = 40000 ldP::inttype;
+
+. ldP::i;
+. ifP::i;

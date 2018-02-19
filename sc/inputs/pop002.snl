@@ -1,0 +1,62 @@
+// --*- C -*--
+// Check module (package) implementation.
+//
+
+// Checking 'push()' and 'pop()' functions:
+
+use * from std;
+
+function print_array( array of type T a; function ( T element ) print )
+{
+    var i = 0;
+    foreach var T e in a do
+        < "[", i , "]: ";
+        print( e );
+        i ++;
+    enddo
+}
+
+null struct S {
+    int val;
+    string name;
+}
+
+var m = new string[0];
+
+. "length(m) ==", length(m);
+print_array( m, function( string i ) { . i } );
+
+var n = new S[0];
+
+. "length(n) ==", length(n);
+print_array( n, function( S s ) { . s.name, s.val } );
+
+. "========================================";
+
+m = push( push( push( m, "eins" ), "zwei" ), "drei" );
+
+. "length(m) ==", length(m);
+print_array( m, function( string i ) { . i } );
+
+n = push( n, struct S { val => 123, name => "first" } );
+n = push( n, struct S { val => 200, name => "second" } );
+n = push( n, struct S { val => 300, name => "third" } );
+n = push( n, struct S { val => 400, name => "fourth" } );
+
+. "length(n) ==", length(n);
+print_array( n, function( S s ) { . s.name, s.val } );
+
+. "========================================";
+
+. "popped value =", pop( m );
+. "popped value =", pop( m );
+
+. "length(m) ==", length(m);
+print_array( m, function( string i ) { . i } );
+
+. "popped value =", pop( n ).name;
+. "popped value =", pop( n ).name;
+
+. "length(n) ==", length(n);
+print_array( n, function( S s ) { . s.val, " ", s.name } );
+

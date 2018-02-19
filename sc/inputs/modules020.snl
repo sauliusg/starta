@@ -1,0 +1,14 @@
+#
+# Check module (package) implementation.
+#
+
+# Check whether packages can be imported from arbitrary files.
+
+use * from std
+
+use * from Mano in "my/packages.slib"
+
+use * from Tavo;
+
+. Mano::greeting( "Saulius" );
+. Tavo::greeting( "Sauliau" );

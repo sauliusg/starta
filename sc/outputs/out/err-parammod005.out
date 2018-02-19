@@ -1,0 +1,20 @@
+./sl: inputs/ParamConstVarProc.slib(4,55): ERROR, function 'addd' is not found for module parameter 'P'
+module ParamConstVarProc( const C, var X, procedure P )
+                                                      ^
+./sl: inputs/ParamConstVarProc.slib(12,13): ERROR, function 'P' is not declared in the current scope
+    return P(s, x);
+            ^
+./sl: inputs/ParamConstVarProc.slib(12,19): ERROR, incompatible types of returned value 1 of function 'pp'
+    return P(s, x);
+                  ^
+./sl: inputs/ParamConstVarProc.slib(4,55): ERROR, function 'subb' is not found for module parameter 'P'
+module ParamConstVarProc( const C, var X, procedure P )
+                                                      ^
+./sl: inputs/ParamConstVarProc.slib(12,13): ERROR, function 'P' is not declared in the current scope
+    return P(s, x);
+            ^
+./sl: inputs/ParamConstVarProc.slib(12,19): ERROR, incompatible types of returned value 1 of function 'pp'
+    return P(s, x);
+                  ^
+./sl: 6 error(s) detected
+

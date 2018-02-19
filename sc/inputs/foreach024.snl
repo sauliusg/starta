@@ -1,0 +1,17 @@
+//--*- C -*--
+
+use std;
+
+var a = [ "vienas", "du" ];
+var b = [ "eins", "zwei", "drei", "vier", "fünf" ];
+
+foreach ( var l => a ) {
+    . l;
+    var count = 0;
+    foreach ( var m in b ) {
+        . "   ", m;
+        count++;
+        if( count > 2 ) { break }
+    }   
+    . "";
+}

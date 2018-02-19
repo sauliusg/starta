@@ -1,0 +1,11 @@
+./sl: inputs/err-typecompat002.snl(24,13): ERROR, incompatible types of returned value 1 of function 'p1'
+    return m; // ERROR
+            ^
+./sl: inputs/err-typecompat002.snl(39,13): ERROR, incompatible types of returned value 1 of function 'q1'
+    return m; // ERROR
+            ^
+./sl: inputs/err-typecompat002.snl(44,13): ERROR, incompatible types of returned value 1 of function 'q2'
+    return m; // ERROR
+            ^
+./sl: 3 error(s) detected
+

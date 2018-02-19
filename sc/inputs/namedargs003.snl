@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test function arument type compatibility
+#
+
+use * from std;
+
+function f( x, y : int = 3; z, t : long = 4 ) : long
+{
+    return x@long + y@long + z + t;
+}
+
+function g( x, y : int; z, t : long = 4 ) : long
+{
+    return x@long + y@long + z + t;
+}
+
+. f(); // OK
+. f( 3, 3, 4, 4 ); // OK
+. f( 1, 2, 3, 4 ); // OK
+
+// . f( y => 4L ); // ERR
+// . f( u => 4L ); // ERR
+
+. g( x=> 3, y => 2, t => 7 ); // OK
+// . g( y => 2 ); // ERR

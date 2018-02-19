@@ -1,0 +1,39 @@
+#
+# Snail language compiler tests
+#
+# Test of simple arithmetics.
+#
+
+include "stdtypes.slib"
+
+var a, b : int;
+var c, d : long;
+
+a = 11;
+b = 35;
+c = 21L;
+
+bytecode function writeln( i : int )
+{
+    bytecode { IPRINT NEWLINE }
+};
+
+bytecode function lwriteln( i : long )
+{
+    bytecode { LPRINT NEWLINE }
+};
+
+bytecode function write( i : int )
+{
+    bytecode { IPRINT }
+};
+
+d = ( a + b )@long / ( a@long - c );
+
+lwriteln( a@long );
+writeln( a );
+lwriteln( d );
+
+c = b@long - d * c + a@long;
+
+lwriteln( c );

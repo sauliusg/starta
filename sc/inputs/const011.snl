@@ -1,0 +1,15 @@
+// --*- C -*--
+
+// Test number conversions (strtol)
+
+use std;
+
+var m: string;
+
+try {
+    var x = const(18446744073709551616)LL;
+    . x;
+}
+catch( m ) {
+    . m
+}

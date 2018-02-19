@@ -1,0 +1,30 @@
+#
+# Snail language compiler tests
+#
+#
+# Test conditional operator.
+#
+
+include "stdtypes.slib"
+
+var a : int = 0;
+var b : int = 2;
+var c : int = 3;
+
+var d : int;
+
+d = a ? b : c;
+
+. d;
+
+d = a < b ? b : c;
+
+. d;
+. "";
+
+var i : int;
+
+for i = 1 to 5 do
+   d = i < c && b < c ? b : c;
+   . d;
+enddo;

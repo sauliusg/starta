@@ -1,0 +1,43 @@
+#
+# SL language compiler tests
+#
+# Test implementation of subscopes.
+#
+
+include "stdtypes.slib"
+
+var x : int = 1;
+
+. x;
+. "";
+
+begin
+   var y, z : int;
+
+   . y;
+   . z;
+
+   y = 2;
+   z = 3;
+
+   . y;
+   . z;
+   . "";
+end
+
+{
+   var y, t : int;
+
+   . y;
+   . t;
+
+   y = 4;
+   t = 5;
+
+   . y;
+   . t;
+   . "";
+};
+
+. x;
+. "";

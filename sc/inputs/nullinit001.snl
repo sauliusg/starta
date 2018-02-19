@@ -1,0 +1,30 @@
+
+use * from std;
+
+type S = struct {
+     string a;
+     int b;
+     float c;
+}
+
+type R = struct {
+     string name;
+     S a1, a2;
+}
+
+var r = struct R {
+   name: "First",
+   a1: new S,
+   a2: struct S {
+       a: "Pirmas",
+       b: 10,
+       c: 1.1,
+   }
+};
+
+// No null checks are necessary:
+
+. r.a1.c;
+. r.a2.a;
+. r.a2.b;
+. r.a2.c;

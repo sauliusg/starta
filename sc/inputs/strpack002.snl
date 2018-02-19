@@ -1,0 +1,21 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var b = new blob(100);
+
+pack b, 0, "c20", "This is my life";
+
+var a = unpack string[]( b, 0, "z4x4" );
+
+. "\"" _ unpack string( b, 0, "z" ) _ "\"";
+. "\"" _ unpack string( b, 0, "z4" ) _ "\"";
+
+for var i = 0 to last(a) do
+    . "\"" _ a[i] _ "\"";
+enddo

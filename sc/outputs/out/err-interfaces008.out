@@ -1,0 +1,8 @@
+./sl: inputs/err-interfaces008.snl(22,1): ERROR, class 'C' does not implement method 'm2' from interface 'I2'
+}
+^
+./sl: inputs/err-interfaces008.snl(26,14): ERROR, interface 'I2' does not have method 'mx'
+. c[1]->mx@I2();
+             ^
+./sl: 2 error(s) detected
+

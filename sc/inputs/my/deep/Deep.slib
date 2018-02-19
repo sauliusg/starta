@@ -1,0 +1,14 @@
+//
+// Test for modules deep in the directory tree.
+//
+
+module Deep;
+
+use * from std;
+
+function hi()
+begin
+    . "Hi from deep sea!";
+end;
+
+end module Deep;

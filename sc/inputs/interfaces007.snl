@@ -1,0 +1,58 @@
+
+use * from std;
+
+interface UnDoable {
+    method doit( x : int );
+    method undo() : int;
+}
+
+class S implements UnDoable {
+    int n;
+    int buffer[];
+
+    method name(): string
+    {
+        return "This is name() of S"
+    }
+
+    method doit @ UnDoable( int x )
+    {
+        var old_buffer = self.buffer;
+        self.buffer = new int[length(self.buffer) + 1];
+        self.buffer := old_buffer;
+        self.buffer[self.n] = x;
+        self.n++;
+    }
+    method undo @ UnDoable() : int
+    {
+        self.n--;
+        return self.buffer[self.n];
+    }
+}
+
+var s = new S;
+
+. s->name();
+
+s->doit@UnDoable( 10 );
+s->doit@UnDoable( 12 );
+s->doit@UnDoable( 17 );
+
+. s->undo@UnDoable();
+. s->undo@UnDoable();
+. s->undo@UnDoable();
+
+// procedure pp( UnDoable d )
+// {
+//     d->doit( 20 );
+//     d->doit( 21 );
+//     d->doit( 25 );
+//     d->doit( 26 );
+// 
+//     d->undo();
+//     d->undo();
+//     d->undo();
+//     d->undo();
+// }
+// 
+// pp( s );

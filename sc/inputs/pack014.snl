@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var b = new blob(4000);
+
+pack b, 0, "I2", [ -2, -1, 0, 1, 2, 3 ];
+
+for var i = 0 to 10 do
+    . unpack int( b, i*2, "I2" )
+enddo
+
+. "----------------";
+
+for var i = 0 to 10 do
+    . unpack int( b, i*2, "U2" )
+enddo
+
+. "=================";
+
+pack b, 0, "I4", [ -2, -1, 0, 1, 2, 3 ];
+
+for var i = 0 to 10 do
+    . unpack int( b, i*4, "I4" )
+enddo
+
+. "----------------";
+
+for var i = 0 to 10 do
+    . unpack int( b, i*4, "U4" )
+enddo

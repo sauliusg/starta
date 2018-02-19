@@ -1,0 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test strto*() functions
+#
+
+use * from std;
+
+var endidx: long;
+var b : byte;
+var s : short;
+var i : int;
+var l : long;
+var d : llong;
+
+i, endidx = strtoi( "AB", 16 );
+. i, endidx;
+
+l, endidx = strtoi( "0xABCDEF", 16 );
+. l, endidx;
+
+d, endidx = strtoll( "010" );
+. d, endidx;
+
+b, endidx = strtob( "010", 10 );
+. b, endidx;
+
+s, endidx = strtoh( "0xFF" );
+. s, endidx;
+
+i, endidx = strtoi( "FF", 10 );
+. i, endidx;
+
+i, endidx = strtoi( null, 10 );
+. i, endidx;
+
+i, endidx = strtoi( null );
+. i, endidx;

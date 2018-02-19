@@ -1,0 +1,5 @@
+./sl: inputs/err-selective013.snl(10,20): ERROR, constant 'NNN' is not found in module 'P1'
+use const NNN from P1;
+                   ^
+./sl: 1 error(s) detected
+

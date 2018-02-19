@@ -1,0 +1,6 @@
+Thu Aug 14 20:57:20 EET 2003
+Linux 2.4.18 i486
+l-opt.snl            real 0m29.850s
+l.snl                real 1m25.840s
+pl-opt.snl           real 0m14.152s
+pl.snl               real 0m44.295s

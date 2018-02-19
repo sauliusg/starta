@@ -1,0 +1,8 @@
+./sl: inputs/err-op010.snl(23,7): ERROR, type 'int' has no unary operator named '+'
+a = +a;
+      ^
+./sl: inputs/err-op010.snl(24,7): ERROR, type 'int' has no unary operator named '-'
+a = -a;
+      ^
+./sl: 2 error(s) detected
+

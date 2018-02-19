@@ -1,0 +1,50 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use * from std;
+
+type A = array of float;
+type M = array [][] of int;
+
+type S = struct { a, b : float };
+
+var s : S = new S;
+
+function p( m, n : array ) : array
+{
+    return new bool[length(m) + length(n)]; // OK
+}
+
+function p1( m, n : array ) : array of bool
+{
+    return m; // ERROR
+}
+
+function p2( m, n : array ) : array
+{
+    return n; // OK
+}
+
+function p3( m, n : array ) : ref
+{
+    return m; // OK
+}
+
+function q1( m, n : ref ) : array of bool
+{
+    return m; // ERROR
+}
+
+function q2( m, n : ref ) : array
+{
+    return m; // ERROR
+}
+
+function q3( m, n : ref ) : ref
+{
+    return m; // OK
+}

@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test global variables
+#
+
+include "stdtypes.slib"
+include "stdio.slib"
+
+var string g1 = "ten", g2 = "eleven", g3 = "twelve";
+
+. g1;
+. g2;
+. g3;
+. "";
+
+procedure p()
+{
+    var l : string = "nothing";
+    . l;
+    l = "one hundred eleven";
+    bytecode {
+	PLDGA %g2
+	PLD   %l
+	PSTI
+    }
+    . l;
+}
+
+p();
+
+. "";
+. g1;
+. g2;
+. g3;

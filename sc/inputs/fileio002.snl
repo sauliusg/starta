@@ -1,0 +1,51 @@
+#
+# Snail compiler tests
+#
+#
+# Test file open/read/write/close
+#
+
+include "stdtypes.slib"
+include "stdio.slib"
+
+var f : file;
+var a, b : int;
+
+b = 10;
+a = 20;
+
+var fname : string = "outputs/text.dat";
+
+f = fopen( fname, "w" );
+
+<f> << a << "\n";
+<f> << b << " " << 30;
+<f> << "\n";
+
+fclose( f );
+
+f = fopen( fname, "r" );
+
+// record Line { value : array [80] of byte };
+
+type Line = blob;
+
+var m : Line = new blob(80);
+var l : int;
+
+## . const(m.allocnref);
+
+l = fread( f, m );
+
+. l;
+
+do l-- if l > length(m) - 1 ;
+
+pack m, l, "i1", 0B;
+
+inline bytecode function asstring( m : Line ) : string {};
+
+. l;
+. asstring( m );
+
+fclose( f );

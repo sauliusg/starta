@@ -1,0 +1,16 @@
+// --*- C -*--
+
+// Test unsigned integre arithmetic.
+
+use std;
+use unsigned;
+
+var u: uint;
+
+u = ~0 U;
+
+. u;
+
+u ++;
+
+. u;

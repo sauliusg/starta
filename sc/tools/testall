@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -x
+
+make distclean
+
+for IMPLEMENTATION in packed-type full-stackcell split-stackcell
+do
+    make INTERPRETER_DIR=interpreters/${IMPLEMENTATION}
+    make INTERPRETER_DIR=interpreters/${IMPLEMENTATION} tests
+    make INTERPRETER_DIR=interpreters/${IMPLEMENTATION} distclean
+done

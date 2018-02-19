@@ -1,0 +1,29 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+use * from std;
+
+var int i, j, k;
+
+var m : array of int = new int[20];
+var s : struct { a, b, c : long } = new struct { a, b, c: long };
+
+function f3( int x ): int, int, long
+{
+    return x, x * x, x@long * x@long * x@long
+}
+
+i, j, k = 1, 2, 3;
+
+m[2], s.a, s.b, s.c = f3( 10 );
+
+. m[2]; . s.a; . s.b; . "";
+
+i, s.a, s.b, s.c = f3( 20 );
+
+. m[2]; . s.a; . s.b; . "";
+

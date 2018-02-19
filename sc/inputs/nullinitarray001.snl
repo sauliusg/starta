@@ -1,0 +1,24 @@
+
+use * from std;
+
+struct Q {
+     string a;
+     int b;
+     float c;
+}
+
+type S = struct {
+     string a;
+     int b;
+     float c;
+     var n, m : Q
+}
+
+var m = struct S { m => new Q, n => new Q } * new [100];
+
+m[1].n.b = 111;
+m[2].m.c = 11.1;
+
+. length(m);
+. m[10].n.b;
+. m[10].m.c;

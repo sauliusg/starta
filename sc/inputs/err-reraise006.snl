@@ -1,0 +1,8 @@
+#
+# Snail compiler tests
+#
+#
+# Test reraise statement
+#
+
+reraise;

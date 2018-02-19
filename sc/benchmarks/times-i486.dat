@@ -1,0 +1,12 @@
+Fri Sep 12 21:04:02 EET 2003
+Linux 2.4.18 i486
+fn001-loop.snl       real 0m1.058s
+fn001.snl            real 0m13.493s
+l-slow.snl           real 0m27.633s
+l-slower.snl         real 1m22.473s
+l.snl                real 0m27.587s
+mat001.snl           real 0m57.071s
+mat002.snl           real 0m59.920s
+pl-slow.snl          real 0m13.314s
+pl-slower.snl        real 0m42.139s
+pl.snl               real 0m13.305s

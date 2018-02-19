@@ -1,0 +1,29 @@
+./sl: inputs/err-interfaces004.snl(24,5): ERROR, method g() does not match method g it should implement - new prototype has too little arguments
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(28,5): ERROR, method f() does not match method f it should implement - new prototype has too little return values
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(32,5): ERROR, method s() does not match method s it should implement - old prototype return value has type string, but new prototype has type int
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(35,23): ERROR, module 'Module' is not available in the current scope
+    method sg @ Module::Ig( char x ) -> (string)
+                      ^
+./sl: inputs/err-interfaces004.snl(36,5): ERROR, interface 'Ig' does not implement method 'sg'
+    {
+    ^
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method 'f' from interface 'If'
+}
+^
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method 's' from interface 'If'
+}
+^
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method 'g' from interface 'Ig'
+}
+^
+./sl: inputs/err-interfaces004.snl(39,1): ERROR, class 'S' does not implement method 's' from interface 'Ig'
+}
+^
+./sl: 9 error(s) detected
+

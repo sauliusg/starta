@@ -1,0 +1,5 @@
+./sl: inputs/err-fnargs011.snl(5,48): ERROR, prototype of function f() does not match previous definition - old prototype argument 2 has type 'float', but new prototype has type 'double'
+procedure f( x: int; y: double; z: char ) : int;
+                                               ^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,20 @@
+
+use * from std;
+
+function g( int x ): float
+{
+    return x + 2
+}
+
+. g( 5 );
+
+function h( int x ): long, float
+{
+    return x@long + 2L, x - 2
+}
+
+. h( 5 );
+
+var x, y = h( 6 );
+
+. x, y;

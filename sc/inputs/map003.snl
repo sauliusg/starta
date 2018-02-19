@@ -1,0 +1,22 @@
+#
+# Test 'map' function
+#
+
+use * from std;
+
+procedure map( p: function (x:type T)->(type T); m: array of type T ): array of type T
+{
+    foreach var e in m do
+        e = p(e);
+    enddo
+
+    return m;
+}
+
+var m = [1,2,3];
+
+var n = map( function (i:int)->(int) { return i+1 }, m );
+
+foreach var k in n do
+    . k;
+enddo

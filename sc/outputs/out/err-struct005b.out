@@ -1,0 +1,32 @@
+./sl: inputs/err-struct005b.snl(13,9): ERROR, redeclaration of forward type 'A' changes non-null flag
+struct A;
+        ^
+./sl: inputs/err-struct005b.snl(14,9): ERROR, redeclaration of forward type 'B' changes non-null flag
+struct B;
+        ^
+./sl: inputs/err-struct005b.snl(16,15): ERROR, definition of forward structure 'A' has different non-null flag
+null struct A {
+              ^
+./sl: inputs/err-struct005b.snl(22,15): ERROR, definition of forward structure 'B' has different non-null flag
+null struct B {
+              ^
+./sl: inputs/err-struct005b.snl(29,14): ERROR, 'alpha' was declared as non-null reference -- it must be initialised
+var alpha : A;
+             ^
+./sl: inputs/err-struct005b.snl(30,13): ERROR, 'beta' was declared as non-null reference -- it must be initialised
+var beta : B;
+            ^
+./sl: inputs/err-struct005b.snl(32,14): ERROR, type 'A' contains non-null fields -- please use struct expressions to initialise them
+alpha = new A;
+             ^
+./sl: inputs/err-struct005b.snl(33,13): ERROR, type 'B' contains non-null fields -- please use struct expressions to initialise them
+beta = new B;
+            ^
+./sl: inputs/err-struct005b.snl(38,16): ERROR, type 'B' contains non-null fields -- please use struct expressions to initialise them
+beta.b1 = new B;
+               ^
+./sl: inputs/err-struct005b.snl(39,19): ERROR, type 'B' contains non-null fields -- please use struct expressions to initialise them
+alpha.b.b2 = new B;
+                  ^
+./sl: 10 error(s) detected
+

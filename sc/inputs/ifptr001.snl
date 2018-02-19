@@ -1,0 +1,24 @@
+#
+# Snail compiler tests
+#
+#
+# Check JNZ and JZ compilation for pointer types.
+#
+
+include "stdtypes.slib"
+
+var a : array of int;
+
+if( a ) then
+    . "'a' is not null"
+else
+    . "'a' is NULL"
+endif;
+
+a = new int[1];
+
+if( a ) then
+    . "'a' is not null"
+else
+    . "'a' is NULL"
+endif;

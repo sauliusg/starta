@@ -1,0 +1,73 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test calls to superclass methods.
+
+use std;
+
+class A {
+    int count;
+    string name;
+    string className;
+
+    constructor ( string name; int count = 0 )
+    {
+        self.className = "class A";
+        self.name = name;
+        self.count = count;
+    }
+
+    method toString() -> string
+    {
+        return
+            "This is %s object " %% self.className _
+            "named '%s' " %% self.name _
+            "counted %d times" %% self.count;
+    }
+}
+
+class B: A {
+    int i;
+
+    constructor ( string name; int count = 0; int i = -1 )
+        super( name, count )
+    {
+        self.className = "class B";
+        self.i = i;
+    }
+
+    method toString(): string
+    {
+        return
+            self->toString@A() _ " with i = %d" %% self.i;
+    }
+}
+
+var a = new A( "First A", 10 );
+
+var c = new class: A { 
+    float x;
+
+    constructor c ( name = "Anonymous c"; int count = -1;
+                    float x = -1.0  )
+        super( name, count )
+    {
+        self.x = x
+    }
+
+    method toString(): string
+    {
+        return "An anonymous class with x = %f" %% self.x;
+    }
+};
+
+. a->toString();
+
+a = new B( "First B", i => -22 );
+
+var b = new B( name => "Second B", count => 20, i => -23 );
+
+. a->toString();
+. b->toString();
+. c->toString();

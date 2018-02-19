@@ -1,0 +1,55 @@
+#
+# Snail compiler tests
+#
+
+type int = {
+    size = 4; kind = integer;
+    inline bytecode operator "+" ( i : int; j : int ) : int
+        { ADD };
+    inline bytecode operator "-" ( i : int; j : int ) : int
+        { SUB };
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+    inline bytecode operator "--" ( i : int ) : int
+        { DEC };
+    inline bytecode operator "incvar" ()
+        { INCVAR };
+    inline bytecode operator "decvar" ()
+        { DECVAR };
+    inline bytecode operator "." ( i : int )
+        { IPRINT NEWLINE };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+    inline bytecode operator "[]" ( a : array; i : int ) : addressof
+        { INDEX };
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_nref };
+};
+
+type long = {
+    size = 8; kind = integer; suffix = "L";
+    inline bytecode operator "+" ( i : long; j : long ) : long
+        { LADD };
+    inline bytecode operator "-" ( i : long; j : long ) : long
+        { LSUB };
+    inline bytecode operator "++" ( i : long ) : long
+        { LINC };
+    inline bytecode operator "--" ( i : long ) : long
+        { LDEC };
+    inline bytecode operator "incvar" ()
+        { LINCVAR };
+    inline bytecode operator "decvar" ()
+        { LDECVAR };
+    inline bytecode operator "." ( i : long )
+        { LPRINT NEWLINE };
+};
+
+var i : int;
+var j : int;
+var l : int;
+var m : int;
+var n : array of long;
+
+n = new long[10];
+
+i, n[3], n[9] = l, m, l - m;

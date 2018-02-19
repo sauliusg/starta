@@ -1,0 +1,14 @@
+# Compiler tests.
+#
+# Test diagnostics of readonly variable increments.
+#
+
+use * from std;
+
+readonly m = [ 5, 6, 7 ];
+
+. m[0];
+m[0]++;
+. m[0];
+m[0]--;
+. m[0];

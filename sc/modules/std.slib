@@ -1,0 +1,7 @@
+
+package std
+
+include "stdtypes.slib";
+include "stdio.slib"
+
+end package std;

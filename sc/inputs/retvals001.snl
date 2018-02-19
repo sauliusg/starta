@@ -1,0 +1,49 @@
+#
+# Snail compiler tests
+#
+#
+# Test that the function always return correct number of values:
+#
+
+use * from std;
+
+function good( int x ) : long
+{
+    if( x > 0 ) {
+    	return (x@long * x@long);
+    } else {
+    	return -(x@long * x@long);
+    }
+}
+
+. good( 5 );
+. good( -3 );
+
+bytecode { ESPRINT };
+
+function bad( int x ) : long
+{
+    if( x > 0 ) {
+    	return (x@long * x@long);
+    }
+}
+
+// Since the previous function, bad(), is not properly terminated by
+// 'return' statement in all branches, and thus does not hit RET opcode
+// in some execution paths, it will sometimes 'fall through' and the
+// control will reach code immediately after the body of bad(). The
+// following crash() procedure is here to catch all such runaway
+// code execution instances under the current SL compiler implementation.
+
+bytecode procedure crash()
+{
+    RAISE_TEST
+}
+
+. bad( 5 );
+. bad( -3 );
+. bad( -3 );
+. bad( -3 );
+. bad( -3 );
+
+bytecode { ESPRINT };

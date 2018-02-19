@@ -1,0 +1,58 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test how indexing outside array bounds is diagnosed.
+
+use * from std;
+
+var m = new int[10];
+
+try {
+    m[-1] = 1;
+}
+catch ArrayIndexNegative( var errno : int; var message : string ) {
+    . "ArrayIndexNegative :", message;
+}
+catch( var errno : int; var message : string ) {
+    . message;
+}
+
+try {
+    m[10] = 1;
+}
+catch ArrayIndexNegative( var errno : int; var message : string ) {
+    . "ArrayIndexNegative :", message;
+}
+catch ( var errno : int; var message : string ) {
+    . message;
+}
+
+try {
+    m[10] = 1;
+}
+catch ArrayIndexOverflow( var errno : int; var message : string ) {
+    . "ArrayIndexOverflow :", message;
+}
+catch ( var errno : int; var message : string ) {
+    . message;
+}
+
+try {
+    . m[21];
+}
+catch ArrayIndexOverflow( var errno : int; var message : string ) {
+    . "ArrayIndexOverflow :", message;
+}
+
+m = null;
+
+try {
+    . m[21];
+}
+catch NullPointerError( var errno : int; var message : string ) {
+    . "NullPointerError   :", message;
+}
+catch ( var errno : int; var message : string ) {
+    . message;
+}

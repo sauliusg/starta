@@ -1,0 +1,13 @@
+#
+# Snail compiler tests
+#
+#
+# Test size diagnostics for primitive types.
+#
+
+use * from std;
+
+type T = {
+    size = 4;
+    nref = 4;
+};

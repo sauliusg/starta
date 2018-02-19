@@ -1,0 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test global variables
+#
+
+include "stdtypes.slib"
+include "stdio.slib"
+
+type R = struct {
+    i, j : int;
+};
+
+var R r = new R;
+
+r.i = 10;
+
+. r.i;
+. r.j;
+
+procedure p()
+{
+    . r.i;
+    . r.j;
+}
+
+procedure q( int i; int j )
+{
+    r.i = i;
+    r.j = j;
+}
+
+p();
+q( 11, 12 );
+p();
+
+. r.i;
+. r.j;

@@ -1,0 +1,11 @@
+./sl: inputs/err-interfaces013.snl(22,1): ERROR, class 'C' does not implement method 'm2' from interface 'I2'
+}
+^
+./sl: inputs/err-interfaces013.snl(26,11): ERROR, interface 'I3' is not declared in the current scope
+. c->m1@I3();
+          ^
+./sl: inputs/err-interfaces013.snl(26,11): ERROR, object 'c' does not have method 'm1'
+. c->m1@I3();
+          ^
+./sl: 3 error(s) detected
+

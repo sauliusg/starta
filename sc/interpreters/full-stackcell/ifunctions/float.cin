@@ -1,0 +1,437 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+#ifdef I
+#undef I
+#endif
+
+#ifdef CVAL
+#undef CVAL
+#endif
+
+#define I num.@field@
+#define CVAL @codeval@
+
+/*
+ FLDCS (load float constant)
+
+ bytcode:
+ FLDCS address_of_float_value_in_string_representation
+
+ stack:
+ --> float_value
+
+ A string representation of the floatint point constant is taken from
+ the static data area at the offset given immediately after the
+ opcode. It is converted into the float representation and the
+ resulting 'float_value', a floating point, is loaded onto the stack.
+
+ */
+
+#if DO_NOT_USE_LDCS_OPTIMISATION
+
+int @PREFIX@LDCS( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+    @type@ value;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    sscanf( istate.static_data + offset, "%@format@", &value );
+    istate.ep[0].I = value;
+
+    return 2;
+}
+
+#else
+
+int @PREFIX@LDCS( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+#if 2@cval_star@3 == 6
+
+    istate.code[istate.ip+1].CVAL = interpret_alloc( &istate, sizeof( @type@ ));
+    if( istate.code[istate.ip+1].CVAL ) {
+        istate.code[istate.ip].fn = @PREFIX@LDC;
+        sscanf( istate.static_data + offset, "%@format@", 
+                istate.code[istate.ip+1].CVAL );
+        return 0;
+    } else {
+        /* If allocation failed, use a fallback to the old
+           behaviour: */
+        @type@ value;
+        istate.ep --;
+        sscanf( istate.static_data + offset, "%@format@", &value );
+        istate.ep[0].I = value;
+
+        return 2;
+    }
+    
+#else
+    istate.code[istate.ip].fn = @PREFIX@LDC;
+    sscanf( istate.static_data + offset, "%@format@",
+            &istate.code[istate.ip+1].CVAL );
+    return 0;
+#endif
+}
+
+#endif
+
+#if 0
+int @PREFIX@POW( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    istate.ep[1].I = powl( istate.ep[1].I, istate.ep[0].I );
+    istate.ep ++;
+
+    return 1;
+}
+#endif
+
+/*
+ * FILESCAN (read (scanf) integer value from the top of stack to a file)
+ * 
+ * bytecode:
+ * FILESCAN
+ * 
+ * stack:
+ * ..., file, value --> file
+ * 
+ * Read (scanf) a float value from a file to the top of stack; leave
+ * the file value on the top.
+ */
+
+int @PREFIX1@FILESCAN( INSTRUCTION_FN_ARGS )
+{
+    bytecode_file_hdr_t *file = STACKCELL_PTR( istate.ep[0] );
+    FILE *fp = file ? file->fp : NULL;
+    /* char *format = file ? file->string_scanf_format : NULL; */
+    @type@ value;
+    int nval;
+
+    TRACE_FUNCTION();
+
+    if( !file ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */
+              "attempt to scan a real value from a file which was never opened",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
+
+    if( !fp ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */ 
+              "attempt to scan a real value from a closed file",
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_NULL_ERROR,
+              EXCEPTION );
+	return 0;
+    }
+
+    nval = fscanf( fp, "%@format@", &value );
+
+    if( nval != 1 ) {
+	interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */
+              (char*)
+              cxprintf( "error scanning interger value from a file - %s",
+                        strerror(errno) ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_FILE_READ_ERROR,
+              EXCEPTION );
+	return 0;        
+    }
+
+    istate.ep --;
+    istate.ep[0].I = value;
+
+    return 1;
+}
+
+
+/*
+ * FILEPRINT (print floating point value from the top of stack to a file)
+ * 
+ * bytecode:
+ * FILEPRINT
+ * 
+ * stack:
+ * ..., file, floating_point --> file
+ * 
+ * Print an floating point value to a file from the top of stack and remove
+ * it; leave the file value on the top. The format for printing is
+ * taken from the file structure.
+ */
+
+int @PREFIX1@FILEPRINT( INSTRUCTION_FN_ARGS )
+{
+    bytecode_file_hdr_t *file = STACKCELL_PTR( istate.ep[1] );
+    FILE *fp = file->fp;
+    char *format = file->float_format.ptr;
+
+    TRACE_FUNCTION();
+
+    if( !format ) {
+	format = "%@printformat@";
+    }
+
+    fprintf( fp, format, istate.ep[0].I );
+    istate.ep ++;
+
+    return 1;
+}
+
+/*
+ * STRTOF Convert an ASCII string to floating-point number in the machine's
+ *        representation.
+ *
+ * bytecode:
+ * STRTOF
+ *
+ * stack:
+ * ..., str -> ..., integer, size
+ */
+
+#if !_ISOC99_SOURCE
+#define strtof  strtod
+#define strtold strtod
+#endif
+
+int STRTO@PREFIX@( INSTRUCTION_FN_ARGS )
+{
+    char *str = STACKCELL_PTR( istate.ep[0] );
+    char *endptr = NULL;
+
+    TRACE_FUNCTION();
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+
+    istate.ep --;
+
+    if( !str ) {
+	istate.ep[1].I = 0;
+        istate.ep[0].num.ssize = -1;
+    } else {
+        istate.ep[1].I = strto@field@( str, &endptr );
+        istate.ep[0].num.ssize = endptr - str;
+    }
+
+    return 1;
+}
+
+#if !_ISOC99_SOURCE
+#undef strtof
+#undef strtold
+#endif
+
+/*---------------------------------------------------------------------------*/
+
+static int
+pack_@field@( stackcell_t *stackcell, char typechar, ssize_t size,
+	      ssize_t *offset, byte *blob )
+{
+    int i;
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+    @type@ fvalue = stackcell->I;
+    llong value;
+    union value {
+        union stackunion num;
+        char bytes[sizeof(union stackunion)];
+    } pckvalue;
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( blob_header->size < size + *offset ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+              "attempting to pack values past the end of a blob",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_OVERFLOW,
+	      EXCEPTION );
+	return 0;
+    }
+
+    switch( typechar ) {
+    case 'i':
+	value = (llong)fvalue;
+	for( i = 0; i < size; i++ ) {
+	    *(blob + *offset + i) = value & 0xFF;
+	    value >>= 8;
+	}
+	break;
+    case 'I':
+	value = (llong)fvalue;
+	for( i = size - 1; i >= 0; i-- ) {
+	    *(blob + *offset + i) = value & 0xFF;
+	    value >>= 8;
+	}
+	break;
+    case 'f':
+        memset( &pckvalue, '\0', sizeof(pckvalue));
+        pckvalue.I = fvalue;
+        for( i = 0; i < size; i++ ) {
+            *(blob + *offset + i) = pckvalue.bytes[i];
+        }
+        break;
+    case 'F':
+        memset( &pckvalue, '\0', sizeof(pckvalue));
+        pckvalue.I = fvalue;
+        for( i = 0; i < size; i++ ) {
+	    *(blob + *offset + size - 1 - i) = pckvalue.bytes[i];
+        }
+        break;
+    case 'r':
+	if( size == sizeof(float) && *offset % size == 0 ) {
+	    *(float*)(blob + *offset) = fvalue;
+	} else
+	if( size == sizeof(double) && *offset % size == 0 ) {
+	    *(double*)(blob + *offset) = fvalue;
+	} else
+	if( size == sizeof(ldouble) && *offset % size == 0 ) {
+	    *(ldouble*)(blob + *offset) = fvalue;
+	} else {
+	    interpret_raise_exception_with_bcalloc_message
+                ( /* err_code = */ -1,
+                  /* message = */
+                  (char*)
+                  cxprintf( "unsupported pack type '%c' and size %d for type "
+                            "'@type@' at offset %d (please check alignment!)",
+                            typechar, size, *offset ),
+                  /* module_id = */ 0,
+                  /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+                  EXCEPTION );        
+	    return 0;
+	}
+	break;
+    default:
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -1,
+              /* message = */
+              (char*)
+              cxprintf( "unsupported pack type '%c' for type '@type@'",
+                        typechar ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+              EXCEPTION );        
+	return 0;
+        break;
+    }
+
+    *offset += size;
+
+    return 1;
+}
+
+static int
+unpack_@field@( stackcell_t *stack_cell, char typechar, ssize_t size,
+		ssize_t *offset, byte *blob, cexception_t *ex )
+{
+    llong value = 0;
+    @type@ fvalue = 0;
+    int i;
+    alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
+    union value {
+        union stackunion num;
+        char bytes[sizeof(union stackunion)];
+    } pckvalue;
+
+    assert( blob_header->magic == BC_MAGIC );
+
+    if( blob_header->size < size + *offset ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "attempting to unpack values past the end of a blob",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_OVERFLOW,
+	      ex );
+	return 0;
+    }
+
+    switch( typechar ) {
+    case 'i':
+        for( i = size - 1; i >= 0; i-- ) {
+            value <<= 8;
+            value |= *(blob + *offset + i);
+	    fvalue = value;
+        }
+        break;
+    case 'I':
+        for( i = 0; i < size; i++ ) {
+            pckvalue.bytes[i] = *(blob + *offset + i);
+        }
+        fvalue = pckvalue.I;
+        break;
+    case 'f':
+        memset( &pckvalue, '\0', sizeof(pckvalue));
+        for( i = 0; i < size; i++ ) {
+            pckvalue.bytes[i] = *(blob + *offset + i);
+        }
+        fvalue = pckvalue.I;
+        break;
+    case 'F':
+        memset( &pckvalue, '\0', sizeof(pckvalue));
+        for( i = 0; i < size; i++ ) {
+            pckvalue.bytes[i] = *(blob + *offset + size - 1 - i);
+        }
+        fvalue = pckvalue.I;
+        break;
+    case 'r':
+	if( size == sizeof(float) && *offset % size == 0 ) {
+	    fvalue = *(float*)(blob + *offset);
+	} else
+	if( size == sizeof(double) && *offset % size == 0 ) {
+	    fvalue = *(double*)(blob + *offset);
+	} else
+	if( size == sizeof(ldouble) && *offset % size == 0 ) {
+	    fvalue = *(ldouble*)(blob + *offset);
+	} else {
+	    interpret_raise_exception_with_bcalloc_message
+		( /* err_code = */ -1,
+		  /* message = */
+		  (char*)
+		  cxprintf( "unsupported unpack type '%c' and size %d "
+			    "for type '@type@' at offset %d "
+			    "(check alignment!)", typechar, size, *offset ),
+		  /* module_id = */ 0,
+		  /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+		  ex );
+	    return 0;	    
+	}
+	break;
+    default:
+        interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      (char*)
+	      cxprintf( "unsupported unpack type '%c' "
+			"for type '@type@'", typechar ),
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_BLOB_BAD_DESCR,
+	      ex );
+	return 0;
+        break;
+    }
+
+    stack_cell->I = fvalue;
+
+    *offset += size;
+
+    return 1;
+}

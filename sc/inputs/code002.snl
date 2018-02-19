@@ -1,0 +1,12 @@
+#
+# Snail language compiler tests
+#
+#
+# Simple bytecode tests
+#
+
+bytecode {
+    SLDC "This is a message from snail\n"
+    SPRINT
+    NEWLINE
+}

@@ -1,0 +1,22 @@
+#
+# Snail compiler tests
+#
+#
+# Test GNU random number generator interface package
+#
+
+use * from std;
+use * from Math;
+use * from GNUrand48;
+
+srand48( 10367 );
+
+. drand48();
+. drand48();
+. drand48();
+. drand48();
+
+. lrand48();
+. lrand48();
+. lrand48();
+. lrand48();

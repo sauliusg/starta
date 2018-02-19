@@ -1,0 +1,53 @@
+#
+# Snail compiler tests
+#
+#
+# Test function and procedure references
+#
+
+use * from std;
+
+procedure g( x : int ) : int
+{
+    return 2 * x;
+}
+
+type F = procedure ( i : int ) -> ( int );
+
+var p : F = g;
+
+if( p ) {
+    . "p is non-null";
+} else {
+    . "p is null";
+}
+
+p = null;
+
+if( p ) {
+    . "p is non-null";
+} else {
+    . "p is null";
+}
+
+#-------------------------------
+
+p = g;
+
+if( null == p ) {
+    . "p is null";
+} else {
+    . "p is non-null";
+}
+
+p = null;
+
+if( null == p ) {
+    . "p is null";
+} else {
+    . "p is non-null";
+}
+
+p = g;
+
+. p ( 128 );

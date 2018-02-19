@@ -1,0 +1,11 @@
+./sl: inputs/err-mass002.snl(55,28): ERROR, incompatible type of argument 1 for operator '-'
+i, n[3], n[9] = l, m, l - m;
+                           ^
+./sl: inputs/err-mass002.snl(55,28): ERROR, incompatible types for assignment
+i, n[3], n[9] = l, m, l - m;
+                           ^
+./sl: inputs/err-mass002.snl(55,28): ERROR, incompatible types for assignment
+i, n[3], n[9] = l, m, l - m;
+                           ^
+./sl: 3 error(s) detected
+

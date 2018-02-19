@@ -1,0 +1,23 @@
+// --*- C -*--
+
+// Test unsigned arithmetics (strtol)
+
+use std;
+use unsigned;
+
+bytecode { SLDC "12345" SPRINT NEWLINE NEWLINE }
+
+. bytecode : ubyte { SLDC "255" LDC 10 libunsigned:STRTOUB IPRINT NEWLINE };
+. "";
+
+. bytecode : ushort { SLDC "65535" LDC 10 libunsigned:STRTOUH IPRINT NEWLINE };
+. "";
+
+. bytecode : uint { SLDC "4294967295" LDC 10 libunsigned:STRTOU IPRINT NEWLINE };
+. "";
+
+. bytecode : ulong { SLDC "4294967295" LDC 10 libunsigned:STRTOUL IPRINT NEWLINE };
+. "";
+
+. bytecode : ullong { SLDC "18446744073709551615" LDC 10 libunsigned:STRTOULL IPRINT NEWLINE };
+. "";

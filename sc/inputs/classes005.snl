@@ -1,0 +1,36 @@
+#
+# Snail compiler tests
+#
+#
+# Test class inheritance.
+#
+
+use * from std;
+
+class S {
+    string name;
+    int val;
+    S next;
+    string description;
+    float x;
+}
+
+var s2 = new class : S {s : string; x, y : double};
+
+var s1 = new S;
+
+s1.name = "This is s1, of class S";
+
+s2.s = "This is s2, of class derived from S";
+s2.val = 20;
+s2.name = "s2";
+
+. '"' _ s2.s _ '"', s2.val;
+
+procedure print_name( s : S )
+{
+    . "Class S name =", "\"" + s.name + "\"";
+}
+
+print_name( s1 );
+print_name( s2 );

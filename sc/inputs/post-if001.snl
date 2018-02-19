@@ -1,0 +1,19 @@
+#
+# Snail compiler tests
+#
+#
+# Test Perl-style pos-conditional operators
+#
+
+include "stdtypes.slib"
+
+var a : int = 1;
+var b : int = 0;
+
+do . "a is zero" if a == 0;
+do . "a is one"  if a == 1;
+do . "a is two"  if a == 2;
+
+do . "b is zero" if b == 0;
+do . "b is one"  if b == 1;
+do . "b is two"  if b == 2;

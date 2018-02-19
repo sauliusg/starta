@@ -1,0 +1,41 @@
+
+use * from std;
+
+struct Q {
+     string a;
+     int b;
+     float c;
+     s : not null struct {
+         int i, j;
+         float x, y, z;
+     }
+}
+
+type S = struct {
+     string a;
+     int b;
+     float c;
+     var n, m : Q
+}
+
+
+var s = struct S {
+    a => "mama",
+    n => struct Q {
+        a => "kva-kva",
+        b => 111
+    },
+    n => struct Q {
+        a => "kva-kva",
+        b => 2222
+    }
+};
+
+var q = struct Q {
+    c => 12,
+};
+
+var qq = struct Q {
+    c => 12,
+    s => new struct { int i, j; float a, b, c; }
+};

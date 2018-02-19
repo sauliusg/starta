@@ -1,0 +1,12 @@
+#
+# Snail language compiler tests
+#
+#
+# Test of operator "new" diagnostics.
+#
+
+type int = { size = 4; kind = integer };
+
+var i : int;
+
+i = new int;

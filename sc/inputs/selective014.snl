@@ -1,0 +1,17 @@
+// --*- C -*--
+// Check module (package) implementation.
+//
+
+// Check whether specific names can be imported from selected
+// packages:
+
+use * from std;
+
+use P1; use P2;
+
+use function fg, aBunny from P1;
+use function ff, gg from P2;
+
+ff();
+fg();
+gg();

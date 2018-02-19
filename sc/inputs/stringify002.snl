@@ -1,0 +1,20 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+var x = 1123;
+var s = "s = " + %%x;
+
+. s;
+
+var f = 3.1415926;
+var d = f@double;
+var e : ldouble = f;
+
+. %% f;
+. %% d;
+. %% e;
+
+. %% "a string?";

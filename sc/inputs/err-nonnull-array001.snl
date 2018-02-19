@@ -1,0 +1,10 @@
+
+use * from std;
+
+type S = struct {
+     string a;
+     int b;
+     float c;
+}
+
+var m = new S[100];

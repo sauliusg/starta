@@ -1,0 +1,20 @@
+./sl: inputs/interfaces006.snl(9,27): ERROR, type 'Ig' is not declared in the current scope
+class S implements If, Ig {
+                          ^
+./sl: inputs/interfaces006.snl(28,18): ERROR, interface 'Ig' is not declared in the current scope
+    method g @ Ig( x, y, z :  int ) : int
+                 ^
+./sl: inputs/interfaces006.snl(40,22): ERROR, module 'Module' is not available in the current scope
+    method s @ Module::Ig() -> (string)
+                     ^
+./sl: inputs/interfaces006.snl(40,26): ERROR, interface 'Ig' is not declared in the current scope
+    method s @ Module::Ig() -> (string)
+                         ^
+./sl: inputs/interfaces006.snl(41,5): ERROR, function 's' is already declared in this scope
+    {
+    ^
+./sl: inputs/interfaces006.snl(51,10): ERROR, interface 'Ig' is not declared in the current scope
+. s->s@Ig();
+         ^
+./sl: 6 error(s) detected
+

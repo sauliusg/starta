@@ -1,0 +1,5 @@
+./sl: inputs/err-multinint001.snl(9,35): ERROR, incompatible types for assignment to variable 'z'
+var x, y, z : float = 1, 2.0, 3.0D;
+                                  ^
+./sl: 1 error(s) detected
+

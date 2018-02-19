@@ -1,0 +1,12 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+use M1;
+use M2;
+
+M1::p1();
+M2::p2();

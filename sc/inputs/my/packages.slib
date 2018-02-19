@@ -1,0 +1,11 @@
+
+package Mano;
+
+use * from std
+
+function greeting( name : string ) -> string
+begin
+    return "Hello, %s, how are you?" %% name
+end;
+
+end package Mano;

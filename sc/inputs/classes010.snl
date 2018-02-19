@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use * from std;
+
+class A {
+    int i;
+    float x;
+    string s;
+
+    method name() : string { return "class A" }
+
+    method addx( a : A )
+    {
+        self.x += a.x
+    }
+}
+
+var a, b : A = new A, new A;
+
+a.x = 5;
+b.x = 8;
+
+b->addx( a );
+
+. b->name();
+. b.x;

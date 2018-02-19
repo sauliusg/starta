@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var strings = [
+    [ "Mano", "batai", "buvo", "du," ],
+    [ "vienas", "dingo", "--", "nerandu!" ],
+    [ "Kur", "suskubo", "jis", "nukristi?" ],
+    [ "Kur", "suskubo", "nusiristi?", "(ir viskas)" ],
+];
+
+var b = new blob(20 * length(strings) * length(strings[0]));
+
+pack b, 0, "zx4", strings;
+
+var a = unpack string[]( b, 0, "zx16" );
+
+for var i = 0 to last(a) do
+    < a[i];
+    . ""
+enddo

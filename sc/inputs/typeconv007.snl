@@ -1,0 +1,17 @@
+#
+# Compiler tests
+#
+#
+# Test type conversions
+#
+
+use * from std;
+
+type Cell = byte;
+
+var Cell c = 1 Cell;
+
+. c;
+
+. c << 10 Cell;
+. c@int << 10;

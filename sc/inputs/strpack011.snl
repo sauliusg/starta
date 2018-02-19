@@ -1,0 +1,38 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var b = new blob(15);
+var s1 = "string 1";
+var s2 = "str 2";
+
+pack b, 0, "sx2", [ s1, s2 ];
+
+var a = unpack string[]( b, 0, "sx2" );
+
+for var int i = 0 to last( a ) do
+    . ">>" _ a[i] _ "<<";
+enddo
+
+pack b, 0, "sx2", [ "alpha", "beta" ];
+
+a = unpack string[] ( b, 0, "sx2" );
+
+for var int i = 0 to last( a ) do
+    . a[i];
+enddo
+
+var strarray = [ "gamma", "delta", "epsilon" ];
+
+pack b, 0, "sx2", strarray;
+
+a = unpack string[] ( b, 0, "sx2" );
+
+for var int i = 0 to last( a ) do
+    . a[i];
+enddo

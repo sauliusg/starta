@@ -1,0 +1,21 @@
+#
+# Regression test: check that exception handling code generator track
+# the execution stack correctly.
+#
+
+use * from std;
+
+exception XXX;
+
+if( 0 ) {
+    raise XXX( -1, "funny" );
+}
+
+function f() : int, float
+{
+    return 1, 1.1;
+}
+
+var a, b, c : float;
+
+a, b, c = f();

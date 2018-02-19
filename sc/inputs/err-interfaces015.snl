@@ -1,0 +1,19 @@
+#
+# Check implementation of interfaces with the same method names.
+#
+
+# Check that lists of reference variables are looped correctly:
+
+use * from std;
+
+interface I1 {
+    method add( int i );
+    method sub( int i );
+    method get(): int;
+}
+
+interface I1 {
+    method add( int i );
+    method sub( int i );
+    method get(): int;
+}

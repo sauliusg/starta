@@ -1,0 +1,16 @@
+
+use * from std;
+use * from Math;
+
+pragma float;
+
+# Examples from:
+# http://www.askamathematician.com/2011/04/q-how-do-you-calculate-6212-or-48293-whats-the-deal-with-this-orders-of-operation-business/
+# Retrieved: 2013-01-02
+# S.G.
+
+. 4**2*3/6+1-5;
+
+. 4**2*3/6 + 1 - 5/14*3 + 6/10 - 4*2/14*6**3/18 + 14;
+
+. "Huh?";

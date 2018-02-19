@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use * from std;
+
+type A = struct {
+    int ii;
+    float xx;
+    string nn;
+    string nm;
+}
+
+type C = struct : A {
+    int a;
+    int b
+}
+
+. "C.ii.offset =", const(C.ii.offset/C.ii.size);
+. "C.xx.offset =", const(C.xx.offset/C.ii.size);
+. "C.a.offset  =", const(C.a.offset/C.ii.size);
+. "C.b.offset  =", const(C.b.offset/C.ii.size);
+. "C.nn.offset =", const(C.nn.offset/C.ii.size);
+. "C.nm.offset =", const(C.nm.offset/C.ii.size);

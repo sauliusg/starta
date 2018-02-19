@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+type collection of T = null {
+    size = sizeof native "void*";
+}
+
+var c : collection of ldouble;
+
+. c[1];

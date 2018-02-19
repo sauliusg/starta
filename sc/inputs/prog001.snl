@@ -1,0 +1,20 @@
+#
+# Snail compiler tests
+#
+#
+# Test 'program' statement and program arguments.
+#
+
+include "stdtypes.slib"
+
+program test( args : array of string ) {
+
+. "Hi!";
+
+var i : int;
+
+for i = 0 to last( args ) do
+    . args[i];
+enddo;
+
+}

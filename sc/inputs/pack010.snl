@@ -1,0 +1,31 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var a = new blob(100);
+
+pack a, 10, "f4", [ 2.0, 3.14, 2.73 ];
+
+var m = unpack (array of float)(a, 14, "f4x4");
+
+. unpack float( a, 10, "f4" );
+
+procedure print_array( float m[] );
+
+print_array( m );
+
+//------------------
+
+procedure print_array( float m[] )
+{
+    for var int i = 0 to last( m ) {
+        < m[i]; < " ";
+    }
+    < "\n";
+}
+

@@ -1,0 +1,22 @@
+package GNUrand48;
+
+use * from std;
+
+load "libraries/GNUrand48/libGNUrand48.so.0.01";
+
+inline bytecode function srand48( long seed )
+{
+    libGNUrand48:SRAND48
+}
+
+inline bytecode function drand48() : double
+{
+    libGNUrand48:DRAND48
+}
+
+inline bytecode function lrand48() : long
+{
+    libGNUrand48:LRAND48
+}
+
+end package GNUrand48;

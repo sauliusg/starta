@@ -1,0 +1,17 @@
+#
+# Snail language compiler tests
+#
+# Test fabs()-fmily functions
+#
+
+use * from std;
+use * from Math;
+
+. fabs(1.0 - 2.0);
+. fabs(2.0 - 1.0);
+
+. dabs(1.0D - 2.0D);
+. dabs(2.0D - 1.0D);
+
+. ldabs(1.0LD - 2.0LD);
+. ldabs(2.0LD - 1.0LD);

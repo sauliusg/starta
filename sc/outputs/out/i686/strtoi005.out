@@ -1,0 +1,20 @@
+STRTOB - '255' 'signed char' value too large
+
+STRTOB - '-255' 'signed char' value too small
+
+STRTOH - '65535' 'short' value too large
+
+STRTOH - '-65535' 'short' value too small
+
+STRTOI - '4294967295' numerical result out of range
+
+STRTOI - '-4294967295' numerical result out of range
+
+STRTOL - '4294967295' numerical result out of range
+
+STRTOL - '-4294967295' numerical result out of range
+
+STRTOLL - '18446744073709551615' numerical result out of range
+
+STRTOLL - '-18446744073709551615' numerical result out of range
+

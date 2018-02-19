@@ -1,0 +1,23 @@
+#
+# Snail compiler tests
+#
+#
+# Test pointer-not operator for files.
+#
+
+include "stdtypes.slib"
+include "stdio.slib"
+
+var f : file;
+
+f = fopen( "inputs/text.dat", "r" );
+
+if( f ) {
+    . "f is not null"
+}
+
+f = null;
+
+if( !f ) {
+    . "f is null"
+}

@@ -1,0 +1,14 @@
+
+module Y1;
+
+use * from std;
+
+type T = int;
+
+type T1 = long;
+
+var t : T;
+
+var t1 : T1;
+
+end module Y1;

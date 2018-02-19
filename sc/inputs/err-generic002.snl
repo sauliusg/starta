@@ -1,0 +1,20 @@
+
+use * from std;
+
+function mini( point: type T;
+               ndim: long;
+
+               makearray: function( length : long ) -> (array of T);
+               makecenter: function( simplex: array of type T; i: long )->(type T)
+
+             ) -> float, float
+{
+    debug;
+
+    # The following assignment is type-incompatible!
+    var simplex: array [][][][] of T = makearray( ndim+1L );
+
+    simplex[0] = makecenter( simplex, 2 );
+
+    return 0.0, 0.0;
+}

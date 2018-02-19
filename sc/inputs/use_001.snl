@@ -1,0 +1,32 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+use * from M;
+
+const CC = 100;
+
+. i;
+. M::i;
+. "";
+
+var int j;
+
+j = const(D);
+. j;
+j = const(M::D);
+. j;
+. "";
+
+. const(CC * C);
+. const(CC * M::C);
+. "";
+
+const X = C + D;
+. const X;
+
+const Y = M::C + M::D;
+. const(Y);

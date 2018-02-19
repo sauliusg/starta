@@ -1,0 +1,15 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+ro var m = new llong[10];
+
+m[0] = -234;
+
+foreach var e in m do
+    . e;
+    e ++;
+    e = 0;
+enddo

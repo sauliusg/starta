@@ -1,0 +1,22 @@
+// --*- C -*--
+// Check module (package) implementation.
+//
+
+// Check whether specific names can be imported from selected
+// packages:
+
+use std;
+
+import P1; import P2;
+
+use P1;
+use const C3, K1 from P2;
+
+. const(C1);
+. const(P1::C2);
+. const(K1);
+. const(P2::K2);
+
+. const(P1::C3);
+. const(P2::K3);
+. const(C3);

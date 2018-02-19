@@ -1,0 +1,23 @@
+#
+# Snail language compiler tests
+#
+# Test substrings
+#
+
+use * from std;
+
+var s = "Something";
+
+. length(s);
+
+try { . s[-10..0] }
+catch ( var m : string) { . m }
+
+try { . s[10..0] }
+catch ( var m : string) { . m }
+
+try { . s[0..20] }
+catch ( var m : string) { . m }
+
+try { . s[9..-30] }
+catch BoundError ( var m : string) { . m }

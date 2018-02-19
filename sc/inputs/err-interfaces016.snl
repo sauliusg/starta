@@ -1,0 +1,28 @@
+#
+# Compiler tests
+#
+#
+# Test interfaces
+#
+
+use * from std;
+
+interface I1 {
+    method mm() : int;
+}
+
+interface I2 {
+    method nn() : float[];
+}
+
+interface I3 {
+    method xx() : float;
+}
+
+interface X: I3 implements I1, I2 {
+    method get(): int
+}
+
+interface Y: I3 implements I1, I2 {
+    method get(): int;
+}

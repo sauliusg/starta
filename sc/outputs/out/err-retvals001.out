@@ -1,0 +1,5 @@
+./sl: inputs/err-retvals001.snl(7,1): ERROR, incompatible types of returned value 1 of function 'h'
+}
+^
+./sl: 1 error(s) detected
+

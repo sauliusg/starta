@@ -1,0 +1,6 @@
+s1 = AT
+s2 = ATOM  
+s3 = ATOM      1  N   SER A   5      45.708   0.732  46.608  1.00 55.34
+string s1 is a prefix of string s2
+string s2 is a prefix of string s3
+string s3 is NOT a prefix of string s1

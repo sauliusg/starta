@@ -1,0 +1,78 @@
+#
+# Snail compiler tests
+#
+#
+# Generic lists.
+#
+
+use * from std;
+
+type list of T = ?{
+    next : list of T;
+    value : T;
+
+    operator "+" ( l1, l2 : list of T ) : list of T
+    {
+	if( l1 && l2 ) {
+	    var r = l1[];
+	    var q = r;
+	    var p = l1.next;
+	    while( p != null ) {
+		q.next = p[];
+		q = q.next;
+		p = p.next;
+	    }
+	    q.next = l2;
+	    return r
+	} else {
+	    if( l1 ) {
+		return l1
+	    } else {
+		return l2
+	    }
+	}
+    }; // operator "+"
+
+    inline bytecode operator "next"( l : list of T )
+    { NEXT const((list of T).next.offset) const((list of T).value.offset) }
+
+} // type "list of T"
+
+procedure cons( s : type T; l : list of type T = null ) : list of type T
+{
+    return type list of T { value => s, next => l };
+}
+
+exception NullPointerException;
+
+procedure head( l : list of type T ) : type T
+{
+    if( l ) {
+        return l.value
+    } else {
+        raise NullPointerException( 123, "attempting to take head of a null list" );
+    }
+}
+
+procedure tail( l : list of type T ) : list of type T
+{
+    if( l ) {
+        return l.next
+    } else {
+        return null;
+    }
+}
+
+var l, p : list of string;
+
+var s : list of string = cons( "one" );
+
+l = s + p;
+l = s + cons( "two" );
+l = l + cons( "1", cons( "2" )) + cons( "three", cons( "four" ));
+
+< "( ";
+foreach var i in l do
+    < i, ""
+enddo
+. ")"

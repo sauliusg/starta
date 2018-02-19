@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test compile time type attributes
+#
+
+use * from std;
+
+type T = null {
+    reference;
+    size = 8;
+    s : string;
+    x : int;
+};
+
+var t : T;
+
+. "for variable 't':";
+
+. const(t.nonexistent_attribute);
+. const(t.s.nonexistent_attribute);
+
+. "for type 'T':";
+
+. const(T.nonexistent_attribute);
+. const(T.s.nonexistent_attribute);

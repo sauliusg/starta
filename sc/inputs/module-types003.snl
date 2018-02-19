@@ -1,0 +1,10 @@
+
+use * from std;
+
+use * from Y1;
+use * from Y2;
+
+type T = long;
+
+var a : T = 10T;
+. a;

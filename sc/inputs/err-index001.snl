@@ -1,0 +1,19 @@
+#
+# Snail compiler tests
+#
+#
+# Test array indexing with chars.
+#
+
+use * from std;
+
+var s : string = "some string";
+
+var counts = new int[256];
+
+var x : double;
+
+. s[1.1];
+. counts[x];
+
+s[0] = 'A'c;

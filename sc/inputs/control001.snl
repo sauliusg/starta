@@ -1,0 +1,28 @@
+#
+# Snail compiler tests
+#
+#
+# Test loops and posfixed conditions;
+#
+
+use * from std;
+
+var i = 0;
+
+repeat {
+  . i; i++
+} while i < 10;
+
+repeat
+  . i; i++
+while i < 20;
+
+i = 0;
+
+while true {
+    do <"gerade   "; .i if i % 2 == 0;
+    do { <"ungerade "; .i } if i % 2 != 0;
+    do break if i > 10;
+    i ++
+}
+

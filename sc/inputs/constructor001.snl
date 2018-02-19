@@ -1,0 +1,29 @@
+
+use * from std;
+
+class C {
+    int i;
+
+    constructor( int x )
+    {
+        self.i = x;
+    }
+
+    method print_i()
+    {
+        . self.i
+    }
+
+    method get_i(): int
+    {
+        return self.i
+    }
+}
+
+var c = new C( 5 );
+
+. c.i;
+
+c->print_i();
+
+. c->get_i();

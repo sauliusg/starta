@@ -1,0 +1,38 @@
+./sl: inputs/Parametrised.slib(2,60): ERROR, type 'fluffy' is not defined for module parameter
+module Parametrised( type inttype, type floattype = double )
+                                                           ^
+./sl: inputs/Parametrised.slib(8,15): ERROR, type 'floattype' has no binary operator named '*'
+    return x*y/(x+y);
+              ^
+./sl: inputs/Parametrised.slib(8,20): ERROR, type 'floattype' has no binary operator named '+'
+    return x*y/(x+y);
+                   ^
+./sl: inputs/Parametrised.slib(8,21): ERROR, type 'floattype' has no binary operator named '/'
+    return x*y/(x+y);
+                    ^
+./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no operator named 'ldc'
+    return x * 2 floattype;
+                          ^
+./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no binary operator named '*'
+    return x * 2 floattype;
+                          ^
+./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no conversion from type 'inttype'
+    return x/i@floattype;
+                        ^
+./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no binary operator named '/'
+    return x/i@floattype;
+                        ^
+./sl: inputs/err-parammod004.snl(11,4): ERROR, module 'P' is not available in the current scope
+. P::parallel( 10, 30 );
+   ^
+./sl: inputs/err-parammod004.snl(11,18): ERROR, type 'floattype' has no conversion from type 'int'
+. P::parallel( 10, 30 );
+                 ^
+./sl: inputs/err-parammod004.snl(11,23): ERROR, type 'floattype' has no conversion from type 'int'
+. P::parallel( 10, 30 );
+                      ^
+./sl: inputs/err-parammod004.snl(11,24): ERROR, type 'floattype' has no unary operator named '.'
+. P::parallel( 10, 30 );
+                       ^
+./sl: 12 error(s) detected
+

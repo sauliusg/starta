@@ -1,0 +1,8 @@
+./sl: inputs/err-new003.snl(35,16): ERROR, incompatible type of argument 1 for operator 'new[]'
+m = new int[10][20];
+               ^
+./sl: inputs/err-new003.snl(35,20): ERROR, incompatible type of argument 1 for operator 'new[][]'
+m = new int[10][20];
+                   ^
+./sl: 2 error(s) detected
+

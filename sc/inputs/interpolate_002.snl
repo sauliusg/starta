@@ -1,0 +1,10 @@
+// --*- C -*--
+
+// Test ldouble printout
+
+use std;
+
+use Mod1 in "$D/modules/dir1/Mod1.slib";
+
+. Mod1::uuid;
+. uuid

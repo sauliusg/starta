@@ -1,0 +1,5 @@
+./sl: inputs/err-nullinit003.snl(28,1): ERROR, non-null field 'm' of type 'S' is not initialised
+};
+^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,9 @@
+// --*- C -*--
+
+// Test number check functions:
+
+use std;
+
+function square( int x ): float => x * x;
+
+. square(4);

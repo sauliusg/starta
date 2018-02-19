@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test generic array and ref indexing diagnostics
+#
+
+use * from std;
+
+//use * from testmath;
+
+function f( float x; float y ) : float
+{
+    use * from testmath;
+
+    return testmath::sqr( x ) / y
+}
+
+function g( float x; float y ) : float
+{
+    use * from testmath;
+
+    return x / testmath::sqr( y );
+}
+
+. f( 2, 3 );
+. g( 2, 3 );

@@ -1,0 +1,68 @@
+// --*- C -*--
+
+// Test ArrayMAth
+
+use std;
+use ArrayMath;
+
+var x = [1,2,3];
+var f = [ 1.0, 2.0, 3.0, 4.0, 5.0, 6. ];
+var d = [ 1.0D, 2.0D, 3.0D, 4.0D, 5.0D, 6.D ];
+var ld = [ 1.0LD, 2.0LD, 3.0LD, 4.0LD, 5.0LD, 6.0LD ];
+
+// integer sums:
+
+. basumi([1B,2B,3B]);
+. basuml([1B,2B,3B]);
+. basumll([1B,2B,3B]);
+. basumf([1B,2B,3B]);
+. basumd([1B,2B,3B]);
+. basumld([1B,2B,3B]);
+. "";
+
+. hasumi([1S,2S,3S]);
+. hasuml([1S,2S,3S]);
+. hasumll([1S,2S,3S]);
+. hasumf([1S,2S,3S]);
+. hasumd([1S,2S,3S]);
+. hasumld([1S,2S,3S]);
+. "";
+
+. asumi(x);
+. asuml(x);
+. asumll(x);
+. asumf(x);
+. asumd(x);
+. asumld(x);
+. "";
+
+. lasumi([1L,2L,3L]);
+. lasuml([1L,2L,3L]);
+. lasumll([1L,2L,3L]);
+. lasumf([1L,2L,3L]);
+. lasumd([1L,2L,3L]);
+. lasumld([1L,2L,3L]);
+. "";
+
+. llasumi([1LL,2LL,3LL]);
+. llasuml([1LL,2LL,3LL]);
+. llasumll([1LL,2LL,3LL]);
+. llasumf([1LL,2LL,3LL]);
+. llasumd([1LL,2LL,3LL]);
+. llasumld([1LL,2LL,3LL]);
+. "";
+
+. fasumf(f);
+. fasumd(f);
+. fasumld(f);
+. "";
+
+. dasumf(d);
+. dasumd(d);
+. dasumld(d);
+. "";
+
+. ldasumf(ld);
+. ldasumd(ld);
+. ldasumld(ld);
+. "";

@@ -1,0 +1,20 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test destructors.
+
+use std;
+
+var x = new null class {
+    name : string;
+
+    destructor {
+        . "Finalising anonymous class assigned to variable 'x'."
+    }
+
+    method set_name( string s ) { self.name = s }
+
+    method name(): string { return self.name }
+};
+

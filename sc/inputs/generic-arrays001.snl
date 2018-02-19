@@ -1,0 +1,101 @@
+//--*- C -*------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2013-09-12 09:13:30 +0300 (Thu, 12 Sep 2013) $ 
+//$Revision: 10 $
+//$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/scilib/trunk/sc/simplex-minimisation/testsimplex.snl $
+//---------------------------------------------------------------------------*/
+//*
+// Test minimisation using the Simplex method -- test how generic
+// arrays are handled in "real life" situations"
+//**
+
+use * from std;
+use * from Math;
+
+use Simplex;
+use * from FloatSimplexFns;
+
+function energy( float x[] ): float
+{
+    return (2.0-x[0])**2.0 + 2.0*(3.0+x[1])**2.0 + 2.5;
+}
+
+function distance( p, q: array of float ): float
+{
+    var sum: float;
+    for var i = 0 to last(p) do
+        sum += (p[i] - q[i]) ** 2.0;
+    enddo;
+    return sqrtf(sum);
+}
+
+procedure reporter(
+ simplex: array [][] of float;
+ energies: array of float;
+ minindex: long;
+ nextindex: long;
+ maxindex: long;
+ stepnr: long
+)
+{
+    . "";
+    . "Step:", stepnr;
+    . "Simplex:";
+    for( var i = 0; i < length(simplex); i++ ) {
+        < i, " ";
+        for( var j = 0; j < length(simplex[i]); j++ ) {
+            < simplex[i][j];
+            < " ";
+        }
+        < "energy =", energies[i], "distances:";
+        for( var j = i + 1; j < length(simplex); j++ ) {
+            < " ", distance( simplex[i], simplex[j] );
+        }
+        . "";
+    }
+    . "ilow, inext, ihigh =", minindex, nextindex, maxindex;
+}
+
+var optimum: array of float;
+var reported_energy: float;
+var nsteps : long;
+
+. energy( [1.0, 2.0] );
+. energy( [2.0, -3.0] );
+
+procedure print_array( p : array of float )
+{
+    for( var i = 0; i < length(p); i++ ) {
+        < p[i], " ";
+    }
+}
+
+reported_energy, optimum =
+    Simplex::minimise( [1.0, 2.0], 2, 2.0, energy,
+                       scale, shift, flip, mkarray, mkcenter,
+                       reporter => reporter );
+
+. reported_energy, energy( optimum );
+print_array( optimum );
+. "";
+
+reported_energy, optimum, nsteps =
+    Simplex::minimise( [0.0, 0.0], 2, 2.0, energy,
+                       scale, shift, flip, mkarray, mkcenter );
+. reported_energy, nsteps;
+print_array( optimum );
+. "";
+
+reported_energy, optimum, nsteps =
+    Simplex::minimise( [10.0, 10.0], 2, 12.0, energy,
+                       scale, shift, flip, mkarray, mkcenter );
+. reported_energy, nsteps;
+print_array( optimum );
+. "";
+
+reported_energy, optimum, nsteps =
+    Simplex::minimise( [100.0, 100.0], 2, 21.0, energy,
+                       scale, shift, flip, mkarray, mkcenter );
+. reported_energy, nsteps;
+print_array( optimum );
+. "";

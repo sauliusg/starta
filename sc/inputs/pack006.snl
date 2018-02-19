@@ -1,0 +1,43 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+procedure print_array( int m[] )
+{
+    for var int i = 0 to last( m ) {
+        < m[i]; < " ";
+    }
+    < "\n";
+}
+
+procedure print_array2( int m[][] )
+{
+    for var int i = 0 to last( m ) {
+        print_array( m[i] );
+    }
+}
+
+print_array2( [ [ 1, 2, 3 ], [ 4, 5, 6 ] ] );
+. "";
+
+var b = new blob(20);
+
+pack b, 0, "I2", [ [ 1S, 2S, 3S ], [ 4S, 5S, 6S ] ];
+
+var m = unpack (array of int)( b, 0, "I2x10" );
+print_array( m );
+. "";
+
+var n = unpack int[2][]( b, 0, "I2x3" );
+print_array2( n );
+. "";
+
+n = unpack int[3][]( b, 0, "I2x2" );
+print_array2( n );
+. "";
+

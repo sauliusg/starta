@@ -1,0 +1,67 @@
+#
+# Snail compiler tests
+#
+#
+# Test exception handling in SL compiler.
+#
+
+include "stdtypes.slib"
+
+inline bytecode function raise_exception( code : int; msg : string )
+{
+    RAISEX
+}
+
+procedure f( i : int ) : int
+{
+    try {
+        try {
+            return i + 1;
+        }
+    }
+}
+
+procedure g( i : int ) : int
+{
+    if( i != 0 ) then
+        return f( i ) / i
+    else
+        . "about to raise exception in g()";
+        raise_exception( 11, "divison by 0 in g()" )
+    endif
+}
+
+. "Before try";
+
+inline bytecode procedure iwrite( i : int )
+{
+    IPRINT
+}
+
+inline bytecode procedure swrite( s : string )
+{
+    SPRINT
+}
+
+inline bytecode procedure nl()
+{
+    NEWLINE
+}
+
+try {
+    . "Within TRY block, before g() call";
+    . g( 2 );
+    . g( 1 );
+    . g( 0 );
+    . "Within TRY block, after g() call\n";
+}
+
+catch( var ex : int; var msg : string ) {
+    swrite( "*** exception " );
+    iwrite( ex );
+    swrite( ", " );
+    swrite( msg );
+    nl();
+}
+
+. "After try";

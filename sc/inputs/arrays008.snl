@@ -1,0 +1,38 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test how indexing outside array bounds is diagnosed.
+
+use * from std;
+
+var m = new int[10];
+
+try {
+    m[-1] = 1;
+}
+catch( var errno : int; var message : string ) {
+    . message;
+}
+
+try {
+    m[10] = 1;
+}
+catch( var errno : int; var message : string ) {
+    . message;
+}
+
+try {
+    . m[21];
+}
+catch( var errno : int; var message : string ) {
+    . message;
+}
+
+m = null;
+try {
+    . m[21];
+}
+catch( var errno : int; var message : string ) {
+    . message;
+}

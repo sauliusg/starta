@@ -1,0 +1,54 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var b = new blob(100);
+
+for var int i = 0 to 50-1 do
+    pack b, i*2, "i2", 12*i;
+enddo
+
+// unpack multidimensional array:
+
+var m = unpack int[3][] ( b, 0, "i2x5" );
+
+var n = unpack int[3][2][] ( b, 0, "i2x4" );
+
+procedure print( int m[] )
+{
+    for var i = 0 to last(m) do
+        < "%3d " %% m[i]
+    enddo
+    . "";
+}
+
+print( unpack int[]( b, 0, "i2x15" ));
+."";
+
+procedure print2( m : array [][] of int )
+{
+    for var i = 0 to last(m) do
+        for var j = 0 to last(m[i]) do
+            < "%3d " %% m[i][j]
+        enddo
+        . ""
+    enddo
+}
+
+print2( m );
+."";
+
+procedure print3( m : array [][][] of int )
+{
+    for var i = 0 to last(m) do
+        print2( m[i] );
+        ."";
+    enddo
+}
+
+print3( n );

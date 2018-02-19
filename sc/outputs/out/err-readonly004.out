@@ -1,0 +1,17 @@
+./sl: inputs/err-readonly004.snl(29,14): ERROR, can not assign to a readonly component
+mm[1][1] = 10;
+             ^
+./sl: inputs/err-readonly004.snl(30,21): ERROR, can not assign to a readonly component
+mm[9] = new int [11];
+                    ^
+./sl: inputs/err-readonly004.snl(31,8): ERROR, can not assign to the readonly variable 'mm'
+mm = nn;
+       ^
+./sl: inputs/err-readonly004.snl(34,16): ERROR, can not assign to the readonly variable 'mm'
+mm, nn = nn, mm;
+               ^
+./sl: inputs/err-readonly004.snl(36,28): ERROR, can not assign to a readonly component
+mm[1], nn[0] = nn[2], mm[1];
+                           ^
+./sl: 5 error(s) detected
+

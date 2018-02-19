@@ -1,0 +1,47 @@
+
+// include "stdtypes.slib"
+
+type int = {
+    size = 4; kind = integer;
+
+    bytecode inline operator "<" ( x, y : int ) : int
+        { LT };
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+
+    inline bytecode operator "." ( i : int )
+        { IPRINT };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+}
+
+type R = null struct {
+    nr : int;
+    next : R;
+};
+
+procedure make_R( nr : int; next : R ) : R
+{
+    var r : R;
+    r = new R;
+    r.nr = nr;
+    r.next = next;
+    return r;
+}
+
+var p : R;
+
+p = make_R( 10, p );
+p = make_R( 20, p );
+p = make_R( 30, p );
+p = make_R( 40, p );
+
+while( p ) {
+    . p.nr;
+    p = p.next;
+}

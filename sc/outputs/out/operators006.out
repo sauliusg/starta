@@ -1,0 +1,13 @@
+((null))
+(one)
+(one, two)
+(alpha, beta, gamma)
+---
+(one)
+---
+(1, 2, three, four)
+(2, three, four)
+1
+2
+(2, three, four, one)
+(one, 2, three, four)

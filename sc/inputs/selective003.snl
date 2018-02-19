@@ -1,0 +1,16 @@
+// --*- C -*--
+// Check module (package) implementation.
+//
+
+// Check whether specific names can be imported from selected
+// packages:
+
+use P1;
+
+use ff, fg from P1;
+use * from P2;
+
+fg();
+ff();
+gg();
+P2::ff();

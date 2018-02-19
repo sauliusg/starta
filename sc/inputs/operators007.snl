@@ -1,0 +1,40 @@
+
+// use * from std;
+
+module N
+
+    type myint = {
+        kind = integer;
+        suffix = "I";
+        size = sizeof native "int";
+
+        inline bytecode operator "ldc" () : myint
+        { LDCS }
+    };
+
+    inline bytecode operator "+" ( a, b : myint ): myint
+    { ADD }
+
+    inline bytecode operator "." ( i : myint )
+    { IPRINT }
+
+end module N;
+
+use * from N;
+
+var i = 12 I;
+
+. i;
+
+module M
+
+    use * from N;
+
+    inline bytecode operator "*"  ( a, b : myint ): myint
+    { MUL }
+
+end module M;
+
+use * from M;
+
+. i * i;

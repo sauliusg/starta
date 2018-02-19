@@ -1,0 +1,16 @@
+
+module Y2;
+
+use * from std;
+
+type T = float;
+
+type T2 = ldouble;
+
+var t : T;
+
+var t2 : T2;
+
+t = 3.13 T;
+
+end module Y2;

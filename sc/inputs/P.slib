@@ -1,0 +1,20 @@
+
+package P;
+
+use * from std;
+
+const X = 100;
+
+var x = 200;
+
+procedure print_name()
+{
+    . "This is package P"
+}
+
+function append_name( string s ) : string
+{
+    return "P: " + s;
+}
+
+end package P;

@@ -1,0 +1,20 @@
+./sl: inputs/checktype001.snl(44,7): ERROR, incompatible types for assignment to variable 'c'
+c = 21;
+      ^
+./sl: inputs/checktype001.snl(56,25): ERROR, incompatible type of argument 1 for operator '-'
+d = ( a + b ) / ( a - c );
+                        ^
+./sl: inputs/checktype001.snl(56,26): ERROR, incompatible type of argument 1 for operator '/'
+d = ( a + b ) / ( a - c );
+                         ^
+./sl: inputs/checktype001.snl(58,12): ERROR, type 'int' has no conversion from type 'long'
+writeln( d );
+           ^
+./sl: inputs/checktype001.snl(60,15): ERROR, incompatible type of argument 1 for operator '-'
+a = b - d * c + a;
+              ^
+./sl: inputs/checktype001.snl(60,18): ERROR, incompatible type of argument 1 for operator '+'
+a = b - d * c + a;
+                 ^
+./sl: 6 error(s) detected
+

@@ -1,0 +1,17 @@
+// --*- C -*--
+
+// Test Starta expressions
+
+use std
+
+var a, b = 3, 5;
+
+function f(int i): int { return i*i }
+
+. (b);
+. (a), (b);
+. (a * b);
+. (a) * (b);
+. (a) * (f(b));
+. (f(a)) * (f(b));
+. f(a) * f(b);

@@ -1,0 +1,8 @@
+./sl: inputs/typeconv002.snl(67,12): ERROR, type conversion impossible - target type 'lonk' not defined in the current scope
+c = b@lonk - d * c + a@long;
+           ^
+./sl: inputs/typeconv002.snl(67,20): ERROR, incompatible type of argument 1 for operator '-'
+c = b@lonk - d * c + a@long;
+                   ^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,25 @@
+#
+# Snail compiler tests
+#
+#
+# Test modules, module function and variable access.
+#
+
+package M;
+
+use * from std;
+
+var i : int; // package M
+
+i = 33;
+
+end package M;
+
+use * from std;
+
+var i : int; // main program
+
+i = 999 int;
+
+. i;
+. M::i;

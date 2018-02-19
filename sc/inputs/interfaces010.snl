@@ -1,0 +1,69 @@
+#
+# Check implementation of interfaces with the same method names.
+#
+
+# Check that interfaces can be declared with the same method names.
+
+use * from std;
+
+interface I1 {
+    method add( int i );
+    method sub( int i );
+    method get(): int;
+}
+
+interface I2 {
+    method add( int i );
+    method remove( int i );
+    method get(): int;
+}
+
+class CC implements I1, I2 {
+    int i;
+    int n;
+    int[] m;
+
+    method add@I1( int i )
+    {
+        self.i += i;
+    }
+
+    method sub@I1( int i )
+    {
+        self.i -= i;
+    }
+
+    method get@I1(): int
+    {
+        return self.i;
+    }
+
+
+    method add@I2( int i )
+    {
+        if( !self.m ) { self.m = new int[100] }
+        self.m[self.n] = i;
+        self.n++
+    }
+
+    method remove@I2( int i )
+    {
+        if( self.n > 0 ) { self.n-- }
+    }
+
+    method get@I2(): int { return self.m ? self.m[0] : -1 }
+}
+
+var c = new CC;
+
+c->add@I1( 4 );
+c->add@I1( 3 );
+. c->get@I1();
+
+procedure g( I1 o )
+{
+   o->add( -o->get() );
+   . o->get();
+}
+
+g( c );

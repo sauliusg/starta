@@ -1,0 +1,25 @@
+package M4
+
+const X = 4000;
+
+use * from std;
+
+var string name = "package M4";
+
+var Y : int = const(X+1);
+
+end package M4;
+
+//-----------------------------------------------
+
+package M5
+
+use * from std;
+
+var string name = "package M5";
+
+const X = 5000;
+
+var Y : int = const(X+1);
+
+end package M5;

@@ -1,0 +1,5 @@
+./sl: inputs/selective014.snl(12,30): ERROR, imported name 'aBunny' should be a function or a procedure, but it is a variable
+use function fg, aBunny from P1;
+                             ^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,5 @@
+./sl: inputs/err-modules006.snl(13,5): ERROR, name 'Mod1' is imported more than once -- please use explicit module name for disambiguation
+Mod1::f();
+    ^
+./sl: 1 error(s) detected
+

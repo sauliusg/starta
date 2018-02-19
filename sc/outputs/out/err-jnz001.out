@@ -1,0 +1,5 @@
+./sl: inputs/err-jnz001.snl(32,1): ERROR, incompatible type of argument 1 for operator 'jnz'
+}
+^
+./sl: 1 error(s) detected
+

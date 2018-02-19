@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Check ref and synonim compatibility:
+#
+
+use * from std;
+
+type R = ref;
+
+var a : ref;
+var b : R;
+
+b = a; // OK
+a = b; // OK

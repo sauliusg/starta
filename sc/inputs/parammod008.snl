@@ -1,0 +1,15 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+use Parametrised( int, float ) as IFP;
+
+. IFP::i;
+
+IFP::i = 23456;
+
+. IFP::i;

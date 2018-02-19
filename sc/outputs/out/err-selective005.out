@@ -1,0 +1,5 @@
+./sl: inputs/err-selective005.snl(14,3): ERROR, name 'ff' is imported more than once -- please use explicit module name for disambiguation
+ff();
+  ^
+./sl: 1 error(s) detected
+

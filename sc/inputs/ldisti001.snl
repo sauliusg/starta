@@ -1,0 +1,54 @@
+#
+# Snail language compiler tests
+#
+#
+# Test of user-defined ldi and sti operators.
+#
+
+// include "stdtypes.slib"
+
+type loader = {
+    size = 4;
+    kind = integer;
+
+    inline bytecode operator "[]" ( a: array; index : loader ) : addressof
+        { INDEX };
+
+    inline bytecode operator "new[]" ( size : loader ) : array
+        { AALLOC %%element_size %%element_nref };
+
+    inline bytecode operator "ldc" () : loader
+	{ LDCS };
+
+    inline bytecode operator "ldi" ( a : addressof ) : loader
+        {
+	    SLDC "This is user-defined \"ldi\" operator\n"
+	    SPRINT
+	    ILDI
+        };
+
+    inline bytecode operator "sti" ( a : addressof; l : loader )
+        {
+	    SLDC "This is user-defined \"sti\" operator\n"
+	    SPRINT
+	    ISTI
+        };
+
+    inline bytecode operator "." ( l : loader )
+	{ IPRINT };
+}
+
+var a, b : array of loader;
+
+a = new loader[10];
+b = new loader[20];
+
+a[2] = 123;
+
+. a[2];
+. b[2];
+
+b[2] = a[2];
+
+. a[2];
+. b[2];

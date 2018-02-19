@@ -1,0 +1,10 @@
+
+use * from std;
+
+var s : int;
+
+procedure ggg( int i )
+{
+}
+
+s = ggg(1);

@@ -1,0 +1,28 @@
+#
+#
+#
+
+type int = {
+    size = 4;
+    bytecode inline operator "<" ( x, y : int ) : int
+        { bytecode{ LT } };
+    inline bytecode operator "++" ( i : int ) : int
+        { INC };
+    bytecode inline operator "." ( i : int )
+        { IPRINT };
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+};
+
+var i : int;
+
+i = 0;
+
+while( i < 10 ) {
+    . i;
+    i ++;
+}

@@ -1,0 +1,11 @@
+./sl: inputs/err-interfaces021.snl(69,16): ERROR, parameter 'i' has no default value, please supply its value
+. am[3]->mn@I2();
+               ^
+./sl: inputs/err-interfaces021.snl(69,16): ERROR, incompatible types for function 'mn' argument nr. 2
+. am[3]->mn@I2();
+               ^
+./sl: inputs/err-interfaces021.snl(69,16): ERROR, too little arguments in call to function 'mn'
+. am[3]->mn@I2();
+               ^
+./sl: 3 error(s) detected
+

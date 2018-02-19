@@ -1,0 +1,15 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+var m = new ldouble[10];
+
+var x : float = -234.5;
+
+. x;
+
+m[0] = x;
+
+. m[0];

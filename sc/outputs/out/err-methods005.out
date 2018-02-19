@@ -1,0 +1,9 @@
+./sl: inputs/err-methods005.snl(15,1): ERROR, class 'P', interface 0, method 'g' is declared but not implemented
+
+}
+^
+./sl: inputs/err-methods005.snl(27,27): ERROR, prototype of function h() does not match previous definition - new prototype has too many arguments
+    method h(int x) : int { return self.i*self.i + x } // ERROR: prototype 
+                          ^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,21 @@
+#
+# Snail language compiler tests
+#
+#
+# Check diagnostics of unary operator argument type mismatch
+#
+
+type float = { size = 4 };
+
+type T = {
+    kind = integer;
+    size = sizeof native "int";
+    suffix = T;
+
+    inline bytecode operator "-" ( i : float ) : T
+	{ NEG };
+};
+
+var a, b : T;
+
+a = -b;

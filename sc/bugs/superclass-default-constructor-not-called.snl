@@ -1,0 +1,37 @@
+// --*- C -*--
+
+// Test access of superclass fields:
+
+use std;
+
+class Alpha {
+    int i;
+    constructor( int i = 1 )
+    {
+        self.i = i;
+    }
+
+    method i(): int { return self.i }
+}
+
+class Beta: Alpha {
+    int i;
+    constructor( int i = 2 )
+    {
+        self.i = i;
+    }
+}
+
+class Gamma: Beta {
+    int i;
+    constructor( int i = 3 )
+        super( i + 2 )
+    {
+        self.i = i;
+    }
+}
+
+var a = new Gamma;
+
+. a.i;
+. a->i(); // Should print "1"

@@ -1,0 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var x = 1;
+
+bytecode {
+    LD %x
+    IPRINT
+    NEWLINE
+}
+
+type collection of T = null {
+    size = sizeof native "void*";
+    inline bytecode operator "[]" ( a : collection of T; i : char ) : addressof
+    {
+        DROP
+        LDC 1111
+        IPRINT
+        NEWLINE
+    };
+    inline bytecode operator "." ( a : collection of T )
+    {
+        DROP
+        LDC 111
+        IPRINT
+    }
+}
+
+var c : collection of ldouble;
+var d : collection of long;
+
+. c;
+. d;

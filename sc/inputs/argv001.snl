@@ -1,0 +1,12 @@
+#
+# Snail compiler tests
+#
+#
+# Test functions to access program arguments
+#
+
+use * from std
+
+var a = arguments();
+
+. a[0];

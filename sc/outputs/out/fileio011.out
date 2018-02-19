@@ -1,0 +1,48 @@
+1 # Compiler tests.
+2 #
+3 # Test the '<filehandle>' file read condition.
+4 #
+5 
+6 use * from std;
+7 
+8 var inp = fopen( "inputs/fileio011.snl", "r" );
+9 
+10 var i = 1;
+11 while( <inp> ) {
+12     . i, $_; i++
+13 }
+14 
+15 fclose( inp );
+16 
+17 inp = fopen( "inputs/fileio011.snl", "r" );
+18 
+19 i = 1;
+20 while <inp> {
+21     . i, $_; i++
+22 }
+23 
+24 fclose( inp );
+1 # Compiler tests.
+2 #
+3 # Test the '<filehandle>' file read condition.
+4 #
+5 
+6 use * from std;
+7 
+8 var inp = fopen( "inputs/fileio011.snl", "r" );
+9 
+10 var i = 1;
+11 while( <inp> ) {
+12     . i, $_; i++
+13 }
+14 
+15 fclose( inp );
+16 
+17 inp = fopen( "inputs/fileio011.snl", "r" );
+18 
+19 i = 1;
+20 while <inp> {
+21     . i, $_; i++
+22 }
+23 
+24 fclose( inp );

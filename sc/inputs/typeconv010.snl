@@ -1,0 +1,11 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+var m = new ldouble[10];
+
+m[0] = -234.5;
+
+. m[0];

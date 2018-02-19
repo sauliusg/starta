@@ -1,0 +1,50 @@
+./sl: inputs/err-classes003.snl(27,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-classes003.snl(31,5): ERROR, interface 'I2' does not implement method 'mn'
+    {
+    ^
+./sl: inputs/err-classes003.snl(36,1): ERROR, class 'A' does not implement method 'mn' from interface 'I1'
+}
+^
+./sl: inputs/err-classes003.snl(39,10): ERROR, field 'i' already defined in type 'A'
+    int i;
+         ^
+./sl: inputs/err-classes003.snl(41,30): ERROR, default constructor is already declared in this scope
+    constructor( int i = 100 ) { self.i = i }
+                             ^
+./sl: inputs/err-classes003.snl(43,25): ERROR, method 'mm@I1' already defined in type 'A'
+    method mm@I1(): int {
+                        ^
+./sl: inputs/err-classes003.snl(45,5): ERROR, method 'mm@I1' already defined in type 'A'
+    }
+    ^
+./sl: inputs/err-classes003.snl(46,25): ERROR, interface 'I2' does not implement method 'mm'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-classes003.snl(46,25): ERROR, method 'mm@I2' already defined in type 'A'
+    method mm@I2(): int {
+                        ^
+./sl: inputs/err-classes003.snl(48,5): ERROR, method 'mm@I2' already defined in type 'A'
+    }
+    ^
+./sl: inputs/err-classes003.snl(50,5): ERROR, interface 'I2' does not implement method 'mn'
+    {
+    ^
+./sl: inputs/err-classes003.snl(50,5): ERROR, method 'mn@I2' already defined in type 'A'
+    {
+    ^
+./sl: inputs/err-classes003.snl(52,5): ERROR, method 'mn@I2' already defined in type 'A'
+    }
+    ^
+./sl: inputs/err-classes003.snl(54,20): ERROR, method 'nn@I2' already defined in type 'A'
+    method nn@I2() { . "A.i =", self.i }
+                   ^
+./sl: inputs/err-classes003.snl(54,40): ERROR, method 'nn@I2' already defined in type 'A'
+    method nn@I2() { . "A.i =", self.i }
+                                       ^
+./sl: inputs/err-classes003.snl(55,1): ERROR, class 'A' does not implement method 'mn' from interface 'I1'
+}
+^
+./sl: 16 error(s) detected
+

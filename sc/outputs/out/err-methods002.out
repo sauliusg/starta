@@ -1,0 +1,5 @@
+./sl: inputs/err-methods002.snl(21,28): ERROR, prototype of function h() does not match previous definition - old prototype return value has type int, but new prototype has type long
+    method h(int i) : long {return i@long}
+                           ^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,42 @@
+#
+# Snail language compiler tests
+#
+#
+# Test of user-defined ld and st operators.
+#
+
+// include "stdtypes.slib"
+
+type loader = {
+    size = 4;
+    kind = integer;
+
+    inline bytecode operator "ldc" () : loader
+	{ LDCS };
+
+    inline bytecode operator "ld" () : loader
+        {
+	    SLDC "This is user-defined \"ld\" operator\n"
+	    SPRINT
+	    LD
+        };
+
+    inline bytecode operator "st" ( l : loader )
+        {
+	    SLDC "This is user-defined \"st\" operator\n"
+	    SPRINT
+	    ST
+        };
+
+    inline bytecode operator "." ( l : loader )
+	{ IPRINT };
+}
+
+var a, b : loader;
+
+a = 11;
+
+b = a;
+
+. a;
+. b;

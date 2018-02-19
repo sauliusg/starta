@@ -1,0 +1,24 @@
+#
+# Snail language compiler tests
+#
+#
+# Type synonimity.
+#
+
+include "stdtypes.slib"
+
+type cell  = new float;
+type voxel = new float;
+
+var c : cell;
+var v : voxel;
+var f : float;
+
+c = f; // ERROR, 'new' types are incomplatible with base types.
+f = c; // ERROR if there is not conversion '@float', OK otherwise
+
+v = f; // ERROR, 'new' types are incomplatible with base types.
+f = v; // ERROR if there is not conversion '@float', OK otherwise
+
+v = c; // ERROR, two named derived types are incompatible
+c = v; // ERROR, two named derived types are incompatible

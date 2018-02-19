@@ -1,0 +1,5 @@
+./sl: inputs/err-methods008.snl(20,5): ERROR, object 'c' does not have method 'i'
+c->i();
+    ^
+./sl: 1 error(s) detected
+

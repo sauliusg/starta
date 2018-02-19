@@ -1,0 +1,11 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Regression test for a buggy derived type multidimensional array declaration.
+
+use * from std;
+
+type t = float;
+
+var m: t[][];

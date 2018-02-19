@@ -1,0 +1,25 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var strings = [
+    "Mano batai buvo du,",
+    "vienas dingo -- nerandu!",
+    "Kur suskubo jis nukristi?",
+    "Kur suskubo nusiristi?",
+];
+
+var b = new blob(100 * length(strings));
+
+pack b, 0, "z80x4", strings;
+
+var a = unpack string[]( b, 0, "z80x4" );
+
+for var i = 0 to last(a) do
+    . "\"" _ a[i] _ "\"";
+enddo

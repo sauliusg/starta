@@ -1,0 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test enumerator types (enum).
+#
+
+include "stdtypes.slib";
+load "libraries/math/libmath.so.0.01";
+
+inline bytecode function
+round( x : float ) : long
+{
+    FLDC 0.5 FADD libmath:LFLOOR
+}
+
+var a : int = 4;
+var b : int = 70;
+
+var l : long = 1;
+var x : float = 2;
+
+. l;
+. x;
+. "";
+
+var m : array [] of float;
+var n : array [] of long;
+
+m = new float[10];
+n = new long[20];
+
+n[2] = round( 3.14 );
+m[2] = a;
+n[3] = b;
+
+. m[2];
+. n[2];
+. n[3];

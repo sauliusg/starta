@@ -1,0 +1,5 @@
+./sl: inputs/clone001.snl(46,42): ERROR, in this type representation, can not allocate array of generic type T
+    var new_p: array [] of T = new T[2+1];
+                                         ^
+./sl: 1 error(s) detected
+

@@ -1,0 +1,64 @@
+//--*- Java -*--
+// Compiler tests
+//
+// Test cloning of classes.
+//
+
+use * from std;
+
+interface IChemAtom {
+    
+    method getcoord(): float[];
+    method gettype(): string;
+}
+
+class Atom implements IChemAtom {
+    string chemtype;
+    float x, y, z;
+
+    constructor ( chemtype : string = "C";
+                  float x = 0; float y = 0; float z = 0 )
+    {
+        self.chemtype = chemtype;
+        self.x = x;
+        self.y = y;
+        self.z = z;
+    }
+    method getcoord@IChemAtom() : float[] { return [self.x, self.y, self.z] }
+    method gettype@IChemAtom() : string { return self.chemtype }
+}
+
+var m, n = new Atom( "H" ) * new [200], [ 10.0D, 20.0D, 30.0D ];
+
+foreach var atom in m { atom = atom[] }
+
+m[0].chemtype = "Se";
+
+. m[0]->gettype@IChemAtom();
+. m[1]->gettype@IChemAtom();
+
+function f( m : array of double ) : double
+begin
+    var sum : double;
+    foreach var element in m do
+        sum += element
+    enddo;
+    return sum
+end;
+
+. f( n );
+
+procedure f2( m : array of double ) : double
+begin
+    var sum : double;
+    for var i = 0 to last(m) do
+        sum += m[i];
+        m[i] = 0.0D;
+        i++;
+    enddo;
+        
+    return sum
+end;
+
+. f2( n );
+. f2( n );

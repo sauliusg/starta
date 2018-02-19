@@ -1,0 +1,5 @@
+./sl: inputs/err-selective010.snl(22,11): ERROR, name 'C3' is imported more than once -- please use explicit module name for disambiguation
+. const(C3);
+          ^
+./sl: 1 error(s) detected
+

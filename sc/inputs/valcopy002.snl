@@ -1,0 +1,20 @@
+#
+# Snail compiler tests
+#
+#
+# Test how the SL compiler deals with the immutable values when
+# compiling the ':=' assignemtn.
+#
+
+use * from std;
+
+readonly mm = [ [ 1, 2, 4, 5 ], [ 3, 4 ], [ 5, 6 ] ]; // OK
+
+var nn = new int[3][3];
+
+nn[0] := mm[0]; // OK
+
+var int i;
+for i = 0 to last(nn[0]) do
+    . nn[0][i];
+enddo

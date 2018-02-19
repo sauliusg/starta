@@ -1,0 +1,22 @@
+#
+# Ackermann function
+#
+
+# ack(3,8) works with:
+# ./sl -I modules/ tt.snl -S 40000 -E 3000 -- 3 8
+
+use * from std;
+
+function ack( m, n : int ) : int
+{
+    if m == 0 then return n + 1 endif;
+    if n == 0 then return ack( m - 1, 1 ) endif;
+    return ack( m - 1, ack( m, n - 1 ));
+};
+
+var argv = arguments();
+
+var m = atoi(argv[1]);
+var n = atoi(argv[2]);
+
+. ack(m,n);

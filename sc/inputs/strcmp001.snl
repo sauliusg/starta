@@ -1,0 +1,27 @@
+
+use * from std;
+
+var s1 = "";
+var s2 : string;
+
+. s2 == null ? "s2 is null" : "s2 is not null";
+
+. "";
+
+s2 = "";
+
+. s2 == null ? "s2 is null" : "s2 is not null";
+
+. s2 == "" ? "s2 is empty" : "s2 is not empty";
+
+. s2 == s1 ? "s2 is the same as s1" : "s2 is not the same as s1";
+
+. "";
+
+s2 = "alalala";
+
+. s2 == null ? "s2 is null" : "s2 is not null";
+
+. s2 == "" ? "s2 is empty" : "s2 is not empty";
+
+. s2 == s1 ? "s2 is the same as s1" : "s2 is not the same as s1";

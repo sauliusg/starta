@@ -1,0 +1,17 @@
+>>> #
+>>> # Snail compiler tests
+>>> #
+>>> #
+>>> # Test file readln() function
+>>> #
+>>> 
+>>> use * from std;
+>>> 
+>>> var infile = fopen( argument(0), "r" );
+>>> var line: string;
+>>> 
+>>> while( (line = readln(infile)) != null ) {
+>>>     . ">>>", line;
+>>> }
+>>> 
+>>> fclose( infile );

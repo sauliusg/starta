@@ -1,0 +1,8 @@
+./sl: inputs/err-selective006.snl(13,15): ERROR, type 'funny' is imported more than once -- please use explicit package name for disambiguation
+var x : funny = new funny;
+              ^
+./sl: inputs/err-selective006.snl(13,26): ERROR, type 'funny' is imported more than once -- please use explicit package name for disambiguation
+var x : funny = new funny;
+                         ^
+./sl: 2 error(s) detected
+

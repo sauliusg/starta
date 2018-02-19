@@ -1,0 +1,20 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+var x = 1;
+
+bytecode {
+    LD %x
+    IPRINT
+    NEWLINE
+
+    LD %%element_size
+    IPRINT
+    NEWLINE
+}

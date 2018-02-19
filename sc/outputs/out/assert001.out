@@ -1,0 +1,1 @@
+./sl: Unhandled exception -3 in the bytecode interpreter: assertion 'assert x >= 8;' failed: line 7, file 'inputs/assert001.snl'

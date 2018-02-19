@@ -1,0 +1,95 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
+\*---------------------------------------------------------------------------*/
+
+#include <arrays.h>
+
+#ifdef I
+#undef I
+#endif
+
+#define I @field@
+
+/*
+ * ASUMF  Sum values in an array, give a 'float' sum
+ * 
+ * array -> sum
+ */
+
+int @PREFIX1@ASUMF( INSTRUCTION_FN_ARGS )
+{
+    @element_type@ *array = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *hdr = (alloccell_t*)array;
+    ssize_t length = hdr ? hdr[-1].length : 0;
+    float sum = 0;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        ssize_t i;
+        for( i = 0; i < length; i ++ )
+            sum += ARRAY_ELEMENT(array[i]);
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep[0].num.f = sum;
+
+    return 1;
+}
+
+/*
+ * ASUMD  Sum values in an array, give a 'double' sum
+ * 
+ * array -> sum
+ */
+
+int @PREFIX1@ASUMD( INSTRUCTION_FN_ARGS )
+{
+    @element_type@ *array = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *hdr = (alloccell_t*)array;
+    ssize_t length = hdr ? hdr[-1].length : 0;
+    double sum = 0;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        ssize_t i;
+        for( i = 0; i < length; i ++ )
+            sum += ARRAY_ELEMENT(array[i]);
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep[0].num.d = sum;
+
+    return 1;
+}
+
+/*
+ * ASUMLD  Sum values in an array, give an 'ldouble' sum
+ * 
+ * array -> sum
+ */
+
+int @PREFIX1@ASUMLD( INSTRUCTION_FN_ARGS )
+{
+    @element_type@ *array = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *hdr = (alloccell_t*)array;
+    ssize_t length = hdr ? hdr[-1].length : 0;
+    ldouble sum = 0;
+
+    TRACE_FUNCTION();
+
+    if( array ) {
+        ssize_t i;
+        for( i = 0; i < length; i ++ )
+            sum += ARRAY_ELEMENT(array[i]);
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    istate.ep[0].num.ld = sum;
+
+    return 1;
+}

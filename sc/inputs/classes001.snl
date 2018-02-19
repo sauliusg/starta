@@ -1,0 +1,50 @@
+#
+# Snail compiler tests
+#
+#
+# Testing classis, inheritance and polymorphism.
+#
+
+use * from std;
+
+type R = struct {
+    int x;
+    float y;
+    char s[];
+};
+
+class S {
+    string name;
+    int val;
+    S next;
+    string description;
+    float x;
+    r : R;
+}
+
+type S2 = class : S {
+    s : string;
+    x : double;
+    y : double;
+}
+
+var s = new S;
+var s2 = new S2;
+
+s2.s = "This is s";
+s2.val = 20;
+s2.name = "s2";
+
+. '"' _ s2.s _ '"', s2.val;
+
+var x = new int [200];
+
+s.name = "s";
+
+procedure print_name( s : S )
+{
+    . "Class S name =", "\"" + s.name + "\"";
+}
+
+print_name( s );
+print_name( s2 );

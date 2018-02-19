@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct expressions
+#
+
+use * from std;
+
+struct S {
+    name : string;
+    value : int;
+};
+
+var s : S = struct S { name : "First S", value => 10 };
+
+. s.name;
+. s.value;

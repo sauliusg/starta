@@ -1,0 +1,49 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test binary operators with different types/
+
+use * from std;
+
+var m = [ 3.0, 4.0, 1.0, 4.0, 12.0 ];
+
+procedure mtimes( float k; float m[] ): float[]
+{
+    for var e in m {
+        e *= k
+    }
+    return m
+}
+
+operator "*"( float k; float m[] ): float[]
+{
+    return mtimes( k, m[] );
+}
+
+operator "*"( int k; float m[] ): float[]
+{
+    return mtimes( k, m[] );
+}
+
+operator "*"( float m[]; float k ): float[]
+{
+    return mtimes( k, m[] );
+}
+
+operator "*"( float m[]; int k ): float[]
+{
+    return mtimes( k, m[] );
+}
+
+operator "<" ( float m[] ) { for var e in m do < e, " "; enddo }
+operator "." ( float m[] ) { < m }
+
+var n = 2.0 * m;
+
+. m;
+. "";
+. n;
+. 0.5 * m;
+. m * 3;
+. m

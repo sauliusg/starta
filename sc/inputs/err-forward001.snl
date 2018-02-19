@@ -1,0 +1,27 @@
+#
+# Snail compiler tests
+#
+#
+# Test enumerator types (enum).
+#
+
+include "stdtypes.slib"
+
+function f( x : int ) : int;
+function g( x : float ) : float;
+
+. f( 11 );
+. g( 21 );
+
+function f( x : int ) : int
+{
+    return x / 2;
+}
+
+(*
+function g( x : float ) : float
+{
+    return x / 2.0;
+}
+*)
+

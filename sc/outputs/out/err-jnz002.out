@@ -1,0 +1,5 @@
+./sl: inputs/err-jnz002.snl(26,20): ERROR, type 'int' has no unary operator named 'jnz'
+for i = 1 to 10000 do
+                   ^
+./sl: 1 error(s) detected
+

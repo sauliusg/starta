@@ -1,0 +1,26 @@
+#
+# Snail compiler tests
+#
+#
+# Test readonlyness of function parameters.
+#
+
+use * from std;
+
+function ok( array [][] of int m ) : float
+{
+    var int i;
+
+    for i = 0 to last(m) do
+        var mm : array of int = m[i];
+        var int j;
+        for j = 0 to last(mm) do
+            < mm[j]; < " ";
+        enddo
+        < "\n";
+    enddo;
+
+    return 0.0;
+}
+
+ok( [ [1,2,3], [4,5,6,7] ] );

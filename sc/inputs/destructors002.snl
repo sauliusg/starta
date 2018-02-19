@@ -1,0 +1,33 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test destructors.
+
+use std;
+
+null class C {
+    string name;
+    int count;
+
+    destructor C
+    {
+        . "Finita la commedia!"
+    }
+
+    constructor( string name = "default C"; int count = -1 )
+    {
+        self.name = name;
+        self.count = count;
+    }
+
+    method print() { . self.name, self.count }
+}
+
+var c1 = new C();
+c1 = null;
+var c2 = new C( "c2", count => 10 );
+c1 = new C;
+
+c1->print();
+c2->print();

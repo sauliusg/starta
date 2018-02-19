@@ -1,0 +1,53 @@
+#
+# Snail language compiler tests
+#
+# Loop test
+#
+
+#
+# See if the nested C-style 'for ...' loop works
+#
+
+type int = {
+    size = 4;
+
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS }
+};
+
+function write( x : int )
+{
+    bytecode { LD %x IPRINT }
+};
+
+function space()
+{
+    bytecode { SPACE }
+};
+
+function lt( x, y : int ) : int
+{
+    bytecode { LD %x LD %y LT }
+};
+
+function add( x, y : int ) : int
+{
+    bytecode { LD %x LD %y ADD }
+};
+
+var i, j : int;
+
+for( i = 0; lt( i, 10 ); i = add( i, 1 )) do
+    write( i );
+    bytecode { SLDC ": " SPRINT };
+    for( j = 0; lt( j, 20 ); j = add( j, 1 )) do
+        write( j );
+	space();
+    enddo;
+    bytecode { NEWLINE };
+enddo

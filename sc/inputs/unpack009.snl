@@ -1,0 +1,40 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
+
+use * from std;
+
+procedure print_array( double m[] )
+{
+    for var int i = 0 to last( m ) {
+        < m[i]; < " ";
+    }
+    < "\n";
+}
+
+procedure print_array2( double m[][] )
+{
+    for var int i = 0 to last( m ) {
+        print_array( m[i] );
+    }
+}
+
+var size = const(double.size);
+
+var b = new blob(6 * size);
+
+var format = "r%d" %% size;
+
+pack b, 0, format, [ [ 1.1D, 2.7D, 3.14D ], [ 4.4D, 5.5D, 6.6D ] ];
+
+. unpack double( b,    0, format );
+. unpack double( b, size, format );
+. "";
+
+print_array( unpack double[]( b, 0, format _ "x6" ) );
+. "";
+
+print_array2( unpack double[2][]( b, 0, format _ "x3" ) );

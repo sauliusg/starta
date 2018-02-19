@@ -1,0 +1,10 @@
+// --*- C -*--
+
+// Test undeclared exception diagnostics:
+
+use std;
+
+exception X;
+
+raise Y( "exception Y" );
+

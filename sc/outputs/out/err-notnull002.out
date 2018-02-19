@@ -1,0 +1,8 @@
+./sl: inputs/err-notnull002.snl(12,10): ERROR, 's' was declared as non-null reference -- it must be initialised
+var s : S; // ERROR
+         ^
+./sl: inputs/err-notnull002.snl(14,9): ERROR, incompatible types for assignment to variable 's'
+s = null; // ERROR
+        ^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,22 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+use * from std;
+
+operator "." ( m: array of int )
+{
+    < "[ ";
+    foreach var e in m { < e, " " };
+    < "]";
+}
+
+operator "." ( m: array of float )
+{
+    < "[ ";
+    foreach var e in m { < e, " " };
+    < "]";
+}
+
+. [ 1, 2, 3, 4 ];
+. [ 1.1, 2.0, 2.9, 3.6 ];

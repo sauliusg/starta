@@ -1,0 +1,20 @@
+#
+# Snail compiler tests
+#
+#
+# Regression test: stack overflow after taking forward function
+# pointers.
+#
+
+use * from std;
+
+function f() : string;
+
+var phi = f;
+
+function f() : string
+{
+    return "I am here!";
+}
+
+. phi();

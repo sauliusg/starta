@@ -1,0 +1,16 @@
+#
+# Snail compiler tests
+#
+#
+# Test how the SL compiler deals with the immutable values when
+# compiling the ':=' assignemtn.
+#
+
+use * from std;
+
+var string s1 = "first";
+var string s2 = "SECOND";
+
+s1 := s2;
+
+. s1;

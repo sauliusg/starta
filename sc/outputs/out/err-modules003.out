@@ -1,0 +1,5 @@
+./sl: inputs/err-modules003.snl(26,26): ERROR, type 'Types::LocalType' is not declared in the current scope
+var xx : Types::LocalType;
+                         ^
+./sl: 1 error(s) detected
+

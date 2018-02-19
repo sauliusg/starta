@@ -1,0 +1,47 @@
+// --*- C -*--
+
+// Test the Starta string library.
+
+use std;
+use Strings;
+
+. ">>>" + chomp( "vava" ) + "<<<";
+. ">>>" + chomp( "vava\n" ) + "<<<";
+. ">>>" + chomp( "vava\n", "\n" ) + "<<<";
+. ">>>" + chomp( "vava ", " " ) + "<<<";
+. "";
+
+for var word in split( "  alpha beta gamma  ", "" ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";
+
+for var word in split( "  alpha beta gamma  ", null ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";
+
+for var word in split( "   alpha  beta gamma  ", " " ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";
+
+for var word in split( "   alpha  beta gamma  ", " ", count => -1 ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";
+
+for var word in split( " ", " " ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";
+
+for var word in split( " ", " ", -1 ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";
+
+for var word in split( "vienas" ) do
+    . ">>>" + word + "<<<"
+enddo;
+. "";

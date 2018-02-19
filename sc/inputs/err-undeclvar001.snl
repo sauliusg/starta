@@ -1,0 +1,12 @@
+#
+# Compiler tests
+#
+#
+# Test the 'strend()' string suffix comparison function.
+#
+
+use * from std;
+
+var s1, s2, s3 : string;
+
+s1, s2, s3, s4 = "core", "ore", "", "eve";

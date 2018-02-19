@@ -1,0 +1,27 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test catch variable declarations, C syntax
+
+use * from std;
+
+exception DIVISION_BY_ZERO;
+
+function g( float x ) -> float
+{
+    if( x == 0.0 ) {
+        raise DIVISION_BY_ZERO( "attempt to divide by 0 in function g()" );
+    }
+    return 1.0/x;
+}
+
+try {
+    . g( 2 );
+    . g( 1 );
+    . g( 0 );
+    . g( 3 );
+}
+catch( var string m; var int err ) {
+    . argument(0) + ":", "ERROR:", m, "(err code = %d)"%%err
+}

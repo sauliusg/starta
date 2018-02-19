@@ -1,0 +1,44 @@
+#
+# Snail compiler tests
+#
+#
+# Test struct and class methods
+#
+
+use * from std;
+
+type P = null class {
+     int x;
+     int i;
+
+     method g() : int { return self.i };
+     method h( int a ) : int { return self.x = a };
+     method t() : int { return self.i * self.x };
+}
+
+null class S : P {
+    int i;
+    string name;
+    gg : function (int i) -> (int);
+    function (int i) -> (int) ff;
+
+    inline bytecode operator "+"(S a, b) : S { };
+    inline bytecode operator "-"(S a, b) : S { }
+
+    method h(int x) : int;
+    method h(int x) : int { return self.i*self.i + x }
+    method f(int x) : int { return self.i * x }
+    method k(int x; int y) : float {return (self.i)@float * x@float * y@float}
+
+    inline bytecode operator "*"(S a, b) : S { return null };
+};
+
+var s = new S;
+
+. "S.f.offset (new)        =", const(S.f.offset);
+. "S.h.offset (overloaded) =", const(S.h.offset);
+. "S.g.offset (inherited)  =", const(S.g.offset);
+. "S.k.offset (new)        =", const(S.k.offset);
+. "S.t.offset (inherited)  =", const(S.t.offset);
+
+## . s->f(5)

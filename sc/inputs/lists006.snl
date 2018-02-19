@@ -1,0 +1,30 @@
+#
+# Regression test:
+#
+
+# Check that lists of reference variables are looped correctly:
+
+use * from std;
+use * from Lists;
+
+class S
+{ 
+  int x
+
+  constructor ( x : int = 111 )
+  { self.x = x }
+}
+
+var a : list of S;
+
+foreach var e in a
+do
+    . e.x
+enddo
+
+a = cons( new S, cons( new S(), cons( new S(3) )));
+
+foreach var e in a
+do
+    . e.x
+enddo

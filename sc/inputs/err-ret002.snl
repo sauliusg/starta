@@ -1,0 +1,21 @@
+#
+# Snail language compiler tests
+#
+#
+# Check diagnosticts of incompatible return values.
+#
+
+include "stdtypes.slib"
+
+var a : int;
+var b : float;
+
+function f1() : float, int
+{
+    return 10;
+}
+
+function f2() : float, int
+{
+    return 10, 1.0, 20;
+}

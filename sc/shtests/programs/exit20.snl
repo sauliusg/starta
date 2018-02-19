@@ -1,0 +1,9 @@
+#
+# Snail language compiler tests
+#
+# Test the exit() function
+#
+
+use * from std;
+
+exit(20);

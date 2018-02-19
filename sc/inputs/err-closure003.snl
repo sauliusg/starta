@@ -1,0 +1,18 @@
+
+use * from std;
+
+var x, y, z = 1, 2, 3;
+
+var fff = closure function( x, y : float ): float
+lambda {
+    var a, b, c : int = x + 1, y + z;
+    var s : string = "va va";
+}
+{ 
+  return x*y/(lambda.a + lambda.b)@float
+};
+
+x, y, z = 2, 4, 6;
+
+. fff( 2, 3 );
+. fff( 5, 3 );

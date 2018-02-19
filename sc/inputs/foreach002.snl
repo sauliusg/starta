@@ -1,0 +1,14 @@
+# Compiler tests.
+#
+# Test 'foreach var X in ARRAY' loops.
+#
+
+use * from std;
+
+var a = [ 11, 3, 12, 74 ];
+var i = 0;
+
+foreach readonly m in a do
+    . i, m;
+    i ++;
+enddo

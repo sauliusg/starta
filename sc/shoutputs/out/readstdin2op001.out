@@ -1,0 +1,8 @@
+
+use * from std;
+
+var line: string;
+repeat {
+   <> >> line;
+   do . line if line;
+} while line;

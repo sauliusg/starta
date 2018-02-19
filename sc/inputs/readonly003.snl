@@ -1,0 +1,21 @@
+#
+# Snail compiler tests
+#
+#
+# Test readonly variables.
+#
+
+use * from std;
+
+// program (args : array of string; io : array of file);
+var io = stdfiles();
+
+var file stdin = io[0];
+var file stdout = io[1];
+
+readonly m : array of int = [10, 20, 30];
+
+var int i;
+for i = 0 to last(m) do
+    <stdout> << m[i] << ";\n"; // OK
+enddo

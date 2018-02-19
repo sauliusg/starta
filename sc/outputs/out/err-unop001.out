@@ -1,0 +1,8 @@
+./sl: inputs/err-unop001.snl(8,8): ERROR, type 'bool' has no unary operator named '.'
+    . b;
+       ^
+./sl: inputs/err-unop001.snl(9,1): ERROR, type 'bool' has no binary operator named 'loop'
+enddo;
+^
+./sl: 2 error(s) detected
+

@@ -1,0 +1,13 @@
+#
+# Snail compiler tests
+#
+#
+# Test dynamic library loading
+#
+
+load "libraries/test/libtest.so.0.01";
+
+bytecode {
+    libtest:TEST
+    libtest:TEST
+};

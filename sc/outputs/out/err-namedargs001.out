@@ -1,0 +1,17 @@
+./sl: inputs/err-namedargs001.snl(24,14): ERROR, type 'int' has no conversion from type 'long'
+. f( y => 4L ); // ERR
+             ^
+./sl: inputs/err-namedargs001.snl(25,8): ERROR, function 'f' does not have argument 'u'
+. f( u => 4L ); // ERR
+       ^
+./sl: inputs/err-namedargs001.snl(25,14): ERROR, type 'int' has no conversion from type 'long'
+. f( u => 4L ); // ERR
+             ^
+./sl: inputs/err-namedargs001.snl(28,8): ERROR, parameter 'x' has no default value, please supply its value before 'y'
+. g( y => 2 ); // ERR
+       ^
+./sl: inputs/err-namedargs001.snl(28,13): ERROR, too little arguments in call to function 'g'
+. g( y => 2 ); // ERR
+            ^
+./sl: 5 error(s) detected
+

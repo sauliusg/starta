@@ -1,0 +1,5 @@
+./sl: inputs/err-selective011.snl(15,26): ERROR, imported name 'print_funny' should be a variable or a procedure, but it is a function
+use var print_funny from P1
+                         ^
+./sl: 1 error(s) detected
+

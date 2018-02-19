@@ -1,0 +1,18 @@
+
+type int = {
+    size = 4;
+    bytecode inline operator "." ( i : int )
+        { IPRINT };
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+};
+
+var a, b : int;
+
+a = 1;
+b = 2;
+
+a, b = b, a;
+
+. a;
+. b;

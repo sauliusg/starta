@@ -1,0 +1,29 @@
+#
+# Snail compiler tests
+#
+#
+# Test truncation of integers to narrow values.
+#
+
+use * from std;
+
+var s : short = 100S;
+var b : byte;
+
+b = lowbyte( s );
+. b;
+
+s = 1000S;
+. s;
+
+// Either the conversion is exact, or the correct value is printed out
+// by an exception handler. Unfortunately, the exception branch can 
+// not be tested on architecures that have both types of the same size:
+
+try {
+    b = lowbyte( s );
+    . b;
+}
+catch TruncatedInteger( var err : int; var msg : string ) {
+    . "1000";
+}

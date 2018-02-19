@@ -1,0 +1,62 @@
+#--*- C -*--
+# Compiler tests
+#
+#
+# Test interfaces
+#
+
+use * from std;
+
+interface I1 {
+    method mm() : int;
+    method mn( int i ) : int;
+}
+
+interface I2: I1 {
+    method nn();
+}
+
+class A implements I2, I1 {
+    int i;
+
+    constructor( int i = 100 ) { self.i = i }
+
+    method mm@I1(): int {
+        return self.i + 1
+    }
+    method mm@I2(): int {
+        return self.i + 2
+    }
+    method mn@I2( int i ): int
+    {
+        return self.i + i
+    }
+
+    method nn@I2() { . "A.i =", self.i }
+}
+
+class A implements I2, I1 {
+    int i;
+
+    constructor( int i = 100 ) { self.i = i }
+
+    method mm@I1(): int {
+        return self.i + 1
+    }
+    method mm@I2(): int {
+        return self.i + 2
+    }
+    method mn@I2( int i ): int
+    {
+        return self.i + i
+    }
+
+    method nn@I2() { . "A.i =", self.i }
+}
+
+var a = new A(101);
+
+. a->mn@I2( 193 );
+a->nn@I2();
+
+// bytecode { PLD %a DUMPVMT }

@@ -1,0 +1,36 @@
+// --*- C -*--
+
+// Test unsigned -- signed conversions
+
+use std;
+use unsigned;
+
+var ub: ubyte;
+var us: ushort;
+var ui: uint;
+var ul: ulong;
+var ull: ullong;
+
+var b: byte;
+var s: short;
+var i: int;
+var l: long;
+var ll: long;
+
+ub = ~0 UB/2 UB;
+
+. ub;       // should print 127
+
+b = 127 B;
+. b;        // should print 127
+
+. ub + 1UB; // should print 128, not a negative number
+. b + 1B;   // should print -128
+
+. ub;       // should print 127, once more.
+i = ub@int;
+. i;        // should print 127
+. i + 1;    // should print 128
+. i - 128;  // should print -1
+
+// ui = b;

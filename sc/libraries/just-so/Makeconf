@@ -1,0 +1,3 @@
+include ../../Makeconf
+
+CFLAGS = -I. -I../../${INTEPRETER_DIR}

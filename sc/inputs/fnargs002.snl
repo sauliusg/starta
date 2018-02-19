@@ -1,0 +1,18 @@
+#
+# Snail compiler tests
+#
+#
+# Test readonlyness of function parameters.
+#
+
+use * from std;
+
+function g( int i; float j ) : float
+{
+    i = 2 * i;
+    j = j / 2.0;
+    return i@float * j;
+}
+
+. g( 2, 4 );
+. g( 3, 6 );

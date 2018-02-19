@@ -1,0 +1,56 @@
+// --*- C -*--
+
+// Test number conversions (strtol)
+
+use std;
+
+var m: string;
+
+try {
+    var x = -9223372036854775807 LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = -9223372036854775808 LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = 9223372036854775808 LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = -9223372036854775809 LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    var x = -92233720368547758090 LL;
+    . x;
+}
+catch( m ) {
+    . m
+}
+
+try {
+    use unsigned;
+    var x = 9223372036854775809 ULL;
+    . x;
+}
+catch( m ) {
+    . m
+}

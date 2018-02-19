@@ -1,0 +1,7 @@
+#
+# Test whether the SL compiler works
+#
+
+use * from std;
+
+. "Hellow, world!"
