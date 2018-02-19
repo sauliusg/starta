@@ -841,9 +841,6 @@ static void compiler_open_include_file( COMPILER *c, char *filename,
             ( ex, COMPILER_FILE_SEARCH_ERROR,
               "could not find required module, terminating" );
     } else {
-#if 0
-        printf( ">>> filename to open '%s'\n", full_name );
-#endif
         compiler_push_compiler_state( c, ex );
         compiler_save_flex_stream( c, full_name, ex );
     }
@@ -930,19 +927,11 @@ static void compiler_close_include_file( COMPILER *c,
 {
     if( c->use_module_name ) {
 	DNODE *module = NULL;
-#if 0
-	module = vartab_lookup( c->compiled_modules, c->use_module_name );
-#else
 	module = vartab_lookup_silently( c->compiled_modules,
                                          c->use_module_name,
                                          /* count = */ NULL,
                                          /* is_imported = */ NULL );
-#endif
 	if( module ) {
-#if 0
-	    printf( ">>> module '%s' is being used\n", 
-                    c->use_module_name );
-#endif
 	    compiler_use_exported_module_names( c, module, ex );
 	} else {
 	    yyerrorf( "no module named '%s'?", c->use_module_name );
@@ -952,17 +941,7 @@ static void compiler_close_include_file( COMPILER *c,
     if( c->requested_module ) {
         cexception_t inner;
         char *synonim;
-#if 0
-        printf( ">>>> checking module synonim for module '%s'...\n",
-                dnode_name( c->requested_module ));
-#endif
         if( (synonim = dnode_synonim( c->requested_module )) != NULL ) {
-#if 0
-            printf( ">>>> inserting synonim '%s' for module '%s' "
-                    "in file '%s'\n", synonim, 
-                    dnode_name( c->requested_module ),
-                    dnode_filename( c->requested_module ));
-#endif
             TYPETAB * typetab = NULL;
             VARTAB * vartab = NULL;
             VARTAB * consttab = NULL;
@@ -977,23 +956,11 @@ static void compiler_close_include_file( COMPILER *c,
                 DNODE *compiled_module =
                     vartab_lookup_module( c->vartab, c->requested_module,
                                           symtab );
-#if 0
-                if( !compiled_module ) {
-                    printf( "!!! could not find module to insert for '%s'\n",
-                            dnode_name( c->requested_module ));
-                } else {
-                    printf( ">>>> found module '%s' to insert under synonim "
-                    "'%s' in file '%s'\n", 
-                    dnode_name( compiled_module ),
-                    synonim, 
-                    dnode_filename( compiled_module ));
-                }
-#endif
                 /* Synonim is inserted as a simple variable, not as a
                    module (i.e. only the name uniqueness is
                    considered, module arguments are not taken into
-                   account. This is necessary to ensure unique names
-                   for enamed parametrised modules, as in 'use M(int)
+                   account). This is necessary to ensure unique names
+                   for renamed parametrised modules, as in 'use M(int)
                    as M1; use M(long) as M2' */
                 if( compiled_module ) {
                     vartab_insert( c->vartab, synonim,
@@ -3215,6 +3182,46 @@ static void compiler_compile_swap( COMPILER *cc, cexception_t *ex )
     compiler_emit( cc, ex, "\tc\n", SWAP );
 }
 
+static void compiler_compile_rot( COMPILER *cc, cexception_t *ex )
+{
+    ENODE *expr1 = enode_list_pop( &cc->e_stack );
+    ENODE *expr2 = enode_list_pop( &cc->e_stack );
+    ENODE *expr3 = enode_list_pop( &cc->e_stack );
+
+    if( !expr1 || !expr2 || !expr3 ) {
+	yyerrorf( "not enough values on the stack for SWAP" );
+    }
+    
+    enode_list_push( &cc->e_stack, expr1 );
+    enode_list_push( &cc->e_stack, expr3 );
+    enode_list_push( &cc->e_stack, expr2 );
+
+    compiler_emit( cc, ex, "\tc\n", ROT );
+}
+
+static void compiler_compile_peek( COMPILER *cc, ssize_t offset,
+                                   cexception_t *ex )
+{
+    ENODE *expr = cc->e_stack;
+    ssize_t count = offset;
+
+    while( expr && count > 1 ) {
+        expr = enode_next( expr );
+        count --;
+    }
+
+    if( expr ) {
+        TNODE *expr_type = enode_type( expr );
+        compiler_push_typed_expression( cc, share_tnode( expr_type ), ex );
+        compiler_emit( cc, ex, "\tce\n", PEEK, &offset );
+    } else {
+        yyerrorf( "not enough expressions on the evaluation stack "
+                  "to generate PEEK" );
+        compiler_push_error_type( cc, ex );
+    }
+
+}
+
 static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 {
     ENODE *expr1 = cc->e_stack;
@@ -3265,9 +3272,9 @@ static void compiler_compile_over( COMPILER *cc, cexception_t *ex )
 }
 
 static int compiler_stack_top_has_operator( COMPILER *c,
-					 char *operator_name,
-					 int arity,
-                                         cexception_t *ex )
+                                            char *operator_name,
+                                            int arity,
+                                            cexception_t *ex )
 {
     ENODE *expr_enode = c ? c->e_stack : NULL;
     TNODE *expr_tnode = expr_enode ? enode_type( expr_enode ) : NULL;
@@ -3588,9 +3595,9 @@ static void compiler_compile_composite_alloc( COMPILER *cc,
 }
 
 static void compiler_compile_array_alloc_operator( COMPILER *cc,
-						char *operator_name,
-						key_value_t *fixup_values,
-						cexception_t *ex )
+                                                   char *operator_name,
+                                                   key_value_t *fixup_values,
+                                                   cexception_t *ex )
 {
     ENODE *volatile top_expr = cc->e_stack;
     TNODE *volatile top_type = top_expr ? enode_type( top_expr ) : NULL;
@@ -6845,139 +6852,156 @@ static void compiler_process_module_parameters( COMPILER *cc,
 #endif
     DNODE *arg, *param, *module_args =
         dnode_module_args( cc->requested_module );
-    if( module_args ) {
-        TYPETAB *ttab =
-            symtab_typetab( stlist_data( cc->symtab_stack ));
-        arg = module_args;
-        foreach_dnode( param, module_params ) {
-            TNODE *param_type = dnode_type( param );
-            char *argument_name;
-            if( !arg ) {
-                /* maybe paremeter has a default value? Check: */
-                argument_name = dnode_synonim( param );
-                if( !argument_name ) {
-                    /* No default value -- an error: */
-                    COMPILER_STATE *st = cc->include_files;
-                    char *filename = st ? st->filename : NULL;
-                    int line_no = st ? st->line_no : 0;
-                    if( filename ) {
-                        yyerrorf( "missing actual argument for "
-                                  "parameter '%s' of module '%s' "
-                                  "included from file '%s', line %d",
-                                  dnode_name( param ),
-                                  dnode_name( cc->requested_module ),
-                                  filename, line_no );
-                    } else {
-                        yyerrorf( "missing actual argument for "
-                                  "parameter '%s' of module '%s'",
-                                  dnode_name( param ),
-                                  dnode_name( cc->requested_module ));
-                    }
-                    break;
-                }
-            } else {
-                argument_name = dnode_name( arg );
-            }
-            if( tnode_kind( param_type ) == TK_TYPE ) {
-                TNODE *arg_type = argument_name ?
-                    typetab_lookup( ttab, argument_name ) :
-                    NULL;
-                if( !arg_type ) {
-                    if( argument_name ) {
-                        yyerrorf( "type '%s' is not defined for "
-                                  "module parameter",
-                                  argument_name );
-                    } else {
-                        yyerrorf( "type is not defined for "
-                                  "module parameter '%s'",
-                                  dnode_name( param ));
-                    }
-                }
-                char *type_name = dnode_name( param );
-                cexception_t inner;
-                TNODE * volatile type_tnode =
-                    new_tnode_equivalent( arg_type, ex );
-                cexception_guard( inner ) {
-                    tnode_set_name( type_tnode, type_name, &inner );
-                    compiler_typetab_insert( cc, type_tnode, &inner );
-                    type_tnode = NULL;
-                    share_tnode( arg_type );
-                    tnode_insert_base_type( param_type, arg_type );
-                }
-                cexception_catch {
-                    delete_tnode( type_tnode );
-                    cexception_reraise( inner, ex );
-                }
-            } else if( tnode_kind( param_type ) == TK_CONST ) {
-                VARTAB *ctab =
-                    symtab_consttab( stlist_data( cc->symtab_stack ));
-                DNODE *argument_dnode =
-                    vartab_lookup( ctab, argument_name );
-                if( !argument_dnode && dnode_name( arg ) == NULL ) {
-                    /* The 'arg' dnode represents a constant expression: */
-                    dnode_set_name( arg, dnode_name( param ), ex );
-                    argument_dnode = arg;
-                    vartab_insert_named( ctab, share_dnode( arg ), ex );
-                }
-                /* Insert the constant under the module parameter name: */
-                if( argument_dnode ) {
-                    dnode_insert_module_args( param, share_dnode( argument_dnode ));
-                    vartab_insert( cc->consts, dnode_name( param ),
-                                   share_dnode( argument_dnode ), ex );
+
+    TYPETAB *ttab =
+        symtab_typetab( stlist_data( cc->symtab_stack ));
+    arg = module_args;
+    foreach_dnode( param, module_params ) {
+        TNODE *param_type = dnode_type( param );
+        char *argument_name;
+        if( !arg ) {
+            /* maybe paremeter has a default value? Check: */
+            argument_name = dnode_synonim( param );
+            if( !argument_name ) {
+                /* No default value -- an error: */
+                COMPILER_STATE *st = cc->include_files;
+                char *filename = st ? st->filename : NULL;
+                int line_no = st ? st->line_no : 0;
+                if( filename ) {
+                    yyerrorf( "missing actual argument for "
+                              "parameter '%s' of module '%s' "
+                              "included from file '%s', line %d",
+                              dnode_name( param ),
+                              dnode_name( cc->requested_module ),
+                              filename, line_no );
                 } else {
-                    yyerrorf( "constant '%s' is not found for module"
-                              " parameter", argument_name );
+                    yyerrorf( "missing actual argument for "
+                              "parameter '%s' of module '%s'",
+                              dnode_name( param ),
+                              dnode_name( cc->requested_module ));
                 }
-            } else if( tnode_kind( param_type ) == TK_VAR ||
-                       tnode_kind( param_type ) == TK_FUNCTION ) {
-                VARTAB *vartab =
-                    symtab_vartab( stlist_data( cc->symtab_stack ));
-                DNODE *argument_dnode =
-                    vartab_lookup( vartab, argument_name );
-                /* Insert the variable or function under the
-                   module parameter name: */
-                if( argument_dnode ) {
-                    dnode_insert_module_args( param, share_dnode( argument_dnode ));
-                    vartab_insert( cc->vartab, dnode_name( param ),
-                                   share_dnode( argument_dnode ), ex );
-                } else {
-                    char *item_name =
-                        tnode_kind( param_type ) == TK_VAR ?
-                        "variable" : "function";
-                    if( argument_name ) {
-                        yyerrorf( "%s '%s' is not found"
-                                  " for module parameter '%s'",
-                                  item_name, argument_name,
-                                  dnode_name( param ));
-                    } else {
-                        yyerrorf( "%s is not found"
-                                  " for module parameter '%s'",
-                                  item_name, dnode_name( param ));
-                    }
-                }
-            } else {
-                yyerrorf( "sorry, parameters of kind '%s' are not yet "
-                          "supported for modules", 
-                          tnode_kind_name( param_type ));
+                break;
             }
-            if( arg )
-                arg = dnode_next( arg );
-        } /* foreach_dnode( param, module_params ) { ... */
-        if( arg ) {
-            COMPILER_STATE *st = cc->include_files;
-            char *filename = st ? st->filename : NULL;
-            int line_no = st ? st->line_no : 0;
-            if( filename ) {
-                yyerrorf( "too many arguments for module '%s' "
-                          "included from file '%s', line %d",
-                          dnode_name( cc->requested_module ),
-                          filename, line_no );
-            } else {
-                yyerrorf( "too many arguments for module '%s'",
-                          dnode_name( cc->requested_module ));
-            }
+        } else {
+            argument_name = dnode_name( arg );
         }
-    } /* if( module_args ) { ... */
+        if( tnode_kind( param_type ) == TK_TYPE ) {
+            TNODE *arg_type = argument_name ?
+                typetab_lookup( ttab, argument_name ) :
+                NULL;
+            if( !arg_type ) {
+                if( argument_name ) {
+                    yyerrorf( "type '%s' is not defined for "
+                              "module parameter",
+                              argument_name );
+                } else {
+                    yyerrorf( "type is not defined for "
+                              "module parameter '%s'",
+                              dnode_name( param ));
+                }
+            }
+            char *type_name = dnode_name( param );
+            cexception_t inner;
+            TNODE * volatile type_tnode =
+                new_tnode_equivalent( arg_type, ex );
+            cexception_guard( inner ) {
+                tnode_set_name( type_tnode, type_name, &inner );
+                compiler_typetab_insert( cc, type_tnode, &inner );
+                type_tnode = NULL;
+                share_tnode( arg_type );
+                tnode_insert_base_type( param_type, arg_type );
+            }
+            cexception_catch {
+                delete_tnode( type_tnode );
+                cexception_reraise( inner, ex );
+            }
+        } else if( tnode_kind( param_type ) == TK_CONST ) {
+            VARTAB *ctab =
+                symtab_consttab( stlist_data( cc->symtab_stack ));
+            DNODE *argument_dnode =
+                vartab_lookup( ctab, argument_name );
+            if( !argument_dnode && dnode_name( arg ) == NULL ) {
+                /* The 'arg' dnode represents a constant expression: */
+                cexception_t inner;
+                const_value_t volatile const_value = make_zero_const_value();
+
+                const_value_copy( (const_value_t*)&const_value,
+                                  dnode_value( arg ), ex );
+                
+                cexception_guard( inner ) {
+                    const_value_to_string( (const_value_t*)&const_value,
+                                           &inner );
+                    dnode_set_name( arg,
+                                    strdupx( const_value_string
+                                             ( (const_value_t*)&const_value ),
+                                             &inner ),
+                                    &inner );
+                    argument_dnode = arg;
+                    vartab_insert_named( ctab, share_dnode( arg ), &inner );
+                }
+                cexception_finally (
+                    { const_value_free( (const_value_t*)&const_value ); },
+                    { cexception_reraise( inner, ex ); }
+                );
+            }
+            /* Insert the constant under the module parameter name: */
+            if( argument_dnode ) {
+                dnode_insert_module_args( param, share_dnode( argument_dnode ));
+                vartab_insert( cc->consts, dnode_name( param ),
+                               share_dnode( argument_dnode ), ex );
+            } else {
+                yyerrorf( "constant '%s' is not found for module"
+                          " parameter", argument_name );
+            }
+        } else if( tnode_kind( param_type ) == TK_VAR ||
+                   tnode_kind( param_type ) == TK_FUNCTION ) {
+            VARTAB *vartab =
+                symtab_vartab( stlist_data( cc->symtab_stack ));
+            DNODE *argument_dnode =
+                vartab_lookup( vartab, argument_name );
+            /* Insert the variable or function under the
+               module parameter name: */
+            if( argument_dnode ) {
+                dnode_insert_module_args( param, share_dnode( argument_dnode ));
+                vartab_insert( cc->vartab, dnode_name( param ),
+                               share_dnode( argument_dnode ), ex );
+            } else {
+                char *item_name =
+                    tnode_kind( param_type ) == TK_VAR ?
+                    "variable" : "function";
+                if( argument_name ) {
+                    yyerrorf( "%s '%s' is not found"
+                              " for module parameter '%s'",
+                              item_name, argument_name,
+                              dnode_name( param ));
+                } else {
+                    yyerrorf( "%s is not found"
+                              " for module parameter '%s'",
+                              item_name, dnode_name( param ));
+                }
+            }
+        } else {
+            yyerrorf( "sorry, parameters of kind '%s' are not yet "
+                      "supported for modules", 
+                      tnode_kind_name( param_type ));
+        }
+        if( arg )
+            arg = dnode_next( arg );
+    } /* foreach_dnode( param, module_params ) { ... */
+    if( arg ) {
+        COMPILER_STATE *st = cc->include_files;
+        char *filename = st ? st->filename : NULL;
+        int line_no = st ? st->line_no : 0;
+        if( filename ) {
+            yyerrorf( "too many arguments for module '%s' "
+                      "included from file '%s', line %d",
+                      dnode_name( cc->requested_module ),
+                      filename, line_no );
+        } else {
+            yyerrorf( "too many arguments for module '%s'",
+                      dnode_name( cc->requested_module ));
+        }
+    }
 }
 
 static COMPILER * volatile compiler;
@@ -7679,6 +7703,7 @@ module_statement
                                               px );
           }
 
+          //compiler_begin_subscope( compiler, px );
 	  compiler_begin_module( compiler, share_dnode(module_dnode), px );
 
           if( compiler->requested_module ) {
@@ -7698,6 +7723,7 @@ module_statement
 	      }
 	  }
 	  compiler_end_module( compiler, px );
+          //compiler_end_subscope( compiler, px );
       }
   ;
 
@@ -11547,14 +11573,18 @@ closure_initialisation
 ;
 
 function_expression_header
-:   function_or_procedure_keyword '(' argument_list ')'
+:   opt_function_attributes function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
         dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
-                                 /* parameters = */ $3,
-                                 /* return_values = */ $5,
+                                 /* parameters = */ $4,
+                                 /* return_values = */ $6,
                                  px );
+        if( $1 & DF_BYTECODE )
+            dnode_set_flags( $$, DF_BYTECODE );
+        if( $1 & DF_INLINE )
+            dnode_set_flags( $$, DF_INLINE );
     }
 ;
 
@@ -11742,21 +11772,361 @@ array_expression
      {
 	 compiler_compile_array_expression( compiler, $2, px );
      }
-/*
-  Expression never used and unnecessary duplication:
-  | '{' expression_list opt_comma '}'
-*/
   /* Array 'comprehensions' (aka array 'for' epxressions): */
-  /* FIXME: add implementation (S.G.): */
-  | '[' _FOR lvariable '=' expression _TO expression ':' expression ']'
-  | '[' expression ':' _FOR lvariable '=' expression _TO expression ':' expression ']'
-  | '[' _FOR lvariable _IN expression ':' expression ']'
-  | '[' expression ':' _FOR lvariable _IN expression ':' expression ']'
+  | '[' labeled_for lvariable
+     {
+         compiler_push_loop( compiler, $2, 2, px );
+         dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+         compiler_compile_dup( compiler, px );
+     }
+     '=' expression
+     {
+         compiler_compile_sti( compiler, px );
+     }
+     _TO expression ':'
+     {
+         /* ..., loop_counter_addr, loop_limit */
+         compiler_compile_dup( compiler, px );
+         /* ..., loop_counter_addr, loop_limit, loop_limit */
+         compiler_compile_unop( compiler, "++", px );
+         /* ..., loop_counter_addr, loop_limit, array_length */
+         compiler_emit( compiler, px, "\n" );
 
-  | '[' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
-  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration '=' expression _TO expression ':' expression ']'
-  | '[' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
-  | '[' expression ':' _FOR variable_declaration_keyword for_variable_declaration _IN expression ':' expression ']'
+         /* Compile loop zero length check: */
+         compiler_compile_peek( compiler, 3, px );
+         compiler_compile_ldi( compiler, px );
+         compiler_compile_peek( compiler, 3, px );
+         if( compiler_test_top_types_are_identical( compiler, px )) {
+             compiler_compile_binop( compiler, ">", px );
+             compiler_push_relative_fixup( compiler, px );
+             compiler_compile_jnz( compiler, 0, px );
+         } else {
+             ssize_t zero = 0;
+             compiler_drop_top_expression( compiler );
+             compiler_drop_top_expression( compiler );
+             compiler_push_relative_fixup( compiler, px );
+             compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+         }
+         compiler_emit( compiler, px, "\n" );
+
+         compiler_push_thrcode( compiler, px );
+     }
+     expression ']'
+     {
+         /* Compile array allocation: */
+         ENODE *element_expr = compiler->e_stack;
+         TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
+         compiler_swap_thrcodes( compiler );
+         compiler_compile_array_alloc( compiler, element_type, px );
+         /* ..., loop_counter_addr, loop_limit, array */
+         compiler_compile_rot( compiler, px );
+         compiler_emit( compiler, px, "\n" );
+         /* ..., array, loop_counter_addr, loop_limit */
+         /* Will return here in the next loop iteration: */
+         compiler_push_current_address( compiler, px );
+         compiler_merge_top_thrcodes( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit, element_expression */
+         compiler_emit( compiler, px, "\n" );
+
+         /* Store array element:*/
+
+         /* Runtime stack configuration at this point: */
+         /* ..., array, loop_counter_addr, loop_limit, expression_value */
+         compiler_compile_peek( compiler, 4, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value, array */
+         compiler_compile_peek( compiler, 4, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value,
+            array, loop_counter_addr */
+         compiler_compile_ldi( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value,
+            array, loop_counter */
+         compiler_compile_address_of_indexed_element( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit, expression_value,
+            element_address */
+         compiler_compile_swap( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit,
+            element_address, expression_value */
+         compiler_compile_sti( compiler, px );
+         /* ..., array, loop_counter_addr, loop_limit */
+         
+         /* Finish the comprehension 'for' loop: */
+         compiler_fixup_here( compiler );
+         compiler_fixup_op_continue( compiler, px );
+         compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+         compiler_fixup_op_break( compiler, px );
+         compiler_pop_loop( compiler );
+         compiler_end_subscope( compiler, px );
+     }
+
+| '[' labeled_for lvariable
+  {
+        compiler_push_loop( compiler, /* loop_label = */ $2,
+                            /* ncounters = */ 2, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+        /* stack now: ..., lvariable_address */
+  }
+    _IN expression
+  {
+        /* stack now: ..., lvariable_address, array_last_ptr == array */
+        compiler_push_thrcode( compiler, px );
+  }
+ ':' expression ']'
+  {
+        /* Compile array allocation: */
+        compiler_swap_thrcodes( compiler );
+        compiler_compile_dup( compiler, px );
+        compiler_emit( compiler, px, "\tc\n", CLONE );
+        /* ..., lvariable_address, array_last_ptr == array, new_array */
+        compiler_compile_rot( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+        /* Will return here in the next loop iteration: */
+        compiler_push_current_address( compiler, px );
+        
+        /* Store the current array element into the loop variable: */
+        compiler_compile_over( compiler, px );
+        compiler_compile_over( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_ldi( compiler, px );
+        compiler_compile_sti( compiler, px );
+        
+        compiler_emit( compiler, px, "\n" );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+
+        compiler_merge_top_thrcodes( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr, expression */
+
+        /* Store array element: */
+        compiler_compile_peek( compiler, 4, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_swap( compiler, px );
+        compiler_compile_sti( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+        /* Advance the target array pointer: */
+        compiler_compile_rot( compiler, px );
+        compiler_compile_rot( compiler, px );
+        /* ..., lvariable_address, array_last_ptr, new_array */
+        compiler_emit( compiler, px, "\tcIc\n", LDC, 1, INDEX );
+
+        compiler_compile_rot( compiler, px );
+        /* ..., new_array, lvariable_address, array_last_ptr */
+
+        /* Finish the comprehension 'for' loop: */
+        // compiler_fixup_here( compiler );
+        compiler_fixup_op_continue( compiler, px );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
+        compiler_fixup_op_break( compiler, px );
+        compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
+        compiler_emit( compiler, px, "\tc\n", ZEROOFFSET );
+  }
+  
+  | '[' labeled_for variable_declaration_keyword for_variable_declaration
+    {
+        int readonly = $3;
+	if( readonly ) {
+	    dnode_set_flags( $4, DF_IS_READONLY );
+	}
+	compiler_push_loop( compiler, $2, 2, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+    }
+  '=' expression
+    {
+	DNODE *loop_counter = $4;
+
+	if( dnode_type( loop_counter ) == NULL ) {
+	    dnode_append_type( loop_counter,
+			       share_tnode( enode_type( compiler->e_stack )));
+	    dnode_assign_offset( loop_counter, &compiler->local_offset );
+	}
+	compiler_vartab_insert_named_vars( compiler, loop_counter, px );
+        compiler_compile_store_variable( compiler, loop_counter, px );
+	compiler_compile_load_variable_address( compiler, loop_counter, px );
+    }
+     _TO expression ':'
+    {
+        /* ..., loop_counter_addr, loop_limit */
+        compiler_compile_dup( compiler, px );
+        /* ..., loop_counter_addr, loop_limit, loop_limit */
+        compiler_compile_unop( compiler, "++", px );
+        /* ..., loop_counter_addr, loop_limit, array_length */
+        compiler_emit( compiler, px, "\n" );
+         
+        /* Compile loop zero length check: */
+        compiler_compile_peek( compiler, 3, px );
+        compiler_compile_ldi( compiler, px );
+        compiler_compile_peek( compiler, 3, px );
+        if( compiler_test_top_types_are_identical( compiler, px )) {
+            compiler_compile_binop( compiler, ">", px );
+            compiler_push_relative_fixup( compiler, px );
+            compiler_compile_jnz( compiler, 0, px );
+        } else {
+            ssize_t zero = 0;
+            compiler_drop_top_expression( compiler );
+            compiler_drop_top_expression( compiler );
+            compiler_push_relative_fixup( compiler, px );
+            compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+        }
+        compiler_emit( compiler, px, "\n" );
+
+        compiler_push_thrcode( compiler, px );
+    }
+     expression ']'
+    {
+        /* Compile array allocation: */
+        ENODE *element_expr = compiler->e_stack;
+        TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
+        compiler_swap_thrcodes( compiler );
+        compiler_compile_array_alloc( compiler, element_type, px );
+        /* ..., loop_counter_addr, loop_limit, array */
+        compiler_compile_rot( compiler, px );
+        compiler_emit( compiler, px, "\n" );
+        /* ..., array, loop_counter_addr, loop_limit */
+        compiler_push_current_address( compiler, px );
+        compiler_merge_top_thrcodes( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit, element_expression */
+        compiler_emit( compiler, px, "\n" );
+
+        /* Store array element:*/
+
+        /* Runtime stack configuration at this point: */
+        /* ..., array, loop_counter_addr, loop_limit, expression_value */
+        compiler_compile_peek( compiler, 4, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value, array */
+        compiler_compile_peek( compiler, 4, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value,
+           array, loop_counter_addr */
+        compiler_compile_ldi( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value,
+           array, loop_counter */
+        compiler_compile_address_of_indexed_element( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit, expression_value,
+           element_address */
+        compiler_compile_swap( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit,
+           element_address, expression_value */
+        compiler_compile_sti( compiler, px );
+        /* ..., array, loop_counter_addr, loop_limit */
+         
+        /* Finish the comprehension 'for' loop: */
+        compiler_fixup_here( compiler );
+        compiler_fixup_op_continue( compiler, px );
+        compiler_compile_loop( compiler, compiler_pop_offset( compiler, px ), px );
+        compiler_fixup_op_break( compiler, px );
+        compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
+    }
+
+  | '[' labeled_for variable_declaration_keyword for_variable_declaration
+    {
+	int readonly = $3;
+	if( readonly ) {
+	    dnode_set_flags( $4, DF_IS_READONLY );
+	}
+	compiler_push_loop( compiler, /* loop_label = */ $2,
+                            /* ncounters = */ 1, px );
+	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+    }
+    _IN expression ':'
+    {
+        DNODE *loop_counter_var = $4;
+        TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
+        TNODE *element_type = 
+            aggregate_expression_type ?
+            tnode_element_type( aggregate_expression_type ) : NULL;
+
+        if( enode_has_flags( compiler->e_stack, EF_IS_READONLY )) {
+	    dnode_set_flags( loop_counter_var, DF_IS_READONLY );
+        }
+
+        if( element_type ) {
+            if( dnode_type( loop_counter_var ) == NULL ) {
+                dnode_append_type( loop_counter_var,
+                                   share_tnode( element_type ));
+            }
+            dnode_assign_offset( loop_counter_var,
+                                 &compiler->local_offset );
+        }
+
+	compiler_vartab_insert_named_vars( compiler, loop_counter_var, px );
+        /* stack now: ..., array_current_ptr == array */
+        compiler_push_thrcode( compiler, px );
+    }
+    expression ']'
+    {
+        /* Compile array allocation: */
+        compiler_swap_thrcodes( compiler );
+        compiler_compile_dup( compiler, px );
+        compiler_emit( compiler, px, "\tc\n", CLONE );
+        /* ..., array_last_ptr == array, new_array */
+        compiler_compile_swap( compiler, px );
+        /* ..., new_array, array_last_ptr == array */
+        
+        /* Will return here in the next loop iteration: */
+        /* stack now: ..., new_array, array_current_ptr == array */
+        compiler_push_current_address( compiler, px );
+
+        /* Store the current array element into the loop variable: */
+        /* stack now: ..., new_array, array_current_ptr */
+        compiler_compile_dup( compiler, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+
+        DNODE *loop_counter_var = $4;
+        TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
+        TNODE *element_type = 
+            aggregate_expression_type ?
+            tnode_element_type( aggregate_expression_type ) : NULL;
+
+        if( aggregate_expression_type &&
+            tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+            element_type &&
+            tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+            compiler_compile_ldi( compiler, px );
+        } else {
+            compiler_emit( compiler, px, "\tc\n", GLDI );
+            compiler_stack_top_dereference( compiler );
+        }
+        compiler_compile_variable_initialisation
+            ( compiler, loop_counter_var, px );
+        
+        compiler_emit( compiler, px, "\n" );
+        /* ..., new_array, array_last_ptr */
+
+        compiler_merge_top_thrcodes( compiler, px );
+        /* ..., new_array, array_last_ptr, expression */
+
+        /* Store a new array element: */
+        compiler_compile_peek( compiler, 3, px );
+        compiler_make_stack_top_element_type( compiler );
+        compiler_make_stack_top_addressof( compiler, px );
+        compiler_compile_swap( compiler, px );
+        compiler_compile_sti( compiler, px );
+        /* ..., new_array, array_last_ptr */
+        /* Advance the target array pointer: */
+        compiler_compile_swap( compiler, px );
+        /* ..., lvariable_address, array_last_ptr, new_array */
+        compiler_emit( compiler, px, "\tcIc\n", LDC, 1, INDEX );
+        compiler_compile_swap( compiler, px );
+        /* ..., new_array, array_last_ptr */
+
+        /* Finish the comprehension 'for' loop: */
+        // compiler_fixup_here( compiler );
+        compiler_fixup_op_continue( compiler, px );
+	compiler_compile_next( compiler, compiler_pop_offset( compiler, px ),
+                               px );
+        compiler_fixup_op_break( compiler, px );
+        compiler_pop_loop( compiler );
+        compiler_end_subscope( compiler, px );
+        compiler_emit( compiler, px, "\tc\n", ZEROOFFSET );
+    }
+
+/*
+  | '[' expression ':' labeled_for variable_declaration_keyword for_variable_declaration _IN
+     expression ':' expression ']'
+*/
   ;
 
 struct_expression
@@ -12794,6 +13164,14 @@ function_or_operator_body
   expression_list ';'
   {
       compiler_compile_return( compiler, $3, px );
+  }
+  | __THICK_ARROW
+  {
+      compiler_push_guarding_retval( compiler, px );
+  }
+  '{' expression_list '}'
+  {
+      compiler_compile_return( compiler, $4, px );
   }
   ;
 

@@ -10,6 +10,8 @@ const N = 100;
 
 var x : double = 30.5;
 
+var i : int = const(C);
+
 procedure add( double x, y ): double { return x + y }
 
 use ProcTypeParam( N, double, x, add ) as P1;

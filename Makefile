@@ -1,7 +1,8 @@
 
-FIRST = cexceptions getoptions lists
+FIRST = common cexceptions getoptions lists starta
 
-DIRS  = ${FIRST} ${filter-out ${FIRST}, ${dir ${wildcard */Makefile}}}
+DIRS  = ${FIRST} \
+	$(filter-out $(addsuffix /,${FIRST}), $(dir $(wildcard */Makefile)))
 
 .PHONY: all test tests alltests listdiff
 .PHONY: bench benchmark benchmarks

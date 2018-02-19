@@ -1,0 +1,25 @@
+//--*- Java -*--
+// Compiler tests
+//
+
+// Test parametrised modules
+
+use * from std;
+
+var x : float;
+var i : int;
+
+procedure g(): int { return 1 }
+procedure h(): int { return 2 }
+
+const C = 1;
+const C2 = 2;
+
+use PT1(C,int,x,g);
+use PT2(C2,short,i,h);
+
+. PT1::pp( 10 ); // 100 + 30.5 + 10 = 140.5
+. PT2::pp( 10 ); // 100 + 30.5 + 10 = 140.5
+
+. PT1::i;
+. PT2::i;

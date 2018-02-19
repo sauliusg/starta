@@ -1,0 +1,17 @@
+// --*- C -*--
+
+// Test various versions of a shortened function expression syntax:
+
+use std;
+
+var f = function (int x) -> (int) => { x * x * x };
+
+. f(20);
+
+var g = function (long x) -> long => x * x ;;
+
+. g(20);
+
+var h = procedure (a, b: float): float => a * b / (a + b) ;;
+
+. h( 10, 30 );

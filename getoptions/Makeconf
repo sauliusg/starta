@@ -1,2 +1,3 @@
 
+TARGET = topt
 LIB_DIRS = ../cexceptions

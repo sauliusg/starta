@@ -1,0 +1,18 @@
+// --*- C -*--
+
+// Test array comprehension syntax
+
+use std;
+use APrint as APint;
+use APrint(long) as APlong;
+
+var m = [for var i = 0 to 8: i*i];
+
+. m;
+
+procedure P( int i ) -> int { . i, i*i; return i * i }
+
+var n : int;
+var p = [for n in m: P(n) ];
+
+. p

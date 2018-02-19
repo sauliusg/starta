@@ -340,6 +340,18 @@ int ROT( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
+int PEEK( INSTRUCTION_FN_ARGS )
+{
+    ssize_t offset = istate.code[istate.ip+1].ssizeval;
+
+    TRACE_FUNCTION();
+
+    istate.ep --;
+    istate.ep[0] = istate.ep[abs(offset)];
+
+    return 2;
+}
+
 int COPY( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *ptr0 = STACKCELL_PTR( istate.ep[0] );
@@ -393,6 +405,26 @@ int OFFSET( INSTRUCTION_FN_ARGS )
     STACKCELL_OFFSET_PTR( istate.ep[0], field_offset );
 
     return 2;
+}
+
+/*
+ * ZEROOFFSET reset stack-cell offset to zero
+ * 
+ * bytecode:
+ * ZEROOFFSET
+ * 
+ * stack:
+ * ptr -> ptr
+ * 
+ */
+
+int ZEROOFFSET( INSTRUCTION_FN_ARGS )
+{
+    TRACE_FUNCTION();
+
+    STACKCELL_OFFSET(istate.ep[0]) = 0;
+
+    return 1;
 }
 
 /*
@@ -1100,7 +1132,6 @@ int APOP( INSTRUCTION_FN_ARGS )
             if( flags & AF_HAS_REFS ) {
                 assert( array[-1].nref > 0 );
                 array[-1].nref --;
-                array[-1].flags |= AF_HAS_REFS;
             }
             
         }
@@ -1219,6 +1250,7 @@ int CLONE( INSTRUCTION_FN_ARGS )
 #endif
 
     ptr[-1].vmt_offset = array[-1].vmt_offset;
+    ptr[-1].flags = array[-1].flags;
 
     if( nref < 0 ) {
         ssize_t ref_size = (ssize_t)abs(nref) * (ssize_t)REF_SIZE;

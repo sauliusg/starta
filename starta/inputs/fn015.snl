@@ -1,0 +1,9 @@
+// --*- C -*--
+
+// Test shortened function definitions:
+
+use std;
+
+function square( int x ): (float) => x * x;
+
+. square(4);

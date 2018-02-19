@@ -199,7 +199,7 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                     ( t1, t2->base_type, generic_types, ex );
             } else {
                 return tnode_create_and_check_placeholder_implementation
-                    ( t1, t2, generic_types, tnode_check_types, ex );
+                    ( t2, t1, generic_types, tnode_check_types, ex );
             }
         } else {
             return tnode_create_and_check_placeholder_implementation
