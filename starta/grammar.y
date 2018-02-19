@@ -2832,10 +2832,10 @@ static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
 			  "onto the stack" );
 	    }
 
-            if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
-		compiler_emit( cc, ex, "\tc\n", GLDI );
-	    } else if( element_type && tnode_is_reference( element_type )) {
+            if( element_type && tnode_is_reference( element_type )) {
 		compiler_emit( cc, ex, "\tc\n", PLDI );
+	    } else if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
+		compiler_emit( cc, ex, "\tc\n", GLDI );
 	    } else {
 		compiler_emit( cc, ex, "\tcs\n", LDI, &element_size );
 	    }
@@ -2916,11 +2916,11 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		compiler_check_operator_retvals( cc, &od, 0, 0 );
 	    } else {
                 ssize_t expr_size = expr_type ? tnode_size( expr_type ) : 0;
-		if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
-		    compiler_emit( cc, &inner, "\tc\n", GSTI );
-                } else if( expr_type && tnode_is_reference( expr_type )) {
+		if( expr_type && tnode_is_reference( expr_type )) {
 		    compiler_emit( cc, &inner, "\tc\n", PSTI );
-		} else {
+		} else if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
+		    compiler_emit( cc, &inner, "\tc\n", GSTI );
+                } else {
 		    compiler_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}
 	    }
@@ -9482,7 +9482,7 @@ var_type_description
   | undelimited_or_structure_description
   | _ARRAY
     { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
-  | type_identifier dimension_list
+  | delimited_type_description dimension_list
     {
         $$ = tnode_append_element_type( $2, share_tnode( $1 ));
     }
@@ -9605,6 +9605,18 @@ delimited_type_description
 	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
 	if( !tnode ) {
 	    tnode = new_tnode_placeholder( type_name, px );
+	    typetab_insert( compiler->typetab, type_name, tnode, px );
+	}
+	$$ = share_tnode( tnode );
+    }
+
+  | '<' __IDENTIFIER '>'
+    {
+	char *type_name = $2;
+	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
+	if( !tnode ) {
+	    tnode = new_tnode_placeholder( type_name, px );
+            tnode_set_flags( tnode, TF_IS_REF );
 	    typetab_insert( compiler->typetab, type_name, tnode, px );
 	}
 	$$ = share_tnode( tnode );
@@ -11576,6 +11588,7 @@ function_expression_header
 :   opt_function_attributes function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
+        int is_function = $2;
         dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
                                  /* parameters = */ $4,
@@ -11585,6 +11598,9 @@ function_expression_header
             dnode_set_flags( $$, DF_BYTECODE );
         if( $1 & DF_INLINE )
             dnode_set_flags( $$, DF_INLINE );
+        if( is_function ) {
+            compiler_set_function_arguments_readonly( dnode_type( $$ ));
+        }
     }
 ;
 

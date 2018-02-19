@@ -147,6 +147,11 @@ static int tnode_structures_are_identical( TNODE *t1, TNODE *t2,
     }
 }
 
+static TNODE *tnode_placeholder_implementation( TNODE *abstract,
+                                                TNODE *concrete,
+                                                TYPETAB *generic_types,
+                                                cexception_t *ex );
+
 static int
 tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
                                                    TYPETAB *generic_types,
@@ -166,18 +171,15 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
     } else {
         cexception_t inner;
         cexception_guard( inner ) {
-            placeholder_implementation =
-                new_tnode_placeholder( t2->name, ex );
-            tnode_insert_base_type( placeholder_implementation,
-                                    share_tnode( t1 ));
-            typetab_insert( generic_types, t2->name,
-                            placeholder_implementation, &inner );
+            placeholder_implementation = 
+                tnode_placeholder_implementation( t2, t1, generic_types, &inner );
         }
-        cexception_catch {
-            delete_tnode( placeholder_implementation );
-            cexception_reraise( inner, ex );
+        if( placeholder_implementation == t2 ) {
+            /* Placeholder implementation was not created: */
+            return 0;
+        } else {
+            return 1;
         }
-        return 1;
     }
 }
 
@@ -521,6 +523,12 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
             typetab_lookup( generic_types, abstract->name );
 
         if( !placeholder_implementation ) {
+            if( tnode_is_reference( abstract ) &&
+                !tnode_is_reference( concrete )) {
+                yyerrorf( "can not implement reference placeholder '%s' "
+                          "with a non-reference type '%s'",
+                          tnode_name( abstract ), tnode_name( concrete ));
+            }
             cexception_t inner;
             cexception_guard( inner ) {
                 placeholder_implementation =
@@ -535,8 +543,8 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                 delete_tnode( placeholder_implementation );
                 cexception_reraise( inner, ex );
             }
+            return placeholder_implementation;
         }
-        return placeholder_implementation;
     }
     return abstract;
 }
