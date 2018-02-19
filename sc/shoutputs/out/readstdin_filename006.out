@@ -1,4 +1,0 @@
-"-" 1 1 A single line in a file.
-After the 'while(<>)' loop:
-curreof() == TRUE
-alleof()  == TRUE

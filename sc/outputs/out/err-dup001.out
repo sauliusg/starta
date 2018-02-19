@@ -1,8 +1,0 @@
-./sl: inputs/err-dup001.snl(25,14): ERROR, incompatible type of argument 1 for operator 'dup'
-a = b = c = 1;
-             ^
-./sl: inputs/err-dup001.snl(25,14): ERROR, incompatible type of argument 1 for operator 'dup'
-a = b = c = 1;
-             ^
-./sl: 2 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-selective007.snl(26,20): ERROR, type 'funny' has no conversion from type 'funny'
-P2::print_funny( x );
-                   ^
-./sl: 1 error(s) detected
-

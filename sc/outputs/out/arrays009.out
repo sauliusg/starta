@@ -1,5 +1,0 @@
-ArrayIndexNegative : negative array index
-array index 10 out of bounds
-ArrayIndexOverflow : array index 10 out of bounds
-ArrayIndexOverflow : array index 21 out of bounds
-NullPointerError   : can't index null array

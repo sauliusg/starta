@@ -1,5 +1,0 @@
-./sl: inputs/err-methods009.snl(47,2): ERROR, variable 's' is not declared in the current scope
-s->list();
- ^
-./sl: 1 error(s) detected
-

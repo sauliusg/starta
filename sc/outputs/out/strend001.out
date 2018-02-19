@@ -1,9 +1,0 @@
-s1 = 'core'
-s2 = 'ore'
-s3 = ''
-s4 = 'eve'
-string s1 is NOT a suffix of string s2
-string s2 is NOT a suffix of string s3
-string s3 is a suffix of string s1
-string s2 is a suffix of string s1
-string s4 is NOT a suffix of string s1

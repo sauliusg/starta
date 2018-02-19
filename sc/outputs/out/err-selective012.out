@@ -1,5 +1,0 @@
-./sl: inputs/err-selective012.snl(10,20): ERROR, module 'P3' is not found for constant import -- consider 'use P3' first
-use const NNN from P3;
-                   ^
-./sl: 1 error(s) detected
-

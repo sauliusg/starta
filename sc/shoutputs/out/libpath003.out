@@ -1,4 +1,0 @@
-./sl: shtests/programs/libpath.snl(5,15): ERROR, could not find module 'std.slib' in the include path
-use * from std;
-              ^
-could not find required module, terminating

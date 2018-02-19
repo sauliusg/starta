@@ -1,7 +1,0 @@
-This is class **B** destructor for object 'default B'
-This is class A destructor for object 'default B'
-default A -1
-b2: 10 1
-This is class A destructor for object 'default A'
-This is class **B** destructor for object 'b2'
-This is class A destructor for object 'b2'

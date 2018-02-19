@@ -1,8 +1,0 @@
-./sl: inputs/err-enum003.snl(37,11): ERROR, enumeration type 'E' does not have value 'two'
-e3 = two E;
-          ^
-./sl: inputs/err-enum003.snl(39,13): ERROR, type 'E' has no binary operator named '+'
-e2 = e1 + e3;
-            ^
-./sl: 2 error(s) detected
-

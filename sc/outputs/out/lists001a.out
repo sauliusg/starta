@@ -1,5 +1,0 @@
-./sl: inputs/lists001a.snl(12,21): ERROR, A generic field ('value') must be a single last field in a structure
-    next : list of T;
-                    ^
-./sl: 1 error(s) detected
-

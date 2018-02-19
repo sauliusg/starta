@@ -1,8 +1,0 @@
-./sl: shtests/programs/nolib.snl(8,17): ERROR, module 'nolib' is not available in the current scope
-bytecode { nolib::OPCODE }
-                ^
-./sl: shtests/programs/nolib.snl(8,26): ERROR, bytecode operation 'OPCODE' is not defined
-bytecode { nolib::OPCODE }
-                         ^
-./sl: 2 error(s) detected
-

@@ -1,9 +1,0 @@
-f() : I have received generic ref argument r,
-that argument is 
-null
-f() : I have received generic ref argument r,
-that argument is 
-not null
-f() : I have received generic ref argument r,
-that argument is 
-not null

@@ -1,5 +1,0 @@
-./sl: inputs/err-readonly005.snl(19,20): ERROR, can not assign to a readonly component
-    <stdin> >> m[i]; // ERROR: can not assign to readonly component.
-                   ^
-./sl: 1 error(s) detected
-

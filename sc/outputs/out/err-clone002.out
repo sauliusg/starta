@@ -1,5 +1,0 @@
-./sl: inputs/err-clone002.snl(36,39): ERROR, only references sould be cloned with '[]' operator
-foreach var atom in n { atom = atom[] }
-                                      ^
-./sl: 1 error(s) detected
-

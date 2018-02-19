@@ -1,8 +1,0 @@
-#
-# Snail compiler tests
-#
-#
-# Test dynamic library loading
-#
-
-load "/usr/lib/noexistent.so";

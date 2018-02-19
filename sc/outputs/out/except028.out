@@ -1,3 +1,0 @@
-0.5
-1
-inputs/except028.snl: ERROR: attempt to divide by 0 in function g() (err code = 0)

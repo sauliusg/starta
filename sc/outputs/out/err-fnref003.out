@@ -1,8 +1,0 @@
-./sl: inputs/err-fnref003.snl(18,4): ERROR, called object is not a function pointer
-s.i();
-   ^
-./sl: inputs/err-fnref003.snl(19,7): ERROR, called object is not a function pointer
-s.name();
-      ^
-./sl: 2 error(s) detected
-

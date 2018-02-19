@@ -1,5 +1,0 @@
-./sl: inputs/err-types001.snl(12,12): ERROR, Unknown type attribute 'nref'
-    nref = 4;
-           ^
-./sl: 1 error(s) detected
-

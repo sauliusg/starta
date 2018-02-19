@@ -1,5 +1,0 @@
-./sl: inputs/module-types002.snl(7,10): ERROR, type 'T' is imported more than once -- please use explicit package name for disambiguation
-var a : T;
-         ^
-./sl: 1 error(s) detected
-

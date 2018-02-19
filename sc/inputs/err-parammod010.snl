@@ -1,9 +1,0 @@
-//--*- Java -*--
-// Compiler tests
-//
-
-// Test parametrised modules
-
-use std;
-
-use ParamConstVarProc( 100, 200, const 300 ) as ifP;

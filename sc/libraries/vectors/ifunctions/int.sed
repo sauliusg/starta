@@ -1,9 +1,0 @@
-s/@type@/int/g;
-s/@PREFIX@/I/g;
-s/@PREFIX1@//g;
-s/@field@/i/g;
-s/@codeval@/ssizeval/g;
-s/@format@/d/g;
-s/@printformat@/d/g;
-s/@strtobin@/atoi/g;
-s/@cval_star@//g

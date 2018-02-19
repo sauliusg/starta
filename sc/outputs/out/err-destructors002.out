@@ -1,5 +1,0 @@
-./sl: inputs/err-destructors002.snl(10,16): ERROR, destructors of anonymous classes should be anonymous
-    destructor XX {
-               ^
-./sl: 1 error(s) detected
-

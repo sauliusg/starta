@@ -1,8 +1,0 @@
-./sl: inputs/err-multinint002.snl(9,33): ERROR, incompatible types for assignment to variable 'z'
-var x, y, z : int = 1, 2.0, 3.0D;
-                                ^
-./sl: inputs/err-multinint002.snl(9,33): ERROR, incompatible types for assignment to variable 'y'
-var x, y, z : int = 1, 2.0, 3.0D;
-                                ^
-./sl: 2 error(s) detected
-

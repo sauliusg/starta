@@ -1,5 +1,0 @@
-./sl: inputs/err-except008.snl(11,13): ERROR, exception 'Exx::Y' is not declared in the current scope
-raise Exx::Y( "exception Y" );
-            ^
-./sl: 1 error(s) detected
-

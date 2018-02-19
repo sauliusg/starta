@@ -1,8 +1,0 @@
-./sl: inputs/err-interfaces007.snl(22,1): ERROR, class 'C' does not implement method 'm2' from interface 'I2'
-}
-^
-./sl: inputs/err-interfaces007.snl(26,11): ERROR, the caller class 'C' does not implement interface 'I1'
-. c->mx@I1();
-          ^
-./sl: 2 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-nonnull-field001.snl(15,14): ERROR, type 'R' contains non-null fields -- please use struct expressions to initialise them
-var m = new R;
-             ^
-./sl: 1 error(s) detected
-

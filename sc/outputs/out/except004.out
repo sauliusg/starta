@@ -1,6 +1,0 @@
-Before try
-Within TRY block, before raise
-Catching exception:
-exception number: 10
-exception message: Exception No. 10
-After try

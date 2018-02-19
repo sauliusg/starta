@@ -1,5 +1,0 @@
-./sl: inputs/err-enum004.snl(33,2): ERROR, enum type 'E' is being extended with wrong parent type
-);
- ^
-./sl: 1 error(s) detected
-

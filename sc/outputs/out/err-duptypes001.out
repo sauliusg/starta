@@ -1,8 +1,0 @@
-./sl: inputs/err-duptypes001.snl(3,25): ERROR, type with empty suffix is already defined in the current scope
-type int   = { size = 4 };
-                        ^
-./sl: inputs/err-duptypes001.snl(7,14): ERROR, field 'i' already defined in type 'S'
-    i : float;
-             ^
-./sl: 2 error(s) detected
-

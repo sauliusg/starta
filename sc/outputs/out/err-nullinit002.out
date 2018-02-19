@@ -1,5 +1,0 @@
-./sl: inputs/err-nullinit002.snl(26,1): ERROR, non-null field 'a2' of type 'Collection' is not initialised
-};
-^
-./sl: 1 error(s) detected
-

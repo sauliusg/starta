@@ -1,5 +1,0 @@
-./sl: inputs/err-destructors001.snl(35,16): ERROR, destructor name 'A' does not match class name 'B'
-    destructor A
-               ^
-./sl: 1 error(s) detected
-

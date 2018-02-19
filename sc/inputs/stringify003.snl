@@ -1,7 +1,0 @@
-// --*- C -*--
-//
-// Check chained stringification operators:
-
-use * from std;
-
-. "i = %d, s = \"%%%%s\", f = %%f" %% 12 %% 23.8 %% "and finally, a string"

@@ -1,9 +1,0 @@
-/*--*- C -*------------------------------------------------------------------*\
-**$Author: saulius $
-**$Date: 2009-01-12 16:00:09 +0200 (Mon, 12 Jan 2009) $ 
-**$Revision: 1335 $
-**$URL: svn+ssh2225://vartai.ibt.lt/home/saulius/svn-repositories/compilers/sl/ifunctions/float.hin $
-\*---------------------------------------------------------------------------*/
-
-int @PREFIX@POW( INSTRUCTION_FN_ARGS );
-int @PREFIX@ABS( INSTRUCTION_FN_ARGS );

@@ -1,5 +1,0 @@
-./sl: inputs/err-nonfn001.snl(12,2): ERROR, call to non-function 'x'
-x();
- ^
-./sl: 1 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-duplicates001.snl(7,14): ERROR, field 'i' already defined in type 'S'
-    i : float;
-             ^
-./sl: 1 error(s) detected
-

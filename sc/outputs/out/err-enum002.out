@@ -1,6 +1,0 @@
-./sl: inputs/err-enum002.snl(39,10): ERROR, enumerator type 'E' should not be given an integer value
-
-e2 = 11 E;
-         ^
-./sl: 1 error(s) detected
-

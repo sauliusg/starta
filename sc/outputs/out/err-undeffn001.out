@@ -1,5 +1,0 @@
-./sl: inputs/err-undeffn001.snl(8,15): ERROR, function 'fff' is not declared in the current scope
-    while( fff( f )) {
-              ^
-./sl: 1 error(s) detected
-

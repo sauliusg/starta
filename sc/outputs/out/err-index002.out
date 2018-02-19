@@ -1,5 +1,0 @@
-./sl: inputs/err-index002.snl(12,6): ERROR, variable 'i' is not declared in the current scope
-. b[i];
-     ^
-./sl: 1 error(s) detected
-

@@ -1,8 +1,0 @@
-Before try
-
-Within TRY block, before g() call
-1
-2
-about to raise exception in g()
-Cought one of MathError, ZeroDivision exceptions
-After catch

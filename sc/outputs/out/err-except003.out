@@ -1,5 +1,0 @@
-./sl: inputs/err-except003.snl(68,21): ERROR, type of variable in a 'catch' clause must have unary 'exceptionval' operator
-catch AnotherError( l ) {
-                    ^
-./sl: 1 error(s) detected
-

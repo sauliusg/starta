@@ -1,8 +1,0 @@
-./sl: inputs/err-fnref002.snl(15,5): ERROR, variable 'p' is not declared in the current scope
-. p . ff( 2 );
-    ^
-./sl: inputs/err-fnref002.snl(15,7): ERROR, this type has no field named 'ff'
-. p . ff( 2 );
-      ^
-./sl: 2 error(s) detected
-

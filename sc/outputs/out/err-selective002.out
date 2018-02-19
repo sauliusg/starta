@@ -1,8 +1,0 @@
-./sl: inputs/err-selective002.snl(10,19): ERROR, name 'uuvv' is not found in module 'P1'
-use ff, uuvv from P1;
-                  ^
-./sl: inputs/err-selective002.snl(13,3): ERROR, function 'fg' is not declared in the current scope
-fg();
-  ^
-./sl: 2 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-eadonly003.snl(19,23): ERROR, can not assign to the readonly variable 's'
-s = "new string for s"; // ERROR: assignment to a readonly variable.
-                      ^
-./sl: 1 error(s) detected
-

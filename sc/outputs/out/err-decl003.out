@@ -1,8 +1,0 @@
-./sl: inputs/err-decl003.snl(11,20): ERROR, type 'nonexistent' is not declared in the current scope
-var b : nonexistent;
-                   ^
-./sl: inputs/err-decl003.snl(18,9): ERROR, incompatible types for assignment to variable 'b'
-b = f1();
-        ^
-./sl: 2 error(s) detected
-

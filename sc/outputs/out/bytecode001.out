@@ -1,5 +1,0 @@
-./sl: inputs/bytecode001.snl(4,1): ERROR, bytecode operation 'NONEXISTENT' is not defined
-}
-^
-./sl: 1 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: WARNING, value '9223372036854775808' converts to a negative number
-HLDCS - '32768' integer constant too large
--32768
-LLLDCS - '9223372036854775808' numerical result out of range
--9223372036854775808

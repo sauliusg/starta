@@ -1,5 +1,0 @@
-./sl: inputs/err-multival002.snl(20,27): ERROR, incompatible types for assignment
-m[2], s.a, m[3] = f3( 20 );
-                          ^
-./sl: 1 error(s) detected
-

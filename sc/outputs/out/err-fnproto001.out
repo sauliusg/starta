@@ -1,5 +1,0 @@
-./sl: inputs/err-fnproto001.snl(8,35): ERROR, prototype of function ff() does not match previous definition - old prototype return value has type long, but new prototype has type float
-function ff( int z; int y ): float;
-                                  ^
-./sl: 1 error(s) detected
-

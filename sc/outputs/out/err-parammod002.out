@@ -1,5 +1,0 @@
-./sl: inputs/err-parammod002.snl(19,15): ERROR, type 'inttype' is imported more than once -- please use explicit package name for disambiguation
-ldP::i = 40000;
-              ^
-./sl: 1 error(s) detected
-

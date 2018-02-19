@@ -1,9 +1,0 @@
-//--*- Java -*--
-// Compiler tests
-//
-
-use * from std;
-
-var v : double;
-
-v = v[];

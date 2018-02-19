@@ -1,8 +1,0 @@
-./sl: inputs/err-interfaces016.snl(24,1): ERROR, interface ('X') can not implement other interfaces
-}
-^
-./sl: inputs/err-interfaces016.snl(28,1): ERROR, interface ('Y') can not implement other interfaces
-}
-^
-./sl: 2 error(s) detected
-

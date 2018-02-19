@@ -1,5 +1,0 @@
-./sl: inputs/err-readonly006.snl(30,20): ERROR, can not assign to the readonly variable 'element'
-        element = 0;
-                   ^
-./sl: 1 error(s) detected
-

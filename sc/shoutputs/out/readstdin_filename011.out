@@ -1,4 +1,0 @@
-"shtests/data/empty-line.txt" 1 1 
-After the 'while(<>)' loop:
-curreof() == TRUE
-alleof()  == TRUE

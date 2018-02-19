@@ -1,8 +1,0 @@
-./sl: inputs/err-unsigned001.snl(14,6): ERROR, incompatible types for assignment to variable 'i'
-i = u; // ERROR, incomplatible types
-     ^
-./sl: inputs/err-unsigned001.snl(15,6): ERROR, incompatible types for assignment to variable 'i'
-i = l; // ERROR, incomplatible types
-     ^
-./sl: 2 error(s) detected
-

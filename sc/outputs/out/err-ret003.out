@@ -1,5 +1,0 @@
-./sl: inputs/err-ret003.snl(6,9): ERROR, the "return" statement should be used only in subroutines, not in the main script
-return 0;
-        ^
-./sl: 1 error(s) detected
-

@@ -1,5 +1,0 @@
-10
-lower bound -1 (originally -10) is out of range 0..9 in substring
-lower bound 10 is out of range 0..9 in substring
-upper bound 20 is out of range 0..8 in substring
-upper bound -21 (originally -30) is out of range 0..8 in substring

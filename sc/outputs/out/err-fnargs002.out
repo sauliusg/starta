@@ -1,8 +1,0 @@
-./sl: inputs/err-fnargs002.snl(16,9): ERROR, too many arguments in call to function 'f'
-f( 3, 4 );
-        ^
-./sl: inputs/err-fnargs002.snl(19,13): ERROR, too many arguments in call to function 'f'
-    f( 3, 4 )
-            ^
-./sl: 2 error(s) detected
-

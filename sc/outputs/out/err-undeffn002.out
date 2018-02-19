@@ -1,5 +1,0 @@
-./sl: inputs/err-undeffn002.snl(13,19): ERROR, functions called in exressions must return at least one value
-    while( fff( f )) {
-                  ^
-./sl: 1 error(s) detected
-

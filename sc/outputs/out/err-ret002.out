@@ -1,8 +1,0 @@
-./sl: inputs/err-ret002.snl(15,14): ERROR, too little values returned from function 'f1'
-    return 10;
-             ^
-./sl: inputs/err-ret002.snl(20,23): ERROR, too many values returned from function 'f2'
-    return 10, 1.0, 20;
-                      ^
-./sl: 2 error(s) detected
-

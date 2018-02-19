@@ -1,1 +1,0 @@
-./sl: Unhandled exception -1 in the bytecode interpreter: attempting to pack a NULL blob

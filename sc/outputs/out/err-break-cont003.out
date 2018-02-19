@@ -1,8 +1,0 @@
-./sl: inputs/err-break-cont003.snl(17,14): ERROR, label 'loop3' is not defined in the current scope
-     	 break loop3
-             ^
-./sl: inputs/err-break-cont003.snl(29,17): ERROR, label 'loop1' is not defined in the current scope
-     	 continue loop1
-                ^
-./sl: 2 error(s) detected
-

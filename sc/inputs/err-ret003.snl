@@ -1,6 +1,0 @@
-#
-# Check diagnostics of the returen statament from the main script
-#
-
-include "stdtypes.slib";
-return 0;

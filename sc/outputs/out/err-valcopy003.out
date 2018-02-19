@@ -1,8 +1,0 @@
-./sl: inputs/err-valcopy003.snl(23,7): ERROR, can not copy into the readonly value in the value-copy assignment ':='
-m := n; // ERROR;
-      ^
-./sl: inputs/err-valcopy003.snl(33,15): ERROR, can not copy into the readonly value in the value-copy assignment ':='
-mm[0] := nn[0]; // ERROR, readonly content may not be modified.
-              ^
-./sl: 2 error(s) detected
-

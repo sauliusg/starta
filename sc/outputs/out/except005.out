@@ -1,7 +1,0 @@
-Before try
-
-Within TRY block, before g() call
-4
-Within TRY block, after g() call
-
-After try

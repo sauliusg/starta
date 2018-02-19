@@ -1,4 +1,0 @@
-
-use * from std;
-
-. const(.stackcellsize);

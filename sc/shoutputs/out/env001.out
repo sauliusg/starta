@@ -1,3 +1,0 @@
-SOME=something set in the env
-PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
-_=./sl

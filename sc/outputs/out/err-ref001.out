@@ -1,8 +1,0 @@
-./sl: inputs/err-ref001.snl(26,8): ERROR, can not index array with unknown element type
-    m[0] = m[1];
-       ^
-./sl: inputs/err-ref001.snl(26,16): ERROR, can not index array with unknown element type
-    m[0] = m[1];
-               ^
-./sl: 2 error(s) detected
-

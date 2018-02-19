@@ -1,5 +1,0 @@
-./sl: inputs/err-except007.snl(9,8): ERROR, exception 'Y' is not declared in the current scope
-raise Y( "exception Y" );
-       ^
-./sl: 1 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-field001.snl(11,11): ERROR, type 'int' is not declared in the current scope
-    int   columnNr;
-          ^
-./sl: 1 error(s) detected
-

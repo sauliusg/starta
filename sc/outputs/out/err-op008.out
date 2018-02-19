@@ -1,8 +1,0 @@
-./sl: inputs/err-op008.snl(23,20): ERROR, unary operator '-' is already defined in type 'int'
-		{ bytecode{ NOP }};
-                   ^
-./sl: inputs/err-op008.snl(35,10): ERROR, type 'int' has no binary operator named '*'
-a = b * c;
-         ^
-./sl: 2 error(s) detected
-

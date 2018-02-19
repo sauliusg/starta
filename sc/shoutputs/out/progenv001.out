@@ -1,5 +1,0 @@
-shtests/programs/progenv.snl: Hello, World
-Our environment is:
-SOME=something set in the env
-PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
-_=./sl

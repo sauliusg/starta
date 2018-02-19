@@ -1,5 +1,0 @@
-./sl: inputs/err-opargs001.snl(22,10): ERROR, incompatible type of argument 2 for operator '+'
-a = b + c;
-         ^
-./sl: 1 error(s) detected
-

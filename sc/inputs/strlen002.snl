@@ -1,9 +1,0 @@
-//--*- Java -*--
-// Compiler tests
-//
-
-// Test strlen on null strings.
-
-use std;
-
-. strlen( null )

@@ -1,8 +1,0 @@
-./sl: inputs/err-fnprotoenum002.snl(15,1): ERROR, prototype of function p() does not match previous definition - old prototype argument 1 has type 'B', but new prototype has type 'int'
-{
-^
-./sl: inputs/err-fnprotoenum002.snl(19,10): ERROR, type 'int' has no conversion from type 'B'
-. p( x B );
-         ^
-./sl: 2 error(s) detected
-

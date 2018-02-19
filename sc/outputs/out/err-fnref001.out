@@ -1,5 +1,0 @@
-./sl: inputs/err-fnref001.snl(24,6): ERROR, incompatible types for assignment to variable 'q'
-q = p;
-     ^
-./sl: 1 error(s) detected
-

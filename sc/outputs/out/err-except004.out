@@ -1,6 +1,0 @@
-./sl: inputs/err-except004.snl(57,7): ERROR, incorrect syntax
-catch 11, m, l {
-      ^
-./sl: compiler could not recover from errors, quitting now
-1 error(s) detected
-

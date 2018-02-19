@@ -1,5 +1,0 @@
-./sl: inputs/err-reraise006.snl(8,1): ERROR, 'reraise' operator can only be used after a try block
-reraise;
-^
-./sl: 1 error(s) detected
-

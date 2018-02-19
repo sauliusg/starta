@@ -1,8 +1,0 @@
-./sl: inputs/err-readonly003.snl(17,9): ERROR, can not assign to a readonly component
-s.i = 10;
-        ^
-./sl: inputs/err-readonly003.snl(18,15): ERROR, can not assign to a readonly component
-s.name = "new";
-              ^
-./sl: 2 error(s) detected
-

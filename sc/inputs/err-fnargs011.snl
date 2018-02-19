@@ -1,5 +1,0 @@
-
-use * from std;
-
-procedure f( x: int; y: float; z: char ) : int;
-procedure f( x: int; y: double; z: char ) : int;

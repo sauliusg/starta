@@ -1,9 +1,0 @@
-Debug statement reached in line 8
-Debug statement reached in line 14
-Debug statement reached in line 8
-Debug statement reached in line 14
-This is p() from main.
-I am procedure p from the package X1
-I am procedure p from the package X2
-I am procedure p1 from the package X1
-I am procedure p2 from the package X2

@@ -1,6 +1,0 @@
-./sl: ./inputs/include002e2.sni(4,1): ERROR, incorrect syntax
-2 +;
-^
-./sl: compiler could not recover from errors, quitting now
-1 error(s) detected
-

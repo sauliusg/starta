@@ -1,8 +1,0 @@
-./sl: inputs/err-struct005a.snl(16,10): ERROR, definition of forward structure 'A' has different non-null flag
-struct A {
-         ^
-./sl: inputs/err-struct005a.snl(22,10): ERROR, definition of forward structure 'B' has different non-null flag
-struct B {
-         ^
-./sl: 2 error(s) detected
-

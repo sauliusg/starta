@@ -1,8 +1,0 @@
-./sl: inputs/err-dupfn001.snl(16,1): ERROR, function 'f1' is already declared in this scope
-{
-^
-./sl: inputs/err-dupfn001.snl(26,1): ERROR, function 'f2' is already declared in this scope
-{
-^
-./sl: 2 error(s) detected
-

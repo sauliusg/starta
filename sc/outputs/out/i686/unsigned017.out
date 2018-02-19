@@ -1,5 +1,0 @@
-UBLDCS - '256' unsigned constant too large
-UHLDCS - '65536' unsigned constant too large
-ULDCS - '4294967296' unsigned constant too large
-ULLDCS - '4294967296' unsigned constant too large
-ULLLDCS - '18446744073709551616' numerical result out of range

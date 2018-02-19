@@ -1,8 +1,0 @@
-./sl: inputs/err-modules007.snl(10,22): ERROR, variable 'image::image' is not declared in the current scope
-. length(image::image), "data points";
-                     ^
-./sl: inputs/err-modules007.snl(10,22): ERROR, incompatible types for function 'length' argument nr. 1
-. length(image::image), "data points";
-                     ^
-./sl: 2 error(s) detected
-

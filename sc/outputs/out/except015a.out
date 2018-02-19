@@ -1,8 +1,0 @@
-Before try
-
-Within TRY block, before g() call
-1
-2
-about to raise exception in g()
-*** catch-all handler: divison by 0 in g()
-After catch

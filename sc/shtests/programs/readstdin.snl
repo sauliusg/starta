@@ -1,7 +1,0 @@
-
-use * from std;
-
-while(<>) {
-    . $_;
-    . $ARG;
-}

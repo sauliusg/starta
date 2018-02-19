@@ -1,1 +1,0 @@
-./sl: Unhandled exception -98 in the bytecode interpreter: reference was checked for nullity and found null

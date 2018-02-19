@@ -1,5 +1,0 @@
-./sl: inputs/err-decl002.snl(12,7): ERROR, type 'T' has no operator named 'ldc'
-a = 10;
-      ^
-./sl: 1 error(s) detected
-

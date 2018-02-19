@@ -1,7 +1,0 @@
-
-use * from std;
-
-var x = 7;
-
-assert x < 8;
-assert x >= 8;

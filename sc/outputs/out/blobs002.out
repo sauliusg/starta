@@ -1,7 +1,0 @@
-a is allocated
-b is NOT allocated
-a and b are different
-a and b are the same now
-a is definitely not null here
-b is null
-b is for sure null

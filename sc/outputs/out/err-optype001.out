@@ -1,8 +1,0 @@
-./sl: inputs/err-optype001.snl(33,13): ERROR, type 'int' operator '+' should return one value
-n[2][3] += 3;
-            ^
-./sl: inputs/err-optype001.snl(33,13): ERROR, not enough values on the stack for assignment
-n[2][3] += 3;
-            ^
-./sl: 2 error(s) detected
-

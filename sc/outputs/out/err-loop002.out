@@ -1,5 +1,0 @@
-./sl: inputs/err-loop002.snl(39,1): ERROR, incompatible type of argument 1 for operator 'loop'
-enddo
-^
-./sl: 1 error(s) detected
-

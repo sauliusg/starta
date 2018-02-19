@@ -1,4 +1,0 @@
-./sl: inputs/include001e1.snl(10,9): ERROR, could not find module 'inputs/include001c.sni' in the include path
-include "inputs/include001c.sni";
-        ^
-could not find required module, terminating

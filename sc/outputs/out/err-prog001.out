@@ -1,5 +1,0 @@
-./sl: inputs/err-prog001.snl(16,1): ERROR, type 'float' has no binary operator named 'nth-byte'
-begin
-^
-./sl: 1 error(s) detected
-

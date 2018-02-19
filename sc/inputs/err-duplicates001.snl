@@ -1,8 +1,0 @@
-
-type float = { size = 4; kind = integer };
-type int   = { size = 4; kind = real };
-
-type S = struct {
-    i : int;
-    i : float;
-};

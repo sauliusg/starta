@@ -1,5 +1,0 @@
-./sl: inputs/err-op011.snl(40,8): ERROR, type 'myint' has no binary operator named '*'
-. i * i;
-       ^
-./sl: 1 error(s) detected
-

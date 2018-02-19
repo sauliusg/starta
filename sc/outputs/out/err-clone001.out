@@ -1,5 +1,0 @@
-./sl: inputs/err-clone001.snl(9,8): ERROR, only references sould be cloned with '[]' operator
-v = v[];
-       ^
-./sl: 1 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-closure001.snl(13,12): ERROR, can not assign to a readonly component
-  lambda.a ++;
-           ^
-./sl: 1 error(s) detected
-

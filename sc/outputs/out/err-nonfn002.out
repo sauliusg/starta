@@ -1,5 +1,0 @@
-./sl: inputs/err-nonfn002.snl(10,5): ERROR, call to non-function 'i'
-M::i();
-    ^
-./sl: 1 error(s) detected
-

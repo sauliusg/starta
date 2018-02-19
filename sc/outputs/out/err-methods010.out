@@ -1,8 +1,0 @@
-./sl: inputs/err-methods010.snl(28,10): ERROR, classes have different number of methods
-        };
-         ^
-./sl: inputs/err-methods010.snl(28,10): ERROR, incompatible types for assignment
-        };
-         ^
-./sl: 2 error(s) detected
-

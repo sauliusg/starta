@@ -1,8 +1,0 @@
-module T(type X)
-
-function f( X i; X j ): X, X
-{
-    return i+j, i-j;
-}
-
-end module T;

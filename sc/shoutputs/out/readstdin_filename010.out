@@ -1,4 +1,0 @@
-"-" 1 1 
-After the 'while(<>)' loop:
-curreof() == TRUE
-alleof()  == TRUE

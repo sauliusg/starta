@@ -1,5 +1,0 @@
-./sl: inputs/err-nonnull-array001.snl(10,19): ERROR, type 'S' is a non-null reference -- please use array expressions to initialise array elements
-var m = new S[100];
-                  ^
-./sl: 1 error(s) detected
-

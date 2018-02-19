@@ -1,5 +1,0 @@
-./sl: inputs/err-interfaces019.snl(28,1): ERROR, class 'A' does not implement method 'mm' from interface 'I1'
-}
-^
-./sl: 1 error(s) detected
-

@@ -1,5 +1,0 @@
-./sl: inputs/err-selective001.snl(13,3): ERROR, function 'fg' is not declared in the current scope
-fg();
-  ^
-./sl: 1 error(s) detected
-

@@ -1,8 +1,0 @@
-// --*- C -*--
-
-// Test whether this file fails on assertion in the library needed for
-// the library opcode module is not available:
-
-use std;
-
-bytecode { nolib::OPCODE }
