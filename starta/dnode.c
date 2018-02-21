@@ -785,10 +785,12 @@ DNODE *dnode_module_args( DNODE *dnode )
     return dnode->module_args;
 }
 
-DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *args )
+DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *volatile *args )
 {
     assert( dnode );
-    dnode->module_args = args;
+    assert( args );
+    dnode->module_args = *args;
+    *args = NULL;
     return dnode;
 }
 

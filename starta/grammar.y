@@ -6946,9 +6946,21 @@ static void compiler_process_module_parameters( COMPILER *cc,
             }
             /* Insert the constant under the module parameter name: */
             if( argument_dnode ) {
-                dnode_insert_module_args( param, share_dnode( argument_dnode ));
-                vartab_insert( cc->consts, dnode_name( param ),
-                               share_dnode( argument_dnode ), ex );
+                cexception_t inner;
+                DNODE * volatile shared_argument_dnode = NULL;
+
+                shared_argument_dnode = share_dnode( argument_dnode );
+                dnode_insert_module_args( param, &shared_argument_dnode );
+
+                shared_argument_dnode = share_dnode( argument_dnode );
+                cexception_guard( inner ) {
+                    vartab_insert( cc->consts, dnode_name( param ),
+                                   shared_argument_dnode, &inner );
+                }
+                cexception_catch {
+                    delete_dnode( shared_argument_dnode );
+                    cexception_reraise( inner, ex );
+                }                    
             } else {
                 yyerrorf( "constant '%s' is not found for module"
                           " parameter", argument_name );
@@ -6962,9 +6974,21 @@ static void compiler_process_module_parameters( COMPILER *cc,
             /* Insert the variable or function under the
                module parameter name: */
             if( argument_dnode ) {
-                dnode_insert_module_args( param, share_dnode( argument_dnode ));
-                vartab_insert( cc->vartab, dnode_name( param ),
-                               share_dnode( argument_dnode ), ex );
+                cexception_t inner;
+                DNODE * volatile shared_argument_dnode = NULL;
+
+                shared_argument_dnode = share_dnode( argument_dnode );
+                dnode_insert_module_args( param, &shared_argument_dnode );
+
+                shared_argument_dnode = share_dnode( argument_dnode );
+                cexception_guard( inner ) {
+                    vartab_insert( cc->vartab, dnode_name( param ),
+                                   shared_argument_dnode, &inner );
+                }
+                cexception_catch {
+                    delete_dnode( shared_argument_dnode );
+                    cexception_reraise( inner, ex );
+                }
             } else {
                 char *item_name =
                     tnode_kind( param_type ) == TK_VAR ?
@@ -7663,7 +7687,7 @@ module_statement
           DNODE *module_dnode = $2;
           DNODE *module_params = $3;
 
-          dnode_insert_module_args( module_dnode, module_params );
+          dnode_insert_module_args( module_dnode, &module_params );
 #if 0
           printf( ">>> compiler->filename = '%s'\n", compiler->filename );
           if( compiler->requested_module ) {
@@ -7707,8 +7731,9 @@ module_statement
 	  compiler_begin_module( compiler, share_dnode(module_dnode), px );
 
           if( compiler->requested_module ) {
-              compiler_process_module_parameters( compiler, module_params,
-                                                  px );
+              compiler_process_module_parameters
+                  ( compiler, /*module_params*/
+                    dnode_module_args( module_dnode ), px );
           }
       }
     statement_list
@@ -7784,7 +7809,7 @@ module_import_identifier
       DNODE *module_name_dnode = new_dnode_module( module_name, px );
       DNODE *module_arguments = $2;
       char *module_synonim = $3;
-      dnode_insert_module_args( module_name_dnode, module_arguments );
+      dnode_insert_module_args( module_name_dnode, &module_arguments );
       dnode_insert_synonim( module_name_dnode, module_synonim );
 
       cexception_guard( inner ) {
@@ -7848,7 +7873,7 @@ module_import_identifier
           freex( module_filename );
           cexception_reraise( inner, px );
       }
-      dnode_insert_module_args( module_name_dnode, module_arguments );
+      dnode_insert_module_args( module_name_dnode, &module_arguments );
       dnode_insert_synonim( module_name_dnode, module_synonim );
 #if 0
       printf( ">>> module '%s', synonim '%s', file '%s'\n",
