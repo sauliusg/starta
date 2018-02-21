@@ -146,7 +146,7 @@ DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex );
 
 DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex );
 
-DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim );
+DNODE *dnode_insert_synonim( DNODE *dnode, char *volatile *synonim );
 
 char *dnode_synonim( DNODE *dnode );
 

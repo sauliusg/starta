@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 
+char *moveptr( char **p );
 char *strclone( const char *s );
 char *strnclone( const char *s, size_t length );
 char *process_escapes( char *str );

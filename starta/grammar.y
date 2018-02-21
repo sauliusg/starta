@@ -20,6 +20,7 @@
 #include <fcntl.h> /* Definition of AT_* constants */
 #include <sys/stat.h> /* For calling 'fstatat()' -- 'struct stat' definition */
 #include <errno.h>
+#include <common.h>
 #include <cexceptions.h>
 #include <cxprintf.h>
 #include <allocx.h>
@@ -7808,9 +7809,9 @@ module_import_identifier
       char *module_name = $1;
       DNODE *module_name_dnode = new_dnode_module( module_name, px );
       DNODE *module_arguments = $2;
-      char *module_synonim = $3;
+      char *module_synonim = moveptr( &$3 );
       dnode_insert_module_args( module_name_dnode, &module_arguments );
-      dnode_insert_synonim( module_name_dnode, module_synonim );
+      dnode_insert_synonim( module_name_dnode, &module_synonim );
 
       cexception_guard( inner ) {
           int count = 0;
@@ -7852,7 +7853,7 @@ module_import_identifier
       DNODE * volatile module_name_dnode = new_dnode_module( $1, px );
       char *module_filename = $3;
       DNODE *module_arguments = $4;
-      char *module_synonim = $5;
+      char *module_synonim = moveptr( &$5 );
       if( compiler->module_filename ) {
           freex( compiler->module_filename );
           compiler->module_filename = NULL;
@@ -7862,11 +7863,6 @@ module_import_identifier
           char *pkg_path =
               compiler_find_include_file( compiler, module_filename, &inner );
           dnode_set_filename( module_name_dnode, pkg_path, &inner );
-#if 0
-          printf( ">>> inserted filename '%s' for module '%s', "
-              "searched as '%s'\n",
-              pkg_path, dnode_name( module_name_dnode ), module_filename );
-#endif
       }
       cexception_catch {
           delete_dnode( module_name_dnode );
@@ -7874,11 +7870,8 @@ module_import_identifier
           cexception_reraise( inner, px );
       }
       dnode_insert_module_args( module_name_dnode, &module_arguments );
-      dnode_insert_synonim( module_name_dnode, module_synonim );
-#if 0
-      printf( ">>> module '%s', synonim '%s', file '%s'\n",
-              $1, module_synonim, $3 );
-#endif
+      dnode_insert_synonim( module_name_dnode, &module_synonim );
+
       freex( module_filename );
       $$ = module_name_dnode;
   }
