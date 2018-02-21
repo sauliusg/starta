@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /* FIXME: use exceptions or return NULL pointers and check in
    strclone() and its clones: */
@@ -22,6 +23,15 @@ if( (s) == NULL ) \
      printf("Out of memory in file %s at line %d\n", __FILE__, __LINE__); \
      exit(99); \
    }
+
+char *moveptr( char **p )
+{
+    void *q;
+    assert( p );
+    q = *p;
+    *p = NULL;
+    return q;
+}
 
 char *strclone( const char *s )
 {

@@ -861,11 +861,13 @@ DNODE *dnode_set_synonim( DNODE *dnode, char *synonim, cexception_t *ex )
     return dnode;
 }
 
-DNODE *dnode_insert_synonim( DNODE *dnode, char *synonim )
+DNODE *dnode_insert_synonim( DNODE *dnode, char *volatile *synonim )
 {
     assert( dnode );
+    assert( synonim );
     assert( !dnode->synonim );
-    dnode->synonim = synonim;
+    dnode->synonim = *synonim;
+    *synonim = NULL;
     return dnode;
 }
 
