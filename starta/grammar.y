@@ -1096,8 +1096,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 	    tnode_shallow_copy( lookup_node, tnode );
 	    delete_tnode( tnode );
             tnode = NULL;
-	} 
-	else if( tnode_is_extendable_enum( lookup_node )) {
+	} else if( tnode_is_extendable_enum( lookup_node )) {
 	    tnode_merge_field_lists( lookup_node, tnode );
 	    compiler_check_enum_basetypes( lookup_node, tnode );
 	    delete_tnode( tnode );
