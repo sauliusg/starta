@@ -11,6 +11,7 @@
 /* uses: */
 #include <stdlib.h>
 #include <allocx.h>
+#include <stringx.h>
 #include <cexceptions.h>
 #include <assert.h>
 
@@ -48,6 +49,12 @@ ssize_t pool_insert_string( char *volatile *str, cexception_t *ex )
     pool[index].str = *str;
     *str = NULL;
     return index;
+}
+
+ssize_t pool_add_string( char *str, cexception_t *ex )
+{
+    char *dup = strdupx( str, ex );
+    return pool_insert_string( &dup, ex );
 }
 
 char *obtain_string_from_pool( ssize_t index )
