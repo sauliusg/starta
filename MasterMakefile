@@ -106,7 +106,7 @@ TST_DEPEND    = ${join ${TST_DIRS}, ${TST_BASENAMES:%.c=.%.d}}
 vpath %.c ${SRC_DIR} ${OTHER_DIRS}
 vpath %.h ${SRC_DIR} ${OTHER_DIRS}
 
-VPATH = ${OTHER_DIRS}
+#VPATH = ${OTHER_DIRS}
 
 OTHER_CFILES := ${notdir $(sort ${wildcard ${addsuffix /*.c, ${OTHER_DIRS}}})}
 OTHER_CFILES := ${filter-out %.tab.c lex.yy.c %.lex.c, ${OTHER_CFILES}}
