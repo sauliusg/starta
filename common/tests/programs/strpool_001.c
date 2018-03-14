@@ -20,6 +20,10 @@ int main( int argc, char *argv[] )
         idx[i] = pool_add_string( strings[i], NULL );
     }
 
+    for( int i = 0; strings[i] != NULL; i ++ ) {
+        printf( "%i:\t%d\n", i, idx[i] );
+    }
+
     char *str3 = obtain_string_from_pool(3);
     printf( "Obtained \"%s\"\n", str3 );
     free( str3 );
