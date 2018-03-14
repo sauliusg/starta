@@ -1,0 +1,15 @@
+
+INTERPRETER_DIR = ../starta/interpreters/packed-type
+## INTERPRETER_DIR = ../starta/interpreters/full-stackcell
+## INTERPRETER_DIR = ../starta/interpreters/split-stackcell
+
+OTHER_DIRS ?= ../starta ../lists ${INTERPRETER_DIR}
+LIB_DIRS   ?= ../getoptions ../cexceptions
+
+## LIBFLAGS = -ldl -lduma
+## LIBFLAGS = -ldl -lefence
+LIBFLAGS ?= -ldl
+
+## LD_LIBRARY_PATH := .${LD_LIBRARY_PATH:%=:%}
+
+export LD_LIBRARY_PATH
