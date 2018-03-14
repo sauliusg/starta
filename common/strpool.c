@@ -21,7 +21,7 @@ static ssize_t pool_length = 0;
 static strpool_t *pool = NULL;
 static int next_free = -1;
 
-static int realloc_pool( cexception_t *ex )
+static void realloc_pool( cexception_t *ex )
 {
     ssize_t new_pool_length =
         pool_length == 0 ? INITIAL_POOL_LENGTH : pool_length * 2;
