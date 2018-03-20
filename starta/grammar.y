@@ -25,6 +25,7 @@
 #include <cxprintf.h>
 #include <allocx.h>
 #include <stringx.h>
+#include <strpool.h>
 #include <stdiox.h>
 #include <tcodes.h>
 #include <thrcode.h>
@@ -5734,38 +5735,56 @@ static void compiler_drop_loop_counters( COMPILER *cc, char *name,
     }
 }
 
-static void compiler_compile_break( COMPILER *cc, char *label,
-				 cexception_t *ex )
+static void compiler_compile_break( COMPILER *cc, ssize_t label_idx,
+                                    cexception_t *ex )
 {
     ssize_t zero = 0;
+    char *volatile label = obtain_string_from_pool( label_idx );
+    cexception_t inner;
 
-    if( compiler_check_break_and_cont_statements( cc )) {
-	char *name = compiler_get_loop_name( cc, label );
+    cexception_guard( inner ) {
+        if( compiler_check_break_and_cont_statements( cc )) {
+            char *name = compiler_get_loop_name( cc, label );
 
-	compiler_drop_loop_counters( cc, name, 0, ex );
+            compiler_drop_loop_counters( cc, name, 0, &inner );
 
-	if( name ) {
-	    thrcode_push_op_break_fixup( cc->thrcode, name, ex );
-	}
-	compiler_emit( cc, ex, "\tce\n", JMP, &zero );
+            if( name ) {
+                thrcode_push_op_break_fixup( cc->thrcode, name, &inner );
+            }
+            compiler_emit( cc, &inner, "\tce\n", JMP, &zero );
+        }
     }
+    cexception_catch {
+        freex( label );
+        cexception_reraise( inner, ex );
+    }
+    freex( label );
 }
 
-static void compiler_compile_continue( COMPILER *cc, char *label,
-				    cexception_t *ex )
+static void compiler_compile_continue( COMPILER *cc, ssize_t label_idx,
+                                       cexception_t *ex )
 {
     ssize_t zero = 0;
+    char *volatile label = obtain_string_from_pool( label_idx );
+    cexception_t inner;
 
-    if( compiler_check_break_and_cont_statements( cc )) {
-	char *name = compiler_get_loop_name( cc, label );
+    cexception_guard( inner ) {
+        if( compiler_check_break_and_cont_statements( cc )) {
+            char *name = compiler_get_loop_name( cc, label );
 
-	compiler_drop_loop_counters( cc, name, 1, ex );
+            compiler_drop_loop_counters( cc, name, 1, &inner );
 
-	if( name ) {
-	    thrcode_push_op_continue_fixup( cc->thrcode, name, ex );
-	}
-	compiler_emit( cc, ex, "\tce\n", JMP, &zero );
+            if( name ) {
+                thrcode_push_op_continue_fixup( cc->thrcode, name, &inner );
+            }
+	compiler_emit( cc, &inner, "\tce\n", JMP, &zero );
+        }
     }
+    cexception_catch {
+        freex( label );
+        cexception_reraise( inner, ex );
+    }
+    freex( label );
 }
 
 static void compiler_set_function_arguments_readonly( TNODE *funct_type )
@@ -7036,7 +7055,7 @@ static cexception_t *px; /* parser exception */
 
 %union {
   long i;
-  char *s;
+  ssize_t si;          /* String index in the string pool */
   ANODE *anode;        /* type attribute description */
   TNODE *tnode;
   DNODE *dnode;
@@ -7133,14 +7152,14 @@ static cexception_t *px; /* parser exception */
 %token __RIGHT_TO_LEFT /* << */
 %token __DOUBLE_PERCENT /* %% */
 
-%token <s> __ARITHM_ASSIGN  /* +=, -=, *=, etc. */
+%token <si> __ARITHM_ASSIGN  /* +=, -=, *=, etc. */
 
 %token __QQ /* ?? */
 
-%token <s> __IDENTIFIER
-%token <s> __INTEGER_CONST
-%token <s> __REAL_CONST
-%token <s> __STRING_CONST
+%token <si> __IDENTIFIER
+%token <si> __INTEGER_CONST
+%token <si> __REAL_CONST
+%token <si> __STRING_CONST
 
 %type <dnode> argument
 %type <dnode> argument_list
@@ -7170,11 +7189,11 @@ static cexception_t *px; /* parser exception */
 %type <dnode> identifier
 %type <dnode> identifier_list
 %type <dnode> import_statement
-%type <s>     include_statement
+%type <si>     include_statement
 %type <i>     index_expression
 %type <tnode> inheritance_and_implementation_list
 %type <tlist> interface_identifier_list
-%type <s>     labeled_for
+%type <si>     labeled_for
 %type <i>     lvalue_list
 %type <i>     md_array_allocator
 %type <dnode> module_import_identifier
@@ -7182,22 +7201,22 @@ static cexception_t *px; /* parser exception */
 %type <dnode> module_parameter_list
 %type <dnode> operator_definition
 %type <dnode> operator_header
-%type <s>     opt_as_identifier
-%type <s>     opt_default_module_parameter
-%type <s>     opt_dot_name
-%type <s>     opt_identifier
+%type <si>     opt_as_identifier
+%type <si>     opt_default_module_parameter
+%type <si>     opt_dot_name
+%type <si>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
 %type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
 %type <i>     function_or_procedure_type_keyword
-%type <s>     opt_closure_initialisation_list
+%type <si>     opt_closure_initialisation_list
 %type <i>     opt_null_type_designator
 %type <tnode> opt_base_type
 %type <i>     opt_function_attributes
 %type <i>     opt_function_or_procedure_keyword
 %type <tlist> opt_implemented_interfaces
-%type <s>     opt_label
+%type <si>     opt_label
 %type <dnode> opt_module_arguments
 %type <dnode> opt_module_parameters
 %type <i>     opt_readonly
@@ -7221,7 +7240,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> interface_operator
 %type <tnode> interface_operator_list
 %type <tnode> compact_type_description
-%type <s>     type_declaration_name
+%type <si>     type_declaration_name
 %type <tnode> type_identifier
 %type <tnode> var_type_description
 %type <tnode> undelimited_or_structure_description
@@ -7392,18 +7411,30 @@ pack_statement
 
 break_or_continue_statement
   : _BREAK
-    { compiler_compile_break( compiler, NULL, px ); }
+    { compiler_compile_break( compiler, -1, px ); }
   | _BREAK __IDENTIFIER
     { compiler_compile_break( compiler, $2, px ); }
   | _CONTINUE
-    { compiler_compile_continue( compiler, NULL, px ); }
+    { compiler_compile_continue( compiler, -1, px ); }
   | _CONTINUE __IDENTIFIER
     { compiler_compile_continue( compiler, $2, px ); }
   ;
 
 undelimited_simple_statement
   : include_statement
-       { compiler_open_include_file( compiler, $1, px ); }
+       {
+           char *volatile filename = obtain_string_from_pool( $1 );
+           cexception_t inner;
+
+           cexception_guard( inner ) {
+               compiler_open_include_file( compiler, filename, px );
+           }
+           cexception_catch {
+               freex( filename );
+               cexception_reraise( inner, px );
+           }
+           freex( filename );
+       }
   | import_statement
        {
            if( yychar != YYEMPTY ) {
