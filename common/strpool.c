@@ -10,6 +10,7 @@
 
 /* uses: */
 #include <stdlib.h>
+#include <string.h>
 #include <allocx.h>
 #include <stringx.h>
 #include <cexceptions.h>
@@ -57,12 +58,57 @@ ssize_t pool_add_string( char *str, cexception_t *ex )
     return pool_insert_string( &dup, ex );
 }
 
+ssize_t pool_clone_string( char *str )
+{
+    int volatile idx;
+    cexception_t inner;
+    cexception_guard( inner ) {
+        idx = pool_add_string( str, &inner );
+    }
+    cexception_catch {
+        return -1;
+    }
+    return idx;
+}
+
+ssize_t pool_strnclone( char *str, size_t length )
+{
+    int volatile idx;
+    char *volatile cloned;
+    cexception_t inner;
+    cexception_guard( inner ) {
+        cloned = mallocx( length + 1, &inner );
+        strncpy( cloned, str, length );
+        cloned[length] = '\0';
+        idx = pool_insert_string( &cloned, &inner );
+    }
+    cexception_catch {
+        freex( cloned );
+        return -1;
+    }
+    return idx;
+}
+
 char *obtain_string_from_pool( ssize_t index )
 {
-    char *string = pool[index].str;
-    pool[index].next = next_free;
-    next_free = index;
-    return string;
+    char *string;
+    if( index < 0 ) {
+        return NULL;
+    } else {
+        string = pool[index].str;
+        pool[index].next = next_free;
+        next_free = index;
+        return string;
+    }
+}
+
+char *get_string_from_pool( ssize_t index )
+{
+    if( index < 0 ) {
+        return NULL;
+    } else {
+        return pool[index].str;
+    }
 }
 
 void free_pool()

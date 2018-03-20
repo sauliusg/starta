@@ -30,22 +30,6 @@ char *moveptr( char **p )
     return q;
 }
 
-char *strclone( const char *s )
-{
-   char *new;
-   merror( new = strdup(s) );
-   return new;
-}
-
-char *strnclone( const char *s, size_t length )
-{
-   char *new;
-   merror( new = malloc(length + 1) );
-   strncpy( new, s, length );
-   new[length] = '\0';
-   return new;
-}
-
 char translate_escape( char **s )
 {
     switch( *(++(*s)) ) {
