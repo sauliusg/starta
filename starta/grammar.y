@@ -7557,11 +7557,15 @@ delimited_control_statement
 raised_exception_identifier
   : __IDENTIFIER
       {
-          $$ = compiler_lookup_dnode( compiler, NULL, $1, "exception" );
+          char *name = obtain_string_from_pool( $1 );
+          $$ = compiler_lookup_dnode( compiler, NULL, name, "exception" );
+          freex( name );
       }
   | module_list __COLON_COLON __IDENTIFIER
       {
-          $$ = compiler_lookup_dnode( compiler, $1, $3, "exception" );
+          char *name = obtain_string_from_pool( $3 );
+          $$ = compiler_lookup_dnode( compiler, $1, name, "exception" );
+          freex( name );
       }
   ;
 
