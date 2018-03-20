@@ -7662,7 +7662,11 @@ raise_statement
 
 exception_declaration
   : _EXCEPTION __IDENTIFIER
-    { compiler_compile_next_exception( compiler, $2, px ); }
+    {
+        char *name = obtain_string_from_pool( $2 );
+        compiler_compile_next_exception( compiler, name, px );
+        freex( name );
+    }
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -7671,7 +7675,17 @@ exception_declaration
 module_name
   : __IDENTIFIER
       {
-	  DNODE *module_dnode = new_dnode_module( $1, px );
+          char *volatile name = obtain_string_from_pool( $1 );
+          DNODE *volatile module_dnode = NULL;
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              module_dnode = new_dnode_module( name, &inner );
+          }
+          cexception_finally (
+              { freex( name ); },
+              { cexception_reraise( inner, px ); }
+          );
 	  $$ = module_dnode;
       }
   ;
