@@ -1,1 +1,0 @@
-../../sc/thrcode.h

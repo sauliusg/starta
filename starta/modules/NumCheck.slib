@@ -1,0 +1,22 @@
+package NumCheck;
+
+use std;
+
+load "libraries/numcheck/libnumcheck.so.0.01";
+
+inline bytecode function is_integer( s: string ) : bool
+{ libnumcheck:ISINTEGER }
+
+inline bytecode function is_integer_with_precision( s: string ) : bool
+{ libnumcheck:ISPRECINT }
+
+inline bytecode function is_real( s: string ) : bool
+{ libnumcheck:ISREAL }
+
+inline bytecode function is_real_with_precision( s: string ) : bool
+{ libnumcheck:ISPRECREAL }
+
+inline bytecode function is_measurement( s: string ) : bool
+{ libnumcheck:ISPRECREAL }
+
+end package NumCheck;

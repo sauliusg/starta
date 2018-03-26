@@ -1,0 +1,15 @@
+// --*- C -*--
+
+// Test feof() function:
+
+use std;
+use Strings;
+
+var count = 0L;
+
+while(<>) {
+    var line = split( $_ );
+    count += llength(line);
+}
+
+. count;

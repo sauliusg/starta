@@ -1,1 +1,0 @@
-../../sc/osctext.pl

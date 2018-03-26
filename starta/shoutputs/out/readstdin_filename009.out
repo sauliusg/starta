@@ -1,0 +1,4 @@
+"shtests/data/one-liner-no-nl.txt" 1 1 A single line in a file, with no new line.
+After the 'while(<>)' loop:
+curreof() == TRUE
+alleof()  == TRUE

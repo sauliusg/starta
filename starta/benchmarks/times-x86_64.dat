@@ -1,0 +1,19 @@
+Wed Dec  6 08:05:49 EET 2017
+Linux 4.10.0-40-generic x86_64
+Intel(R) Xeon(R) CPU           W3565  @ 3.20GHz
+Intel(R) Xeon(R) CPU           W3565  @ 3.20GHz
+Intel(R) Xeon(R) CPU           W3565  @ 3.20GHz
+Intel(R) Xeon(R) CPU           W3565  @ 3.20GHz
+gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609
+fib.snl              real 0m5.875s
+fn001-loop.snl       real 0m0.005s
+fn001.snl            real 0m0.157s
+l-slow.snl           real 0m0.292s
+l-slower.snl         real 0m0.818s
+l.snl                real 0m0.286s
+mat001.snl           real 0m36.353s
+mat001asm.snl        real 0m16.783s
+mat002.snl           real 0m0.660s
+pl-slow.snl          real 0m0.154s
+pl-slower.snl        real 0m0.426s
+pl.snl               real 0m0.151s

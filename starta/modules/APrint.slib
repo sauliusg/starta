@@ -1,0 +1,22 @@
+# --*- C -*--
+
+module APrint( type T = int )
+
+// Print function for arrays
+
+use std;
+
+operator "<" (a : array of T)
+{
+    var separator = "";
+    < "[";
+    for var e in a {
+        < separator, e;
+        separator = ",";
+    }
+    < " ]"
+}
+
+operator "." (a : array of T) { < a }
+
+end module APrint;

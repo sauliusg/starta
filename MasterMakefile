@@ -7,8 +7,8 @@
 
 MAKECONF_EXAMPLES = ${filter-out %~, ${wildcard Makeconf*.example}}
 
-MAKECONF_FILES = $(sort ${filter-out ${MAKECONF_EXAMPLES}, \
-	${filter-out %~, ${wildcard Makeconf*}}} \
+MAKECONF_FILES = $(sort \
+	${filter-out %~, ${wildcard Makeconf*}} \
 	${MAKECONF_EXAMPLES:%.example=%})
 
 ifneq ("${MAKECONF_FILES}","")
@@ -202,7 +202,7 @@ FORCE:;
 # Makeconfig files:
 
 %: %.example
-	cp $< $@
+	sed 's/\?=/=/g; s/^## LD_LIBRARY_PATH :=/LD_LIBRARY_PATH :=/' $< > $@
 
 #------------------------------------------------------------------------------
 #

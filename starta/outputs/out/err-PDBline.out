@@ -1,0 +1,5 @@
+./sl: inputs/err-PDBline.snl(19,46): ERROR, function 'fromStrings' does not have argument 'recodType'
+                               recodType     => line[0:5],
+                                             ^
+./sl: 1 error(s) detected
+

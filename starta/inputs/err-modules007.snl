@@ -1,0 +1,10 @@
+// --*- C -*--
+
+// Test operator for linked lists:
+
+pragma prepend "$D";
+
+use std;
+use Image in "image.slib";
+
+. length(image::image), "data points";

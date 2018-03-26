@@ -1,1 +1,0 @@
-../../sc/thrlist.c

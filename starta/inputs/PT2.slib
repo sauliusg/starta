@@ -1,0 +1,32 @@
+// --*- Java -*--
+// An example of a module parametrised with a constant, a variable and
+// a procedure.
+
+module PT2( const C, type T, var X, function P )
+
+use * from std;
+
+const N = 100;
+
+var x : double = 30.5;
+
+var i : int = const(C);
+
+procedure add( double x, y ): double { return x + y }
+
+use ProcTypeParam( N, double, x, add ) as P1;
+use ProcTypeParam( N, double, x, add ) as P2;
+
+function pp( double x ): double { return ProcTypeParam::pp( x ) }
+
+procedure set_inner( i : double )
+{
+    P1::inner = i
+}
+
+function get_inner(): double
+{
+    return P2::inner
+}
+
+end module PT2;

@@ -1,0 +1,1 @@
+../../starta/typetab.h
