@@ -18,11 +18,11 @@ void delete_strpool( STRPOOL *pool );
 void dispose_strpool( STRPOOL *volatile *pool );
 void free_strpool( STRPOOL *p );
 
-ssize_t pool_insert_string( STRPOOL *p, char *volatile *str, cexception_t *ex );
-ssize_t pool_add_string( STRPOOL *p, char *str, cexception_t *ex );
-ssize_t pool_clone_string( STRPOOL *p, char *str );
-ssize_t pool_strnclone( STRPOOL *p, char *str, size_t length );
-char *obtain_string_from_pool( STRPOOL *p, ssize_t index );
-char *get_string_from_pool( STRPOOL *p, ssize_t index );
+ssize_t strpool_insert_string( STRPOOL *p, char *volatile *str, cexception_t *ex );
+ssize_t strpool_add_string( STRPOOL *p, char *str, cexception_t *ex );
+ssize_t strpool_strclone( STRPOOL *p, char *str );
+ssize_t strpool_strnclone( STRPOOL *p, char *str, size_t length );
+char *obtain_string_from_strpool( STRPOOL *p, ssize_t index );
+char *get_string_from_strpool( STRPOOL *p, ssize_t index );
 
 #endif

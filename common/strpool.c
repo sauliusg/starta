@@ -74,7 +74,7 @@ void dispose_strpool( STRPOOL *volatile *pool )
     }
 }
 
-static void realloc_pool( STRPOOL *p, cexception_t *ex )
+static void realloc_strpool( STRPOOL *p, cexception_t *ex )
 {
     ssize_t new_pool_length =
         p->pool_length == 0 ? INITIAL_POOL_LENGTH : p->pool_length * 2;
@@ -89,13 +89,13 @@ static void realloc_pool( STRPOOL *p, cexception_t *ex )
     p->pool_length = new_pool_length;
 }
 
-ssize_t pool_insert_string( STRPOOL *p, char *volatile *str, cexception_t *ex )
+ssize_t strpool_insert_string( STRPOOL *p, char *volatile *str, cexception_t *ex )
 {
     assert(p);
     assert(str);
 
     if( p->next_free < 0 ) {
-        realloc_pool( p, ex );
+        realloc_strpool( p, ex );
     }
 
     assert( p->next_free >= 0 );
@@ -107,18 +107,18 @@ ssize_t pool_insert_string( STRPOOL *p, char *volatile *str, cexception_t *ex )
     return index;
 }
 
-ssize_t pool_add_string( STRPOOL *p, char *str, cexception_t *ex )
+ssize_t strpool_add_string( STRPOOL *p, char *str, cexception_t *ex )
 {
     char *dup = strdupx( str, ex );
-    return pool_insert_string( p, &dup, ex );
+    return strpool_insert_string( p, &dup, ex );
 }
 
-ssize_t pool_clone_string( STRPOOL *p, char *str )
+ssize_t strpool_clone_string( STRPOOL *p, char *str )
 {
     int volatile idx;
     cexception_t inner;
     cexception_guard( inner ) {
-        idx = pool_add_string( p, str, &inner );
+        idx = strpool_add_string( p, str, &inner );
     }
     cexception_catch {
         return -1;
@@ -126,7 +126,7 @@ ssize_t pool_clone_string( STRPOOL *p, char *str )
     return idx;
 }
 
-ssize_t pool_strnclone( STRPOOL *p, char *str, size_t length )
+ssize_t strpool_strnclone( STRPOOL *p, char *str, size_t length )
 {
     int volatile idx;
     char *volatile cloned;
@@ -135,7 +135,7 @@ ssize_t pool_strnclone( STRPOOL *p, char *str, size_t length )
         cloned = mallocx( length + 1, &inner );
         strncpy( cloned, str, length );
         cloned[length] = '\0';
-        idx = pool_insert_string( p, &cloned, &inner );
+        idx = strpool_insert_string( p, &cloned, &inner );
     }
     cexception_catch {
         freex( cloned );
@@ -144,7 +144,7 @@ ssize_t pool_strnclone( STRPOOL *p, char *str, size_t length )
     return idx;
 }
 
-char *obtain_string_from_pool( STRPOOL *p, ssize_t index )
+char *obtain_string_from_strpool( STRPOOL *p, ssize_t index )
 {
     char *string;
     if( index < 0 ) {
@@ -157,7 +157,7 @@ char *obtain_string_from_pool( STRPOOL *p, ssize_t index )
     }
 }
 
-char *get_string_from_pool( STRPOOL *p, ssize_t index )
+char *get_string_from_strpool( STRPOOL *p, ssize_t index )
 {
     if( index < 0 ) {
         return NULL;
