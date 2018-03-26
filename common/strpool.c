@@ -113,7 +113,7 @@ ssize_t strpool_add_string( STRPOOL *p, char *str, cexception_t *ex )
     return strpool_insert_string( p, &dup, ex );
 }
 
-ssize_t strpool_clone_string( STRPOOL *p, char *str )
+ssize_t strpool_strclone( STRPOOL *p, char *str )
 {
     int volatile idx;
     cexception_t inner;
