@@ -7858,21 +7858,36 @@ module_argument
     { $$ = new_dnode_constant( /* name */ NULL, &$2, px ); }
 | __INTEGER_CONST
     {
+        char *int_string = obtain_string_from_strpool( compiler->strpool, $1 );
+        intmax_t value = atol( int_string );
+        freex( int_string );
         const_value_t cval = 
-            make_const_value( px, VT_INTMAX, (intmax_t)atol( $1 ));
+            make_const_value( px, VT_INTMAX, value );
         $$ = new_dnode_constant( /* name */ NULL, &cval, px );
     }
 
 | __REAL_CONST
     {
-        const_value_t cval = make_const_value( px, VT_FLOAT, atof( $1 ));
+        char *real_string = obtain_string_from_strpool( compiler->strpool, $1 );
+        double value = atof( real_string );
+        freex( real_string );
+        const_value_t cval = make_const_value( px, VT_FLOAT, value );
         $$ = new_dnode_constant( /* name */ NULL, &cval, px );
     }
 
 | __STRING_CONST
     {
-        const_value_t cval = make_const_value( px, VT_STRING, $1 );
-        $$ = new_dnode_constant( /* name */ NULL, &cval, px );
+        char *volatile string = obtain_string_from_strpool( compiler->strpool, $1 );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            const_value_t cval = make_const_value( &inner, VT_STRING, string );
+            $$ = new_dnode_constant( /* name */ NULL, &cval, &inner );
+        }
+        cexception_catch {
+            freex( string );
+            cexception_reraise( inner, px );
+        }
+        freex( string );
     }
 ;
 
@@ -7880,21 +7895,23 @@ opt_as_identifier
 :  _AS __IDENTIFIER
     { $$ = $2; }
 | /* empty */
-    { $$ = NULL; }
+    { $$ = -1; }
 ;
 
 module_import_identifier
   : __IDENTIFIER opt_module_arguments opt_as_identifier
   {
       cexception_t inner;
-      char *module_name = $1;
-      DNODE *module_name_dnode = new_dnode_module( module_name, px );
+      char *volatile module_name =
+          obtain_string_from_strpool( compiler->strpool, $1 );
+      DNODE *module_name_dnode = NULL;
       DNODE *module_arguments = $2;
       char *module_synonim = moveptr( &$3 );
       dnode_insert_module_args( module_name_dnode, &module_arguments );
       dnode_insert_synonim( module_name_dnode, &module_synonim );
 
       cexception_guard( inner ) {
+          module_name_dnode = new_dnode_module( module_name, px );
           int count = 0;
           DNODE *existing_name = 
               vartab_lookup_silently( compiler->vartab, module_name, 
@@ -7923,9 +7940,11 @@ module_import_identifier
       }
       cexception_catch {
           delete_dnode( module_name_dnode );
+          freex( module_name );
           cexception_reraise( inner, px );
       }
 
+      freex( module_name );
       $$ = module_name_dnode;
   }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
