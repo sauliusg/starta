@@ -8259,7 +8259,19 @@ function_or_procedure: _FUNCTION | _PROCEDURE;
 load_library_statement
    : _LOAD __STRING_CONST
        {
-	   compiler_load_library( compiler, $2, "SL_OPCODES", px );
+           char *volatile library_name =
+               obtain_string_from_strpool( compiler->strpool, $2 );
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_load_library( compiler, library_name,
+                                      "SL_OPCODES", &inner );
+           }
+         cexception_catch {
+             freex( library_name );
+             cexception_reraise( inner, px );
+         }
+         freex( library_name );
        }
    ;
 
