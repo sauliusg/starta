@@ -9,6 +9,7 @@
 #define __GRAMMAR_Y_H
 
 #include <thrcode.h>
+#include <strpool.h>
 #include <cexceptions.h>
 
 typedef enum {
@@ -35,6 +36,8 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
 
 THRCODE *new_thrcode_from_string( char *program, char **include_paths,
                                   cexception_t *ex );
+
+STRPOOL *current_compiler_strpool( void );
 
 void compiler_printf( cexception_t *ex, char *format, ... );
 
