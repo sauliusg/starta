@@ -7906,12 +7906,15 @@ module_import_identifier
           obtain_string_from_strpool( compiler->strpool, $1 );
       DNODE *module_name_dnode = NULL;
       DNODE *module_arguments = $2;
-      char *module_synonim = moveptr( &$3 );
-      dnode_insert_module_args( module_name_dnode, &module_arguments );
-      dnode_insert_synonim( module_name_dnode, &module_synonim );
+      char *volatile module_synonim =
+          obtain_string_from_strpool( compiler->strpool, $3 );
 
       cexception_guard( inner ) {
           module_name_dnode = new_dnode_module( module_name, px );
+
+          dnode_insert_module_args( module_name_dnode, &module_arguments );
+          dnode_insert_synonim( module_name_dnode, &module_synonim );
+
           int count = 0;
           DNODE *existing_name = 
               vartab_lookup_silently( compiler->vartab, module_name, 
@@ -7941,10 +7944,12 @@ module_import_identifier
       cexception_catch {
           delete_dnode( module_name_dnode );
           freex( module_name );
+          freex( module_synonim );
           cexception_reraise( inner, px );
       }
 
       freex( module_name );
+      freex( module_synonim );
       $$ = module_name_dnode;
   }
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
