@@ -18,52 +18,107 @@
 
 #define INITIAL_POOL_LENGTH 4
 
-static ssize_t pool_length = 0;
-static strpool_t *pool = NULL;
-static int next_free = -1;
+typedef union {
+    int next;
+    char *str;
+} strpool_t;
 
-static void realloc_pool( cexception_t *ex )
+typedef struct STRPOOL {
+    ssize_t pool_length;
+    strpool_t *pool;
+    int next_free;
+} STRPOOL;
+
+
+STRPOOL *new_strpool( cexception_t *ex )
 {
-    ssize_t new_pool_length =
-        pool_length == 0 ? INITIAL_POOL_LENGTH : pool_length * 2;
-
-    pool = reallocx( pool, new_pool_length * sizeof(pool[0]), ex );
-    next_free = pool_length;
-    ssize_t i;
-    for( i = pool_length; i < new_pool_length - 1; i++ ) {
-        pool[i].next = i+1;
-    }
-    pool[i].next = -1;
-    pool_length = new_pool_length;
+    STRPOOL *p = callocx( 1, sizeof(*p), ex );
+    p->next_free = -1;
+    return p;
 }
 
-ssize_t pool_insert_string( char *volatile *str, cexception_t *ex )
+void free_strpool( STRPOOL *p )
 {
+    ssize_t i;
+
+    i = p->next_free;
+    while( i >= 0 ) {
+        p->next_free = p->pool[i].next;
+        p->pool[i].str = NULL;
+        i = p->next_free;
+    }
+    for( i = 0; i < p->pool_length; i++ ) {
+        if( p->pool[i].str != NULL ) {
+            free( p->pool[i].str );
+        }
+    }
+    free( p->pool );
+    p->pool = NULL;
+    p->pool_length = 0;
+    p->next_free = -1;
+}
+
+void delete_strpool( STRPOOL *pool )
+{
+    if( pool ) {
+        free_strpool( pool );
+        freex( pool );
+    }
+}
+
+void dispose_strpool( STRPOOL *volatile *pool )
+{
+    if( pool ) {
+        delete_strpool( *pool );
+        *pool = NULL;
+    }
+}
+
+static void realloc_pool( STRPOOL *p, cexception_t *ex )
+{
+    ssize_t new_pool_length =
+        p->pool_length == 0 ? INITIAL_POOL_LENGTH : p->pool_length * 2;
+
+    p->pool = reallocx( p->pool, new_pool_length * sizeof(p->pool[0]), ex );
+    p->next_free = p->pool_length;
+    ssize_t i;
+    for( i = p->pool_length; i < new_pool_length - 1; i++ ) {
+        p->pool[i].next = i+1;
+    }
+    p->pool[new_pool_length - 1].next = -1;
+    p->pool_length = new_pool_length;
+}
+
+ssize_t pool_insert_string( STRPOOL *p, char *volatile *str, cexception_t *ex )
+{
+    assert(p);
     assert(str);
 
-    if( next_free < 0 ) {
-        realloc_pool( ex );
+    if( p->next_free < 0 ) {
+        realloc_pool( p, ex );
     }
 
-    ssize_t index = next_free;
-    next_free = pool[index].next;
-    pool[index].str = *str;
+    assert( p->next_free >= 0 );
+
+    ssize_t index = p->next_free;
+    p->next_free = p->pool[index].next;
+    p->pool[index].str = *str;
     *str = NULL;
     return index;
 }
 
-ssize_t pool_add_string( char *str, cexception_t *ex )
+ssize_t pool_add_string( STRPOOL *p, char *str, cexception_t *ex )
 {
     char *dup = strdupx( str, ex );
-    return pool_insert_string( &dup, ex );
+    return pool_insert_string( p, &dup, ex );
 }
 
-ssize_t pool_clone_string( char *str )
+ssize_t pool_clone_string( STRPOOL *p, char *str )
 {
     int volatile idx;
     cexception_t inner;
     cexception_guard( inner ) {
-        idx = pool_add_string( str, &inner );
+        idx = pool_add_string( p, str, &inner );
     }
     cexception_catch {
         return -1;
@@ -71,7 +126,7 @@ ssize_t pool_clone_string( char *str )
     return idx;
 }
 
-ssize_t pool_strnclone( char *str, size_t length )
+ssize_t pool_strnclone( STRPOOL *p, char *str, size_t length )
 {
     int volatile idx;
     char *volatile cloned;
@@ -80,7 +135,7 @@ ssize_t pool_strnclone( char *str, size_t length )
         cloned = mallocx( length + 1, &inner );
         strncpy( cloned, str, length );
         cloned[length] = '\0';
-        idx = pool_insert_string( &cloned, &inner );
+        idx = pool_insert_string( p, &cloned, &inner );
     }
     cexception_catch {
         freex( cloned );
@@ -89,44 +144,24 @@ ssize_t pool_strnclone( char *str, size_t length )
     return idx;
 }
 
-char *obtain_string_from_pool( ssize_t index )
+char *obtain_string_from_pool( STRPOOL *p, ssize_t index )
 {
     char *string;
     if( index < 0 ) {
         return NULL;
     } else {
-        string = pool[index].str;
-        pool[index].next = next_free;
-        next_free = index;
+        string = p->pool[index].str;
+        p->pool[index].next = p->next_free;
+        p->next_free = index;
         return string;
     }
 }
 
-char *get_string_from_pool( ssize_t index )
+char *get_string_from_pool( STRPOOL *p, ssize_t index )
 {
     if( index < 0 ) {
         return NULL;
     } else {
-        return pool[index].str;
+        return p->pool[index].str;
     }
-}
-
-void free_pool()
-{
-    ssize_t i;
-
-    i = next_free;
-    while( i >= 0 ) {
-        next_free = pool[i].next;
-        pool[i].str = NULL;
-        i = next_free;
-    }
-    for( i = 0; i < pool_length; i++ ) {
-        if( pool[i].str != NULL ) {
-            free( pool[i].str );
-        }
-    }
-    pool_length = 0;
-    free( pool );
-    pool = NULL;
 }

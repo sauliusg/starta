@@ -8,6 +8,8 @@
 
 int main( int argc, char *argv[] )
 {
+    STRPOOL *pool = new_strpool( NULL );
+
     printf( "Hi!\n" );
 
     char *strings[] = {
@@ -17,34 +19,34 @@ int main( int argc, char *argv[] )
     int idx[sizeof(strings)/sizeof(strings[0])];
 
     for( int i = 0; strings[i] != NULL; i ++ ) {
-        idx[i] = pool_add_string( strings[i], NULL );
+        idx[i] = pool_add_string( pool, strings[i], NULL );
     }
 
     for( int i = 0; strings[i] != NULL; i ++ ) {
         printf( "%i:\t%d\n", i, idx[i] );
     }
 
-    char *str3 = obtain_string_from_pool(3);
+    char *str3 = obtain_string_from_pool( pool, 3 );
     printf( "Obtained \"%s\"\n", str3 );
     free( str3 );
 
-    pool_add_string( "One more string", NULL );
+    pool_add_string( pool, "One more string", NULL );
     
     for( int i = 0; strings[i] != NULL; i ++ ) {
-        char *str = obtain_string_from_pool( i );
+        char *str = obtain_string_from_pool( pool, i );
         printf( "%i:\t%s\n", i, str );
         free( str );
     }
 
     int i;
-    i = pool_add_string( "Before last", NULL );
-    i = pool_add_string( "Very last", NULL );
+    i = pool_add_string( pool, "Before last", NULL );
+    i = pool_add_string( pool, "Very last", NULL );
 
-    str3 = obtain_string_from_pool( i );
+    str3 = obtain_string_from_pool( pool, i );
     printf( "Obtained string %d: \"%s\"\n", i, str3 );
     free( str3 );
 
-    free_pool();
+    dispose_strpool( &pool );
     
     return 0;
 }
