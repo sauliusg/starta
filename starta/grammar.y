@@ -7955,29 +7955,39 @@ module_import_identifier
   | __IDENTIFIER _IN __STRING_CONST opt_module_arguments opt_as_identifier
   {
       cexception_t inner;
-      DNODE * volatile module_name_dnode = new_dnode_module( $1, px );
-      char *module_filename = $3;
+      DNODE * volatile module_name_dnode = NULL;
+      char *volatile module_name =
+          obtain_string_from_strpool( compiler->strpool, $3 );
+      char *volatile module_filename =
+          obtain_string_from_strpool( compiler->strpool, $3 );
       DNODE *module_arguments = $4;
-      char *module_synonim = moveptr( &$5 );
+      char *volatile module_synonim =
+          obtain_string_from_strpool( compiler->strpool, $5 );
+
       if( compiler->module_filename ) {
           freex( compiler->module_filename );
           compiler->module_filename = NULL;
       }
       cexception_guard( inner ) {
-          compiler->module_filename = strdupx( $3, &inner );
+          module_name_dnode = new_dnode_module( module_name, &inner );
+          compiler->module_filename = strdupx( module_filename, &inner );
           char *pkg_path =
               compiler_find_include_file( compiler, module_filename, &inner );
           dnode_set_filename( module_name_dnode, pkg_path, &inner );
       }
       cexception_catch {
           delete_dnode( module_name_dnode );
+          freex( module_name );
           freex( module_filename );
+          freex( module_synonim );
           cexception_reraise( inner, px );
       }
       dnode_insert_module_args( module_name_dnode, &module_arguments );
       dnode_insert_synonim( module_name_dnode, &module_synonim );
 
+      freex( module_name );
       freex( module_filename );
+      freex( module_synonim );
       $$ = module_name_dnode;
   }
 ;
@@ -7994,91 +8004,247 @@ use_statement
 selective_use_statement
    : _USE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $4;
+           char *module_name =
+               obtain_string_from_strpool( compiler->strpool, $4 );
            DNODE *imported_identifiers = $2;
+           cexception_t inner;
 
-           compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, IMPORT_ALL, px );
+           cexception_guard( inner ) {
+               compiler_import_selected_names( compiler, imported_identifiers,
+                                               module_name, IMPORT_ALL,
+                                               &inner );
+           }
+           cexception_catch {
+               delete_dnode( imported_identifiers );
+               freex( module_name );
+               cexception_reraise( inner, px );
+           }
 
+           freex( module_name );
            delete_dnode( imported_identifiers );
        }
 
    | _USE _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           compiler_import_array_definition( compiler, $5, px );
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_array_definition( compiler, module_name,
+                                                 &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
        }
    | _IMPORT _TYPE _ARRAY _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           compiler_import_array_definition( compiler, $5, px );
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_array_definition( compiler, module_name,
+                                                 &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
        }
 
    | _USE _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           compiler_import_type_identifier_list( compiler, $3, $5, px );
+           DNODE *volatile imported_identifiers = $3;
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_type_identifier_list( compiler,
+                                                     imported_identifiers,
+                                                     module_name, &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
+           delete_dnode( imported_identifiers );
        }
    | _IMPORT _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           compiler_import_type_identifier_list( compiler, $3, $5, px );
+           DNODE *volatile imported_identifiers = $3;
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_type_identifier_list( compiler,
+                                                     imported_identifiers,
+                                                     module_name, px );
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
+           delete_dnode( imported_identifiers );
        }
 
    | _USE _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *imported_identifiers = $3;
+           DNODE *volatile imported_identifiers = $3;
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
 
-           compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, IMPORT_VAR, px );
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_selected_names( compiler, imported_identifiers,
+                                               module_name, IMPORT_VAR,
+                                               &inner );
 
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
            delete_dnode( imported_identifiers );
        }
 
    | _IMPORT _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *imported_identifiers = $3;
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+           DNODE *volatile imported_identifiers = $3;
 
-           compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, IMPORT_VAR, px );
-
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_selected_names( compiler, imported_identifiers,
+                                               module_name, IMPORT_VAR,
+                                               &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
            delete_dnode( imported_identifiers );
        }
 
    | _USE _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           compiler_import_selected_constants( compiler, $3, $5, px );
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+           DNODE *volatile imported_identifiers = $3;
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_selected_constants( compiler,
+                                                   imported_identifiers,
+                                                   module_name, &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
+           delete_dnode( imported_identifiers );
        }
    | _IMPORT _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
-           compiler_import_selected_constants( compiler, $3, $5, px );
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+           DNODE *volatile imported_identifiers = $3;
+
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_selected_constants( compiler,
+                                                   imported_identifiers,
+                                                   module_name, &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
+           delete_dnode( imported_identifiers );
        }
 
    | _USE function_or_procedure identifier_list
      _FROM /* module_import_identifier */  __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *imported_identifiers = $3;
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+           DNODE *volatile imported_identifiers = $3;
 
-           compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, IMPORT_FUNCTION, px );
-
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_selected_names( compiler,
+                                               imported_identifiers,
+                                               module_name, IMPORT_FUNCTION,
+                                               &inner );
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
            delete_dnode( imported_identifiers );
        }
    | _IMPORT function_or_procedure identifier_list 
      _FROM /* module_import_identifier */  __IDENTIFIER
        {
-           char *module_name = $5;
-           DNODE *imported_identifiers = $3;
+           char *volatile module_name =
+               obtain_string_from_strpool( compiler->strpool, $5 );
+           DNODE *volatile imported_identifiers = $3;
 
-           compiler_import_selected_names( compiler, imported_identifiers,
-                                           module_name, IMPORT_FUNCTION, px );
+           cexception_t inner;
+           cexception_guard( inner ) {
+               compiler_import_selected_names( compiler,
+                                               imported_identifiers,
+                                               module_name, IMPORT_FUNCTION,
+                                               &inner );
 
+           }
+           cexception_catch {
+               freex( module_name );
+               delete_dnode( imported_identifiers );
+               cexception_reraise( inner, px );
+           }
+           freex( module_name );
            delete_dnode( imported_identifiers );
        }
    ;
 
 identifier
   : __IDENTIFIER
-     { $$ = new_dnode_name( $1, px ); }
+     {
+         char *volatile name =
+             obtain_string_from_strpool( compiler->strpool, $1 );
+
+         cexception_t inner;
+         cexception_guard( inner ) {
+             $$ = new_dnode_name( name, &inner );
+         }
+         cexception_catch {
+             freex( name );
+             cexception_reraise( inner, px );
+         }
+         freex( name );
+     }
   ;
 
 identifier_list
