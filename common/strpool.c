@@ -157,7 +157,7 @@ char *obtain_string_from_strpool( STRPOOL *p, ssize_t index )
     }
 }
 
-char *get_string_from_strpool( STRPOOL *p, ssize_t index )
+char *strpool_get_string( STRPOOL *p, ssize_t index )
 {
     if( index < 0 ) {
         return NULL;
