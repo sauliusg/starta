@@ -31,7 +31,7 @@ USTRING         {UDSTRING}|{USSTRING}
 %{
 /* exports: */
 #include <lexer_flex.h>
-
+    
 /* uses: */
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +43,7 @@ USTRING         {UDSTRING}|{USSTRING}
 #include <tnode.h>
 #include <dnode.h>
 #include <enode.h>
+#include <strpool.h>
 #include <grammar_y.h>
 #include <grammar.tab.h>
 #include <allocx.h>
@@ -123,6 +124,24 @@ caused an error, and can inform user about this.*/
 
 static void storeCurrentLine( char *line, int length );
 
+static ssize_t strpool( char *str )
+{
+    STRPOOL *p = current_compiler_strpool();
+    return strpool_strclone( p, str );
+}
+ 
+static ssize_t strnpool( char *str, ssize_t length )
+{
+    STRPOOL *p = current_compiler_strpool();
+    return strpool_strnclone( p, str, length );
+}
+ 
+static char* get_pool_string( ssize_t index )
+{
+    STRPOOL *p = current_compiler_strpool();
+    return strpool_get_string( p, index );
+}
+ 
 %}
 
 %%
@@ -163,17 +182,17 @@ static void storeCurrentLine( char *line, int length );
 
 "=>"                    { MARK; return __THICK_ARROW; }
 
-"+="                    { MARK; yylval.si = pool_clone_string("+"); return __ARITHM_ASSIGN; }
-"-="                    { MARK; yylval.si = pool_clone_string("-"); return __ARITHM_ASSIGN; }
-"*="                    { MARK; yylval.si = pool_clone_string("*"); return __ARITHM_ASSIGN; }
-"/="                    { MARK; yylval.si = pool_clone_string("/"); return __ARITHM_ASSIGN; }
-"%="                    { MARK; yylval.si = pool_clone_string("%"); return __ARITHM_ASSIGN; }
-"|="                    { MARK; yylval.si = pool_clone_string("|"); return __ARITHM_ASSIGN; }
-"&="                    { MARK; yylval.si = pool_clone_string("&"); return __ARITHM_ASSIGN; }
-"^="                    { MARK; yylval.si = pool_clone_string("^"); return __ARITHM_ASSIGN; }
-"**="                   { MARK; yylval.si = pool_clone_string("**"); return __ARITHM_ASSIGN; }
-"&&="                   { MARK; yylval.si = pool_clone_string("&&"); return __ARITHM_ASSIGN; }
-"||="                   { MARK; yylval.si = pool_clone_string("||"); return __ARITHM_ASSIGN; }
+"+="                    { MARK; yylval.si = strpool("+"); return __ARITHM_ASSIGN; }
+"-="                    { MARK; yylval.si = strpool("-"); return __ARITHM_ASSIGN; }
+"*="                    { MARK; yylval.si = strpool("*"); return __ARITHM_ASSIGN; }
+"/="                    { MARK; yylval.si = strpool("/"); return __ARITHM_ASSIGN; }
+"%="                    { MARK; yylval.si = strpool("%"); return __ARITHM_ASSIGN; }
+"|="                    { MARK; yylval.si = strpool("|"); return __ARITHM_ASSIGN; }
+"&="                    { MARK; yylval.si = strpool("&"); return __ARITHM_ASSIGN; }
+"^="                    { MARK; yylval.si = strpool("^"); return __ARITHM_ASSIGN; }
+"**="                   { MARK; yylval.si = strpool("**"); return __ARITHM_ASSIGN; }
+"&&="                   { MARK; yylval.si = strpool("&&"); return __ARITHM_ASSIGN; }
+"||="                   { MARK; yylval.si = strpool("||"); return __ARITHM_ASSIGN; }
 
 "_"			{ MARK; return '_'; }
 "::"			{ MARK; return __COLON_COLON; }
@@ -277,7 +296,7 @@ while       { MARK; return _WHILE; }
                            if( compiler_flex_debug_flags &
 			           COMPILER_FLEX_DEBUG_YYLVAL )
                                printf("yylval.si = %s\n", yytext);
-                           yylval.si = pool_clone_string(yytext);
+                           yylval.si = strpool(yytext);
                            return __IDENTIFIER;
 			%}
 
@@ -286,43 +305,43 @@ while       { MARK; return _WHILE; }
 {INTEGER}".."		%{
                            yyless(strlen(yytext) - 2);
                            MARK;
-                           yylval.si = pool_strnclone(yytext, yyleng);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext, yyleng);
+                           process_escapes(get_pool_string(yylval.si));
 			   return __INTEGER_CONST;
 			%}
 
 {INTEGER}		%{
                            MARK;
-                           yylval.si = pool_strnclone(yytext, yyleng);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext, yyleng);
+                           process_escapes(get_pool_string(yylval.si));
 			   return __INTEGER_CONST;
 			%}
 
 "0x"{INTEGER}		%{
                            MARK;
-                           yylval.si = pool_strnclone(yytext, yyleng);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext, yyleng);
+                           process_escapes(get_pool_string(yylval.si));
 			   return __INTEGER_CONST;
 			%}
 
 "0b"{INTEGER}		%{
                            MARK;
-                           yylval.si = pool_strnclone(yytext, yyleng);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext, yyleng);
+                           process_escapes(get_pool_string(yylval.si));
 			   return __INTEGER_CONST;
 			%}
 
 "0o"{INTEGER}		%{
                            MARK;
-                           yylval.si = pool_strnclone(yytext, yyleng);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext, yyleng);
+                           process_escapes(get_pool_string(yylval.si));
 			   return __INTEGER_CONST;
 			%}
 
 {REAL}			%{
                            MARK;
-                           yylval.si = pool_strnclone(yytext, yyleng);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext, yyleng);
+                           process_escapes(get_pool_string(yylval.si));
 			   /* sscanf( yytext, "%lf", &yylval.r ); */
 			   return __REAL_CONST;
 			%}
@@ -332,8 +351,8 @@ while       { MARK; return _WHILE; }
 {STRING}		%{
                            MARK;
                            assert(yyleng > 1);
-                           yylval.si = pool_strnclone(yytext + 1, yyleng - 2);
-                           process_escapes(get_string_from_pool(yylval.si));
+                           yylval.si = strnpool(yytext + 1, yyleng - 2);
+                           process_escapes(get_pool_string(yylval.si));
                            return __STRING_CONST;
 			%}
 
@@ -342,9 +361,9 @@ while       { MARK; return _WHILE; }
                            assert(yyleng > 0);
                            yyerror("unterminated string");
                            yylval.si = yyleng > 1 ?
-                                         pool_strnclone(yytext + 1, yyleng - 2) :
-                                         pool_clone_string("");
-                           process_escapes(get_string_from_pool(yylval.si));
+                                         strnpool(yytext + 1, yyleng - 2) :
+                                         strpool("");
+                           process_escapes(get_pool_string(yylval.si));
                            return __STRING_CONST;
 			%}
 

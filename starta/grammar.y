@@ -42,6 +42,7 @@
 #include <stlist.h>
 #include <fixup.h>
 #include <tnode_compat.h>
+#include <strpool.h>
 #include <bytecode_file.h> /* for bytecode_file_hdr_t, needed by
 			      compiler_native_type_size() */
 #include <cvalue_t.h>
@@ -264,6 +265,10 @@ typedef struct {
     VARTAB *initialised_references;
     STLIST *initialised_ref_symtab_stack;
 
+    /* String pool from which the lexer will allocate strings and put
+       their pool indexes in the Yacc stack: */
+    STRPOOL *strpool;
+
 } COMPILER;
 
 static void delete_string_array( char ***array )
@@ -337,7 +342,8 @@ static void delete_compiler( COMPILER *c )
         delete_dnode( c->requested_module );
 
         delete_string_array( &c->include_paths );
-
+        delete_strpool( c->strpool );
+        
         freex( c );
     }
 }
@@ -372,6 +378,8 @@ static COMPILER *new_compiler( char *filename,
 	cc->local_offset = starting_local_offset;
 
 	cc->include_paths = include_paths;
+
+        cc->strpool = new_strpool( &inner );
     }
     cexception_catch {
         delete_compiler( cc );
@@ -5739,7 +5747,8 @@ static void compiler_compile_break( COMPILER *cc, ssize_t label_idx,
                                     cexception_t *ex )
 {
     ssize_t zero = 0;
-    char *volatile label = obtain_string_from_pool( label_idx );
+    char *volatile label =
+        obtain_string_from_strpool( cc->strpool, label_idx );
     cexception_t inner;
 
     cexception_guard( inner ) {
@@ -5765,7 +5774,8 @@ static void compiler_compile_continue( COMPILER *cc, ssize_t label_idx,
                                        cexception_t *ex )
 {
     ssize_t zero = 0;
-    char *volatile label = obtain_string_from_pool( label_idx );
+    char *volatile label =
+        obtain_string_from_strpool( cc->strpool, label_idx );
     cexception_t inner;
 
     cexception_guard( inner ) {
@@ -6720,11 +6730,16 @@ static void compiler_import_selected_names( COMPILER *c,
     }
 }
 
-static DNODE* compiler_module_parameter_dnode( char *parameter_name,
-                                               char *parameter_default,
+static DNODE* compiler_module_parameter_dnode( COMPILER *c,
+                                               ssize_t parameter_name_idx,
+                                               ssize_t parameter_default_idx,
                                                type_kind_t kind,
                                                cexception_t *ex )
 {
+    char *parameter_name =
+        obtain_string_from_strpool( c->strpool, parameter_name_idx );
+    char *parameter_default =
+        obtain_string_from_strpool( c->strpool, parameter_default_idx );
     cexception_t inner;
     TNODE *volatile dnode_type = tnode_set_kind( new_tnode( ex ), kind );
     DNODE *volatile parameter_dnode = NULL;
@@ -7423,7 +7438,8 @@ break_or_continue_statement
 undelimited_simple_statement
   : include_statement
        {
-           char *volatile filename = obtain_string_from_pool( $1 );
+           char *volatile filename =
+               obtain_string_from_strpool( compiler->strpool, $1 );
            cexception_t inner;
 
            cexception_guard( inner ) {
@@ -7557,13 +7573,13 @@ delimited_control_statement
 raised_exception_identifier
   : __IDENTIFIER
       {
-          char *name = obtain_string_from_pool( $1 );
+          char *name = obtain_string_from_strpool( compiler->strpool, $1 );
           $$ = compiler_lookup_dnode( compiler, NULL, name, "exception" );
           freex( name );
       }
   | module_list __COLON_COLON __IDENTIFIER
       {
-          char *name = obtain_string_from_pool( $3 );
+          char *name = obtain_string_from_strpool( compiler->strpool, $3 );
           $$ = compiler_lookup_dnode( compiler, $1, name, "exception" );
           freex( name );
       }
@@ -7663,7 +7679,7 @@ raise_statement
 exception_declaration
   : _EXCEPTION __IDENTIFIER
     {
-        char *name = obtain_string_from_pool( $2 );
+        char *name = obtain_string_from_strpool( compiler->strpool, $2 );
         compiler_compile_next_exception( compiler, name, px );
         freex( name );
     }
@@ -7675,7 +7691,7 @@ exception_declaration
 module_name
   : __IDENTIFIER
       {
-          char *volatile name = obtain_string_from_pool( $1 );
+          char *volatile name = obtain_string_from_strpool( compiler->strpool, $1 );
           DNODE *volatile module_dnode = NULL;
           cexception_t inner;
 
@@ -7710,22 +7726,36 @@ module_parameter_list
 
 module_parameter
 : _TYPE __IDENTIFIER opt_default_module_parameter
-    { $$ = compiler_module_parameter_dnode( $2, $3, TK_TYPE, px ); }
+    {
+        $$ = compiler_module_parameter_dnode( compiler, $2, $3, TK_TYPE, px );
+    }
 | _PROCEDURE  __IDENTIFIER opt_default_module_parameter
-    { $$ = compiler_module_parameter_dnode( $2, $3, TK_FUNCTION, px ); }
+    {
+        $$ = compiler_module_parameter_dnode( compiler, $2, $3,
+                                              TK_FUNCTION, px );
+    }
 | _FUNCTION __IDENTIFIER opt_default_module_parameter
-    { $$ = compiler_module_parameter_dnode( $2, $3, TK_FUNCTION, px ); }
+    {
+        $$ = compiler_module_parameter_dnode( compiler, $2, $3,
+                                              TK_FUNCTION, px );
+    }
 | _CONST __IDENTIFIER opt_default_module_parameter
-    { $$ = compiler_module_parameter_dnode( $2, $3, TK_CONST, px ); }
+    {
+        $$ = compiler_module_parameter_dnode( compiler, $2, $3, TK_CONST, px );
+    }
 | _VAR __IDENTIFIER opt_default_module_parameter
-    { $$ = compiler_module_parameter_dnode( $2, $3, TK_VAR, px ); }
+    {
+        $$ = compiler_module_parameter_dnode( compiler, $2, $3, TK_VAR, px );
+    }
 | _OPERATOR __STRING_CONST opt_default_module_parameter
-    { $$ = compiler_module_parameter_dnode( $2, $3, TK_OPERATOR, px ); }
+    {
+        $$ = compiler_module_parameter_dnode( compiler, $2, $3, TK_OPERATOR, px );
+    }
 ;
 
 opt_default_module_parameter
 : /* empty */
-    { $$ = NULL; }
+    { $$ = -1; }
 | '=' __IDENTIFIER
     { $$ = $2; }
 ;
@@ -7791,10 +7821,13 @@ module_statement
 	  char *name;
 	  if( compiler->current_module &&
 	      (name = dnode_name( compiler->current_module )) != NULL ) {
-	      if( strcmp( $8, name ) != 0 ) {
+              char *module_identifier =
+                  obtain_string_from_strpool( compiler->strpool, $8 );
+	      if( strcmp( module_identifier, name ) != 0 ) {
 		  yyerrorf( "module '%s' ends with 'end module %s'",
-			    name, $8 );
+			    name, module_identifier );
 	      }
+              freex( module_identifier );
 	  }
 	  compiler_end_module( compiler, px );
           //compiler_end_subscope( compiler, px );
@@ -13993,6 +14026,13 @@ THRCODE *new_thrcode_from_string( char *program, char **include_paths,
     compiler = NULL;
 
     return code;
+}
+
+STRPOOL *current_compiler_strpool( void )
+{
+    if( compiler ) {
+        return compiler->strpool;
+    }
 }
 
 void compiler_printf( cexception_t *ex, char *format, ... )
