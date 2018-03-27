@@ -9284,13 +9284,24 @@ control_statement
 
   | labeled_for variable_declaration_keyword for_variable_declaration
       {
-	int readonly = $2;
-	if( readonly ) {
-	    dnode_set_flags( $3, DF_IS_READONLY );
-	}
-	compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 1, px );
-	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+          int readonly = $2;
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              if( readonly ) {
+                  dnode_set_flags( $3, DF_IS_READONLY );
+              }
+              compiler_push_loop( compiler, loop_label,
+                                  /* ncounters = */ 1, &inner );
+              dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
       }
     _IN expression
       {
@@ -9383,10 +9394,21 @@ control_statement
 
   | labeled_for lvariable _IN
       {
-        compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 2, px );
-	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
-        /* stack now: ..., lvariable_address */
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              compiler_push_loop( compiler, loop_label,
+                                  /* ncounters = */ 2, &inner );
+              dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
+          /* stack now: ..., lvariable_address */
       }
     expression
       {
@@ -9445,13 +9467,24 @@ control_statement
 
   | labeled_for '(' variable_declaration_keyword for_variable_declaration
       {
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
 	int readonly = $3;
-	if( readonly ) {
-	    dnode_set_flags( $4, DF_IS_READONLY );
-	}
-	compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 1, px );
-	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( readonly ) {
+                dnode_set_flags( $4, DF_IS_READONLY );
+            }
+            compiler_push_loop( compiler, loop_label,
+                                /* ncounters = */ 1, &inner );
+            dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+        }
+        cexception_catch {
+            freex( loop_label );
+            cexception_reraise( inner, px );
+        }
+        freex( loop_label );
       }
     in_loop_separator expression ')'
       {
@@ -9543,9 +9576,20 @@ control_statement
 
   | labeled_for '(' lvariable
       {
-        compiler_push_loop( compiler, /* loop_label = */ $1,
-                            /* ncounters = */ 2, px );
-	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          char *loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              compiler_push_loop( compiler, loop_label,
+                                  /* ncounters = */ 2, &inner );
+              dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
         /* stack now: ..., lvariable_address */
       }
     in_loop_separator expression ')'
@@ -9692,26 +9736,39 @@ catch_list
 catch_var_identifier
   : __IDENTIFIER
     {
-     char *opname = "exceptionval";
-     ssize_t try_var_offset = compiler->try_variable_stack ?
-	 compiler->try_variable_stack[compiler->try_block_level-1] : 0;
-     DNODE *catch_var = vartab_lookup( compiler->vartab, $1 );
-     TNODE *catch_var_type = catch_var ? dnode_type( catch_var ) : NULL;
+        char *volatile catch_ident =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+        char *opname = "exceptionval";
+        ssize_t try_var_offset = compiler->try_variable_stack ?
+            compiler->try_variable_stack[compiler->try_block_level-1] : 0;
 
-     if( !catch_var_type ||
-         !compiler_lookup_operator( compiler, catch_var_type, opname, 1, px )) {
-	 yyerrorf( "type of variable in a 'catch' clause must "
-		   "have unary '%s' operator", opname );
-     } else {
-	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
-	 compiler_push_typed_expression( compiler, new_tnode_ref( px ), px );
-	 compiler_check_and_compile_operator( compiler, catch_var_type,
-					   opname, /*arity:*/1,
-					   /*fixup_values:*/ NULL,
-					   px );
-	 compiler_emit( compiler, px, "\n" );
-	 compiler_compile_variable_assignment( compiler, catch_var, px );
-     }
+        cexception_t inner;
+        cexception_guard( inner ) {
+            DNODE *catch_var = vartab_lookup( compiler->vartab, catch_ident );
+            TNODE *catch_var_type = catch_var ? dnode_type( catch_var ) : NULL;
+
+            if( !catch_var_type ||
+                !compiler_lookup_operator( compiler, catch_var_type, opname, 1, &inner )) {
+                yyerrorf( "type of variable in a 'catch' clause must "
+                          "have unary '%s' operator", opname );
+            } else {
+                compiler_emit( compiler, &inner, "\n\tce\n", PLD, &try_var_offset );
+                compiler_push_typed_expression( compiler,
+                                                new_tnode_ref( &inner ),
+                                                &inner );
+                compiler_check_and_compile_operator( compiler, catch_var_type,
+                                                     opname, /*arity:*/1,
+                                                     /*fixup_values:*/ NULL,
+                                                     &inner );
+                compiler_emit( compiler, &inner, "\n" );
+                compiler_compile_variable_assignment( compiler, catch_var, &inner );
+            }
+        }
+        cexception_catch {
+            freex( catch_ident );
+            cexception_reraise( inner, px );
+        }
+        freex( catch_ident );
     }
   ;
 
