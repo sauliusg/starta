@@ -9836,29 +9836,69 @@ catch_variable_list
 exception_identifier_list
   : __IDENTIFIER
     {
-      compiler_emit_catch_comparison( compiler, NULL, $1, px );
-      $$ = 0;
+        char *volatile ident =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_emit_catch_comparison( compiler, NULL, ident, &inner );
+        }
+        cexception_catch {
+            freex( ident );
+            cexception_reraise( inner, px );
+        }
+        freex( ident );
+        $$ = 0;
     }
   | module_list __COLON_COLON __IDENTIFIER
     {
-      compiler_emit_catch_comparison( compiler, $1, $3, px );
-      $$ = 0;
+        char *volatile ident =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_emit_catch_comparison( compiler, $1, ident, &inner );
+        }
+        cexception_catch {
+            freex( ident );
+            cexception_reraise( inner, px );
+        }
+        freex( ident );
+        $$ = 0;
     }
   | exception_identifier_list ',' __IDENTIFIER
     {
-      ssize_t zero = 0;
-      compiler_push_relative_fixup( compiler, px );
-      compiler_emit( compiler, px, "\tce\n", BJNZ, &zero );
-      compiler_emit_catch_comparison( compiler, NULL, $3, px );
-      $$ = $1 + 1;
+        ssize_t zero = 0;
+        char *volatile ident =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_push_relative_fixup( compiler, &inner );
+            compiler_emit( compiler, &inner, "\tce\n", BJNZ, &zero );
+            compiler_emit_catch_comparison( compiler, NULL, ident, &inner );
+        }
+        cexception_catch {
+            freex( ident );
+            cexception_reraise( inner, px );
+        }
+        freex( ident );
+        $$ = $1 + 1;
     }
   | exception_identifier_list ',' module_list __COLON_COLON __IDENTIFIER
     {
       ssize_t zero = 0;
-      compiler_push_relative_fixup( compiler, px );
-      compiler_emit( compiler, px, "\tce\n", BJNZ, &zero );
-      compiler_emit_catch_comparison( compiler, $3, $5, px );
-      $$ = $1 + 1;
+        char *volatile ident =
+            obtain_string_from_strpool( compiler->strpool, $5 );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_push_relative_fixup( compiler, &inner );
+            compiler_emit( compiler, &inner, "\tce\n", BJNZ, &zero );
+            compiler_emit_catch_comparison( compiler, $3, ident, &inner );
+        }
+        cexception_catch {
+            freex( ident );
+            cexception_reraise( inner, px );
+        }
+        freex( ident );
+        $$ = $1 + 1;
     }
   ;
 
