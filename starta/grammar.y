@@ -8300,56 +8300,79 @@ pragma_statement
 
 | _PRAGMA __IDENTIFIER constant_expression
    {
-       if( const_value_type( &$3 ) == VT_INTMAX ) {
-           long ival = const_value_integer( &$3 );
-           compiler_set_integer_pragma( compiler, $2, ival );
-       } else {
-           char *sval = const_value_string( &$3 );
-           compiler_set_string_pragma( compiler, $2, sval, px );
+       char *volatile pragma_name =
+           obtain_string_from_strpool( compiler->strpool, $2 );
+
+       cexception_t inner;
+       cexception_guard( inner ) {
+           if( const_value_type( &$3 ) == VT_INTMAX ) {
+               long ival = const_value_integer( &$3 );
+               compiler_set_integer_pragma( compiler, pragma_name, ival );
+           } else {
+               char *sval = const_value_string( &$3 );
+               compiler_set_string_pragma( compiler, pragma_name,
+                                           sval, &inner );
+           }
        }
+       cexception_catch {
+           freex( pragma_name );
+           cexception_reraise( inner, px );
+       }
+       freex( pragma_name );
    }
 
 | _PRAGMA __IDENTIFIER _CONST type_identifier
    {
-       TNODE *default_type = $4;
-       char *type_kind_name = $2;
+       TNODE *volatile default_type = $4;
+       char *volatile type_kind_name =
+           obtain_string_from_strpool( compiler->strpool, $2 );
 
-       if( default_type ) {
-           if( type_kind_name && strcmp( type_kind_name, "integer" ) == 0 ) {
-               typetab_override_suffix( compiler->typetab, /*name*/ "",
-                                        TS_INTEGER_SUFFIX,
-                                        share_tnode( default_type ),
-                                        px );
-           } else if( type_kind_name && 
-                      strcmp( type_kind_name, "real" ) == 0 ) {
-               typetab_override_suffix( compiler->typetab, /*name*/ "",
-                                        TS_FLOAT_SUFFIX, 
-                                        share_tnode( default_type ),
-                                        px );
-           } else {
-               yyerror( "only \"integer\" and \"real\" constant kinds "
-                        "can be assigned to default types by this pragma" );
+       cexception_t inner;
+       cexception_guard( inner ) {
+           if( default_type ) {
+               if( type_kind_name && strcmp( type_kind_name, "integer" ) == 0 ) {
+                   typetab_override_suffix( compiler->typetab, /*name*/ "",
+                                            TS_INTEGER_SUFFIX,
+                                            share_tnode( default_type ),
+                                            &inner );
+               } else if( type_kind_name && 
+                          strcmp( type_kind_name, "real" ) == 0 ) {
+                   typetab_override_suffix( compiler->typetab, /*name*/ "",
+                                            TS_FLOAT_SUFFIX, 
+                                            share_tnode( default_type ),
+                                            &inner );
+               } else {
+                   yyerror( "only \"integer\" and \"real\" constant kinds "
+                            "can be assigned to default types by this pragma" );
+               }
            }
        }
+       cexception_catch {
+           freex( type_kind_name );
+           cexception_reraise( inner, px );
+       }
+       freex( type_kind_name );
    }
 ;
 
 opt_identifier
 : __IDENTIFIER
-| { $$ = ""; }
+| { $$ = strpool_add_string( compiler->strpool, "", px ); }
 ;
 
 program_header
   :  _PROGRAM opt_identifier '(' argument_list ')' opt_retval_description_list
         {
 	  cexception_t inner;
+          char *volatile program_name =
+              obtain_string_from_strpool( compiler->strpool, $2 );
 	  DNODE *volatile funct = NULL;
           DNODE *retvals = $6;
           TNODE *retval_type = retvals ? dnode_type( retvals ) : NULL;
           ssize_t program_addr;
 
     	  cexception_guard( inner ) {
-	      $$ = funct = new_dnode_function( $2, $4, $6, &inner );
+	      $$ = funct = new_dnode_function( program_name, $4, $6, &inner );
 	      funct = $$ =
 		  compiler_check_and_set_fn_proto( compiler, funct, &inner );
 
@@ -8375,12 +8398,14 @@ program_header
               }
 	  }
 	  cexception_catch {
+              freex( program_name );
 	      delete_dnode( $4 );
 	      delete_dnode( $6 );
 	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );
 	  }
+          freex( program_name );
 	}
 ;
 
@@ -8394,35 +8419,47 @@ program_definition
 module_list
 : __IDENTIFIER
 {
+    char *module_name =
+        obtain_string_from_strpool( compiler->strpool, $1 );
     DNODE *module;
-    module = vartab_lookup( compiler->vartab, $1 );
+    module = vartab_lookup( compiler->vartab, module_name );
     if( !module ) {
         yyerrorf( "module '%s' is not available in the current scope", $1 );
     }
     $$ = module;
+    freex( module_name );
 }
 | module_list __COLON_COLON __IDENTIFIER
 {
     DNODE *container = $1;
     DNODE *module = NULL;
+    char *module_name =
+        obtain_string_from_strpool( compiler->strpool, $3 );
     if( container ) {
-        module = dnode_vartab_lookup_var( container, $3 );
+        module = dnode_vartab_lookup_var( container, module_name );
         if( !module ) {
             yyerrorf( "module '%s' is not available in as a submodule", $3 );
         }
     }
     $$ = module;
+    freex( module_name );
 }
 ;
 
 variable_access_identifier
   : __IDENTIFIER
      {
-	 $$ = compiler_lookup_dnode( compiler, NULL, $1, "variable" );
+         char *ident =
+             obtain_string_from_strpool( compiler->strpool, $1 );
+	 $$ = compiler_lookup_dnode( compiler, NULL, ident, "variable" );
+         freex( ident );
      }
   | module_list __COLON_COLON __IDENTIFIER
      {
-	 $$ = compiler_lookup_dnode( compiler, $1, $3, "variable" );
+         char *ident =
+             obtain_string_from_strpool( compiler->strpool, $3 );
+	 $$ = compiler_lookup_dnode( compiler, $1, ident, "variable" );
+         freex( ident );
      }
   ;
 
@@ -8868,7 +8905,7 @@ opt_label
   : __IDENTIFIER ':'
       { $$ = $1; }
   |
-      { $$ = NULL; }
+      { $$ = -1; }
   ;
 
 if_condition
@@ -9056,12 +9093,23 @@ control_statement
   | opt_label _WHILE
       {
 	  ssize_t zero = 0;
-          compiler_begin_subscope( compiler, px );
-	  compiler_push_loop( compiler, $1, 0, px );
-          compiler_push_relative_fixup( compiler, px );
-	  compiler_emit( compiler, px, "\tce\n", JMP, &zero );
-	  compiler_push_current_address( compiler, px );
-	  compiler_push_thrcode( compiler, px );
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              compiler_begin_subscope( compiler, &inner );
+              compiler_push_loop( compiler, loop_label, 0, &inner );
+              compiler_push_relative_fixup( compiler, &inner );
+              compiler_emit( compiler, &inner, "\tce\n", JMP, &zero );
+              compiler_push_current_address( compiler, &inner );
+              compiler_push_thrcode( compiler, &inner );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
       }
     condition
       {
@@ -9080,8 +9128,19 @@ control_statement
 
   | labeled_for '(' statement ';'
       {
-        compiler_push_loop( compiler, $1, 0, px );
-	compiler_push_thrcode( compiler, px );
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              compiler_push_loop( compiler, loop_label, 0, &inner );
+              compiler_push_thrcode( compiler, &inner );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
       }
     condition ';'
       {
@@ -9113,9 +9172,20 @@ control_statement
 
   | labeled_for lvariable
       {
-        compiler_push_loop( compiler, $1, 2, px );
-	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
-	compiler_compile_dup( compiler, px );
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              compiler_push_loop( compiler, loop_label, 2, &inner );
+              dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+              compiler_compile_dup( compiler, &inner );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
       }
     '=' expression
       {
@@ -9152,12 +9222,23 @@ control_statement
 
   | labeled_for variable_declaration_keyword for_variable_declaration
       {
-	int readonly = $2;
-	if( readonly ) {
-	    dnode_set_flags( $3, DF_IS_READONLY );
-	}
-	compiler_push_loop( compiler, $1, 2, px );
-	dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          char *volatile loop_label =
+              obtain_string_from_strpool( compiler->strpool, $1 );
+          int readonly = $2;
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              if( readonly ) {
+                  dnode_set_flags( $3, DF_IS_READONLY );
+              }
+              compiler_push_loop( compiler, loop_label, 2, &inner );
+              dnode_set_flags( compiler->loops, DF_LOOP_HAS_VAL );
+          }
+          cexception_catch {
+              freex( loop_label );
+              cexception_reraise( inner, px );
+          }
+          freex( loop_label );
       }
     '=' expression
       {
