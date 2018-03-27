@@ -9996,19 +9996,35 @@ undelimited_or_structure_description
 type_identifier
   : __IDENTIFIER
      {
-	 $$ = compiler_lookup_tnode( compiler, NULL, $1, "type" );
+         char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
+	 $$ = compiler_lookup_tnode( compiler, NULL, ident, "type" );
+         freex( ident );
      }
   | __IDENTIFIER _UNITS ':' __STRING_CONST
      {
-	 $$ = compiler_lookup_tnode( compiler, NULL, $1, "type" );
+         char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
+         char *units = obtain_string_from_strpool( compiler->strpool, $4 );
+
+	 $$ = compiler_lookup_tnode( compiler, NULL, ident, "type" );
+
+         freex( units );
+         freex( ident );
      }
   | module_list __COLON_COLON __IDENTIFIER
      {
-	 $$ = compiler_lookup_tnode( compiler, $1, $3, "type" );
+         char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+	 $$ = compiler_lookup_tnode( compiler, $1, ident, "type" );
+         freex( ident );
      }
   | module_list __COLON_COLON __IDENTIFIER _UNITS ':' __STRING_CONST
      {
-	 $$ = compiler_lookup_tnode( compiler, $1, $3, "type" );
+         char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+         char *units = obtain_string_from_strpool( compiler->strpool, $6 );
+
+	 $$ = compiler_lookup_tnode( compiler, $1, ident, "type" );
+
+         freex( units );
+         freex( ident );
      }
   ;
 
@@ -10080,12 +10096,22 @@ delimited_type_description
 
   | _TYPE __IDENTIFIER
     {
-	char *type_name = $2;
+	char *volatile type_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
 	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
-	if( !tnode ) {
-	    tnode = new_tnode_placeholder( type_name, px );
-	    typetab_insert( compiler->typetab, type_name, tnode, px );
-	}
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( !tnode ) {
+                tnode = new_tnode_placeholder( type_name, &inner );
+                typetab_insert( compiler->typetab, type_name, tnode, &inner );
+            }
+        }
+        cexception_catch {
+            freex( type_name );
+            cexception_reraise( inner, px );
+        }
+        freex( type_name );
 	$$ = share_tnode( tnode );
     }
 
