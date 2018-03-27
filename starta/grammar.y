@@ -10265,17 +10265,28 @@ undelimited_type_description
 
   | _ENUM __IDENTIFIER '(' enum_member_list ')'
     {
-      TNODE *enum_implementing_type = typetab_lookup( compiler->typetab, $2 );
-      ssize_t tsize = enum_implementing_type ?
-	  tnode_size( enum_implementing_type ) : 0;
+        char *volatile enum_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
 
-      if( compiler->current_type &&
-	      tnode_is_forward( compiler->current_type )) {
-	  tnode_set_kind( compiler->current_type, TK_ENUM );
-	  tnode_set_size( compiler->current_type, tsize );
-      }
-      $$ = tnode_finish_enum( $4, NULL, enum_implementing_type, px );
-      compiler_check_enum_attributes( $$ );
+        TNODE *enum_implementing_type = typetab_lookup( compiler->typetab, enum_name );
+        ssize_t tsize = enum_implementing_type ?
+            tnode_size( enum_implementing_type ) : 0;
+
+        if( compiler->current_type &&
+            tnode_is_forward( compiler->current_type )) {
+            tnode_set_kind( compiler->current_type, TK_ENUM );
+            tnode_set_size( compiler->current_type, tsize );
+        }
+        cexception_t inner;
+        cexception_guard( inner ) {
+            $$ = tnode_finish_enum( $4, NULL, enum_implementing_type, &inner );
+        }
+        cexception_catch {
+            freex( enum_name );
+            cexception_reraise( inner, px );
+        }
+        freex( enum_name );
+        compiler_check_enum_attributes( $$ );
     }
 
   | '(' __THREE_DOTS ',' enum_member_list ')'
@@ -10306,12 +10317,18 @@ enum_member_list
 enum_member
   : __IDENTIFIER
     {
-	$$ = new_dnode_name( $1, px );
+        char *member_name =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+	$$ = new_dnode_name( member_name, px );
+        freex( member_name );
     }
   | __IDENTIFIER '=' constant_integer_expression
     {
-	$$ = new_dnode_name( $1, px );
+        char *member_name =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+	$$ = new_dnode_name( member_name, px );
 	dnode_set_offset( $$, $3 );
+        freex( member_name );
     }
   | __THREE_DOTS
     {
@@ -10524,11 +10541,15 @@ size_constant
     }
   | _SIZEOF _NATIVE __STRING_CONST
     {
-      $$ = compiler_native_type_size( $3 );
+        char *size_str = obtain_string_from_strpool( compiler->strpool, $3 );
+        $$ = compiler_native_type_size( size_str );
+        freex( size_str );
     }
   | _NATIVE __STRING_CONST /* _REF */ '*'
     {
-      $$ = compiler_native_type_nreferences( $2 );
+        char *size_str = obtain_string_from_strpool( compiler->strpool, $2 );
+        $$ = compiler_native_type_nreferences( size_str );
+        freex( size_str );
     }
   ;
 
