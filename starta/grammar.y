@@ -11295,23 +11295,25 @@ bytecode_constant
 
   | __DOUBLE_PERCENT __IDENTIFIER
       {
-	static const ssize_t zero = 0;
-	if( !compiler->current_function ) {
-	    yyerrorf( "type attribute '%%%%%s' is not available here "
-		      "(are you compiling a function or operator?)", $2 );
-	} else {
-            if( implementation_has_attribute( $2 )) {
-                compiler_emit( compiler, px, "\te\n", &zero );
-                
-                FIXUP *type_attribute_fixup =
-                    new_fixup_absolute
-                    ( $2, thrcode_length( compiler->thrcode ) - 1,
-                      NULL /* next */, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+          static const ssize_t zero = 0;
+          if( !compiler->current_function ) {
+              yyerrorf( "type attribute '%%%%%s' is not available here "
+                        "(are you compiling a function or operator?)", ident );
+          } else {
+              if( implementation_has_attribute( ident )) {
+                  compiler_emit( compiler, px, "\te\n", &zero );
 
-                dnode_insert_code_fixup( compiler->current_function,
-                                         type_attribute_fixup );
-            }
-        }
+                  FIXUP *type_attribute_fixup =
+                      new_fixup_absolute
+                      ( ident, thrcode_length( compiler->thrcode ) - 1,
+                        NULL /* next */, px );
+
+                  dnode_insert_code_fixup( compiler->current_function,
+                                           type_attribute_fixup );
+              }
+          }
+          freex( ident );
       }
 
   | _CONST '(' constant_expression ')'
@@ -11340,11 +11342,15 @@ bytecode_constant
 function_identifier
   : __IDENTIFIER
 	{
-	    compiler_check_and_push_function_name( compiler, NULL, $1, px );
+            char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
+	    compiler_check_and_push_function_name( compiler, NULL, ident, px );
+            freex( ident );
 	}
   | module_list __COLON_COLON __IDENTIFIER
 	{
-	    compiler_check_and_push_function_name( compiler, $1, $3, px );
+            char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+	    compiler_check_and_push_function_name( compiler, $1, ident, px );
+            freex( ident );
 	}
   ;
 
