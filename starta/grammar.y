@@ -11240,44 +11240,57 @@ opcode
 
 variable_reference
   : '%' __IDENTIFIER
-      { 
-         DNODE *varnode = vartab_lookup( compiler->vartab, $2 );
-	 if( varnode ) {
-	     ssize_t var_offset = dnode_offset( varnode );
-             compiler_emit( compiler, px, "\teN\n", &var_offset, $2 );
-	 } else {
-	     yyerrorf( "name '%s' not declared in the current scope", $2 );
-	 }
+      {
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+          DNODE *varnode = vartab_lookup( compiler->vartab, ident );
+          if( varnode ) {
+              ssize_t var_offset = dnode_offset( varnode );
+              compiler_emit( compiler, px, "\teN\n", &var_offset, ident );
+          } else {
+              yyerrorf( "name '%s' not declared in the current scope", ident );
+          }
+          freex( ident );
       }
   ;
 
 bytecode_constant
   : __INTEGER_CONST
       {
-	  ssize_t val = atol( $1 );
+          char *int_str = obtain_string_from_strpool( compiler->strpool, $1 );
+	  ssize_t val = atol( int_str );
 	  compiler_emit( compiler, px, "\te\n", &val );
+          freex( int_str );
       }
   | '+' __INTEGER_CONST
       {
-	  ssize_t val = atol( $2 );
+          char *int_str = obtain_string_from_strpool( compiler->strpool, $2 );
+	  ssize_t val = atol( int_str );
 	  compiler_emit( compiler, px, "\te\n", &val );
+          freex( int_str );
       }
   | '-' __INTEGER_CONST
       {
-	  ssize_t val = -atol( $2 );
+          char *int_str = obtain_string_from_strpool( compiler->strpool, $2 );
+	  ssize_t val = -atol( int_str );
 	  compiler_emit( compiler, px, "\te\n", &val );
+          freex( int_str );
       }
   | __REAL_CONST
       {
-	double val;
-	sscanf( $1, "%lf", &val );
-        compiler_emit( compiler, px, "\tf\n", val );
+          char *real_str = obtain_string_from_strpool( compiler->strpool, $1 );
+          double val;
+          sscanf( real_str, "%lf", &val );
+          compiler_emit( compiler, px, "\tf\n", val );
+          freex( real_str );
       }
   | __STRING_CONST
       {
-	ssize_t string_offset;
-	string_offset = compiler_assemble_static_string( compiler, $1, px );
-        compiler_emit( compiler, px, "\te\n", &string_offset );
+          char *strvalue = obtain_string_from_strpool( compiler->strpool, $1 );
+          ssize_t string_offset;
+          string_offset =
+              compiler_assemble_static_string( compiler, strvalue, px );
+          compiler_emit( compiler, px, "\te\n", &string_offset );
+          freex( strvalue );
       }
 
   | __DOUBLE_PERCENT __IDENTIFIER
