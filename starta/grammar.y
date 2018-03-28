@@ -11710,7 +11710,8 @@ actual_argument_list
       }
   | __IDENTIFIER 
       {
-          char *argument_name = $1;
+          char *argument_name =
+              obtain_string_from_strpool( compiler->strpool, $1 );
           TNODE *current_function_type =
               compiler->current_call ?
               dnode_type( compiler->current_call ) : NULL;
@@ -11725,6 +11726,7 @@ actual_argument_list
               yyerrorf( "function '%s' does not have argument '%s'",
                         function_name, argument_name );
           }
+          freex( argument_name );
       }
    __THICK_ARROW expression
       {
@@ -11736,7 +11738,9 @@ actual_argument_list
       }
   | actual_argument_list ',' __IDENTIFIER
       {
-	  compiler_emit_default_arguments( compiler, $3, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+	  compiler_emit_default_arguments( compiler, ident, px );
+          freex( ident );
       }
     __THICK_ARROW expression
       {
