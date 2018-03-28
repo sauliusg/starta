@@ -12854,13 +12854,17 @@ field_initialiser
      {
 	 DNODE *field;
          TNODE *field_type;
+         char *field_identifier =
+             obtain_string_from_strpool( compiler->strpool, $1 );
 
 	 compiler_compile_dup( compiler, px );
-	 field = compiler_make_stack_top_field_type( compiler, $1 );
+	 field = compiler_make_stack_top_field_type( compiler,
+                                                     field_identifier );
          field_type = field ? dnode_type( field ) : NULL;
 	 compiler_make_stack_top_addressof( compiler, px );
 
-         if( !vartab_lookup( compiler->initialised_references, $1 ) &&
+         if( !vartab_lookup( compiler->initialised_references,
+                             field_identifier ) &&
              field_type && tnode_is_non_null_reference( field_type )) {
              vartab_insert_named( compiler->initialised_references,
                                   share_dnode( field ), px );
@@ -12870,6 +12874,7 @@ field_initialiser
 	     ssize_t field_offset = dnode_offset( field );
 	     compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
 	 }
+         freex( field_identifier );
      }
     field_initialiser_separator expression
      {
@@ -12967,13 +12972,17 @@ arithmetic_expression
 
   | expression '@' __IDENTIFIER
       {
-       compiler_compile_named_type_conversion( compiler, /*target_name*/$3, px );
+          char *target_name =
+              obtain_string_from_strpool( compiler->strpool, $3 );
+          compiler_compile_named_type_conversion( compiler, target_name, px );
+          freex( target_name );
       }
 
   | expression '@' module_list __COLON_COLON __IDENTIFIER
       {
           DNODE *module = $3;
-          char *target_name = $5;
+          char *target_name =
+              obtain_string_from_strpool( compiler->strpool, $5 );
           TNODE *target_type = NULL;
 
           if( module ) {
@@ -12982,6 +12991,7 @@ arithmetic_expression
 
           compiler_compile_type_conversion( compiler, target_type, 
                                             target_name, px );
+          freex( target_name );
       }
 
   | expression '@' '(' var_type_description ')'
