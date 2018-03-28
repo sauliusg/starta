@@ -11101,8 +11101,10 @@ assignment_statement
 
   | __IDENTIFIER ',' 
       {
-	  compiler_push_varaddr_expr( compiler, $1, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
+	  compiler_push_varaddr_expr( compiler, ident, px );
 	  compiler_push_thrcode( compiler, px );
+          freex( ident );
       }
     lvalue_list '=' multivalue_expression_list
       {
@@ -11126,9 +11128,11 @@ assignment_statement
 	  compiler_compile_load_variable_value( compiler, $1, px );
       }
     __ARITHM_ASSIGN expression
-      { 
-	compiler_compile_binop( compiler, $3, px );
-	compiler_compile_store_variable( compiler, $1, px );
+      {
+          char *opname = obtain_string_from_strpool( compiler->strpool, $3 );
+          compiler_compile_binop( compiler, opname, px );
+          compiler_compile_store_variable( compiler, $1, px );
+          freex( opname );
       }
   | lvalue
       {
@@ -11137,8 +11141,10 @@ assignment_statement
       }
     __ARITHM_ASSIGN expression
       { 
-	  compiler_compile_binop( compiler, $3, px );
+          char *opname = obtain_string_from_strpool( compiler->strpool, $3 );
+	  compiler_compile_binop( compiler, opname, px );
 	  compiler_compile_sti( compiler, px );
+          freex( opname );
       }
 
   | lvalue
