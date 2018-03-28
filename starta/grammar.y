@@ -10737,16 +10737,20 @@ undelimited_type_declaration
 type_of_type_declaration
   : _TYPE __IDENTIFIER _OF __IDENTIFIER '='
       {
+        char *volatile type_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
+        char *volatile element_name =
+            obtain_string_from_strpool( compiler->strpool, $4 );
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
 	cexception_guard( inner ) {
-	    base = new_tnode_placeholder( $4, &inner );
-	    tnode = new_tnode_composite( $2, base, &inner );
+	    base = new_tnode_placeholder( element_name, &inner );
+	    tnode = new_tnode_composite( type_name, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
 	    compiler_typetab_insert( compiler, tnode, &inner );
-	    tnode = typetab_lookup( compiler->typetab, $2 );
+	    tnode = typetab_lookup( compiler->typetab, type_name );
 	    compiler_push_current_type( compiler, share_tnode( tnode ),
                                         &inner );
 	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
@@ -10755,8 +10759,12 @@ type_of_type_declaration
 	cexception_catch {
 	    delete_tnode( base );
 	    delete_tnode( tnode );
+            freex( type_name );
+            freex( element_name );
 	    cexception_reraise( inner, px );
 	}
+        freex( type_name );
+        freex( element_name );
       }
     undelimited_type_description
       {
@@ -10767,16 +10775,20 @@ type_of_type_declaration
 
   |  _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
       {
+        char *volatile type_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
+        char *volatile element_name =
+            obtain_string_from_strpool( compiler->strpool, $4 );
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
 	cexception_guard( inner ) {
-	    base = new_tnode_placeholder( $4, &inner );
-	    tnode = new_tnode_composite( $2, base, &inner );
+	    base = new_tnode_placeholder( element_name, &inner );
+	    tnode = new_tnode_composite( type_name, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
 	    compiler_typetab_insert( compiler, tnode, &inner );
-	    tnode = typetab_lookup( compiler->typetab, $2 );
+	    tnode = typetab_lookup( compiler->typetab, type_name );
 	    compiler_push_current_type( compiler, share_tnode( tnode ),
                                         &inner );
 	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
@@ -10785,8 +10797,12 @@ type_of_type_declaration
 	cexception_catch {
 	    delete_tnode( base );
 	    delete_tnode( tnode );
+            freex( type_name );
+            freex( element_name );
 	    cexception_reraise( inner, px );
 	}
+        freex( type_name );
+        freex( element_name );
       }
       struct_or_class_body
       {
@@ -10800,16 +10816,20 @@ type_of_type_declaration
 
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator
       {
+        char *volatile type_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
+        char *volatile element_name =
+            obtain_string_from_strpool( compiler->strpool, $4 );
 	TNODE * volatile base = NULL;
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
 	cexception_guard( inner ) {
-	    base = new_tnode_placeholder( $4, &inner );
-	    tnode = new_tnode_composite( $2, base, &inner );
+	    base = new_tnode_placeholder( element_name, &inner );
+	    tnode = new_tnode_composite( type_name, base, &inner );
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
 	    compiler_typetab_insert( compiler, tnode, &inner );
-	    tnode = typetab_lookup( compiler->typetab, $2 );
+	    tnode = typetab_lookup( compiler->typetab, type_name );
 	    compiler->current_type = tnode;
 	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
 	    compiler_begin_scope( compiler, &inner );
@@ -10817,8 +10837,12 @@ type_of_type_declaration
 	cexception_catch {
 	    delete_tnode( base );
 	    delete_tnode( tnode );
+            freex( type_name );
+            freex( element_name );
 	    cexception_reraise( inner, px );
 	}
+        freex( type_name );
+        freex( element_name );
       }
     struct_or_class_body
       {
