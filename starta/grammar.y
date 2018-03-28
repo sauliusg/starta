@@ -11918,7 +11918,7 @@ opt_closure_initialisation_list
 }
 | /* empty */
 {
-    $$ = NULL;
+    $$ = -1;
 }
 ;
 
@@ -12247,9 +12247,11 @@ closure_header
       }
       opt_closure_initialisation_list
       {
+          char *closure_name =
+              obtain_string_from_strpool( compiler->strpool, $8 );
           DNODE *parameters = $4;
           DNODE *return_values = $6;
-          DNODE *self_dnode = new_dnode_name( $8, px );
+          DNODE *self_dnode = new_dnode_name( closure_name, px );
           ENODE *closure_expr = compiler->e_stack;
           TNODE *closure_type = enode_type( closure_expr );
 
@@ -12271,6 +12273,7 @@ closure_header
           $$ = new_dnode_function( /* name = */ NULL, 
                                    parameters, return_values, px );
           tnode_set_kind( dnode_type( $$ ), TK_CLOSURE );
+          freex( closure_name );
     }
 ;
 
