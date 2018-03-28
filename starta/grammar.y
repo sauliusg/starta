@@ -10626,7 +10626,8 @@ type_declaration_name
 type_declaration_start
   : _TYPE type_declaration_name
       {
-	TNODE *old_tnode = typetab_lookup_silently( compiler->typetab, $2 );
+        char *type_name = obtain_string_from_strpool( compiler->strpool, $2 );
+	TNODE *old_tnode = typetab_lookup_silently( compiler->typetab, type_name );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
@@ -10637,6 +10638,7 @@ type_declaration_start
 	assert( !compiler->current_type );
 	compiler_push_current_type( compiler, share_tnode( tnode ), px );
 	compiler_begin_scope( compiler, px );
+        freex( type_name );
       }
 ;
 
