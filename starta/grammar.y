@@ -10556,45 +10556,40 @@ size_constant
 type_attribute
   : __IDENTIFIER
     {
-        char *volatile attribute =
-            obtain_string_from_strpool( compiler->strpool, $1 );
-
-        cexception_t inner;
-        cexception_guard( inner ) {
-            $$ = new_anode_integer_attribute( attribute, 1, &inner );
-        }
-        cexception_catch {
-            freex( attribute );
-            cexception_reraise( inner, px );
-        }
+        char *attribute = obtain_string_from_strpool( compiler->strpool, $1 );
+        $$ = new_anode_integer_attribute( attribute, 1, px );
         freex( attribute );
     }
   | __IDENTIFIER '=' __INTEGER_CONST
     {
-        char *volatile attribute =
-            obtain_string_from_strpool( compiler->strpool, $1 );
-        char *volatile value =
-            obtain_string_from_strpool( compiler->strpool, $3 );
-
-        cexception_t inner;
-        cexception_guard( inner ) {
-            $$ = new_anode_integer_attribute( attribute, atol( value ),
-                                              &inner );
-        }
-        cexception_catch {
-            freex( attribute );
-            freex( value );
-            cexception_reraise( inner, px );
-        }
+        char *attribute = obtain_string_from_strpool( compiler->strpool, $1 );
+        char *value = obtain_string_from_strpool( compiler->strpool, $3 );
+        $$ = new_anode_integer_attribute( attribute, atol( value ), px );
         freex( attribute );
         freex( value );
     }
   | __IDENTIFIER '=' size_constant
-    { $$ = new_anode_integer_attribute( $1, $3, px ); }
+    {
+        char *attribute = obtain_string_from_strpool( compiler->strpool, $1 );
+        $$ = new_anode_integer_attribute( attribute, $3, px );
+        freex( attribute );
+    }
   | __IDENTIFIER '=' __IDENTIFIER
-    { $$ = new_anode_string_attribute( $1, $3, px ); }
+    {
+        char *attribute = obtain_string_from_strpool( compiler->strpool, $1 );
+        char *value = obtain_string_from_strpool( compiler->strpool, $3 );
+        $$ = new_anode_string_attribute( attribute, value, px );
+        freex( attribute );
+        freex( value );
+    }
   | __IDENTIFIER '=' __STRING_CONST
-    { $$ = new_anode_string_attribute( $1, $3, px ); }
+    {
+        char *attribute = obtain_string_from_strpool( compiler->strpool, $1 );
+        char *value = obtain_string_from_strpool( compiler->strpool, $3 );
+        $$ = new_anode_string_attribute( attribute, value, px );
+        freex( attribute );
+        freex( value );
+    }
   ;
 
 dimension_list
@@ -10616,16 +10611,16 @@ type_declaration_name
     { $$ = $1; }
 
   | _STRUCT
-    { $$ = "struct"; }
+    { $$ = strpool_add_string( compiler->strpool, "struct", px); }
 
   | _ARRAY
-    { $$ = "array"; }
+    { $$ = strpool_add_string( compiler->strpool, "array", px ); }
 
   | _PROCEDURE
-    { $$ = "procedure"; }
+    { $$ = strpool_add_string( compiler->strpool, "procedure", px ); }
 
   | _BLOB
-    { $$ = "blob"; }
+    { $$ = strpool_add_string( compiler->strpool, "blob", px ); }
 ;
 
 type_declaration_start
