@@ -10858,11 +10858,13 @@ type_of_type_declaration
 struct_declaration
   : opt_null_type_designator _STRUCT __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
+        char *struct_name =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, struct_name );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_struct( $3, px );
+	    TNODE *tnode = new_tnode_forward_struct( struct_name, px );
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
@@ -10874,10 +10876,11 @@ struct_declaration
                           "has different non-null flag", $3 );
             }
         }
-	tnode = typetab_lookup( compiler->typetab, $3 );
+	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
 	compiler->current_type = tnode;
 	compiler_begin_scope( compiler, px );
+        freex( struct_name );
     }
     struct_or_class_body
     {
@@ -10922,20 +10925,23 @@ struct_declaration
 class_declaration
   : opt_null_type_designator _CLASS __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
+        char *struct_name =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, struct_name );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_class( $3, px );
+	    TNODE *tnode = new_tnode_forward_class( struct_name, px );
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
 	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup( compiler->typetab, $3 );
+	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
 	compiler->current_type = tnode;
 	compiler_begin_scope( compiler, px );
+        freex( struct_name );
     }
     struct_or_class_body
     {
@@ -10967,20 +10973,23 @@ class_declaration
 interface_declaration
   : opt_null_type_designator _INTERFACE __IDENTIFIER
     {
-	TNODE *old_tnode = typetab_lookup( compiler->typetab, $3 );
+        char *struct_name =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+	TNODE *old_tnode = typetab_lookup( compiler->typetab, struct_name );
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_interface( $3, px );
+	    TNODE *tnode = new_tnode_forward_interface( struct_name, px );
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
 	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup( compiler->typetab, $3 );
+	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
 	compiler->current_type = tnode;
 	compiler_begin_scope( compiler, px );
+        freex( struct_name );
     }
     interface_declaration_body
     {
@@ -10994,22 +11003,28 @@ interface_declaration
 forward_struct_declaration
   : opt_null_type_designator _STRUCT __IDENTIFIER
       {
-	  TNODE *tnode = new_tnode_forward_struct( $3, px );
+          char *struct_name =
+              obtain_string_from_strpool( compiler->strpool, $3 );
+	  TNODE *tnode = new_tnode_forward_struct( struct_name, px );
           if( $1 ) {
               tnode_set_flags( tnode, TF_NON_NULL );
           }
 	  compiler_typetab_insert( compiler, tnode, px );
+          freex( struct_name );
       }
 ;
 
 forward_class_declaration
   : opt_null_type_designator _CLASS __IDENTIFIER
       {
-	  TNODE *tnode = new_tnode_forward_class( $3, px );
+          char *struct_name =
+              obtain_string_from_strpool( compiler->strpool, $3 );
+	  TNODE *tnode = new_tnode_forward_class( struct_name, px );
           if( $1 ) {
               tnode_set_flags( tnode, TF_NON_NULL );
           }
 	  compiler_typetab_insert( compiler, tnode, px );
+          freex( struct_name );
       }
 ;
 
