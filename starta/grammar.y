@@ -11058,8 +11058,10 @@ lvalue_list
       }
 | __IDENTIFIER
       {
-	  compiler_push_varaddr_expr( compiler, $1, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
+	  compiler_push_varaddr_expr( compiler, ident, px );
 	  compiler_push_thrcode( compiler, px );
+          freex( ident );
 	  $$ = 1;
       }
 | lvalue_list ',' lvalue
@@ -11069,8 +11071,10 @@ lvalue_list
       }
 | lvalue_list ',' __IDENTIFIER
       {
-	  compiler_push_varaddr_expr( compiler, $3, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+	  compiler_push_varaddr_expr( compiler, ident, px );
 	  compiler_push_thrcode( compiler, px );
+          freex( ident );
 	  $$ = $1 + 1;
       }
 ;
