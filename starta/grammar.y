@@ -13181,7 +13181,8 @@ generator_new
 	  DNODE *constructor_dnode;
           TNODE *constructor_tnode;
           TNODE *type_tnode = $2;
-          char  *constructor_name = $3;
+          char  *constructor_name =
+              obtain_string_from_strpool( compiler->strpool, $3 );
 
           compiler_check_type_contains_non_null_ref( type_tnode );
           compiler_compile_alloc( compiler, share_tnode( type_tnode ), px );
@@ -13208,6 +13209,7 @@ generator_new
           compiler_compile_dup( compiler, px );
 	  compiler_push_guarding_arg( compiler, px );
           compiler_swap_top_expressions( compiler );
+          freex( constructor_name );
 	}
     '(' opt_actual_argument_list ')'
         {
