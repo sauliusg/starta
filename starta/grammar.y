@@ -10631,10 +10631,10 @@ type_declaration_start
 	TNODE *tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
-	    TNODE *tnode = new_tnode_forward( $2, px );
+	    TNODE *tnode = new_tnode_forward( type_name, px );
 	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup_silently( compiler->typetab, $2 );
+	tnode = typetab_lookup_silently( compiler->typetab, type_name );
 	assert( !compiler->current_type );
 	compiler_push_current_type( compiler, share_tnode( tnode ), px );
 	compiler_begin_scope( compiler, px );
