@@ -11430,7 +11430,8 @@ multivalue_function_call
         {
             DNODE *object = $1;
             TNODE *object_type = dnode_type( object );
-            char  *method_name = $3;
+            char  *method_name =
+                obtain_string_from_strpool( compiler->strpool, $3 );
             TNODE *interface_type = $4;
             DNODE *method = NULL;
             int class_has_interface = 1;
@@ -11544,6 +11545,7 @@ multivalue_function_call
 	    }
 	    compiler_push_guarding_arg( compiler, px );
 	    compiler_compile_load_variable_value( compiler, object, px );
+            freex( method_name );
 	}
     '(' opt_actual_argument_list ')'
         {
@@ -11565,7 +11567,8 @@ multivalue_function_call
             ENODE *object_expr = compiler->e_stack;;
             TNODE *object_type =
 		object_expr ? enode_type( object_expr ) : NULL;
-            char  *method_name = $4;
+            char  *method_name =
+                obtain_string_from_strpool( compiler->strpool, $4 );
             TNODE *interface_type = $5;
             DNODE *method = NULL;
             int class_has_interface = 1;
@@ -11670,6 +11673,7 @@ multivalue_function_call
 	    }
             compiler_push_guarding_arg( compiler, px );
             compiler_swap_top_expressions( compiler );
+            freex( method_name );
 	}
     '(' opt_actual_argument_list ')'
         {
