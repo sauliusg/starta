@@ -13125,7 +13125,7 @@ opt_dot_name
   : '.' __IDENTIFIER
   { $$ = $2; }
   | /* empty */
-  { $$ = ""; }
+  { $$ = strpool_add_string( compiler->strpool, "", px ); }
 ;
 
 generator_new
