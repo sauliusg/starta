@@ -10555,9 +10555,40 @@ size_constant
 
 type_attribute
   : __IDENTIFIER
-    { $$ = new_anode_integer_attribute( $1, 1, px ); }
+    {
+        char *volatile attribute =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            $$ = new_anode_integer_attribute( attribute, 1, &inner );
+        }
+        cexception_catch {
+            freex( attribute );
+            cexception_reraise( inner, px );
+        }
+        freex( attribute );
+    }
   | __IDENTIFIER '=' __INTEGER_CONST
-    { $$ = new_anode_integer_attribute( $1, atol( $3 ), px ); }
+    {
+        char *volatile attribute =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+        char *volatile value =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            $$ = new_anode_integer_attribute( attribute, atol( value ),
+                                              &inner );
+        }
+        cexception_catch {
+            freex( attribute );
+            freex( value );
+            cexception_reraise( inner, px );
+        }
+        freex( attribute );
+        freex( value );
+    }
   | __IDENTIFIER '=' size_constant
     { $$ = new_anode_integer_attribute( $1, $3, px ); }
   | __IDENTIFIER '=' __IDENTIFIER
