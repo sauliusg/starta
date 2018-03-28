@@ -13453,32 +13453,36 @@ field_access
   : variable_access_identifier '.' __IDENTIFIER
       {
        DNODE *field;
+       char *field_name = obtain_string_from_strpool( compiler->strpool, $3 );
 
        if( compiler_dnode_is_reference( compiler, $1 )) {
 	   compiler_compile_load_variable_value( compiler, $1, px );
        } else {
            compiler_compile_load_variable_address( compiler, $1, px );
        }
-       field = compiler_make_stack_top_field_type( compiler, $3 );
+       field = compiler_make_stack_top_field_type( compiler, field_name );
        compiler_make_stack_top_addressof( compiler, px );
        if( field && dnode_offset( field ) != 0 ) {
 	   ssize_t field_offset = dnode_offset( field );
 	   compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
        }
+       freex( field_name );
       }
   | lvalue '.' __IDENTIFIER
       {
        DNODE *field;
+       char *field_name = obtain_string_from_strpool( compiler->strpool, $3 );
 
        if( compiler_stack_top_base_is_reference( compiler )) {
 	   compiler_compile_ldi( compiler, px );
        }
-       field = compiler_make_stack_top_field_type( compiler, $3 );
+       field = compiler_make_stack_top_field_type( compiler, field_name );
        compiler_make_stack_top_addressof( compiler, px );
        if( field && dnode_offset( field ) != 0 ) {
 	   ssize_t field_offset = dnode_offset( field );
 	   compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
        }
+       freex( field_name );
       }
   ;
 
