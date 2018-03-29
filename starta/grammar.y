@@ -7880,7 +7880,10 @@ module_argument
         char *volatile string = obtain_string_from_strpool( compiler->strpool, $1 );
         cexception_t inner;
         cexception_guard( inner ) {
+            /* cval now takes ownership of the string, no need to free
+               it later: */
             const_value_t cval = make_const_value( &inner, VT_STRING, string );
+            string = NULL;
             $$ = new_dnode_constant( /* name */ NULL, &cval, &inner );
         }
         cexception_catch {
@@ -8071,11 +8074,11 @@ selective_use_statement
            }
            cexception_catch {
                freex( module_name );
-               delete_dnode( imported_identifiers );
+               // delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           delete_dnode( imported_identifiers );
+           // delete_dnode( imported_identifiers );
        }
    | _IMPORT _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
@@ -8091,11 +8094,11 @@ selective_use_statement
            }
            cexception_catch {
                freex( module_name );
-               delete_dnode( imported_identifiers );
+               // delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           delete_dnode( imported_identifiers );
+           // delete_dnode( imported_identifiers );
        }
 
    | _USE _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
@@ -8155,11 +8158,11 @@ selective_use_statement
            }
            cexception_catch {
                freex( module_name );
-               delete_dnode( imported_identifiers );
+               // delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           delete_dnode( imported_identifiers );
+           // delete_dnode( imported_identifiers );
        }
    | _IMPORT _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
@@ -8175,11 +8178,11 @@ selective_use_statement
            }
            cexception_catch {
                freex( module_name );
-               delete_dnode( imported_identifiers );
+               // delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           delete_dnode( imported_identifiers );
+           // delete_dnode( imported_identifiers );
        }
 
    | _USE function_or_procedure identifier_list
