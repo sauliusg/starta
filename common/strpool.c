@@ -9,6 +9,7 @@
 #include <strpool.h>
 
 /* uses: */
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <allocx.h>
@@ -163,5 +164,26 @@ char *strpool_get_string( STRPOOL *p, ssize_t index )
         return NULL;
     } else {
         return p->pool[index].str;
+    }
+}
+
+static int is_free( STRPOOL *p, int i )
+{
+    int j = p->next_free;
+    while( j >= 0 ) {
+        if( i == j ) {
+            return 1;
+        }
+        j = p->pool[j].next;
+    }
+    return 0;
+}
+
+void strpool_print_strings( STRPOOL *p )
+{
+    for( int i = 0; i < p->pool_length; i++ ) {
+        if( !is_free( p, i )) {
+            printf( "%d: \"%s\"\n", i, p->pool[i].str );
+        }
     }
 }
