@@ -342,7 +342,9 @@ static void delete_compiler( COMPILER *c )
         delete_dnode( c->requested_module );
 
         delete_string_array( &c->include_paths );
+#if 0
         strpool_print_strings( c->strpool );
+#endif
         delete_strpool( c->strpool );
         
         freex( c );
