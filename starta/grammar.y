@@ -7957,7 +7957,7 @@ module_import_identifier
       cexception_t inner;
       DNODE * volatile module_name_dnode = NULL;
       char *volatile module_name =
-          obtain_string_from_strpool( compiler->strpool, $3 );
+          obtain_string_from_strpool( compiler->strpool, $1 );
       char *volatile module_filename =
           obtain_string_from_strpool( compiler->strpool, $3 );
       DNODE *module_arguments = $4;
