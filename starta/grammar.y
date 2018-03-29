@@ -8424,7 +8424,8 @@ module_list
     DNODE *module;
     module = vartab_lookup( compiler->vartab, module_name );
     if( !module ) {
-        yyerrorf( "module '%s' is not available in the current scope", $1 );
+        yyerrorf( "module '%s' is not available in the current scope",
+                  module_name );
     }
     $$ = module;
     freex( module_name );
@@ -8438,7 +8439,8 @@ module_list
     if( container ) {
         module = dnode_vartab_lookup_var( container, module_name );
         if( !module ) {
-            yyerrorf( "module '%s' is not available in as a submodule", $3 );
+            yyerrorf( "module '%s' is not available in as a submodule",
+                      module_name );
         }
     }
     $$ = module;
@@ -10873,7 +10875,7 @@ struct_declaration
             if( tnode_is_non_null_reference( old_tnode ) !=
                 ($1 ? 1 : 0 )) {
                 yyerrorf( "definition of forward structure '%s' "
-                          "has different non-null flag", $3 );
+                          "has different non-null flag", struct_name );
             }
         }
 	tnode = typetab_lookup( compiler->typetab, struct_name );
