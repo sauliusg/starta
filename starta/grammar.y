@@ -13506,71 +13506,114 @@ assignment_expression
 constant
   : __INTEGER_CONST
       {
-       compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-                                  NULL, NULL, "integer", $1, px );
+          char *int_text = obtain_string_from_strpool( compiler->strpool, $1 );
+          compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
+                                     NULL, NULL, "integer", int_text, px );
+          freex( int_text );
       }
   | __INTEGER_CONST __IDENTIFIER
       {
-       compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-                                  NULL, $2, "integer", $1, px );
+          char *int_text = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+          compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
+                                     NULL, ident, "integer", int_text, px );
+          freex( int_text );
+          freex( ident );
       }
   | __INTEGER_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-                                  $2, $4, "integer", $1, px );
+          char *int_text = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
+          compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
+                                     $2, ident, "integer", int_text, px );
+          freex( int_text );
+          freex( ident );
       }
   | __REAL_CONST
       {
-       compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
-                                  NULL, NULL, "real", $1, px );
+          char *real = obtain_string_from_strpool( compiler->strpool, $1 );
+          compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
+                                     NULL, NULL, "real", real, px );
+          freex( real );
       }
   | __REAL_CONST __IDENTIFIER
       {
-       compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
-                                  NULL, $2, "real", $1, px );
+          char *real = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+          compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
+                                  NULL, ident, "real", real, px );
+          freex( real );
+          freex( ident );
       }
   | __REAL_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
-                                  $2, $4, "real", $1, px );
+          char *real = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
+          compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
+                                     $2, ident, "real", real, px );
+          freex( real );
+          freex( ident );
       }
   | __STRING_CONST
       {
-       compiler_compile_constant( compiler, TS_STRING_SUFFIX,
-                                  NULL, NULL, "string", $1, px );
+          char *str = obtain_string_from_strpool( compiler->strpool, $1 );
+          compiler_compile_constant( compiler, TS_STRING_SUFFIX,
+                                     NULL, NULL, "string", str, px );
+          freex( str );
       }
   | __STRING_CONST __IDENTIFIER
       {
-       compiler_compile_constant( compiler, TS_STRING_SUFFIX,
-                                  NULL, $2, "string", $1, px );
+          char *str = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+          compiler_compile_constant( compiler, TS_STRING_SUFFIX,
+                                     NULL, ident, "string", str, px );
+          freex( str );
+          freex( ident );
       }
   | __STRING_CONST module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_constant( compiler, TS_STRING_SUFFIX,
-                                  $2, $4, "string", $1, px );
+          char *str = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
+          compiler_compile_constant( compiler, TS_STRING_SUFFIX,
+                                     $2, ident, "string", str, px );
+          freex( str );
+          freex( ident );
       }
   | __IDENTIFIER  __IDENTIFIER
       {
-       compiler_compile_enumeration_constant( compiler, NULL, $1, $2, px );
+          char *value = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *tenum = obtain_string_from_strpool( compiler->strpool, $2 );
+          compiler_compile_enumeration_constant( compiler, NULL,
+                                                 value, tenum, px );
+          freex( value );
+          freex( tenum );
       }
 
   | __IDENTIFIER module_list __COLON_COLON __IDENTIFIER
       {
-       compiler_compile_enumeration_constant( compiler, $2, $1, $4, px );
+          char *value = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *tenum = obtain_string_from_strpool( compiler->strpool, $4 );
+          compiler_compile_enumeration_constant( compiler, $2,
+                                                 value, tenum, px );
+          freex( value );
+          freex( tenum );
       }
 
   | _CONST __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $2,
-                                                       "constant" );
-	if( const_dnode ) {
-	    char pad[80];
+          char *const_str = obtain_string_from_strpool( compiler->strpool, $2 );
+          DNODE *const_dnode =
+              compiler_lookup_constant( compiler, NULL, const_str, "constant" );
 
-	    snprintf( pad, sizeof(pad), "%ld",
-		      (long)dnode_ssize_value( const_dnode ));
-	    compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-				    NULL, NULL, "integer", pad, px );
-	}
+          if( const_dnode ) {
+              char pad[80];
+
+              snprintf( pad, sizeof(pad), "%ld",
+                        (long)dnode_ssize_value( const_dnode ));
+              compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
+                                         NULL, NULL, "integer", pad, px );
+          }
+          freex( const_str );
       }
 
   | _CONST module_list __COLON_COLON __IDENTIFIER
