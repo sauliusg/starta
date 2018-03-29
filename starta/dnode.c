@@ -30,16 +30,19 @@
    value or an offset (which may be treated as a kind of value).  Note
    that types are not represented by dnodes, but instead by tnodes. */
 
+static int curno;
+
 struct DNODE {
     char *name;            /* The declared name; this name is supposed
                               to be unique in a current scope */
-    char * filename;       /* Name of the file in which a module named
+    char *filename;        /* Name of the file in which a module named
                               in the "name" field is declared; a
                               unique pair identifying a module is
                               (name, filename). */
     char *synonim;         /* Synonim name for different
                               implementations of parametrised modules. */
     dnode_flag_t flags;
+    int serno;
     TNODE *tnode;          /* type descriptor node, describes the type
 			      of the variable, or the type of the
 			      return value the function, or the type
@@ -94,6 +97,11 @@ struct DNODE {
 void delete_dnode( DNODE *node )
 {
     DNODE *next;
+
+    if( node && node->serno == 1584 ) {
+        // fprintf( stderr, "deleting %d\n", node->serno );
+    }
+
     while( node ) {
         next = node->next;
 	if( node->rcount <= 0 ) {
@@ -212,6 +220,10 @@ DNODE* new_dnode( cexception_t *ex )
 {
     DNODE *node = alloc_dnode( ex );
     node->rcount = 1;
+    node->serno = ++curno;
+    if( node->serno == 1584 ) {
+        // fprintf( stderr, "allocating %d\n", node->serno );
+    }
     return node;
 }
 
