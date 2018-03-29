@@ -8,6 +8,7 @@
 
 int main( int argc, char *argv[] )
 {
+    int i;
     STRPOOL *pool = new_strpool( NULL );
 
     printf( "Hi!\n" );
@@ -18,11 +19,11 @@ int main( int argc, char *argv[] )
 
     int idx[sizeof(strings)/sizeof(strings[0])];
 
-    for( int i = 0; strings[i] != NULL; i ++ ) {
+    for( i = 0; strings[i] != NULL; i ++ ) {
         idx[i] = strpool_add_string( pool, strings[i], NULL );
     }
 
-    for( int i = 0; strings[i] != NULL; i ++ ) {
+    for( i = 0; strings[i] != NULL; i ++ ) {
         printf( "%i:\t%d\n", i, idx[i] );
     }
 
@@ -32,13 +33,12 @@ int main( int argc, char *argv[] )
 
     strpool_add_string( pool, "One more string", NULL );
     
-    for( int i = 0; strings[i] != NULL; i ++ ) {
+    for( i = 0; strings[i] != NULL; i ++ ) {
         char *str = obtain_string_from_strpool( pool, i );
         printf( "%i:\t%s\n", i, str );
         free( str );
     }
 
-    int i;
     i = strpool_add_string( pool, "Before last", NULL );
     i = strpool_add_string( pool, "Very last", NULL );
 

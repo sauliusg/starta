@@ -167,9 +167,9 @@ char *strpool_get_string( STRPOOL *p, ssize_t index )
     }
 }
 
-static int is_free( STRPOOL *p, int i )
+static int is_free( STRPOOL *p, ssize_t i )
 {
-    int j = p->next_free;
+    ssize_t j = p->next_free;
     while( j >= 0 ) {
         if( i == j ) {
             return 1;
@@ -181,7 +181,8 @@ static int is_free( STRPOOL *p, int i )
 
 void strpool_print_strings( STRPOOL *p )
 {
-    for( int i = 0; i < p->pool_length; i++ ) {
+    ssize_t i;
+    for( i = 0; i < p->pool_length; i++ ) {
         if( !is_free( p, i )) {
             printf( "%d: \"%s\"\n", i, p->pool[i].str );
         }
