@@ -11228,14 +11228,26 @@ bytecode_item
 
 opcode
   : __IDENTIFIER
-      { compiler_emit( compiler, px, "\tC\n", $1 ); }
+      {
+          char *opcode = obtain_string_from_strpool( compiler->strpool, $1 );
+          compiler_emit( compiler, px, "\tC\n", opcode );
+          freex( opcode );
+      }
   | module_list __COLON_COLON __IDENTIFIER
       {
+          char *opcode = obtain_string_from_strpool( compiler->strpool, $3 );
           compiler_emit( compiler, px, "\tMC\n", 
-                         $1 ? dnode_name($1) : "???", $3 );
+                         $1 ? dnode_name($1) : "???", opcode );
+          freex( opcode );
       }
   | __IDENTIFIER ':' __IDENTIFIER
-      { compiler_emit( compiler, px, "\tMC\n", $1, $3 ); }
+      {
+          char *libname = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *opcode = obtain_string_from_strpool( compiler->strpool, $3 );
+          compiler_emit( compiler, px, "\tMC\n", libname, opcode );
+          freex( libname );
+          freex( opcode );
+      }
   ;
 
 variable_reference
@@ -13618,16 +13630,18 @@ constant
 
   | _CONST module_list __COLON_COLON __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler, $2, $4,
-						    "constant" );
-	if( const_dnode ) {
-	    char pad[80];
+          char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
+          DNODE *const_dnode = compiler_lookup_constant( compiler, $2, ident,
+                                                         "constant" );
+          freex( ident );
+          if( const_dnode ) {
+              char pad[80];
 
-	    snprintf( pad, sizeof(pad), "%ld",
-		      (long)dnode_ssize_value( const_dnode ));
-	    compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
-				    NULL, NULL, "integer", pad, px );
-	}
+              snprintf( pad, sizeof(pad), "%ld",
+                        (long)dnode_ssize_value( const_dnode ));
+              compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
+                                         NULL, NULL, "integer", pad, px );
+          }
       }
 
   | _CONST '(' constant_expression ')'
@@ -13637,13 +13651,19 @@ constant
 
   | _CONST '(' constant_expression ')' __IDENTIFIER
       {
-	  compiler_compile_multitype_const_value( compiler, &$3, NULL, $5, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $5 );
+	  compiler_compile_multitype_const_value( compiler, &$3, NULL,
+                                                  ident, px );
+          freex( ident );
       }
 
   | _CONST '(' constant_expression ')'
     module_list __COLON_COLON __IDENTIFIER
       {
-	  compiler_compile_multitype_const_value( compiler, &$3, $5, $7, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $7 );
+	  compiler_compile_multitype_const_value( compiler, &$3, $5,
+                                                  ident, px );
+          freex( ident );
       }
 
   ;
@@ -13713,11 +13733,13 @@ argument
 
   | opt_readonly __IDENTIFIER
       {
-	  $$ = new_dnode_name( $2, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+	  $$ = new_dnode_name( ident, px );
 	  dnode_append_type( $$, new_tnode_ignored( px ));
 	  if( $1 ) {
 	      dnode_list_set_flags( $$, DF_IS_READONLY );
 	  }
+          freex( ident );
       }
   ;
 
@@ -13939,7 +13961,8 @@ function_header
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
 	  int is_function = $2;
-          char *function_name = $3;
+          char *volatile function_name =
+              obtain_string_from_strpool( compiler->strpool, $3 );
           DNODE *volatile parameters = $5;
           DNODE *volatile retvals = $7;
 
@@ -13964,24 +13987,30 @@ function_header
 	      delete_dnode( retvals );
 	      delete_dnode( funct );
 	      $$ = NULL;
+              freex( function_name );
 	      cexception_reraise( inner, px );
 	  }
+          freex( function_name );
 	}
   ;
 
 opt_method_interface
   : '@' __IDENTIFIER
   {
-      char *interface_name = $2;
+      char *interface_name =
+          obtain_string_from_strpool( compiler->strpool, $2 );
       $$ = compiler_lookup_tnode( compiler, /*module_name =*/ NULL,
                                   interface_name, "interface" );
+      freex( interface_name );
   }
   | '@' module_list __COLON_COLON __IDENTIFIER
   {
       DNODE *module = $2;
-      char *interface_name = $4;
+      char *interface_name =
+          obtain_string_from_strpool( compiler->strpool, $4 );
       $$ = compiler_lookup_tnode( compiler, module,
                                   interface_name, "interface" );
+      freex( interface_name );
   }
   | /* empty */
   { $$ = NULL; }
@@ -13996,7 +14025,8 @@ method_header
 	  DNODE *volatile funct = NULL;
           DNODE *volatile self_dnode = NULL;
           TNODE *current_class = compiler->current_type;;
-          char *method_name = $4;
+          char *method_name =
+              obtain_string_from_strpool( compiler->strpool, $4 );
           TNODE *interface_type = $5;
           DNODE *implements_method = NULL;
           DNODE *volatile parameter_list = $7;
@@ -14133,8 +14163,10 @@ method_header
 	      delete_dnode( funct );
               delete_dnode( self_dnode );
 	      $$ = NULL;
+              freex( method_name );
 	      cexception_reraise( inner, px );
 	  }
+          freex( method_name );
 	}
   ;
 
@@ -14195,7 +14227,8 @@ constructor_header
           DNODE *volatile self_dnode = NULL;
           
           int function_attributes = $1;
-          char *constructor_name = $4;
+          char *constructor_name =
+              obtain_string_from_strpool( compiler->strpool, $4 );
           DNODE *parameter_list = $6;
 
     	  cexception_guard( inner ) {
@@ -14242,8 +14275,10 @@ constructor_header
 	      delete_dnode( parameter_list );
 	      delete_dnode( funct );
 	      $$ = NULL;
-	      cexception_reraise( inner, px );
+              freex( constructor_name );
+              cexception_reraise( inner, px );
 	  }
+          freex( constructor_name );
 	}
   ;
 
@@ -14255,7 +14290,8 @@ destructor_header
           DNODE *volatile self_dnode = NULL;
           
           int function_attributes = $1;
-          char *destructor_name = $4;
+          char *destructor_name =
+              obtain_string_from_strpool( compiler->strpool, $4 );
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = compiler->current_type;
@@ -14300,8 +14336,10 @@ destructor_header
 	      delete_dnode( self_dnode );
 	      delete_dnode( funct );
 	      $$ = NULL;
+              freex( destructor_name );
 	      cexception_reraise( inner, px );
 	  }
+          freex( destructor_name );
 	}
   ;
 
@@ -14316,7 +14354,8 @@ operator_header
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
-          char *operator_name = $3;
+          char *operator_name =
+              obtain_string_from_strpool( compiler->strpool, $3 );
           DNODE *volatile arguments = $5;
           DNODE *volatile retvals = $7;
 
@@ -14336,9 +14375,11 @@ operator_header
 	      delete_dnode( arguments );
 	      delete_dnode( retvals );
 	      delete_dnode( funct );
+              freex( operator_name );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );
 	  }
+          freex( operator_name );
 	}
   ;
 
@@ -14352,8 +14393,10 @@ function_prototype
 constant_declaration
   : _CONST __IDENTIFIER '=' constant_expression
     {
-      DNODE *const_dnode = new_dnode_constant( $2, &$4, px );
-      compiler_consttab_insert_consts( compiler, const_dnode, px );
+        char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+        DNODE *const_dnode = new_dnode_constant( ident, &$4, px );
+        compiler_consttab_insert_consts( compiler, const_dnode, px );
+        freex( ident );
     }
 ;
 
@@ -14371,26 +14414,39 @@ constant_integer_expression
 field_designator
   : __IDENTIFIER '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_type_field( compiler, NULL, $1, $3 );
+        char *structure = obtain_string_from_strpool( compiler->strpool, $1 );
+        char *field = obtain_string_from_strpool( compiler->strpool, $3 );
+	$$ = compiler_lookup_type_field( compiler, NULL, structure, field );
+        freex( structure );
+        freex( field );
     }
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
+        char *ident = obtain_string_from_strpool( compiler->strpool, $7 );
         TNODE *composite = $2;
         composite = new_tnode_derived( share_tnode( composite ), px );
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
-	$$ = compiler_lookup_tnode_field( compiler, composite, $7 );
+	$$ = compiler_lookup_tnode_field( compiler, composite, ident );
+
+        freex( ident );
     }
   | module_list __COLON_COLON __IDENTIFIER  '.' __IDENTIFIER
     {
-	$$ = compiler_lookup_type_field( compiler, $1, $3, $5 );
+        char *structure = obtain_string_from_strpool( compiler->strpool, $3 );
+        char *field = obtain_string_from_strpool( compiler->strpool, $5 );
+	$$ = compiler_lookup_type_field( compiler, $1, structure, field );
+        freex( structure );
+        freex( field );
     }
   | field_designator '.' __IDENTIFIER
     {
+        char *subfield = obtain_string_from_strpool( compiler->strpool, $3 );
 	DNODE *field = $1;
 	TNODE *tnode = field ? dnode_type( field ) : NULL;
-	$$ = tnode ? tnode_lookup_field( tnode, $3 ) : NULL;
+	$$ = tnode ? tnode_lookup_field( tnode, subfield ) : NULL;
+        freex( subfield );
     }
 ;
 
@@ -14401,90 +14457,120 @@ constant_expression
   | __INTEGER_CONST
       {
           intmax_t value;
+          char *int_str = obtain_string_from_strpool( compiler->strpool, $1 );
 
           errno = 0;
-          value = strtoll( $1, NULL, 0 );
+          value = strtoll( int_str, NULL, 0 );
           if( errno ) {
               int errnoll = errno;
               errno = 0;
-              value = strtoull( $1, NULL, 0 );
+              value = strtoull( int_str, NULL, 0 );
               if( errno ) {
                   char *message = strerror(errno);
                   yyerrorf( "when converting integer constant '%s' - %c%s",
-                            $1, tolower(message[0]),
+                            int_str, tolower(message[0]),
                             *message == '\0' ? "" : message+1 );
               } else {
                   if( value == LLONG_MIN ) {
                       fprintf( stderr, "%s: WARNING, value '%s' converts to "
-                               "a negative number\n", progname, $1 );
+                               "a negative number\n", progname, int_str );
                   } else {
                       char *message = strerror(errnoll);
                       yyerrorf( "when converting signed integer constant "
-                                "'%s' - %c%s", $1, tolower(message[0]),
+                                "'%s' - %c%s", int_str, tolower(message[0]),
                                 *message == '\0' ? "" : message+1 );
                   }
               }
           }
 	  $$ = make_const_value( px, VT_INTMAX, value );
+          freex( int_str );
       }
 
   | __REAL_CONST
       {
-	  $$ = make_const_value( px, VT_FLOAT, atof( $1 ));
+          char *real = obtain_string_from_strpool( compiler->strpool, $1 );
+	  $$ = make_const_value( px, VT_FLOAT, atof( real ));
+          freex( real );
       }
 
   | __STRING_CONST
       {
-	  $$ = make_const_value( px, VT_STRING, $1 );
+          char *str = obtain_string_from_strpool( compiler->strpool, $1 );
+	  $$ = make_const_value( px, VT_STRING, str );
+          freex( str );
       }
 
   | __IDENTIFIER __IDENTIFIER
       {
-	  $$ = make_const_value( px, VT_ENUM, $1, $2 );
+          char *enum_str = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *enum_typ = obtain_string_from_strpool( compiler->strpool, $2 );
+          
+	  $$ = make_const_value( px, VT_ENUM, enum_str, enum_typ );
+
+          freex( enum_str );
+          freex( enum_typ );
       }
 
   | __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, $1,
-                                                       "constant" );
-	$$ = make_zero_const_value();
-	if( const_dnode ) {
-	    const_value_copy( &$$, dnode_value( const_dnode ), px );
-	} else {
-	    $$ = make_const_value( px, VT_INTMAX, (intmax_t)0 );
-	}
+          char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
+          DNODE *const_dnode = compiler_lookup_constant( compiler, NULL, ident,
+                                                         "constant" );
+          $$ = make_zero_const_value();
+          if( const_dnode ) {
+              const_value_copy( &$$, dnode_value( const_dnode ), px );
+          } else {
+              $$ = make_const_value( px, VT_INTMAX, (intmax_t)0 );
+          }
+          freex( ident );
       }
 
   | module_list __COLON_COLON __IDENTIFIER
       {
-	DNODE *const_dnode = compiler_lookup_constant( compiler, $1, $3,
-                                                       "constant" );
-	$$ = make_zero_const_value();
-	if( const_dnode ) {
-	    const_value_copy( &$$, dnode_value( const_dnode ), px );
-	} else {
-	    $$ = make_const_value( px, VT_INTMAX, (intmax_t)0 );
-	}
+          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+          DNODE *const_dnode = compiler_lookup_constant( compiler, $1, ident,
+                                                         "constant" );
+          $$ = make_zero_const_value();
+          if( const_dnode ) {
+              const_value_copy( &$$, dnode_value( const_dnode ), px );
+          } else {
+              $$ = make_const_value( px, VT_INTMAX, (intmax_t)0 );
+          }
+          freex( ident );
       }
 
   | field_designator '.' __IDENTIFIER
       {
-	  $$ = compiler_get_dnode_compile_time_attribute( $1, $3, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+	  $$ = compiler_get_dnode_compile_time_attribute( $1, ident, px );
+          freex( ident );
       }
 
   | __IDENTIFIER '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compile_time_value( compiler, NULL, $1, $3, px );
+          char *structure = obtain_string_from_strpool( compiler->strpool, $1 );
+          char *field = obtain_string_from_strpool( compiler->strpool, $3 );
+	  $$ = compiler_make_compile_time_value( compiler, NULL,
+                                                 structure, field, px );
+          freex( structure );
+          freex( field );
       }
 
   | module_list __COLON_COLON __IDENTIFIER '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compile_time_value( compiler, $1, $3, $5, px );
+          char *structure = obtain_string_from_strpool( compiler->strpool, $3 );
+          char *field = obtain_string_from_strpool( compiler->strpool, $5 );
+	  $$ = compiler_make_compile_time_value( compiler, $1,
+                                                 structure, field, px );
+          freex( structure );
+          freex( field );
       }
 
   | '.' __IDENTIFIER
       {
-	  $$ = compiler_make_compiler_attribute( $2, px );
+          char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
+	  $$ = compiler_make_compiler_attribute( ident, px );
+          freex( ident );
       }
 
   | constant_expression '+' constant_expression
@@ -14633,6 +14719,8 @@ STRPOOL *current_compiler_strpool( void )
 {
     if( compiler ) {
         return compiler->strpool;
+    } else {
+        return NULL;
     }
 }
 
