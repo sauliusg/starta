@@ -184,7 +184,7 @@ void strpool_print_strings( STRPOOL *p )
     ssize_t i;
     for( i = 0; i < p->pool_length; i++ ) {
         if( !is_free( p, i )) {
-            printf( "%d: \"%s\"\n", i, p->pool[i].str );
+            printf( "STRPOOL: %d: \"%s\"\n", i, p->pool[i].str );
         }
     }
 }
