@@ -13,6 +13,7 @@
 
 void delete_thrlist( THRLIST *list )
 {
+    checkptr( list );
     delete_sllist( (SLLIST*)list );
 }
 
@@ -30,6 +31,7 @@ void create_thrlist( THRLIST * volatile *list,
 		     thrcode_dispose_function_t dispose_fn,
 		     THRLIST *next, cexception_t *ex )
 {
+    checkptr( data );
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
 		   (dispose_function_t) dispose_fn,
@@ -43,6 +45,7 @@ void dispose_thrlist( THRLIST* volatile *list )
 
 THRCODE* thrlist_data( THRLIST *list )
 {
+    checkptr( list );
     return (THRCODE*) sllist_data( (SLLIST *)list );
 }
 

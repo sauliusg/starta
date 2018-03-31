@@ -14697,7 +14697,7 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
         compiler = NULL;
     }
     cexception_catch {
-        // delete_compiler( compiler );
+        delete_compiler( compiler );
         compiler = NULL;
         cexception_reraise( inner, ex );
     }
