@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <strpool.h>
+#include <allocx.h>
 #include <cexceptions.h>
 
 int main( int argc, char *argv[] )
@@ -29,14 +30,14 @@ int main( int argc, char *argv[] )
 
     char *str3 = obtain_string_from_strpool( pool, 3 );
     printf( "Obtained \"%s\"\n", str3 );
-    free( str3 );
+    freex( str3 );
 
     strpool_add_string( pool, "One more string", NULL );
     
     for( i = 0; strings[i] != NULL; i ++ ) {
         char *str = obtain_string_from_strpool( pool, i );
         printf( "%i:\t%s\n", i, str );
-        free( str );
+        freex( str );
     }
 
     i = strpool_add_string( pool, "Before last", NULL );
@@ -44,7 +45,7 @@ int main( int argc, char *argv[] )
 
     str3 = obtain_string_from_strpool( pool, i );
     printf( "Obtained string %d: \"%s\"\n", i, str3 );
-    free( str3 );
+    freex( str3 );
 
     dispose_strpool( &pool );
     
