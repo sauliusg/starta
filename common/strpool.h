@@ -8,6 +8,7 @@
 #ifndef __STRPOOL_H
 #define __STRPOOL_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <cexceptions.h>
 
@@ -25,5 +26,7 @@ ssize_t strpool_strnclone( STRPOOL *p, char *str, size_t length );
 char *obtain_string_from_strpool( STRPOOL *p, ssize_t index );
 char *strpool_get_string( STRPOOL *p, ssize_t index );
 void strpool_print_strings( STRPOOL *p );
+void strpool_print_strings_to_stderr( STRPOOL *p );
+void strpool_fprint_strings( FILE *fp, STRPOOL *p );
 
 #endif

@@ -181,11 +181,21 @@ static int is_free( STRPOOL *p, ssize_t i )
 
 void strpool_print_strings( STRPOOL *p )
 {
+    strpool_fprint_strings( stdout, p );
+}
+
+void strpool_print_strings_to_stderr( STRPOOL *p )
+{
+    strpool_fprint_strings( stderr, p );
+}
+
+void strpool_fprint_strings( FILE *fp, STRPOOL *p )
+{
     ssize_t i;
-    printf( "STRPOOL LENGTH: %zd\n", p->pool_length );
+    fprintf( fp, "STRPOOL LENGTH: %zd\n", p->pool_length );
     for( i = 0; i < p->pool_length; i++ ) {
         if( !is_free( p, i )) {
-            printf( "STRPOOL: %zd: \"%s\"\n", i, p->pool[i].str );
+            fprintf( fp, "STRPOOL: %zd: \"%s\"\n", i, p->pool[i].str );
         }
     }
 }

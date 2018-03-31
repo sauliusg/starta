@@ -346,7 +346,7 @@ static void delete_compiler( COMPILER *c )
         delete_string_array( &c->include_paths );
 
         if( memleak_debug ) {
-            strpool_print_strings( c->strpool );
+            strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();
         }
 
