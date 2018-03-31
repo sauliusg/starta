@@ -55,7 +55,9 @@ SLLIST* new_sllist( void *data,
 
     list->rcount = 1;
     list->data = data;
+#ifdef ALLOCX_DEBUG_COUNTS
     checkptr( data );
+#endif
     list->delete_fn = delete_fn;
     list->next = next;
 
@@ -83,7 +85,9 @@ void create_sllist( SLLIST * volatile *list,
     node = new_sllist( /*data*/ NULL, /*delete_fn*/ NULL, next, ex );
     if( data ) {
 	node->data = *data;
+#ifdef ALLOCX_DEBUG_COUNTS
         checkptr( *data );
+#endif
 	*data = NULL;
     }
     node->dispose_fn = dispose_fn;
@@ -102,7 +106,9 @@ void dispose_sllist( SLLIST* volatile *list )
 void* sllist_data( SLLIST *list )
 {
     if( list ) {
+#ifdef ALLOCX_DEBUG_COUNTS
         checkptr( list->data );
+#endif
 	return list->data;
     } else {
 	return NULL;
@@ -127,7 +133,9 @@ void sllist_set_data( SLLIST *list, void * volatile *data )
     assert( !list->data );
 
     list->data = *data;
+#ifdef ALLOCX_DEBUG_COUNTS
     checkptr( *data );
+#endif
     *data = NULL;
 }
 

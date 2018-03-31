@@ -13,7 +13,9 @@
 
 void delete_thrlist( THRLIST *list )
 {
+#ifdef ALLOCX_DEBUG_COUNTS
     checkptr( list );
+#endif
     delete_sllist( (SLLIST*)list );
 }
 
@@ -31,7 +33,9 @@ void create_thrlist( THRLIST * volatile *list,
 		     thrcode_dispose_function_t dispose_fn,
 		     THRLIST *next, cexception_t *ex )
 {
+#ifdef ALLOCX_DEBUG_COUNTS
     checkptr( data );
+#endif
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
 		   (dispose_function_t) dispose_fn,
@@ -45,7 +49,9 @@ void dispose_thrlist( THRLIST* volatile *list )
 
 THRCODE* thrlist_data( THRLIST *list )
 {
+#ifdef ALLOCX_DEBUG_COUNTS
     checkptr( list );
+#endif
     return (THRCODE*) sllist_data( (SLLIST *)list );
 }
 
