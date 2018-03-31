@@ -4477,8 +4477,6 @@ static void compiler_merge_functions_and_main( COMPILER *cc,
 static void compiler_push_thrcode( COMPILER *sc,
                                    cexception_t *ex )
 {
-    // Memory management BUG!!!
-    // FIXME: should handle main_thrcode and function_thrcode properly! S.G.
     thrlist_push_data( &sc->thrstack, &sc->thrcode, delete_thrcode, NULL, ex );
     create_thrcode( &sc->thrcode, ex );
     elist_push_data( &sc->saved_estacks, &sc->e_stack, delete_enode, NULL, ex );
