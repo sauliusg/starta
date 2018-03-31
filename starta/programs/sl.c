@@ -162,6 +162,7 @@ static char *usage_text[2] = {
 "      code  - print the generated code in a bytecode assembler notation\n"
 "      dump  - dump the generated code after patching addresses\n"
 "      trace - print opcode names and stack top during program execution\n"
+"      memleak - print leaked strings and nodes\n"
 "\n"
 
 "  -I, --include-path path/to/modules\n"
@@ -330,6 +331,9 @@ int main( int argc, char *argv[], char *env[] )
       if( strstr(debug.value.s, "code") != NULL ) {
 	  compiler_flex_debug_lines();
 	  thrcode_debug_on();
+      }
+      if( strstr(debug.value.s, "memleak") != NULL ) {
+          compiler_memleak_debug_on();
       }
   }
 

@@ -46,5 +46,6 @@ void compiler_yy_reset_error_count( void );
 
 void compiler_yy_debug_on( void );
 void compiler_yy_debug_off( void );
+void compiler_memleak_debug_on( void );
 
 #endif

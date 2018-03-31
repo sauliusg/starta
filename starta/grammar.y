@@ -56,6 +56,8 @@ char *progname;
 
 static char *compiler_version = "0.0";
 
+static unsigned char memleak_debug;
+ 
 /* COMPILER_STATE contains necessary compiler state that must be
    saved and restored when include files are processed. */
 
@@ -342,12 +344,12 @@ static void delete_compiler( COMPILER *c )
         delete_dnode( c->requested_module );
 
         delete_string_array( &c->include_paths );
-#if 0
-        strpool_print_strings( c->strpool );
-#endif
-#if 0
-        dnode_print_allocated_to_stderr();
-#endif
+
+        if( memleak_debug ) {
+            strpool_print_strings( c->strpool );
+            dnode_print_allocated_to_stderr();
+        }
+
         delete_strpool( c->strpool );
         
         freex( c );
@@ -14809,4 +14811,9 @@ void compiler_yy_debug_off( void )
 #ifdef YYDEBUG
     yydebug = 0;
 #endif
+}
+
+void compiler_memleak_debug_on( void )
+{
+    memleak_debug = 1;
 }
