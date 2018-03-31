@@ -12,6 +12,7 @@
 
 typedef struct DNODE DNODE;
 
+#include <stdio.h>
 #include <tnode.h>
 #include <typetab.h>
 #include <vartab.h>
@@ -264,5 +265,9 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab );
 
 DNODE *dnode_remove_last( DNODE *list );
+
+void dnode_print_allocated();
+void dnode_print_allocated_to_stderr();
+void dnode_fprint_allocated( FILE *fp );
 
 #endif

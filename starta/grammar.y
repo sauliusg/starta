@@ -345,6 +345,9 @@ static void delete_compiler( COMPILER *c )
 #if 0
         strpool_print_strings( c->strpool );
 #endif
+#if 0
+        dnode_print_allocated_to_stderr();
+#endif
         delete_strpool( c->strpool );
         
         freex( c );

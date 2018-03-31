@@ -31,6 +31,11 @@
    that types are not represented by dnodes, but instead by tnodes. */
 
 struct DNODE {
+    /* Next and previous DNODEs in the allocated DNODE list; used to
+       keep track of the allocated DNODEs and to prevent memory
+       leaks: */
+    DNODE *next_alloc, *prev_alloc;
+
     char *name;            /* The declared name; this name is supposed
                               to be unique in a current scope */
     char *filename;        /* Name of the file in which a module named
