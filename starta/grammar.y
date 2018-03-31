@@ -14670,29 +14670,37 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
                                 cexception_t *ex )
 {
     THRCODE *code;
+    cexception_t inner;
 
     assert( !compiler );
     compiler = new_compiler( filename, include_paths, ex );
 
-    compiler_compile_file( filename, ex );
+    cexception_guard( inner ) {
+        compiler_compile_file( filename, &inner );
 
-    thrcode_flush_lines( compiler->thrcode );
-    code = compiler->thrcode;
-    if( compiler->thrcode == compiler->function_thrcode ) {
-	compiler->function_thrcode = NULL;
-    } else
-    if( compiler->thrcode == compiler->main_thrcode ) {
-	compiler->main_thrcode = NULL;
-    } else {
-	assert( 0 );
+        thrcode_flush_lines( compiler->thrcode );
+        code = compiler->thrcode;
+        if( compiler->thrcode == compiler->function_thrcode ) {
+            compiler->function_thrcode = NULL;
+        } else
+            if( compiler->thrcode == compiler->main_thrcode ) {
+                compiler->main_thrcode = NULL;
+            } else {
+                assert( 0 );
+            }
+        compiler->thrcode = NULL;
+
+        thrcode_insert_static_data( code, compiler->static_data,
+                                    compiler->static_data_size );
+        compiler->static_data = NULL;
+        delete_compiler( compiler );
+        compiler = NULL;
     }
-    compiler->thrcode = NULL;
-
-    thrcode_insert_static_data( code, compiler->static_data,
-				compiler->static_data_size );
-    compiler->static_data = NULL;
-    delete_compiler( compiler );
-    compiler = NULL;
+    cexception_catch {
+        // delete_compiler( compiler );
+        compiler = NULL;
+        cexception_reraise( inner, ex );
+    }
 
     return code;
 }
