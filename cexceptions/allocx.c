@@ -50,7 +50,7 @@ void *callocx( size_t size, size_t nr, cexception_t *ex )
     if( p ) {
         *((long long*)p) = ++alloc_count;
         if( alloc_count == 7 ) {
-            printf( ".... allocating node no. %zd\n", alloc_count );            
+            printf( ".... allocating node no. %Ld %p\n", alloc_count, p );
         }
         printf( ">>> calloc node no. %Ld %p\n", *(long long*)p, p );
         p = (void*) ( (long long*)p + 1 );
