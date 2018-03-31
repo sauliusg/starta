@@ -14688,18 +14688,6 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
 
         thrcode_flush_lines( compiler->thrcode );
         code = share_thrcode( compiler->thrcode );
-#if 0
-        if( compiler->thrcode == compiler->function_thrcode ) {
-            compiler->function_thrcode = NULL;
-        } else
-            if( compiler->thrcode == compiler->main_thrcode ) {
-                compiler->main_thrcode = NULL;
-            } else {
-                assert( 0 );
-            }
-        compiler->thrcode = NULL;
-#endif
-        
         thrcode_insert_static_data( code, compiler->static_data,
                                     compiler->static_data_size );
         compiler->static_data = NULL;
