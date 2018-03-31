@@ -50,10 +50,10 @@ void free_strpool( STRPOOL *p )
     }
     for( i = 0; i < p->pool_length; i++ ) {
         if( p->pool[i].str != NULL ) {
-            free( p->pool[i].str );
+            freex( p->pool[i].str );
         }
     }
-    free( p->pool );
+    freex( p->pool );
     p->pool = NULL;
     p->pool_length = 0;
     p->next_free = -1;
