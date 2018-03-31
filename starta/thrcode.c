@@ -118,6 +118,7 @@ struct THRCODE {
 			        on the vector 'opcodes'. At any given moment,
 			        the following must hold:
 			        thrcode->length <= thrcode->capacity */
+    size_t rcount;           /* reference count */
     FIXUP *fixups;           /* locations containing forward
 				references that need to be fixed up in
 				this code. */
@@ -147,13 +148,28 @@ struct THRCODE {
 
 THRCODE *new_thrcode( cexception_t *ex )
 {
-    return callocx( 1, sizeof(THRCODE), ex );
+    THRCODE *tc = callocx( 1, sizeof(THRCODE), ex );
+    tc->rcount = 1;
+    return tc;
+}
+
+THRCODE *share_thrcode( THRCODE *bc )
+{
+    if( bc )
+        bc->rcount ++;
+    return bc;
 }
 
 void delete_thrcode( THRCODE *bc )
 {
     if( bc ) {
         checkptr( bc );
+        if( bc->rcount <= 0 ) {
+	    printf( "!!! thrcode->rcount = %ld (%p)!!!\n", bc->rcount, bc );
+	    assert( bc->rcount > 0 );
+	}
+        if( --bc->rcount > 0 )
+	    return;
 	delete_fixup_list( bc->fixups );
 	delete_fixup_list( bc->forward_function_calls );
 	delete_fixup_list( bc->op_continue_fixups );

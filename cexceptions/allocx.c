@@ -7,6 +7,7 @@
 
 /* memory allocation functions that use cexception handling */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <allocx.h>
 
@@ -29,10 +30,7 @@ void *mallocx( size_t size, cexception_t *ex )
     }
     if( p ) {
         *((long long*)p) = ++alloc_count;
-        if( alloc_count == 7 ) {
-            printf( ".... allocating node no. %zd\n", alloc_count );
-        }
-        printf( ">>> malloc node no. %Ld %p\n", *(long long*)p, p );
+        //printf( ">>>> malloc node %p (%Ld)\n", p, *(long long*)p );
         p = (void*) ( (long long*)p + 1 );
     }
     return p;
@@ -49,10 +47,7 @@ void *callocx( size_t size, size_t nr, cexception_t *ex )
     }
     if( p ) {
         *((long long*)p) = ++alloc_count;
-        if( alloc_count == 7 ) {
-            printf( ".... allocating node no. %Ld %p\n", alloc_count, p );
-        }
-        printf( ">>> calloc node no. %Ld %p\n", *(long long*)p, p );
+        //printf( ">>>> calloc node %p (%Ld)\n", p, *(long long*)p );
         p = (void*) ( (long long*)p + 1 );
     }
     return p;
@@ -72,10 +67,7 @@ void *reallocx( void *buffer, size_t new_size, cexception_t *ex )
     if( p ) {
         if( !buffer )
             *((long long*)p) = ++alloc_count;
-        if( alloc_count == 7 ) {
-            printf( ".... allocating node no. %zd\n", alloc_count );
-        }
-        printf( ">>> reallocating node no. %Ld %p\n", *(long long*)p, p );
+        //printf( ">>>> reallocating node %p (%Ld)\n", p, *(long long*)p );
         p = (void*) ( (long long*)p + 1 );
     }
     return p;
@@ -85,10 +77,10 @@ void freex( void *p )
 {
     if( p ) {
         p = (void*) ( (long long*)p - 1 );
-        printf( ">>> freeing node no. %Ld\n", *(long long*)p );
         if( *(long long*)p > alloc_count ) {
             printf( "!!!! not my node, %p (%Ld)?!\n", p, *(long long*)p );
         }
+        //printf( "<<<< freeing node %p (%Ld)\n", p, *(long long*)p );
         free( p );
     }
 }
@@ -98,7 +90,11 @@ int checkptr( void *p )
     if( p ) {
         p = (void*) ( (long long*)p - 1 );
         if( *(long long*)p > alloc_count ) {
-            printf( "<<<< not an alloc'ed node, %p (%Ld)?!\n", p, *(long long*)p );
+            printf( "!!!!!! not an alloc'ed node, %p (%Ld)?!\n", p, *(long long*)p );
+            return 0;
+        } else {
+            return 1;
         }
     }
+    return 1;
 }

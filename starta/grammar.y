@@ -154,12 +154,8 @@ static COMPILER_STATE *new_compiler_state( char *filename,
 #define starting_local_offset -1
 
 typedef struct {
-    THRCODE *thrcode;  /* thrcode should not be freed in
-			  delete_compiler(), it should point either to
-			  the same object as main_thrcode or to the
-			  same object as function_thrcode; both of
-			  these fields should be freed in
-			  delete_compiler(). */
+    /* Threaded code (bytecode) that is generated: */
+    THRCODE *thrcode;
     THRCODE *main_thrcode;
     THRCODE *function_thrcode;
 
@@ -298,6 +294,7 @@ static void delete_compiler( COMPILER *c )
 	freex( c->filename );
 	if( c->yyin ) fclosex( c->yyin, NULL );
 
+        delete_thrcode( c->thrcode );
         delete_thrcode( c->main_thrcode );
         delete_thrcode( c->function_thrcode );
 
@@ -480,7 +477,7 @@ static char *make_full_file_name( char *filename, char *path,
     ssize_t size;
 
     if( !filename ) { /* a hack to free memory */
-	free( full_path );
+	freex( full_path );
 	full_path = NULL;
 	full_path_size = 0;
 	return NULL;
@@ -4453,14 +4450,16 @@ static void compiler_compile_function_thrcode( COMPILER *cc )
 {
     assert( cc );
     assert( cc->thrcode != cc->function_thrcode );
-    cc->thrcode = cc->function_thrcode;
+    delete_thrcode( cc->thrcode );
+    cc->thrcode = share_thrcode( cc->function_thrcode );
 }
 
 static void compiler_compile_main_thrcode( COMPILER *cc )
 {
     assert( cc );
     assert( cc->thrcode != cc->main_thrcode );
-    cc->thrcode = cc->main_thrcode;
+    delete_thrcode( cc->thrcode );
+    cc->thrcode = share_thrcode( cc->main_thrcode );
 }
 
 static void compiler_merge_functions_and_main( COMPILER *cc,
@@ -4471,7 +4470,8 @@ static void compiler_merge_functions_and_main( COMPILER *cc,
     delete_thrcode( cc->main_thrcode );
     cc->main_thrcode = cc->function_thrcode;
     cc->function_thrcode = NULL;
-    cc->thrcode = cc->main_thrcode;
+    delete_thrcode( cc->thrcode );
+    cc->thrcode = share_thrcode( cc->main_thrcode );
 }
 
 static void compiler_push_thrcode( COMPILER *sc,
@@ -13845,7 +13845,7 @@ function_or_operator_end
 
           compiler_merge_functions_and_top( compiler, px );
           if( !compiler->thrcode ) {
-              compiler->thrcode = compiler->main_thrcode;
+              compiler->thrcode = share_thrcode( compiler->main_thrcode );
           }
           compiler_fixup_function_calls( compiler->function_thrcode, funct );
           compiler_fixup_function_calls( compiler->main_thrcode, funct );
@@ -14633,10 +14633,16 @@ static void compiler_compile_file( char *filename, cexception_t *ex )
     cexception_catch {
         if( yyin && yyin != stdin )
             fclosex( yyin, ex );
-	cexception_reraise( inner, ex );
+        assert( !compiler->yyin || compiler->yyin == yyin );
+        compiler->yyin = NULL;
+        yyin = NULL;
+        cexception_reraise( inner, ex );
     }
     if( yyin != stdin )
         fclosex( yyin, ex );
+    assert( !compiler->yyin || compiler->yyin == yyin );
+    compiler->yyin = NULL;
+    yyin = NULL;
 }
 
 static void compiler_compile_string( char *program, cexception_t *ex )
@@ -14671,7 +14677,7 @@ static void compiler_compile_string( char *program, cexception_t *ex )
 THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
                                 cexception_t *ex )
 {
-    THRCODE *code;
+    THRCODE *volatile code = NULL;
     cexception_t inner;
 
     assert( !compiler );
@@ -14681,7 +14687,8 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
         compiler_compile_file( filename, &inner );
 
         thrcode_flush_lines( compiler->thrcode );
-        code = compiler->thrcode;
+        code = share_thrcode( compiler->thrcode );
+#if 0
         if( compiler->thrcode == compiler->function_thrcode ) {
             compiler->function_thrcode = NULL;
         } else
@@ -14691,7 +14698,8 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
                 assert( 0 );
             }
         compiler->thrcode = NULL;
-
+#endif
+        
         thrcode_insert_static_data( code, compiler->static_data,
                                     compiler->static_data_size );
         compiler->static_data = NULL;
@@ -14701,6 +14709,7 @@ THRCODE *new_thrcode_from_file( char *filename, char **include_paths,
     cexception_catch {
         delete_compiler( compiler );
         compiler = NULL;
+        delete_thrcode( code );
         cexception_reraise( inner, ex );
     }
 
@@ -14718,7 +14727,9 @@ THRCODE *new_thrcode_from_string( char *program, char **include_paths,
     compiler_compile_string( program, ex );
 
     thrcode_flush_lines( compiler->thrcode );
-    code = compiler->thrcode;
+    code = share_thrcode( compiler->thrcode );
+
+#if 0
     if( compiler->thrcode == compiler->function_thrcode ) {
 	compiler->function_thrcode = NULL;
     } else
@@ -14728,6 +14739,7 @@ THRCODE *new_thrcode_from_string( char *program, char **include_paths,
 	assert( 0 );
     }
     compiler->thrcode = NULL;
+#endif
 
     thrcode_insert_static_data( code, compiler->static_data,
 				compiler->static_data_size );
