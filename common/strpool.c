@@ -195,7 +195,8 @@ void strpool_fprint_strings( FILE *fp, STRPOOL *p )
     fprintf( fp, "STRPOOL LENGTH: %zd\n", p->pool_length );
     for( i = 0; i < p->pool_length; i++ ) {
         if( !is_free( p, i )) {
-            fprintf( fp, "STRPOOL: %zd: \"%s\"\n", i, p->pool[i].str );
+            fprintf( fp, "STRPOOL: %zd: %p \"%s\"\n", i,
+                     p->pool[i].str, p->pool[i].str );
         }
     }
 }
