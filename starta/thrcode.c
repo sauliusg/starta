@@ -163,7 +163,9 @@ THRCODE *share_thrcode( THRCODE *bc )
 void delete_thrcode( THRCODE *bc )
 {
     if( bc ) {
+#ifdef ALLOCX_DEBUG_COUNTS
         checkptr( bc );
+#endif
         if( bc->rcount <= 0 ) {
 	    printf( "!!! thrcode->rcount = %ld (%p)!!!\n", bc->rcount, bc );
 	    assert( bc->rcount > 0 );
