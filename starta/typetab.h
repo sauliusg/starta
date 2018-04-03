@@ -28,6 +28,7 @@ typedef enum {
 
 TYPETAB *new_typetab( cexception_t *ex );
 void delete_typetab( TYPETAB *table );
+void typetab_break_cycles( TYPETAB *table );
 
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *tnode, cexception_t *ex );

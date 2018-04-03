@@ -55,6 +55,33 @@ void delete_tnode( TNODE *tnode )
     }
 }
 
+TNODE* tnode_break_cycles( TNODE *tnode )
+{
+    if( tnode ) {
+        dispose_dnode( &tnode->fields );
+        dispose_dnode( &tnode->operators );
+        dispose_dnode( &tnode->conversions );
+        dispose_dnode( &tnode->methods );
+        dispose_dnode( &tnode->args );
+        dispose_dnode( &tnode->return_vals );
+
+        delete_tnode( tnode->base_type );
+        tnode->base_type = NULL;
+        delete_tnode( tnode->element_type );
+        tnode->element_type = NULL;
+
+        delete_tlist( tnode->interfaces );
+        tnode->interfaces = NULL;
+
+        dispose_dnode( &tnode->constructor );
+        dispose_dnode( &tnode->destructor );
+
+        tnode_break_cycles( tnode->next );
+    }
+
+    return tnode;
+}
+
 static void tnode_update_self_parameter_type( TNODE *new_tnode,
 					      TNODE *old_tnode )
 {

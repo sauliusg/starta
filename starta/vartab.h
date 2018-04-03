@@ -20,6 +20,8 @@ typedef struct VARTAB VARTAB; /* variable symbol table */
 VARTAB *new_vartab( cexception_t *ex );
 void delete_vartab( VARTAB *table );
 
+void vartab_break_cycles( VARTAB *table );
+
 int vartab_current_scope( VARTAB *vartab );
 
 void vartab_insert_operator( VARTAB *table, const char *name,
