@@ -301,6 +301,12 @@ static void delete_compiler( COMPILER *c )
         delete_thrlist( c->thrstack );
 
 	freex( c->static_data );
+        vartab_break_cycles( c->vartab );
+        vartab_break_cycles( c->consts );
+        vartab_break_cycles( c->compiled_modules );
+        vartab_break_cycles( c->operators );
+        typetab_break_cycles( c->typetab );
+
 	delete_vartab( c->vartab );
 	delete_vartab( c->consts );
 	delete_vartab( c->compiled_modules );

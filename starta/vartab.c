@@ -114,6 +114,17 @@ void delete_vartab( VARTAB *table )
     free_vartab( table );
 }
 
+void vartab_break_cycles( VARTAB *table )
+{
+    VAR_NODE *vnode;
+
+    if( table ) {
+        for( vnode = table->node; vnode != NULL; vnode = vnode->next ) {
+            dnode_break_cycles( vnode->dnode );
+        }
+    }
+}
+
 int vartab_current_scope( VARTAB *vartab )
 {
     assert( vartab );

@@ -36,6 +36,10 @@ typedef enum {
 
 void delete_dnode( DNODE *node );
 
+void dispose_dnode( DNODE *volatile *dnode );
+
+DNODE *dnode_break_cycles( DNODE *dnode );
+
 DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex );
 
 DNODE* clone_dnode( DNODE *dnode, cexception_t *ex );

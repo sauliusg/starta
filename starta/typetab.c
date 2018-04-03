@@ -98,6 +98,18 @@ void delete_typetab( TYPETAB *table )
     freex( table );
 }
 
+void typetab_break_cycles( TYPETAB *table )
+{
+    TYPE_NODE *node;
+
+    if( table ) {
+        for( node = table->node; node != NULL; node = node->next ) {
+            tnode_break_cycles( node->tnode );
+        }
+    }
+}
+
+
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *tnode, cexception_t *ex )
 {
