@@ -110,68 +110,68 @@ Makefile:232: .pack.d: No such file or directory
 Makefile:232: .tcodes.d: No such file or directory
 Makefile:232: .tnode.d: No such file or directory
 Makefile:232: programs/.sl.d: No such file or directory
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/packed-type/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../common/strpool.c | sed -e 's,^strpool.o:,./obj/strpool.o:,' > .strpool.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c yy.c -o obj/yy.o
 sed -f interpreters/packed-type/ifunctions/byte.sed interpreters/packed-type/ifunctions/integer.hin > generated/byte_integer.h
 sed -f interpreters/packed-type/ifunctions/short.sed interpreters/packed-type/ifunctions/integer.hin > generated/short_integer.h
 sed -f interpreters/packed-type/ifunctions/int.sed interpreters/packed-type/ifunctions/integer.hin > generated/int_integer.h
@@ -188,24 +188,24 @@ sed -f interpreters/packed-type/ifunctions/llong.sed interpreters/packed-type/if
 sed -f interpreters/packed-type/ifunctions/float.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/packed-type/ifunctions/double.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/packed-type/ifunctions/ldouble.sed interpreters/packed-type/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c vartab.c -o obj/vartab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c dnode.c -o obj/dnode.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c common.c -o obj/common.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c common.c -o obj/common.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c anode.c -o obj/anode.o
 anode.c: In function ‘delete_anode’:
 anode.c:37:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "!!! anode->rcound == %d !!!\n", node->rcount );
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c run.c -o obj/run.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c run.c -o obj/run.o
 run.c: In function ‘thrcode_dump_single_stack’:
 run.c:544:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
       printf( "%10p %4d %4d %10d  ",
@@ -214,39 +214,39 @@ run.c:544:14: warning: format ‘%d’ expects argument of type ‘int’, but a
 run.c:548:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
       printf( "%10p %4d %4s %10d  ",
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c enode.c -o obj/enode.o
 ar cr libstarta.a ./obj/thrlist.o ./obj/yy.o ./obj/vartab.o ./obj/dnode.o ./obj/elist.o ./obj/tnode_compat.o ./obj/cvalue_t.o ./obj/stlist.o ./obj/typetab.o ./obj/dlist.o ./obj/common.o ./obj/tlist.o ./obj/fixup.o ./obj/anode.o ./obj/thrcode.o ./obj/run.o ./obj/symtab.o ./obj/enode.o
 bison -y -v -d grammar.y
 grammar.y: warning: 2 shift/reduce conflicts [-Wconflicts-sr]
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\""   -c -o grammar.tab.o grammar.tab.c
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2693:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2744:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c ../common/formats.c -o obj/formats.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c ../common/strpool.c -o obj/strpool.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c ../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c ../common/formats.c -o obj/formats.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c ../common/strpool.c -o obj/strpool.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c ../lists/sllist.c -o obj/sllist.o
 ../lists/sllist.c: In function ‘delete_sllist’:
 ../lists/sllist.c:31:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "!!! sllist->rcound == %d !!!\n", list->rcount );
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/bctraverse.c -o obj/bctraverse.o
 interpreters/packed-type/bctraverse.c: In function ‘bctraverse’:
 interpreters/packed-type/bctraverse.c:69:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 5 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "%10p (%10p) (up: %10p) nref = %4d length = %8d, k = %d\n",
               ^
 interpreters/packed-type/bctraverse.c:69:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 6 has type ‘ssize_t {aka long int}’ [-Wformat=]
 interpreters/packed-type/bctraverse.c:69:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 7 has type ‘ssize_t {aka long int}’ [-Wformat=]
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/implementation.c -o obj/implementation.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/pack.c -o obj/pack.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/implementation.c -o obj/implementation.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/pack.c -o obj/pack.o
 awk '/^ *int /{print $2}' generated/byte_integer.h \
 | sed -e 's/(//' \
 | awk '{print "{ "$1", \""$1"\" },"}' > generated/byte_integer.tab.c
@@ -314,7 +314,7 @@ sed -f interpreters/packed-type/ifunctions/llong.sed interpreters/packed-type/if
 sed -f interpreters/packed-type/ifunctions/float.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/packed-type/ifunctions/double.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/packed-type/ifunctions/ldouble.sed interpreters/packed-type/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/tcodes.c -o obj/tcodes.o
 In file included from interpreters/packed-type/tcodes.c:234:0:
 ./generated/byte_intfloat.c: In function ‘BALDCS’:
 ./generated/byte_intfloat.c:295:49: warning: format ‘%d’ expects argument of type ‘int *’, but argument 3 has type ‘signed char *’ [-Wformat=]
@@ -325,15 +325,15 @@ In file included from interpreters/packed-type/tcodes.c:235:0:
 ./generated/short_intfloat.c:295:49: warning: format ‘%d’ expects argument of type ‘int *’, but argument 3 has type ‘short int *’ [-Wformat=]
      sscanf( istate.static_data + string_offset, "%d", &value );
                                                  ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/packed-type/tnode.c -o obj/tnode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/packed-type/tnode.c -o obj/tnode.o
 interpreters/packed-type/tnode.c: In function ‘tnode_print_indent’:
-interpreters/packed-type/tnode.c:1254:13: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
+interpreters/packed-type/tnode.c:1281:13: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
      printf( "size = %d ", tnode->size );
              ^
 ld -shared -soname libstarta.so.0 -o libstarta.so.0.01 obj/thrlist.o obj/yy.o obj/vartab.o obj/dnode.o obj/elist.o obj/tnode_compat.o obj/cvalue_t.o obj/stlist.o obj/typetab.o obj/dlist.o obj/common.o obj/tlist.o obj/fixup.o obj/anode.o obj/thrcode.o obj/run.o obj/symtab.o obj/enode.o grammar.tab.o lexer.lex.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o -ldl -lc_nonshared
 ln -sf libstarta.so.0.01 libstarta.so.0
 ln -sf libstarta.so.0 libstarta.so
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4044M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libstarta.a ../getoptions/libgetoptions.a ../cexceptions/libcexceptions.a -ldl
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/packed-type -DSVN_VERSION="\"SVN revision 4046M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libstarta.a ../getoptions/libgetoptions.a ../cexceptions/libcexceptions.a -ldl
 make OPTFLAGS="" INTERPRETER_DIR="interpreters/packed-type" \
 	-C libraries CC=gcc LD=ld
 make[2]: Entering directory '/home/saulius/src/compilers/branches/saulius-fight-memory-leaks/starta/libraries'
@@ -2117,68 +2117,68 @@ Makefile:232: .pack.d: No such file or directory
 Makefile:232: .tcodes.d: No such file or directory
 Makefile:232: .tnode.d: No such file or directory
 Makefile:232: programs/.sl.d: No such file or directory
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/full-stackcell/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../common/strpool.c | sed -e 's,^strpool.o:,./obj/strpool.o:,' > .strpool.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c yy.c -o obj/yy.o
 sed -f interpreters/full-stackcell/ifunctions/byte.sed interpreters/full-stackcell/ifunctions/integer.hin > generated/byte_integer.h
 sed -f interpreters/full-stackcell/ifunctions/short.sed interpreters/full-stackcell/ifunctions/integer.hin > generated/short_integer.h
 sed -f interpreters/full-stackcell/ifunctions/int.sed interpreters/full-stackcell/ifunctions/integer.hin > generated/int_integer.h
@@ -2195,24 +2195,24 @@ sed -f interpreters/full-stackcell/ifunctions/llong.sed interpreters/full-stackc
 sed -f interpreters/full-stackcell/ifunctions/float.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/full-stackcell/ifunctions/double.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/full-stackcell/ifunctions/ldouble.sed interpreters/full-stackcell/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c vartab.c -o obj/vartab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c dnode.c -o obj/dnode.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c common.c -o obj/common.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c common.c -o obj/common.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c anode.c -o obj/anode.o
 anode.c: In function ‘delete_anode’:
 anode.c:37:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "!!! anode->rcound == %d !!!\n", node->rcount );
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c run.c -o obj/run.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c run.c -o obj/run.o
 run.c: In function ‘thrcode_dump_single_stack’:
 run.c:544:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
       printf( "%10p %4d %4d %10d  ",
@@ -2221,38 +2221,38 @@ run.c:544:14: warning: format ‘%d’ expects argument of type ‘int’, but a
 run.c:548:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
       printf( "%10p %4d %4s %10d  ",
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c enode.c -o obj/enode.o
 ar cr libstarta.a ./obj/thrlist.o ./obj/yy.o ./obj/vartab.o ./obj/dnode.o ./obj/elist.o ./obj/tnode_compat.o ./obj/cvalue_t.o ./obj/stlist.o ./obj/typetab.o ./obj/dlist.o ./obj/common.o ./obj/tlist.o ./obj/fixup.o ./obj/anode.o ./obj/thrcode.o ./obj/run.o ./obj/symtab.o ./obj/enode.o
 bison -y -v -d grammar.y
 grammar.y: warning: 2 shift/reduce conflicts [-Wconflicts-sr]
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\""   -c -o grammar.tab.o grammar.tab.c
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2693:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2744:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c ../common/formats.c -o obj/formats.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c ../common/strpool.c -o obj/strpool.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c ../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c ../common/formats.c -o obj/formats.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c ../common/strpool.c -o obj/strpool.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c ../lists/sllist.c -o obj/sllist.o
 ../lists/sllist.c: In function ‘delete_sllist’:
 ../lists/sllist.c:31:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "!!! sllist->rcound == %d !!!\n", list->rcount );
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/bctraverse.c -o obj/bctraverse.o
 interpreters/full-stackcell/bctraverse.c: In function ‘bctraverse’:
 interpreters/full-stackcell/bctraverse.c:64:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 5 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "%10p (%10p) (up: %10p) nref = %4d length = %8d, k = %d\n",
               ^
 interpreters/full-stackcell/bctraverse.c:64:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 6 has type ‘ssize_t {aka long int}’ [-Wformat=]
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/implementation.c -o obj/implementation.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/pack.c -o obj/pack.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/implementation.c -o obj/implementation.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/pack.c -o obj/pack.o
 awk '/^ *int /{print $2}' generated/byte_integer.h \
 | sed -e 's/(//' \
 | awk '{print "{ "$1", \""$1"\" },"}' > generated/byte_integer.tab.c
@@ -2320,7 +2320,7 @@ sed -f interpreters/full-stackcell/ifunctions/llong.sed interpreters/full-stackc
 sed -f interpreters/full-stackcell/ifunctions/float.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/full-stackcell/ifunctions/double.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/full-stackcell/ifunctions/ldouble.sed interpreters/full-stackcell/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/tcodes.c -o obj/tcodes.o
 In file included from interpreters/full-stackcell/tcodes.c:234:0:
 ./generated/byte_intfloat.c: In function ‘BALDCS’:
 ./generated/byte_intfloat.c:295:49: warning: format ‘%d’ expects argument of type ‘int *’, but argument 3 has type ‘signed char *’ [-Wformat=]
@@ -2335,15 +2335,15 @@ interpreters/full-stackcell/tcodes.c: In function ‘FREAD’:
 interpreters/full-stackcell/tcodes.c:2462:12: note: the ABI of passing union with long double has changed in GCC 4.4
       char *message =
             ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/full-stackcell/tnode.c -o obj/tnode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/full-stackcell/tnode.c -o obj/tnode.o
 interpreters/full-stackcell/tnode.c: In function ‘tnode_print_indent’:
-interpreters/full-stackcell/tnode.c:1248:13: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
+interpreters/full-stackcell/tnode.c:1275:13: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
      printf( "size = %d ", tnode->size );
              ^
 ld -shared -soname libstarta.so.0 -o libstarta.so.0.01 obj/thrlist.o obj/yy.o obj/vartab.o obj/dnode.o obj/elist.o obj/tnode_compat.o obj/cvalue_t.o obj/stlist.o obj/typetab.o obj/dlist.o obj/common.o obj/tlist.o obj/fixup.o obj/anode.o obj/thrcode.o obj/run.o obj/symtab.o obj/enode.o grammar.tab.o lexer.lex.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o -ldl -lc_nonshared
 ln -sf libstarta.so.0.01 libstarta.so.0
 ln -sf libstarta.so.0 libstarta.so
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4044M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libstarta.a ../getoptions/libgetoptions.a ../cexceptions/libcexceptions.a -ldl
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/full-stackcell -DSVN_VERSION="\"SVN revision 4046M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libstarta.a ../getoptions/libgetoptions.a ../cexceptions/libcexceptions.a -ldl
 make OPTFLAGS="" INTERPRETER_DIR="interpreters/full-stackcell" \
 	-C libraries CC=gcc LD=ld
 make[2]: Entering directory '/home/saulius/src/compilers/branches/saulius-fight-memory-leaks/starta/libraries'
@@ -4127,68 +4127,68 @@ Makefile:232: .pack.d: No such file or directory
 Makefile:232: .tcodes.d: No such file or directory
 Makefile:232: .tnode.d: No such file or directory
 Makefile:232: programs/.sl.d: No such file or directory
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 programs/sl.c | sed -e 's,^sl.o:,./obj/programs/sl.o:,' > programs/.sl.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/tnode.c | sed -e 's,^tnode.o:,./obj/tnode.o:,' > .tnode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/tcodes.c | sed -e 's,^tcodes.o:,./obj/tcodes.o:,' > .tcodes.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/pack.c | sed -e 's,^pack.o:,./obj/pack.o:,' > .pack.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/implementation.c | sed -e 's,^implementation.o:,./obj/implementation.o:,' > .implementation.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/bytecode_file.c | sed -e 's,^bytecode_file.o:,./obj/bytecode_file.o:,' > .bytecode_file.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/bctraverse.c | sed -e 's,^bctraverse.o:,./obj/bctraverse.o:,' > .bctraverse.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/bcalloc.c | sed -e 's,^bcalloc.o:,./obj/bcalloc.o:,' > .bcalloc.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 interpreters/split-stackcell/alloccell.c | sed -e 's,^alloccell.o:,./obj/alloccell.o:,' > .alloccell.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../lists/sllist.c | sed -e 's,^sllist.o:,./obj/sllist.o:,' > .sllist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../common/strpool.c | sed -e 's,^strpool.o:,./obj/strpool.o:,' > .strpool.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 ../common/formats.c | sed -e 's,^formats.o:,./obj/formats.o:,' > .formats.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 common.c | sed -e 's,^common.o:,./obj/common.o:,' > .common.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 anode.c | sed -e 's,^anode.o:,./obj/anode.o:,' > .anode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 enode.c | sed -e 's,^enode.o:,./obj/enode.o:,' > .enode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 cvalue_t.c | sed -e 's,^cvalue_t.o:,./obj/cvalue_t.o:,' > .cvalue_t.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 run.c | sed -e 's,^run.o:,./obj/run.o:,' > .run.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 tnode_compat.c | sed -e 's,^tnode_compat.o:,./obj/tnode_compat.o:,' > .tnode_compat.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 vartab.c | sed -e 's,^vartab.o:,./obj/vartab.o:,' > .vartab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 symtab.c | sed -e 's,^symtab.o:,./obj/symtab.o:,' > .symtab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 tlist.c | sed -e 's,^tlist.o:,./obj/tlist.o:,' > .tlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 elist.c | sed -e 's,^elist.o:,./obj/elist.o:,' > .elist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 thrlist.c | sed -e 's,^thrlist.o:,./obj/thrlist.o:,' > .thrlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 dnode.c | sed -e 's,^dnode.o:,./obj/dnode.o:,' > .dnode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 fixup.c | sed -e 's,^fixup.o:,./obj/fixup.o:,' > .fixup.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 dlist.c | sed -e 's,^dlist.o:,./obj/dlist.o:,' > .dlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 yy.c | sed -e 's,^yy.o:,./obj/yy.o:,' > .yy.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 thrcode.c | sed -e 's,^thrcode.o:,./obj/thrcode.o:,' > .thrcode.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 typetab.c | sed -e 's,^typetab.o:,./obj/typetab.o:,' > .typetab.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -M -MG \
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -M -MG \
 stlist.c | sed -e 's,^stlist.o:,./obj/stlist.o:,' > .stlist.d
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c thrlist.c -o obj/thrlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c yy.c -o obj/yy.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c thrlist.c -o obj/thrlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c yy.c -o obj/yy.o
 sed -f interpreters/split-stackcell/ifunctions/byte.sed interpreters/split-stackcell/ifunctions/integer.hin > generated/byte_integer.h
 sed -f interpreters/split-stackcell/ifunctions/short.sed interpreters/split-stackcell/ifunctions/integer.hin > generated/short_integer.h
 sed -f interpreters/split-stackcell/ifunctions/int.sed interpreters/split-stackcell/ifunctions/integer.hin > generated/int_integer.h
@@ -4205,24 +4205,24 @@ sed -f interpreters/split-stackcell/ifunctions/llong.sed interpreters/split-stac
 sed -f interpreters/split-stackcell/ifunctions/float.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/float_intfloat.h
 sed -f interpreters/split-stackcell/ifunctions/double.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/double_intfloat.h
 sed -f interpreters/split-stackcell/ifunctions/ldouble.sed interpreters/split-stackcell/ifunctions/intfloat.hin > generated/ldouble_intfloat.h
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c vartab.c -o obj/vartab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c dnode.c -o obj/dnode.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c elist.c -o obj/elist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c tnode_compat.c -o obj/tnode_compat.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c cvalue_t.c -o obj/cvalue_t.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c stlist.c -o obj/stlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c typetab.c -o obj/typetab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c dlist.c -o obj/dlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c common.c -o obj/common.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c tlist.c -o obj/tlist.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c fixup.c -o obj/fixup.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c anode.c -o obj/anode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c vartab.c -o obj/vartab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c dnode.c -o obj/dnode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c elist.c -o obj/elist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c tnode_compat.c -o obj/tnode_compat.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c cvalue_t.c -o obj/cvalue_t.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c stlist.c -o obj/stlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c typetab.c -o obj/typetab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c dlist.c -o obj/dlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c common.c -o obj/common.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c tlist.c -o obj/tlist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c fixup.c -o obj/fixup.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c anode.c -o obj/anode.o
 anode.c: In function ‘delete_anode’:
 anode.c:37:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "!!! anode->rcound == %d !!!\n", node->rcount );
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c thrcode.c -o obj/thrcode.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c run.c -o obj/run.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c thrcode.c -o obj/thrcode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c run.c -o obj/run.o
 run.c: In function ‘thrcode_dump_single_stack’:
 run.c:544:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
       printf( "%10p %4d %4d %10d  ",
@@ -4231,39 +4231,39 @@ run.c:544:14: warning: format ‘%d’ expects argument of type ‘int’, but a
 run.c:548:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
       printf( "%10p %4d %4s %10d  ",
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c symtab.c -o obj/symtab.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c enode.c -o obj/enode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c symtab.c -o obj/symtab.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c enode.c -o obj/enode.o
 ar cr libstarta.a ./obj/thrlist.o ./obj/yy.o ./obj/vartab.o ./obj/dnode.o ./obj/elist.o ./obj/tnode_compat.o ./obj/cvalue_t.o ./obj/stlist.o ./obj/typetab.o ./obj/dlist.o ./obj/common.o ./obj/tlist.o ./obj/fixup.o ./obj/anode.o ./obj/thrcode.o ./obj/run.o ./obj/symtab.o ./obj/enode.o
 bison -y -v -d grammar.y
 grammar.y: warning: 2 shift/reduce conflicts [-Wconflicts-sr]
 test -f y.tab.c  && mv y.tab.c grammar.tab.c   ; true
 test -f y.tab.h  && mv y.tab.h grammar.tab.h   ; true
 test -f y.output && mv y.output grammar.output ; true
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\""   -c -o grammar.tab.o grammar.tab.c
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\""   -c -o grammar.tab.o grammar.tab.c
 flex -d lexer.flex
 mv lex.yy.c lexer.lex.c
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\""   -c -o lexer.lex.o lexer.lex.c
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\""   -c -o lexer.lex.o lexer.lex.c
 lex.yy.c:2693:17: warning: ‘yyunput’ defined but not used [-Wunused-function]
 lex.yy.c:2744:16: warning: ‘input’ defined but not used [-Wunused-function]
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c ../common/formats.c -o obj/formats.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c ../common/strpool.c -o obj/strpool.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c ../lists/sllist.c -o obj/sllist.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c ../common/formats.c -o obj/formats.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c ../common/strpool.c -o obj/strpool.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c ../lists/sllist.c -o obj/sllist.o
 ../lists/sllist.c: In function ‘delete_sllist’:
 ../lists/sllist.c:31:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "!!! sllist->rcound == %d !!!\n", list->rcount );
               ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/alloccell.c -o obj/alloccell.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/bcalloc.c -o obj/bcalloc.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/bctraverse.c -o obj/bctraverse.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/alloccell.c -o obj/alloccell.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/bcalloc.c -o obj/bcalloc.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/bctraverse.c -o obj/bctraverse.o
 interpreters/split-stackcell/bctraverse.c: In function ‘bctraverse’:
 interpreters/split-stackcell/bctraverse.c:69:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 5 has type ‘ssize_t {aka long int}’ [-Wformat=]
       printf( "%10p (%10p) (up: %10p) nref = %4d length = %8d, k = %d\n",
               ^
 interpreters/split-stackcell/bctraverse.c:69:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 6 has type ‘ssize_t {aka long int}’ [-Wformat=]
 interpreters/split-stackcell/bctraverse.c:69:14: warning: format ‘%d’ expects argument of type ‘int’, but argument 7 has type ‘ssize_t {aka long int}’ [-Wformat=]
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/bytecode_file.c -o obj/bytecode_file.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/implementation.c -o obj/implementation.o
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/pack.c -o obj/pack.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/bytecode_file.c -o obj/bytecode_file.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/implementation.c -o obj/implementation.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/pack.c -o obj/pack.o
 awk '/^ *int /{print $2}' generated/byte_integer.h \
 | sed -e 's/(//' \
 | awk '{print "{ "$1", \""$1"\" },"}' > generated/byte_integer.tab.c
@@ -4331,7 +4331,7 @@ sed -f interpreters/split-stackcell/ifunctions/llong.sed interpreters/split-stac
 sed -f interpreters/split-stackcell/ifunctions/float.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/float_intfloat.c
 sed -f interpreters/split-stackcell/ifunctions/double.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/double_intfloat.c
 sed -f interpreters/split-stackcell/ifunctions/ldouble.sed interpreters/split-stackcell/ifunctions/intfloat.cin > generated/ldouble_intfloat.c
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/tcodes.c -o obj/tcodes.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/tcodes.c -o obj/tcodes.o
 In file included from interpreters/split-stackcell/tcodes.c:233:0:
 ./generated/byte_intfloat.c: In function ‘BALDCS’:
 ./generated/byte_intfloat.c:296:49: warning: format ‘%d’ expects argument of type ‘int *’, but argument 3 has type ‘signed char *’ [-Wformat=]
@@ -4346,15 +4346,15 @@ interpreters/split-stackcell/tcodes.c: In function ‘FREAD’:
 interpreters/split-stackcell/tcodes.c:2663:12: note: the ABI of passing union with long double has changed in GCC 4.4
       char *message =
             ^
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\"" -c interpreters/split-stackcell/tnode.c -o obj/tnode.o
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\"" -c interpreters/split-stackcell/tnode.c -o obj/tnode.o
 interpreters/split-stackcell/tnode.c: In function ‘tnode_print_indent’:
-interpreters/split-stackcell/tnode.c:1250:13: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
+interpreters/split-stackcell/tnode.c:1277:13: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘ssize_t {aka long int}’ [-Wformat=]
      printf( "size = %d ", tnode->size );
              ^
 ld -shared -soname libstarta.so.0 -o libstarta.so.0.01 obj/thrlist.o obj/yy.o obj/vartab.o obj/dnode.o obj/elist.o obj/tnode_compat.o obj/cvalue_t.o obj/stlist.o obj/typetab.o obj/dlist.o obj/common.o obj/tlist.o obj/fixup.o obj/anode.o obj/thrcode.o obj/run.o obj/symtab.o obj/enode.o grammar.tab.o lexer.lex.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o -ldl -lc_nonshared
 ln -sf libstarta.so.0.01 libstarta.so.0
 ln -sf libstarta.so.0 libstarta.so
-gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4044M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libstarta.a ../getoptions/libgetoptions.a ../cexceptions/libcexceptions.a -ldl
+gcc -Wall -g -fPIC  -DYYDEBUG=1 -D_YACC_ -I. -I. -I../cexceptions -I../common -I../getoptions -I../lists -Iinterpreters/split-stackcell -DSVN_VERSION="\"SVN revision 4046M\""  -o sl programs/sl.c grammar.tab.o lexer.lex.o obj/common.o obj/formats.o obj/strpool.o obj/sllist.o obj/alloccell.o obj/bcalloc.o obj/bctraverse.o obj/bytecode_file.o obj/implementation.o obj/pack.o obj/tcodes.o obj/tnode.o libstarta.a ../getoptions/libgetoptions.a ../cexceptions/libcexceptions.a -ldl
 make OPTFLAGS="" INTERPRETER_DIR="interpreters/split-stackcell" \
 	-C libraries CC=gcc LD=ld
 make[2]: Entering directory '/home/saulius/src/compilers/branches/saulius-fight-memory-leaks/starta/libraries'
