@@ -74,10 +74,10 @@ void dlist_push( DLIST *volatile *list,
 }
 
 void dlist_push_data( DLIST *volatile *list,
-			DNODE *volatile *data,
-			dnode_delete_function_t delete_fn,
-			dnode_dispose_function_t dispose_fn,
-			cexception_t *ex )
+                      DNODE *volatile *data,
+                      dnode_delete_function_t delete_fn,
+                      dnode_dispose_function_t dispose_fn,
+                      cexception_t *ex )
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
