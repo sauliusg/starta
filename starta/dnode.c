@@ -112,6 +112,12 @@ void delete_dnode( DNODE *node )
 	freex( node->filename );
 	freex( node->synonim );
 	freex( node->code );
+
+        typetab_break_cycles( node->typetab );
+        vartab_break_cycles( node->vartab );
+        vartab_break_cycles( node->consts );
+        vartab_break_cycles( node->operators );
+
 	delete_tnode( node->tnode );
 	delete_vartab( node->vartab );
 	delete_vartab( node->consts );
@@ -128,6 +134,7 @@ void delete_dnode( DNODE *node )
 #endif
 	delete_fixup_list( node->code_fixups );
 	const_value_free( &node->cvalue );
+
         delete_dnode( node->module_args );
 	free_dnode( node );
 	node = next;
