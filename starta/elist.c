@@ -17,21 +17,23 @@ void delete_elist( ELIST *list )
 }
 
 ELIST* new_elist( ENODE *enode,
-		      enode_delete_function_t delete_fn,
-		      ELIST *next,
-		      cexception_t *ex )
+                  enode_delete_function_t delete_fn,
+                  ELIST *next,
+                  cexception_t *ex )
 {
-    return (ELIST*)new_sllist( enode, (delete_function_t) delete_fn,
-				 (SLLIST*) next, ex );
+    return (ELIST*)new_sllist( enode, (break_cycle_function_t)NULL,
+                               (delete_function_t) delete_fn,
+                               (SLLIST*) next, ex );
 }
 
 void create_elist( ELIST * volatile *list,
-		     ENODE * volatile *data,
-		     enode_dispose_function_t dispose_fn,
-		     ELIST *next, cexception_t *ex )
+                   ENODE * volatile *data,
+                   enode_dispose_function_t dispose_fn,
+                   ELIST *next, cexception_t *ex )
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
+                   (break_cycle_function_t)NULL,
 		   (dispose_function_t) dispose_fn,
 		   (SLLIST*) next, ex );
 }
@@ -83,6 +85,7 @@ void elist_push_data( ELIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t)NULL,
 		      (delete_function_t) delete_fn,
 		      (dispose_function_t) dispose_fn,
 		      ex );

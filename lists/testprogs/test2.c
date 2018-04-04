@@ -33,6 +33,7 @@ static void create_string_list( SLLIST * volatile *list,
 				cexception_t *exception )
 {
     create_sllist( list, (void**)(value),
+                   (break_cycle_function_t)NULL,
 		   (dispose_function_t)strdispose,
                    next, exception );
 }
@@ -42,6 +43,7 @@ static void push_shared_string( SLLIST * volatile *list,
 				cexception_t *exception )
 {
     sllist_push_shared_data( list, (void*)(value),
+                             (break_cycle_function_t)NULL,
                              (delete_function_t)free,
                              (dispose_function_t)NULL,
                              (share_function_t)strdup,

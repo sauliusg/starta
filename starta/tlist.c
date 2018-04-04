@@ -20,7 +20,8 @@ TLIST* new_tlist( TNODE *tnode,
                   TLIST *next,
                   cexception_t *ex )
 {
-    return (TLIST*)new_sllist( tnode, (delete_function_t) delete_tnode,
+    return (TLIST*)new_sllist( tnode, (break_cycle_function_t) tnode_break_cycles,
+                               (delete_function_t) delete_tnode,
                                (SLLIST*) next, ex );
 }
 
@@ -30,8 +31,14 @@ void create_tlist( TLIST * volatile *list,
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
+                   (break_cycle_function_t) tnode_break_cycles,
 		   (dispose_function_t) dispose_tnode,
 		   (SLLIST*) next, ex );
+}
+
+void tlist_break_cycles( TLIST *list )
+{
+    sllist_break_cycles( (SLLIST *)list );
 }
 
 void dispose_tlist( TLIST* volatile *list )
@@ -81,6 +88,7 @@ void tlist_push_data( TLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) tnode_break_cycles,
 		      (delete_function_t) delete_fn,
 		      (dispose_function_t) dispose_fn,
 		      ex );
@@ -92,6 +100,7 @@ void tlist_push_tnode( TLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) tnode_break_cycles,
 		      (delete_function_t) delete_tnode,
 		      NULL,
 		      ex );

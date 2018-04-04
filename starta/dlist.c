@@ -20,7 +20,8 @@ DLIST* new_dlist( DNODE *dnode,
                   DLIST *next,
                   cexception_t *ex )
 {
-    return (DLIST*)new_sllist( dnode, (delete_function_t) delete_dnode,
+    return (DLIST*)new_sllist( dnode, (break_cycle_function_t) dnode_break_cycles,
+                               (delete_function_t) delete_dnode,
                                (SLLIST*) next, ex );
 }
 
@@ -30,8 +31,14 @@ void create_dlist( DLIST * volatile *list,
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
+                   (break_cycle_function_t) dnode_break_cycles,
 		   (dispose_function_t) dispose_dnode,
 		   (SLLIST*) next, ex );
+}
+
+void dlist_break_cycles( DLIST *list )
+{
+    sllist_break_cycles( (SLLIST *)list );
 }
 
 void dispose_dlist( DLIST* volatile *list )
@@ -81,6 +88,7 @@ void dlist_push_data( DLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) dnode_break_cycles,
 		      (delete_function_t) delete_fn,
 		      (dispose_function_t) dispose_fn,
 		      ex );
@@ -92,6 +100,7 @@ void dlist_push_dnode( DLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) dnode_break_cycles,
 		      (delete_function_t) delete_dnode,
 		      NULL,
 		      ex );

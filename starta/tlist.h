@@ -23,6 +23,7 @@ TLIST* new_tlist( TNODE *tnode,
 void create_tlist( TLIST * volatile *list,
                    TNODE * volatile *data,
                    TLIST *next, cexception_t *ex );
+void tlist_break_cycles( TLIST *list );
 void dispose_tlist( TLIST* volatile *list );
 TNODE* tlist_data( TLIST *list );
 TNODE* tlist_extract_data( TLIST *list );
