@@ -157,7 +157,7 @@ DNODE *dnode_break_cycles( DNODE *dnode )
         delete_fixup_list( dnode->code_fixups );
         dnode->code_fixups = NULL;
 
-        dnode_break_cycles( dnode->next );
+        dispose_dnode( &dnode->next );
         dispose_dnode( &dnode->module_args );
     }
     
