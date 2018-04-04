@@ -55,6 +55,13 @@ void delete_tnode( TNODE *tnode )
     }
 }
 
+void dispose_tnode( TNODE *volatile *tnode )
+{
+    assert( tnode );
+    delete_tnode( *tnode );
+    *tnode = NULL;
+}
+
 TNODE* tnode_break_cycles( TNODE *tnode )
 {
     if( tnode ) {
