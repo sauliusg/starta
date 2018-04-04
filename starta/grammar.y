@@ -338,7 +338,8 @@ static void delete_compiler( COMPILER *c )
 
         dnode_break_cycles( c->current_module );
         delete_dnode( c->current_module );
-        
+
+        vartab_break_cycles( c->initialised_references );
         delete_vartab( c->initialised_references );
 	delete_stlist( c->initialised_ref_symtab_stack );
 
@@ -348,6 +349,7 @@ static void delete_compiler( COMPILER *c )
 
         freex( c->use_module_name );
         freex( c->module_filename );
+
         dnode_break_cycles( c->requested_module );
         delete_dnode( c->requested_module );
 
