@@ -293,4 +293,8 @@ TNODE *tnode_drop_last_argument( TNODE *tnode );
 #define foreach_tnode_base_class( NODE, LIST ) \
    for( NODE = LIST; NODE != NULL; NODE = tnode_base_type( NODE ))
 
+void tnode_print_allocated();
+void tnode_print_allocated_to_stderr();
+void tnode_fprint_allocated( FILE *fp );
+
 #endif

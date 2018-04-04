@@ -47,8 +47,14 @@ static DNODE *alloc_dnode( cexception_t *ex )
     /* return callocx( sizeof(DNODE), 1, ex ); */
     assert( last_dnode < MAX_DNODES );
     /* printf( "allocating dnode %ld\n", last_dnode ); */
+    TNODE *node = &dnodes[last_dnode++];
+    if( allocated ) {
+        allocated->prev_alloc = node;
+    }
+    node->next_alloc = allocated;
+    allocated = node;
     maxalloc ++;
-    return &dnodes[last_dnode++];
+    return node;
 }
 
 static void free_dnode( DNODE *dnode )
