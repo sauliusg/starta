@@ -330,6 +330,7 @@ static void delete_compiler( COMPILER *c )
         dnode_break_cycles( c->current_call );
 	delete_dnode( c->current_call );
 
+        dlist_break_cycles( c->current_call_stack );
 	delete_dlist( c->current_call_stack );
         assert( !c->current_arg_stack );
         freex( c->current_interface_nr_stack );
@@ -343,8 +344,10 @@ static void delete_compiler( COMPILER *c )
         delete_vartab( c->initialised_references );
 	delete_stlist( c->initialised_ref_symtab_stack );
 
+        dlist_break_cycles( c->current_function_stack );
         delete_dlist( c->current_function_stack );
 
+        tlist_break_cycles( c->current_type_stack );
         delete_tlist( c->current_type_stack );
 
         freex( c->use_module_name );

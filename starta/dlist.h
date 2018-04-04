@@ -22,6 +22,7 @@ DLIST* new_dlist( DNODE *dnode,
 void create_dlist( DLIST * volatile *list,
                    DNODE * volatile *data,
                    DLIST *next, cexception_t *ex );
+void dlist_break_cycles( DLIST *list );
 void dispose_dlist( DLIST* volatile *list );
 DNODE* dlist_data( DLIST *list );
 DNODE* dlist_extract_data( DLIST *list );

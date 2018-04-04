@@ -17,21 +17,23 @@ void delete_stlist( STLIST *list )
 }
 
 STLIST* new_stlist( SYMTAB *symtab,
-		      symtab_delete_function_t delete_fn,
-		      STLIST *next,
-		      cexception_t *ex )
+                    symtab_delete_function_t delete_fn,
+                    STLIST *next,
+                    cexception_t *ex )
 {
-    return (STLIST*)new_sllist( symtab, (delete_function_t) delete_fn,
-				 (SLLIST*) next, ex );
+    return (STLIST*)new_sllist( symtab, (break_cycle_function_t)NULL,
+                                (delete_function_t) delete_fn,
+                                (SLLIST*) next, ex );
 }
 
 void create_stlist( STLIST * volatile *list,
-		     SYMTAB * volatile *data,
-		     symtab_dispose_function_t dispose_fn,
-		     STLIST *next, cexception_t *ex )
+                    SYMTAB * volatile *data,
+                    symtab_dispose_function_t dispose_fn,
+                    STLIST *next, cexception_t *ex )
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
+                   (break_cycle_function_t)NULL,
 		   (dispose_function_t) dispose_fn,
 		   (SLLIST*) next, ex );
 }
@@ -67,8 +69,8 @@ void stlist_disconnect( STLIST *list )
 }
 
 void stlist_push( STLIST *volatile *list,
-		   STLIST *volatile *node,
-		   cexception_t *ex )
+                  STLIST *volatile *node,
+                  cexception_t *ex )
 {
     sllist_push( (SLLIST *volatile *)list,
 		 (SLLIST *volatile *)node,
@@ -76,13 +78,14 @@ void stlist_push( STLIST *volatile *list,
 }
 
 void stlist_push_data( STLIST *volatile *list,
-			SYMTAB *volatile *data,
-			symtab_delete_function_t delete_fn,
-			symtab_dispose_function_t dispose_fn,
-			cexception_t *ex )
+                       SYMTAB *volatile *data,
+                       symtab_delete_function_t delete_fn,
+                       symtab_dispose_function_t dispose_fn,
+                       cexception_t *ex )
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t)NULL,
 		      (delete_function_t) delete_fn,
 		      (dispose_function_t) dispose_fn,
 		      ex );
@@ -94,6 +97,7 @@ void stlist_push_symtab( STLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t)NULL,
 		      (delete_function_t) delete_symtab,
 		      NULL,
 		      ex );
