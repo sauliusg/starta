@@ -17,22 +17,20 @@ void delete_tlist( TLIST *list )
 }
 
 TLIST* new_tlist( TNODE *tnode,
-		      tnode_delete_function_t delete_fn,
-		      TLIST *next,
-		      cexception_t *ex )
+                  TLIST *next,
+                  cexception_t *ex )
 {
-    return (TLIST*)new_sllist( tnode, (delete_function_t) delete_fn,
-				 (SLLIST*) next, ex );
+    return (TLIST*)new_sllist( tnode, (delete_function_t) delete_tnode,
+                               (SLLIST*) next, ex );
 }
 
 void create_tlist( TLIST * volatile *list,
-		     TNODE * volatile *data,
-		     tnode_dispose_function_t dispose_fn,
-		     TLIST *next, cexception_t *ex )
+                   TNODE * volatile *data,
+                   TLIST *next, cexception_t *ex )
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
-		   (dispose_function_t) dispose_fn,
+		   (dispose_function_t) dispose_tnode,
 		   (SLLIST*) next, ex );
 }
 
