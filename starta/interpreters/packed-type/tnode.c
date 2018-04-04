@@ -130,8 +130,22 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
     /* The field dst->base_type is simply copied along with all other
        fields. */
     dst_kind = dst->kind;
+
+    ssize_t serno = src->serno;
+    void *src_next_alloc = src->next_alloc;
+    void *src_prev_alloc = src->prev_alloc;
+
+    src->next_alloc = dst->next_alloc;
+    src->prev_alloc = dst->prev_alloc;
+
     *dst = *src;
+
     memset( src, 0, sizeof(*src));
+
+    src->serno = serno;
+    src->next_alloc = src_next_alloc;
+    src->prev_alloc = src_prev_alloc;
+
     dst->rcount = dst_rcount;
     src->rcount = src_rcount;
 
@@ -1283,7 +1297,7 @@ void tnode_print_indent( TNODE *tnode, int indent )
     assert( tnode );
     printf( "%*sTNODE ", indent, "" );
     printf( "%s ", tnode_kind_name( tnode ));
-    printf( "size = %d ", tnode->size );
+    printf( "size = %zd ", tnode->size );
     printf( "%s ", tnode->name ? tnode->name : "-" );
     putchar( '\n' );
     if( tnode->element_type )

@@ -358,6 +358,7 @@ static void delete_compiler( COMPILER *c )
         if( memleak_debug ) {
             strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();
+            tnode_print_allocated_to_stderr();
         }
 
         delete_strpool( c->strpool );

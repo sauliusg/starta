@@ -10,6 +10,11 @@
 #include <tlist.h>
 
 struct TNODE {
+    /* Next and previous TNODEs in the allocated TNODE list; used to
+       keep track of the allocated TNODEs and to prevent memory
+       leaks: */
+    TNODE *next_alloc, *prev_alloc;
+
     type_kind_t kind;     /* what kind of type is it: simple type,
 			     struct, class, vector, function type, etc. */
     char *name;           /* name of the type ( 'int', 'real', etc. ) */
@@ -27,6 +32,8 @@ struct TNODE {
     ssize_t nrefs;        /* number of fields in the type (structure, class,
 			     etc.) that are references and should be garbage
 			     collected */
+
+    ssize_t serno;
 
     ssize_t nextnumoffs;  /* The offset of the next numeric
                              (non-reference) field to be assigned. */
