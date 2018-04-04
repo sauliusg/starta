@@ -327,6 +327,7 @@ static void delete_compiler( COMPILER *c )
 	delete_enode( c->e_stack );
         freex( c->try_variable_stack );
 
+        dnode_break_cycles( c->current_call );
 	delete_dnode( c->current_call );
 
 	delete_dlist( c->current_call_stack );
@@ -335,6 +336,9 @@ static void delete_compiler( COMPILER *c )
 
 	delete_dlist( c->current_module_stack );
 
+        dnode_break_cycles( c->current_module );
+        delete_dnode( c->current_module );
+        
         delete_vartab( c->initialised_references );
 	delete_stlist( c->initialised_ref_symtab_stack );
 
@@ -344,6 +348,7 @@ static void delete_compiler( COMPILER *c )
 
         freex( c->use_module_name );
         freex( c->module_filename );
+        dnode_break_cycles( c->requested_module );
         delete_dnode( c->requested_module );
 
         delete_string_array( &c->include_paths );
