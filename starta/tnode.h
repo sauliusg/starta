@@ -74,6 +74,7 @@ typedef enum {
 } type_kind_t;
 
 void delete_tnode( TNODE *tnode );
+void dispose_tnode( TNODE *volatile *tnode );
 TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );

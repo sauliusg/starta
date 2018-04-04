@@ -144,8 +144,8 @@ void dispose_dnode( DNODE *volatile *dnode )
 DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
-        delete_tnode( dnode->tnode );
-        dnode->tnode = NULL;
+        dispose_tnode( &dnode->tnode );
+
         delete_vartab( dnode->vartab );
         dnode->vartab = NULL;
         delete_vartab( dnode->consts );
