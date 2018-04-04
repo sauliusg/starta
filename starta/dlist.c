@@ -17,22 +17,20 @@ void delete_dlist( DLIST *list )
 }
 
 DLIST* new_dlist( DNODE *dnode,
-		      dnode_delete_function_t delete_fn,
-		      DLIST *next,
-		      cexception_t *ex )
+                  DLIST *next,
+                  cexception_t *ex )
 {
-    return (DLIST*)new_sllist( dnode, (delete_function_t) delete_fn,
-				 (SLLIST*) next, ex );
+    return (DLIST*)new_sllist( dnode, (delete_function_t) delete_dnode,
+                               (SLLIST*) next, ex );
 }
 
 void create_dlist( DLIST * volatile *list,
-		     DNODE * volatile *data,
-		     dnode_dispose_function_t dispose_fn,
-		     DLIST *next, cexception_t *ex )
+                   DNODE * volatile *data,
+                   DLIST *next, cexception_t *ex )
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
-		   (dispose_function_t) dispose_fn,
+		   (dispose_function_t) dispose_dnode,
 		   (SLLIST*) next, ex );
 }
 
