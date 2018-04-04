@@ -72,10 +72,8 @@ TNODE* tnode_break_cycles( TNODE *tnode )
         dispose_dnode( &tnode->args );
         dispose_dnode( &tnode->return_vals );
 
-        delete_tnode( tnode->base_type );
-        tnode->base_type = NULL;
-        delete_tnode( tnode->element_type );
-        tnode->element_type = NULL;
+        dispose_tnode( &tnode->base_type );
+        dispose_tnode( &tnode->element_type );
 
         delete_tlist( tnode->interfaces );
         tnode->interfaces = NULL;
