@@ -65,6 +65,13 @@ void dispose_tnode( TNODE *volatile *tnode )
 TNODE* tnode_break_cycles( TNODE *tnode )
 {
     if( tnode ) {
+        dnode_break_cycles( tnode->fields );
+        dnode_break_cycles( tnode->operators );
+        dnode_break_cycles( tnode->conversions );
+        dnode_break_cycles( tnode->methods );
+        dnode_break_cycles( tnode->args );
+        dnode_break_cycles( tnode->return_vals );
+
         dispose_dnode( &tnode->fields );
         dispose_dnode( &tnode->operators );
         dispose_dnode( &tnode->conversions );
@@ -78,10 +85,13 @@ TNODE* tnode_break_cycles( TNODE *tnode )
         delete_tlist( tnode->interfaces );
         tnode->interfaces = NULL;
 
+        dnode_break_cycles( tnode->constructor );
+        dnode_break_cycles( tnode->destructor );
+
         dispose_dnode( &tnode->constructor );
         dispose_dnode( &tnode->destructor );
 
-        tnode_break_cycles( tnode->next );
+        //tnode_break_cycles( tnode->next );
     }
 
     return tnode;
