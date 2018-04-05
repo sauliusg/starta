@@ -1677,31 +1677,25 @@ DNODE *tnode_methods( TNODE *tnode )
 TNODE *tnode_base_type( TNODE *tnode )
     { assert( tnode ); return tnode->base_type; }
 
-TNODE *tnode_insert_base_type_NEW( TNODE *tnode, TNODE *volatile *base_type )
-{
-    assert( base_type );
-    TNODE *rv = tnode_insert_base_type( tnode, *base_type );
-    *base_type = NULL;
-    return rv;
-}
-
-TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
+TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type )
 {
     DNODE *field;
+    assert( base_type );
     assert( tnode );
     assert( !tnode->base_type );
-    assert( base_type != tnode );
+    assert( *base_type != tnode );
 
-    if( base_type ) {
-        tnode->base_type = base_type;
+    if( *base_type ) {
+        tnode->base_type = *base_type;
+        *base_type = NULL;
         if( tnode->kind != TK_INTERFACE )
-            tnode->max_vmt_offset = base_type->max_vmt_offset;
-	tnode->size += tnode_size( base_type );
-	tnode->nrefs += base_type->nrefs;
-	tnode->nextnumoffs += base_type->nextnumoffs;
-	tnode->nextrefoffs += base_type->nextrefoffs;
-        if( tnode->align < base_type->align ) {
-            tnode->align = base_type->align;
+            tnode->max_vmt_offset = tnode->base_type->max_vmt_offset;
+	tnode->size += tnode_size( tnode->base_type );
+	tnode->nrefs += tnode->base_type->nrefs;
+	tnode->nextnumoffs += tnode->base_type->nextnumoffs;
+	tnode->nextrefoffs += tnode->base_type->nextrefoffs;
+        if( tnode->align < tnode->base_type->align ) {
+            tnode->align = tnode->base_type->align;
         }
 	foreach_dnode( field, tnode->fields ) {
 	    TNODE *field_type = dnode_type( field );
@@ -1711,11 +1705,11 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
                 if( tnode_is_reference( field_type )) {
                     dnode_set_offset( field,
                                       dnode_offset( field ) +
-                                      base_type->nextrefoffs );
+                                      tnode->base_type->nextrefoffs );
                 } else {
                     dnode_set_offset( field,
                                       dnode_offset( field ) +
-                                      base_type->nextnumoffs );
+                                      tnode->base_type->nextnumoffs );
                 }
 	    }
 	}

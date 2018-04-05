@@ -6974,7 +6974,7 @@ static void compiler_process_module_parameters( COMPILER *cc,
                 compiler_typetab_insert( cc, type_tnode, &inner );
                 type_tnode = NULL;
                 shared_arg_type = share_tnode( arg_type );
-                tnode_insert_base_type_NEW( param_type, &shared_arg_type );
+                tnode_insert_base_type( param_type, &shared_arg_type );
             }
             cexception_catch {
                 delete_tnode( type_tnode );
@@ -10088,7 +10088,7 @@ delimited_type_description
         TNODE *shared_var_type = share_tnode( $2 );
 	assert( compiler->current_type );
         assert( $2 );
-        tnode_insert_base_type_NEW( compiler->current_type, &shared_var_type );
+        tnode_insert_base_type( compiler->current_type, &shared_var_type );
         tnode_insert_element_type( compiler->current_type,
                                    share_tnode( tnode_element_type( $2 )));
         if( tnode_is_reference( $2 )) {
@@ -10385,7 +10385,7 @@ inheritance_and_implementation_list
 
       if( base_type && current_class != base_type ) {
           if( !tnode_base_type( current_class )) {
-              tnode_insert_base_type_NEW( current_class, &shared_base_type );
+              tnode_insert_base_type( current_class, &shared_base_type );
           }
       }
 

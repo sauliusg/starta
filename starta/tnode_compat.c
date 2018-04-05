@@ -169,8 +169,8 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
         cexception_guard( inner ) {
             placeholder_implementation =
                 new_tnode_placeholder( t2->name, &inner );
-            tnode_insert_base_type_NEW( placeholder_implementation,
-                                        &shared_t1 );
+            tnode_insert_base_type( placeholder_implementation,
+                                    &shared_t1 );
             typetab_insert( generic_types, t2->name,
                             placeholder_implementation, &inner );
         }
@@ -528,8 +528,8 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
             cexception_guard( inner ) {
                 placeholder_implementation =
                     new_tnode_placeholder( abstract->name, &inner );
-                tnode_insert_base_type_NEW( placeholder_implementation,
-                                            &shared_concrete );
+                tnode_insert_base_type( placeholder_implementation,
+                                        &shared_concrete );
                 placeholder_implementation =
                     typetab_insert( generic_types, abstract->name,
                                     placeholder_implementation, &inner );
