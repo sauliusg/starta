@@ -4831,9 +4831,11 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
 				    type_name, &inner );
             tnode_set_suffix( tnode, tnode_name( tnode ), &inner );
+            delete_tnode( type_descr );
 	} else {
 	    tnode = type_descr;
 	}
+        type_descr = NULL;
 	compiler_typetab_insert( cc, tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
@@ -10377,7 +10379,7 @@ inheritance_and_implementation_list
 
       if( base_type && current_class != base_type ) {
           if( !tnode_base_type( current_class )) {
-              tnode_insert_base_type( current_class, share_tnode( base_type ));
+              tnode_insert_base_type( current_class, base_type );
           }
       }
 
@@ -10386,7 +10388,7 @@ inheritance_and_implementation_list
       }
       compiler_start_virtual_method_table( compiler, current_class, px );
 
-      $$ = base_type;
+      $$ = share_tnode( base_type );
   }
 ;
 
