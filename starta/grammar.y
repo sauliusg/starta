@@ -8319,13 +8319,11 @@ pragma_statement
        if( default_type ) {
            typetab_override_suffix( compiler->typetab, /*name*/ "",
                                     TS_INTEGER_SUFFIX,
-                                    share_tnode( default_type ),
-                                    px );
+                                    default_type, px );
 
            typetab_override_suffix( compiler->typetab, /*name*/ "",
                                     TS_FLOAT_SUFFIX, 
-                                    share_tnode( default_type ),
-                                    px );
+                                    default_type, px );
        }
    }
 
@@ -8364,14 +8362,12 @@ pragma_statement
                if( type_kind_name && strcmp( type_kind_name, "integer" ) == 0 ) {
                    typetab_override_suffix( compiler->typetab, /*name*/ "",
                                             TS_INTEGER_SUFFIX,
-                                            share_tnode( default_type ),
-                                            &inner );
+                                            default_type, &inner );
                } else if( type_kind_name && 
                           strcmp( type_kind_name, "real" ) == 0 ) {
                    typetab_override_suffix( compiler->typetab, /*name*/ "",
                                             TS_FLOAT_SUFFIX, 
-                                            share_tnode( default_type ),
-                                            &inner );
+                                            default_type, &inner );
                } else {
                    yyerror( "only \"integer\" and \"real\" constant kinds "
                             "can be assigned to default types by this pragma" );
@@ -9996,7 +9992,7 @@ var_type_description
     { $$ = new_tnode_array_snail( NULL, compiler->typetab, px ); }
   | type_identifier dimension_list
     {
-        $$ = tnode_append_element_type( $2, share_tnode( $1 ));
+        $$ = tnode_append_element_type( $2, $1 );
     }
   ;
 
@@ -10030,6 +10026,7 @@ type_identifier
      {
          char *ident = obtain_string_from_strpool( compiler->strpool, $1 );
 	 $$ = compiler_lookup_tnode( compiler, NULL, ident, "type" );
+         share_tnode( $$ );
          freex( ident );
      }
   | __IDENTIFIER _UNITS ':' __STRING_CONST
@@ -10038,6 +10035,7 @@ type_identifier
          char *units = obtain_string_from_strpool( compiler->strpool, $4 );
 
 	 $$ = compiler_lookup_tnode( compiler, NULL, ident, "type" );
+         share_tnode( $$ );
 
          freex( units );
          freex( ident );
@@ -10046,6 +10044,7 @@ type_identifier
      {
          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
 	 $$ = compiler_lookup_tnode( compiler, $1, ident, "type" );
+         share_tnode( $$ );
          freex( ident );
      }
   | module_list __COLON_COLON __IDENTIFIER _UNITS ':' __STRING_CONST
@@ -10054,6 +10053,7 @@ type_identifier
          char *units = obtain_string_from_strpool( compiler->strpool, $6 );
 
 	 $$ = compiler_lookup_tnode( compiler, $1, ident, "type" );
+         share_tnode( $$ );
 
          freex( units );
          freex( ident );
@@ -10076,7 +10076,7 @@ opt_null_type_designator
 delimited_type_description
   : type_identifier
     { 
-       $$ = share_tnode( $1 );
+       $$ = $1;
     }
 
   | _LIKE var_type_description
@@ -10113,7 +10113,7 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( share_tnode( composite ), px );
+      $$ = new_tnode_derived( composite, px );
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
     }
@@ -10202,7 +10202,6 @@ interface_identifier_list
   {
       TLIST *interfaces = NULL;
       if( $1 ) {
-          share_tnode( $1 );
           tlist_push_tnode( &interfaces, &$1, px );
       }
       $$ = interfaces;
@@ -10210,7 +10209,6 @@ interface_identifier_list
   |  type_identifier ',' interface_identifier_list
   {
       if( $1 ) {
-          share_tnode( $1 );
           tlist_push_tnode( &$3, &$1, px );
       }
       $$ = $3;
@@ -10286,7 +10284,7 @@ undelimited_type_description
   | type_identifier _OF undelimited_or_structure_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( share_tnode( composite ), px );
+      $$ = new_tnode_derived( composite, px );
       tnode_insert_element_type( $$, $3 );
     }
 
@@ -10567,6 +10565,7 @@ size_constant
 
       if( tnode ) {
 	  $$ = tnode_size( tnode );
+          delete_tnode( tnode );
       }
     }
   | _SIZEOF _NATIVE __STRING_CONST
@@ -12833,7 +12832,7 @@ array_expression
 struct_expression
   : opt_null_type_designator _STRUCT type_identifier
      {
-	 compiler_compile_alloc( compiler, share_tnode( $3 ), px );
+	 compiler_compile_alloc( compiler, $3, px );
          compiler_push_initialised_ref_tables( compiler, px );
      }
     '{' field_initialiser_list opt_comma '}'
@@ -12864,7 +12863,7 @@ struct_expression
 
   | _TYPE type_identifier _OF delimited_type_description
      {
-	 TNODE *composite = new_tnode_derived( share_tnode( $2 ), px );
+	 TNODE *composite = new_tnode_derived( $2, px );
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
@@ -13245,7 +13244,8 @@ generator_new
               obtain_string_from_strpool( compiler->strpool, $3 );
 
           compiler_check_type_contains_non_null_ref( type_tnode );
-          compiler_compile_alloc( compiler, share_tnode( type_tnode ), px );
+          compiler_compile_alloc( compiler, type_tnode, px );
+          // compiler_compile_alloc( compiler, &type_tnode, px );
 
           /* --- function call generation starts here: */
 
@@ -14472,7 +14472,7 @@ field_designator
     {
         char *ident = obtain_string_from_strpool( compiler->strpool, $7 );
         TNODE *composite = $2;
-        composite = new_tnode_derived( share_tnode( composite ), px );
+        composite = new_tnode_derived( composite, px );
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
