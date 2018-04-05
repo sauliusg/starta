@@ -106,6 +106,13 @@ VARTAB *new_vartab( cexception_t *ex )
     return alloc_vartab( ex );
 }
 
+void dispose_vartab( VARTAB *volatile *table )
+{
+    assert( table );
+    delete_vartab( *table );
+    *table = NULL;
+}
+
 void delete_vartab( VARTAB *table )
 {
     if( !table ) return;

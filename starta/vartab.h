@@ -18,6 +18,7 @@ typedef struct VARTAB VARTAB; /* variable symbol table */
 #include <cexceptions.h>
 
 VARTAB *new_vartab( cexception_t *ex );
+void dispose_vartab( VARTAB *volatile *table );
 void delete_vartab( VARTAB *table );
 
 void vartab_break_cycles( VARTAB *table );
