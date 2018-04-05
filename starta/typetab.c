@@ -91,6 +91,13 @@ TYPETAB *new_typetab( cexception_t *ex )
     return callocx( sizeof(TYPETAB), 1, ex );
 }
 
+void dispose_typetab( TYPETAB *volatile *table )
+{
+    assert( table );
+    delete_typetab( *table );
+    *table = NULL;
+}
+
 void delete_typetab( TYPETAB *table )
 {
     if( !table ) return;

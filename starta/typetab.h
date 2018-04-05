@@ -27,6 +27,7 @@ typedef enum {
 #include <cexceptions.h>
 
 TYPETAB *new_typetab( cexception_t *ex );
+void dispose_typetab( TYPETAB *volatile *table );
 void delete_typetab( TYPETAB *table );
 void typetab_break_cycles( TYPETAB *table );
 

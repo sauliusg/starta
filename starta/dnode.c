@@ -153,16 +153,11 @@ DNODE *dnode_break_cycles( DNODE *dnode )
     if( dnode ) {
         dispose_tnode( &dnode->tnode );
 
-        delete_vartab( dnode->vartab );
-        dnode->vartab = NULL;
-        delete_vartab( dnode->consts );
-        dnode->consts = NULL;
-        delete_typetab( dnode->typetab );
-        dnode->typetab = NULL;
-        delete_vartab( dnode->operators );
-        dnode->operators = NULL;
-        delete_fixup_list( dnode->code_fixups );
-        dnode->code_fixups = NULL;
+        dispose_vartab( &dnode->vartab );
+        dispose_vartab( &dnode->consts );
+        dispose_typetab( &dnode->typetab );
+        dispose_vartab( &dnode->operators );
+        dispose_fixup_list( &dnode->code_fixups );
 
         dispose_dnode( &dnode->next );
         dispose_dnode( &dnode->module_args );
