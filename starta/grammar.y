@@ -10085,9 +10085,10 @@ delimited_type_description
 
   | _LIKE var_type_description
     {
+        TNODE *shared_var_type = share_tnode( $2 );
 	assert( compiler->current_type );
         assert( $2 );
-        tnode_insert_base_type( compiler->current_type, $2 );
+        tnode_insert_base_type_NEW( compiler->current_type, &shared_var_type );
         tnode_insert_element_type( compiler->current_type,
                                    share_tnode( tnode_element_type( $2 )));
         if( tnode_is_reference( $2 )) {
@@ -10099,10 +10100,11 @@ delimited_type_description
     struct_or_class_body
     {
 	/* $$ = new_tnode_derived( share_tnode( $2 ), px ); */
-	$$ = new_tnode_equivalent( share_tnode( $2 ), px );
+	$$ = new_tnode_equivalent( $2, px );
 
 	assert( compiler->current_type );
         assert( $4 );
+
         if( tnode_suffix( $4 )) {
             tnode_set_suffix( $$, tnode_suffix( $4 ), px );
         } else {
@@ -10110,9 +10112,10 @@ delimited_type_description
         }
 
 	$$ = tnode_move_operators( $$, $4 );
-	delete_tnode( $4 );
-	$4 = NULL;
-    }
+
+	dispose_tnode( &$4 );
+	dispose_tnode( &$2 );
+   }
 
   | type_identifier _OF delimited_type_description
     {
