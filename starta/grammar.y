@@ -201,9 +201,7 @@ typedef struct {
 
     DLIST *current_function_stack;
 
-    TNODE *current_type;     /* Type declaration that is currently
-				being compiled. NOTE! this field must
-				not be deleted in delete_compiler() */
+    TNODE *current_type;
 
     TLIST *current_type_stack;
 
@@ -349,6 +347,9 @@ static void delete_compiler( COMPILER *c )
 
         tlist_break_cycles( c->current_type_stack );
         delete_tlist( c->current_type_stack );
+
+        tnode_break_cycles( c->current_type );
+        delete_tnode( c->current_type );
 
         freex( c->use_module_name );
         freex( c->module_filename );
@@ -1310,12 +1311,14 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 }
 
 static void compiler_push_current_type( COMPILER *c,
-                                        TNODE *type_tnode,
+                                        TNODE * volatile *type_tnode,
                                         cexception_t *ex )
 {
+    assert( type_tnode );
     tlist_push_tnode( &c->current_type_stack,
                       &c->current_type, ex );
-    c->current_type = type_tnode;
+    c->current_type = *type_tnode;
+    *type_tnode = NULL;
 }
 
 static TNODE *compiler_pop_current_type( COMPILER *c )
@@ -10007,8 +10010,7 @@ undelimited_or_structure_description
       cexception_guard( inner ) {
           tnode = new_tnode( &inner );
           tnode_set_flags( tnode, TF_IS_FORWARD );
-          compiler_push_current_type( compiler, tnode, &inner );
-          tnode = NULL;
+          compiler_push_current_type( compiler, &tnode, &inner );
       }
       cexception_catch {
           delete_tnode( tnode );
@@ -10226,8 +10228,7 @@ struct_description
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-            compiler_push_current_type( compiler, tnode, &inner );
-            tnode = NULL;
+            compiler_push_current_type( compiler, &tnode, &inner );
         }
         cexception_catch {
             delete_tnode( tnode );
@@ -10256,8 +10257,7 @@ class_description
             if( $1 ) {
                 tnode_set_flags( tnode, TF_NON_NULL );
             }
-            compiler_push_current_type( compiler, tnode, &inner );
-            tnode = NULL;
+            compiler_push_current_type( compiler, &tnode, &inner );
         }
         cexception_catch {
             delete_tnode( tnode );
@@ -10658,15 +10658,17 @@ type_declaration_start
       {
         char *type_name = obtain_string_from_strpool( compiler->strpool, $2 );
 	TNODE *old_tnode = typetab_lookup_silently( compiler->typetab, type_name );
-	TNODE *tnode = NULL;
+	TNODE *volatile shared_tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
 	    TNODE *tnode = new_tnode_forward( type_name, px );
 	    compiler_typetab_insert( compiler, tnode, px );
 	}
-	tnode = typetab_lookup_silently( compiler->typetab, type_name );
+	shared_tnode = 
+            share_tnode( typetab_lookup_silently( compiler->typetab,
+                                                  type_name ));
 	assert( !compiler->current_type );
-	compiler_push_current_type( compiler, share_tnode( tnode ), px );
+	compiler_push_current_type( compiler, &shared_tnode, px );
 	compiler_begin_scope( compiler, px );
         freex( type_name );
       }
@@ -10772,23 +10774,31 @@ type_of_type_declaration
         char *volatile element_name =
             obtain_string_from_strpool( compiler->strpool, $4 );
 	TNODE * volatile base = NULL;
+	TNODE * volatile shared_base = NULL;
 	TNODE * volatile tnode = NULL;
+	TNODE * volatile shared_tnode = NULL;
 	cexception_t inner;
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( element_name, &inner );
+            shared_base = share_tnode( base );
 	    tnode = new_tnode_composite( type_name, base, &inner );
+            base = NULL;
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
 	    compiler_typetab_insert( compiler, tnode, &inner );
-	    tnode = typetab_lookup( compiler->typetab, type_name );
-	    compiler_push_current_type( compiler, share_tnode( tnode ),
-                                        &inner );
-	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
+            tnode = NULL;
+	    shared_tnode =
+                share_tnode( typetab_lookup( compiler->typetab, type_name ));
+	    compiler_push_current_type( compiler, &shared_tnode, &inner );
+	    compiler_typetab_insert( compiler, shared_base, &inner );
+            shared_base = NULL;
 	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
+	    delete_tnode( shared_base );
 	    delete_tnode( tnode );
+	    delete_tnode( shared_tnode );
             freex( type_name );
             freex( element_name );
 	    cexception_reraise( inner, px );
@@ -10810,23 +10820,31 @@ type_of_type_declaration
         char *volatile element_name =
             obtain_string_from_strpool( compiler->strpool, $4 );
 	TNODE * volatile base = NULL;
+	TNODE * volatile shared_base = NULL;
 	TNODE * volatile tnode = NULL;
+	TNODE * volatile shared_tnode = NULL;
 	cexception_t inner;
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( element_name, &inner );
+            shared_base = share_tnode( base );
 	    tnode = new_tnode_composite( type_name, base, &inner );
+            base = NULL;
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
 	    compiler_typetab_insert( compiler, tnode, &inner );
-	    tnode = typetab_lookup( compiler->typetab, type_name );
-	    compiler_push_current_type( compiler, share_tnode( tnode ),
-                                        &inner );
-	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
+            tnode = NULL;
+	    shared_tnode =
+                share_tnode( typetab_lookup( compiler->typetab, type_name ));
+	    compiler_push_current_type( compiler, &shared_tnode, &inner );
+	    compiler_typetab_insert( compiler, shared_base, &inner );
+            shared_base = NULL;
 	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
+	    delete_tnode( shared_base );
 	    delete_tnode( tnode );
+	    delete_tnode( shared_tnode );
             freex( type_name );
             freex( element_name );
 	    cexception_reraise( inner, px );
