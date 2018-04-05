@@ -161,6 +161,8 @@ DNODE *dnode_break_cycles( DNODE *dnode )
 
         dispose_dnode( &dnode->next );
         dispose_dnode( &dnode->module_args );
+
+        dnode_break_cycles( dnode->next );
     }
     
     return dnode;
