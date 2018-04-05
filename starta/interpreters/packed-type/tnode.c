@@ -1677,6 +1677,14 @@ DNODE *tnode_methods( TNODE *tnode )
 TNODE *tnode_base_type( TNODE *tnode )
     { assert( tnode ); return tnode->base_type; }
 
+TNODE *tnode_insert_base_type_NEW( TNODE *tnode, TNODE *volatile *base_type )
+{
+    assert( base_type );
+    TNODE *rv = tnode_insert_base_type( tnode, *base_type );
+    *base_type = NULL;
+    return rv;
+}
+
 TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
 {
     DNODE *field;
