@@ -6966,17 +6966,19 @@ static void compiler_process_module_parameters( COMPILER *cc,
             }
             char *type_name = dnode_name( param );
             cexception_t inner;
+            TNODE * volatile shared_arg_type = NULL;
             TNODE * volatile type_tnode =
                 new_tnode_equivalent( arg_type, ex );
             cexception_guard( inner ) {
                 tnode_set_name( type_tnode, type_name, &inner );
                 compiler_typetab_insert( cc, type_tnode, &inner );
                 type_tnode = NULL;
-                share_tnode( arg_type );
-                tnode_insert_base_type( param_type, arg_type );
+                shared_arg_type = share_tnode( arg_type );
+                tnode_insert_base_type_NEW( param_type, &shared_arg_type );
             }
             cexception_catch {
                 delete_tnode( type_tnode );
+                delete_tnode( shared_arg_type );
                 cexception_reraise( inner, ex );
             }
         } else if( tnode_kind( param_type ) == TK_CONST ) {
