@@ -156,6 +156,7 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
                                                          cexception_t *ex ),
                                                    cexception_t *ex)
 {
+    TNODE *volatile shared_t1 = share_tnode( t1 );
     TNODE *volatile placeholder_implementation =
         typetab_lookup( generic_types, t2->name );
 
@@ -167,13 +168,14 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
         cexception_t inner;
         cexception_guard( inner ) {
             placeholder_implementation =
-                new_tnode_placeholder( t2->name, ex );
-            tnode_insert_base_type( placeholder_implementation,
-                                    share_tnode( t1 ));
+                new_tnode_placeholder( t2->name, &inner );
+            tnode_insert_base_type_NEW( placeholder_implementation,
+                                        &shared_t1 );
             typetab_insert( generic_types, t2->name,
                             placeholder_implementation, &inner );
         }
         cexception_catch {
+            delete_tnode( shared_t1 );
             delete_tnode( placeholder_implementation );
             cexception_reraise( inner, ex );
         }
@@ -521,17 +523,19 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
             typetab_lookup( generic_types, abstract->name );
 
         if( !placeholder_implementation ) {
+            TNODE *volatile shared_concrete = share_tnode( concrete );
             cexception_t inner;
             cexception_guard( inner ) {
                 placeholder_implementation =
-                    new_tnode_placeholder( abstract->name, ex );
-                tnode_insert_base_type( placeholder_implementation,
-                                        share_tnode( concrete ));
+                    new_tnode_placeholder( abstract->name, &inner );
+                tnode_insert_base_type_NEW( placeholder_implementation,
+                                            &shared_concrete );
                 placeholder_implementation =
                     typetab_insert( generic_types, abstract->name,
                                     placeholder_implementation, &inner );
             }
             cexception_catch {
+                delete_tnode( shared_concrete );
                 delete_tnode( placeholder_implementation );
                 cexception_reraise( inner, ex );
             }
