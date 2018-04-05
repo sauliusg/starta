@@ -10379,12 +10379,13 @@ inheritance_and_implementation_list
   {
       TNODE *current_class = compiler->current_type;
       TNODE *base_type = $1 ?
-          $1 : typetab_lookup( compiler->typetab, "struct" );
+          $1 : share_tnode(typetab_lookup( compiler->typetab, "struct" ));
+      TNODE *shared_base_type = share_tnode( base_type );
       TLIST *interfaces = $2;
 
       if( base_type && current_class != base_type ) {
           if( !tnode_base_type( current_class )) {
-              tnode_insert_base_type( current_class, base_type );
+              tnode_insert_base_type_NEW( current_class, &shared_base_type );
           }
       }
 
@@ -10393,7 +10394,8 @@ inheritance_and_implementation_list
       }
       compiler_start_virtual_method_table( compiler, current_class, px );
 
-      $$ = share_tnode( base_type );
+      delete_tnode( shared_base_type );
+      $$ = base_type;
   }
 ;
 
