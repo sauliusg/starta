@@ -1148,6 +1148,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 	    } else {
 		yyerrorf( type_conflict_msg );
 	    }
+	    dispose_tnode( &tnode );
 	}
         
     }
