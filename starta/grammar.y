@@ -2818,7 +2818,8 @@ static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
 	    expr_type ? tnode_element_type( expr_type ) : NULL;
 	operator_description_t od;
 
-	compiler_init_operator_description( &od, cc, element_type, "ldi", 1, ex );
+	compiler_init_operator_description( &od, cc, element_type,
+                                            "ldi", 1, ex );
 
 	if( !expr_type || tnode_kind( expr_type ) != TK_ADDRESSOF ) {
 	    yyerrorf( "lvalue is needed for indirect load (LDI)" );
@@ -2840,7 +2841,7 @@ static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
 		delete_enode( expr );
 		cexception_reraise( inner, ex );
 	    }
-	    delete_enode( expr );
+	    dispose_enode( &expr );
 	} else {
 	    TNODE *element_type =
 		expr_type ? tnode_element_type( expr_type ) : NULL;

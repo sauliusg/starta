@@ -25,6 +25,8 @@ typedef enum {
     EF_IS_ZERO       = 0x40
 } enode_flag_t;
 
+void dispose_enode( ENODE *volatile *node );
+
 void delete_enode( ENODE* node );
 
 ENODE *enode_make_type_to_element_type( ENODE *enode );
