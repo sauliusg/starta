@@ -1147,7 +1147,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 		yyerrorf( type_conflict_msg );
 	    }
 	}
-        dispose_tnode( &tnode );        
+        dispose_tnode( &tnode );
     }
     return lookup_node;
 }
