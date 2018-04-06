@@ -1135,12 +1135,11 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
                           "non-null flag", tnode_name( lookup_node ) );
             }
 	    tnode_shallow_copy( lookup_node, tnode );
-	    delete_tnode( tnode );
-            tnode = NULL;
+	    dispose_tnode( &tnode );
 	} else if( tnode_is_extendable_enum( lookup_node )) {
 	    tnode_merge_field_lists( lookup_node, tnode );
 	    compiler_check_enum_basetypes( lookup_node, tnode );
-	    delete_tnode( tnode );
+	    dispose_tnode( &tnode );
 	} else if( !is_imported ) {
 	    char *name = tnode_name( tnode );
 	    if( strstr( type_conflict_msg, "%s" ) != NULL ) {
