@@ -1150,6 +1150,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 	}
     }
     if( tnode && lookup_node != tnode && is_imported ) {
+        assert(0);
         return tnode;
     } else {
         return lookup_node;
