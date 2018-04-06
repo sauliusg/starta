@@ -118,7 +118,7 @@ void typetab_break_cycles( TYPETAB *table )
 
 
 TNODE *typetab_insert( TYPETAB *table, const char *name,
-		       TNODE *tnode, cexception_t *ex )
+		       TNODE *volatile *tnode, cexception_t *ex )
 {
     return typetab_insert_suffix( table, name, TS_NOT_A_SUFFIX, tnode, 
                                   /* count = */ NULL,
@@ -130,7 +130,7 @@ static TYPE_NODE *typetab_lookup_typenode( TYPETAB *table, const char *name,
                                            type_suffix_t suffix );
 
 TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
-			      type_suffix_t suffix, TNODE *tnode,
+			      type_suffix_t suffix, TNODE *volatile *tnode,
                               int *count, int *is_imported,
 			      cexception_t *ex )
 {
@@ -153,25 +153,28 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
                duplicate; we discard the submitted tnode and return
                the found one: */
             ret = lookup_node->tnode;
+            dispose_tnode( tnode );
         } else {
             /* We mask the imported node and insert the newly created
                one: */
-            table->node = new_type_node( tnode, name, suffix,
+            table->node = new_type_node( *tnode, name, suffix,
                                          table->current_scope,
                                          table->current_subscope,
                                          /* count = */ 1,
                                          /* next = */ table->node, ex );
-            ret = tnode;
+            ret = *tnode;
+            *tnode = NULL;
         }
     } else {
         if( count ) *count = 1;
         if( is_imported ) *is_imported = 0;
-        table->node = new_type_node( tnode, name, suffix,
+        table->node = new_type_node( *tnode, name, suffix,
                                      table->current_scope,
                                      table->current_subscope,
                                      /* count = */ 1,
                                      /* next = */ table->node, ex );
-        ret = tnode;
+        ret = *tnode;
+        *tnode = NULL;
     }
 
     return ret;
@@ -233,16 +236,18 @@ static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
 }
 
 void typetab_override_suffix( TYPETAB *table, const char *name,
-                              type_suffix_t suffix, TNODE *tnode,
+                              type_suffix_t suffix, TNODE *volatile *tnode,
                               cexception_t *ex )
 {
+    assert( tnode );
     assert( table );
     assert( name );
-    table->node = new_type_node( tnode, name, suffix,
+    table->node = new_type_node( *tnode, name, suffix,
                                  table->current_scope,
                                  table->current_subscope,
                                  /* count = */ 1,
                                  /* next = */ table->node, ex );
+    *tnode = NULL;
 }
 
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )

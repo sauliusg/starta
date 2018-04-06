@@ -1110,13 +1110,22 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
                                            char *type_conflict_msg,
                                            cexception_t *ex )
 {
-    TNODE *lookup_node;
+    TNODE *volatile lookup_node = NULL;
     int count = 0;
     int is_imported = 0;
+    TNODE *volatile shared_tnode = share_tnode( tnode );
+    cexception_t inner;
 
-    lookup_node =
-	typetab_insert_suffix( cc->typetab, name, suffix_type, tnode,
-                               &count, &is_imported, ex );
+    cexception_guard( inner ) {
+        lookup_node =
+            typetab_insert_suffix( cc->typetab, name, suffix_type,
+                                   &shared_tnode,
+                                   &count, &is_imported, &inner );
+    }
+    cexception_catch {
+        delete_tnode( shared_tnode );
+        cexception_reraise( inner, ex );
+    }
 
     if( lookup_node != tnode ) {
 	if( tnode_is_forward( lookup_node )) {
@@ -6803,20 +6812,27 @@ static void compiler_import_array_definition( COMPILER *c, char *module_name,
                   module_name, module_name );
     } else {
         char *name = "array";
-        TNODE *identifier_tnode =
-            dnode_typetab_lookup_type( module, name );
-        if( identifier_tnode ) {
-            if( typetab_lookup( c->typetab, name )) {
-                yyerrorf( "type named '%s' is already defined -- "
-                          "can not import", name );
+        TNODE *volatile identifier_tnode =
+            share_tnode( dnode_typetab_lookup_type( module, name ));
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( identifier_tnode ) {
+                if( typetab_lookup( c->typetab, name )) {
+                    yyerrorf( "type named '%s' is already defined -- "
+                              "can not import", name );
+                } else {
+                    typetab_insert( c->typetab, name, &identifier_tnode,
+                                    &inner );
+                }
             } else {
-                typetab_insert( c->typetab, name, 
-                                share_tnode( identifier_tnode ),
-                                ex );
+                yyerrorf( "type '%s' is not found in module '%s'",
+                          name, module_name );
             }
-        } else {
-            yyerrorf( "type '%s' is not found in module '%s'",
-                      name, module_name );
+        }
+        cexception_catch {
+            delete_tnode( identifier_tnode );
+            cexception_reraise( inner, ex );
         }
     }
 }
@@ -6838,39 +6854,51 @@ static void compiler_import_type_identifier_list( COMPILER *c,
         foreach_dnode( identifier, imported_identifiers ) {
             char *name = dnode_name( identifier );
             TNODE *identifier_tnode =
-                dnode_typetab_lookup_type( module, name );
-            if( identifier_tnode ) {
-                if( typetab_lookup( c->typetab, name )) {
-                    yyerrorf( "type named '%s' is already defined -- "
-                              "can not import", name );
-                } else {
-                    typetab_insert( c->typetab, name, 
-                                    share_tnode( identifier_tnode ),
-                                    ex );
-                    type_kind_t kind = tnode_kind( identifier_tnode );
-                    char *suffix = tnode_suffix( identifier_tnode );
-                    if( !suffix ) suffix = "";
-                    if( kind == TK_INTEGER || kind == TK_REAL || 
-                        kind == TK_STRING || suffix != NULL ) {
-                        type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
-                        switch( kind ) {
-                        case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
-                        case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
-                        case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
-                        default:
-                            break;
-                        }
-                        if( suffix_kind != TS_NOT_A_SUFFIX ) {
-                            typetab_override_suffix
-                                ( c->typetab, suffix, suffix_kind,
-                                  share_tnode( identifier_tnode ), ex );
+                share_tnode( dnode_typetab_lookup_type( module, name ));
+            TNODE *shared_tnode =
+                share_tnode( identifier_tnode );
+
+            cexception_t inner;
+            cexception_guard( inner ) {
+                if( identifier_tnode ) {
+                    if( typetab_lookup( c->typetab, name )) {
+                        yyerrorf( "type named '%s' is already defined -- "
+                                  "can not import", name );
+                    } else {
+                        typetab_insert( c->typetab, name, &shared_tnode,
+                                        &inner );
+                        type_kind_t kind = tnode_kind( identifier_tnode );
+                        char *suffix = tnode_suffix( identifier_tnode );
+                        if( !suffix ) suffix = "";
+                        if( kind == TK_INTEGER || kind == TK_REAL || 
+                            kind == TK_STRING || suffix != NULL ) {
+                            type_suffix_t suffix_kind = TS_NOT_A_SUFFIX;
+                            switch( kind ) {
+                            case TK_INTEGER: suffix_kind = TS_INTEGER_SUFFIX; break;
+                            case TK_REAL:    suffix_kind = TS_FLOAT_SUFFIX; break;
+                            case TK_STRING:  suffix_kind = TS_STRING_SUFFIX; break;
+                            default:
+                                break;
+                            }
+                            if( suffix_kind != TS_NOT_A_SUFFIX ) {
+                                typetab_override_suffix
+                                    ( c->typetab, suffix, suffix_kind,
+                                      &identifier_tnode, ex );
+                            }
                         }
                     }
+                } else {
+                    yyerrorf( "type '%s' is not found in module '%s'",
+                              name, module_name );
                 }
-            } else {
-                yyerrorf( "type '%s' is not found in module '%s'",
-                          name, module_name );
             }
+            cexception_catch {
+                delete_tnode( shared_tnode );
+                delete_tnode( identifier_tnode );
+                cexception_reraise( inner, ex );
+            }
+            dispose_tnode( &shared_tnode );
+            dispose_tnode( &identifier_tnode );
         }
     }
     delete_dnode( imported_identifiers );
@@ -8324,11 +8352,11 @@ pragma_statement
        if( default_type ) {
            typetab_override_suffix( compiler->typetab, /*name*/ "",
                                     TS_INTEGER_SUFFIX,
-                                    default_type, px );
+                                    &default_type, px );
 
            typetab_override_suffix( compiler->typetab, /*name*/ "",
                                     TS_FLOAT_SUFFIX, 
-                                    default_type, px );
+                                    &default_type, px );
        }
    }
 
@@ -8367,12 +8395,12 @@ pragma_statement
                if( type_kind_name && strcmp( type_kind_name, "integer" ) == 0 ) {
                    typetab_override_suffix( compiler->typetab, /*name*/ "",
                                             TS_INTEGER_SUFFIX,
-                                            default_type, &inner );
+                                            &default_type, &inner );
                } else if( type_kind_name && 
                           strcmp( type_kind_name, "real" ) == 0 ) {
                    typetab_override_suffix( compiler->typetab, /*name*/ "",
                                             TS_FLOAT_SUFFIX, 
-                                            default_type, &inner );
+                                            &default_type, &inner );
                } else {
                    yyerror( "only \"integer\" and \"real\" constant kinds "
                             "can be assigned to default types by this pragma" );
@@ -8381,8 +8409,10 @@ pragma_statement
        }
        cexception_catch {
            freex( type_kind_name );
+           delete_tnode( default_type );
            cexception_reraise( inner, px );
        }
+       assert( !default_type );
        freex( type_kind_name );
    }
 ;
@@ -10138,21 +10168,28 @@ delimited_type_description
     {
 	char *volatile type_name =
             obtain_string_from_strpool( compiler->strpool, $2 );
-	TNODE *tnode = typetab_lookup( compiler->typetab, type_name );
+	TNODE *volatile tnode =
+            share_tnode( typetab_lookup( compiler->typetab, type_name ));
+	TNODE *volatile shared_tnode = NULL;
 
         cexception_t inner;
         cexception_guard( inner ) {
             if( !tnode ) {
                 tnode = new_tnode_placeholder( type_name, &inner );
-                typetab_insert( compiler->typetab, type_name, tnode, &inner );
+                shared_tnode = share_tnode( tnode );
+                typetab_insert( compiler->typetab, type_name,
+                                &shared_tnode, &inner );
+                assert( !shared_tnode );
             }
         }
         cexception_catch {
             freex( type_name );
+            delete_tnode( tnode );
+            delete_tnode( shared_tnode );
             cexception_reraise( inner, px );
         }
         freex( type_name );
-	$$ = share_tnode( tnode );
+	$$ = tnode;
     }
 
   | function_or_procedure_type_keyword '(' argument_list ')'
