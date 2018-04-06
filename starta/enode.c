@@ -38,6 +38,13 @@ struct ENODE {
 
 #include <enode_a.ci>
 
+void dispose_enode( ENODE *volatile *node )
+{
+    assert( node );
+    delete_enode( *node );
+    *node = NULL;
+}
+
 void delete_enode( ENODE* node )
 {
     if( node ) {
