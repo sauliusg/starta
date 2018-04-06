@@ -1116,6 +1116,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
     TNODE *volatile shared_tnode = share_tnode( tnode );
     cexception_t inner;
 
+    // FIXME: check memory leaks and usage.
     cexception_guard( inner ) {
         lookup_node =
             typetab_insert_suffix( cc->typetab, name, suffix_type,
