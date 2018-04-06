@@ -1148,13 +1148,12 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 		yyerrorf( type_conflict_msg );
 	    }
 	}
+        
     }
-    if( tnode && lookup_node != tnode && is_imported ) {
-        assert(0);
-        return tnode;
-    } else {
-        return lookup_node;
+    if( lookup_node != tnode ) {
+        delete_tnode( tnode );
     }
+    return lookup_node;
 }
 
 static int compiler_current_scope( COMPILER *cc )
