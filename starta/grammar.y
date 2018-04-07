@@ -996,8 +996,9 @@ static void compiler_close_include_file( COMPILER *c,
                    for renamed parametrised modules, as in 'use M(int)
                    as M1; use M(long) as M2' */
                 if( compiled_module ) {
+                    share_dnode( compiled_module );
                     vartab_insert( c->vartab, synonim,
-                                   share_dnode( compiled_module ), &inner );
+                                   &compiled_module, &inner );
                 }
 
                 obtain_tables_from_symtab( symtab, &vartab,
@@ -1187,37 +1188,73 @@ static void compiler_typetab_insert( COMPILER *cc,
 }
 
 static void compiler_vartab_insert_named_vars( COMPILER *cc,
-                                               DNODE *vars,
+                                               DNODE *volatile *vars,
                                                cexception_t *ex )
 {
-    vartab_insert_named_vars( cc->vartab, vars, ex );
-    if( cc->current_module && dnode_scope( vars ) == 0 ) {
-	dnode_vartab_insert_named_vars( cc->current_module,
-					share_dnode( vars ), ex );
+    assert( vars );
+    DNODE *volatile shared_vars = share_dnode( *vars );
+
+    cexception_t inner;
+    cexception_guard( inner ) {
+        vartab_insert_named_vars( cc->vartab, vars, &inner );
+        if( cc->current_module && dnode_scope( shared_vars ) == 0 ) {
+            dnode_vartab_insert_named_vars( cc->current_module,
+                                            &shared_vars, &inner );
+        } else {
+            delete_dnode( shared_vars );
+        }
+    }
+    cexception_catch {
+        delete_dnode( shared_vars );
+        cexception_reraise( inner, ex );
     }
 }
 
 static void compiler_vartab_insert_single_named_var( COMPILER *cc,
-                                                     DNODE *var,
+                                                     DNODE *volatile *var,
                                                      cexception_t *ex )
 {
-    char *name = dnode_name( var );
+    assert( var );
+    DNODE *volatile shared_var = share_dnode( *var );
+    char *name = dnode_name( *var );
+    cexception_t inner;
+    
     assert( name );
-
-    vartab_insert( cc->vartab, name, var, ex );
-    if( cc->current_module && dnode_scope( var ) == 0 ) {
-	dnode_vartab_insert_dnode( cc->current_module, name,
-                                   share_dnode( var ), ex );
+    cexception_guard( inner ) {
+        vartab_insert( cc->vartab, name, var, &inner );
+        if( cc->current_module && dnode_scope( shared_var ) == 0 ) {
+            dnode_vartab_insert_dnode( cc->current_module, name,
+                                       &shared_var, &inner );
+        } else {
+            delete_dnode( shared_var );
+        }
+    }
+    cexception_catch {
+        delete_dnode( shared_var );
+        cexception_reraise( inner, ex );
     }
 }
 
-static void compiler_consttab_insert_consts( COMPILER *cc, DNODE *consts,
+static void compiler_consttab_insert_consts( COMPILER *cc,
+                                             DNODE *volatile *consts,
                                              cexception_t *ex )
 {
-    vartab_insert_named_vars( cc->consts, consts, ex );
-    if( cc->current_module ) {
-	dnode_consttab_insert_consts( cc->current_module,
-				      share_dnode( consts ), ex );
+    assert( consts );
+    DNODE *volatile shared_consts = share_dnode( *consts );
+    cexception_t inner;
+
+    cexception_guard( inner ) {
+        vartab_insert_named_vars( cc->consts, consts, &inner );
+        if( cc->current_module ) {
+            dnode_consttab_insert_consts( cc->current_module,
+                                          &shared_consts, &inner );
+        } else {
+            delete_dnode( shared_consts );
+        }
+    }
+    cexception_catch {
+        delete_dnode( shared_consts );
+        cexception_reraise( inner, ex );
     }
 }
 
@@ -1403,23 +1440,30 @@ static void compiler_compile_exception( COMPILER *c,
 				     cexception_t *ex )
 {
     cexception_t inner;
-    TNODE *exception_type =
+    DNODE *volatile exception = NULL;
+    DNODE *volatile shared_exception = NULL;
+    TNODE *volatile exception_type =
 	share_tnode( typetab_lookup( c->typetab, "exception" ));
-    DNODE * volatile exception = NULL;
 
     cexception_guard( inner ) {
 	exception =
 	    new_dnode_exception( exception_name, exception_type, &inner );
+        exception_type = NULL;
+        shared_exception = share_dnode( exception );
 
 	dnode_set_ssize_value( exception, exception_nr );
-	vartab_insert_named( c->vartab, exception, &inner );
+	vartab_insert_named( c->vartab, &exception, &inner );
         if( c->current_module && dnode_scope( exception ) == 0 ) {
             dnode_vartab_insert_named_vars( c->current_module,
-                                            share_dnode( exception ), ex );
+                                            &shared_exception, &inner );
+        } else {
+            dispose_dnode( &shared_exception );
         }
     }
     cexception_catch {
 	delete_dnode( exception );
+	delete_dnode( shared_exception );
+        delete_tnode( exception_type );
 	cexception_reraise( inner, ex );
     }
 }
@@ -4039,7 +4083,15 @@ static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
 	delete_dnode( fn_proto );
 	return fn_dnode;
     } else {
-	compiler_vartab_insert_single_named_var( cc, fn_proto, ex );
+        DNODE *volatile shared_proto = share_dnode( fn_proto );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_vartab_insert_single_named_var( cc, &shared_proto, &inner );
+        }
+        cexception_catch {
+            delete_dnode( shared_proto );
+            cexception_reraise( inner, ex );
+        }
 	return fn_proto;
     }
 }
@@ -4100,20 +4152,21 @@ static void compiler_emit_argument_list( COMPILER *cc,
 	share_dnode( varnode );
 
 	compiler_emit_st( cc, argtype, dnode_name( varnode ),
-		       dnode_offset( varnode ), dnode_scope( varnode ), ex );
+                          dnode_offset( varnode ), dnode_scope( varnode ),
+                          ex );
     }
 }
 
 static void compiler_emit_function_arguments( DNODE *function, COMPILER *cc,
-					   cexception_t *ex )
+                                              cexception_t *ex )
 {
     assert( function );
     compiler_emit_argument_list( cc, dnode_function_args( function ), ex );
 }
 
 static void compiler_emit_drop_returned_values( COMPILER *cc,
-					     ssize_t drop_retvals,
-					     cexception_t *ex  )
+                                                ssize_t drop_retvals,
+                                                cexception_t *ex  )
 {
     if( drop_retvals > 1 ) {
 	compiler_compile_dropn( cc, drop_retvals, ex );
