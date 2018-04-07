@@ -1123,6 +1123,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
             typetab_insert_suffix( cc->typetab, name, suffix_type,
                                    &shared_tnode,
                                    &count, &is_imported, &inner );
+        assert( !shared_tnode );
     }
     cexception_catch {
         delete_tnode( shared_tnode );
@@ -1149,6 +1150,9 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 	    }
 	}
         dispose_tnode( tnode );
+    } else {
+        // FIXME: check why dispose_tnode( tnode ) does not work here:
+        *tnode = NULL;
     }
     return lookup_node;
 }
@@ -1163,14 +1167,16 @@ static void compiler_typetab_insert( COMPILER *cc,
                                      cexception_t *ex )
 {
     assert( tnode );
+
     TNODE *volatile lookup_tnode =
         compiler_typetab_insert_msg( cc, tnode_name( *tnode ),
                                      TS_NOT_A_SUFFIX, tnode,
                                      "type '%s' is already declared", ex );
-    TNODE *volatile shared_tnode = share_tnode( lookup_tnode );
 
     if( cc->current_module &&
         compiler_current_scope( cc )  == 0 ) {
+        TNODE *volatile shared_tnode = share_tnode( lookup_tnode );
+
         cexception_t inner;
         cexception_guard( inner ) {
             dnode_typetab_insert_named_tnode( cc->current_module,
@@ -1181,7 +1187,7 @@ static void compiler_typetab_insert( COMPILER *cc,
             delete_tnode( shared_tnode );
             cexception_reraise( inner, ex );
         }
-    }
+    } 
 }
 
 static void compiler_vartab_insert_named_vars( COMPILER *cc,
