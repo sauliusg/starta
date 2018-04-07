@@ -1152,7 +1152,8 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
         dispose_tnode( tnode );
     } else {
         // FIXME: check why dispose_tnode( tnode ) does not work here:
-        *tnode = NULL;
+        dispose_tnode( tnode );
+        // *tnode = NULL;
     }
     return lookup_node;
 }
@@ -10975,7 +10976,8 @@ type_of_type_declaration
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
 	    compiler_typetab_insert( compiler, &tnode, &inner );
 
-	    tnode = typetab_lookup( compiler->typetab, type_name );
+	    tnode =
+                share_tnode( typetab_lookup( compiler->typetab, type_name ));
 
 	    compiler->current_type = moveptr( (void**)&tnode );
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
@@ -11025,6 +11027,7 @@ struct_declaration
         }
 	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
+        share_tnode( tnode );
 	compiler->current_type = moveptr( (void**)&tnode );
 	compiler_begin_scope( compiler, px );
         freex( struct_name );
