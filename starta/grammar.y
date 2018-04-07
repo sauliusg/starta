@@ -1106,14 +1106,15 @@ static void compiler_check_enum_basetypes( TNODE *lookup_tnode, TNODE *tnode )
 static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
                                            char *name,
                                            type_suffix_t suffix_type,
-                                           TNODE *tnode,
+                                           TNODE *volatile *tnode,
                                            char *type_conflict_msg,
                                            cexception_t *ex )
 {
+    assert( tnode );
     TNODE *volatile lookup_node = NULL;
     int count = 0;
     int is_imported = 0;
-    TNODE *volatile shared_tnode = share_tnode( tnode );
+    TNODE *volatile shared_tnode = share_tnode( *tnode );
     cexception_t inner;
 
     // FIXME: check memory leaks and usage.
@@ -1128,26 +1129,26 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
         cexception_reraise( inner, ex );
     }
 
-    if( lookup_node != tnode ) {
+    if( lookup_node != *tnode ) {
 	if( tnode_is_forward( lookup_node )) {
-            if( tnode_is_non_null_reference( tnode ) !=
+            if( tnode_is_non_null_reference( *tnode ) !=
                 tnode_is_non_null_reference( lookup_node )) {
                 yyerrorf( "redeclaration of forward type '%s' changes "
                           "non-null flag", tnode_name( lookup_node ) );
             }
-	    tnode_shallow_copy( lookup_node, tnode );
+	    tnode_shallow_copy( lookup_node, *tnode );
 	} else if( tnode_is_extendable_enum( lookup_node )) {
-	    tnode_merge_field_lists( lookup_node, tnode );
-	    compiler_check_enum_basetypes( lookup_node, tnode );
+	    tnode_merge_field_lists( lookup_node, *tnode );
+	    compiler_check_enum_basetypes( lookup_node, *tnode );
 	} else if( !is_imported ) {
-	    char *name = tnode_name( tnode );
+	    char *name = tnode_name( *tnode );
 	    if( strstr( type_conflict_msg, "%s" ) != NULL ) {
 		yyerrorf( type_conflict_msg, name );
 	    } else {
 		yyerrorf( type_conflict_msg );
 	    }
 	}
-        dispose_tnode( &tnode );
+        dispose_tnode( tnode );
     }
     return lookup_node;
 }
@@ -1158,17 +1159,28 @@ static int compiler_current_scope( COMPILER *cc )
 }
 
 static void compiler_typetab_insert( COMPILER *cc,
-                                     TNODE *tnode,
+                                     TNODE *volatile *tnode,
                                      cexception_t *ex )
 {
-    TNODE *lookup_tnode =
-	compiler_typetab_insert_msg( cc, tnode_name( tnode ),
-				  TS_NOT_A_SUFFIX, tnode,
-				  "type '%s' is already declared", ex );
-    if( cc->current_module && lookup_tnode == tnode &&
+    assert( tnode );
+    TNODE *volatile lookup_tnode =
+        compiler_typetab_insert_msg( cc, tnode_name( *tnode ),
+                                     TS_NOT_A_SUFFIX, tnode,
+                                     "type '%s' is already declared", ex );
+    TNODE *volatile shared_tnode = share_tnode( lookup_tnode );
+
+    if( cc->current_module &&
         compiler_current_scope( cc )  == 0 ) {
-	dnode_typetab_insert_named_tnode( cc->current_module,
-					  share_tnode( tnode ), ex );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            dnode_typetab_insert_named_tnode( cc->current_module,
+                                              shared_tnode, &inner );
+            shared_tnode = NULL;
+        }
+        cexception_catch {
+            delete_tnode( shared_tnode );
+            cexception_reraise( inner, ex );
+        }
     }
 }
 
@@ -1215,6 +1227,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     char *suffix;
     type_kind_t type_kind;
     char *type_conflict_msg = NULL;
+    TNODE *volatile shared_tnode = NULL;
 
     suffix = tnode_suffix( tnode );
     if( !suffix ) suffix = "";
@@ -1236,13 +1249,15 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "integer type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX, tnode,
+	shared_tnode = share_tnode( tnode );
+	compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX,
+                                     &shared_tnode,
                                      type_conflict_msg, ex );
-	share_tnode( tnode );
 	if( cc->current_module ) {
+            shared_tnode = share_tnode( tnode );
 	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_INTEGER_SUFFIX,
-					       share_tnode( tnode ), ex );
+					       shared_tnode, ex );
 	}
 	break;
     case TK_REAL:
@@ -1253,13 +1268,15 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "real type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX, tnode,
+	shared_tnode = share_tnode( tnode );
+	compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX,
+                                     &shared_tnode,
                                      type_conflict_msg, ex );
-	share_tnode( tnode );
 	if( cc->current_module ) {
+            shared_tnode = share_tnode( tnode );
 	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_FLOAT_SUFFIX,
-					       share_tnode( tnode ), ex );
+					       shared_tnode, ex );
 	}
 	break;
     case TK_STRING:
@@ -1270,13 +1287,15 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "string type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX, tnode,
+	shared_tnode = share_tnode( tnode );
+	compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX,
+                                     &shared_tnode,
                                      type_conflict_msg, ex );
-	share_tnode( tnode );
 	if( cc->current_module ) {
+            shared_tnode = share_tnode( tnode );
 	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_STRING_SUFFIX,
-					       share_tnode( tnode ), ex );
+					       shared_tnode, ex );
 	}
 	break;
     case TK_NONE:
@@ -1287,13 +1306,15 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
 	    type_conflict_msg = "type with suffix '%s' is already "
     	    		        "defined in the current scope";
 	}
-	compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX, tnode,
+	shared_tnode = share_tnode( tnode );
+	compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX,
+                                     &shared_tnode,
                                      type_conflict_msg, ex );
-	share_tnode( tnode );
 	if( cc->current_module ) {
+            shared_tnode = share_tnode( tnode );
 	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
 					       TS_NOT_A_SUFFIX,
-					       share_tnode( tnode ), ex );
+					       shared_tnode, ex );
 	}
 	break;
     case TK_STRUCT:
@@ -4817,7 +4838,7 @@ static void compiler_compile_type_declaration( COMPILER *cc,
                                                cexception_t *ex )
 {
     cexception_t inner;
-    TNODE *tnode = NULL;
+    TNODE *volatile tnode = NULL;
     char * volatile type_name = NULL;
 
     if( !type_descr ) {
@@ -4841,18 +4862,22 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	    tnode = type_descr;
 	}
         type_descr = NULL;
-	compiler_typetab_insert( cc, tnode, &inner );
+	compiler_typetab_insert( cc, &tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
-	compiler_insert_tnode_into_suffix_list( cc, share_tnode( tnode ), &inner );
+        share_tnode( tnode );
+	compiler_insert_tnode_into_suffix_list( cc, tnode, &inner );
+        tnode = NULL;
 	/* cc->current_type = NULL; */
         delete_tnode( compiler_pop_current_type( cc ));
 	freex( type_name );
     }
     cexception_catch {
 	freex( type_name );
+        delete_tnode( tnode );
 	cexception_reraise( inner, ex );
     }
+    assert( !tnode );
 }
 
 static ssize_t compiler_native_type_size( const char *name )
@@ -6995,8 +7020,7 @@ static void compiler_process_module_parameters( COMPILER *cc,
                 new_tnode_equivalent( arg_type, ex );
             cexception_guard( inner ) {
                 tnode_set_name( type_tnode, type_name, &inner );
-                compiler_typetab_insert( cc, type_tnode, &inner );
-                type_tnode = NULL;
+                compiler_typetab_insert( cc, &type_tnode, &inner );
                 shared_arg_type = share_tnode( arg_type );
                 tnode_insert_base_type( param_type, &shared_arg_type );
             }
@@ -7118,6 +7142,24 @@ static void compiler_process_module_parameters( COMPILER *cc,
     }
 }
 
+static void compiler_insert_new_type( COMPILER *c, char *name, int not_null,
+                                      TNODE* (*tnode_creator)( char *name, cexception_t *ex ),
+                                      cexception_t *ex )
+{
+    TNODE *volatile tnode = (*tnode_creator)( name, ex );
+    if( not_null ) {
+        tnode_set_flags( tnode, TF_NON_NULL );
+    }
+    cexception_t inner;
+    cexception_guard( inner ) {
+        compiler_typetab_insert( c, &tnode, &inner );
+    }
+    cexception_catch {
+        delete_tnode( tnode );
+        cexception_reraise( inner, ex );
+    }
+}
+ 
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -7839,7 +7881,7 @@ module_statement
           cexception_t inner;
           cexception_guard( inner ) {
               if( compiler->requested_module ) {
-                  dnode_set_filename( module_dnode, 
+                  dnode_set_filename( module_dnode,
                                       dnode_filename( compiler->requested_module ),
                                       &inner );
               }
@@ -10702,8 +10744,8 @@ type_declaration_start
 	TNODE *volatile shared_tnode = NULL;
 
 	if( !old_tnode || !tnode_is_extendable_enum( old_tnode )) {
-	    TNODE *tnode = new_tnode_forward( type_name, px );
-	    compiler_typetab_insert( compiler, tnode, px );
+            compiler_insert_new_type( compiler, type_name, /*not_null =*/0,
+                                      new_tnode_forward, px );
 	}
 	shared_tnode = 
             share_tnode( typetab_lookup_silently( compiler->typetab,
@@ -10823,16 +10865,18 @@ type_of_type_declaration
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
+
 	    tnode = new_tnode_composite( type_name, base, &inner );
             base = NULL;
+
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    compiler_typetab_insert( compiler, tnode, &inner );
-            tnode = NULL;
+	    compiler_typetab_insert( compiler, &tnode, &inner );
+
 	    shared_tnode =
                 share_tnode( typetab_lookup( compiler->typetab, type_name ));
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
-	    compiler_typetab_insert( compiler, shared_base, &inner );
-            shared_base = NULL;
+
+	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
@@ -10864,21 +10908,23 @@ type_of_type_declaration
 	TNODE * volatile shared_base = NULL;
 	TNODE * volatile tnode = NULL;
 	TNODE * volatile shared_tnode = NULL;
-	cexception_t inner;
 
+	cexception_t inner;
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
+
 	    tnode = new_tnode_composite( type_name, base, &inner );
             base = NULL;
+
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    compiler_typetab_insert( compiler, tnode, &inner );
-            tnode = NULL;
+	    compiler_typetab_insert( compiler, &tnode, &inner );
+
 	    shared_tnode =
                 share_tnode( typetab_lookup( compiler->typetab, type_name ));
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
-	    compiler_typetab_insert( compiler, shared_base, &inner );
-            shared_base = NULL;
+
+	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
@@ -10910,17 +10956,23 @@ type_of_type_declaration
         char *volatile element_name =
             obtain_string_from_strpool( compiler->strpool, $4 );
 	TNODE * volatile base = NULL;
+	TNODE * volatile shared_base = NULL;
 	TNODE * volatile tnode = NULL;
 	cexception_t inner;
 
 	cexception_guard( inner ) {
 	    base = new_tnode_placeholder( element_name, &inner );
+            shared_base = share_tnode( base );
 	    tnode = new_tnode_composite( type_name, base, &inner );
+            base = NULL;
+
 	    tnode_set_flags( tnode, TF_IS_FORWARD );
-	    compiler_typetab_insert( compiler, tnode, &inner );
+	    compiler_typetab_insert( compiler, &tnode, &inner );
+
 	    tnode = typetab_lookup( compiler->typetab, type_name );
-	    compiler->current_type = tnode;
-	    compiler_typetab_insert( compiler, share_tnode( base ), &inner );
+
+	    compiler->current_type = moveptr( (void**)&tnode );
+	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
@@ -10930,6 +10982,9 @@ type_of_type_declaration
             freex( element_name );
 	    cexception_reraise( inner, px );
 	}
+        assert( !tnode );
+        assert( !base );
+        assert( !shared_base );
         freex( type_name );
         freex( element_name );
       }
@@ -10953,11 +11008,8 @@ struct_declaration
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_struct( struct_name, px );
-            if( $1 ) {
-                tnode_set_flags( tnode, TF_NON_NULL );
-            }
-	    compiler_typetab_insert( compiler, tnode, px );
+            compiler_insert_new_type( compiler, struct_name, /*not_null =*/$1,
+                                      new_tnode_forward_struct, px );
 	} else {
             if( tnode_is_non_null_reference( old_tnode ) !=
                 ($1 ? 1 : 0 )) {
@@ -10967,7 +11019,7 @@ struct_declaration
         }
 	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
-	compiler->current_type = tnode;
+	compiler->current_type = moveptr( (void**)&tnode );
 	compiler_begin_scope( compiler, px );
         freex( struct_name );
     }
@@ -10975,7 +11027,7 @@ struct_declaration
     {
 	tnode_finish_struct( $5, px );
 	compiler_end_scope( compiler, px );
-	compiler_typetab_insert( compiler, $5, px );
+	compiler_typetab_insert( compiler, &$5, px );
         compiler->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _STRUCT
@@ -11020,15 +11072,12 @@ class_declaration
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_class( struct_name, px );
-            if( $1 ) {
-                tnode_set_flags( tnode, TF_NON_NULL );
-            }
-	    compiler_typetab_insert( compiler, tnode, px );
+            compiler_insert_new_type( compiler, struct_name, /*not_null=*/0,
+                                      new_tnode_forward_class, px );
 	}
 	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
-	compiler->current_type = tnode;
+	compiler->current_type = share_tnode( tnode );
 	compiler_begin_scope( compiler, px );
         freex( struct_name );
     }
@@ -11037,7 +11086,7 @@ class_declaration
  	tnode_finish_class( $5, px );
 	compiler_finish_virtual_method_table( compiler, $5, px );
 	compiler_end_scope( compiler, px );
-	compiler_typetab_insert( compiler, $5, px );
+	compiler_typetab_insert( compiler, &$5, px );
 	compiler->current_type = NULL;
     }
   | type_declaration_start '=' opt_null_type_designator _CLASS
@@ -11068,15 +11117,12 @@ interface_declaration
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-	    TNODE *tnode = new_tnode_forward_interface( struct_name, px );
-            if( $1 ) {
-                tnode_set_flags( tnode, TF_NON_NULL );
-            }
-	    compiler_typetab_insert( compiler, tnode, px );
+            compiler_insert_new_type( compiler, struct_name, /*not_null=*/0,
+                                      new_tnode_forward_interface, px );
 	}
 	tnode = typetab_lookup( compiler->typetab, struct_name );
 	assert( !compiler->current_type );
-	compiler->current_type = tnode;
+	compiler->current_type = share_tnode( tnode );
 	compiler_begin_scope( compiler, px );
         freex( struct_name );
     }
@@ -11084,7 +11130,7 @@ interface_declaration
     {
  	tnode_finish_interface( $5, ++compiler->last_interface_number, px );
 	compiler_end_scope( compiler, px );
-	compiler_typetab_insert( compiler, $5, px );
+	compiler_typetab_insert( compiler, &$5, px );
 	compiler->current_type = NULL;
     }
 ;
@@ -11094,11 +11140,10 @@ forward_struct_declaration
       {
           char *struct_name =
               obtain_string_from_strpool( compiler->strpool, $3 );
-	  TNODE *tnode = new_tnode_forward_struct( struct_name, px );
-          if( $1 ) {
-              tnode_set_flags( tnode, TF_NON_NULL );
-          }
-	  compiler_typetab_insert( compiler, tnode, px );
+
+          compiler_insert_new_type( compiler, struct_name, /*not_null=*/$1,
+                                    new_tnode_forward_struct, px );
+
           freex( struct_name );
       }
 ;
@@ -11108,11 +11153,10 @@ forward_class_declaration
       {
           char *struct_name =
               obtain_string_from_strpool( compiler->strpool, $3 );
-	  TNODE *tnode = new_tnode_forward_class( struct_name, px );
-          if( $1 ) {
-              tnode_set_flags( tnode, TF_NON_NULL );
-          }
-	  compiler_typetab_insert( compiler, tnode, px );
+
+          compiler_insert_new_type( compiler, struct_name, /*not_null=*/$1,
+                                    new_tnode_forward_class, px );
+
           freex( struct_name );
       }
 ;

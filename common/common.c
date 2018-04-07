@@ -21,7 +21,7 @@ if( (s) == NULL ) \
      exit(99); \
    }
 
-char *moveptr( char **p )
+void *moveptr( void *volatile *p )
 {
     void *q;
     assert( p );
