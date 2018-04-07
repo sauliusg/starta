@@ -11072,7 +11072,7 @@ class_declaration
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-            compiler_insert_new_type( compiler, struct_name, /*not_null=*/0,
+            compiler_insert_new_type( compiler, struct_name, /*not_null=*/$1,
                                       new_tnode_forward_class, px );
 	}
 	tnode = typetab_lookup( compiler->typetab, struct_name );
@@ -11117,7 +11117,7 @@ interface_declaration
 	TNODE *tnode = NULL;
 
 	if( !old_tnode ) {
-            compiler_insert_new_type( compiler, struct_name, /*not_null=*/0,
+            compiler_insert_new_type( compiler, struct_name, /*not_null=*/$1,
                                       new_tnode_forward_interface, px );
 	}
 	tnode = typetab_lookup( compiler->typetab, struct_name );
