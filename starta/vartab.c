@@ -44,7 +44,7 @@ static VAR_NODE *new_var_node_default( cexception_t *ex )
     return alloc_var_node( ex );
 }
 
-static VAR_NODE *new_var_node( DNODE *dnode,
+static VAR_NODE *new_var_node( DNODE *volatile *dnode,
                                const char* name,
                                int current_scope,
                                int current_subscope,
@@ -53,15 +53,17 @@ static VAR_NODE *new_var_node( DNODE *dnode,
                                cexception_t *ex )
 {
     VAR_NODE *node = new_var_node_default( ex );
+    assert( dnode );
 
-    node->dnode = dnode;
+    node->dnode = *dnode;
     node->name  = strdupx( (char*)name, ex );
     node->next  = next_node;
     node->scope = current_scope;
     node->count = count;
     node->subscope = current_subscope;
-    dnode_set_scope( dnode, current_scope );
+    dnode_set_scope( *dnode, current_scope );
 
+    *dnode = NULL;
     return node;
 }
 
@@ -139,9 +141,10 @@ int vartab_current_scope( VARTAB *vartab )
 }
 
 void vartab_insert_operator( VARTAB *table, const char *name,
-                             DNODE *dnode, cexception_t *ex )
+                             DNODE *volatile *dnode, cexception_t *ex )
 {
     assert( table );
+    assert( dnode );
     table->node = new_var_node( dnode, name,
                                 table->current_scope,
                                 table->current_subscope,
@@ -149,45 +152,61 @@ void vartab_insert_operator( VARTAB *table, const char *name,
                                 table->node, ex );
 }
 
-void vartab_insert_named_operator( VARTAB *table, DNODE *dnode,
+void vartab_insert_named_operator( VARTAB *table, DNODE *volatile *dnode,
                                    cexception_t *ex )
 {
-    vartab_insert_operator( table, dnode_name( dnode ), dnode, ex );
+    assert( dnode );
+    vartab_insert_operator( table, dnode_name( *dnode ), dnode, ex );
 }
 
-void vartab_insert_named_vars( VARTAB *table, DNODE *dnode_list,
+void vartab_insert_named_vars( VARTAB *table, DNODE *volatile *dnode_list,
 			       cexception_t *ex )
 {
     DNODE *dnode;
+    DNODE *volatile shared_dnode = NULL;
     char *name;
+    cexception_t inner;
 
+    assert( dnode_list );
     assert( table );
     assert( dnode_list );
 
-    dnode = dnode_list;
-    name = dnode_name( dnode );
-    assert( name );
-    vartab_insert( table, name, dnode, ex );
-
-    while( ( dnode = dnode_next( dnode )) != NULL ) {
+    cexception_guard( inner ) {
+        dnode = *dnode_list;
         name = dnode_name( dnode );
-	assert( name );
-	vartab_insert( table, name, share_dnode( dnode ), ex );
+        assert( name );
+        shared_dnode = share_dnode( dnode );
+        vartab_insert( table, name, &shared_dnode, &inner );
+
+        while( ( dnode = dnode_next( dnode )) != NULL ) {
+            name = dnode_name( dnode );
+            assert( name );
+            shared_dnode = share_dnode( dnode );
+            vartab_insert( table, name, &shared_dnode, &inner );
+        }
     }
+    cexception_catch {
+        dispose_dnode( dnode_list );
+        delete_dnode( shared_dnode );
+        cexception_reraise( inner, ex );
+    }
+    dispose_dnode( dnode_list );
 }
 
-void vartab_insert_named( VARTAB *table, DNODE *dnode, cexception_t *ex )
+void vartab_insert_named( VARTAB *table, DNODE *volatile *dnode, cexception_t *ex )
 {
     assert( table );
-    vartab_insert( table, dnode_name(dnode), dnode, ex );
+    assert( dnode );
+    vartab_insert( table, dnode_name(*dnode), dnode, ex );
 }
 
 static VAR_NODE *vartab_lookup_varnode( VARTAB *table, const char *name );
 
 void vartab_insert( VARTAB *table, const char *name,
-		    DNODE *dnode, cexception_t *ex )
+		    DNODE *volatile *dnode, cexception_t *ex )
 {
     VAR_NODE * volatile node = NULL;
+    assert( dnode );
     assert( table );
 
     if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
@@ -197,7 +216,7 @@ void vartab_insert( VARTAB *table, const char *name,
                       name );
             table->duplicates =
                 new_var_node_linked( table->duplicates, ex );
-            table->duplicates->dnode = dnode;
+            table->duplicates->dnode = *dnode;
 #if 0
         } else {
             fprintf( stderr, "name '%s' shadows previous declaration "
@@ -214,22 +233,24 @@ void vartab_insert( VARTAB *table, const char *name,
                                     /* count = */ 1,
                                     table->node, ex );
     }
+    *dnode = NULL;
 }
 
 static
 VAR_NODE *vartab_lookup_module_varnode( VARTAB *table, DNODE *module, 
                                         char *name, SYMTAB *symtab );
 
-void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
+void vartab_insert_module( VARTAB *table, DNODE *volatile *module, char *name,
                            SYMTAB *st, cexception_t *ex )
 {
     VAR_NODE * volatile node = NULL;
     int count = 0;
     assert( table );
+    assert( module );
 
     vartab_lookup_silently( table, name, &count, /* &s_imported = */ NULL );
 
-    if( (node = vartab_lookup_module_varnode( table, module, name, st ))
+    if( (node = vartab_lookup_module_varnode( table, *module, name, st ))
         != NULL ) {
         if( node->scope == table->current_scope &&
             (node->flags & VNF_IS_IMPORTED) == 0 ) {
@@ -237,7 +258,7 @@ void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
                       name );
             table->duplicates =
                 new_var_node_linked( table->duplicates, ex );
-            table->duplicates->dnode = module;
+            table->duplicates->dnode = *module;
         }
     }
     if( !node || node->scope != table->current_scope ||
@@ -252,20 +273,23 @@ void vartab_insert_module( VARTAB *table, DNODE *module, char *name,
 #endif
                                     table->node, ex );
     }
+    *module = NULL;
 }
 
-void vartab_insert_named_module( VARTAB *table, DNODE *module,
+void vartab_insert_named_module( VARTAB *table, DNODE *volatile *module,
                                  SYMTAB *st, cexception_t *ex )
 {
-    char *name = dnode_name( module );
+    assert( module );
+    char *name = dnode_name( *module );
     vartab_insert_module( table, module, name, st, ex );
 }
 
 void vartab_insert_modules_name( VARTAB *table, const char *name,
-                                 DNODE *dnode, cexception_t *ex )
+                                 DNODE *volatile *dnode, cexception_t *ex )
 {
     VAR_NODE * volatile node = NULL;
     assert( table );
+    assert( dnode );
 
     if( (node = vartab_lookup_varnode( table, name )) != NULL ) {
         if( node->scope == table->current_scope ) {
@@ -274,7 +298,7 @@ void vartab_insert_modules_name( VARTAB *table, const char *name,
                    the imported name:*/
                 table->duplicates =
                     new_var_node_linked( table->duplicates, ex );
-                table->duplicates->dnode = dnode;
+                table->duplicates->dnode = *dnode;
             } else {
                 /* another imported name exists: add the new
                    imported name, but mark that it is present
@@ -300,19 +324,29 @@ void vartab_insert_modules_name( VARTAB *table, const char *name,
 
         table->node->flags |= VNF_IS_IMPORTED;
     }
+    *dnode = NULL;
 }
 
 void vartab_copy_table( VARTAB *dst, VARTAB *src, cexception_t *ex )
 {
     VAR_NODE *curr;
+    DNODE *volatile shared_dnode = NULL;
+    cexception_t inner;
 
     assert( dst );
     assert( src );
 
-    for( curr = src->node; curr != NULL; curr = curr->next ) {
-	char *name = curr->name;
-	DNODE *dnode = curr->dnode;
-	vartab_insert_modules_name( dst, name, share_dnode( dnode ), ex );
+    cexception_guard( inner ) {
+        for( curr = src->node; curr != NULL; curr = curr->next ) {
+            char *name = curr->name;
+            DNODE *dnode = curr->dnode;
+            shared_dnode = share_dnode( dnode );
+            vartab_insert_modules_name( dst, name, &shared_dnode, &inner );
+        }
+    }
+    cexception_catch {
+        delete_dnode( shared_dnode );
+        cexception_reraise( inner, ex );
     }
 }
 

@@ -1067,37 +1067,45 @@ TYPETAB *dnode_typetab( DNODE *dnode )
     return dnode->typetab;
 }
 
-void dnode_vartab_insert_dnode( DNODE *dnode, const char *name, DNODE *var,
+void dnode_vartab_insert_dnode( DNODE *dnode, const char *name,
+                                DNODE *volatile *var,
 				cexception_t *ex )
 {
+    assert( var );
     assert( dnode->vartab );
     vartab_insert( dnode->vartab, name, var, ex );
 }
 
-void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *var,
+void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *volatile *var,
 				      cexception_t *ex )
 {
+    assert( var );
     assert( dnode->vartab );
     vartab_insert_named( dnode->vartab, var, ex );
 }
 
-void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *vars,
+void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *volatile *vars,
 				     cexception_t *ex )
 {
+    assert( vars );
     assert( dnode->vartab );
     vartab_insert_named_vars( dnode->vartab, vars, ex );
 }
 
-void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
+void dnode_optab_insert_named_operator( DNODE *dnode,
+                                        DNODE *volatile *operator,
                                         cexception_t *ex )
 {
+    assert( operator );
     assert( dnode->vartab );
     vartab_insert_named_operator( dnode->operators, operator, ex );
 }
 
-void dnode_optab_insert_operator( DNODE *dnode, char *opname, DNODE *operator,
+void dnode_optab_insert_operator( DNODE *dnode, char *opname,
+                                  DNODE *volatile *operator,
                                   cexception_t *ex )
 {
+    assert( operator );
     assert( dnode->vartab );
     vartab_insert_operator( dnode->operators, opname, operator, ex );
 }
@@ -1109,9 +1117,11 @@ DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name )
     return vartab_lookup( dnode->vartab, name );
 }
 
-void dnode_consttab_insert_consts( DNODE *dnode, DNODE *vars,
+void dnode_consttab_insert_consts( DNODE *dnode,
+                                   DNODE *volatile *vars,
 				   cexception_t *ex )
 {
+    assert( vars );
     assert( dnode->consts );
     vartab_insert_named_vars( dnode->consts, vars, ex );
 }

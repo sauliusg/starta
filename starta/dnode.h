@@ -221,7 +221,8 @@ DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code,
 
 thrcode_t *dnode_code( DNODE *dnode, ssize_t *code_length );
 
-void dnode_vartab_insert_dnode( DNODE *dnode, const char *name, DNODE *var,
+void dnode_vartab_insert_dnode( DNODE *dnode, const char *name,
+                                DNODE *volatile *var,
 				cexception_t *ex );
 
 VARTAB *dnode_vartab( DNODE *dnode );
@@ -232,21 +233,24 @@ VARTAB *dnode_operator_vartab( DNODE *dnode );
 
 TYPETAB *dnode_typetab( DNODE *dnode );
 
-void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *var,
+void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *volatile *var,
 				      cexception_t *ex );
 
-void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *vars,
+void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *volatile *vars,
 				     cexception_t *ex );
 
-void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
+void dnode_optab_insert_named_operator( DNODE *dnode,
+                                        DNODE *volatile *operator,
                                         cexception_t *ex );
 
-void dnode_optab_insert_operator( DNODE *dnode, char *opname, DNODE *operator,
+void dnode_optab_insert_operator( DNODE *dnode, char *opname,
+                                  DNODE *volatile *operator,
                                   cexception_t *ex );
 
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name );
 
-void dnode_consttab_insert_consts( DNODE *dnode, DNODE *consts,
+void dnode_consttab_insert_consts( DNODE *dnode,
+                                   DNODE *volatile *consts,
 				   cexception_t *ex );
 
 DNODE *dnode_consttab_lookup_const( DNODE *dnode, const char *name );
