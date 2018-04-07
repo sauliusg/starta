@@ -1117,7 +1117,6 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
     TNODE *volatile shared_tnode = share_tnode( *tnode );
     cexception_t inner;
 
-    // FIXME: check memory leaks and usage.
     cexception_guard( inner ) {
         lookup_node =
             typetab_insert_suffix( cc->typetab, name, suffix_type,
@@ -1149,12 +1148,8 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
 		yyerrorf( type_conflict_msg );
 	    }
 	}
-        dispose_tnode( tnode );
-    } else {
-        // FIXME: check why dispose_tnode( tnode ) does not work here:
-        dispose_tnode( tnode );
-        // *tnode = NULL;
     }
+    dispose_tnode( tnode );
     return lookup_node;
 }
 
