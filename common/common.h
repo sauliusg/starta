@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-char *moveptr( char **p );
+void *moveptr( void *volatile *p );
 char *process_escapes( char *str );
 char translate_escape( char **s );
 
