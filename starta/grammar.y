@@ -7021,12 +7021,14 @@ static void compiler_import_type_identifier_list( COMPILER *c,
 }
 
 static void compiler_import_selected_constants( COMPILER *c,
-                                                DNODE *imported_identifiers, 
+                                                DNODE *volatile *imported_identifiers, 
                                                 char *module_name,
                                                 cexception_t *ex )
 {
     DNODE *module = 
         vartab_lookup( c->compiled_modules, module_name );
+
+    assert( imported_identifiers );
 
     if( !module ) {
         yyerrorf( "module '%s' is not found for constant import "
@@ -7034,21 +7036,29 @@ static void compiler_import_selected_constants( COMPILER *c,
                   module_name, module_name );
     } else {
         DNODE *identifier;
-        foreach_dnode( identifier, imported_identifiers ) {
-            char *name = dnode_name( identifier );
-            DNODE *identifier_dnode =
-                dnode_consttab_lookup_const( module, name );
-            if( identifier_dnode ) {
-                vartab_insert( c->consts, name, 
-                               share_dnode( identifier_dnode ),
-                               ex );
-            } else {
-                yyerrorf( "constant '%s' is not found in module '%s'",
-                          name, module_name );
+        DNODE *volatile shared_identifier = NULL;
+        cexception_t inner;
+        cexception_guard( inner ) {
+            foreach_dnode( identifier, *imported_identifiers ) {
+                char *name = dnode_name( identifier );
+                DNODE *identifier_dnode =
+                    dnode_consttab_lookup_const( module, name );
+                if( identifier_dnode ) {
+                    shared_identifier = share_dnode( identifier_dnode );
+                    vartab_insert( c->consts, name, &shared_identifier,
+                                   &inner );
+                } else {
+                    yyerrorf( "constant '%s' is not found in module '%s'",
+                              name, module_name );
+                }
             }
         }
+        cexception_catch {
+            delete_dnode( shared_identifier );
+            cexception_reraise( inner, ex );
+        }
     }
-    delete_dnode( imported_identifiers );
+    dispose_dnode( imported_identifiers );
 }
 
 static void compiler_process_module_parameters( COMPILER *cc,
@@ -7132,6 +7142,7 @@ static void compiler_process_module_parameters( COMPILER *cc,
                 vartab_lookup( ctab, argument_name );
             if( !argument_dnode && dnode_name( arg ) == NULL ) {
                 /* The 'arg' dnode represents a constant expression: */
+                DNODE *volatile shared_arg = NULL;
                 cexception_t inner;
                 const_value_t volatile const_value = make_zero_const_value();
 
@@ -7147,10 +7158,14 @@ static void compiler_process_module_parameters( COMPILER *cc,
                                              &inner ),
                                     &inner );
                     argument_dnode = arg;
-                    vartab_insert_named( ctab, share_dnode( arg ), &inner );
+                    shared_arg = share_dnode( arg );
+                    vartab_insert_named( ctab, &shared_arg, &inner );
                 }
                 cexception_finally (
-                    { const_value_free( (const_value_t*)&const_value ); },
+                    {
+                        delete_dnode( shared_arg );
+                        const_value_free( (const_value_t*)&const_value );
+                    },
                     { cexception_reraise( inner, ex ); }
                 );
             }
@@ -7165,7 +7180,7 @@ static void compiler_process_module_parameters( COMPILER *cc,
                 shared_argument_dnode = share_dnode( argument_dnode );
                 cexception_guard( inner ) {
                     vartab_insert( cc->consts, dnode_name( param ),
-                                   shared_argument_dnode, &inner );
+                                   &shared_argument_dnode, &inner );
                 }
                 cexception_catch {
                     delete_dnode( shared_argument_dnode );
@@ -7193,7 +7208,7 @@ static void compiler_process_module_parameters( COMPILER *cc,
                 shared_argument_dnode = share_dnode( argument_dnode );
                 cexception_guard( inner ) {
                     vartab_insert( cc->vartab, dnode_name( param ),
-                                   shared_argument_dnode, &inner );
+                                   &shared_argument_dnode, &inner );
                 }
                 cexception_catch {
                     delete_dnode( shared_argument_dnode );
