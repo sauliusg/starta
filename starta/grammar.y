@@ -4143,17 +4143,25 @@ static void compiler_emit_argument_list( COMPILER *cc,
                                          cexception_t *ex )
 {
     DNODE *varnode;
+    DNODE *volatile shared_varnode = NULL;
 
-    foreach_reverse_dnode( varnode, argument_list ) {
-	TNODE *argtype = dnode_type( varnode );
+    cexception_t inner;
+    cexception_guard( inner ) {
+        foreach_reverse_dnode( varnode, argument_list ) {
+            TNODE *argtype = dnode_type( varnode );
 
-	dnode_assign_offset( varnode, &cc->local_offset );
-	vartab_insert_named( cc->vartab, varnode, ex );
-	share_dnode( varnode );
+            dnode_assign_offset( varnode, &cc->local_offset );
+            shared_varnode = share_dnode( varnode );
+            vartab_insert_named( cc->vartab, &shared_varnode, &inner );
 
-	compiler_emit_st( cc, argtype, dnode_name( varnode ),
-                          dnode_offset( varnode ), dnode_scope( varnode ),
-                          ex );
+            compiler_emit_st( cc, argtype, dnode_name( varnode ),
+                              dnode_offset( varnode ), dnode_scope( varnode ),
+                              &inner );
+        }
+    }
+    cexception_catch {
+        delete_dnode( shared_varnode );
+        cexception_reraise( inner, ex );
     }
 }
 
@@ -5464,16 +5472,32 @@ static void compiler_compile_zero_out_stackcells( COMPILER *cc,
 }
 
 static void compiler_begin_module( COMPILER *c,
-                                   DNODE *module,
+                                   DNODE *volatile *module,
                                    cexception_t *ex )
 {
-    compiler_push_symbol_tables( c, ex );
-    vartab_insert_named_module( c->compiled_modules, module, 
-                                /* SYMTAB *st = */ NULL,
-                                ex );
-    vartab_insert_named( c->vartab, share_dnode( module ), ex );
-    dlist_push_dnode( &c->current_module_stack, &c->current_module, ex );
-    c->current_module = module;
+    DNODE *volatile shared_module = NULL;
+    assert( module );
+
+    cexception_t inner;
+    cexception_guard( inner ) {
+        compiler_push_symbol_tables( c, &inner );
+        shared_module = share_dnode( *module );
+        vartab_insert_named_module( c->compiled_modules, &shared_module, 
+                                    /* SYMTAB *st = */ NULL,
+                                    &inner );
+        
+        shared_module = share_dnode( *module );
+        vartab_insert_named( c->vartab, &shared_module, ex );
+        dlist_push_dnode( &c->current_module_stack, &c->current_module, ex );
+        // FIXME: share current_module in the future:
+        delete_dnode( *module );
+        c->current_module = *module;
+        *module = NULL;
+    }
+    cexception_catch {
+        delete_dnode( shared_module );
+        cexception_reraise( inner, ex );
+    }
 }
 
 static void compiler_end_module( COMPILER *c, cexception_t *ex )
@@ -5528,6 +5552,8 @@ static void compiler_import_module( COMPILER *c,
                                           module_name_dnode,
                                           symtab );
 
+    DNODE *volatile shared_module = NULL;
+
 #if 0
     printf( ">>> module = '%s', filename = '%s'\n",
             dnode_name( module_name_dnode ),
@@ -5544,11 +5570,12 @@ static void compiler_import_module( COMPILER *c,
 #if 0
                 printf( ">>> will insert module '%s' as '%s'\n", module_name, synonim );
 #endif
+                shared_module = share_dnode( module );
                 if( synonim ) {
-                    vartab_insert_module( c->vartab, share_dnode( module ),
+                    vartab_insert_module( c->vartab, &shared_module,
                                           synonim, symtab, &inner );
                 } else {
-                    vartab_insert_named_module( c->vartab, share_dnode( module ),
+                    vartab_insert_named_module( c->vartab, &shared_module,
                                                 symtab, &inner );
                 }
 #if 0
@@ -5567,6 +5594,7 @@ static void compiler_import_module( COMPILER *c,
     cexception_catch {
         VARTAB *vt, *ct, *ot;
         TYPETAB *tt;
+        delete_dnode( shared_module );
         obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
         delete_symtab( symtab );
         cexception_reraise( inner, ex );
@@ -5599,6 +5627,8 @@ static void compiler_use_module( COMPILER *c,
                                           module_name_dnode,
                                           symtab );
 
+    DNODE *volatile shared_module = NULL;
+    
 #if 0
     printf( "\n>>> module = '%s', filename = '%s'\n",
             dnode_name( module_name_dnode ),
@@ -5629,17 +5659,18 @@ static void compiler_use_module( COMPILER *c,
                             module_name, 
                             synonim ? synonim : dnode_name( module ));
 #endif
+                    shared_module = share_dnode( module );
                     if( synonim ) {
 #if 0
                         printf( ">>> reinserting synonim\n" );
 #endif
-                        vartab_insert_module( c->vartab, share_dnode( module ),
+                        vartab_insert_module( c->vartab, &shared_module ,
                                               synonim, symtab, &inner );
                     } else {
 #if 0
                         printf( ">>> reinserting under its own name\n" );
 #endif
-                        vartab_insert_named_module( c->vartab, share_dnode( module ),
+                        vartab_insert_named_module( c->vartab, &shared_module,
                                                     symtab, &inner );
                     }
                 }
@@ -5672,6 +5703,7 @@ static void compiler_use_module( COMPILER *c,
     cexception_catch {
         VARTAB *vt, *ct, *ot;
         TYPETAB *tt;
+        delete_dnode( shared_module );
         obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
         delete_symtab( symtab );
         cexception_reraise( inner, ex );
@@ -6818,28 +6850,37 @@ static void compiler_import_selected_names( COMPILER *c,
             char *name = dnode_name( identifier );
             DNODE *identifier_dnode =
                 dnode_vartab_lookup_var( module, name );
-            if( identifier_dnode ) {
-                TNODE *identifier_type = dnode_type( identifier_dnode );
-                type_kind_t identifier_kind = tnode_kind( identifier_type );
-                if( keyword != 0 ) {
-                    if( keyword == IMPORT_FUNCTION && 
-                        identifier_kind != TK_FUNCTION ) {
-                        yyerrorf( "imported name '%s' should be a function "
-                                  "or a procedure, but it is a variable",
-                                  name );
+            DNODE *shared_dnode = NULL;
+            cexception_t inner;
+
+            cexception_guard( inner ) {
+                if( identifier_dnode ) {
+                    TNODE *identifier_type = dnode_type( identifier_dnode );
+                    type_kind_t identifier_kind = tnode_kind( identifier_type );
+                    if( keyword != 0 ) {
+                        if( keyword == IMPORT_FUNCTION && 
+                            identifier_kind != TK_FUNCTION ) {
+                            yyerrorf( "imported name '%s' should be a function "
+                                      "or a procedure, but it is a variable",
+                                      name );
+                        }
+                        if( keyword == IMPORT_VAR && 
+                            identifier_kind == TK_FUNCTION ) {
+                            yyerrorf( "imported name '%s' should be a variable "
+                                      "or a procedure, but it is a %s",
+                                      name, tnode_kind_name( identifier_type ));
+                        }
                     }
-                    if( keyword == IMPORT_VAR && 
-                        identifier_kind == TK_FUNCTION ) {
-                        yyerrorf( "imported name '%s' should be a variable "
-                                  "or a procedure, but it is a %s",
-                                  name, tnode_kind_name( identifier_type ));
-                    }
+                    shared_dnode = share_dnode( identifier_dnode );
+                    vartab_insert( c->vartab, name, &shared_dnode, &inner );
+                } else {
+                    yyerrorf( "name '%s' is not found in module '%s'",
+                              name, module_name );
                 }
-                vartab_insert( c->vartab, name, 
-                               share_dnode( identifier_dnode ), ex );
-            } else {
-                yyerrorf( "name '%s' is not found in module '%s'",
-                          name, module_name );
+            }
+            cexception_catch {
+                delete_dnode( shared_dnode );
+                cexception_reraise( inner, ex );
             }
         }
     }
