@@ -7689,7 +7689,7 @@ undelimited_simple_statement
 #if 0
         printf( ">>>> receiving operator '%s', tnode name '%s'\n", dnode_name($1), tnode_name(dnode_type($1)));
 #endif
-        DNODE *operator = $1;
+        DNODE *volatile operator = $1;
         TNODE *optype = operator ? dnode_type( operator ) : NULL;
         char *opname = operator ? dnode_name( operator ) : NULL;
 
@@ -7702,10 +7702,23 @@ undelimited_simple_statement
 #if 0
         printf( ">>>> inserting operator '%s'\n", opname );
 #endif
-        vartab_insert_operator( compiler->operators, opname, operator, px );
-        if( compiler->current_module && dnode_scope( operator ) == 0 ) {
-            dnode_optab_insert_operator( compiler->current_module, opname,
-                                         share_dnode( operator ), px );
+        DNODE *volatile shared_operator = NULL;
+        cexception_t inner;
+        cexception_guard( inner ) {
+            shared_operator = share_dnode( operator );
+            vartab_insert_operator( compiler->operators, opname, &shared_operator, &inner );
+
+            if( compiler->current_module && dnode_scope( operator ) == 0 ) {
+                dnode_optab_insert_operator( compiler->current_module, opname,
+                                             &operator, &inner );
+            } else {
+                dispose_dnode( &operator );
+            }
+        }
+        cexception_catch {
+            delete_dnode( shared_operator );
+            delete_dnode( operator );
+            cexception_reraise( inner, px );
         }
     }
   | compound_statement
@@ -7972,23 +7985,12 @@ opt_default_module_parameter
 module_statement
   : module_keyword module_name opt_module_parameters
       {
-          DNODE *module_dnode = $2;
+          DNODE *volatile module_dnode = $2;
+          DNODE *volatile shared_module_dnode = NULL;
           DNODE *module_params = $3;
 
           dnode_insert_module_args( module_dnode, &module_params );
-#if 0
-          printf( ">>> compiler->filename = '%s'\n", compiler->filename );
-          if( compiler->requested_module ) {
-              printf( ">>> requested_module = '%s', synonim = '%s', "
-                      "filename = '%s'\n", 
-                      dnode_name( compiler->requested_module ),
-                      dnode_synonim( compiler->requested_module ),
-                      dnode_filename( compiler->requested_module ));
-          } else {
-              printf( ">>> no requested module for '%s'\n",
-                      dnode_name( module_dnode ));
-          }
-#endif
+
           cexception_t inner;
           cexception_guard( inner ) {
               if( compiler->requested_module ) {
@@ -7996,36 +7998,37 @@ module_statement
                                       dnode_filename( compiler->requested_module ),
                                       &inner );
               }
+
+              shared_module_dnode = share_dnode( module_dnode );
+              vartab_insert_named_module( compiler->vartab, &shared_module_dnode,
+                                          stlist_data( compiler->symtab_stack ),
+                                          &inner );
+
+              if( compiler->current_module && dnode_scope( module_dnode ) == 0 ) {
+                  shared_module_dnode = share_dnode( module_dnode );
+                  dnode_vartab_insert_named_vars( compiler->current_module,
+                                                  &shared_module_dnode,
+                                                  &inner );
+              }
+
+              //compiler_begin_subscope( compiler, px );
+              shared_module_dnode = share_dnode( module_dnode );
+              compiler_begin_module( compiler, &shared_module_dnode, &inner );
+
+              if( compiler->requested_module ) {
+                  compiler_process_module_parameters
+                      ( compiler, /*module_params*/
+                        dnode_module_args( module_dnode ), &inner );
+              }
           }
           cexception_catch {
               delete_dnode( module_dnode );
+              delete_dnode( shared_module_dnode );
               cexception_reraise( inner, px );
           }
-
-#if 0
-          printf( ">>> inserting module '%s' into vartab %p\n", 
-                  dnode_name( module_dnode ), compiler->vartab );
-#endif
-	  vartab_insert_named_module( compiler->vartab, module_dnode,
-                                      stlist_data( compiler->symtab_stack ),
-                                      px );
-          if( compiler->current_module && dnode_scope( module_dnode ) == 0 ) {
-              dnode_vartab_insert_named_vars( compiler->current_module,
-                                              share_dnode( module_dnode ),
-                                              px );
-          }
-
-          //compiler_begin_subscope( compiler, px );
-	  compiler_begin_module( compiler, share_dnode(module_dnode), px );
-
-          if( compiler->requested_module ) {
-              compiler_process_module_parameters
-                  ( compiler, /*module_params*/
-                    dnode_module_args( module_dnode ), px );
-          }
+          delete_dnode( module_dnode );
       }
-    statement_list
-    '}' module_keyword __IDENTIFIER
+    statement_list '}' module_keyword __IDENTIFIER
       {
 	  char *name;
 	  if( compiler->current_module &&
@@ -8362,16 +8365,16 @@ selective_use_statement
            cexception_t inner;
            cexception_guard( inner ) {
                compiler_import_selected_constants( compiler,
-                                                   imported_identifiers,
+                                                   &imported_identifiers,
                                                    module_name, &inner );
            }
            cexception_catch {
                freex( module_name );
-               // delete_dnode( imported_identifiers );
+               delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           // delete_dnode( imported_identifiers );
+           delete_dnode( imported_identifiers );
        }
    | _IMPORT _CONST identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
