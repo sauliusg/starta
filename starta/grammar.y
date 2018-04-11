@@ -6834,11 +6834,12 @@ static void compiler_set_integer_pragma( COMPILER *c, char *pragma_name,
 }
 
 static void compiler_import_selected_names( COMPILER *c,
-                                            DNODE *imported_identifiers,
+                                            DNODE *volatile *imported_identifiers,
                                             char *module_name,
                                             int keyword,
                                             cexception_t *ex )
 {
+    assert( imported_identifiers );
     DNODE *module = 
         vartab_lookup( c->compiled_modules, module_name );
     DNODE *identifier;
@@ -6846,7 +6847,7 @@ static void compiler_import_selected_names( COMPILER *c,
         yyerrorf( "module '%s' is not found -- consider 'use %s' first",
                   module_name, module_name );
     } else {
-        foreach_dnode( identifier, imported_identifiers ) {
+        foreach_dnode( identifier, *imported_identifiers ) {
             char *name = dnode_name( identifier );
             DNODE *identifier_dnode =
                 dnode_vartab_lookup_var( module, name );
@@ -6880,10 +6881,12 @@ static void compiler_import_selected_names( COMPILER *c,
             }
             cexception_catch {
                 delete_dnode( shared_dnode );
+                dispose_dnode( imported_identifiers );
                 cexception_reraise( inner, ex );
             }
         }
     }
+    dispose_dnode( imported_identifiers );
 }
 
 static DNODE* compiler_module_parameter_dnode( COMPILER *c,
@@ -6954,7 +6957,7 @@ static void compiler_import_array_definition( COMPILER *c, char *module_name,
 }
 
 static void compiler_import_type_identifier_list( COMPILER *c, 
-                                                  DNODE *imported_identifiers,
+                                                  DNODE *volatile *imported_identifiers,
                                                   char *module_name,
                                                   cexception_t *ex )
 {
@@ -6967,7 +6970,7 @@ static void compiler_import_type_identifier_list( COMPILER *c,
                   module_name, module_name );
     } else {
         DNODE *identifier;
-        foreach_dnode( identifier, imported_identifiers ) {
+        foreach_dnode( identifier, *imported_identifiers ) {
             char *name = dnode_name( identifier );
             TNODE *identifier_tnode =
                 share_tnode( dnode_typetab_lookup_type( module, name ));
@@ -7011,13 +7014,14 @@ static void compiler_import_type_identifier_list( COMPILER *c,
             cexception_catch {
                 delete_tnode( shared_tnode );
                 delete_tnode( identifier_tnode );
+                dispose_dnode( imported_identifiers );
                 cexception_reraise( inner, ex );
             }
             dispose_tnode( &shared_tnode );
             dispose_tnode( &identifier_tnode );
         }
     }
-    delete_dnode( imported_identifiers );
+    dispose_dnode( imported_identifiers );
 }
 
 static void compiler_import_selected_constants( COMPILER *c,
@@ -8225,7 +8229,7 @@ selective_use_statement
            cexception_t inner;
 
            cexception_guard( inner ) {
-               compiler_import_selected_names( compiler, imported_identifiers,
+               compiler_import_selected_names( compiler, &imported_identifiers,
                                                module_name, IMPORT_ALL,
                                                &inner );
            }
@@ -8281,16 +8285,16 @@ selective_use_statement
            cexception_t inner;
            cexception_guard( inner ) {
                compiler_import_type_identifier_list( compiler,
-                                                     imported_identifiers,
+                                                     &imported_identifiers,
                                                      module_name, &inner );
            }
            cexception_catch {
                freex( module_name );
-               // delete_dnode( imported_identifiers );
+               delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           // delete_dnode( imported_identifiers );
+           delete_dnode( imported_identifiers );
        }
    | _IMPORT _TYPE identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
        {
@@ -8301,16 +8305,16 @@ selective_use_statement
            cexception_t inner;
            cexception_guard( inner ) {
                compiler_import_type_identifier_list( compiler,
-                                                     imported_identifiers,
+                                                     &imported_identifiers,
                                                      module_name, px );
            }
            cexception_catch {
                freex( module_name );
-               // delete_dnode( imported_identifiers );
+               delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           // delete_dnode( imported_identifiers );
+           delete_dnode( imported_identifiers );
        }
 
    | _USE _VAR identifier_list _FROM /* module_import_identifier */ __IDENTIFIER
@@ -8321,7 +8325,7 @@ selective_use_statement
 
            cexception_t inner;
            cexception_guard( inner ) {
-               compiler_import_selected_names( compiler, imported_identifiers,
+               compiler_import_selected_names( compiler, &imported_identifiers,
                                                module_name, IMPORT_VAR,
                                                &inner );
 
@@ -8343,7 +8347,7 @@ selective_use_statement
 
            cexception_t inner;
            cexception_guard( inner ) {
-               compiler_import_selected_names( compiler, imported_identifiers,
+               compiler_import_selected_names( compiler, &imported_identifiers,
                                                module_name, IMPORT_VAR,
                                                &inner );
            }
@@ -8385,16 +8389,16 @@ selective_use_statement
            cexception_t inner;
            cexception_guard( inner ) {
                compiler_import_selected_constants( compiler,
-                                                   imported_identifiers,
+                                                   &imported_identifiers,
                                                    module_name, &inner );
            }
            cexception_catch {
                freex( module_name );
-               // delete_dnode( imported_identifiers );
+               delete_dnode( imported_identifiers );
                cexception_reraise( inner, px );
            }
            freex( module_name );
-           // delete_dnode( imported_identifiers );
+           delete_dnode( imported_identifiers );
        }
 
    | _USE function_or_procedure identifier_list
@@ -8407,7 +8411,7 @@ selective_use_statement
            cexception_t inner;
            cexception_guard( inner ) {
                compiler_import_selected_names( compiler,
-                                               imported_identifiers,
+                                               &imported_identifiers,
                                                module_name, IMPORT_FUNCTION,
                                                &inner );
            }
@@ -8429,7 +8433,7 @@ selective_use_statement
            cexception_t inner;
            cexception_guard( inner ) {
                compiler_import_selected_names( compiler,
-                                               imported_identifiers,
+                                               &imported_identifiers,
                                                module_name, IMPORT_FUNCTION,
                                                &inner );
 
@@ -8870,20 +8874,39 @@ opt_variable_declaration_keyword
 
 variable_declaration
   : variable_declaration_keyword identifier ':' var_type_description
-    {
-     int readonly = $1;
+  {
+      int readonly = $1;
+      DNODE *volatile identifier_dnode = $2;
+      DNODE *volatile shared_dnode = NULL;
+      TNODE *volatile type_tnode = $4;
+      cexception_t inner;
 
-     dnode_list_append_type( $2, $4 );
-     dnode_list_assign_offsets( $2, &compiler->local_offset );
-     compiler_vartab_insert_named_vars( compiler, $2, px );
-     if( readonly ) {
-	 dnode_list_set_flags( $2, DF_IS_READONLY );
-     }
-     if( compiler->loops ) {
-	 compiler_compile_zero_out_stackcells( compiler, $2, px );
-     }
-     compiler_check_non_null_variables( $2 );
-    }
+      cexception_guard( inner ) {
+          dnode_list_append_type( identifier_dnode, type_tnode );
+          type_tnode = NULL;
+          dnode_list_assign_offsets( identifier_dnode,
+                                     &compiler->local_offset );
+          shared_dnode = share_dnode( identifier_dnode );
+          compiler_vartab_insert_named_vars( compiler, &shared_dnode, &inner );
+          if( readonly ) {
+              dnode_list_set_flags( identifier_dnode, DF_IS_READONLY );
+          }
+          if( compiler->loops ) {
+              compiler_compile_zero_out_stackcells( compiler, identifier_dnode,
+                                                    &inner );
+          }
+          compiler_check_non_null_variables( identifier_dnode );
+      }
+      cexception_catch {
+          delete_dnode( shared_dnode );
+          delete_dnode( identifier_dnode );
+          delete_tnode( type_tnode );
+          cexception_reraise( inner, px );
+      }
+      delete_dnode( shared_dnode );
+      delete_dnode( identifier_dnode );
+      delete_tnode( type_tnode );
+  }
   | variable_declaration_keyword 
     identifier ',' identifier_list ':' var_type_description
     {
