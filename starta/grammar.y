@@ -8911,72 +8911,115 @@ variable_declaration
     identifier ',' identifier_list ':' var_type_description
     {
      int readonly = $1;
+     DNODE *volatile identifier_dnode = $2;
+     DNODE *volatile shared_dnode = NULL;
 
-     $2 = dnode_append( $2, $4 );
-     dnode_list_append_type( $2, $6 );
-     dnode_list_assign_offsets( $2, &compiler->local_offset );
-     compiler_vartab_insert_named_vars( compiler, $2, px );
-     if( readonly ) {
-	 dnode_list_set_flags( $2, DF_IS_READONLY );
+     identifier_dnode = dnode_append( identifier_dnode, $4 );
+     dnode_list_append_type( identifier_dnode, $6 );
+     dnode_list_assign_offsets( identifier_dnode, &compiler->local_offset );
+
+     cexception_t inner;
+     cexception_guard( inner ) {
+         shared_dnode = share_dnode( identifier_dnode );
+         compiler_vartab_insert_named_vars( compiler, &shared_dnode, &inner );
+         if( readonly ) {
+             dnode_list_set_flags( identifier_dnode, DF_IS_READONLY );
+         }
+         if( compiler->loops ) {
+             compiler_compile_zero_out_stackcells( compiler, identifier_dnode,
+                                                   &inner );
+         }
+         compiler_check_non_null_variables( identifier_dnode );
      }
-     if( compiler->loops ) {
-	 compiler_compile_zero_out_stackcells( compiler, $2, px );
+     cexception_catch {
+         delete_dnode( identifier_dnode );
+         delete_dnode( shared_dnode );
+         cexception_reraise( inner, px );
      }
-     compiler_check_non_null_variables( $2 );
+     delete_dnode( identifier_dnode );
+     delete_dnode( shared_dnode );
     }
+
   | variable_declaration_keyword
     identifier ':' var_type_description initialiser
     {
      int readonly = $1;
-     DNODE *var = $2;
+     DNODE *volatile var = $2;
+     DNODE *volatile shared_dnode = NULL;
 
      dnode_list_append_type( var, $4 );
      dnode_list_assign_offsets( var, &compiler->local_offset );
-     compiler_vartab_insert_named_vars( compiler, $2, px );
-     if( readonly ) {
-	 dnode_list_set_flags( var, DF_IS_READONLY );
+
+     cexception_t inner;
+     cexception_guard( inner ) {
+         shared_dnode = share_dnode( var );
+         compiler_vartab_insert_named_vars( compiler, &var, &inner );
+         if( readonly ) {
+             dnode_list_set_flags( var, DF_IS_READONLY );
+         }
+         compiler_compile_initialise_variable( compiler, var, &inner );
      }
-     compiler_compile_initialise_variable( compiler, var, px );
+     cexception_catch {
+         delete_dnode( var );
+         delete_dnode( shared_dnode );
+         cexception_reraise( inner, px );
+     }
+     delete_dnode( var );
+     delete_dnode( shared_dnode );
     }
 
   | variable_declaration_keyword identifier ','
     identifier_list ':' var_type_description '=' multivalue_expression_list
     {
      int readonly = $1;
+     DNODE *volatile identifier_dnode = $2;
+     DNODE *volatile shared_dnode = NULL;
      int expr_nr = $8;
 
-     $2 = dnode_append( $2, $4 );
-     dnode_list_append_type( $2, $6 );
-     dnode_list_assign_offsets( $2, &compiler->local_offset );
-     compiler_vartab_insert_named_vars( compiler, $2, px );
-     if( readonly ) {
-	 dnode_list_set_flags( $2, DF_IS_READONLY );
-     }
-     {
-	 DNODE *var;
-	 DNODE *lst = $2;
-	 int len = dnode_list_length( lst );         
+     identifier_dnode = dnode_append( identifier_dnode, $4 );
+     dnode_list_append_type( identifier_dnode, $6 );
+     dnode_list_assign_offsets( identifier_dnode, &compiler->local_offset );
 
-         if( expr_nr < len ) {
-             yyerrorf( "number of expressions (%d) is less "
-                       "the number of variables (%d)", expr_nr, len );
+     cexception_t inner;
+     cexception_guard( inner ) {
+         shared_dnode = share_dnode( identifier_dnode );
+         compiler_vartab_insert_named_vars( compiler, &shared_dnode, px );
+         if( readonly ) {
+             dnode_list_set_flags( identifier_dnode, DF_IS_READONLY );
          }
+         {
+             DNODE *var;
+             DNODE *lst = identifier_dnode;
+             int len = dnode_list_length( lst );         
 
-         if( expr_nr > len ) {
-             if( expr_nr == len + 1 ) {
-                 compiler_compile_drop( compiler, px );
-             } else {
-                 compiler_compile_dropn( compiler, expr_nr - len, px );
+             if( expr_nr < len ) {
+                 yyerrorf( "number of expressions (%d) is less "
+                           "the number of variables (%d)", expr_nr, len );
+             }
+
+             if( expr_nr > len ) {
+                 if( expr_nr == len + 1 ) {
+                     compiler_compile_drop( compiler, px );
+                 } else {
+                     compiler_compile_dropn( compiler, expr_nr - len, px );
+                 }
+             }
+
+             len = 0;
+             foreach_reverse_dnode( var, lst ) {
+                 len ++;
+                 if( len <= expr_nr )
+                     compiler_compile_initialise_variable( compiler, var, px );
              }
          }
-
-         len = 0;
-         foreach_reverse_dnode( var, lst ) {
-             len ++;
-             if( len <= expr_nr )
-                 compiler_compile_initialise_variable( compiler, var, px );
-         }
      }
+     cexception_catch {
+         delete_dnode( identifier_dnode );
+         delete_dnode( shared_dnode );
+         cexception_reraise( inner, px );
+     }
+     delete_dnode( identifier_dnode );
+     delete_dnode( shared_dnode );
     }
 
   | variable_declaration_keyword identifier ','
@@ -8988,23 +9031,41 @@ variable_declaration
         $2 = dnode_append( $2, $4 );
         dnode_list_append_type( $2, $6 );
         dnode_list_assign_offsets( $2, &compiler->local_offset );
-        compiler_vartab_insert_named_vars( compiler, $2, px );
+        compiler_vartab_insert_named_vars( compiler, &$2, px );
     }
 
   | variable_declaration_keyword var_type_description variable_declarator_list
       {
         int readonly = $1;
+        DNODE *volatile var_list_dnode = $3;
+        DNODE *volatile shared_dnode = NULL;
 
-	dnode_list_append_type( $3, $2 );
-	dnode_list_assign_offsets( $3, &compiler->local_offset );
-	compiler_vartab_insert_named_vars( compiler, $3, px );
-	if( readonly ) {
-	    dnode_list_set_flags( $3, DF_IS_READONLY );
-	}
-	if( compiler->loops ) {
-	    compiler_compile_zero_out_stackcells( compiler, $3, px );
-	}
-	compiler_compile_variable_initialisations( compiler, $3, px );
+	dnode_list_append_type( var_list_dnode, $2 );
+	dnode_list_assign_offsets( var_list_dnode, &compiler->local_offset );
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            shared_dnode = share_dnode( var_list_dnode );
+            compiler_vartab_insert_named_vars( compiler, &shared_dnode,
+                                               &inner );
+            if( readonly ) {
+                dnode_list_set_flags( var_list_dnode, DF_IS_READONLY );
+            }
+            if( compiler->loops ) {
+                compiler_compile_zero_out_stackcells( compiler, var_list_dnode,
+                                                      &inner );
+            }
+            compiler_compile_variable_initialisations( compiler,
+                                                       var_list_dnode,
+                                                       &inner );
+        }
+        cexception_catch {
+            delete_dnode( var_list_dnode );
+            delete_dnode( shared_dnode );
+            cexception_reraise( inner, px );
+        }
+        delete_dnode( var_list_dnode );
+        delete_dnode( shared_dnode );
       }
 
   | variable_declaration_keyword identifier initialiser
@@ -9012,29 +9073,54 @@ variable_declaration
      TNODE *expr_type = compiler->e_stack ?
 	 share_tnode( enode_type( compiler->e_stack )) : NULL;
      int readonly = $1;
-     DNODE *var = $2;
+     DNODE *volatile var = $2;
+     DNODE *volatile shared_var = NULL;
+     DNODE *volatile shared_args = NULL;
+     DNODE *volatile shared_retvals = NULL;
+     TNODE *volatile shared_base = NULL;
 
      type_kind_t expr_type_kind = expr_type ?
          tnode_kind( expr_type ) : TK_NONE;
 
-     if( expr_type_kind == TK_FUNCTION ||
-         expr_type_kind == TK_OPERATOR ||
-         expr_type_kind == TK_METHOD ) {
-         TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
-         expr_type = new_tnode_function_or_proc_ref
-             ( share_dnode( tnode_args( expr_type )),
-               share_dnode( tnode_retvals( expr_type )),
-               share_tnode( base_type ),
-               px );
-     }
+     cexception_t inner;
+     cexception_guard( inner ) {
+         if( expr_type_kind == TK_FUNCTION ||
+             expr_type_kind == TK_OPERATOR ||
+             expr_type_kind == TK_METHOD ) {
+             TNODE *base_type = typetab_lookup( compiler->typetab,
+                                                "procedure" );
+             shared_args = share_dnode( tnode_args( expr_type ));
+             shared_retvals = share_dnode( tnode_retvals( expr_type ));
+             shared_base = share_tnode( base_type );
 
-     dnode_list_append_type( var, expr_type );
-     dnode_list_assign_offsets( var, &compiler->local_offset );
-     compiler_vartab_insert_named_vars( compiler, var, px );
-     if( readonly ) {
-	 dnode_list_set_flags( var, DF_IS_READONLY );
+             expr_type = new_tnode_function_or_proc_ref
+                 ( shared_args, shared_retvals, shared_base, &inner );
+             shared_args = shared_retvals = NULL;
+             shared_base = NULL;
+         }
+
+         dnode_list_append_type( var, expr_type );
+         dnode_list_assign_offsets( var, &compiler->local_offset );
+
+         shared_var = share_dnode( var );
+         compiler_vartab_insert_named_vars( compiler, &shared_var, &inner );
+         if( readonly ) {
+             dnode_list_set_flags( var, DF_IS_READONLY );
+         }
+         compiler_compile_initialise_variable( compiler, var, &inner );
      }
-     compiler_compile_initialise_variable( compiler, var, px );
+     cexception_finally (
+         {
+             delete_dnode( var );
+             delete_dnode( shared_var );
+             delete_dnode( shared_args );
+             delete_dnode( shared_retvals );
+             delete_tnode( shared_base );
+         },
+         {
+             cexception_reraise( inner, px );
+         }
+     )
     }
  
  | variable_declaration_keyword identifier ','
