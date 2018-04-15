@@ -1,0 +1,94 @@
+Memory management in C code
+===========================
+
+-- If a function gets a *pointer* to an object, e.g.:
+
+	OBJECT *obj = new_object( ex );
+	int param = 43;
+	/* ... do some computations ... */
+	do_something_with_object( obj, param );
+	/* ... do some more computations, possibly with the 'obj' ... */
+	delete_object( obj );
+	/* ... The 'obj' referent MAY NOT be used beyond this pont... */
+	return;
+
+   then the function 'do_something_with_object()' MUST NOT free the
+   object 'obj', and it MAY NOT insert it into structures that own
+   this object. If insertion into such structures is necessary inside
+   'do_something_with_object()', then the object MUST be sharable, and
+   the 'do_something_with_object()' function MUST call
+   'share_object(obj)' to incremen the reference count.
+
+   The caller of the 'do_something_with_object()' function remains the
+   owner of the object and MUST delete or dispose this object afther
+   the use.
+
+-- If a function gets a *ponter* to a (volatile) *pointer* to an
+   object, then the function becomes an *owner* of this object; it
+   either MUST take care of the memory pointed to by 'obj' (by
+   deleting/disposing it, or by including 'obj' into a structure that
+   owns it), and MUST set the 'obj' pointer to NULL; or it MUST throe
+   an exception, in which case the caller MUST catch that exception
+   and delete the object pointed to by 'obj' itself. After the
+   do_something_to_object() call suceeds and returns, the 'obj' value
+   MUST be NULL and MUST NOT be used by the caller (even if the caller
+   rerains the reference ot the 'obj' object in another variable, this
+   reference MAY NOT be used, since the object MAY be already
+   deleted). After the call, the caller is no longer the owner of the
+   object pointed to by 'obj'.
+
+   If the object 'obj' is needed after the call to
+   'do_something_with_object()', the object MUST be sharable and the
+   caller MUST call 'share_object(obj)' before the call to
+   'do_something_to_object()'; if it does so, then it MUST delete
+   its own shared reference to 'obj' afther the work.
+
+   The three scenarios are illustrated by examples below:
+
+	/* Caller does not need and does not use the object after the call. */
+	/* Callee always succeeds and does not raise exceptions. */
+	OBJECT *volatile obj = new_object( ex );
+	int paramater = 42;
+	/* ... do something, possibly using 'obj' */
+	do_something_to_object( &obj, parameter );
+	/* ... The variable 'obj' is NULL after this point*/
+
+	/* Caller does not need and does not use the object after the call. */
+	/* Callee may raise an exception. */
+	OBJECT *volatile obj = new_object( ex );
+	int paramater = 42;
+	cexception_t inner;
+	/* ... do something, possibly using 'obj' */
+	cexception_guard( inner )
+	    do_something_to_object( &obj, parameter, &inner );
+	    /* 'obj' is NULL after this point. */
+	}
+	cexception_catch {
+	    delete_object( obj );
+	    cexception_reraise( inner, ex );
+	}
+	/* ... The variable 'obj' is NULL after this point*/
+
+	/* Caller needs the object after the call. */
+	/* Callee may raise an exception. */
+	OBJECT *volatile obj = new_object( ex );
+	OBJECT *volatile shared_obj = share_object( obj );
+	int paramater = 42;
+	cexception_t inner;
+	/* ... do something, possibly using 'obj' */
+	cexception_guard( inner )
+	    do_something_to_object( &obj, parameter, &inner );
+	    /* 'obj' is NULL after this point. */
+	}
+	cexception_catch {
+	    delete_object( obj );
+	    delete_object( shared_obj );
+	    cexception_reraise( inner, ex );
+	}
+	/* ... The variable 'obj' is NULL after this point, */
+	/* but 'shared_obj' is still available and owned by the caller. */
+	do_something_with_object( shared_obj, param );
+	dispose_object( &shared_obj );
+	/* ... The variable 'shared_obj' is NULL after this point,
+	   memory may be released if 'obj' was not retained by 
+	   'do_something_to_object()' */
