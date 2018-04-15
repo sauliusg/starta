@@ -9127,55 +9127,83 @@ variable_declaration
     identifier_list '=' multivalue_expression_list
     {
      int readonly = $1;
+     DNODE *volatile ident_dnode = $2;
+     DNODE *volatile shared_dnode = NULL;
+     DNODE *volatile shared_args = NULL;
+     DNODE *volatile shared_retvals = NULL;
+     TNODE *volatile shared_base = NULL;
+     TNODE *volatile expr_type = NULL;
+     cexception_t inner;
 
-     $2 = dnode_append( $2, $4 );
-     dnode_list_assign_offsets( $2, &compiler->local_offset );
-     compiler_vartab_insert_named_vars( compiler, $2, px );
-     if( readonly ) {
-	 dnode_list_set_flags( $2, DF_IS_READONLY );
-     }
-     {
-	 DNODE *var;
-	 DNODE *lst = $2;
-         ssize_t len = dnode_list_length( lst );
-         ssize_t expr_nr = $6;
-
-         if( expr_nr < len ) {
-             yyerrorf( "number of expressions (%d) is less than "
-                       "is needed to initialise %d variables",
-                       expr_nr, len );
+     cexception_guard( inner ) {
+         ident_dnode = dnode_append( ident_dnode, $4 );
+         dnode_list_assign_offsets( ident_dnode, &compiler->local_offset );
+         shared_dnode = share_dnode( ident_dnode );
+         compiler_vartab_insert_named_vars( compiler, &shared_dnode, &inner );
+         if( readonly ) {
+             dnode_list_set_flags( ident_dnode, DF_IS_READONLY );
          }
+         {
+             DNODE *var;
+             DNODE *lst = ident_dnode;
+             ssize_t len = dnode_list_length( lst );
+             ssize_t expr_nr = $6;
 
-         if( expr_nr > len ) {
-             if( expr_nr == len + 1 ) {
-                 compiler_compile_drop( compiler, px );
-             } else {
-                 compiler_compile_dropn( compiler, expr_nr - len, px );
+             if( expr_nr < len ) {
+                 yyerrorf( "number of expressions (%d) is less than "
+                           "is needed to initialise %d variables",
+                           expr_nr, len );
+             }
+
+             if( expr_nr > len ) {
+                 if( expr_nr == len + 1 ) {
+                     compiler_compile_drop( compiler, &inner );
+                 } else {
+                     compiler_compile_dropn( compiler, expr_nr - len, &inner );
+                 }
+             }
+
+             len = 0;
+             foreach_reverse_dnode( var, lst ) {
+                 len ++;
+                 expr_type = compiler->e_stack ?
+                     share_tnode( enode_type( compiler->e_stack )) : NULL;
+                 type_kind_t expr_type_kind = expr_type ?
+                     tnode_kind( expr_type ) : TK_NONE;
+                 if( expr_type_kind == TK_FUNCTION ||
+                     expr_type_kind == TK_OPERATOR ||
+                     expr_type_kind == TK_METHOD ) {
+                     shared_base = share_tnode( typetab_lookup( compiler->typetab,
+                                                                "procedure" ));
+
+                     shared_args = share_dnode( tnode_args( expr_type ));
+                     shared_retvals = share_dnode( tnode_retvals( expr_type ));
+
+                     expr_type = new_tnode_function_or_proc_ref
+                         ( shared_args, shared_retvals, shared_base, &inner );
+                     shared_args = shared_retvals = NULL;
+                     shared_base = NULL;
+                 }
+                 dnode_append_type( var, expr_type );
+                 expr_type = NULL;
+                 if( len <= expr_nr )
+                     compiler_compile_initialise_variable( compiler, var, &inner );
              }
          }
-
-         len = 0;
-	 foreach_reverse_dnode( var, lst ) {
-             len ++;
-             TNODE *expr_type = compiler->e_stack ?
-                 share_tnode( enode_type( compiler->e_stack )) : NULL;
-             type_kind_t expr_type_kind = expr_type ?
-                 tnode_kind( expr_type ) : TK_NONE;
-             if( expr_type_kind == TK_FUNCTION ||
-                 expr_type_kind == TK_OPERATOR ||
-                 expr_type_kind == TK_METHOD ) {
-                 TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
-                 expr_type = new_tnode_function_or_proc_ref
-                     ( share_dnode( tnode_args( expr_type )),
-                       share_dnode( tnode_retvals( expr_type )),
-                       share_tnode( base_type ),
-                       px );
-             }
-             dnode_append_type( var, expr_type );
-             if( len <= expr_nr )
-                 compiler_compile_initialise_variable( compiler, var, px );
-	 }
      }
+     cexception_finally(
+         {
+             delete_dnode( ident_dnode );
+             delete_dnode( shared_dnode );
+             delete_dnode( shared_args );
+             delete_dnode( shared_retvals );
+             delete_tnode( shared_base );
+             delete_tnode( expr_type );
+         },
+         {
+             cexception_reraise( inner, px );
+         }
+     )
     }
 
   ;
@@ -9566,16 +9594,29 @@ control_statement
       }
     '=' expression
       {
-	DNODE *loop_counter = $3;
+	DNODE *volatile loop_counter = $3;
+        DNODE *volatile shared_counter = NULL;
 
-	if( dnode_type( loop_counter ) == NULL ) {
-	    dnode_append_type( loop_counter,
-			       share_tnode( enode_type( compiler->e_stack )));
-	    dnode_assign_offset( loop_counter, &compiler->local_offset );
-	}
-	compiler_vartab_insert_named_vars( compiler, loop_counter, px );
-        compiler_compile_store_variable( compiler, loop_counter, px );
-	compiler_compile_load_variable_address( compiler, loop_counter, px );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( dnode_type( loop_counter ) == NULL ) {
+                dnode_append_type( loop_counter,
+                                   share_tnode( enode_type( compiler->e_stack )));
+                dnode_assign_offset( loop_counter, &compiler->local_offset );
+            }
+            shared_counter = share_dnode( loop_counter );
+            compiler_vartab_insert_named_vars( compiler, &shared_counter,
+                                               &inner );
+            compiler_compile_store_variable( compiler, loop_counter, &inner );
+            compiler_compile_load_variable_address( compiler, loop_counter, &inner );
+        }
+        cexception_catch {
+            delete_dnode( loop_counter );
+            delete_dnode( shared_counter );
+            cexception_reraise( inner, px );
+        }
+        delete_dnode( loop_counter );
+        delete_dnode( shared_counter );
       }
     _TO expression
       {
@@ -9629,7 +9670,8 @@ control_statement
       }
     _IN expression
       {
-	DNODE *loop_counter_var = $3;
+	DNODE *volatile loop_counter_var = $3;
+	DNODE *volatile shared_loop_counter = NULL;
         TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
         TNODE *element_type = 
             aggregate_expression_type ?
@@ -9651,31 +9693,43 @@ control_statement
                                  &compiler->local_offset );
         }
 
-	compiler_vartab_insert_named_vars( compiler, loop_counter_var, px );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            shared_loop_counter = share_dnode( loop_counter_var );
+            compiler_vartab_insert_named_vars( compiler, &shared_loop_counter,
+                                               &inner );
 
-        compiler_emit( compiler, px, "\tce\n", OFFSET, &neg_element_size );
+            compiler_emit( compiler, &inner, "\tce\n", OFFSET, &neg_element_size );
 
-        compiler_push_relative_fixup( compiler, px );
-        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+            compiler_push_relative_fixup( compiler, &inner );
+            compiler_emit( compiler, &inner, "\tce\n", JMP, &zero );
 
-        compiler_push_current_address( compiler, px );
+            compiler_push_current_address( compiler, &inner );
 
-        /* stack now: ..., array_current_ptr */
-        /* Store the current array element into the loop variable: */
-        compiler_compile_dup( compiler, px );
-        compiler_make_stack_top_element_type( compiler );
-        compiler_make_stack_top_addressof( compiler, px );
-        if( aggregate_expression_type &&
-            tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
-            element_type &&
-            tnode_kind( element_type ) != TK_PLACEHOLDER ) {
-            compiler_compile_ldi( compiler, px );
-        } else {
-            compiler_emit( compiler, px, "\tc\n", GLDI );
-            compiler_stack_top_dereference( compiler );
+            /* stack now: ..., array_current_ptr */
+            /* Store the current array element into the loop variable: */
+            compiler_compile_dup( compiler, &inner );
+            compiler_make_stack_top_element_type( compiler );
+            compiler_make_stack_top_addressof( compiler, &inner );
+            if( aggregate_expression_type &&
+                tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+                element_type &&
+                tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+                compiler_compile_ldi( compiler, &inner );
+            } else {
+                compiler_emit( compiler, &inner, "\tc\n", GLDI );
+                compiler_stack_top_dereference( compiler );
+            }
+            compiler_compile_variable_initialisation
+                ( compiler, loop_counter_var, &inner );
+
         }
-        compiler_compile_variable_initialisation
-            ( compiler, loop_counter_var, px );
+        cexception_catch {
+            delete_dnode( shared_loop_counter );
+            delete_dnode( loop_counter_var );
+            cexception_reraise( inner, px );
+        }
+        delete_dnode( loop_counter_var );
       }
      loop_body
       {
@@ -9812,7 +9866,8 @@ control_statement
       }
     in_loop_separator expression ')'
       {
-	DNODE *loop_counter_var = $4;
+	DNODE *volatile loop_counter_var = $4;
+	DNODE *volatile shared_loop_counter = NULL;
         TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
         TNODE *element_type = 
             aggregate_expression_type ?
@@ -9834,30 +9889,44 @@ control_statement
                                  &compiler->local_offset );
         }
 
-	compiler_vartab_insert_named_vars( compiler, loop_counter_var, px );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            shared_loop_counter = share_dnode( loop_counter_var );
 
-        compiler_emit( compiler, px, "\tce\n", OFFSET, &neg_element_size );
+            compiler_vartab_insert_named_vars( compiler, &shared_loop_counter,
+                                               &inner );
 
-        compiler_push_relative_fixup( compiler, px );
-        compiler_emit( compiler, px, "\tce\n", JMP, &zero );
+            compiler_emit( compiler, &inner, "\tce\n", OFFSET,
+                           &neg_element_size );
 
-        compiler_push_current_address( compiler, px );
+            compiler_push_relative_fixup( compiler, &inner );
+            compiler_emit( compiler, &inner, "\tce\n", JMP, &zero );
 
-        /* stack now: ..., array_current_ptr */
-        /* Store the current array element into the loop variable: */
-        compiler_compile_dup( compiler, px );
-        compiler_make_stack_top_element_type( compiler );
-        compiler_make_stack_top_addressof( compiler, px );
-        if( aggregate_expression_type &&
-            tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
-            tnode_kind( element_type ) != TK_PLACEHOLDER ) {
-            compiler_compile_ldi( compiler, px );
-        } else {
-            compiler_emit( compiler, px, "\tc\n", GLDI );
-            compiler_stack_top_dereference( compiler );
+            compiler_push_current_address( compiler, &inner );
+
+            /* stack now: ..., array_current_ptr */
+            /* Store the current array element into the loop variable: */
+            compiler_compile_dup( compiler, &inner );
+            compiler_make_stack_top_element_type( compiler );
+            compiler_make_stack_top_addressof( compiler, &inner );
+            if( aggregate_expression_type &&
+                tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
+                tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+                compiler_compile_ldi( compiler, &inner );
+            } else {
+                compiler_emit( compiler, &inner, "\tc\n", GLDI );
+                compiler_stack_top_dereference( compiler );
+            }
+            compiler_compile_variable_initialisation
+                ( compiler, loop_counter_var, &inner );
         }
-        compiler_compile_variable_initialisation
-            ( compiler, loop_counter_var, px );
+        cexception_catch {
+            delete_dnode( loop_counter_var );
+            delete_dnode( shared_loop_counter );
+            cexception_reraise( inner, px );
+        }
+        delete_dnode( loop_counter_var );
+        delete_dnode( shared_loop_counter );
       }
      loop_body
       {
