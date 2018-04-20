@@ -12261,7 +12261,7 @@ stdio_inpupt_condition
         compiler_push_typed_expression( compiler, string_tnode, &inner );
         compiler_emit( compiler, &inner, "\tc\n", STDREAD );
         compiler_emit( compiler, &inner, "\tc\n", DUP );
-        compiler_emit( compiler, &inner, "\tce\n", PST, &default_var_offset );        
+        compiler_emit( compiler, &inner, "\tce\n", PST, &default_var_offset );
     }
     cexception_catch {
         delete_tnode( type_tnode );
@@ -12301,6 +12301,7 @@ file_input_condition
           compiler_drop_top_expression( compiler );
           type_tnode = share_tnode( string_type );
           compiler_push_typed_expression( compiler, string_type, &inner );
+          type_tnode = NULL;
       }
       cexception_catch {
           delete_tnode( type_tnode );
