@@ -2815,24 +2815,24 @@ static void compiler_compile_variable_assignment_or_init(
 }
 
 static void compiler_compile_variable_assignment( COMPILER *cc,
-					       DNODE *variable,
-					       cexception_t *ex )
+                                                  DNODE *variable,
+                                                  cexception_t *ex )
 {
     compiler_compile_variable_assignment_or_init(
         cc, variable, enode_is_readonly_compatible_with_var, ex );
 }
 
 static void compiler_compile_variable_initialisation( COMPILER *cc,
-						   DNODE *variable,
-						   cexception_t *ex )
+                                                      DNODE *variable,
+                                                      cexception_t *ex )
 {
     compiler_compile_variable_assignment_or_init(
         cc, variable, enode_is_readonly_compatible_for_init, ex );
 }
 
 static void compiler_compile_store_variable( COMPILER *cc,
-					  DNODE *varnode,
-					  cexception_t *ex )
+                                             DNODE *varnode,
+                                             cexception_t *ex )
 {
     if( varnode ) {
         compiler_compile_variable_assignment( cc, varnode, ex );
@@ -2842,8 +2842,8 @@ static void compiler_compile_store_variable( COMPILER *cc,
 }
 
 static void compiler_compile_initialise_variable( COMPILER *cc,
-					       DNODE *varnode,
-					       cexception_t *ex )
+                                                  DNODE *varnode,
+                                                  cexception_t *ex )
 {
     if( varnode ) {
         compiler_compile_variable_initialisation( cc, varnode, ex );
@@ -10169,53 +10169,89 @@ catch_variable_declaration
   : _VAR identifier_list ':' var_type_description
     {
      char *opname = "exceptionval";
+     DNODE *volatile var_list = $2;
+     TNODE *volatile type_node = $4;
+     TNODE *volatile shared_type_node = NULL;
      ssize_t try_var_offset = compiler->try_variable_stack ?
 	 compiler->try_variable_stack[compiler->try_block_level-1] : 0;
 
-     dnode_list_append_type( $2, $4 );
-     dnode_list_assign_offsets( $2, &compiler->local_offset );     
-     if( $2 && dnode_list_length( $2 ) > 1 ) {
-	 yyerrorf( "only one variable may be declared in the 'catch' clause" );
+     cexception_t inner;
+     cexception_guard( inner ) {
+         shared_type_node = share_tnode( type_node );
+         dnode_list_append_type( var_list, shared_type_node );
+         shared_type_node = NULL;
+         dnode_list_assign_offsets( var_list, &compiler->local_offset );     
+         if( var_list && dnode_list_length( var_list ) > 1 ) {
+             yyerrorf( "only one variable may be declared in the 'catch' clause" );
+         }
+         if( !type_node || !compiler_lookup_operator( compiler, type_node,
+                                                      opname, 1, &inner )) {
+             yyerrorf( "type of variable declared in a 'catch' clause must "
+                       "have unary '%s' operator", opname );
+         } else {
+             compiler_emit( compiler, &inner, "\n\tce\n", PLD, &try_var_offset );
+             compiler_push_typed_expression( compiler, new_tnode_ref( &inner ), &inner );
+             compiler_check_and_compile_operator( compiler, type_node, opname,
+                                                  /*arity:*/1,
+                                                  /*fixup_values:*/ NULL, &inner );
+             compiler_emit( compiler, &inner, "\n" );
+             compiler_compile_variable_assignment( compiler, var_list, &inner );
+         }
+         vartab_insert_named_vars( compiler->vartab, &var_list, &inner );
      }
-     if( !$4 || !compiler_lookup_operator( compiler, $4, opname, 1, px )) {
-	 yyerrorf( "type of variable declared in a 'catch' clause must "
-		   "have unary '%s' operator", opname );
-     } else {
-	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
-	 compiler_push_typed_expression( compiler, new_tnode_ref( px ), px );
-	 compiler_check_and_compile_operator( compiler, $4, opname,
-                                              /*arity:*/1,
-                                              /*fixup_values:*/ NULL, px );
-	 compiler_emit( compiler, px, "\n" );
-	 compiler_compile_variable_assignment( compiler, $2, px );	 
+     cexception_catch {
+         delete_dnode( var_list );
+         delete_tnode( type_node );
+         delete_tnode( shared_type_node );
+         cexception_reraise( inner, px );
      }
-     vartab_insert_named_vars( compiler->vartab, $2, px );
+     assert( !var_list );
+     delete_tnode( type_node );
+     delete_tnode( shared_type_node );
     }
-
   | _VAR var_type_description uninitialised_var_declarator_list
     {
+     DNODE *volatile var_list = $3;
+     TNODE *volatile type_node = $2;
+     TNODE *volatile shared_type_node = NULL;
      char *opname = "exceptionval";
      ssize_t try_var_offset = compiler->try_variable_stack ?
 	 compiler->try_variable_stack[compiler->try_block_level-1] : 0;
 
-     dnode_list_append_type( $3, $2 );
-     dnode_list_assign_offsets( $3, &compiler->local_offset );     
-     if( $2 && dnode_list_length( $3 ) > 1 ) {
-	 yyerrorf( "only one variable may be declared in the 'catch' clause" );
+     cexception_t inner;
+     cexception_guard( inner ) {
+         shared_type_node = share_tnode( type_node );
+         dnode_list_append_type( var_list, shared_type_node );
+         shared_type_node = NULL;
+         dnode_list_assign_offsets( var_list, &compiler->local_offset );
+         if( var_list && dnode_list_length( var_list ) > 1 ) {
+             yyerrorf( "only one variable may be declared in "
+                       "the 'catch' clause" );
+         }
+         if( !type_node ||
+             !compiler_lookup_operator( compiler, type_node, opname, 1, &inner )) {
+             yyerrorf( "type of variable declared in a 'catch' clause must "
+                       "have unary '%s' operator", opname );
+         } else {
+             compiler_emit( compiler, &inner, "\n\tce\n", PLD, &try_var_offset );
+             compiler_push_typed_expression( compiler, new_tnode_ref( &inner ), &inner );
+             compiler_check_and_compile_operator( compiler, type_node, opname,
+                                                  /*arity:*/1,
+                                                  /*fixup_values:*/ NULL, &inner );
+             compiler_emit( compiler, &inner, "\n" );
+             compiler_compile_variable_assignment( compiler, var_list, &inner );
+         }
+         vartab_insert_named_vars( compiler->vartab, &var_list, &inner );
      }
-     if( !$2 || !compiler_lookup_operator( compiler, $2, opname, 1, px )) {
-	 yyerrorf( "type of variable declared in a 'catch' clause must "
-		   "have unary '%s' operator", opname );
-     } else {
-	 compiler_emit( compiler, px, "\n\tce\n", PLD, &try_var_offset );
-	 compiler_push_typed_expression( compiler, new_tnode_ref( px ), px );
-	 compiler_check_and_compile_operator( compiler, $2, opname,
-                                              /*arity:*/1,
-                                              /*fixup_values:*/ NULL, px );
-	 compiler_emit( compiler, px, "\n" );
-	 compiler_compile_variable_assignment( compiler, $3, px );	 
+     cexception_catch {
+         delete_dnode( var_list );
+         delete_tnode( type_node );
+         delete_tnode( shared_type_node );
+         cexception_reraise( inner, px );
      }
-     vartab_insert_named_vars( compiler->vartab, $3, px );
+     assert( !var_list );
+     delete_tnode( type_node );
+     delete_tnode( shared_type_node );     
     }
   ;
 
@@ -12199,8 +12235,9 @@ stdio_inpupt_condition
 {
     cexception_t inner;
     TNODE *string_tnode = typetab_lookup( compiler->typetab, "string" );
-    TNODE *type_tnode = string_tnode;
-    DNODE *default_var = NULL;
+    TNODE *volatile type_tnode = string_tnode;
+    DNODE *volatile default_var = NULL;
+    DNODE *volatile shared_default_var = NULL;
     ssize_t default_var_offset = 0;
 
     cexception_guard( inner ) {
@@ -12208,17 +12245,17 @@ stdio_inpupt_condition
         default_var = new_dnode_typed( "$_", type_tnode, &inner );
         dnode_assign_offset( default_var, &compiler->local_offset );
         type_tnode = NULL;
-        compiler_vartab_insert_named_vars( compiler, default_var, &inner );
+
+        shared_default_var = share_dnode( default_var );
+        compiler_vartab_insert_named_vars( compiler, &shared_default_var, &inner );
         default_var_offset = dnode_offset( default_var );
-        default_var = NULL;
 
         compiler->local_offset ++;
         type_tnode = share_tnode( string_tnode );
         default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
         dnode_assign_offset( default_var, &compiler->local_offset );
         type_tnode = NULL;
-        compiler_vartab_insert_named_vars( compiler, default_var, &inner );
-        default_var = NULL;
+        compiler_vartab_insert_named_vars( compiler, &default_var, &inner );
 
         share_tnode( string_tnode );
         compiler_push_typed_expression( compiler, string_tnode, &inner );
@@ -12228,9 +12265,12 @@ stdio_inpupt_condition
     }
     cexception_catch {
         delete_tnode( type_tnode );
+        delete_dnode( shared_default_var );
         delete_dnode( default_var );
         cexception_reraise( inner, px );
     }
+    delete_tnode( type_tnode );
+    delete_dnode( default_var );
 }
 ;
 
@@ -12239,8 +12279,8 @@ file_input_condition
   {
       cexception_t inner;
       TNODE *string_type = typetab_lookup( compiler->typetab, "string" );
-      TNODE *type_tnode = string_type;
-      DNODE *default_var = NULL;
+      TNODE *volatile type_tnode = string_type;
+      DNODE *volatile default_var = NULL;
       ssize_t default_var_offset = 0;
 
       cexception_guard( inner ) {
@@ -12248,17 +12288,15 @@ file_input_condition
           default_var = new_dnode_typed( "$_", type_tnode, &inner );
           dnode_assign_offset( default_var, &compiler->local_offset );
           type_tnode = NULL;
-          compiler_vartab_insert_named_vars( compiler, default_var, &inner );
           default_var_offset = dnode_offset( default_var );
-          default_var = NULL;
+          compiler_vartab_insert_named_vars( compiler, &default_var, &inner );
 
           compiler->local_offset ++;
           type_tnode = share_tnode( string_type );
           default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
           dnode_assign_offset( default_var, &compiler->local_offset );
           type_tnode = NULL;
-          compiler_vartab_insert_named_vars( compiler, default_var, &inner );
-          default_var = NULL;
+          compiler_vartab_insert_named_vars( compiler, &default_var, &inner );
 
           compiler_drop_top_expression( compiler );
           type_tnode = share_tnode( string_type );
@@ -12266,8 +12304,11 @@ file_input_condition
       }
       cexception_catch {
           delete_tnode( type_tnode );
+          delete_dnode( default_var );
           cexception_reraise( inner, px );
       }
+      delete_tnode( type_tnode );
+      delete_dnode( default_var );
 
       compiler_emit( compiler, px, "\tcI\n", LDC, '\n' );
       compiler_emit( compiler, px, "\tccc\n", SFILEREADLN, SWAP, DROP );
@@ -13012,16 +13053,30 @@ array_expression
     }
   '=' expression
     {
-	DNODE *loop_counter = $4;
+	DNODE *volatile loop_counter = $4;
+        DNODE *volatile shared_loop_counter = NULL;
 
-	if( dnode_type( loop_counter ) == NULL ) {
-	    dnode_append_type( loop_counter,
-			       share_tnode( enode_type( compiler->e_stack )));
-	    dnode_assign_offset( loop_counter, &compiler->local_offset );
-	}
-	compiler_vartab_insert_named_vars( compiler, loop_counter, px );
-        compiler_compile_store_variable( compiler, loop_counter, px );
-	compiler_compile_load_variable_address( compiler, loop_counter, px );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( dnode_type( loop_counter ) == NULL ) {
+                dnode_append_type( loop_counter,
+                                   share_tnode( enode_type( compiler->e_stack )));
+                dnode_assign_offset( loop_counter, &compiler->local_offset );
+            }
+            shared_loop_counter = share_dnode( loop_counter );
+            compiler_vartab_insert_named_vars( compiler, &shared_loop_counter,
+                                               &inner );
+            compiler_compile_store_variable( compiler, loop_counter, &inner );
+            compiler_compile_load_variable_address( compiler, loop_counter,
+                                                    &inner );
+        }
+        cexception_catch {
+            delete_dnode( loop_counter );
+            delete_dnode( shared_loop_counter );
+            cexception_reraise( inner, px );
+        }
+        delete_dnode( loop_counter );
+        delete_dnode( shared_loop_counter );
     }
      _TO expression ':'
     {
@@ -13111,7 +13166,7 @@ array_expression
     }
     _IN expression ':'
     {
-        DNODE *loop_counter_var = $4;
+        DNODE *volatile loop_counter_var = $4;
         TNODE *aggregate_expression_type = enode_type( compiler->e_stack );
         TNODE *element_type = 
             aggregate_expression_type ?
@@ -13130,7 +13185,14 @@ array_expression
                                  &compiler->local_offset );
         }
 
-	compiler_vartab_insert_named_vars( compiler, loop_counter_var, px );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_vartab_insert_named_vars( compiler, &loop_counter_var, &inner );
+        }
+        cexception_catch {
+            delete_dnode( loop_counter_var );
+            cexception_reraise( inner, px );
+        }
         /* stack now: ..., array_current_ptr == array */
         compiler_push_thrcode( compiler, px );
     }
@@ -13293,26 +13355,37 @@ field_initialiser
      {
 	 DNODE *field;
          TNODE *field_type;
-         char *field_identifier =
+	 DNODE *volatile shared_field = NULL;
+         char *volatile field_identifier =
              obtain_string_from_strpool( compiler->strpool, $1 );
 
-	 compiler_compile_dup( compiler, px );
-	 field = compiler_make_stack_top_field_type( compiler,
-                                                     field_identifier );
-         field_type = field ? dnode_type( field ) : NULL;
-	 compiler_make_stack_top_addressof( compiler, px );
+         cexception_t inner;
+         cexception_guard( inner ) {
+             compiler_compile_dup( compiler, &inner );
+             field = compiler_make_stack_top_field_type( compiler,
+                                                         field_identifier );
+             field_type = field ? dnode_type( field ) : NULL;
+             compiler_make_stack_top_addressof( compiler, &inner );
 
-         if( !vartab_lookup( compiler->initialised_references,
-                             field_identifier ) &&
-             field_type && tnode_is_non_null_reference( field_type )) {
-             vartab_insert_named( compiler->initialised_references,
-                                  share_dnode( field ), px );
+             if( !vartab_lookup( compiler->initialised_references,
+                                 field_identifier ) &&
+                 field_type && tnode_is_non_null_reference( field_type )) {
+                 shared_field = share_dnode( field );
+                 vartab_insert_named( compiler->initialised_references,
+                                      &shared_field, &inner );
+             }
+
+             if( field && dnode_offset( field ) != 0 ) {
+                 ssize_t field_offset = dnode_offset( field );
+                 compiler_emit( compiler, &inner, "\tce\n", OFFSET,
+                                &field_offset );
+             }
          }
-
-	 if( field && dnode_offset( field ) != 0 ) {
-	     ssize_t field_offset = dnode_offset( field );
-	     compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
-	 }
+         cexception_catch {
+             freex( field_identifier );
+             delete_dnode( shared_field );
+             cexception_reraise( inner, px );
+         }
          freex( field_identifier );
      }
     field_initialiser_separator expression
@@ -14821,9 +14894,19 @@ function_prototype
 constant_declaration
   : _CONST __IDENTIFIER '=' constant_expression
     {
-        char *ident = obtain_string_from_strpool( compiler->strpool, $2 );
-        DNODE *const_dnode = new_dnode_constant( ident, &$4, px );
-        compiler_consttab_insert_consts( compiler, const_dnode, px );
+        char *volatile ident =
+            obtain_string_from_strpool( compiler->strpool, $2 );
+        DNODE *volatile const_dnode = new_dnode_constant( ident, &$4, px );
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_consttab_insert_consts( compiler, &const_dnode, &inner );
+        }
+        cexception_catch {
+            freex( ident );
+            delete_dnode( const_dnode );
+            cexception_reraise( inner, px );
+        }
         freex( ident );
     }
 ;
