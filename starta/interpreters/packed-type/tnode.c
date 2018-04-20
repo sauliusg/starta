@@ -120,7 +120,7 @@ static void tnode_update_self_parameter_type( TNODE *new_tnode,
 
 TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 {
-    int dst_rcount, src_rcount;
+    int dst_rcount, src_rcount, dst_serno;
     TNODE *dst_element = NULL;
     type_kind_t dst_kind;
 
@@ -138,6 +138,7 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 
     dst_rcount = dst->rcount;
     src_rcount = src->rcount;
+    dst_serno = dst->serno;
     dst_element = dst->element_type;
     /* The field dst->base_type is simply copied along with all other
        fields. */
@@ -154,6 +155,7 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 
     memset( src, 0, sizeof(*src));
 
+    dst->serno = dst_serno;
     src->serno = serno;
     src->next_alloc = src_next_alloc;
     src->prev_alloc = src_prev_alloc;
