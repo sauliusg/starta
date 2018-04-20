@@ -8953,7 +8953,7 @@ variable_declaration
      cexception_t inner;
      cexception_guard( inner ) {
          shared_dnode = share_dnode( var );
-         compiler_vartab_insert_named_vars( compiler, &var, &inner );
+         compiler_vartab_insert_named_vars( compiler, &shared_dnode, &inner );
          if( readonly ) {
              dnode_list_set_flags( var, DF_IS_READONLY );
          }
