@@ -1112,7 +1112,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
                                            cexception_t *ex )
 {
     assert( tnode );
-    TNODE *volatile lookup_node = NULL;
+    TNODE *lookup_node = NULL;
     int count = 0;
     int is_imported = 0;
     TNODE *volatile shared_tnode = share_tnode( *tnode );
@@ -1165,7 +1165,7 @@ static void compiler_typetab_insert( COMPILER *cc,
 {
     assert( tnode );
 
-    TNODE *volatile lookup_tnode =
+    TNODE *lookup_tnode =
         compiler_typetab_insert_msg( cc, tnode_name( *tnode ),
                                      TS_NOT_A_SUFFIX, tnode,
                                      "type '%s' is already declared", ex );
