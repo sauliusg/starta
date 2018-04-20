@@ -1449,15 +1449,15 @@ static void compiler_compile_exception( COMPILER *c,
 	exception =
 	    new_dnode_exception( exception_name, exception_type, &inner );
         exception_type = NULL;
-        shared_exception = share_dnode( exception );
 
 	dnode_set_ssize_value( exception, exception_nr );
-	vartab_insert_named( c->vartab, &exception, &inner );
+        shared_exception = share_dnode( exception );
+	vartab_insert_named( c->vartab, &shared_exception, &inner );
         if( c->current_module && dnode_scope( exception ) == 0 ) {
             dnode_vartab_insert_named_vars( c->current_module,
-                                            &shared_exception, &inner );
+                                            &exception, &inner );
         } else {
-            dispose_dnode( &shared_exception );
+            dispose_dnode( &exception );
         }
     }
     cexception_catch {
