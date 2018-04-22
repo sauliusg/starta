@@ -31,9 +31,6 @@ void vartab_insert_operator( VARTAB *table, const char *name,
 void vartab_insert_named_operator( VARTAB *table, DNODE *volatile *dnode,
                                    cexception_t *ex );
 
-void vartab_insert_named_vars_OLD( VARTAB *table, DNODE *dnode_list,
-                                   cexception_t *ex );
-
 void vartab_insert_named_vars( VARTAB *table, DNODE *volatile *dnode_list,
 			       cexception_t *ex );
 
