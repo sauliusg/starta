@@ -1,0 +1,5 @@
+./sl: inputs/struct009.snl(21,6): ERROR, incompatible types for assignment to variable 'r'
+r = s; // ERROR, incompatible types
+     ^
+./sl: 1 error(s) detected
+
