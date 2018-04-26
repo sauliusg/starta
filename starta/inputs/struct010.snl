@@ -1,0 +1,26 @@
+// --*- C -*--
+
+// Test struct and class type compatibility
+
+use std;
+
+struct S {
+    float x, y, z;
+    string name;
+    constructor( float x, y, z ) { self.x = x; self.y = y; self.z = z }
+};
+
+struct R : S {
+    constructor() super(1,1,1); {}
+    operator ">" ( R r1, r2 ): bool { return r1.x > r2.x }
+};
+
+var s : S = new S(1,2,3);
+var r = new R();
+
+. s.x, s.y, s.z;
+. r.x, r.y, r.z;
+
+s = r; // OK
+
+. s.x, s.y, s.z;
