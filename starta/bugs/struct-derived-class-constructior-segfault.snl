@@ -1,0 +1,23 @@
+// --*- C -*--
+
+// Test struct and class type compatibility
+
+use std;
+
+struct S {
+    float x, y, z;
+    string name;
+};
+
+struct R : S {
+    int num;
+    constructor fromS( S s )
+    {
+    self := s; // BUG: segfaults here
+    }
+};
+
+var s : S = new S;
+var r = new R.fromS(s);
+
+s = r; // OK
