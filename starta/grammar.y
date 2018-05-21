@@ -4912,14 +4912,16 @@ static void compiler_compile_indexing( COMPILER *cc,
 }
 
 static void compiler_compile_type_declaration( COMPILER *cc,
-                                               TNODE *type_descr,
+                                               TNODE *volatile *type_descr,
                                                cexception_t *ex )
 {
     cexception_t inner;
     TNODE *volatile tnode = NULL;
-    char * volatile type_name = NULL;
+    char  *volatile type_name = NULL;
 
-    if( !type_descr ) {
+    assert( type_descr );
+
+    if( !*type_descr ) {
 	/* cc->current_type = NULL; */
         delete_tnode( compiler_pop_current_type( cc ));
         return;
@@ -4928,35 +4930,35 @@ static void compiler_compile_type_declaration( COMPILER *cc,
     type_name = strdupx( tnode_name( cc->current_type ), ex );
 
     cexception_guard( inner ) {
-	assert( type_descr );
-	if( tnode_name( type_descr ) == NULL ) {
-	    tnode = tnode_set_name( type_descr, type_name, &inner );
-	} else if( type_descr != cc->current_type ) {
-	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
+	if( tnode_name( *type_descr ) == NULL ) {
+            tnode_set_name( *type_descr, type_name, &inner );
+	    tnode = moveptr( (void**)type_descr );
+	} else if( *type_descr != cc->current_type ) {
+	    tnode = tnode_set_name( new_tnode_equivalent( *type_descr, &inner ),
                                     type_name, &inner );
+            *type_descr = NULL;
             tnode_set_suffix( tnode, tnode_name( tnode ), &inner );
-            delete_tnode( type_descr );
 	} else {
-	    tnode = type_descr;
+	    tnode = moveptr( (void**)type_descr );
 	}
 
-        share_tnode( tnode );
 	compiler_typetab_insert( cc, &tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
 
-        // FIXME: memory leak bug here:
         share_tnode( tnode );
 	compiler_insert_tnode_into_suffix_list( cc, &tnode, &inner );
 	/* cc->current_type = NULL; */
         delete_tnode( compiler_pop_current_type( cc ));
-	freex( type_name );
     }
     cexception_catch {
 	freex( type_name );
+        dispose_tnode( type_descr );
         delete_tnode( tnode );
 	cexception_reraise( inner, ex );
     }
+    freex( type_name );
+    assert( !*type_descr );
     assert( !tnode );
 }
 
@@ -11105,8 +11107,17 @@ type_declaration_start
 delimited_type_declaration
   : type_declaration_start '=' delimited_type_description
       {
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $3, px );
+          TNODE *volatile ntype = $3;
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              compiler_end_scope( compiler, &inner );
+              compiler_compile_type_declaration( compiler, &ntype, &inner );
+          }
+          cexception_catch {
+              delete_tnode( ntype );
+              cexception_reraise( inner, px );
+          }
       }
   | type_declaration_start '=' _NEW var_type_description
       {
@@ -11120,7 +11131,7 @@ delimited_type_declaration
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
             tnode_copy_operators( ntype, $4, &inner );
-            compiler_compile_type_declaration( compiler, ntype, &inner );
+            compiler_compile_type_declaration( compiler, &ntype, &inner );
         }
         cexception_catch {
             delete_tnode( ntype );
@@ -11131,11 +11142,14 @@ delimited_type_declaration
   | type_declaration_start '=' _NEW var_type_description struct_or_class_body
       {
         cexception_t inner;
-        TNODE * type_description = $4;
+        TNODE * volatile type_description = $4;
+        TNODE * volatile struct_body = $5;
         TNODE * volatile ntype = NULL; /* new type */
 	compiler_end_scope( compiler, px );
         cexception_guard( inner ) {
             ntype = new_tnode_derived( type_description, &inner );
+            type_description = NULL;
+
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
@@ -11143,27 +11157,42 @@ delimited_type_declaration
             tnode_copy_operators( ntype, $4, &inner );
             tnode_move_operators( ntype, $5 );
 
-            if( tnode_suffix( $5 )) {
-                tnode_set_suffix( ntype, tnode_suffix( $5 ), px );
+            if( tnode_suffix( struct_body )) {
+                tnode_set_suffix( ntype, tnode_suffix( struct_body ), &inner );
             } else {
-                tnode_set_suffix( ntype, tnode_name( compiler->current_type ), px );
+                tnode_set_suffix( ntype, tnode_name( compiler->current_type ), &inner );
             }
 
-            delete_tnode( $5 );
-            $5 = NULL;
-            compiler_compile_type_declaration( compiler, ntype, &inner );
+            dispose_tnode( &struct_body );
+
+            compiler_compile_type_declaration( compiler, &ntype, &inner );
         }
         cexception_catch {
             delete_tnode( ntype );
+            delete_tnode( type_description );
+            delete_tnode( struct_body );
             cexception_reraise( inner, px );
         }
+        assert( !struct_body );
+        assert( !type_description );
+        assert( !ntype );
       }
 
   | type_declaration_start '=' delimited_type_description initialiser
       {
-        compiler_compile_drop( compiler, px );
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $3, px );
+          TNODE *volatile ntype = $3;
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              compiler_compile_drop( compiler, &inner );
+              compiler_end_scope( compiler, &inner );
+              compiler_compile_type_declaration( compiler, &ntype, &inner );
+          }
+          cexception_catch {
+              delete_tnode( ntype );
+              cexception_reraise( inner, px );
+          }
+          assert( !ntype );
       }
   | type_declaration_start
       {
@@ -11177,16 +11206,36 @@ delimited_type_declaration
 undelimited_type_declaration
   : type_declaration_start '=' undelimited_type_description
       {
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $3, px );
-	compiler->current_type = NULL;
+          TNODE *volatile ntype = $3;
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              compiler_end_scope( compiler, &inner );
+              compiler_compile_type_declaration( compiler, &ntype, &inner );
+              compiler->current_type = NULL;
+          }
+          cexception_catch {
+              delete_tnode( ntype );
+              cexception_reraise( inner, px );
+          }
+          assert( !ntype );
       }
 
   | type_declaration_start '=' undelimited_type_description type_initialiser
       {
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $3, px );
-	compiler->current_type = NULL;
+          TNODE *volatile ntype = $3;
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              compiler_end_scope( compiler, &inner );
+              compiler_compile_type_declaration( compiler, &ntype, &inner );
+              compiler->current_type = NULL;
+          }
+          cexception_catch {
+              delete_tnode( ntype );
+              cexception_reraise( inner, px );
+          }
+          assert( !ntype );
       }
 
   | struct_declaration
@@ -11238,9 +11287,19 @@ type_of_type_declaration
       }
     undelimited_type_description
       {
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $7, px );
-	delete_tnode( compiler_pop_current_type( compiler ));
+          TNODE *volatile ntype = $7;
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              compiler_end_scope( compiler, &inner );
+              compiler_compile_type_declaration( compiler, &ntype, &inner );
+              delete_tnode( compiler_pop_current_type( compiler ));
+          }
+          cexception_catch {
+              delete_tnode( ntype );
+              cexception_reraise( inner, px );
+          }
+          assert( !ntype );
       }
 
   |  _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator _STRUCT
@@ -11286,12 +11345,22 @@ type_of_type_declaration
       }
       struct_or_class_body
       {
+        TNODE *volatile ntype = $9;
+        cexception_t inner;
+        
         if( $6 ) {
             tnode_set_flags( $9, TF_NON_NULL );
+        } 
+
+        cexception_guard( inner ) {
+            compiler_end_scope( compiler, &inner );
+            compiler_compile_type_declaration( compiler, &ntype, &inner );
+            delete_tnode( compiler_pop_current_type( compiler ));
         }
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $9, px );
-	delete_tnode( compiler_pop_current_type( compiler ));
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
       }
 
   | _TYPE __IDENTIFIER _OF __IDENTIFIER '=' opt_null_type_designator
@@ -11336,12 +11405,22 @@ type_of_type_declaration
       }
     struct_or_class_body
       {
-        if( $6 ) {
-            tnode_set_flags( $8, TF_NON_NULL );
-        }
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $8, px );
-	compiler->current_type = NULL;
+          TNODE *volatile ntype = $8;
+          cexception_t inner;
+
+          if( $6 ) {
+              tnode_set_flags( ntype, TF_NON_NULL );
+          }
+
+          cexception_guard( inner ) {
+              compiler_end_scope( compiler, &inner );
+              compiler_compile_type_declaration( compiler, &ntype, &inner );
+              compiler->current_type = NULL;
+          }
+          cexception_catch {
+              delete_tnode( ntype );
+              cexception_reraise( inner, px );
+          }
       }
 ;
 
@@ -11385,13 +11464,23 @@ struct_declaration
     }
     struct_or_class_body
     {
+        TNODE *volatile ntype = $6;
+        cexception_t inner;
+
         if( $3 ) {
-            tnode_set_flags( $6, TF_NON_NULL );
+            tnode_set_flags( ntype, TF_NON_NULL );
         }
-	tnode_finish_struct( $6, px );
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $6, px );
-        compiler->current_type = NULL;
+
+        cexception_guard( inner ) {
+            tnode_finish_struct( ntype, &inner );
+            compiler_end_scope( compiler, &inner );
+            compiler_compile_type_declaration( compiler, &ntype, &inner );
+            compiler->current_type = NULL;
+        }
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
     }
   | type_declaration_start '=' opt_null_type_designator
     {
@@ -11399,12 +11488,26 @@ struct_declaration
     }
     struct_or_class_body
     {
+        TNODE *volatile ntype = $5;
+        cexception_t inner;
+
         if( $3 ) {
             tnode_set_flags( $5, TF_NON_NULL );
         }
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $5, px );
-        compiler->current_type = NULL;
+
+        cexception_guard( inner ) {
+            compiler_end_scope( compiler, &inner );
+            // FIXME: reintroduces memory leak to save from
+            // double-delete in shtests/programs/readstdinop.snl
+            // compilation:
+            share_tnode( ntype );
+            compiler_compile_type_declaration( compiler, &ntype, &inner );
+            compiler->current_type = NULL;
+        }
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
     }
 
   | type_of_type_declaration
@@ -11444,14 +11547,24 @@ class_declaration
     }
     struct_or_class_body
     {
+        TNODE *volatile ntype = $6;
+        cexception_t inner;
+
         if( $3 ) {
             tnode_set_flags( $6, TF_NON_NULL );
         }
- 	tnode_finish_class( $6, px );
-	compiler_finish_virtual_method_table( compiler, $6, px );
-	compiler_end_scope( compiler, px );
-	compiler_compile_type_declaration( compiler, $6, px );
-	compiler->current_type = NULL;
+
+        cexception_guard( inner ) {
+            tnode_finish_class( ntype, &inner );
+            compiler_finish_virtual_method_table( compiler, ntype, &inner );
+            compiler_end_scope( compiler, &inner );
+            compiler_compile_type_declaration( compiler, &ntype, &inner );
+            compiler->current_type = NULL;
+        }
+        cexception_catch {
+            delete_tnode( ntype );
+            cexception_reraise( inner, px );
+        }
     }
 ;
 
