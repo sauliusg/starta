@@ -4928,6 +4928,8 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	compiler_typetab_insert( cc, &tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
+
+        // FIXME: memleak bug here:
         share_tnode( tnode );
 	compiler_insert_tnode_into_suffix_list( cc, tnode, &inner );
         tnode = NULL;
