@@ -8816,9 +8816,12 @@ stdread_io_statement
 : '<' '>' __LEFT_TO_RIGHT variable_access_identifier
       {
           cexception_t inner;
-          TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
+          TNODE *volatile type_tnode = typetab_lookup( compiler->typetab, "string" );
 
           cexception_guard( inner ) {
+              //FIXME: change interface of
+              //'compiler_push_typed_expression()' so that it accepts TNODE *volatile *:
+              share_tnode( type_tnode );
               compiler_push_typed_expression( compiler, type_tnode, &inner );
               compiler_emit( compiler, &inner, "\tc\n", STDREAD );
           }
@@ -8832,9 +8835,12 @@ stdread_io_statement
   | '<' '>' __LEFT_TO_RIGHT lvalue
       {
           cexception_t inner;
-          TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
+          TNODE *volatile type_tnode = typetab_lookup( compiler->typetab, "string" );
 
           cexception_guard( inner ) {
+              //FIXME: change interface of
+              //'compiler_push_typed_expression()' so that it accepts TNODE *volatile *:
+              share_tnode( type_tnode );
               compiler_push_typed_expression( compiler, type_tnode, &inner );
               compiler_emit( compiler, &inner, "\tc\n", STDREAD );
           }
@@ -12486,7 +12492,7 @@ io_expression
   | '<' '>'
   {
     cexception_t inner;
-    TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
+    TNODE *volatile type_tnode = typetab_lookup( compiler->typetab, "string" );
 
     cexception_guard( inner ) {
         // FIXME: fix memory management here, and fix interface of
