@@ -1419,7 +1419,7 @@ static void compiler_push_typed_expression( COMPILER *c, TNODE *tnode,
 }
 
 static void compiler_push_error_type( COMPILER *c,
-				   cexception_t *ex )
+                                      cexception_t *ex )
 {
     ENODE *expr_enode = NULL;
 
@@ -1429,7 +1429,7 @@ static void compiler_push_error_type( COMPILER *c,
 }
 
 static void compiler_append_expression_type( COMPILER *c,
-					  TNODE *base_tnode )
+                                             TNODE *base_tnode )
 {
     assert( c->e_stack );
     enode_append_element_type( c->e_stack, base_tnode );
@@ -1450,9 +1450,9 @@ static TNODE *new_tnode_blob_snail( TYPETAB *typetab, cexception_t *ex )
 }
 
 static void compiler_compile_exception( COMPILER *c,
-				     char *exception_name,
-				     ssize_t exception_nr,
-				     cexception_t *ex )
+                                        char *exception_name,
+                                        ssize_t exception_nr,
+                                        cexception_t *ex )
 {
     cexception_t inner;
     DNODE *volatile exception = NULL;
@@ -11497,10 +11497,6 @@ struct_declaration
 
         cexception_guard( inner ) {
             compiler_end_scope( compiler, &inner );
-            // FIXME: reintroduces memory leak to save from
-            // double-delete in shtests/programs/readstdinop.snl
-            // compilation:
-            share_tnode( ntype );
             compiler_compile_type_declaration( compiler, &ntype, &inner );
             compiler->current_type = NULL;
         }
@@ -12493,6 +12489,9 @@ io_expression
     TNODE *type_tnode = typetab_lookup( compiler->typetab, "string" );
 
     cexception_guard( inner ) {
+        // FIXME: fix memory management here, and fix interface of
+        // compiler_push_typed_expression():
+        share_tnode( type_tnode );
         compiler_push_typed_expression( compiler, type_tnode, &inner );
         compiler_emit( compiler, &inner, "\tc\n", STDREAD );
     }
