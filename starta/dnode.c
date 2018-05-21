@@ -113,11 +113,6 @@ void delete_dnode( DNODE *node )
 	freex( node->synonim );
 	freex( node->code );
 
-        typetab_break_cycles( node->typetab );
-        vartab_break_cycles( node->vartab );
-        vartab_break_cycles( node->consts );
-        vartab_break_cycles( node->operators );
-
 	delete_tnode( node->tnode );
 	delete_vartab( node->vartab );
 	delete_vartab( node->consts );
@@ -151,6 +146,14 @@ void dispose_dnode( DNODE *volatile *dnode )
 DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
+
+#if 1
+        typetab_break_cycles( dnode->typetab );
+        vartab_break_cycles( dnode->vartab );
+        vartab_break_cycles( dnode->consts );
+        vartab_break_cycles( dnode->operators );
+#endif
+
         dispose_tnode( &dnode->tnode );
 
         dispose_vartab( &dnode->vartab );
