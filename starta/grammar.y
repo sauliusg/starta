@@ -1259,7 +1259,7 @@ static void compiler_consttab_insert_consts( COMPILER *cc,
 }
 
 static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
-                                                    TNODE *tnode,
+                                                    TNODE *volatile *tnode,
                                                     cexception_t *ex )
 {
     TNODE *base_type = NULL;
@@ -1268,110 +1268,125 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
     char *type_conflict_msg = NULL;
     TNODE *volatile shared_tnode = NULL;
 
-    suffix = tnode_suffix( tnode );
+    assert( tnode );
+
+    suffix = tnode_suffix( *tnode );
     if( !suffix ) suffix = "";
 
-    type_kind = tnode_kind( tnode );
+    type_kind = tnode_kind( *tnode );
 
     if( type_kind == TK_DERIVED &&
-	(base_type = tnode_base_type( tnode )) ) {
+	(base_type = tnode_base_type( *tnode )) ) {
 	type_kind = tnode_kind( base_type );
     }
 
-    switch( type_kind ) {
-    case TK_BOOL:
-    case TK_INTEGER:
-        if( !suffix || suffix[0] == '\0' ) {
-	    type_conflict_msg = "integer type with empty suffix is already "
-    	    		        "defined in the current scope";
-        } else {
-	    type_conflict_msg = "integer type with suffix '%s' is already "
-    	    		        "defined in the current scope";
-	}
-	shared_tnode = share_tnode( tnode );
-	compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX,
-                                     &shared_tnode,
-                                     type_conflict_msg, ex );
-	if( cc->current_module ) {
-            shared_tnode = share_tnode( tnode );
-	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
-					       TS_INTEGER_SUFFIX,
-					       shared_tnode, ex );
-	}
-	break;
-    case TK_REAL:
-        if( !suffix || suffix[0] == '\0' ) {
-	    type_conflict_msg = "real type with empty suffix is already "
-    	    		        "defined in the current scope";
-        } else {
-	    type_conflict_msg = "real type with suffix '%s' is already "
-    	    		        "defined in the current scope";
-	}
-	shared_tnode = share_tnode( tnode );
-	compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX,
-                                     &shared_tnode,
-                                     type_conflict_msg, ex );
-	if( cc->current_module ) {
-            shared_tnode = share_tnode( tnode );
-	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
-					       TS_FLOAT_SUFFIX,
-					       shared_tnode, ex );
-	}
-	break;
-    case TK_STRING:
-        if( !suffix || suffix[0] == '\0' ) {
-	    type_conflict_msg = "string type with empty suffix is already "
-    	    		        "defined in the current scope";
-        } else {
-	    type_conflict_msg = "string type with suffix '%s' is already "
-    	    		        "defined in the current scope";
-	}
-	shared_tnode = share_tnode( tnode );
-	compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX,
-                                     &shared_tnode,
-                                     type_conflict_msg, ex );
-	if( cc->current_module ) {
-            shared_tnode = share_tnode( tnode );
-	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
-					       TS_STRING_SUFFIX,
-					       shared_tnode, ex );
-	}
-	break;
-    case TK_NONE:
-        if( !suffix || suffix[0] == '\0' ) {
-	    type_conflict_msg = "type with empty suffix is already "
-    	    		        "defined in the current scope";
-        } else {
-	    type_conflict_msg = "type with suffix '%s' is already "
-    	    		        "defined in the current scope";
-	}
-	shared_tnode = share_tnode( tnode );
-	compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX,
-                                     &shared_tnode,
-                                     type_conflict_msg, ex );
-	if( cc->current_module ) {
-            shared_tnode = share_tnode( tnode );
-	    dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
-					       TS_NOT_A_SUFFIX,
-					       shared_tnode, ex );
-	}
-	break;
-    case TK_STRUCT:
-    case TK_CLASS:
-    case TK_BLOB:
-    case TK_ARRAY:
-    case TK_COMPOSITE:
-    case TK_ENUM:
-    case TK_REF:
-    case TK_FUNCTION_REF:
-    case TK_DERIVED:
-        delete_tnode( tnode );
-	break;
-    default:
-	yyerrorf( "types of kind '%s' do not have suffix table",
-		  tnode_kind_name( tnode ));
-	break;
+    cexception_t inner;
+    cexception_guard( inner ) {
+        switch( type_kind ) {
+        case TK_BOOL:
+        case TK_INTEGER:
+            if( !suffix || suffix[0] == '\0' ) {
+                type_conflict_msg = "integer type with empty suffix is already "
+                    "defined in the current scope";
+            } else {
+                type_conflict_msg = "integer type with suffix '%s' is already "
+                    "defined in the current scope";
+            }
+            shared_tnode = share_tnode( *tnode );
+            compiler_typetab_insert_msg( cc, suffix, TS_INTEGER_SUFFIX,
+                                         &shared_tnode,
+                                         type_conflict_msg, &inner );
+            if( cc->current_module ) {
+                shared_tnode = share_tnode( *tnode );
+                dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
+                                                   TS_INTEGER_SUFFIX,
+                                                   shared_tnode, &inner );
+            }
+            shared_tnode = NULL;
+            break;
+        case TK_REAL:
+            if( !suffix || suffix[0] == '\0' ) {
+                type_conflict_msg = "real type with empty suffix is already "
+                    "defined in the current scope";
+            } else {
+                type_conflict_msg = "real type with suffix '%s' is already "
+                    "defined in the current scope";
+            }
+            shared_tnode = share_tnode( *tnode );
+            compiler_typetab_insert_msg( cc, suffix, TS_FLOAT_SUFFIX,
+                                         &shared_tnode,
+                                         type_conflict_msg, &inner );
+            if( cc->current_module ) {
+                shared_tnode = share_tnode( *tnode );
+                dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
+                                                   TS_FLOAT_SUFFIX,
+                                                   shared_tnode, &inner );
+            }
+            shared_tnode = NULL;
+            break;
+        case TK_STRING:
+            if( !suffix || suffix[0] == '\0' ) {
+                type_conflict_msg = "string type with empty suffix is already "
+                    "defined in the current scope";
+            } else {
+                type_conflict_msg = "string type with suffix '%s' is already "
+                    "defined in the current scope";
+            }
+            shared_tnode = share_tnode( *tnode );
+            compiler_typetab_insert_msg( cc, suffix, TS_STRING_SUFFIX,
+                                         &shared_tnode,
+                                         type_conflict_msg, &inner );
+            if( cc->current_module ) {
+                shared_tnode = share_tnode( *tnode );
+                dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
+                                                   TS_STRING_SUFFIX,
+                                                   shared_tnode, &inner );
+            }
+            shared_tnode = NULL;
+            break;
+        case TK_NONE:
+            if( !suffix || suffix[0] == '\0' ) {
+                type_conflict_msg = "type with empty suffix is already "
+                    "defined in the current scope";
+            } else {
+                type_conflict_msg = "type with suffix '%s' is already "
+                    "defined in the current scope";
+            }
+            shared_tnode = share_tnode( *tnode );
+            compiler_typetab_insert_msg( cc, suffix, TS_NOT_A_SUFFIX,
+                                         &shared_tnode,
+                                         type_conflict_msg, &inner );
+            if( cc->current_module ) {
+                shared_tnode = share_tnode( *tnode );
+                dnode_typetab_insert_tnode_suffix( cc->current_module, suffix,
+                                                   TS_NOT_A_SUFFIX,
+                                                   shared_tnode, &inner );
+            }
+            shared_tnode = NULL;
+            break;
+        case TK_STRUCT:
+        case TK_CLASS:
+        case TK_BLOB:
+        case TK_ARRAY:
+        case TK_COMPOSITE:
+        case TK_ENUM:
+        case TK_REF:
+        case TK_FUNCTION_REF:
+        case TK_DERIVED:
+            break;
+        default:
+            yyerrorf( "types of kind '%s' do not have suffix table",
+                      tnode_kind_name( *tnode ));
+            break;
+        }
     }
+    cexception_catch {
+        dispose_tnode( tnode );
+        delete_tnode( shared_tnode );
+        cexception_reraise( inner, ex );
+    }
+    dispose_tnode( tnode );
+    delete_tnode( shared_tnode );
 }
 
 static void compiler_push_current_type( COMPILER *c,
@@ -4918,21 +4933,21 @@ static void compiler_compile_type_declaration( COMPILER *cc,
 	    tnode = tnode_set_name( type_descr, type_name, &inner );
 	} else if( type_descr != cc->current_type ) {
 	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
-				    type_name, &inner );
+                                    type_name, &inner );
             tnode_set_suffix( tnode, tnode_name( tnode ), &inner );
             delete_tnode( type_descr );
 	} else {
 	    tnode = type_descr;
 	}
-        type_descr = NULL;
+
+        share_tnode( tnode );
 	compiler_typetab_insert( cc, &tnode, &inner );
 	tnode = typetab_lookup_silently( cc->typetab, type_name );
 	tnode_reset_flags( tnode, TF_IS_FORWARD );
 
-        // FIXME: memleak bug here:
+        // FIXME: memory leak bug here:
         share_tnode( tnode );
-	compiler_insert_tnode_into_suffix_list( cc, tnode, &inner );
-        tnode = NULL;
+	compiler_insert_tnode_into_suffix_list( cc, &tnode, &inner );
 	/* cc->current_type = NULL; */
         delete_tnode( compiler_pop_current_type( cc ));
 	freex( type_name );
@@ -11106,7 +11121,7 @@ delimited_type_declaration
                             &inner );
             tnode_copy_operators( ntype, $4, &inner );
             compiler_compile_type_declaration( compiler, ntype, &inner );
-            ;        }
+        }
         cexception_catch {
             delete_tnode( ntype );
             cexception_reraise( inner, px );
