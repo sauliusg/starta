@@ -73,7 +73,7 @@ ENODE *share_enode( ENODE *enode );
 
 ENODE *new_enode( cexception_t *ex );
 
-ENODE *new_enode_typed( TNODE *tnode, cexception_t *ex );
+ENODE *new_enode_typed( TNODE *volatile *tnode, cexception_t *ex );
 
 ENODE *new_enode_return_value( TNODE *retval_tnode, cexception_t *ex );
 

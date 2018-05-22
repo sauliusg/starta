@@ -304,10 +304,12 @@ ENODE *new_enode( cexception_t *ex )
     return enode;
 }
 
-ENODE *new_enode_typed( TNODE *tnode, cexception_t *ex )
+ENODE *new_enode_typed( TNODE *volatile *tnode, cexception_t *ex )
 {
     ENODE *enode = new_enode( ex );
-    enode->value.expr_type = tnode;
+    assert( tnode );
+    enode->value.expr_type = *tnode;
+    *tnode = NULL;
     return enode;
 }
 
