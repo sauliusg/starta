@@ -1,0 +1,14 @@
+#! /usr/bin/env starta
+// --*- C -*--
+
+// Argument is not returned:
+
+pragma prepend "$D";
+
+use std;
+
+use Vectors;
+
+var arg1 = argument(1);
+
+. arg1;
