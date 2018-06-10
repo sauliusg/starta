@@ -6937,9 +6937,12 @@ static DNODE* compiler_module_parameter_dnode( COMPILER *c,
            parameter name: */
         dnode_set_synonim( parameter_dnode, parameter_default, &inner );
         freex( parameter_default );
+        freex( parameter_name );
     }
     cexception_catch {
         delete_tnode( dnode_type );
+        freex( parameter_default );
+        freex( parameter_name );
         cexception_reraise( inner, ex );
     }
 
