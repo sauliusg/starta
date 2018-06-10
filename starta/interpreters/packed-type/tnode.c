@@ -1215,7 +1215,12 @@ int tnode_align( TNODE *tnode )
     }
 }
 
-type_kind_t tnode_kind( TNODE *tnode ) { assert( tnode ); return tnode->kind; }
+type_kind_t tnode_kind( TNODE *tnode )
+{
+    assert( tnode );
+    assert( tnode->rcount > 0 );
+    return tnode->kind;
+}
 
 DNODE *tnode_args( TNODE* tnode )
 {
