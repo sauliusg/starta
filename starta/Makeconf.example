@@ -10,6 +10,8 @@ LIB_DIRS   ?= ../getoptions ../cexceptions
 ## LIBFLAGS = -ldl -lefence
 LIBFLAGS ?= -ldl
 
+## OPTFLAGS = -fsanitize=address
+
 EXT ?= .snl
 TEST_OPTIONS ?= -I inputs -I modules -I . -G
 SIZE_OPTIONS ?= -c -d dump
