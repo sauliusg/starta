@@ -1942,6 +1942,9 @@ static DNODE* compiler_lookup_conversion( COMPILER *cc,
         vartab_lookup_operator( cc->operators, tnode_name( target_type ),
                                 conversion_argument ) : NULL;
 
+    tlist_pop_data( &conversion_argument );
+    delete_tlist( conversion_argument );
+    
     if( conversion_dnode ) {
         return conversion_dnode;
     } else {
