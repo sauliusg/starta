@@ -807,7 +807,8 @@ int GSTI( INSTRUCTION_FN_ARGS )
         if( pos_offset < size )
             memcpy( num_ptr, &istate.ep[0].num, copy_size );
 
-        if( neg_offset < 0 ) {
+        if( neg_offset < 0 &&
+            neg_offset >= -sizeof(alloccell_t) + nref * REF_SIZE ) {
             *ref_ptr = istate.ep[0].PTR;
         }
     }
