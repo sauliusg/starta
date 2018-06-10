@@ -8560,8 +8560,10 @@ pragma_statement
        }
        cexception_catch {
            freex( pragma_name );
+           const_value_free( &$3 );
            cexception_reraise( inner, px );
        }
+       const_value_free( &$3 );
        freex( pragma_name );
    }
 
@@ -11956,6 +11958,7 @@ bytecode_constant
 			"in bytecode", cvalue_type_name( const_expr ));
 	      break;
 	  }
+          const_value_free( &const_expr );
       }     
   ;
 
@@ -14402,6 +14405,7 @@ argument
 		dnode_set_flags( arg, DF_IS_READONLY );
 	    }
 	}
+        const_value_free( &$6 );
     }
 
   | opt_readonly var_type_description uninitialised_var_declarator_list
@@ -15097,8 +15101,10 @@ constant_declaration
         cexception_catch {
             freex( ident );
             delete_dnode( const_dnode );
+            const_value_free( &$4 );
             cexception_reraise( inner, px );
         }
+        const_value_free( &$4 );
         freex( ident );
     }
 ;
