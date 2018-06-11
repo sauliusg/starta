@@ -3082,12 +3082,22 @@ static void compiler_compile_operator( COMPILER *cc,
                                        int arity,
                                        cexception_t *ex )
 {
+    cexception_t inner;
     operator_description_t od;
 
-    compiler_init_operator_description( &od, cc, tnode, operator_name, arity, ex );
-    compiler_emit_operator_or_report_missing( cc, &od, NULL, "", ex );
-    compiler_check_operator_retvals( cc, &od, 0, 1 );
-    compiler_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, ex );
+    share_tnode( tnode );
+    cexception_guard( inner ) {
+        compiler_init_operator_description( &od, cc, tnode, operator_name, arity,
+                                            &inner );
+        compiler_emit_operator_or_report_missing( cc, &od, NULL, "", &inner );
+        compiler_check_operator_retvals( cc, &od, 0, 1 );
+        compiler_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, &inner );
+    }
+    cexception_catch {
+        delete_tnode( tnode );
+	cexception_reraise( inner, ex );
+    }
+    delete_tnode( tnode );
 }
 
 static void compiler_check_and_compile_operator( COMPILER *cc,
@@ -3101,10 +3111,11 @@ static void compiler_check_and_compile_operator( COMPILER *cc,
     operator_description_t od;
     TYPETAB *volatile generic_types = NULL;
 
+    share_tnode( tnode );
     generic_types = new_typetab( ex );
     cexception_guard( inner ) {
 	compiler_init_operator_description( &od, cc, tnode, 
-                                         operator_name, arity, ex );
+                                            operator_name, arity, ex );
 	compiler_check_operator_args( cc, &od, generic_types, ex );
 	compiler_drop_operator_args( cc, &od );
 	compiler_emit_operator_or_report_missing( cc, &od, fixup_values, "", ex );
@@ -3113,8 +3124,10 @@ static void compiler_check_and_compile_operator( COMPILER *cc,
     }
     cexception_catch {
 	delete_typetab( generic_types );
+        delete_tnode( tnode );
 	cexception_reraise( inner, ex );
     }
+    delete_tnode( tnode );
     delete_typetab( generic_types );
 }
 
