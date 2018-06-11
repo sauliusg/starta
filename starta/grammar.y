@@ -324,7 +324,8 @@ static void delete_compiler( COMPILER *c )
 	delete_elist( c->saved_estacks );
 	delete_enode( c->e_stack );
         freex( c->try_variable_stack );
-
+        freex( c->catch_jumpover_stack );
+    
         dnode_break_cycles( c->current_call );
 	delete_dnode( c->current_call );
 
