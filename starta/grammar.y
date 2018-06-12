@@ -7201,9 +7201,8 @@ static void compiler_process_module_parameters( COMPILER *cc,
                     const_value_to_string( (const_value_t*)&const_value,
                                            &inner );
                     dnode_set_name( arg,
-                                    strdupx( const_value_string
-                                             ( (const_value_t*)&const_value ),
-                                             &inner ),
+                                    const_value_string
+                                    ((const_value_t*)&const_value),
                                     &inner );
                     argument_dnode = arg;
                     shared_arg = share_dnode( arg );
