@@ -134,6 +134,10 @@ void interpret( THRCODE *code, int argc, char *argv[], char *env[],
     cexception_guard( inner ) {
         run( &inner );
         bcalloc_run_all_destructors( &inner );
+        memset( istate.call_stack, 0, sizeof(istate.call_stack[0]) * istate.call_stack_length );
+        memset( istate.eval_stack, 0, sizeof(istate.eval_stack[0]) * istate.eval_stack_length );
+        thrcode_gc_mark_and_sweep( &inner );
+        bccollect( &inner );
     }
     cexception_catch {
         int error_code = cexception_error_code( &inner );
@@ -726,6 +730,8 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
                 in_gc = 0;
                 cexception_reraise( inner, ex );
             }
+            hdr->vmt_offset = 0; // Not an object any more; prevents
+                                 // running destructor twice.
         }
     }
 
