@@ -5285,20 +5285,21 @@ static void compiler_compile_multitype_const_value( COMPILER *cc,
 	assert( type_name );
 	type_name ++;
 
-	value_name = strdupx( v->value.s, ex );
-	value_name_terminator = strstr( value_name, " " );
-	assert( value_name_terminator );
-	*value_name_terminator = '\0';
-
 	cexception_guard( inner ) {
+            value_name = strdupx( v->value.s, &inner );
+            value_name_terminator = strstr( value_name, " " );
+            assert( value_name_terminator );
+            *value_name_terminator = '\0';
 	    compiler_compile_enumeration_constant( cc, module,
                                                    value_name, type_name,
                                                    &inner );
 	}
 	cexception_catch {
 	    freex( value_name );
+            const_value_free( v );
 	    cexception_reraise( inner, ex );
 	}
+        const_value_free( v );
 	freex( value_name );
 	return;
 	break;
