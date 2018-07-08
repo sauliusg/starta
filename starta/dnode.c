@@ -359,13 +359,13 @@ DNODE *new_dnode_return_value( TNODE *retval_type, cexception_t *ex )
 }
 
 typedef TNODE* (*tnode_creator_t) ( char *name,
-				    DNODE *params,
-				    DNODE *retvals,
+				    DNODE *volatile *params,
+				    DNODE *volatile *retvals,
 				    cexception_t *ex );
 
 static DNODE* new_dnode_function_or_operator( char *name,
-					      DNODE *parameters,
-					      DNODE *return_values,
+					      DNODE *volatile *parameters,
+					      DNODE *volatile *return_values,
 					      tnode_creator_t tnode_creator,
 					      cexception_t *ex )
 {
@@ -383,49 +383,52 @@ static DNODE* new_dnode_function_or_operator( char *name,
 }
 
 DNODE* new_dnode_function( char *name,
-			   DNODE *parameters,
-			   DNODE *return_values, 
+			   DNODE *volatile *parameters,
+			   DNODE *volatile *return_values, 
 			   cexception_t *ex )
 {
     return new_dnode_function_or_operator( name, parameters, return_values,
-					   new_tnode_function, ex );
+					   new_tnode_function_NEW, ex );
 }
 
 DNODE* new_dnode_constructor( char *name,
-                              DNODE *parameters,
-                              DNODE *return_values, 
+                              DNODE *volatile *parameters,
+                              DNODE *volatile *return_values, 
                               cexception_t *ex )
 {
     return new_dnode_function_or_operator( name, parameters, return_values,
-					   new_tnode_constructor, ex );
+					   new_tnode_constructor_NEW, ex );
 }
 
 DNODE* new_dnode_destructor( char *name,
-                             DNODE *parameters,
+                             DNODE *volatile *parameters,
                              cexception_t *ex )
 {
+    DNODE *null_dnode = NULL;
     return new_dnode_function_or_operator( name, parameters,
-                                           /* return_values = */ NULL,
-					   new_tnode_destructor, ex );
+                                           /* return_values = */ &null_dnode,
+					   new_tnode_destructor_NEW, ex );
 }
 
-DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
+DNODE* new_dnode_method( char *name,
+                         DNODE *volatile *parameters,
+                         DNODE *volatile *return_values,
                          cexception_t *ex )
 {
     return new_dnode_function_or_operator( name, parameters, return_values,
-					   new_tnode_method, ex );
+					   new_tnode_method_NEW, ex );
 }
 
 DNODE* new_dnode_operator( char *name,
-			   DNODE *parameters,
-			   DNODE *return_values,
+			   DNODE *volatile *parameters,
+			   DNODE *volatile *return_values,
 			   cexception_t *ex )
 {
     cexception_t inner;
     DNODE * volatile op = NULL;
 
     op = new_dnode_function_or_operator( name, parameters, return_values,
-					 new_tnode_operator, ex );
+					 new_tnode_operator_NEW, ex );
 
     cexception_guard( inner ) {
 	TNODE *op_type = dnode_type( op );

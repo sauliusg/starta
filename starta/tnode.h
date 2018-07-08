@@ -105,21 +105,46 @@ TNODE *new_tnode_function_or_proc_ref( DNODE *parameters,
 TNODE *new_tnode_function( char *name, DNODE *parameters, DNODE *return_dnodes,
 			   cexception_t *ex );
 
+TNODE *new_tnode_function_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex );
+
 TNODE *new_tnode_constructor( char *name,
                               DNODE *parameters,
                               DNODE *return_dnodes,
                               cexception_t *ex );
+
+TNODE *new_tnode_constructor_NEW( char *name,
+                                  DNODE *volatile *parameters,
+                                  DNODE *volatile *return_dnodes,
+                                  cexception_t *ex );
 
 TNODE *new_tnode_destructor( char *name,
                              DNODE *parameters,
                              DNODE *return_dnodes,
                              cexception_t *ex );
 
+TNODE *new_tnode_destructor_NEW( char *name,
+                                 DNODE *volatile *parameters,
+                                 DNODE *volatile *return_dnodes,
+                                 cexception_t *ex );
+
 TNODE *new_tnode_method( char *name, DNODE *parameters, DNODE *return_dnodes,
                          cexception_t *ex );
 
+TNODE *new_tnode_method_NEW( char *name,
+                             DNODE *volatile *parameters,
+                             DNODE *volatile *return_dnodes,
+                             cexception_t *ex );
+
 TNODE *new_tnode_operator( char *name, DNODE *parameters, DNODE *return_dnodes,
 			   cexception_t *ex );
+
+TNODE *new_tnode_operator_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex );
 
 TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 

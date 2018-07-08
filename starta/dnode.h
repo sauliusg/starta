@@ -71,20 +71,28 @@ DNODE* new_dnode_constant( char *name, const_value_t *value,
 
 DNODE *new_dnode_return_value( TNODE *retval_type, cexception_t *ex );
 
-DNODE* new_dnode_function( char *name, DNODE *parameters, DNODE *return_values, 
+DNODE* new_dnode_function( char *name,
+                           DNODE *volatile *parameters,
+                           DNODE *volatile *return_values, 
 			   cexception_t *ex );
 
-DNODE* new_dnode_constructor( char *name, DNODE *parameters,
-                              DNODE *return_values, 
+DNODE* new_dnode_constructor( char *name,
+                              DNODE *volatile *parameters,
+                              DNODE *volatile *return_values, 
                               cexception_t *ex );
 
-DNODE* new_dnode_destructor( char *name, DNODE *parameters,
+DNODE* new_dnode_destructor( char *name,
+                             DNODE *volatile *parameters,
                              cexception_t *ex );
 
-DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
+DNODE* new_dnode_method( char *name,
+                         DNODE *volatile *parameters,
+                         DNODE *volatile *return_values,
                          cexception_t *ex );
 
-DNODE* new_dnode_operator( char *name, DNODE *parameters, DNODE *return_values,
+DNODE* new_dnode_operator( char *name,
+                           DNODE *volatile *parameters,
+                           DNODE *volatile *return_values,
 			   cexception_t *ex );
 
 DNODE *new_dnode_module( char *name, cexception_t *ex );

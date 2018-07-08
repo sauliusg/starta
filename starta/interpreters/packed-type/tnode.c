@@ -516,6 +516,20 @@ TNODE *new_tnode_function( char *name,
 					   TK_FUNCTION, ex );
 }
 
+TNODE *new_tnode_function_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_FUNCTION, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
+}
+
 TNODE *new_tnode_constructor( char *name,
                               DNODE *parameters,
                               DNODE *return_dnodes,
@@ -523,6 +537,20 @@ TNODE *new_tnode_constructor( char *name,
 {
     return new_tnode_function_or_operator( name, parameters, return_dnodes,
 					   TK_CONSTRUCTOR, ex );
+}
+
+TNODE *new_tnode_constructor_NEW( char *name,
+                                  DNODE *volatile *parameters,
+                                  DNODE *volatile *return_dnodes,
+                                  cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_CONSTRUCTOR, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
 }
 
 TNODE *new_tnode_destructor( char *name,
@@ -534,6 +562,20 @@ TNODE *new_tnode_destructor( char *name,
 					   TK_DESTRUCTOR, ex );
 }
 
+TNODE *new_tnode_destructor_NEW( char *name,
+                                 DNODE *volatile *parameters,
+                                 DNODE *volatile *return_dnodes,
+                                 cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_DESTRUCTOR, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
+}
+
 TNODE *new_tnode_method( char *name,
                          DNODE *parameters,
                          DNODE *return_dnodes,
@@ -543,6 +585,20 @@ TNODE *new_tnode_method( char *name,
 					   TK_METHOD, ex );
 }
 
+TNODE *new_tnode_method_NEW( char *name,
+                             DNODE *volatile *parameters,
+                             DNODE *volatile *return_dnodes,
+                             cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_METHOD, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
+}
+
 TNODE *new_tnode_operator( char *name,
 			   DNODE *parameters,
 			   DNODE *return_dnodes,
@@ -550,6 +606,20 @@ TNODE *new_tnode_operator( char *name,
 {
     return new_tnode_function_or_operator( name, parameters, return_dnodes,
 					   TK_OPERATOR, ex );
+}
+
+TNODE *new_tnode_operator_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_OPERATOR, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
 }
 
 static int tnode_is_constructor( TNODE *tnode )
