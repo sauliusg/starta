@@ -143,6 +143,24 @@ void dispose_dnode( DNODE *volatile *dnode )
     *dnode = NULL;
 }
 
+void break_cycles_for_all_dnodes( void )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        dnode_break_cycles( node );
+    }
+}
+
+void deallocate_all_dnodes( void )
+{
+    DNODE *node, *next;
+    for( node = allocated; node != NULL; ) {
+        next = node->next_alloc;
+        delete_dnode( node );
+        node = next;
+    }
+}
+
 DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
