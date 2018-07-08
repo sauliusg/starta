@@ -38,6 +38,10 @@ void delete_dnode( DNODE *node );
 
 void dispose_dnode( DNODE *volatile *dnode );
 
+void break_cycles_for_all_dnodes( void );
+
+void deallocate_all_dnodes( void );
+
 DNODE *dnode_break_cycles( DNODE *dnode );
 
 DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex );

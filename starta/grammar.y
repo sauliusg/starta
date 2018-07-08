@@ -360,6 +360,8 @@ static void delete_compiler( COMPILER *c )
 
         delete_string_array( &c->include_paths );
 
+        break_cycles_for_all_dnodes();
+        deallocate_all_dnodes();
         if( memleak_debug ) {
             strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();
