@@ -12895,6 +12895,9 @@ closure_initialisation
             compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
             compiler_compile_swap( compiler, px );
             compiler_compile_sti( compiler, px );
+        } else {
+            /*TODO: check that this does not introduce a memory leak (S.G.):*/
+            share_tnode( var ? dnode_type( var ) : NULL );
         }
     }
 
