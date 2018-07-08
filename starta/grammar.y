@@ -8632,12 +8632,14 @@ program_header
           char *volatile program_name =
               obtain_string_from_strpool( compiler->strpool, $2 );
 	  DNODE *volatile funct = NULL;
-          DNODE *retvals = $6;
+          DNODE *volatile arguments = $4;
+          DNODE *volatile retvals = $6;
           TNODE *retval_type = retvals ? dnode_type( retvals ) : NULL;
           ssize_t program_addr;
 
     	  cexception_guard( inner ) {
-	      $$ = funct = new_dnode_function( program_name, $4, $6, &inner );
+	      $$ = funct =
+                  new_dnode_function( program_name, &arguments, &retvals, &inner );
 	      funct = $$ =
 		  compiler_check_and_set_fn_proto( compiler, funct, &inner );
 
@@ -12900,10 +12902,12 @@ function_expression_header
 :   opt_function_attributes function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
+        DNODE *volatile parameters = $4;
+        DNODE *volatile return_values = $6;
         dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
         $$ = new_dnode_function( /* name = */ NULL,
-                                 /* parameters = */ $4,
-                                 /* return_values = */ $6,
+                                 &parameters,
+                                 &return_values,
                                  px );
         if( $1 & DF_BYTECODE )
             dnode_set_flags( $$, DF_BYTECODE );
@@ -12943,8 +12947,8 @@ closure_header
       {
           char *closure_name =
               obtain_string_from_strpool( compiler->strpool, $8 );
-          DNODE *parameters = $4;
-          DNODE *return_values = $6;
+          DNODE *volatile parameters = $4;
+          DNODE *volatile return_values = $6;
           DNODE *self_dnode = new_dnode_name( closure_name, px );
           ENODE *closure_expr = compiler->e_stack;
           TNODE *closure_type = enode_type( closure_expr );
@@ -12965,7 +12969,7 @@ closure_header
           dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
 
           $$ = new_dnode_function( /* name = */ NULL, 
-                                   parameters, return_values, px );
+                                   &parameters, &return_values, px );
           tnode_set_kind( dnode_type( $$ ), TK_CLOSURE );
           freex( closure_name );
     }
@@ -14683,10 +14687,8 @@ function_header
           DNODE *volatile retvals = $7;
 
     	  cexception_guard( inner ) {
-	      $$ = funct = new_dnode_function( function_name, parameters,
-                                               retvals, &inner );
-	      parameters = NULL;
-	      retvals = NULL;
+	      $$ = funct = new_dnode_function( function_name, &parameters,
+                                               &retvals, &inner );
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( $1 & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
@@ -14809,8 +14811,8 @@ method_header
                                 interface_name ? interface_name : ""
                                 );
 
-                      funct = new_dnode_method( full_method_name, parameter_list,
-                                                return_values, &inner2 );
+                      funct = new_dnode_method( full_method_name, &parameter_list,
+                                                &return_values, &inner2 );
                       freex( full_method_name );
                   }
                   cexception_catch {
@@ -14818,8 +14820,8 @@ method_header
                       cexception_reraise( inner2, &inner );
                   }
               } else {
-                  funct = new_dnode_method( method_name, parameter_list,
-                                            return_values, &inner );
+                  funct = new_dnode_method( method_name, &parameter_list,
+                                            &return_values, &inner );
               }
 
               $$ = funct;
@@ -14857,8 +14859,6 @@ method_header
                   }
               }
 
-	      parameter_list = NULL;
-	      return_values = NULL;
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( $1 & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
@@ -14945,7 +14945,8 @@ constructor_header
           int function_attributes = $1;
           char *constructor_name =
               obtain_string_from_strpool( compiler->strpool, $4 );
-          DNODE *parameter_list = $6;
+          DNODE *volatile parameter_list = $6;
+          DNODE *volatile null_dnode = NULL;
 
     	  cexception_guard( inner ) {
               TNODE *class_tnode = compiler->current_type;
@@ -14960,10 +14961,10 @@ constructor_header
               self_dnode = NULL;
 
 	      $$ = funct = new_dnode_constructor( constructor_name,
-                                                  parameter_list,
-                                                  /* return_dnode = */ NULL,
+                                                  &parameter_list,
+                                                  /* return_dnode = */
+                                                  &null_dnode,
                                                   &inner );
-	      parameter_list = NULL;
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
@@ -15034,9 +15035,7 @@ destructor_header
               }
 
 	      $$ = funct = new_dnode_destructor( destructor_name,
-                                                 self_dnode, &inner );
-
-              self_dnode = NULL;
+                                                 &self_dnode, &inner );
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
@@ -15077,11 +15076,9 @@ operator_header
 
     	  cexception_guard( inner ) {
 	      $$ = funct = new_dnode_operator( operator_name, 
-                                               arguments, retvals, &inner );
-	      arguments = NULL;
-	      retvals = NULL;
+                                               &arguments, &retvals, &inner );
 	      if( $1 & DF_BYTECODE )
-		dnode_set_flags( funct, DF_BYTECODE );
+                  dnode_set_flags( funct, DF_BYTECODE );
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 	      $$ = funct;
