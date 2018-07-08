@@ -12871,7 +12871,7 @@ closure_initialisation
     i = 0;
     foreach_reverse_dnode( var, closure_var_list ) {
         i ++;
-        if( i > len ) break;
+        if( i > len ) break; /*FIXME: this operator is probably no needed? (S.G.)*/
         if( i <= expr_nr ) {
             TNODE *var_type = var ? dnode_type( var ) : NULL;
 
