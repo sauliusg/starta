@@ -8634,12 +8634,15 @@ program_header
 	  DNODE *volatile funct = NULL;
           DNODE *volatile arguments = $4;
           DNODE *volatile retvals = $6;
+          DNODE *volatile shared_retvals = NULL;
           TNODE *retval_type = retvals ? dnode_type( retvals ) : NULL;
           ssize_t program_addr;
 
     	  cexception_guard( inner ) {
+              shared_retvals = share_dnode( retvals );
 	      $$ = funct =
-                  new_dnode_function( program_name, &arguments, &retvals, &inner );
+                  new_dnode_function( program_name, &arguments,
+                                      &shared_retvals, &inner );
 	      funct = $$ =
 		  compiler_check_and_set_fn_proto( compiler, funct, &inner );
 
@@ -8662,12 +8665,14 @@ program_header
                                           "nth-byte", 2, px );
                   compiler_emit( compiler, px, "\tc\n", EXIT );
                   compiler_emit( compiler, px, "\tc\n", DROP );
+                  dispose_dnode( &retvals );
               }
 	  }
 	  cexception_catch {
               freex( program_name );
-	      delete_dnode( $4 );
-	      delete_dnode( $6 );
+	      delete_dnode( shared_retvals );
+	      delete_dnode( retvals );
+	      delete_dnode( arguments );
 	      delete_dnode( funct );
 	      $$ = NULL;
 	      cexception_reraise( inner, px );
