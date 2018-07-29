@@ -939,8 +939,7 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
             newretvals = newargs = NULL;
             dnode_replace_type( newop, newtype );
             newtype = NULL;
-            tnode_insert_single_operator( dst, newop );
-            newop = NULL;
+            tnode_insert_single_operator( dst, &newop );
         }
     }
     cexception_catch {
@@ -1629,12 +1628,13 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
     return tnode;
 }
 
-TNODE *tnode_insert_single_operator( TNODE* tnode, DNODE *operator )
+TNODE *tnode_insert_single_operator( TNODE *tnode, DNODE *volatile *operator )
 {
     assert( tnode );
-    tnode_check_operator_does_not_exist( tnode, tnode->operators, operator );
-    share_dnode( operator );
-    tnode->operators = dnode_append( tnode->operators, operator );
+    assert( operator );
+    tnode_check_operator_does_not_exist( tnode, tnode->operators, *operator );
+    tnode->operators = dnode_append( tnode->operators, *operator );
+    operator = NULL;
     return tnode;
 }
 
@@ -1647,29 +1647,30 @@ TNODE *tnode_insert_single_conversion( TNODE* tnode, DNODE *conversion )
     return tnode;
 }
 
-TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member )
+TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member )
 {
-    TNODE *member_type = member ? dnode_type( member ) : NULL;
+    assert( member );
+    TNODE *member_type = *member ? dnode_type( *member ) : NULL;
 
     assert( tnode );
 
-    if( member ) {
+    if( *member ) {
 	if( tnode_is_conversion( member_type )) {
-	    tnode_insert_single_conversion( tnode, member );
+	    tnode_insert_single_conversion( tnode, *member );
 	} else
 	if( tnode_is_operator( member_type )) {
 	    tnode_insert_single_operator( tnode, member );
         } else
 	if( tnode_is_method( member_type )) {
-	    tnode_insert_single_method( tnode, member );
+	    tnode_insert_single_method( tnode, *member );
         } else
 	if( tnode_is_constructor( member_type )) {
-	    tnode_insert_constructor( tnode, member );
+	    tnode_insert_constructor( tnode, *member );
         } else
 	if( tnode_is_destructor( member_type )) {
-	    tnode_insert_destructor( tnode, member );
+	    tnode_insert_destructor( tnode, *member );
 	} else {
-	    tnode_insert_fields( tnode, member );
+	    tnode_insert_fields( tnode, *member );
 	}
     }
     return tnode;

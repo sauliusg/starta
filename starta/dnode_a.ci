@@ -66,6 +66,15 @@ static void free_dnode( DNODE *dnode )
     dnode->rcount--;
 }
 
+void deallocate_all_dnodes( void )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; ) {
+        deallocate_dnode_buffers( node );
+    }
+    allocated = NULL;
+}
+
 #else
 
 static DNODE *alloc_dnode( cexception_t *ex )
@@ -85,6 +94,18 @@ static void free_dnode( DNODE *dnode )
     assert( dnode->rcount == 0 );
     dnode_exclude_from_allocated_list( dnode );
     freex( dnode );
+}
+
+void deallocate_all_dnodes( void )
+{
+    DNODE *node, *next;
+    for( node = allocated; node != NULL; ) {
+        next = node->next;
+        deallocate_dnode_buffers( node );
+        freex( node );
+        node = next;
+    }
+    allocated = NULL;
 }
 
 #endif

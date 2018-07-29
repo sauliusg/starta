@@ -56,7 +56,7 @@ struct DNODE {
 			      variable on the stack frame, or address
 			      of the function in the bytecode, or
 			      offset of the virtual method in the
-			      virtual method table. */
+`			      virtual method table. */
     int rcount;            /* reference count */
     ssize_t code_length;   /* number of opcodes in the following
 			      opcode array */
@@ -96,6 +96,14 @@ struct DNODE {
 
 #include <dnode_a.ci>
 
+void deallocate_dnode_buffers( DNODE *dnode )
+{
+    freex( dnode->name );
+    freex( dnode->filename );
+    freex( dnode->synonim );
+    freex( dnode->code );
+}
+
 void delete_dnode( DNODE *node )
 {
     DNODE *next;
@@ -108,10 +116,8 @@ void delete_dnode( DNODE *node )
 	}
         if( --node->rcount > 0 )
 	    return;
-	freex( node->name );
-	freex( node->filename );
-	freex( node->synonim );
-	freex( node->code );
+
+        deallocate_dnode_buffers( node );
 
 	delete_tnode( node->tnode );
 	delete_vartab( node->vartab );
@@ -151,30 +157,19 @@ void break_cycles_for_all_dnodes( void )
     }
 }
 
-void deallocate_all_dnodes( void )
-{
-    DNODE *node, *next;
-    for( node = allocated; node != NULL; ) {
-        next = node->next_alloc;
-        delete_dnode( node );
-        node = next;
-    }
-}
-
 DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
 
-#if 0
         typetab_break_cycles( dnode->typetab );
         vartab_break_cycles( dnode->vartab );
         vartab_break_cycles( dnode->consts );
         vartab_break_cycles( dnode->operators );
-#else
-        // dispose_typetab( &dnode->typetab );
-        // dispose_vartab( &dnode->vartab );
-        // dispose_vartab( &dnode->consts );
-        // dispose_vartab( &dnode->operators );
+#if 1
+        dispose_typetab( &dnode->typetab );
+        dispose_vartab( &dnode->vartab );
+        dispose_vartab( &dnode->consts );
+        dispose_vartab( &dnode->operators );
 #endif
 
         dispose_tnode( &dnode->tnode );

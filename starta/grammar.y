@@ -360,7 +360,7 @@ static void delete_compiler( COMPILER *c )
 
         delete_string_array( &c->include_paths );
 
-        break_cycles_for_all_dnodes();
+        //break_cycles_for_all_dnodes();
         deallocate_all_dnodes();
         if( memleak_debug ) {
             strpool_print_strings_to_stderr( c->strpool );
@@ -10882,7 +10882,7 @@ struct_field_list
      {
 	 assert( compiler->current_type );
 	 $$ = share_tnode( compiler->current_type );
-         tnode_insert_type_member( $$, $1 );
+         tnode_insert_type_member( $$, &$1 );
      }
   | type_attribute
      {
@@ -10901,7 +10901,7 @@ struct_field_list
      }
   | struct_field_list ';' struct_field
      {
-         $$ = tnode_insert_type_member( $1, $3 );
+         $$ = tnode_insert_type_member( $1, &$3 );
      }
   | struct_field_list ';' type_attribute
      {
@@ -10929,21 +10929,21 @@ struct_operator_list
     {
 	TNODE *struct_type = compiler->current_type;
         assert( struct_type );
-	tnode_insert_type_member( struct_type, $1 );
+	tnode_insert_type_member( struct_type, &$1 );
 	$$ = struct_type;
     }
   | struct_operator_list struct_operator
     {
 	TNODE *struct_type = compiler->current_type;
         assert( struct_type );
-	tnode_insert_type_member( struct_type, $2 );
+	tnode_insert_type_member( struct_type, &$2 );
 	$$ = $1;
     }
   | struct_operator_list ';' struct_operator
     {
 	TNODE *struct_type = compiler->current_type;
         assert( struct_type );
-	tnode_insert_type_member( struct_type, $3 );
+	tnode_insert_type_member( struct_type, &$3 );
 	$$ = $1;
     }
 ;
@@ -10993,17 +10993,17 @@ interface_operator_list
   : interface_operator
     {
 	TNODE *struct_type = compiler->current_type;
-	tnode_insert_type_member( struct_type, $1 );
+	tnode_insert_type_member( struct_type, &$1 );
 	$$ = struct_type;
     }
   | interface_operator_list interface_operator
     {
-	tnode_insert_type_member( $1, $2 );
+	tnode_insert_type_member( $1, &$2 );
 	$$ = $1;
     }
   | interface_operator_list ';' interface_operator
     {
-	tnode_insert_type_member( $1, $3 );
+	tnode_insert_type_member( $1, &$3 );
 	$$ = $1;
     }
 ;
@@ -15089,7 +15089,6 @@ operator_header
                   dnode_set_flags( funct, DF_BYTECODE );
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
-	      $$ = funct;
               compiler_set_function_arguments_readonly( dnode_type( funct ));
 	  }
 	  cexception_catch {
