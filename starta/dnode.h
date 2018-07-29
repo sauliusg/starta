@@ -34,8 +34,8 @@ typedef enum {
     DF_IS_IMMUTABLE    = 0x80
 } dnode_flag_t;
 
+void deallocate_dnode_buffers( DNODE *dnode );
 void delete_dnode( DNODE *node );
-
 void dispose_dnode( DNODE *volatile *dnode );
 
 void break_cycles_for_all_dnodes( void );
