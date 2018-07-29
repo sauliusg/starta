@@ -165,11 +165,16 @@ DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
 
-#if 1
+#if 0
         typetab_break_cycles( dnode->typetab );
         vartab_break_cycles( dnode->vartab );
         vartab_break_cycles( dnode->consts );
         vartab_break_cycles( dnode->operators );
+#else
+        // dispose_typetab( &dnode->typetab );
+        // dispose_vartab( &dnode->vartab );
+        // dispose_vartab( &dnode->consts );
+        // dispose_vartab( &dnode->operators );
 #endif
 
         dispose_tnode( &dnode->tnode );
