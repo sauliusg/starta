@@ -1633,7 +1633,7 @@ TNODE *tnode_insert_single_operator( TNODE* tnode, DNODE *operator )
 {
     assert( tnode );
     tnode_check_operator_does_not_exist( tnode, tnode->operators, operator );
-    share_tnode( tnode );
+    share_dnode( operator );
     tnode->operators = dnode_append( tnode->operators, operator );
     return tnode;
 }
