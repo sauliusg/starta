@@ -157,21 +157,44 @@ void break_cycles_for_all_dnodes( void )
     }
 }
 
+void take_ownership_of_all_dnodes( void )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        share_dnode( node );
+    }
+}
+
+void delete_all_dnodes( void )
+{
+    DNODE *node, *next;
+    for( node = allocated; node != NULL; ) {
+        next = node->next;
+        delete_dnode( node );
+        node = next;
+    }
+    allocated = NULL;
+}
+
 DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
+        
+        if( dnode->flags & DF_CYCLES_BROKEN )
+            return;
+
+        dnode->flags |= DF_CYCLES_BROKEN;
 
         typetab_break_cycles( dnode->typetab );
         vartab_break_cycles( dnode->vartab );
         vartab_break_cycles( dnode->consts );
         vartab_break_cycles( dnode->operators );
-#if 1
-        dispose_typetab( &dnode->typetab );
-        dispose_vartab( &dnode->vartab );
-        dispose_vartab( &dnode->consts );
-        dispose_vartab( &dnode->operators );
-#endif
 
+        tnode_break_cycles( dnode->tnode );
+
+        dnode_break_cycles( dnode->next );
+        dnode_break_cycles( dnode->module_args );
+        
         dispose_tnode( &dnode->tnode );
 
         dispose_vartab( &dnode->vartab );

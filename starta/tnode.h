@@ -32,6 +32,7 @@ typedef enum {
     TF_NON_NULL        = 0x40,
     TF_IS_EQUIVALENT   = 0x80,
     TF_HAS_PLACEHOLDER = 0x100,
+    TF_CYCLES_BROKEN   = 0x200,
     last_TYPE_FLAG
 } type_flag_t;
 
@@ -73,8 +74,13 @@ typedef enum {
     last_type_kind_t
 } type_kind_t;
 
+void deallocate_tnode_buffers( TNODE *tnode );
 void delete_tnode( TNODE *tnode );
 void dispose_tnode( TNODE *volatile *tnode );
+void break_cycles_for_all_tnodes( void );
+void take_ownership_of_all_tnodes( void );
+void deallocate_all_tnodes( void );
+void delete_all_tnodes( void );
 TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );
