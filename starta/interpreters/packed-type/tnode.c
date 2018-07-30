@@ -87,11 +87,11 @@ void delete_all_tnodes( void )
 {
     TNODE *node, *next;
     for( node = allocated; node != NULL; ) {
-        next = node->next;
+        next = node->next_alloc;
         delete_tnode( node );
         node = next;
     }
-    allocated = NULL;
+    //allocated = NULL;
 }
 
 TNODE* tnode_break_cycles( TNODE *tnode )

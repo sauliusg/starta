@@ -71,7 +71,7 @@ void deallocate_all_tnodes( void )
 {
     TNODE *node, *next;
     for( node = allocated; node != NULL; ) {
-        next = node->next;
+        next = node->next_alloc;
         deallocate_tnode_buffers( node );
         node = next;
     }
@@ -108,7 +108,7 @@ void deallocate_all_tnodes( void )
 {
     TNODE *node, *next;
     for( node = allocated; node != NULL; ) {
-        next = node->next;
+        next = node->next_alloc;
         deallocate_tnode_buffers( node );
         freex( node );
         node = next;
