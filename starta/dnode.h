@@ -31,7 +31,8 @@ typedef enum {
     DF_HAS_INITIALISER = 0x20,
     DF_LOOP_HAS_VAL    = 0x40, /* describes 'for' loops that need extra
 				  value on top of the evluation stack. */
-    DF_IS_IMMUTABLE    = 0x80
+    DF_IS_IMMUTABLE    = 0x80,
+    DF_CYCLES_BROKEN   = 0x100
 } dnode_flag_t;
 
 void deallocate_dnode_buffers( DNODE *dnode );
@@ -39,8 +40,9 @@ void delete_dnode( DNODE *node );
 void dispose_dnode( DNODE *volatile *dnode );
 
 void break_cycles_for_all_dnodes( void );
-
 void deallocate_all_dnodes( void );
+void take_ownership_of_all_dnodes( void );
+void delete_all_dnodes( void );
 
 DNODE *dnode_break_cycles( DNODE *dnode );
 

@@ -27,6 +27,12 @@
 #include <tnode.ci>
 #include <tnode_a.ci>
 
+void deallocate_tnode_buffers( TNODE *tnode )
+{
+    freex( tnode->name );
+    freex( tnode->suffix );
+}
+
 void delete_tnode( TNODE *tnode )
 {
     if( tnode ) {
@@ -37,8 +43,7 @@ void delete_tnode( TNODE *tnode )
 	}
         if( --tnode->rcount > 0 )
 	    return;
-        freex( tnode->name );
-        freex( tnode->suffix );
+        deallocate_tnode_buffers( tnode );
 	delete_dnode( tnode->fields );
 	delete_dnode( tnode->operators );
 	delete_dnode( tnode->conversions );
@@ -62,9 +67,42 @@ void dispose_tnode( TNODE *volatile *tnode )
     *tnode = NULL;
 }
 
+void break_cycles_for_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        tnode_break_cycles( node );
+    }
+}
+
+void take_ownership_of_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        share_tnode( node );
+    }
+}
+
+void delete_all_tnodes( void )
+{
+    TNODE *node, *next;
+    for( node = allocated; node != NULL; ) {
+        next = node->next;
+        delete_tnode( node );
+        node = next;
+    }
+    allocated = NULL;
+}
+
 TNODE* tnode_break_cycles( TNODE *tnode )
 {
     if( tnode ) {
+
+        if( tnode->flags & TF_CYCLES_BROKEN )
+            return tnode;
+
+        tnode->flags |= TF_CYCLES_BROKEN;
+
         dnode_break_cycles( tnode->fields );
         dnode_break_cycles( tnode->operators );
         dnode_break_cycles( tnode->conversions );
