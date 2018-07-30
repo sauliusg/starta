@@ -366,8 +366,8 @@ static void delete_compiler( COMPILER *c )
         break_cycles_for_all_tnodes();
         delete_all_dnodes();
         delete_all_tnodes();
-        //deallocate_all_dnodes();
-        //deallocate_all_tnodes();
+        deallocate_all_dnodes();
+        deallocate_all_tnodes();
         if( memleak_debug ) {
             strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();

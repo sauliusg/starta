@@ -169,11 +169,11 @@ void delete_all_dnodes( void )
 {
     DNODE *node, *next;
     for( node = allocated; node != NULL; ) {
-        next = node->next;
+        next = node->next_alloc;
         delete_dnode( node );
         node = next;
     }
-    allocated = NULL;
+    //allocated = NULL;
 }
 
 DNODE *dnode_break_cycles( DNODE *dnode )
@@ -181,7 +181,7 @@ DNODE *dnode_break_cycles( DNODE *dnode )
     if( dnode ) {
         
         if( dnode->flags & DF_CYCLES_BROKEN )
-            return;
+            return dnode;
 
         dnode->flags |= DF_CYCLES_BROKEN;
 

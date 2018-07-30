@@ -69,7 +69,7 @@ static void free_dnode( DNODE *dnode )
 void deallocate_all_dnodes( void )
 {
     DNODE *node;
-    for( node = allocated; node != NULL; ) {
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
         deallocate_dnode_buffers( node );
     }
     allocated = NULL;
@@ -100,7 +100,7 @@ void deallocate_all_dnodes( void )
 {
     DNODE *node, *next;
     for( node = allocated; node != NULL; ) {
-        next = node->next;
+        next = node->next_alloc;
         deallocate_dnode_buffers( node );
         freex( node );
         node = next;
