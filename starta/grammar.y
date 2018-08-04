@@ -299,11 +299,11 @@ static void delete_compiler( COMPILER *c )
         delete_thrlist( c->thrstack );
 
 	freex( c->static_data );
-        vartab_break_cycles( c->vartab );
-        vartab_break_cycles( c->consts );
-        vartab_break_cycles( c->compiled_modules );
-        vartab_break_cycles( c->operators );
-        typetab_break_cycles( c->typetab );
+        // vartab_break_cycles( c->vartab );
+        // vartab_break_cycles( c->consts );
+        // vartab_break_cycles( c->compiled_modules );
+        // vartab_break_cycles( c->operators );
+        // typetab_break_cycles( c->typetab );
 
 	delete_vartab( c->vartab );
 	delete_vartab( c->consts );
@@ -326,36 +326,36 @@ static void delete_compiler( COMPILER *c )
         freex( c->try_variable_stack );
         freex( c->catch_jumpover_stack );
     
-        dnode_break_cycles( c->current_call );
+        // dnode_break_cycles( c->current_call );
 	delete_dnode( c->current_call );
 
-        dlist_break_cycles( c->current_call_stack );
+        // dlist_break_cycles( c->current_call_stack );
 	delete_dlist( c->current_call_stack );
         assert( !c->current_arg_stack );
         freex( c->current_interface_nr_stack );
 
 	delete_dlist( c->current_module_stack );
 
-        dnode_break_cycles( c->current_module );
+        // dnode_break_cycles( c->current_module );
         delete_dnode( c->current_module );
 
-        vartab_break_cycles( c->initialised_references );
+        // vartab_break_cycles( c->initialised_references );
         delete_vartab( c->initialised_references );
 	delete_stlist( c->initialised_ref_symtab_stack );
 
-        dlist_break_cycles( c->current_function_stack );
+        // dlist_break_cycles( c->current_function_stack );
         delete_dlist( c->current_function_stack );
 
-        tlist_break_cycles( c->current_type_stack );
+        // tlist_break_cycles( c->current_type_stack );
         delete_tlist( c->current_type_stack );
 
-        tnode_break_cycles( c->current_type );
+        // tnode_break_cycles( c->current_type );
         delete_tnode( c->current_type );
 
         freex( c->use_module_name );
         freex( c->module_filename );
 
-        dnode_break_cycles( c->requested_module );
+        // dnode_break_cycles( c->requested_module );
         delete_dnode( c->requested_module );
 
         delete_string_array( &c->include_paths );
