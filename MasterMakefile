@@ -316,9 +316,18 @@ ${DIFF_FILES}: ${TARGET}
 
 ${DIFFIL_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
-	unset SL_INCLUDE_PATHS; \
-	./$^ ${TEST_OPTIONS} 2>&1 | diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
-	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
+	if [ ! -f ${TEST_DIR}/$*.chk ] || ${TEST_DIR}/$*.chk; then \
+		unset SL_INCLUDE_PATHS; \
+		./$^ ${TEST_OPTIONS} 2>&1 \
+			| diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
+		if [ $$? = 0 ]; \
+			then echo "OK"; \
+			else echo "FAILED:"; cat $@; \
+		fi; \
+	else \
+		echo " -- SKIPPED"; \
+		touch $@; \
+	fi
 
 ${OUTPUT_DIR}/%.out: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@test -f $@ || echo "$@:"
