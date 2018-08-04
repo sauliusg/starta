@@ -409,7 +409,7 @@ static COMPILER *new_compiler( char *filename,
 
 	cc->local_offset = starting_local_offset;
 
-	cc->include_paths = include_paths;
+	cc->include_paths = clone_string_array( include_paths, &inner );
 
         cc->strpool = new_strpool( &inner );
     }
