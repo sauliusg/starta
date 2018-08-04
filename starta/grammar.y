@@ -364,8 +364,8 @@ static void delete_compiler( COMPILER *c )
         take_ownership_of_all_tnodes();
         break_cycles_for_all_dnodes();
         break_cycles_for_all_tnodes();
-        delete_all_dnodes();
-        delete_all_tnodes();
+        //delete_all_dnodes();
+        //delete_all_tnodes();
         deallocate_all_dnodes();
         deallocate_all_tnodes();
         if( memleak_debug ) {

@@ -98,6 +98,7 @@ struct DNODE {
 
 void deallocate_dnode_buffers( DNODE *dnode )
 {
+    const_value_free( &dnode->cvalue );
     freex( dnode->name );
     freex( dnode->filename );
     freex( dnode->synonim );
