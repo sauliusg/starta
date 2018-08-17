@@ -366,18 +366,27 @@ static void delete_compiler( COMPILER *c )
         set_rcount2_for_all_tnodes( -1 );
         traverse_all_dnodes();
         traverse_all_tnodes();
-        take_ownership_of_all_dnodes();
-        take_ownership_of_all_tnodes();
-        break_cycles_for_all_dnodes();
-        break_cycles_for_all_tnodes();
-        //delete_all_dnodes();
-        //delete_all_tnodes();
+
         if( memleak_debug ) {
             strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();
             tnode_print_allocated_to_stderr();
         }
 
+        take_ownership_of_all_dnodes();
+        take_ownership_of_all_tnodes();
+        break_cycles_for_all_dnodes();
+        break_cycles_for_all_tnodes();
+        delete_all_dnodes();
+        delete_all_tnodes();
+
+        if( memleak_debug ) {
+            fprintf( stderr, "\nAfter deleting nodes:\n" );
+            strpool_print_strings_to_stderr( c->strpool );
+            dnode_print_allocated_to_stderr();
+            tnode_print_allocated_to_stderr();
+        }
+        
         delete_strpool( c->strpool );
         
         freex( c );
