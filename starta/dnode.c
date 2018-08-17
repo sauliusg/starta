@@ -58,6 +58,12 @@ struct DNODE {
 			      offset of the virtual method in the
 			      virtual method table. */
     int rcount;            /* reference count */
+    int rcount2;           /* The second reference count, used to
+                              count references from cycles. If all
+                              references come exclusively from other
+                              symbol table nodes, and there are no
+                              more roots elswhere in the code, we
+                              should have rcount == rcount2.  */
     ssize_t code_length;   /* number of opcodes in the following
 			      opcode array */
     thrcode_t *code;       /* code fragment that implements an
@@ -148,6 +154,34 @@ void dispose_dnode( DNODE *volatile *dnode )
     assert( dnode );
     delete_dnode( *dnode );
     *dnode = NULL;
+}
+
+void dnode_traverse_rcount2( DNODE *dnode )
+{
+    if( !dnode ) return;
+    if( dnode->flags & DF_VISITED ) return;
+
+    dnode->flags |= DF_VISITED;
+    dnode->rcount2 ++;
+
+    dnode_traverse_rcount2( dnode->next );
+}
+
+
+void traverse_all_dnodes( void )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        dnode_traverse_rcount2( node );
+    }
+}
+
+void reset_flags_for_all_dnodes( dnode_flag_t flags )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        dnode_reset_flags( node, flags );
+    }
 }
 
 void break_cycles_for_all_dnodes( void )

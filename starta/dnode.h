@@ -31,12 +31,23 @@ typedef enum {
     DF_HAS_INITIALISER = 0x20,
     DF_LOOP_HAS_VAL    = 0x40, /* describes 'for' loops that need extra
 				  value on top of the evluation stack. */
-    DF_IS_IMMUTABLE    = 0x80,
-    DF_CYCLES_BROKEN   = 0x100
+    DF_IS_IMMUTABLE    = 0x080,
+    DF_CYCLES_BROKEN   = 0x100,
+    DF_VISITED         = 0x200, /* Spcifies that the node has been
+                                   visited during the cycle search. */
+    DF_IN_CYCLES       = 0x400, /* This flag is set when rcount ==
+                                   rcount2 for the given DNODE,
+                                   indicating that there are no
+                                   external ponters (roots) leading to
+                                   this DNODE, and all rcount comes
+                                   from poiters in cycles. */
 } dnode_flag_t;
 
 void deallocate_dnode_buffers( DNODE *dnode );
 void delete_dnode( DNODE *node );
+void dnode_traverse_rcount2( DNODE *dnode );
+void traverse_all_dnodes( void );
+void reset_flags_for_all_dnodes( dnode_flag_t flags );
 void dispose_dnode( DNODE *volatile *dnode );
 
 void break_cycles_for_all_dnodes( void );
