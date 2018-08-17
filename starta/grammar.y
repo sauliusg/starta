@@ -360,6 +360,7 @@ static void delete_compiler( COMPILER *c )
 
         delete_string_array( &c->include_paths );
 
+        traverse_all_dnodes();
         take_ownership_of_all_dnodes();
         take_ownership_of_all_tnodes();
         break_cycles_for_all_dnodes();
