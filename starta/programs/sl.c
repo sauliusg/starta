@@ -348,6 +348,10 @@ int main( int argc, char *argv[], char *env[] )
 	  }
           char * program = program_line.value.s;
           code = new_thrcode_from_string( program, include_paths, &inner );
+          /* Last resort deallocation of the DNODE and TNODE blosks
+             that would otherwise be lost: */
+          deallocate_all_dnodes();
+          deallocate_all_tnodes();
           if( rstack_length.present ) {
               interpret_rstack_length( rstack_length.value.i );
           }
