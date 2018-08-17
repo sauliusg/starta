@@ -33,7 +33,7 @@ typedef enum {
 				  value on top of the evluation stack. */
     DF_IS_IMMUTABLE    = 0x080,
     DF_CYCLES_BROKEN   = 0x100,
-    DF_VISITED         = 0x200, /* Spcifies that the node has been
+    DF_VISITED         = 0x200, /* Specifies that the node has been
                                    visited during the cycle search. */
     DF_IN_CYCLES       = 0x400, /* This flag is set when rcount ==
                                    rcount2 for the given DNODE,
@@ -48,6 +48,7 @@ void delete_dnode( DNODE *node );
 void dnode_traverse_rcount2( DNODE *dnode );
 void traverse_all_dnodes( void );
 void reset_flags_for_all_dnodes( dnode_flag_t flags );
+void set_rcount2_for_all_dnodes( int value );
 void dispose_dnode( DNODE *volatile *dnode );
 
 void break_cycles_for_all_dnodes( void );

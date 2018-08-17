@@ -57,6 +57,12 @@ struct TNODE {
     int  align;           /* alignment of variable of a given type */
 
     long rcount;          /* reference count */
+    ssize_t rcount2;      /* The second reference count, used to count
+                             references from cycles. If all references
+                             come exclusively from other symbol table
+                             nodes, and there are no more roots
+                             elsewhere in the code, we should have
+                             rcount == rcount2.  */
 
     DNODE *fields;        /* for structure types, contains a list of
 			     definitions of the fields; for enum

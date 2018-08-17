@@ -62,7 +62,7 @@ struct DNODE {
                               count references from cycles. If all
                               references come exclusively from other
                               symbol table nodes, and there are no
-                              more roots elswhere in the code, we
+                              more roots elswehere in the code, we
                               should have rcount == rcount2.  */
     ssize_t code_length;   /* number of opcodes in the following
 			      opcode array */
@@ -96,7 +96,7 @@ struct DNODE {
     DNODE *prev; /* reference to the previous declaration in a
 		    declaration list */
     DNODE *last; /* Last element of the linked list attached to this
-                    dnode; can be used for efficient appendeing of new
+                    dnode; can be used for efficient appending of new
                     nodes to the DNODE * list.*/
 };
 
@@ -159,11 +159,16 @@ void dispose_dnode( DNODE *volatile *dnode )
 void dnode_traverse_rcount2( DNODE *dnode )
 {
     if( !dnode ) return;
+
+    dnode->rcount2 ++;
+
     if( dnode->flags & DF_VISITED ) return;
 
     dnode->flags |= DF_VISITED;
-    dnode->rcount2 ++;
 
+    tnode_traverse_rcount2( dnode->tnode );
+
+    dnode_traverse_rcount2( dnode->module_args );
     dnode_traverse_rcount2( dnode->next );
 }
 
@@ -181,6 +186,14 @@ void reset_flags_for_all_dnodes( dnode_flag_t flags )
     DNODE *node;
     for( node = allocated; node != NULL; node = node->next_alloc ) {
         dnode_reset_flags( node, flags );
+    }
+}
+
+void set_rcount2_for_all_dnodes( int value )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        node->rcount2 = value;
     }
 }
 

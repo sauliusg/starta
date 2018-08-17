@@ -133,9 +133,10 @@ void tnode_fprint_allocated( FILE *fp )
     TNODE *node;
     fprintf( fp, "MAX TNODES: %jd\n", maxalloc );
     for( node = allocated; node != NULL; node = node->next_alloc ) {
-        fprintf( fp, "TNODE: %p \"%s\" base type = \"%s\" rcount = %zd "
-                 "next = %p\n", node, node->name,
+        fprintf( fp, "TNODE: %p rcount = %zd rcount2 = %zd \"%s\" "
+                 "base type = \"%s\" next = %p\n", node, node->rcount,
+                 node->rcount2, node->name,
                  node->base_type ? tnode_name( node->base_type ) : "",
-                 node->rcount, node->next );
+                 node->next );
     }
 }
