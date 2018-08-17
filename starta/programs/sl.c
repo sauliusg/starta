@@ -19,6 +19,8 @@
 #include <grammar_y.h>
 #include <lexer_flex.h>
 #include <run.h>
+#include <dnode.h>
+#include <tnode.h>
 #include <bcalloc.h>
 #include <allocx.h>
 #include <stringx.h>
