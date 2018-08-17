@@ -134,6 +134,17 @@ void vartab_break_cycles( VARTAB *table )
     }
 }
 
+void vartab_traverse_dnodes_and_set_rcount2( VARTAB *table )
+{
+    VAR_NODE *vnode;
+
+    if( table ) {
+        for( vnode = table->node; vnode != NULL; vnode = vnode->next ) {
+            dnode_traverse_rcount2( vnode->dnode );
+        }
+    }
+}
+
 int vartab_current_scope( VARTAB *vartab )
 {
     assert( vartab );

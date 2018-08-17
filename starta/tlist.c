@@ -36,6 +36,17 @@ void create_tlist( TLIST * volatile *list,
 		   (SLLIST*) next, ex );
 }
 
+void tlist_traverse_tnodes_and_set_rcount2( TLIST *tlist )
+{
+    SLLIST *current = (SLLIST*)tlist;
+
+    for( ; current != NULL; current = sllist_next(current) ) {
+	if( sllist_data(current) ) {
+            tnode_traverse_rcount2( (TNODE*)sllist_data(current) );
+        }
+    }
+}
+
 void tlist_break_cycles( TLIST *list )
 {
     sllist_break_cycles( (SLLIST *)list );

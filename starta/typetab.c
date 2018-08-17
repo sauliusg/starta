@@ -116,6 +116,16 @@ void typetab_break_cycles( TYPETAB *table )
     }
 }
 
+void typetab_traverse_tnodes_and_set_rcount2( TYPETAB *table )
+{
+    TYPE_NODE *node;
+
+    if( table ) {
+        for( node = table->node; node != NULL; node = node->next ) {
+            tnode_traverse_rcount2( node->tnode );
+        }
+    }
+}
 
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *volatile *tnode, cexception_t *ex )
