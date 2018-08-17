@@ -360,7 +360,12 @@ static void delete_compiler( COMPILER *c )
 
         delete_string_array( &c->include_paths );
 
+        reset_flags_for_all_dnodes( DF_VISITED | DF_IN_CYCLES );
+        reset_flags_for_all_tnodes( TF_VISITED | TF_IN_CYCLES );
+        set_rcount2_for_all_dnodes( -1 );
+        set_rcount2_for_all_tnodes( -1 );
         traverse_all_dnodes();
+        traverse_all_tnodes();
         take_ownership_of_all_dnodes();
         take_ownership_of_all_tnodes();
         break_cycles_for_all_dnodes();

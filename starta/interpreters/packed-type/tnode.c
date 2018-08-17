@@ -67,6 +67,56 @@ void dispose_tnode( TNODE *volatile *tnode )
     *tnode = NULL;
 }
 
+void tnode_traverse_rcount2( TNODE *tnode )
+{
+    if( !tnode ) return;
+
+    tnode->rcount2 ++;
+
+    if( tnode->flags & TF_VISITED ) return;
+
+    tnode->flags |= TF_VISITED;
+
+    tnode_traverse_rcount2( tnode->base_type );
+    tnode_traverse_rcount2( tnode->element_type );
+    
+    dnode_traverse_rcount2( tnode->fields );
+    dnode_traverse_rcount2( tnode->operators );
+    dnode_traverse_rcount2( tnode->conversions );
+    dnode_traverse_rcount2( tnode->methods );
+    dnode_traverse_rcount2( tnode->args );
+    dnode_traverse_rcount2( tnode->return_vals );
+    dnode_traverse_rcount2( tnode->constructor );
+    dnode_traverse_rcount2( tnode->destructor );
+    
+    tnode_traverse_rcount2( tnode->next );
+}
+
+
+void traverse_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        tnode_traverse_rcount2( node );
+    }
+}
+
+void reset_flags_for_all_tnodes( type_flag_t flags )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        tnode_reset_flags( node, flags );
+    }
+}
+
+void set_rcount2_for_all_tnodes( int value )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        node->rcount2 = value;
+    }
+}
+
 void break_cycles_for_all_tnodes( void )
 {
     TNODE *node;
