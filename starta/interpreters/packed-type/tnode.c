@@ -77,6 +77,7 @@ void tnode_traverse_rcount2( TNODE *tnode )
 
     tnode->flags |= TF_VISITED;
 
+    tlist_traverse_tnodes_and_set_rcount2( tnode->interfaces );
     tnode_traverse_rcount2( tnode->base_type );
     tnode_traverse_rcount2( tnode->element_type );
     

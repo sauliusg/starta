@@ -168,6 +168,11 @@ void dnode_traverse_rcount2( DNODE *dnode )
 
     tnode_traverse_rcount2( dnode->tnode );
 
+    vartab_traverse_dnodes_and_set_rcount2( dnode->vartab );
+    vartab_traverse_dnodes_and_set_rcount2( dnode->consts );
+    vartab_traverse_dnodes_and_set_rcount2( dnode->operators );
+    typetab_traverse_tnodes_and_set_rcount2( dnode->typetab );
+                                        
     dnode_traverse_rcount2( dnode->module_args );
     dnode_traverse_rcount2( dnode->next );
 }
