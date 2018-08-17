@@ -56,7 +56,7 @@ struct DNODE {
 			      variable on the stack frame, or address
 			      of the function in the bytecode, or
 			      offset of the virtual method in the
-`			      virtual method table. */
+			      virtual method table. */
     int rcount;            /* reference count */
     ssize_t code_length;   /* number of opcodes in the following
 			      opcode array */
