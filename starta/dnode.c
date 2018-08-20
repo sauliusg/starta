@@ -194,6 +194,15 @@ void reset_flags_for_all_dnodes( dnode_flag_t flags )
     }
 }
 
+void set_accessible_flag_for_all_dnodes( void )
+{
+    DNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        if( node->rcount > node->rcount2 )
+            dnode_set_flags( node, DF_ACESSIBLE );
+    }
+}
+
 void set_rcount2_for_all_dnodes( int value )
 {
     DNODE *node;
@@ -233,7 +242,8 @@ DNODE *dnode_break_cycles( DNODE *dnode )
 {
     if( dnode ) {
         
-        if( dnode->flags & DF_CYCLES_BROKEN )
+        if( (dnode->flags & DF_CYCLES_BROKEN) ||
+            (dnode->flags & DF_ACESSIBLE) )
             return dnode;
 
         dnode->flags |= DF_CYCLES_BROKEN;

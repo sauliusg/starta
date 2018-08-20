@@ -93,6 +93,7 @@ void break_cycles_for_all_tnodes( void );
 void tnode_traverse_rcount2( TNODE *tnode );
 void traverse_all_tnodes( void );
 void reset_flags_for_all_tnodes( type_flag_t flags );
+void set_accessible_flag_for_all_tnodes( void );
 void set_rcount2_for_all_tnodes( int value );
 void take_ownership_of_all_tnodes( void );
 void deallocate_all_tnodes( void );
