@@ -110,6 +110,15 @@ void reset_flags_for_all_tnodes( type_flag_t flags )
     }
 }
 
+void set_accessible_flag_for_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        if( node->rcount > node->rcount2 )
+            tnode_set_flags( node, TF_ACESSIBLE );
+    }
+}
+
 void set_rcount2_for_all_tnodes( int value )
 {
     TNODE *node;
@@ -142,14 +151,14 @@ void delete_all_tnodes( void )
         delete_tnode( node );
         node = next;
     }
-    //allocated = NULL;
 }
 
 TNODE* tnode_break_cycles( TNODE *tnode )
 {
     if( tnode ) {
 
-        if( tnode->flags & TF_CYCLES_BROKEN )
+        if( (tnode->flags & TF_CYCLES_BROKEN) ||
+            (tnode->flags & TF_ACESSIBLE) )
             return tnode;
 
         tnode->flags |= TF_CYCLES_BROKEN;

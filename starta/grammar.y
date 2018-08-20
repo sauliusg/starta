@@ -366,6 +366,8 @@ static void delete_compiler( COMPILER *c )
         set_rcount2_for_all_tnodes( -1 );
         traverse_all_dnodes();
         traverse_all_tnodes();
+        set_accessible_flag_for_all_dnodes();
+        set_accessible_flag_for_all_tnodes();
 
         if( memleak_debug ) {
             strpool_print_strings_to_stderr( c->strpool );
