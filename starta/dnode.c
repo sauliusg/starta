@@ -186,6 +186,25 @@ void traverse_all_dnodes( void )
     }
 }
 
+void dnode_mark_accessible( DNODE *dnode )
+{
+    if( !dnode ) return;
+
+    if( dnode->flags & DF_ACCESSIBLE ) return;
+
+    dnode->flags |= DF_ACCESSIBLE;
+
+    tnode_mark_accessible( dnode->tnode );
+
+    vartab_traverse_dnodes_and_mark_accessible( dnode->vartab );
+    vartab_traverse_dnodes_and_mark_accessible( dnode->consts );
+    vartab_traverse_dnodes_and_mark_accessible( dnode->operators );
+    typetab_traverse_tnodes_and_mark_accessible( dnode->typetab );
+                                        
+    dnode_mark_accessible( dnode->module_args );
+    dnode_mark_accessible( dnode->next );
+}
+
 void reset_flags_for_all_dnodes( dnode_flag_t flags )
 {
     DNODE *node;
@@ -198,8 +217,9 @@ void set_accessible_flag_for_all_dnodes( void )
 {
     DNODE *node;
     for( node = allocated; node != NULL; node = node->next_alloc ) {
-        if( node->rcount > node->rcount2 )
-            dnode_set_flags( node, DF_ACESSIBLE );
+        if( node->rcount > node->rcount2 ) {
+            dnode_mark_accessible( node );
+        }
     }
 }
 
@@ -243,7 +263,7 @@ DNODE *dnode_break_cycles( DNODE *dnode )
     if( dnode ) {
         
         if( (dnode->flags & DF_CYCLES_BROKEN) ||
-            (dnode->flags & DF_ACESSIBLE) )
+            (dnode->flags & DF_ACCESSIBLE) )
             return dnode;
 
         dnode->flags |= DF_CYCLES_BROKEN;

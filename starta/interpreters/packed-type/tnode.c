@@ -19,6 +19,7 @@
 #include <stackcell.h>
 #include <tcodes.h>
 #include <tlist.h>
+#include <dnode.h>
 #include <allocx.h>
 #include <stringx.h>
 #include <assert.h>
@@ -102,6 +103,31 @@ void traverse_all_tnodes( void )
     }
 }
 
+void tnode_mark_accessible( TNODE *tnode )
+{
+    if( !tnode ) return;
+
+    if( tnode->flags & TF_ACCESSIBLE ) return;
+
+    tnode->flags |= TF_ACCESSIBLE;
+
+    tlist_traverse_tnodes_and_mark_accessible( tnode->interfaces );
+    tnode_mark_accessible( tnode->base_type );
+    tnode_mark_accessible( tnode->element_type );
+    
+    dnode_mark_accessible( tnode->fields );
+    dnode_mark_accessible( tnode->operators );
+    dnode_mark_accessible( tnode->conversions );
+    dnode_mark_accessible( tnode->methods );
+    dnode_mark_accessible( tnode->args );
+    dnode_mark_accessible( tnode->return_vals );
+    dnode_mark_accessible( tnode->constructor );
+    dnode_mark_accessible( tnode->destructor );
+    
+    tnode_mark_accessible( tnode->next );
+}
+
+
 void reset_flags_for_all_tnodes( type_flag_t flags )
 {
     TNODE *node;
@@ -115,7 +141,7 @@ void set_accessible_flag_for_all_tnodes( void )
     TNODE *node;
     for( node = allocated; node != NULL; node = node->next_alloc ) {
         if( node->rcount > node->rcount2 )
-            tnode_set_flags( node, TF_ACESSIBLE );
+            tnode_mark_accessible( node );
     }
 }
 
@@ -158,7 +184,7 @@ TNODE* tnode_break_cycles( TNODE *tnode )
     if( tnode ) {
 
         if( (tnode->flags & TF_CYCLES_BROKEN) ||
-            (tnode->flags & TF_ACESSIBLE) )
+            (tnode->flags & TF_ACCESSIBLE) )
             return tnode;
 
         tnode->flags |= TF_CYCLES_BROKEN;

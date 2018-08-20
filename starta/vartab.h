@@ -23,6 +23,7 @@ void delete_vartab( VARTAB *table );
 
 void vartab_break_cycles( VARTAB *table );
 void vartab_traverse_dnodes_and_set_rcount2( VARTAB *table );
+void vartab_traverse_dnodes_and_mark_accessible( VARTAB *table );
 
 int vartab_current_scope( VARTAB *vartab );
 

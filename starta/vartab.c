@@ -145,6 +145,17 @@ void vartab_traverse_dnodes_and_set_rcount2( VARTAB *table )
     }
 }
 
+void vartab_traverse_dnodes_and_mark_accessible( VARTAB *table )
+{
+    VAR_NODE *vnode;
+
+    if( table ) {
+        for( vnode = table->node; vnode != NULL; vnode = vnode->next ) {
+            dnode_mark_accessible( vnode->dnode );
+        }
+    }
+}
+
 int vartab_current_scope( VARTAB *vartab )
 {
     assert( vartab );
