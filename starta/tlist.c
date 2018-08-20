@@ -47,6 +47,17 @@ void tlist_traverse_tnodes_and_set_rcount2( TLIST *tlist )
     }
 }
 
+void tlist_traverse_tnodes_and_mark_accessible( TLIST *tlist )
+{
+    SLLIST *current = (SLLIST*)tlist;
+
+    for( ; current != NULL; current = sllist_next(current) ) {
+	if( sllist_data(current) ) {
+            tnode_mark_accessible( (TNODE*)sllist_data(current) );
+        }
+    }
+}
+
 void tlist_break_cycles( TLIST *list )
 {
     sllist_break_cycles( (SLLIST *)list );

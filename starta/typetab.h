@@ -31,6 +31,7 @@ void dispose_typetab( TYPETAB *volatile *table );
 void delete_typetab( TYPETAB *table );
 void typetab_break_cycles( TYPETAB *table );
 void typetab_traverse_tnodes_and_set_rcount2( TYPETAB *table );
+void typetab_traverse_tnodes_and_mark_accessible( TYPETAB *table );
 
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *volatile *tnode, cexception_t *ex );

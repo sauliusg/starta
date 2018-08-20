@@ -127,6 +127,17 @@ void typetab_traverse_tnodes_and_set_rcount2( TYPETAB *table )
     }
 }
 
+void typetab_traverse_tnodes_and_mark_accessible( TYPETAB *table )
+{
+    TYPE_NODE *node;
+
+    if( table ) {
+        for( node = table->node; node != NULL; node = node->next ) {
+            tnode_mark_accessible( node->tnode );
+        }
+    }
+}
+
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *volatile *tnode, cexception_t *ex )
 {

@@ -360,8 +360,8 @@ static void delete_compiler( COMPILER *c )
 
         delete_string_array( &c->include_paths );
 
-        reset_flags_for_all_dnodes( DF_VISITED | DF_ACESSIBLE );
-        reset_flags_for_all_tnodes( TF_VISITED | TF_ACESSIBLE );
+        reset_flags_for_all_dnodes( DF_VISITED | DF_ACCESSIBLE );
+        reset_flags_for_all_tnodes( TF_VISITED | TF_ACCESSIBLE );
         set_rcount2_for_all_dnodes( -1 );
         set_rcount2_for_all_tnodes( -1 );
         traverse_all_dnodes();

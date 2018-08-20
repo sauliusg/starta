@@ -35,7 +35,7 @@ typedef enum {
     DF_CYCLES_BROKEN   = 0x100,
     DF_VISITED         = 0x200, /* Specifies that the node has been
                                    visited during the cycle search. */
-    DF_ACESSIBLE       = 0x400, /* This flag is set when rcount >
+    DF_ACCESSIBLE      = 0x400, /* This flag is set when rcount >
                                    rcount2 for the given DNODE,
                                    indicating that there are external
                                    ponters (roots) leading to this
@@ -51,6 +51,7 @@ void deallocate_dnode_buffers( DNODE *dnode );
 void delete_dnode( DNODE *node );
 void dnode_traverse_rcount2( DNODE *dnode );
 void traverse_all_dnodes( void );
+void dnode_mark_accessible( DNODE *dnode );
 void reset_flags_for_all_dnodes( dnode_flag_t flags );
 void set_accessible_flag_for_all_dnodes( void );
 void set_rcount2_for_all_dnodes( int value );
