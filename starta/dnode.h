@@ -35,12 +35,16 @@ typedef enum {
     DF_CYCLES_BROKEN   = 0x100,
     DF_VISITED         = 0x200, /* Specifies that the node has been
                                    visited during the cycle search. */
-    DF_IN_CYCLES       = 0x400, /* This flag is set when rcount ==
+    DF_ACESSIBLE       = 0x400, /* This flag is set when rcount >
                                    rcount2 for the given DNODE,
-                                   indicating that there are no
-                                   external ponters (roots) leading to
-                                   this DNODE, and all rcount comes
-                                   from poiters in cycles. */
+                                   indicating that there are external
+                                   ponters (roots) leading to this
+                                   DNODE, and thus this node might be
+                                   accessible in the
+                                   program. Otherwise, all reference
+                                   counts come from cycle references,
+                                   and the node can be safely
+                                   collected. */
 } dnode_flag_t;
 
 void deallocate_dnode_buffers( DNODE *dnode );
