@@ -125,9 +125,12 @@ void dnode_fprint_allocated( FILE *fp )
     DNODE *node;
     fprintf( fp, "MAX DNODES: %jd\n", maxalloc );
     for( node = allocated; node != NULL; node = node->next_alloc ) {
-        fprintf( fp, "DNODE: %p rcount = %d rcount2 = %d \"%s\" type = \"%s\" "
+        fprintf( fp, "DNODE: %p rcount = %d rcount2 = %d %s %s \"%s\" type = \"%s\" "
                  "next = %p prev = %p\n", node, node->rcount,
-                 node->rcount2, node->name,
+                 node->rcount2,
+                 (node->flags & DF_ACCESSIBLE ? "ACCESSIBLE" : ""),
+                 (node->flags & DF_CYCLES_BROKEN ? "CYCLES_BROKEN" : ""),
+                 node->name,
                  node->tnode ? tnode_name( node->tnode ) : "",
                  node->next, node->prev );
     }
