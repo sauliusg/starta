@@ -67,17 +67,6 @@ static void free_tnode( TNODE *tnode )
     tnode->rcount--;
 }
 
-void deallocate_all_tnodes( void )
-{
-    TNODE *node, *next;
-    for( node = allocated; node != NULL; ) {
-        next = node->next_alloc;
-        deallocate_tnode_buffers( node );
-        node = next;
-    }
-    allocated = NULL;
-}
-
 #else
 
 static TNODE *alloc_tnode( cexception_t *ex )
@@ -102,18 +91,6 @@ static void free_tnode( TNODE *tnode )
     //printf( "<<<<< freeing tnode %zd\n", tnode->serno ); 
     tnode_exclude_from_allocated_list( tnode );
     freex( tnode );
-}
-
-void deallocate_all_tnodes( void )
-{
-    TNODE *node, *next;
-    for( node = allocated; node != NULL; ) {
-        next = node->next_alloc;
-        deallocate_tnode_buffers( node );
-        freex( node );
-        node = next;
-    }
-    allocated = NULL;
 }
 
 #endif

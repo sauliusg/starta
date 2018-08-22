@@ -86,7 +86,6 @@ typedef enum {
     last_type_kind_t
 } type_kind_t;
 
-void deallocate_tnode_buffers( TNODE *tnode );
 void delete_tnode( TNODE *tnode );
 void dispose_tnode( TNODE *volatile *tnode );
 void break_cycles_for_all_tnodes( void );
@@ -97,7 +96,6 @@ void reset_flags_for_all_tnodes( type_flag_t flags );
 void set_accessible_flag_for_all_tnodes( void );
 void set_rcount2_for_all_tnodes( int value );
 void take_ownership_of_all_tnodes( void );
-void deallocate_all_tnodes( void );
 void delete_all_tnodes( void );
 TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
