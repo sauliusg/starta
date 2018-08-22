@@ -2,7 +2,7 @@
 FIRST = 
 DIRS  = ${FIRST} ${filter-out ${FIRST}, ${dir ${wildcard */Makefile}}}
 
-ALL_TARGETS = all clean cleanAll test tests shtests alltests listdiff \
+ALL_TARGETS = all clean cleanAll distclean test tests shtests alltests listdiff \
     bench benchmark benchmarks
 
 .PHONY: ${ALL_TARGETS}

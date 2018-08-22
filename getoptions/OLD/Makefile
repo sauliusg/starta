@@ -20,7 +20,7 @@ CC = gcc
 
 #------------------------------------------------------------------------------
 
-.PHONY: all tests install clean cleanAll
+.PHONY: all tests install clean cleanAll distclean
 
 all: ${LIB} tests
 
@@ -51,6 +51,6 @@ clean:
 	rm -f tests/*.o
 	rm -f ${EXEFILES}
 
-cleanAll: clean
+cleanAll distclean: clean
 	rm -f ${LIB}
 	rm -f .*.d
