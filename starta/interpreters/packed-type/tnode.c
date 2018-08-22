@@ -28,12 +28,6 @@
 #include <tnode.ci>
 #include <tnode_a.ci>
 
-void deallocate_tnode_buffers( TNODE *tnode )
-{
-    freex( tnode->name );
-    freex( tnode->suffix );
-}
-
 void delete_tnode( TNODE *tnode )
 {
     if( tnode ) {
@@ -44,7 +38,8 @@ void delete_tnode( TNODE *tnode )
 	}
         if( --tnode->rcount > 0 )
 	    return;
-        deallocate_tnode_buffers( tnode );
+        freex( tnode->name );
+        freex( tnode->suffix );
 	delete_dnode( tnode->fields );
 	delete_dnode( tnode->operators );
 	delete_dnode( tnode->conversions );
