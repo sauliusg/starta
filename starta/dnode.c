@@ -57,6 +57,8 @@ struct DNODE {
 			      of the function in the bytecode, or
 			      offset of the virtual method in the
 			      virtual method table. */
+    ssize_t serno;         /* Allocation serial number; used to hunt
+                              down memory leaks. */
     int rcount;            /* reference count */
     int rcount2;           /* The second reference count, used to
                               count references from cycles. If all
