@@ -196,9 +196,7 @@ typedef struct {
     COMPILER_STATE *include_files;
 
     DNODE *current_function; /* Function that is currently being
-				compiled. NOTE! this field must not be
-				deleted in delete_compiler() */
-
+                                compiled. */
     DLIST *current_function_stack;
 
     TNODE *current_type;
@@ -344,6 +342,7 @@ static void delete_compiler( COMPILER *c )
 	delete_stlist( c->initialised_ref_symtab_stack );
 
         // dlist_break_cycles( c->current_function_stack );
+        delete_dnode( c->current_function );
         delete_dlist( c->current_function_stack );
 
         // tlist_break_cycles( c->current_type_stack );
@@ -4140,7 +4139,7 @@ static DNODE *compiler_check_and_set_fn_proto( COMPILER *cc,
 	}
 	dnode_shallow_copy( fn_dnode, fn_proto, ex );
 	delete_dnode( fn_proto );
-	return fn_dnode;
+	return share_dnode( fn_dnode );
     } else {
         DNODE *volatile shared_proto = share_dnode( fn_proto );
         cexception_t inner;
@@ -7458,24 +7457,18 @@ static cexception_t *px; /* parser exception */
 
 %type <dnode> argument
 %type <dnode> argument_list
-%type <dnode> closure_header
 %type <dnode> closure_var_declaration
 %type <dnode> closure_var_list_declaration
 %type <c>     constant_expression
 %type <i>     constant_integer_expression
-%type <dnode> constructor_header
 %type <dnode> constructor_definition
 %type <tnode> dimension_list
-%type <dnode> destructor_header
 %type <dnode> destructor_definition
 %type <dnode> enum_member
 %type <tnode> enum_member_list
 %type <i>     expression_list
 %type <dnode> field_designator
-%type <dnode> function_expression_header
-%type <dnode> function_header
 %type <dnode> method_definition
-%type <dnode> method_header
 %type <dnode> module_argument
 %type <dnode> module_argument_list
 %type <dnode> module_list
@@ -7495,14 +7488,12 @@ static cexception_t *px; /* parser exception */
 %type <dnode> module_parameter
 %type <dnode> module_parameter_list
 %type <dnode> operator_definition
-%type <dnode> operator_header
 %type <si>     opt_as_identifier
 %type <si>     opt_default_module_parameter
 %type <si>     opt_dot_name
 %type <si>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
-%type <dnode> function_definition
 %type <i>     function_or_procedure_keyword
 %type <i>     function_or_procedure_type_keyword
 %type <si>     opt_closure_initialisation_list
@@ -7518,7 +7509,6 @@ static cexception_t *px; /* parser exception */
 %type <dnode> opt_retval_description_list
 %type <i>     opt_variable_declaration_keyword
 %type <dnode> module_name
-%type <dnode> program_header
 %type <dnode> raised_exception_identifier;
 %type <dnode> retval_description_list
 %type <i>     size_constant
@@ -8661,10 +8651,10 @@ program_header
 
     	  cexception_guard( inner ) {
               shared_retvals = share_dnode( retvals );
-	      $$ = funct =
+	      funct =
                   new_dnode_function( program_name, &arguments,
                                       &shared_retvals, &inner );
-	      funct = $$ =
+	      funct =
 		  compiler_check_and_set_fn_proto( compiler, funct, &inner );
 
               compiler_check_and_emit_program_arguments( compiler, $4,
@@ -8695,11 +8685,13 @@ program_header
 	      delete_dnode( retvals );
 	      delete_dnode( arguments );
 	      delete_dnode( funct );
-	      $$ = NULL;
 	      cexception_reraise( inner, px );
 	  }
           freex( program_name );
-	}
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
+        }
 ;
 
 program_definition
@@ -10973,9 +10965,24 @@ struct_operator
   : operator_definition
   | method_definition
   | method_header
+      {
+          $$ = compiler->current_function;
+	  compiler->current_function = 
+              dlist_pop_data( &compiler->current_function_stack );
+      }
   | constructor_definition
   | constructor_header
+      {
+          $$ = compiler->current_function;
+	  compiler->current_function = 
+              dlist_pop_data( &compiler->current_function_stack );
+      }
   | destructor_header
+      {
+          $$ = compiler->current_function;
+	  compiler->current_function = 
+              dlist_pop_data( &compiler->current_function_stack );
+      }
   | destructor_definition
   ;
 
@@ -11031,6 +11038,7 @@ interface_operator_list
 
 interface_operator
   : method_header
+      { $$ = compiler->current_function; }
   | method_definition
   ;
 
@@ -12934,14 +12942,17 @@ function_expression_header
         DNODE *volatile parameters = $4;
         DNODE *volatile return_values = $6;
         dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
-        $$ = new_dnode_function( /* name = */ NULL,
-                                 &parameters,
-                                 &return_values,
-                                 px );
+        DNODE *funct = new_dnode_function( /* name = */ NULL,
+                                           &parameters,
+                                           &return_values,
+                                           px );
         if( $1 & DF_BYTECODE )
-            dnode_set_flags( $$, DF_BYTECODE );
+            dnode_set_flags( funct, DF_BYTECODE );
         if( $1 & DF_INLINE )
-            dnode_set_flags( $$, DF_INLINE );
+            dnode_set_flags( funct, DF_INLINE );
+        dlist_push_dnode( &compiler->current_function_stack,
+                          &compiler->current_function, px );
+        compiler->current_function = funct;
     }
 ;
 
@@ -12997,10 +13008,13 @@ closure_header
         
           dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
 
-          $$ = new_dnode_function( /* name = */ NULL, 
-                                   &parameters, &return_values, px );
-          tnode_set_kind( dnode_type( $$ ), TK_CLOSURE );
+          DNODE *funct = new_dnode_function( /* name = */ NULL, 
+                                            &parameters, &return_values, px );
+          tnode_set_kind( dnode_type( funct ), TK_CLOSURE );
           freex( closure_name );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
     }
 ;
 
@@ -13008,18 +13022,30 @@ function_expression
 :   function_expression_header
     function_or_operator_start
     function_or_operator_body
+    { $<dnode>$ = share_dnode( compiler->current_function ); }
     function_or_operator_end
     {
+        DNODE *volatile funct = $<dnode>4;
         compiler->loops = dlist_pop_data( &compiler->loop_stack );
-        compiler_compile_load_function_address( compiler, $1, px );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_compile_load_function_address( compiler, funct, &inner );
+        }
+        cexception_catch {
+            delete_dnode( funct );
+            cexception_reraise( inner, px );
+        }
+        delete_dnode( funct );
     }
 
 | closure_header
   function_or_operator_start
   function_or_operator_body
+    { $<dnode>$ = share_dnode( compiler->current_function ); }
   function_or_operator_end
     {
-        ENODE *closure_expr = enode_list_pop( &compiler->e_stack );
+        DNODE *volatile closure_dnode = $<dnode>4;
+        ENODE *volatile closure_expr = enode_list_pop( &compiler->e_stack );
         TNODE *closure_type = enode_type( closure_expr );
         DNODE *fields = tnode_fields( closure_type );
         ssize_t offs = dnode_offset( fields );
@@ -13028,9 +13054,21 @@ function_expression
 
         compiler->loops = dlist_pop_data( &compiler->loop_stack );
         compiler_emit( compiler, px, "\tce\n", OFFSET, &offs );
-        compiler_compile_load_function_address( compiler, $1, px );
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            compiler_compile_load_function_address( compiler,
+                                                    closure_dnode,
+                                                    &inner );
+        }
+        cexception_catch {
+            delete_enode( closure_expr );
+            delete_dnode( closure_dnode );
+            cexception_reraise( inner, px );
+        }
         compiler_emit( compiler, px, "\tc\n", PSTI );
         delete_enode( closure_expr );
+        delete_dnode( closure_dnode );
     }
 ;
 
@@ -14496,14 +14534,10 @@ function_or_operator_start
   :
         {
 	  cexception_t inner;
-	  DNODE *volatile funct = $<dnode>0;
+	  DNODE *funct = compiler->current_function;
           TNODE *fn_tnode = funct ? dnode_type( funct ) : NULL;
 	  int is_bytecode = dnode_has_flags( funct, DF_BYTECODE );
 
-          dlist_push_dnode( &compiler->current_function_stack,
-                            &compiler->current_function, px );
-
-	  compiler->current_function = funct;
 	  dnode_reset_flags( funct, DF_FNPROTO );
 
           compiler_push_thrcode( compiler, px );
@@ -14520,9 +14554,6 @@ function_or_operator_start
               compiler_begin_scope( compiler, &inner );
 	  }
 	  cexception_catch {
-	      delete_dnode( funct );
-	      compiler->current_function =
-                  dlist_pop_data( &compiler->current_function_stack );
 	      cexception_reraise( inner, px );
 	  }
 	  if( !is_bytecode ) {
@@ -14584,6 +14615,7 @@ function_or_operator_end
           compiler_fixup_function_calls( compiler->function_thrcode, funct );
           compiler_fixup_function_calls( compiler->main_thrcode, funct );
 	  compiler_end_scope( compiler, px );
+          delete_dnode( compiler->current_function );
 	  compiler->current_function = 
               dlist_pop_data( &compiler->current_function_stack );
 	}
@@ -14591,24 +14623,30 @@ function_or_operator_end
 
 method_definition
   : method_header
+        { $<dnode>$ = share_dnode( compiler->current_function ); }
     function_or_operator_start
     function_or_operator_body
     function_or_operator_end
+        { $$ = $<dnode>2; }
   ;
 
 constructor_definition
   : constructor_header
+        { $<dnode>$ = share_dnode( compiler->current_function ); }
     function_or_operator_start
     opt_base_class_initialisation
     function_or_operator_body
     function_or_operator_end
+        { $$ = $<dnode>2; }
   ;
 
 destructor_definition
   : destructor_header
+        { $<dnode>$ = share_dnode( compiler->current_function ); }
     function_or_operator_start
     function_or_operator_body
     function_or_operator_end
+        { $$ = $<dnode>2; }
   ;
 
 function_definition
@@ -14620,9 +14658,11 @@ function_definition
 
 operator_definition
   : operator_header
+        { $<dnode>$ = share_dnode( compiler->current_function ); }
     function_or_operator_start
     function_or_operator_body
     function_or_operator_end
+        { $$ = $<dnode>2; }
   ;
 
 function_or_operator_body
@@ -14716,14 +14756,14 @@ function_header
           DNODE *volatile retvals = $7;
 
     	  cexception_guard( inner ) {
-	      $$ = funct = new_dnode_function( function_name, &parameters,
-                                               &retvals, &inner );
+              funct = new_dnode_function( function_name, &parameters,
+                                          &retvals, &inner );
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( $1 & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
-	      funct = $$ =
+	      funct =
 		  compiler_check_and_set_fn_proto( compiler, funct, px );
 	      if( is_function ) {
 		  compiler_set_function_arguments_readonly( dnode_type( funct ));
@@ -14733,11 +14773,13 @@ function_header
 	      delete_dnode( parameters );
 	      delete_dnode( retvals );
 	      delete_dnode( funct );
-	      $$ = NULL;
               freex( function_name );
 	      cexception_reraise( inner, px );
 	  }
           freex( function_name );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
 	}
   ;
 
@@ -14853,8 +14895,6 @@ method_header
                                             &return_values, &inner );
               }
 
-              $$ = funct;
-
               if( implements_method ) {
                   TNODE *method_type = dnode_type( funct );
                   TNODE *implements_type = dnode_type( implements_method );
@@ -14894,7 +14934,7 @@ method_header
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
               dnode_set_scope( funct, compiler_current_scope( compiler ));
-	      funct = $$ =
+	      funct =
 		  compiler_check_and_set_fn_proto( compiler, funct, px );
 	      share_dnode( funct );
               tnode_insert_single_method( current_class, share_dnode( funct ));
@@ -14907,11 +14947,13 @@ method_header
 	      delete_dnode( return_values );
 	      delete_dnode( funct );
               delete_dnode( self_dnode );
-	      $$ = NULL;
               freex( method_name );
 	      cexception_reraise( inner, px );
 	  }
           freex( method_name );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
 	}
   ;
 
@@ -14989,11 +15031,11 @@ constructor_header
               parameter_list = dnode_append( self_dnode, parameter_list );
               self_dnode = NULL;
 
-	      $$ = funct = new_dnode_constructor( constructor_name,
-                                                  &parameter_list,
-                                                  /* return_dnode = */
-                                                  &null_dnode,
-                                                  &inner );
+	      funct = new_dnode_constructor( constructor_name,
+                                             &parameter_list,
+                                             /* return_dnode = */
+                                             &null_dnode,
+                                             &inner );
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
@@ -15007,11 +15049,9 @@ constructor_header
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
 #if 1
-	      funct = $$ =
+	      funct =
 		  compiler_check_and_set_constructor( class_tnode, funct, px );
               share_dnode( funct );
-#else
-              $$ = funct;
 #endif
 
               /* Constructors are always functions (?): */
@@ -15020,11 +15060,13 @@ constructor_header
 	  cexception_catch {
 	      delete_dnode( parameter_list );
 	      delete_dnode( funct );
-	      $$ = NULL;
               freex( constructor_name );
               cexception_reraise( inner, px );
 	  }
           freex( constructor_name );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
 	}
   ;
 
@@ -15063,8 +15105,8 @@ destructor_header
                   }
               }
 
-	      $$ = funct = new_dnode_destructor( destructor_name,
-                                                 &self_dnode, &inner );
+	      funct = new_dnode_destructor( destructor_name,
+                                            &self_dnode, &inner );
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
@@ -15079,11 +15121,13 @@ destructor_header
 	  cexception_catch {
 	      delete_dnode( self_dnode );
 	      delete_dnode( funct );
-	      $$ = NULL;
               freex( destructor_name );
 	      cexception_reraise( inner, px );
 	  }
           freex( destructor_name );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
 	}
   ;
 
@@ -15104,8 +15148,8 @@ operator_header
           DNODE *volatile retvals = $7;
 
     	  cexception_guard( inner ) {
-	      $$ = funct = new_dnode_operator( operator_name, 
-                                               &arguments, &retvals, &inner );
+	      funct = new_dnode_operator( operator_name, 
+                                          &arguments, &retvals, &inner );
 	      if( $1 & DF_BYTECODE )
                   dnode_set_flags( funct, DF_BYTECODE );
 	      if( $1 & DF_INLINE )
@@ -15117,16 +15161,28 @@ operator_header
 	      delete_dnode( retvals );
 	      delete_dnode( funct );
               freex( operator_name );
-	      $$ = NULL;
 	      cexception_reraise( inner, px );
 	  }
           freex( operator_name );
+          dlist_push_dnode( &compiler->current_function_stack,
+                            &compiler->current_function, px );
+          compiler->current_function = funct;
 	}
   ;
 
 function_prototype
   : function_header
+  {
+      delete_dnode( compiler->current_function );
+      compiler->current_function = 
+          dlist_pop_data( &compiler->current_function_stack );
+  }
   | _FORWARD function_header
+  {
+      delete_dnode( compiler->current_function );
+      compiler->current_function = 
+          dlist_pop_data( &compiler->current_function_stack );
+  }
   ;
 
 /*---------------------------------------------------------------------------*/
