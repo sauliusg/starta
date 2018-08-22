@@ -11288,7 +11288,8 @@ undelimited_type_declaration
           cexception_guard( inner ) {
               compiler_end_scope( compiler, &inner );
               compiler_compile_type_declaration( compiler, &ntype, &inner );
-              compiler->current_type = NULL;
+              // compiler->current_type = NULL;
+              dispose_tnode( &compiler->current_type );
           }
           cexception_catch {
               delete_tnode( ntype );
@@ -11305,7 +11306,8 @@ undelimited_type_declaration
           cexception_guard( inner ) {
               compiler_end_scope( compiler, &inner );
               compiler_compile_type_declaration( compiler, &ntype, &inner );
-              compiler->current_type = NULL;
+              // compiler->current_type = NULL;
+              dispose_tnode( &compiler->current_type );
           }
           cexception_catch {
               delete_tnode( ntype );
@@ -11491,7 +11493,8 @@ type_of_type_declaration
           cexception_guard( inner ) {
               compiler_end_scope( compiler, &inner );
               compiler_compile_type_declaration( compiler, &ntype, &inner );
-              compiler->current_type = NULL;
+              // compiler->current_type = NULL;
+              dispose_tnode( &compiler->current_type );
           }
           cexception_catch {
               delete_tnode( ntype );
@@ -11530,7 +11533,8 @@ struct_declaration
 	tnode_finish_struct( $5, px );
 	compiler_end_scope( compiler, px );
 	compiler_typetab_insert( compiler, &$5, px );
-        compiler->current_type = NULL;
+        // compiler->current_type = NULL;
+        dispose_tnode( &compiler->current_type );
     }
   | type_declaration_start '=' opt_null_type_designator _STRUCT
     {
@@ -11551,7 +11555,8 @@ struct_declaration
             tnode_finish_struct( ntype, &inner );
             compiler_end_scope( compiler, &inner );
             compiler_compile_type_declaration( compiler, &ntype, &inner );
-            compiler->current_type = NULL;
+            // compiler->current_type = NULL;
+            dispose_tnode( &compiler->current_type );
         }
         cexception_catch {
             delete_tnode( ntype );
@@ -11574,7 +11579,8 @@ struct_declaration
         cexception_guard( inner ) {
             compiler_end_scope( compiler, &inner );
             compiler_compile_type_declaration( compiler, &ntype, &inner );
-            compiler->current_type = NULL;
+            // compiler->current_type = NULL;
+            dispose_tnode( &compiler->current_type );
         }
         cexception_catch {
             delete_tnode( ntype );
@@ -11609,7 +11615,8 @@ class_declaration
 	compiler_finish_virtual_method_table( compiler, $5, px );
 	compiler_end_scope( compiler, px );
 	compiler_typetab_insert( compiler, &$5, px );
-	compiler->current_type = NULL;
+	// compiler->current_type = NULL;
+        dispose_tnode( &compiler->current_type );
     }
   | type_declaration_start '=' opt_null_type_designator _CLASS
     {
@@ -11631,7 +11638,8 @@ class_declaration
             compiler_finish_virtual_method_table( compiler, ntype, &inner );
             compiler_end_scope( compiler, &inner );
             compiler_compile_type_declaration( compiler, &ntype, &inner );
-            compiler->current_type = NULL;
+            // compiler->current_type = NULL;
+            dispose_tnode( &compiler->current_type );
         }
         cexception_catch {
             delete_tnode( ntype );
@@ -11663,7 +11671,8 @@ interface_declaration
  	tnode_finish_interface( $5, ++compiler->last_interface_number, px );
 	compiler_end_scope( compiler, px );
 	compiler_typetab_insert( compiler, &$5, px );
-	compiler->current_type = NULL;
+	// compiler->current_type = NULL;
+        dispose_tnode( &compiler->current_type );
     }
 ;
 
