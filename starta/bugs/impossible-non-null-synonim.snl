@@ -1,0 +1,12 @@
+// --*- C -*--
+
+// Test struct and class type compatibility
+
+use std;
+
+struct S {
+    float x, y, z;
+    string name;
+};
+
+type T = S;
