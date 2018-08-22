@@ -6,7 +6,7 @@ DIRS  = ${FIRST} \
 
 .PHONY: all test tests alltests listdiff
 .PHONY: bench benchmark benchmarks
-.PHONY: clean cleanAll
+.PHONY: clean cleanAll distclean
 
 all test tests shtests shtest alltests bench benchmark benchmarks listdiff:
 	for i in ${DIRS} ; do \
@@ -19,7 +19,7 @@ clean:
 	sed -e 's,^\./,,' |\
 	xargs -n1 -t ${MAKE} $@ -C
 
-cleanAll:
+cleanAll distclean:
 	find . -name Makefile -exec dirname {} \; |\
 	grep -vE '^\.$$' |\
 	sed -e 's,^\./,,' |\
