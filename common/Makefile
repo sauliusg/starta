@@ -1,11 +1,11 @@
 
 .PHONY: all test tests alltests listdiff
 .PHONY: bench benchmark benchmarks
-.PHONY: clean cleanAll
+.PHONY: clean cleanAll distclean
 
 all:
 
-clean cleanAll:
+clean cleanAll distclean:
 	rm -f *.o
 	rm -f .*.d
 
