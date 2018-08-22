@@ -102,16 +102,6 @@ struct DNODE {
 
 #include <dnode_a.ci>
 
-void deallocate_dnode_buffers( DNODE *dnode )
-{
-    const_value_free( &dnode->cvalue );
-    delete_fixup_list( dnode->code_fixups );
-    freex( dnode->name );
-    freex( dnode->filename );
-    freex( dnode->synonim );
-    freex( dnode->code );
-}
-
 void delete_dnode( DNODE *node )
 {
     DNODE *next;
@@ -125,13 +115,19 @@ void delete_dnode( DNODE *node )
         if( --node->rcount > 0 )
 	    return;
 
-        deallocate_dnode_buffers( node );
+        const_value_free( &node->cvalue );
+        delete_fixup_list( node->code_fixups );
+        freex( node->name );
+        freex( node->filename );
+        freex( node->synonim );
+        freex( node->code );
+
+        delete_vartab( node->vartab );
+        delete_vartab( node->consts );
+        delete_typetab( node->typetab );
+        delete_vartab( node->operators );
 
 	delete_tnode( node->tnode );
-	delete_vartab( node->vartab );
-	delete_vartab( node->consts );
-	delete_typetab( node->typetab );
-	delete_vartab( node->operators );
 #if 0
 	{
 	    FIXUP *f;
