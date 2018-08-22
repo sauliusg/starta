@@ -105,6 +105,7 @@ struct DNODE {
 void deallocate_dnode_buffers( DNODE *dnode )
 {
     const_value_free( &dnode->cvalue );
+    delete_fixup_list( dnode->code_fixups );
     freex( dnode->name );
     freex( dnode->filename );
     freex( dnode->synonim );
@@ -140,8 +141,6 @@ void delete_dnode( DNODE *node )
 	    } 
 	}
 #endif
-	delete_fixup_list( node->code_fixups );
-	const_value_free( &node->cvalue );
 
         delete_dnode( node->module_args );
 	free_dnode( node );

@@ -350,7 +350,7 @@ int main( int argc, char *argv[], char *env[] )
 	  }
           char * program = program_line.value.s;
           code = new_thrcode_from_string( program, include_paths, &inner );
-          /* Last resort deallocation of the DNODE and TNODE blosks
+          /* Last resort deallocation of the DNODE and TNODE blocks
              that would otherwise be lost: */
           deallocate_all_dnodes();
           deallocate_all_tnodes();
@@ -384,7 +384,6 @@ int main( int argc, char *argv[], char *env[] )
 	      i++;
 	  }
 	  code = new_thrcode_from_file( files[0], include_paths, &inner );
-
           if( rstack_length.present ) {
               interpret_rstack_length( rstack_length.value.i );
           }
@@ -411,7 +410,10 @@ int main( int argc, char *argv[], char *env[] )
 	  for( i = 0; files[i] != NULL; i++ ) {
 	      code = new_thrcode_from_file( files[i], include_paths,
                                             &inner );
-
+              /* Last resort deallocation of the DNODE and TNODE blocks
+                 that would otherwise be lost: */
+              deallocate_all_dnodes();
+              deallocate_all_tnodes();
               if( rstack_length.present ) {
                   interpret_rstack_length( rstack_length.value.i );
               }
@@ -438,6 +440,10 @@ int main( int argc, char *argv[], char *env[] )
 	      code = NULL;
 	  }
       }
+      /* Last resort deallocation of the DNODE and TNODE blocks
+         that would otherwise be lost: */
+      deallocate_all_dnodes();
+      deallocate_all_tnodes();
   }
   cexception_catch {
       fprintf( stderr, "%s: %s\n", argv[0], cexception_message( &inner ));
