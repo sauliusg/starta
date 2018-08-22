@@ -47,7 +47,6 @@ typedef enum {
                                    collected. */
 } dnode_flag_t;
 
-void deallocate_dnode_buffers( DNODE *dnode );
 void delete_dnode( DNODE *node );
 void dnode_traverse_rcount2( DNODE *dnode );
 void traverse_all_dnodes( void );
@@ -58,7 +57,6 @@ void set_rcount2_for_all_dnodes( int value );
 void dispose_dnode( DNODE *volatile *dnode );
 
 void break_cycles_for_all_dnodes( void );
-void deallocate_all_dnodes( void );
 void take_ownership_of_all_dnodes( void );
 void delete_all_dnodes( void );
 
