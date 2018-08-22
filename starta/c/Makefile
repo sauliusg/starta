@@ -25,7 +25,7 @@ XO = ${C:%.c=%_o}
 
 .PHONY: all test tests alltests listdiff
 .PHONY: bench benchmark benchmarks
-.PHONY: clean cleanAll
+.PHONY: clean cleanAll distclean
 
 all: ${X} ## ${XO}
 
@@ -41,7 +41,7 @@ all: ${X} ## ${XO}
 lsopcodes: lsopcodes.o
 	${CC} ${LDFLAFS} $< -o $@ -ldl
 
-clean cleanAll:
+clean cleanAll distclean:
 	rm -f ${X} ${XO} interpret.o
 
 test tests alltests bench benchmark benchmarks listdiff : # do nothing

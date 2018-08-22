@@ -18,7 +18,7 @@ LIB = libcex.a
 
 #------------------------------------------------------------------------------
 
-.PHONY: all tests install clean cleanAll
+.PHONY: all tests install clean cleanAll distclean
 
 all: ${LIB}
 
@@ -56,6 +56,6 @@ clean:
 	rm -f tests/*.o
 	rm -f ${EXEFILES}
 
-cleanAll: clean
+cleanAll distclean: clean
 	rm -f ${LIB}
 	rm -f .*.d
