@@ -3,39 +3,3 @@
 #
 
 use std;
-
-type int = {
-    size = 4;
-    bytecode inline operator "+" ( x : int; y : int ) : int
-        { bytecode{ ADD }};
-    bytecode inline operator "-" ( x : int; y : int ) : int
-        { bytecode{ SUB }};
-    bytecode inline operator "*" ( x : int; y : int ) : int
-        { bytecode{ MUL }};
-    bytecode inline operator "/" ( x : int; y : int ) : int
-        { bytecode{ DIV }};
-    bytecode inline operator "%" ( x : int; y : int ) : int
-        { bytecode{ MOD }};
-    bytecode inline operator "==" ( x : int; y : int ) : int
-        { bytecode{ EQ }};
-    bytecode inline operator "." ( i : int )
-        { IPRINT };
-    bytecode inline operator "jnz" ( x : int )
-        { JNZ };
-    bytecode inline operator "jz" ( x : int )
-        { JZ };
-    inline bytecode operator "ldc" () : int
-        { LDCS };
-};
-
-function ack( m, n : int ) : int
-{
-    if m == 0 then return n + 1 endif;
-    if n == 0 then return ack( m - 1, 1 ) endif;
-    return ack( m - 1, ack( m, n - 1 ));
-};
-
-. ack(0,0);
-. ack(1,1);
-. ack(2,2);
-. ack(3,3);
