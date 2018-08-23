@@ -94,4 +94,8 @@ void enode_list_swap( ENODE **ptr_list );
 #define foreach_enode( NODE, LIST ) \
    for( NODE = LIST; NODE != NULL; NODE = enode_next( NODE ))
 
+void enode_print_allocated(void);
+void enode_print_allocated_to_stderr(void);
+void enode_fprint_allocated( FILE *fp );
+
 #endif

@@ -372,6 +372,7 @@ static void delete_compiler( COMPILER *c )
             strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();
             tnode_print_allocated_to_stderr();
+            enode_print_allocated_to_stderr();
         }
 
         take_ownership_of_all_dnodes();
@@ -386,6 +387,7 @@ static void delete_compiler( COMPILER *c )
             strpool_print_strings_to_stderr( c->strpool );
             dnode_print_allocated_to_stderr();
             tnode_print_allocated_to_stderr();
+            enode_print_allocated_to_stderr();
         }
         
         delete_strpool( c->strpool );
