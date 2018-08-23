@@ -1,14 +1,14 @@
 #
-# Snail language compiler tests
-#
-# Test of simple arithmetics.
+# Ackermann function
 #
 
-type int  = {
-    size = 4; kind = integer;
-    inline bytecode operator "+" ( x : int; y : int ) : int
-        { ADD };
-    inline bytecode operator "-" ( x : int; y : int ) : int
+use std;
+
+type int = {
+    size = 4;
+    bytecode inline operator "+" ( x : int; y : int ) : int
+        { bytecode{ ADD }};
+    bytecode inline operator "-" ( x : int; y : int ) : int
         { bytecode{ SUB }};
     bytecode inline operator "*" ( x : int; y : int ) : int
         { bytecode{ MUL }};
@@ -16,49 +16,26 @@ type int  = {
         { bytecode{ DIV }};
     bytecode inline operator "%" ( x : int; y : int ) : int
         { bytecode{ MOD }};
+    bytecode inline operator "==" ( x : int; y : int ) : int
+        { bytecode{ EQ }};
+    bytecode inline operator "." ( i : int )
+        { IPRINT };
+    bytecode inline operator "jnz" ( x : int )
+        { JNZ };
+    bytecode inline operator "jz" ( x : int )
+        { JZ };
     inline bytecode operator "ldc" () : int
-        { LDCS }
+        { LDCS };
 };
 
-type long = {
-    size = 8; kind = integer; suffix = L;
-    bytecode inline operator "+" ( x : long; y : long ) : long
-        { bytecode{ LADD }};
-    bytecode inline operator "-" ( x : long; y : long ) : long
-        { bytecode{ LSUB }};
-    bytecode inline operator "*" ( x : long; y : long ) : long
-        { bytecode{ LMUL }};
-    bytecode inline operator "/" ( x : long; y : long ) : long
-        { bytecode{ LDIV }};
-    bytecode inline operator "%" ( x : long; y : long ) : long
-        { bytecode{ LMOD }};
-    inline bytecode operator "ldc" () : int
-        { LLDCS }
-};
-
-var a, b : int;
-var c, d : int;
-
-a = 11;
-b = 35;
-c = 21;
-
-bytecode function writeln( i : int )
+function ack( m, n : int ) : int
 {
-    bytecode { IPRINT NEWLINE }
+    if m == 0 then return n + 1 endif;
+    if n == 0 then return ack( m - 1, 1 ) endif;
+    return ack( m - 1, ack( m, n - 1 ));
 };
 
-bytecode function write( i : int )
-{
-    bytecode { IPRINT }
-};
-
-
-d = a + b;
-
-d = ( a + b ) / ( a - c );
-writeln( d );
-
-a = b - d * c + a;
-
-writeln( a );
+. ack(0,0);
+. ack(1,1);
+. ack(2,2);
+. ack(3,3);
