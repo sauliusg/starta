@@ -8,12 +8,15 @@
 /* private allocator for dnodes */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <cexceptions.h>
 #include <allocx.h>
 
 #if 0
 #define USE_FIXED_NODE_ARRAY
 #endif
+
+static size_t max_enode, cur_enode;
 
 #ifdef USE_FIXED_NODE_ARRAY
 
@@ -25,12 +28,14 @@ static long last_enode;
 static ENODE *alloc_enode( cexception_t *ex )
 {
     assert( last_enode < MAX_ENODES );
+    max_enode++; cur_enode++;
     return &enodes[last_enode++];
 }
 
 static void free_enode( ENODE *enode )
 {
     assert( enode->rcount == 0 );
+    cur_enode--;
     enode->rcount--;
 }
 
@@ -38,13 +43,31 @@ static void free_enode( ENODE *enode )
 
 static ENODE *alloc_enode( cexception_t *ex )
 {
+    max_enode++; cur_enode++;
     return callocx( sizeof(ENODE), 1, ex );
 }
 
 static void free_enode( ENODE *enode )
 {
     assert( enode->rcount == 0 );
+    cur_enode--;
     freex( enode );
 }
 
 #endif
+
+void enode_print_allocated(void)
+{
+    enode_fprint_allocated( stdout );
+}
+
+void enode_print_allocated_to_stderr(void)
+{
+    enode_fprint_allocated( stderr );
+}
+
+void enode_fprint_allocated( FILE *fp )
+{
+    fprintf( fp, "MAX ENODES: %zd (still allocated %zd)\n",
+             max_enode, cur_enode );
+}
