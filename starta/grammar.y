@@ -2422,21 +2422,29 @@ static void compiler_push_operator_retvals( COMPILER *cc,
 
     if( od->containing_type && retval_type &&
         tnode_kind( retval_type ) == TK_PLACEHOLDER ) {
-	TNODE *element_type = tnode_element_type( od->containing_type );
-	if( element_type ) {
-	    retval_type = element_type;
-	}
+        TNODE *element_type = tnode_element_type( od->containing_type );
+        if( element_type ) {
+            delete_tnode( retval_type );
+            retval_type = share_tnode( element_type );
+        }
     }
 
-    if( retval_type ) {
-	TNODE *shared_retval = share_tnode( retval_type );
-	compiler_push_typed_expression( cc, &shared_retval, ex );
-    }  else {
-	if( !od->operator && on_error_expr && *on_error_expr ) {
-	    enode_set_has_errors( *on_error_expr );
-	    enode_list_push( &cc->e_stack, *on_error_expr );
-	    *on_error_expr = NULL; /* let's not delete expression :) */
-	}
+    cexception_t inner;
+    cexception_guard( inner ) {
+        if( retval_type ) {
+            TNODE *shared_retval = share_tnode( retval_type );
+            compiler_push_typed_expression( cc, &shared_retval, &inner );
+        }  else {
+            if( !od->operator && on_error_expr && *on_error_expr ) {
+                enode_set_has_errors( *on_error_expr );
+                enode_list_push( &cc->e_stack, *on_error_expr );
+                *on_error_expr = NULL; /* let's not delete expression :) */
+            }
+        }
+    }
+    cexception_catch {
+        delete_tnode( retval_type );
+        cexception_reraise( inner, ex );
     }
 
     delete_tnode( retval_type );
