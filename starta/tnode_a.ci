@@ -17,7 +17,7 @@
 
 /* The doubly-linked list of allocated TNODEs: */
 static TNODE *allocated = NULL;
-static intmax_t maxalloc;
+static intmax_t maxalloc, curralloc;
 
 static void tnode_exclude_from_allocated_list( TNODE *tnode )
 {
@@ -54,7 +54,7 @@ static TNODE *alloc_tnode( cexception_t *ex )
     }
     node->next_alloc = allocated;
     allocated = node;
-    maxalloc ++;
+    maxalloc ++; curralloc++;
     return node;
 }
 
@@ -65,6 +65,7 @@ static void free_tnode( TNODE *tnode )
     assert( tnode->rcount == 0 );
     tnode_exclude_from_allocated_list( tnode );
     tnode->rcount--;
+    curralloc--;
 }
 
 #else
@@ -79,7 +80,7 @@ static TNODE *alloc_tnode( cexception_t *ex )
     node->next_alloc = allocated;
     allocated = node;
 #endif
-    maxalloc ++;
+    maxalloc ++; curralloc ++;
     node->serno = maxalloc;
     //printf( ">>>> allocating tnode no %zd\n", maxalloc ); 
     return node;
@@ -91,6 +92,7 @@ static void free_tnode( TNODE *tnode )
     //printf( "<<<<< freeing tnode %zd\n", tnode->serno ); 
     tnode_exclude_from_allocated_list( tnode );
     freex( tnode );
+    curralloc--;
 }
 
 #endif
@@ -108,7 +110,8 @@ void tnode_print_allocated_to_stderr()
 void tnode_fprint_allocated( FILE *fp )
 {
     TNODE *node;
-    fprintf( fp, "MAX TNODES: %jd\n", maxalloc );
+    fprintf( fp, "MAX TNODES: %jd (still allocated %jd)\n",
+             maxalloc, curralloc );
     for( node = allocated; node != NULL; node = node->next_alloc ) {
         fprintf( fp, "TNODE: %p rcount = %zd rcount2 = %zd serno = %zd "
                  "%s%s\"%s\" base type = \"%s\" next = %p\n",

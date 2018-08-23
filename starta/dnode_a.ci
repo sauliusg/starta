@@ -18,7 +18,7 @@
 
 /* The doubly-linked list of allocated DNODEs: */
 static DNODE *allocated = NULL;
-static intmax_t maxalloc;
+static intmax_t maxalloc, curralloc;
 
 static void dnode_exclude_from_allocated_list( DNODE *dnode )
 {
@@ -53,7 +53,7 @@ static DNODE *alloc_dnode( cexception_t *ex )
     }
     node->next_alloc = allocated;
     allocated = node;
-    maxalloc ++;
+    maxalloc ++; curralloc ++;
     node->serno = maxalloc;
     return node;
 }
@@ -65,6 +65,7 @@ static void free_dnode( DNODE *dnode )
     assert( dnode->rcount == 0 );
     dnode_exclude_from_allocated_list( dnode );
     dnode->rcount--;
+    curralloc --;
 }
 
 #else
@@ -77,7 +78,7 @@ static DNODE *alloc_dnode( cexception_t *ex )
     }
     node->next_alloc = allocated;
     allocated = node;
-    maxalloc ++;
+    maxalloc ++; curralloc ++;
     node->serno = maxalloc;
     return node;
 }
@@ -87,6 +88,7 @@ static void free_dnode( DNODE *dnode )
     assert( dnode->rcount == 0 );
     dnode_exclude_from_allocated_list( dnode );
     freex( dnode );
+    curralloc --;
 }
 
 #endif
@@ -104,7 +106,8 @@ void dnode_print_allocated_to_stderr()
 void dnode_fprint_allocated( FILE *fp )
 {
     DNODE *node;
-    fprintf( fp, "MAX DNODES: %jd\n", maxalloc );
+    fprintf( fp, "MAX DNODES: %jd (still allocated %jd)\n",
+             maxalloc, curralloc );
     for( node = allocated; node != NULL; node = node->next_alloc ) {
         fprintf( fp, "DNODE: %p rcount = %d rcount2 = %d serno = %zd "
                  "%s%s\"%s\" type = \"%s\" next = %p prev = %p\n",
