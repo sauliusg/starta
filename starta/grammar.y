@@ -2420,6 +2420,8 @@ static void compiler_push_operator_retvals( COMPILER *cc,
         // CHECK MEMORY USAGE HERE!!! S.G.
 #endif
         retval_type = new_tnode_implementation( retval_type, generic_types, ex );
+    } else {
+        share_tnode( retval_type );
     }
 
     if( od->containing_type && retval_type &&
@@ -2431,8 +2433,8 @@ static void compiler_push_operator_retvals( COMPILER *cc,
     }
 
     if( retval_type ) {
-	share_tnode( retval_type );
-	compiler_push_typed_expression( cc, &retval_type, ex );
+	TNODE *shared_retval = share_tnode( retval_type );
+	compiler_push_typed_expression( cc, &shared_retval, ex );
     }  else {
 	if( !od->operator && on_error_expr && *on_error_expr ) {
 	    enode_set_has_errors( *on_error_expr );
@@ -2440,6 +2442,8 @@ static void compiler_push_operator_retvals( COMPILER *cc,
 	    *on_error_expr = NULL; /* let's not delete expression :) */
 	}
     }
+
+    delete_tnode( retval_type );
 }
 
 static void compiler_emit_operator_or_report_missing( COMPILER *cc,
