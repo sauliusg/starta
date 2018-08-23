@@ -123,3 +123,8 @@ void tnode_fprint_allocated( FILE *fp )
                  node->next );
     }
 }
+
+void null_allocated_tnodes(void)
+{
+    allocated = NULL;
+}

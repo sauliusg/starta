@@ -119,3 +119,8 @@ void dnode_fprint_allocated( FILE *fp )
                  node->next, node->prev );
     }
 }
+
+void null_allocated_dnodes(void)
+{
+    allocated = NULL;
+}

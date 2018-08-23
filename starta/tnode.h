@@ -344,4 +344,6 @@ void tnode_print_allocated();
 void tnode_print_allocated_to_stderr();
 void tnode_fprint_allocated( FILE *fp );
 
+void null_allocated_tnodes(void);
+
 #endif

@@ -308,4 +308,6 @@ void dnode_print_allocated();
 void dnode_print_allocated_to_stderr();
 void dnode_fprint_allocated( FILE *fp );
 
+void null_allocated_dnodes(void);
+
 #endif
