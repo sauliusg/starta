@@ -372,6 +372,8 @@ int main( int argc, char *argv[], char *env[] )
                   printf( "%s: '%s' -- OK\n", progname, files[0] );
               }
           }
+          null_allocated_dnodes();
+          null_allocated_tnodes();
           return 0;
       }
       
@@ -436,6 +438,8 @@ int main( int argc, char *argv[], char *env[] )
   cexception_catch {
       fprintf( stderr, "%s: %s\n", argv[0], cexception_message( &inner ));
       delete_thrcode( code );
+      null_allocated_dnodes();
+      null_allocated_tnodes();
       exit(3);
   }
   delete_thrcode( code );
