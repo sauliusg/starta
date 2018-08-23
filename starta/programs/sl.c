@@ -439,6 +439,8 @@ int main( int argc, char *argv[], char *env[] )
       exit(3);
   }
   delete_thrcode( code );
+  null_allocated_dnodes();
+  null_allocated_tnodes();
 
   return 0;
 }
