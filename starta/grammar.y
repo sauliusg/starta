@@ -2415,10 +2415,6 @@ static void compiler_push_operator_retvals( COMPILER *cc,
     }
 
     if( generic_types ) {
-#if 0
-    // if( 0 ) {
-        // CHECK MEMORY USAGE HERE!!! S.G.
-#endif
         retval_type = new_tnode_implementation( retval_type, generic_types, ex );
     } else {
         share_tnode( retval_type );
