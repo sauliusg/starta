@@ -121,6 +121,30 @@ static void free_tnode( TNODE *tnode )
     assert( tnode->rcount == 0 );
     //printf( "<<<<< freeing tnode %zd\n", tnode->serno ); 
     tnode_exclude_from_allocated_list( tnode );
+
+#if USE_STACK_TRACES
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( tnode->serno == requested_serno ) {
+        int i;
+        printf( "FREE TNODE: freeing tnode serno = %zd\n", tnode->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            printf( "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+
     freex( tnode );
     curralloc--;
 }
