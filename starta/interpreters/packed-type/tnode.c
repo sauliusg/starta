@@ -28,9 +28,43 @@
 #include <tnode.ci>
 #include <tnode_a.ci>
 
+#ifndef USE_STACK_TRACES
+#define USE_STACK_TRACES 1
+#endif
+
+#if USE_STACK_TRACES
+#include <execinfo.h>
+#include <stdlib.h>
+#endif
+
 void delete_tnode( TNODE *tnode )
 {
     if( tnode ) {
+#if USE_STACK_TRACES
+        void *buffer[100];
+        char **strings;
+        int ntraces;
+        int requested_serno = 0;
+        char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+        if( requested_serno_envvar ) {
+            requested_serno = atoi( requested_serno_envvar );
+        }
+
+        if( tnode->serno == requested_serno ) {
+            int i;
+            printf( "DELETE TNODE: freeing tnode serno = %zd, rcount = %jd\n",
+                    tnode->serno, tnode->rcount );
+            ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+            strings = backtrace_symbols( buffer, ntraces );
+            for( i = 0; i < ntraces; i++ ) {
+                printf( "\t%3d: %s\n", i, strings[i] );
+                fflush( NULL );
+            }
+            free( strings );
+        }
+#endif
+
         if( tnode->rcount <= 0 ) {
 	    printf( "!!! tnode->rcount = %ld (%s) !!!\n",
 		    tnode->rcount, tnode_kind_name(tnode) );
@@ -310,6 +344,32 @@ TNODE *share_tnode( TNODE* node )
 {
     if( !node ) return NULL;
     node->rcount ++;
+
+#if USE_STACK_TRACES
+        void *buffer[100];
+        char **strings;
+        int ntraces;
+        int requested_serno = 0;
+        char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+        if( requested_serno_envvar ) {
+            requested_serno = atoi( requested_serno_envvar );
+        }
+
+        if( node->serno == requested_serno ) {
+            int i;
+            printf( "SHARE TNODE: freeing tnode serno = %zd, new rcount = %jd\n",
+                    node->serno, node->rcount );
+            ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+            strings = backtrace_symbols( buffer, ntraces );
+            for( i = 0; i < ntraces; i++ ) {
+                printf( "\t%3d: %s\n", i, strings[i] );
+                fflush( NULL );
+            }
+            free( strings );
+        }
+#endif
+
     return node;
 }
 
