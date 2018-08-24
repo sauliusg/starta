@@ -108,6 +108,7 @@ static TNODE *alloc_tnode( cexception_t *ex )
         strings = backtrace_symbols( buffer, ntraces );
         for( i = 0; i < ntraces; i++ ) {
             printf( "\t%3d: %s\n", i, strings[i] );
+            fflush( NULL );
         }
         free( strings );
     }
@@ -140,6 +141,7 @@ static void free_tnode( TNODE *tnode )
         strings = backtrace_symbols( buffer, ntraces );
         for( i = 0; i < ntraces; i++ ) {
             printf( "\t%3d: %s\n", i, strings[i] );
+            fflush( NULL );
         }
         free( strings );
     }
