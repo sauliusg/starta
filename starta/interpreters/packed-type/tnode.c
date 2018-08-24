@@ -53,7 +53,7 @@ void delete_tnode( TNODE *tnode )
 
         if( tnode->serno == requested_serno ) {
             int i;
-            printf( "DELETE TNODE: freeing tnode serno = %zd, rcount = %jd\n",
+            printf( "DELETE TNODE: deleting tnode serno = %zd, rcount = %jd\n",
                     tnode->serno, tnode->rcount );
             ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
             strings = backtrace_symbols( buffer, ntraces );
@@ -358,7 +358,7 @@ TNODE *share_tnode( TNODE* node )
 
         if( node->serno == requested_serno ) {
             int i;
-            printf( "SHARE TNODE: freeing tnode serno = %zd, new rcount = %jd\n",
+            printf( "SHARE TNODE: sharing tnode serno = %zd, new rcount = %jd\n",
                     node->serno, node->rcount );
             ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
             strings = backtrace_symbols( buffer, ntraces );
