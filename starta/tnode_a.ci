@@ -15,6 +15,15 @@
 #define USE_FIXED_NODE_ARRAY
 #endif
 
+#ifndef USE_STACK_TRACES
+#define USE_STACK_TRACES 1
+#endif
+
+#if USE_STACK_TRACES
+#include <execinfo.h>
+#include <stdlib.h>
+#endif
+
 /* The doubly-linked list of allocated TNODEs: */
 static TNODE *allocated = NULL;
 static intmax_t maxalloc, curralloc;
@@ -73,16 +82,37 @@ static void free_tnode( TNODE *tnode )
 static TNODE *alloc_tnode( cexception_t *ex )
 {
     TNODE *node = callocx( sizeof(TNODE), 1, ex );
-#if 1
     if( allocated ) {
         allocated->prev_alloc = node;
     }
     node->next_alloc = allocated;
     allocated = node;
-#endif
     maxalloc ++; curralloc ++;
     node->serno = maxalloc;
-    //printf( ">>>> allocating tnode no %zd\n", maxalloc ); 
+
+#if USE_STACK_TRACES
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( node->serno == requested_serno ) {
+        int i;
+        printf( "ALLOC TNODE: allocating tnode serno = %zd\n", node->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            printf( "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+    
     return node;
 }
 
