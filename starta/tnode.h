@@ -273,7 +273,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member );
 TNODE *tnode_insert_enum_value( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value_list( TNODE *tnode, DNODE *list );
 TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor );
-TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor );
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *volatile *destructor );
 ssize_t tnode_max_vmt_offset( TNODE *tnode );
 ssize_t tnode_vmt_offset( TNODE *tnode );
 ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset );
