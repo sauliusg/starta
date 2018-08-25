@@ -16,7 +16,7 @@
 #endif
 
 #ifndef USE_STACK_TRACES
-#define USE_STACK_TRACES 1
+#define USE_STACK_TRACES 0
 #endif
 
 #if USE_STACK_TRACES
