@@ -103,11 +103,11 @@ static TNODE *alloc_tnode( cexception_t *ex )
 
     if( node->serno == requested_serno ) {
         int i;
-        printf( "ALLOC TNODE: allocating tnode serno = %zd\n", node->serno );
+        fprintf( stderr, "ALLOC TNODE: allocating tnode serno = %zd\n", node->serno );
         ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
         strings = backtrace_symbols( buffer, ntraces );
         for( i = 0; i < ntraces; i++ ) {
-            printf( "\t%3d: %s\n", i, strings[i] );
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
             fflush( NULL );
         }
         free( strings );
@@ -136,11 +136,11 @@ static void free_tnode( TNODE *tnode )
 
     if( tnode->serno == requested_serno ) {
         int i;
-        printf( "FREE TNODE: freeing tnode serno = %zd\n", tnode->serno );
+        fprintf( stderr, "FREE TNODE: freeing tnode serno = %zd\n", tnode->serno );
         ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
         strings = backtrace_symbols( buffer, ntraces );
         for( i = 0; i < ntraces; i++ ) {
-            printf( "\t%3d: %s\n", i, strings[i] );
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
             fflush( NULL );
         }
         free( strings );
