@@ -15145,7 +15145,7 @@ destructor_header
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
-              tnode_insert_destructor( class_tnode, share_dnode( funct ));
+              tnode_insert_destructor( class_tnode, funct );
 
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
