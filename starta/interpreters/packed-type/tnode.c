@@ -40,6 +40,7 @@
 void delete_tnode( TNODE *tnode )
 {
     if( tnode ) {
+
 #if USE_STACK_TRACES
         void *buffer[100];
         char **strings;
@@ -53,12 +54,12 @@ void delete_tnode( TNODE *tnode )
 
         if( tnode->serno == requested_serno ) {
             int i;
-            printf( "DELETE TNODE: deleting tnode serno = %zd, rcount = %jd\n",
-                    tnode->serno, tnode->rcount );
+            fprintf( stderr, "DELETE TNODE: deleting tnode serno = %zd, "
+                     "rcount = %jd\n", tnode->serno, tnode->rcount );
             ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
             strings = backtrace_symbols( buffer, ntraces );
             for( i = 0; i < ntraces; i++ ) {
-                printf( "\t%3d: %s\n", i, strings[i] );
+                fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
                 fflush( NULL );
             }
             free( strings );
@@ -358,12 +359,12 @@ TNODE *share_tnode( TNODE* node )
 
         if( node->serno == requested_serno ) {
             int i;
-            printf( "SHARE TNODE: sharing tnode serno = %zd, new rcount = %jd\n",
-                    node->serno, node->rcount );
+            fprintf( stderr, "SHARE TNODE: sharing tnode serno = %zd, "
+                     "new rcount = %jd\n", node->serno, node->rcount );
             ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
             strings = backtrace_symbols( buffer, ntraces );
             for( i = 0; i < ntraces; i++ ) {
-                printf( "\t%3d: %s\n", i, strings[i] );
+                fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
                 fflush( NULL );
             }
             free( strings );
