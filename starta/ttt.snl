@@ -20,9 +20,9 @@ type A = {
     constructor {
     }
     */
-    /*
     destructor A {
     }
+    /*
     */
     /*
     method asString( i : int = 1 ): string;
