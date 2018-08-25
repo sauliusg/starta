@@ -14837,6 +14837,7 @@ method_header
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
+	  DNODE *volatile shared_funct = NULL;
           DNODE *volatile self_dnode = NULL;
           TNODE *current_class = compiler->current_type;;
           char *method_name =
@@ -14962,7 +14963,11 @@ method_header
 	      funct =
 		  compiler_check_and_set_fn_proto( compiler, funct, px );
 	      share_dnode( funct );
-              tnode_insert_single_method( current_class, share_dnode( funct ));
+
+              shared_funct = share_dnode( funct );
+              tnode_insert_single_method( current_class, &shared_funct );
+              assert( !shared_funct );
+
 	      if( is_function ) {
 		  compiler_set_function_arguments_readonly( dnode_type( funct ));
 	      }
@@ -14971,6 +14976,7 @@ method_header
 	      delete_dnode( parameter_list );
 	      delete_dnode( return_values );
 	      delete_dnode( funct );
+	      delete_dnode( shared_funct );
               delete_dnode( self_dnode );
               freex( method_name );
 	      cexception_reraise( inner, px );

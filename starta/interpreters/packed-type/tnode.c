@@ -1729,21 +1729,23 @@ TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor )
     return tnode;
 }
 
-TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
+TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
 {
     DNODE *existing_method;
     DNODE *inherited_method;
     ssize_t method_offset;
-    char *method_name = method ? dnode_name( method ) : NULL;
+
+    assert( method );
+    char *method_name = *method ? dnode_name( *method ) : NULL;
     char msg[100];
 
     assert( tnode );
 
     existing_method =
-        tnode_check_method_does_not_exist( tnode, tnode->methods, method );
+        tnode_check_method_does_not_exist( tnode, tnode->methods, *method );
 
     if( !existing_method ) {
-        TNODE *method_type = method ? dnode_type( method ) : NULL;
+        TNODE *method_type = *method ? dnode_type( *method ) : NULL;
         ssize_t method_interface_nr = method_type ?
             tnode_interface_number( method_type ) : 0;
 
@@ -1754,13 +1756,13 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
             if( tnode->kind == TK_INTERFACE ) {
 		yyerrorf( "interface '%s' should not override "
                           "method '%s' inherited from '%s'",
-                          tnode->name, dnode_name( method ),
+                          tnode->name, dnode_name( *method ),
                           tnode->base_type->name );
             } else
-            if( !dnode_function_prototypes_match_msg( inherited_method, method,
+            if( !dnode_function_prototypes_match_msg( inherited_method, *method,
                                                       msg, sizeof(msg))) {
 		yyerrorf( "Prototype of method %s() does not match "
-			  "inherited definition:\n%s", dnode_name( method ),
+			  "inherited definition:\n%s", dnode_name( *method ),
 			  msg );
 	    }
 	    method_offset = dnode_offset( inherited_method );
@@ -1785,23 +1787,25 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	}
 
         tnode_set_flags( tnode, TF_IS_REF );
-	tnode->methods = dnode_append( method, tnode->methods );
+	tnode->methods = dnode_append( *method, tnode->methods );
         if( method_interface_nr == 0 ) {
 #if 0
             printf( ">>> setting offset %d for method '%s', interface no. %d\n",
                     method_offset, dnode_name( method ), method_interface_nr );
 #endif
-            dnode_set_offset( method, method_offset );
+            dnode_set_offset( *method, method_offset );
         }
     } else {
- 	if( !dnode_function_prototypes_match_msg( existing_method, method,
+ 	if( !dnode_function_prototypes_match_msg( existing_method, *method,
 						  msg, sizeof(msg))) {
 	    yyerrorf( "Prototype of method %s() does not match "
-		      "previous definition:\n%s", dnode_name( method ),
+		      "previous definition:\n%s", dnode_name( *method ),
 		      msg );
 	}
-	delete_dnode( method );
+	dispose_dnode( method );
     }
+
+    *method = NULL;
 
     return tnode;
 }
@@ -1840,7 +1844,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member )
 	    tnode_insert_single_operator( tnode, member );
         } else
 	if( tnode_is_method( member_type )) {
-	    tnode_insert_single_method( tnode, *member );
+	    tnode_insert_single_method( tnode, member );
         } else
 	if( tnode_is_constructor( member_type )) {
 	    tnode_insert_constructor( tnode, *member );

@@ -268,7 +268,7 @@ void tnode_print_indent( TNODE *tnode, int indent );
 TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field );
 TNODE *tnode_insert_single_operator( TNODE *tnode, DNODE *volatile *operator );
 TNODE *tnode_insert_single_conversion( TNODE *tnode, DNODE *conversion );
-TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method );
+TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method );
 TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member );
 TNODE *tnode_insert_enum_value( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value_list( TNODE *tnode, DNODE *list );
