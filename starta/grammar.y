@@ -4199,9 +4199,10 @@ static DNODE *compiler_check_and_set_constructor( TNODE *class_tnode,
             dnode_shallow_copy( fn_dnode, fn_proto, ex );
         }
 	delete_dnode( fn_proto );
-	return fn_dnode;
+	return share_dnode( fn_dnode );
     } else {
-	tnode_insert_constructor( class_tnode, share_dnode( fn_proto ));
+        DNODE *shared_proto = share_dnode( fn_proto );
+	tnode_insert_constructor( class_tnode, &shared_proto );
 	return fn_proto;
     }
 }
@@ -15074,20 +15075,14 @@ constructor_header
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
-#if 0
-              tnode_insert_constructor( class_tnode, share_dnode( funct ));
-#endif
-
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
 	          dnode_set_flags( funct, DF_BYTECODE );
 	      if( function_attributes & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
-#if 1
+
 	      funct =
 		  compiler_check_and_set_constructor( class_tnode, funct, px );
-              share_dnode( funct );
-#endif
 
               /* Constructors are always functions (?): */
               /* compiler_set_function_arguments_readonly( dnode_type( funct )); */

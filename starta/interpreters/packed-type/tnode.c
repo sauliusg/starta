@@ -1676,18 +1676,20 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
     return tnode;
 }
 
-TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
+TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *volatile *constructor )
 {
     char msg[100];
 
     assert( tnode );
     assert( constructor );
+    assert( *constructor );
 
-    char *constructor_name = dnode_name( constructor );
+    char *constructor_name = dnode_name( *constructor );
     DNODE *current_constructor =
         tnode_lookup_constructor( tnode, constructor_name );
 
-    if( current_constructor == constructor ) {
+    if( current_constructor == *constructor ) {
+        dispose_dnode( constructor );
         return tnode;
     }
 
@@ -1695,21 +1697,24 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
         if( constructor_name && *constructor_name != '\0' ) {
             /* constructor_name is not "": */
             tnode->constructor =
-                dnode_append( tnode->constructor, constructor );
+                dnode_append( tnode->constructor, *constructor );
         } else {
             tnode->constructor =
-                dnode_append( constructor, tnode->constructor );
+                dnode_append( *constructor, tnode->constructor );
+            *constructor = NULL;
         }
     } else {
-        if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,
+        if( !dnode_function_prototypes_match_msg( tnode->constructor,
+                                                  *constructor,
                                                   msg, sizeof(msg))) {
             yyerrorf( "Prototype of constructor %s() does not match "
-                      "inherited definition -- %s", dnode_name( constructor ),
+                      "inherited definition -- %s", dnode_name( *constructor ),
                       msg );
-            delete_dnode( constructor );
+            dispose_dnode( constructor );
         } else {
             delete_dnode( tnode->constructor );
-            tnode->constructor = constructor;
+            tnode->constructor = *constructor;
+            *constructor = NULL;
         }
     }
     return tnode;
@@ -1851,7 +1856,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member )
 	    tnode_insert_single_method( tnode, member );
         } else
 	if( tnode_is_constructor( member_type )) {
-	    tnode_insert_constructor( tnode, *member );
+	    tnode_insert_constructor( tnode, member );
         } else
 	if( tnode_is_destructor( member_type )) {
 	    tnode_insert_destructor( tnode, member );

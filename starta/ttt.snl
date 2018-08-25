@@ -16,9 +16,9 @@ type A = {
         NOP
     }
     */
-    /*
     constructor {
     }
+    /*
     */
     destructor A {
     }
