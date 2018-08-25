@@ -11054,7 +11054,11 @@ interface_operator_list
 
 interface_operator
   : method_header
-      { $$ = compiler->current_function; }
+      {
+          $$ = compiler->current_function;
+	  compiler->current_function = 
+              dlist_pop_data( &compiler->current_function_stack );
+      }
   | method_definition
   ;
 
@@ -14960,9 +14964,9 @@ method_header
 	      if( $1 & DF_INLINE )
 	          dnode_set_flags( funct, DF_INLINE );
               dnode_set_scope( funct, compiler_current_scope( compiler ));
+
 	      funct =
 		  compiler_check_and_set_fn_proto( compiler, funct, px );
-	      share_dnode( funct );
 
               shared_funct = share_dnode( funct );
               tnode_insert_single_method( current_class, &shared_funct );
