@@ -608,7 +608,7 @@ DNODE *new_dnode_module( char *name, cexception_t *ex )
 
 DNODE *share_dnode( DNODE* node )
 {
-    if( node )
+    if( node ) {
         node->rcount ++;
 
 #if USE_STACK_TRACES
@@ -634,6 +634,7 @@ DNODE *share_dnode( DNODE* node )
             free( strings );
         }
 #endif
+    }
 
     return node;
 }
