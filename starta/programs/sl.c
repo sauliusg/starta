@@ -445,6 +445,7 @@ int main( int argc, char *argv[], char *env[] )
   delete_thrcode( code );
   null_allocated_dnodes();
   null_allocated_tnodes();
+  fflush(NULL);
 
   return 0;
 }
