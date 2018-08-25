@@ -10894,10 +10894,16 @@ inheritance_and_implementation_list
 struct_or_class_body
   : inheritance_and_implementation_list
     '{' struct_field_list '}'
-    { $$ = $3; }
+    {
+        delete_tnode( $1 );
+        $$ = $3;
+    }
   | inheritance_and_implementation_list
     '{' struct_field_list struct_operator_list opt_semicolon '}'
-    { $$ = $3; }
+    {
+        delete_tnode( $1 );
+        $$ = $3;
+    }
   ;
 
 struct_field_list
