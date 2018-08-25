@@ -10,11 +10,11 @@ type A = {
     suffix = A;
     kind = integer;
 
+    /*
     inline bytecode operator "!" ( A a ): A
     {
         NOP
     }
-    /*
     */
     /*
     constructor {
@@ -27,11 +27,11 @@ type A = {
     /*
     method asString( i : int = 1 ): string;
     */
-    /*
     method asString( i : int = 1 ): string
     {
         return "A->asString(): " + "%d" %% i
     }
+    /*
     */
 }
 
