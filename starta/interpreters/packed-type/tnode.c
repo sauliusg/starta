@@ -1715,16 +1715,20 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
     return tnode;
 }
 
-TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor )
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *volatile *destructor )
 {
     assert( tnode );
     assert( destructor );
+    assert( *destructor );
 
-    if( !tnode->destructor || tnode->destructor == destructor ) {
-        tnode->destructor = destructor;
+    if( !tnode->destructor || tnode->destructor == *destructor ) {
+        delete_dnode( tnode->destructor );
+        tnode->destructor = *destructor;
+        *destructor = NULL;
     } else {
         yyerrorf( "destructor is already declared for class '%s'", 
                   tnode_name( tnode ));
+        dispose_dnode( destructor );
     }
     return tnode;
 }
@@ -1850,7 +1854,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member )
 	    tnode_insert_constructor( tnode, *member );
         } else
 	if( tnode_is_destructor( member_type )) {
-	    tnode_insert_destructor( tnode, *member );
+	    tnode_insert_destructor( tnode, member );
 	} else {
 	    tnode_insert_fields( tnode, *member );
 	}

@@ -15110,6 +15110,7 @@ destructor_header
         {
 	  cexception_t inner;
 	  DNODE *volatile funct = NULL;
+	  DNODE *volatile shared_funct = NULL;
           DNODE *volatile self_dnode = NULL;
           
           int function_attributes = $1;
@@ -15145,7 +15146,8 @@ destructor_header
 
               dnode_set_scope( funct, compiler_current_scope( compiler ));
 
-              tnode_insert_destructor( class_tnode, funct );
+              shared_funct = share_dnode( funct );
+              tnode_insert_destructor( class_tnode, &shared_funct );
 
 	      dnode_set_flags( funct, DF_FNPROTO );
 	      if( function_attributes & DF_BYTECODE )
@@ -15156,10 +15158,12 @@ destructor_header
 	  cexception_catch {
 	      delete_dnode( self_dnode );
 	      delete_dnode( funct );
+	      delete_dnode( shared_funct );
               freex( destructor_name );
 	      cexception_reraise( inner, px );
 	  }
           freex( destructor_name );
+          delete_dnode( shared_funct );
           dlist_push_dnode( &compiler->current_function_stack,
                             &compiler->current_function, px );
           compiler->current_function = funct;
