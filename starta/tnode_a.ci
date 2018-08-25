@@ -120,7 +120,6 @@ static void free_tnode( TNODE *tnode )
 {
     assert( tnode->rcount == 0 );
     //printf( "<<<<< freeing tnode %zd\n", tnode->serno ); 
-    tnode_exclude_from_allocated_list( tnode );
 
 #if USE_STACK_TRACES
     void *buffer[100];
@@ -145,6 +144,7 @@ static void free_tnode( TNODE *tnode )
     }
 #endif
 
+    tnode_exclude_from_allocated_list( tnode );
     freex( tnode );
     curralloc--;
 }
