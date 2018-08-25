@@ -11,7 +11,7 @@
 #include <cexceptions.h>
 #include <allocx.h>
 
-#if 1
+#if 0
 #define USE_FIXED_NODE_ARRAY
 #endif
 
