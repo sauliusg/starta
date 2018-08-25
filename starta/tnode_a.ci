@@ -11,7 +11,7 @@
 #include <cexceptions.h>
 #include <allocx.h>
 
-#if 0
+#if 1
 #define USE_FIXED_NODE_ARRAY
 #endif
 
@@ -64,6 +64,31 @@ static TNODE *alloc_tnode( cexception_t *ex )
     node->next_alloc = allocated;
     allocated = node;
     maxalloc ++; curralloc++;
+    node->serno = maxalloc;
+
+#if USE_STACK_TRACES
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( node->serno == requested_serno ) {
+        int i;
+        fprintf( stderr, "ALLOC TNODE: allocating tnode serno = %zd\n", node->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+    
     return node;
 }
 
@@ -72,6 +97,30 @@ static void free_tnode( TNODE *tnode )
     /* freex( tnode ); return; */
     /* printf( "deleting tnode %d\n", (tnode-tnodes) ); */
     assert( tnode->rcount == 0 );
+
+#if USE_STACK_TRACES
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( tnode->serno == requested_serno ) {
+        int i;
+        fprintf( stderr, "FREE TNODE: freeing tnode serno = %zd\n", tnode->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+
     tnode_exclude_from_allocated_list( tnode );
     tnode->rcount--;
     curralloc--;
