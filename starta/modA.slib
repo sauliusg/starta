@@ -1,0 +1,37 @@
+// --*- C -*--
+
+module modA;
+
+use std;
+
+type A = {
+    size = 1;
+    suffix = A;
+    kind = integer;
+
+    inline bytecode operator "!" ( A a ): A
+    {
+        NOP
+    }
+    /*
+    */
+    /*
+    constructor {
+    }
+    */
+    /*
+    destructor A {
+    }
+    */
+    /*
+    method asString( i : int = 1 ): string;
+    */
+    /*
+    method asString( i : int = 1 ): string
+    {
+        return "A->asString(): " + "%d" %% i
+    }
+    */
+}
+
+end module modA;

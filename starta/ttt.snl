@@ -1,0 +1,6 @@
+// --*- C -*--
+
+// Test methods with default parameter values:
+
+use std;
+use modA;
