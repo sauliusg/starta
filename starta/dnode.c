@@ -25,6 +25,15 @@
 #include <stackcell.h>
 #include <allocx.h>
 
+#ifndef USE_STACK_TRACES
+#define USE_STACK_TRACES 0
+#endif
+
+#if USE_STACK_TRACES
+#include <execinfo.h>
+#include <stdlib.h>
+#endif
+
 /* "declared name" can be a name of a variable, constant, function,
    module, label -- in short, anything that can be associated with a
    value or an offset (which may be treated as a kind of value).  Note
