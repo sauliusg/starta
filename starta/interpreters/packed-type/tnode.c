@@ -60,7 +60,6 @@ void delete_tnode( TNODE *tnode )
             strings = backtrace_symbols( buffer, ntraces );
             for( i = 0; i < ntraces; i++ ) {
                 fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
-                fflush( NULL );
             }
             free( strings );
         }
@@ -365,7 +364,6 @@ TNODE *share_tnode( TNODE* node )
             strings = backtrace_symbols( buffer, ntraces );
             for( i = 0; i < ntraces; i++ ) {
                 fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
-                fflush( NULL );
             }
             free( strings );
         }
