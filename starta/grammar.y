@@ -14102,8 +14102,6 @@ generator_new
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
-          //FIXME: will probably cause a double-delete here, since
-          //'element_type' is not shared (S.G.):
           compiler_compile_mdalloc( compiler, element_type, level, px );
           compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
           compiler_swap_top_expressions( compiler );
