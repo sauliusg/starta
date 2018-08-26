@@ -5619,26 +5619,28 @@ static int compiler_can_compile_use_statement( COMPILER *cc,
 }
 
 static void compiler_import_module( COMPILER *c,
-                                    DNODE *module_name_dnode,
+                                    DNODE *volatile *module_name_dnode,
                                     cexception_t *ex )
 {
+    assert( module_name_dnode );
+
     cexception_t inner;
-    char *module_name = dnode_name( module_name_dnode );
+    char *module_name = dnode_name( *module_name_dnode );
 
     SYMTAB *volatile symtab = new_symtab( c->vartab, c->consts, c->typetab,
                                           c->operators, ex );
 
 
     DNODE *module = vartab_lookup_module( c->compiled_modules,
-                                          module_name_dnode,
+                                          *module_name_dnode,
                                           symtab );
 
     DNODE *volatile shared_module = NULL;
 
 #if 0
     printf( ">>> module = '%s', filename = '%s'\n",
-            dnode_name( module_name_dnode ),
-            dnode_filename( module_name_dnode ));
+            dnode_name( *module_name_dnode ),
+            dnode_filename( *module_name_dnode ));
 #endif
 
     cexception_guard( inner ) {
@@ -5647,7 +5649,7 @@ static void compiler_import_module( COMPILER *c,
             printf( ">>> can import module '%s'\n", module_name );
 #endif
             if( module != NULL ) {
-                char *synonim = dnode_synonim( module_name_dnode );
+                char *synonim = dnode_synonim( *module_name_dnode );
 #if 0
                 printf( ">>> will insert module '%s' as '%s'\n", module_name, synonim );
 #endif
@@ -5668,7 +5670,7 @@ static void compiler_import_module( COMPILER *c,
                                                                &inner );
                 compiler_open_include_file( c, pkg_path, &inner );
                 assert( !c->requested_module  );
-                c->requested_module = module_name_dnode;
+                c->requested_module = share_dnode( *module_name_dnode );
             }
         }
     }
@@ -5685,6 +5687,7 @@ static void compiler_import_module( COMPILER *c,
     TYPETAB *tt;
     obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
     delete_symtab( symtab );
+    dispose_dnode( module_name_dnode );
 }
 
 /* 
@@ -5794,9 +5797,9 @@ static void compiler_use_module( COMPILER *c,
 
     VARTAB *vt, *ct, *ot;
     TYPETAB *tt;
-    dispose_dnode( module_name_dnode );
     obtain_tables_from_symtab( symtab, &vt, &ct, &tt, &ot );
     delete_symtab( symtab );
+    dispose_dnode( module_name_dnode );
 }
 
 static void compiler_debug()
@@ -7750,7 +7753,7 @@ undelimited_simple_statement
                              look-ahead token, to the input stream. S.G.*/
                yyclearin; /* Discard the Bison look-ahead token. S.G. */
            }
-           compiler_import_module( compiler, $1, px );
+           compiler_import_module( compiler, &$1, px );
        }
   | use_statement
        {
