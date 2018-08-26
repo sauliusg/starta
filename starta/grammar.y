@@ -13256,6 +13256,10 @@ array_expression
 
          compiler_swap_thrcodes( compiler );
 
+         //FIXME: sharing 'element_type' may introduce memory leaks,
+         //not sharing may introduce double-delete. Will need to check
+         //what the pointer balance is (S.G.):
+         //TNODE *shared_element_type = element_type;
          TNODE *shared_element_type = share_tnode( element_type );
          compiler_compile_array_alloc( compiler, &shared_element_type, px );
 
@@ -13439,6 +13443,10 @@ array_expression
         TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
         compiler_swap_thrcodes( compiler );
 
+        //FIXME: sharing 'element_type' may introduce memory leaks,
+        //not sharing may introduce double-delete. Will need to check
+        //what the pointer balance is (S.G.):
+        //TNODE *shared_element_type = element_type;
         TNODE *shared_element_type = share_tnode( element_type );
         compiler_compile_array_alloc( compiler, &shared_element_type, px );
         /* ..., loop_counter_addr, loop_limit, array */
