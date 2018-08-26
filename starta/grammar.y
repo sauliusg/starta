@@ -1454,9 +1454,10 @@ static void compiler_push_error_type( COMPILER *c,
     enode_list_push( &c->e_stack, expr_enode );
 }
 
-static void compiler_append_expression_type( COMPILER *c,
-                                             TNODE *base_tnode )
+static void compiler_append_top_expression_type( COMPILER *c,
+                                                 TNODE *volatile *base_tnode )
 {
+    assert( base_tnode );
     assert( c->e_stack );
     enode_append_element_type( c->e_stack, base_tnode );
 }
@@ -3831,19 +3832,29 @@ static void compiler_compile_blob_alloc( COMPILER *cc,
 }
 
 static void compiler_compile_mdalloc( COMPILER *cc,
-                                      TNODE *element_type,
+                                      TNODE *volatile *element_type,
                                       int level,
                                       cexception_t *ex )
 {
-    TNODE *array_tnode = new_tnode_array_snail( NULL, cc->typetab, ex );
+    assert( element_type );
+    
+    TNODE *volatile array_tnode = new_tnode_array_snail( NULL, cc->typetab, ex );
+    cexception_t inner;
 
-    if( element_type ) {
+    if( *element_type ) {
 	key_value_t *fixup_values =
-	    make_mdalloc_key_value_list( element_type, level );
+	    make_mdalloc_key_value_list( *element_type, level );
 
-	compiler_compile_array_alloc_operator( cc, "new[][]", fixup_values, ex );
-	compiler_append_expression_type( cc, array_tnode );
-	compiler_append_expression_type( cc, element_type );
+        cexception_guard( inner ) {
+            compiler_compile_array_alloc_operator( cc, "new[][]", fixup_values,
+                                                   &inner );
+            compiler_append_top_expression_type( cc, &array_tnode );
+            compiler_append_top_expression_type( cc, element_type );
+        }
+        cexception_catch {
+            delete_tnode( array_tnode );
+            cexception_reraise( inner, ex );
+        }
     } else {
 	key_value_t fixup_vals[] = {
 	    { "element_size", sizeof(void*) },
@@ -3853,13 +3864,21 @@ static void compiler_compile_mdalloc( COMPILER *cc,
 	    { NULL }
 	};
 
-	if( level == 0 ) {
-	    compiler_compile_array_alloc_operator( cc, "new[]", fixup_vals, ex );
-	    compiler_push_typed_expression( cc, &array_tnode, ex );
-	} else {
-	    compiler_compile_array_alloc_operator( cc, "new[][]", fixup_vals, ex );
-	    compiler_append_expression_type( cc, array_tnode );
-	}
+        cexception_guard( inner ) {
+            if( level == 0 ) {
+                compiler_compile_array_alloc_operator( cc, "new[]",
+                                                       fixup_vals, &inner );
+                compiler_push_typed_expression( cc, &array_tnode, &inner );
+            } else {
+                compiler_compile_array_alloc_operator( cc, "new[][]",
+                                                       fixup_vals, &inner );
+                compiler_append_top_expression_type( cc, &array_tnode );
+            }
+        }
+        cexception_catch {
+            delete_tnode( array_tnode );
+            cexception_reraise( inner, ex );
+        }
     }
 }
 
@@ -13185,32 +13204,42 @@ unpack_expression
       int arity = 3;
       int level = $3;
       TNODE *element_type = $2;
-      TNODE *array_tnode =
+      TNODE *volatile array_tnode =
 	  new_tnode_array_snail( NULL, compiler->typetab, px );
+      cexception_t inner;
 
-      if( compiler_lookup_operator( compiler, element_type, operator_name,
-                                    arity, px )) {
-          key_value_t *fixup_values =
-              make_mdalloc_key_value_list( element_type, level );
-	  compiler_check_and_compile_operator( compiler, element_type,
-					    operator_name,
-					    arity, fixup_values,
-					    px );
-	  /* Return value pushed by ..._compile_operator() function must
-	     be dropped, since it only describes return value as having
-	     type 'array'. The caller of the current function will push
-	     a correct return value 'array of proper_element_type' */
-	  compiler_drop_top_expression( compiler );
-	  if( compiler_stack_top_is_array( compiler )) {
-	      compiler_append_expression_type( compiler, array_tnode );
-	      compiler_append_expression_type( compiler, share_tnode( element_type ));
-	  }
-      } else {
-	  compiler_drop_top_expression( compiler );
-	  compiler_drop_top_expression( compiler );
-	  compiler_drop_top_expression( compiler );
-	  tnode_report_missing_operator( element_type, operator_name, arity );
+      cexception_guard( inner ) {
+          if( compiler_lookup_operator( compiler, element_type, operator_name,
+                                        arity, px )) {
+              key_value_t *fixup_values =
+                  make_mdalloc_key_value_list( element_type, level );
+              compiler_check_and_compile_operator( compiler, element_type,
+                                                   operator_name,
+                                                   arity, fixup_values,
+                                                   px );
+              /* Return value pushed by ..._compile_operator() function must
+                 be dropped, since it only describes return value as having
+                 type 'array'. The caller of the current function will push
+                 a correct return value 'array of proper_element_type' */
+              compiler_drop_top_expression( compiler );
+              if( compiler_stack_top_is_array( compiler )) {
+                  TNODE *volatile shared_element_type =
+                      share_tnode( element_type );
+                  compiler_append_top_expression_type( compiler, &array_tnode );
+                  compiler_append_top_expression_type( compiler, &shared_element_type );
+              }
+          } else {
+              compiler_drop_top_expression( compiler );
+              compiler_drop_top_expression( compiler );
+              compiler_drop_top_expression( compiler );
+              tnode_report_missing_operator( element_type, operator_name, arity );
+          }
       }
+      cexception_catch {
+          delete_tnode( array_tnode );
+          cexception_reraise( inner, px );
+      }
+      delete_tnode( array_tnode );
       compiler_emit( compiler, px, "\n" );
   }
   ;
@@ -14101,7 +14130,7 @@ generator_new
   | _NEW compact_type_description md_array_allocator '[' expression ']'
       {
           compiler_check_array_component_is_not_null( $2, compiler->e_stack  );
-          compiler_compile_mdalloc( compiler, $2, $3, px );
+          compiler_compile_mdalloc( compiler, &$2, $3, px );
       }
   | _NEW _ARRAY '[' expression ']' _OF var_type_description
       {
@@ -14111,7 +14140,7 @@ generator_new
   | _NEW _ARRAY md_array_allocator '[' expression ']' _OF var_type_description
       {
           compiler_check_array_component_is_not_null( $8, compiler->e_stack  );
-          compiler_compile_mdalloc( compiler, $8, $3, px );
+          compiler_compile_mdalloc( compiler, &$8, $3, px );
       }
   | _NEW compact_type_description '[' expression ']' _OF var_type_description
       {
@@ -14140,8 +14169,17 @@ generator_new
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
-          compiler_compile_mdalloc( compiler, share_tnode(element_type),
-                                    level, px );
+          TNODE *volatile shared_element_type = share_tnode( element_type );
+
+          cexception_t inner;
+          cexception_guard( inner ) {
+              compiler_compile_mdalloc( compiler, &shared_element_type,
+                                        level, &inner );
+          }
+          cexception_catch {
+              delete_tnode( element_type );
+              cexception_reraise( inner, px );
+          }
           compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
           compiler_swap_top_expressions( compiler );
           compiler_drop_top_expression( compiler );
@@ -14152,13 +14190,15 @@ md_array_allocator
   : '[' expression ']'
       {
 	int level = 0;
-	compiler_compile_mdalloc( compiler, NULL, level, px );
+        TNODE *null_tnode = NULL;
+	compiler_compile_mdalloc( compiler, &null_tnode, level, px );
 	$$ = level + 1;
       }
   | md_array_allocator '[' expression ']'
       {
 	int level = $1;
-	compiler_compile_mdalloc( compiler, NULL, level, px );
+        TNODE *null_tnode = NULL;
+	compiler_compile_mdalloc( compiler, &null_tnode, level, px );
 	$$ = level + 1;
       }
   ;
