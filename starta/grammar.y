@@ -3803,7 +3803,7 @@ static void compiler_compile_array_alloc( COMPILER *cc,
     key_value_t *fixup_values =
         make_tnode_key_value_list( NULL, *element_type );
 
-    if( element_type && tnode_kind( *element_type ) != TK_PLACEHOLDER ) {
+    if( *element_type && tnode_kind( *element_type ) != TK_PLACEHOLDER ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
         if( *element_type ) {
