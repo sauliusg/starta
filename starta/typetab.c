@@ -274,16 +274,26 @@ void typetab_override_suffix( TYPETAB *table, const char *name,
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
 {
     TYPE_NODE *curr;
+    TNODE *volatile shared_tnode = NULL;
+    cexception_t inner;
 
     assert( dst );
     assert( src );
 
-    for( curr = src->node; curr != NULL; curr = curr->next ) {
-	char *name = curr->name;
-	TNODE *tnode = curr->tnode;
-	type_suffix_t suffix_type = curr->suffix;
-	typetab_insert_imported_suffix( dst, name, suffix_type, 
-                                        share_tnode( tnode ), ex );
+    cexception_guard( inner ) {
+        for( curr = src->node; curr != NULL; curr = curr->next ) {
+            char *name = curr->name;
+            TNODE *tnode = curr->tnode;
+            type_suffix_t suffix_type = curr->suffix;
+            shared_tnode = share_tnode( tnode );
+            typetab_insert_imported_suffix( dst, name, suffix_type, 
+                                            shared_tnode, &inner );
+            shared_tnode = NULL;
+        }
+    }
+    cexception_catch {
+        delete_tnode( shared_tnode );
+        cexception_reraise( inner, ex );
     }
 }
 
