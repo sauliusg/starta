@@ -5570,8 +5570,7 @@ static void compiler_begin_module( COMPILER *c,
         shared_module = share_dnode( *module );
         vartab_insert_named( c->vartab, &shared_module, ex );
         dlist_push_dnode( &c->current_module_stack, &c->current_module, ex );
-        // FIXME: share current_module in the future:
-        delete_dnode( *module );
+        assert( !c->current_module );
         c->current_module = *module;
         *module = NULL;
     }
@@ -5584,6 +5583,7 @@ static void compiler_begin_module( COMPILER *c,
 static void compiler_end_module( COMPILER *c, cexception_t *ex )
 {
     compiler_pop_symbol_tables( c );
+    delete_dnode( c->current_module );
     c->current_module = dlist_pop_data( &c->current_module_stack );
 }
 
