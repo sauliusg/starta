@@ -156,7 +156,7 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
                                                          cexception_t *ex ),
                                                    cexception_t *ex)
 {
-    TNODE *volatile shared_t1 = share_tnode( t1 );
+    TNODE *volatile shared_t1 = NULL;
     TNODE *volatile placeholder_implementation =
         typetab_lookup( generic_types, t2->name );
 
@@ -169,6 +169,7 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
         cexception_guard( inner ) {
             placeholder_implementation =
                 new_tnode_placeholder( t2->name, &inner );
+            shared_t1 = share_tnode( t1 );
             tnode_insert_base_type( placeholder_implementation,
                                     &shared_t1 );
             typetab_insert( generic_types, t2->name,
