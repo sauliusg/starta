@@ -11047,9 +11047,10 @@ interface_declaration_body
             yyerrorf( "interfaces ('%s') can only inherit from other interfaces",
                       current_type ? tnode_name( current_type ) : "?");
         }
+        delete_tnode( base_type );
         delete_tnode( $3 );
         delete_tnode( $4 );
-        $$ = current_type;
+        $$ = share_tnode( current_type );
     }
   ;
 
