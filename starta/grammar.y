@@ -10919,7 +10919,7 @@ struct_or_class_body
     '{' struct_field_list struct_operator_list opt_semicolon '}'
     {
         delete_tnode( $1 );
-        //delete_tnode( $4 );
+        delete_tnode( $4 );
         $$ = $3;
     }
   ;
@@ -10977,7 +10977,7 @@ struct_operator_list
 	TNODE *struct_type = compiler->current_type;
         assert( struct_type );
 	tnode_insert_type_member( struct_type, &$1 );
-	$$ = struct_type;
+	$$ = share_tnode( struct_type );
     }
   | struct_operator_list struct_operator
     {
