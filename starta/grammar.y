@@ -1525,7 +1525,7 @@ static void compiler_push_array_of_type( COMPILER *c, TNODE *tnode,
 
     cexception_guard( inner ) {
 	array_type = new_tnode_array_snail( tnode, c->typetab, &inner );
-	share_tnode( tnode );
+	//share_tnode( tnode );
 	expr_enode = new_enode_typed( &array_type, &inner );
 	enode_list_push( &c->e_stack, expr_enode );
     }
@@ -14090,7 +14090,7 @@ generator_new
           ENODE *top_expr = compiler->e_stack;
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next_expr ) : NULL;
-          compiler_compile_array_alloc( compiler, element_type, px );
+          compiler_compile_array_alloc( compiler, share_tnode(element_type), px );
           compiler_emit( compiler, px, "\tc\n", FILLARRAY );
           compiler_swap_top_expressions( compiler );
           compiler_drop_top_expression( compiler );
@@ -14102,6 +14102,8 @@ generator_new
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
+          //FIXME: will probably cause a double-delete here, since
+          //'element_type' is not shared (S.G.):
           compiler_compile_mdalloc( compiler, element_type, level, px );
           compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
           compiler_swap_top_expressions( compiler );
