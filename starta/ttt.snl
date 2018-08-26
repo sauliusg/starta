@@ -1,5 +1,22 @@
-use std;
 
-var m = new long[0];
+// include "stdtypes.slib"
 
-push(push(m,10L),20L)
+type char = {
+    size = 1;
+}
+
+type int = {
+    size = 4; kind = integer;
+
+    inline bytecode operator "new[]" ( i : int ) : array
+        { AALLOC %%element_size %%element_nref };
+
+    inline bytecode operator "new[][]" ( i : int ) : array
+        { MDALLOCC %%element_size %%element_nref %%level };
+
+    inline bytecode operator "ldc" () : int
+        { LDCS };
+}
+
+var m = new int[10][5];
+var n = new int[20];
