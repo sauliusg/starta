@@ -12763,11 +12763,11 @@ closure_initialisation
     offset = dnode_offset( closure_var );
     compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
 
-    TNODE *volatile addr_tnode =
-        new_tnode_addressof( share_tnode( var_type ), px );
+    TNODE *volatile addr_tnode = NULL;
 
     cexception_t inner;
     cexception_guard( inner ) {
+        addr_tnode = new_tnode_addressof( share_tnode( var_type ), &inner );
         compiler_push_typed_expression( compiler, &addr_tnode, &inner );
     }
     cexception_catch {
@@ -12788,22 +12788,18 @@ closure_initialisation
     DNODE *closure_var_list = $1;
     DNODE *closure_var;
     ssize_t offset = 0;
-    int first_variable = 1;
 
     assert( closure_tnode );
 
+    share_dnode( closure_var_list ); /* Prevent Bison %destructor from
+                                        freeing these nodes. */
     tnode_insert_fields( closure_tnode, closure_var_list );
 
     foreach_dnode( closure_var, closure_var_list ) {
-
-        if( !first_variable ) {
-            share_tnode( closure_tnode );
-        }
         offset = dnode_offset( closure_var );
         compiler_emit( compiler, px, "\tce\n", OFFSET, &offset );
         compiler_emit( compiler, px, "\tc\n", RTOR );
         compiler_emit( compiler, px, "\tc\n", DUP );
-        first_variable = 0;
     }
 }
  '=' multivalue_expression_list
@@ -12850,6 +12846,7 @@ closure_initialisation
             compiler_compile_sti( compiler, px );
         }
     }
+    delete_dnode( var_list );
 }
 
 | opt_variable_declaration_keyword identifier
