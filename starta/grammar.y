@@ -7389,6 +7389,9 @@ static cexception_t *px; /* parser exception */
 		          are allocated. */
 }
 
+%destructor { delete_dnode($$); } <dnode>
+%destructor { delete_tnode($$); } <tnode>
+
 %token _ADDRESSOF
 %token _ARRAY
 %token _AS
@@ -10916,6 +10919,7 @@ struct_or_class_body
     '{' struct_field_list struct_operator_list opt_semicolon '}'
     {
         delete_tnode( $1 );
+        //delete_tnode( $4 );
         $$ = $3;
     }
   ;
@@ -11043,6 +11047,8 @@ interface_declaration_body
             yyerrorf( "interfaces ('%s') can only inherit from other interfaces",
                       current_type ? tnode_name( current_type ) : "?");
         }
+        //delete_tnode( $3 );
+        //delete_tnode( $4 );
         $$ = current_type;
     }
   ;
