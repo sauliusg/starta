@@ -81,7 +81,7 @@ ENODE *new_enode_guarding_arg( cexception_t *ex );
 
 ENODE *new_enode_varaddr_expr( DNODE *var_dnode, cexception_t *ex );
 
-void enode_append_element_type( ENODE *enode, TNODE *base );
+void enode_append_element_type( ENODE *enode, TNODE *volatile *base );
 
 void enode_list_push( ENODE **ptr_list, ENODE *enode );
 

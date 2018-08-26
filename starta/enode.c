@@ -339,15 +339,17 @@ ENODE *new_enode_varaddr_expr( DNODE *var_dnode, cexception_t *ex )
     return enode;
 }
 
-void enode_append_element_type( ENODE *enode, TNODE *element_type )
+void enode_append_element_type( ENODE *enode, TNODE *volatile *element_type )
 {
+    assert( element_type );
     assert( enode );
     if( !enode->value.expr_type ) {
-	enode->value.expr_type = element_type;
+	enode->value.expr_type = *element_type;
     } else {
 	enode->value.expr_type =
-	    tnode_append_element_type( enode->value.expr_type, element_type );
+	    tnode_append_element_type( enode->value.expr_type, *element_type );
     }
+    *element_type = NULL;
 }
 
 void enode_list_push( ENODE **ptr_list, ENODE *enode )
