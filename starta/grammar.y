@@ -3831,9 +3831,9 @@ static void compiler_compile_blob_alloc( COMPILER *cc,
 }
 
 static void compiler_compile_mdalloc( COMPILER *cc,
-				   TNODE *element_type,
-				   int level,
-				   cexception_t *ex )
+                                      TNODE *element_type,
+                                      int level,
+                                      cexception_t *ex )
 {
     TNODE *array_tnode = new_tnode_array_snail( NULL, cc->typetab, ex );
 
@@ -3843,7 +3843,7 @@ static void compiler_compile_mdalloc( COMPILER *cc,
 
 	compiler_compile_array_alloc_operator( cc, "new[][]", fixup_values, ex );
 	compiler_append_expression_type( cc, array_tnode );
-	compiler_append_expression_type( cc, share_tnode( element_type ));
+	compiler_append_expression_type( cc, element_type );
     } else {
 	key_value_t fixup_vals[] = {
 	    { "element_size", sizeof(void*) },
@@ -14140,7 +14140,8 @@ generator_new
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           ENODE *next2_expr = next_expr ? enode_next( next_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next2_expr ) : NULL;
-          compiler_compile_mdalloc( compiler, element_type, level, px );
+          compiler_compile_mdalloc( compiler, share_tnode(element_type),
+                                    level, px );
           compiler_emit( compiler, px, "\tce\n", FILLMDARRAY, &level );
           compiler_swap_top_expressions( compiler );
           compiler_drop_top_expression( compiler );
