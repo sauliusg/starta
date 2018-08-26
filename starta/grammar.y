@@ -1516,23 +1516,26 @@ static void compiler_compile_next_exception( COMPILER *c,
     compiler_compile_exception( c, exception_name, ++c->latest_exception_nr, ex );
 }
 
-static void compiler_push_array_of_type( COMPILER *c, TNODE *tnode,
+static void compiler_push_array_of_type( COMPILER *c, TNODE *volatile *tnode,
                                          cexception_t *ex )
 {
     cexception_t inner;
     ENODE *expr_enode = NULL;
     TNODE * volatile array_type = NULL;
 
+    assert( tnode );
     cexception_guard( inner ) {
-	array_type = new_tnode_array_snail( tnode, c->typetab, &inner );
-	//share_tnode( tnode );
+	array_type = new_tnode_array_snail( *tnode, c->typetab, &inner );
+        *tnode = NULL;
 	expr_enode = new_enode_typed( &array_type, &inner );
 	enode_list_push( &c->e_stack, expr_enode );
     }
     cexception_catch {
 	delete_tnode( array_type );
+        dispose_tnode( tnode );
 	cexception_reraise( inner, ex );
     }
+    assert( !*tnode );
 }
 
 static void compiler_drop_top_expression( COMPILER *cc )
@@ -3792,17 +3795,20 @@ static void compiler_compile_array_alloc_operator( COMPILER *cc,
 }
 
 static void compiler_compile_array_alloc( COMPILER *cc,
-                                          TNODE *element_type,
+                                          TNODE *volatile *element_type,
                                           cexception_t *ex )
 {
-    key_value_t *fixup_values = make_tnode_key_value_list( NULL, element_type );
+    assert( element_type );
 
-    if( element_type && tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+    key_value_t *fixup_values =
+        make_tnode_key_value_list( NULL, *element_type );
+
+    if( element_type && tnode_kind( *element_type ) != TK_PLACEHOLDER ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
-        if( element_type ) {
+        if( *element_type ) {
             yyerrorf( "in this type representation, can not allocate array "
-                      "of generic type %s", tnode_name( element_type ));
+                      "of generic type %s", tnode_name( *element_type ));
         } else {
             yyerrorf( "undefined element type for array allocation" );
         }
@@ -5858,7 +5864,8 @@ static void compiler_compile_array_expression( COMPILER* cc,
 	    compiler_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
                         &nrefs, &nexpr );
 	}
-	compiler_push_array_of_type( cc, share_tnode( top_type ), ex );
+        TNODE *shared_top_type = share_tnode( top_type );
+	compiler_push_array_of_type( cc, &shared_top_type, ex );
 	delete_enode( top );
     }
 }
@@ -13246,8 +13253,12 @@ array_expression
          /* Compile array allocation: */
          ENODE *element_expr = compiler->e_stack;
          TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
+
          compiler_swap_thrcodes( compiler );
-         compiler_compile_array_alloc( compiler, element_type, px );
+
+         TNODE *shared_element_type = share_tnode( element_type );
+         compiler_compile_array_alloc( compiler, &shared_element_type, px );
+
          /* ..., loop_counter_addr, loop_limit, array */
          compiler_compile_rot( compiler, px );
          compiler_emit( compiler, px, "\n" );
@@ -13427,7 +13438,9 @@ array_expression
         ENODE *element_expr = compiler->e_stack;
         TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
         compiler_swap_thrcodes( compiler );
-        compiler_compile_array_alloc( compiler, element_type, px );
+
+        TNODE *shared_element_type = share_tnode( element_type );
+        compiler_compile_array_alloc( compiler, &shared_element_type, px );
         /* ..., loop_counter_addr, loop_limit, array */
         compiler_compile_rot( compiler, px );
         compiler_emit( compiler, px, "\n" );
@@ -14059,7 +14072,7 @@ generator_new
   | _NEW compact_type_description '[' expression ']'
       {
           compiler_check_array_component_is_not_null( $2, compiler->e_stack );
-          compiler_compile_array_alloc( compiler, $2, px );
+          compiler_compile_array_alloc( compiler, &$2, px );
       }
   | _NEW compact_type_description md_array_allocator '[' expression ']'
       {
@@ -14069,7 +14082,7 @@ generator_new
   | _NEW _ARRAY '[' expression ']' _OF var_type_description
       {
           compiler_check_array_component_is_not_null( $7, compiler->e_stack  );
-          compiler_compile_array_alloc( compiler, $7, px );
+          compiler_compile_array_alloc( compiler, &$7, px );
       }
   | _NEW _ARRAY md_array_allocator '[' expression ']' _OF var_type_description
       {
@@ -14090,7 +14103,8 @@ generator_new
           ENODE *top_expr = compiler->e_stack;
           ENODE *next_expr = top_expr ? enode_next( top_expr ) : NULL;
           TNODE *element_type =  next_expr ? enode_type( next_expr ) : NULL;
-          compiler_compile_array_alloc( compiler, share_tnode(element_type), px );
+          TNODE *shared_element_type = share_tnode( element_type );
+          compiler_compile_array_alloc( compiler, &shared_element_type, px );
           compiler_emit( compiler, px, "\tc\n", FILLARRAY );
           compiler_swap_top_expressions( compiler );
           compiler_drop_top_expression( compiler );
