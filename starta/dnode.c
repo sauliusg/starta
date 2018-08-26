@@ -1015,6 +1015,7 @@ DNODE *dnode_insert_module_args( DNODE *dnode, DNODE *volatile *args )
 {
     assert( dnode );
     assert( args );
+    assert( !dnode->module_args );
     dnode->module_args = *args;
     *args = NULL;
     return dnode;
