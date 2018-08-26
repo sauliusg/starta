@@ -1,37 +1,5 @@
-// --*- C -*--
-
-// Test methods with default parameter values:
-
 use std;
-// use modA;
 
-type A = {
-    size = 1;
-    suffix = A;
-    kind = integer;
+var m = new long[0];
 
-    /*
-    inline bytecode operator "!" ( A a ): A
-    {
-        NOP
-    }
-    */
-    constructor() {
-    }
-    /*
-    */
-    destructor A {
-    }
-    /*
-    */
-    /*
-    method asString( i : int = 1 ): string;
-    */
-    method asString( i : int = 1 ): string
-    {
-        return "A->asString(): " + "%d" %% i
-    }
-    /*
-    */
-}
-
+push(push(m,10L),20L)
