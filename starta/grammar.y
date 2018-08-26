@@ -11047,8 +11047,8 @@ interface_declaration_body
             yyerrorf( "interfaces ('%s') can only inherit from other interfaces",
                       current_type ? tnode_name( current_type ) : "?");
         }
-        //delete_tnode( $3 );
-        //delete_tnode( $4 );
+        delete_tnode( $3 );
+        delete_tnode( $4 );
         $$ = current_type;
     }
   ;
@@ -11058,7 +11058,7 @@ interface_operator_list
     {
 	TNODE *struct_type = compiler->current_type;
 	tnode_insert_type_member( struct_type, &$1 );
-	$$ = struct_type;
+	$$ = share_tnode( struct_type );
     }
   | interface_operator_list interface_operator
     {
