@@ -1,22 +1,39 @@
+#
+# Snail compiler tests
+#
+#
+# Test 
+#
 
-// include "stdtypes.slib"
+use * from std;
 
-type char = {
-    size = 1;
+type collection of T = null {
+    reference;
+    size = sizeof native "void*";
+
+    inline bytecode operator "new[char]" ( i : char ) : collection of T
+    {
+      BAALLOC %%element_size %%element_nref
+      SLDC "This is 'collection of T' new[char]" SPRINT NEWLINE
+    };
+
+(*
+    inline bytecode operator "[char]" ( a : collection of T; i : char ) : 
+        addressof
+    {
+	BINDEX
+    };
+*)
 }
 
-type int = {
-    size = 4; kind = integer;
+(*
+var c : collection of ldouble;
+var d : collection of long;
 
-    inline bytecode operator "new[]" ( i : int ) : array
-        { AALLOC %%element_size %%element_nref };
+c = new collection [200 char] of ldouble;
 
-    inline bytecode operator "new[][]" ( i : int ) : array
-        { MDALLOCC %%element_size %%element_nref %%level };
+c['1'c] = 2.2LD;
 
-    inline bytecode operator "ldc" () : int
-        { LDCS };
-}
-
-var m = new int[10][5];
-var n = new int[20];
+. c['1'c];
+*)
+. "done";
