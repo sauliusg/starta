@@ -17,21 +17,22 @@ type collection of T = null {
       SLDC "This is 'collection of T' new[char]" SPRINT NEWLINE
     };
 
-(*
     inline bytecode operator "[char]" ( a : collection of T; i : char ) : 
         addressof
     {
 	BINDEX
     };
+(*
 *)
 }
 
-(*
 var c : collection of ldouble;
 var d : collection of long;
 
+// memleak here:
 c = new collection [200 char] of ldouble;
 
+(*
 c['1'c] = 2.2LD;
 
 . c['1'c];
