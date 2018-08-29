@@ -496,39 +496,42 @@ TNODE *new_tnode_ref( cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_derived( TNODE *base, cexception_t *ex )
+TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
 {
     cexception_t inner;
     TNODE *node = new_tnode( ex );
+    assert( base );
 
     cexception_guard( inner ) {
 	/* node->kind = base->kind; */
 	node->kind = TK_DERIVED;
 	/* base->name is not copied */
 #if 0
-	while( base && base->kind == TK_DERIVED &&
-               tnode_has_flags( base, TF_IS_EQUIVALENT ))
-	    base = base->base_type;
+	while( *base && (*base)->kind == TK_DERIVED &&
+               tnode_has_flags( *base, TF_IS_EQUIVALENT ))
+	    *base = (*base)->base_type;
 #endif
-	assert( node != base );
-	node->base_type = share_tnode( base );
-	if( base ) {
-	    node->element_type = share_tnode( base->element_type );
-	    node->size = base->size;
-	    node->nrefs = base->nrefs;
-	    /* base->rcount is skipped, of cource ;-) */
-	    node->fields = share_dnode( base->fields );
-	    node->flags = base->flags;
+	assert( node != *base );
+	if( *base ) {
+	    node->element_type = share_tnode( (*base)->element_type );
+	    node->size = (*base)->size;
+	    node->nrefs = (*base)->nrefs;
+	    /* (*base)->rcount is skipped, of cource ;-) */
+	    node->fields = share_dnode( (*base)->fields );
+	    node->flags = (*base)->flags;
 #if 0
-	    node->operators = share_dnode( base->operators );
-	    node->conversions = share_dnode( base->conversions );
+	    node->operators = share_dnode( (*base)->operators );
+	    node->conversions = share_dnode( (*base)->conversions );
 #endif
-	    node->args = share_dnode( base->args );
-	    node->return_vals = share_dnode( base->return_vals );
+	    node->args = share_dnode( (*base)->args );
+	    node->return_vals = share_dnode( (*base)->return_vals );
 	}
 	node->flags &= ~TF_IS_FORWARD;
+	node->base_type = *base;
+        *base = NULL;
     }
     cexception_catch {
+        dispose_tnode( base );
 	delete_tnode( node );
 	cexception_reraise( inner, ex );
     }

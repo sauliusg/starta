@@ -10620,7 +10620,6 @@ delimited_type_description
     }
     struct_or_class_body
     {
-	/* $$ = new_tnode_derived( share_tnode( $2 ), px ); */
 	$$ = new_tnode_equivalent( $2, px );
 
 	assert( compiler->current_type );
@@ -10640,8 +10639,16 @@ delimited_type_description
 
   | type_identifier _OF delimited_type_description
     {
-      TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      TNODE *volatile composite = $1;
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          $$ = new_tnode_derived( &composite, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$3 );
+          cexception_reraise( inner, px );
+      }
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
     }
@@ -10819,7 +10826,15 @@ undelimited_type_description
   | type_identifier _OF undelimited_or_structure_description
     {
       TNODE *composite = $1;
-      $$ = new_tnode_derived( composite, px );
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          $$ = new_tnode_derived( &composite, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$3 );
+          cexception_reraise( inner, px );
+      }
       tnode_insert_element_type( $$, $3 );
     }
 
@@ -11262,7 +11277,7 @@ delimited_type_declaration
         TNODE * volatile ntype = NULL; /* new type */
 	compiler_end_scope( compiler, px );
         cexception_guard( inner ) {
-            ntype = new_tnode_derived( type_description, &inner );
+            ntype = new_tnode_derived( &type_description, &inner );
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
@@ -11283,9 +11298,7 @@ delimited_type_declaration
         TNODE * volatile ntype = NULL; /* new type */
 	compiler_end_scope( compiler, px );
         cexception_guard( inner ) {
-            ntype = new_tnode_derived( type_description, &inner );
-            type_description = NULL;
-
+            ntype = new_tnode_derived( &type_description, &inner );
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
                             &inner );
@@ -13680,7 +13693,18 @@ struct_expression
 
   | _TYPE type_identifier _OF delimited_type_description
      {
-	 TNODE *composite = new_tnode_derived( $2, px );
+	 TNODE *volatile composite = NULL;
+         cexception_t inner;
+
+         //FIXME: 'composite' not used afterwards -- must it not be
+         //deleted? (S.G.)
+         cexception_guard( inner ) {
+             composite = new_tnode_derived( &$2, &inner );
+         }
+         cexception_catch {
+             dispose_tnode( &$4 );
+             cexception_reraise( inner, px );
+         }
 	 tnode_set_kind( composite, TK_COMPOSITE );
 	 tnode_insert_element_type( composite, $4 );
 
@@ -15342,8 +15366,18 @@ field_designator
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
         char *ident = obtain_string_from_strpool( compiler->strpool, $7 );
-        TNODE *composite = $2;
-        composite = new_tnode_derived( composite, px );
+        TNODE *volatile composite = $2;
+        cexception_t inner;
+
+        //FIXME: 'composite' not used afterwards -- should we delete
+        //it? S.G.
+        cexception_guard( inner ) {
+            composite = new_tnode_derived( &composite, &inner );
+        }
+        cexception_catch {
+            dispose_tnode( &$4 );
+            cexception_reraise( inner, px );
+        }
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
         
