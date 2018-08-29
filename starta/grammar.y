@@ -11524,6 +11524,7 @@ type_of_type_declaration
 	    tnode =
                 share_tnode( typetab_lookup( compiler->typetab, type_name ));
 
+            assert( !compiler->current_type );
 	    compiler->current_type = moveptr( (void**)&tnode );
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
@@ -11553,7 +11554,6 @@ type_of_type_declaration
           cexception_guard( inner ) {
               compiler_end_scope( compiler, &inner );
               compiler_compile_type_declaration( compiler, &ntype, &inner );
-              // compiler->current_type = NULL;
               dispose_tnode( &compiler->current_type );
           }
           cexception_catch {
