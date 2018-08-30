@@ -7237,7 +7237,7 @@ static void compiler_process_module_parameters( COMPILER *cc,
             cexception_t inner;
             TNODE * volatile shared_arg_type = NULL;
             TNODE * volatile type_tnode =
-                new_tnode_equivalent( arg_type, ex );
+                new_tnode_equivalent( share_tnode(arg_type), ex );
             cexception_guard( inner ) {
                 tnode_set_name( type_tnode, type_name, &inner );
                 compiler_typetab_insert( cc, &type_tnode, &inner );
