@@ -13694,15 +13694,18 @@ struct_expression
   | _TYPE type_identifier _OF delimited_type_description
      {
 	 TNODE *volatile composite = NULL;
+         TNODE *volatile type_identifier_tnode = NULL;
          cexception_t inner;
 
          //FIXME: 'composite' not used afterwards -- must it not be
          //deleted? (S.G.)
          cexception_guard( inner ) {
-             composite = new_tnode_derived( &$2, &inner );
+             type_identifier_tnode = $2;
+             composite = new_tnode_derived( &type_identifier_tnode, &inner );
          }
          cexception_catch {
              dispose_tnode( &$4 );
+             delete_tnode( type_identifier_tnode );
              cexception_reraise( inner, px );
          }
 	 tnode_set_kind( composite, TK_COMPOSITE );
@@ -13733,7 +13736,7 @@ struct_expression
                 }
             }
         }
-
+        dispose_tnode( &$2 );
         compiler_pop_initialised_ref_tables( compiler );
     }
 
