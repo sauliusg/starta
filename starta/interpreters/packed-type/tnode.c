@@ -540,7 +540,7 @@ TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
 
 TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex )
 {
-    TNODE *node = new_tnode_derived( base, ex );
+    TNODE *node = new_tnode_derived( &base, ex );
     node->flags |= TF_IS_EQUIVALENT;
     return node;
 }
@@ -986,7 +986,7 @@ TNODE *new_tnode_composite_synonim( TNODE *composite_type,
     TNODE *volatile created_type = NULL;
 
     cexception_guard( inner ) {
-	created_type = new_tnode_derived( composite_type, &inner );
+	created_type = new_tnode_derived( &composite_type, &inner );
 	tnode_set_kind( created_type, TK_COMPOSITE );
 	tnode_insert_element_type( created_type, element_type );
 	share_tnode( element_type );
