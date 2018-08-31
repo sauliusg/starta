@@ -10621,7 +10621,11 @@ delimited_type_description
     }
     struct_or_class_body
     {
-	$$ = new_tnode_equivalent( &$2, px );
+        //FIXME (S.G.): strangely, we need to dispose $2, even though
+        //we insert it into the tnode produced by the
+        //'new_tnode_equivalent()' -- will need to investigate here...
+        TNODE *volatile shared_var_type = $2;
+	$$ = new_tnode_equivalent( &shared_var_type, px );
 
 	assert( compiler->current_type );
         assert( $4 );
