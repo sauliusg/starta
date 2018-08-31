@@ -108,7 +108,7 @@ TNODE *new_tnode_nullref( cexception_t *ex );
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
 TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex );
-TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex );
+TNODE *new_tnode_equivalent( TNODE *volatile *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
 TNODE *tnode_set_nref( TNODE *tnode, ssize_t nref );

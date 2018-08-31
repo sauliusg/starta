@@ -5013,9 +5013,8 @@ static void compiler_compile_type_declaration( COMPILER *cc,
             tnode_set_name( *type_descr, type_name, &inner );
 	    tnode = moveptr( (void**)type_descr );
 	} else if( *type_descr != cc->current_type ) {
-	    tnode = tnode_set_name( new_tnode_equivalent( *type_descr, &inner ),
+	    tnode = tnode_set_name( new_tnode_equivalent( type_descr, &inner ),
                                     type_name, &inner );
-            *type_descr = NULL;
             tnode_set_suffix( tnode, tnode_name( tnode ), &inner );
 	} else {
 	    tnode = moveptr( (void**)type_descr );
@@ -7236,11 +7235,13 @@ static void compiler_process_module_parameters( COMPILER *cc,
             char *type_name = dnode_name( param );
             cexception_t inner;
             TNODE * volatile shared_arg_type = NULL;
-            TNODE * volatile type_tnode =
-                new_tnode_equivalent( share_tnode(arg_type), ex );
+            TNODE * volatile type_tnode = NULL;
             cexception_guard( inner ) {
+                shared_arg_type = share_tnode( arg_type );
+                type_tnode = new_tnode_equivalent( &shared_arg_type, ex );
                 tnode_set_name( type_tnode, type_name, &inner );
                 compiler_typetab_insert( cc, &type_tnode, &inner );
+
                 shared_arg_type = share_tnode( arg_type );
                 tnode_insert_base_type( param_type, &shared_arg_type );
             }
@@ -10620,7 +10621,7 @@ delimited_type_description
     }
     struct_or_class_body
     {
-	$$ = new_tnode_equivalent( $2, px );
+	$$ = new_tnode_equivalent( &$2, px );
 
 	assert( compiler->current_type );
         assert( $4 );

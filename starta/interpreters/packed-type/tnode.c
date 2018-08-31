@@ -538,9 +538,9 @@ TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex )
+TNODE *new_tnode_equivalent( TNODE *volatile *base, cexception_t *ex )
 {
-    TNODE *node = new_tnode_derived( &base, ex );
+    TNODE *node = new_tnode_derived( base, ex );
     node->flags |= TF_IS_EQUIVALENT;
     return node;
 }
