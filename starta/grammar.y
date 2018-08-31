@@ -10639,7 +10639,7 @@ delimited_type_description
 
   | type_identifier _OF delimited_type_description
     {
-      TNODE *volatile composite = $1;
+      TNODE *volatile composite = moveptr( (void**)&$1 );
       cexception_t inner;
 
       cexception_guard( inner ) {
@@ -11568,7 +11568,7 @@ type_of_type_declaration
               compiler_end_scope( compiler, &inner );
               compiler_compile_type_declaration( compiler, &ntype, &inner );
               dispose_tnode( &compiler->current_type );
-          }
+         }
           cexception_catch {
               delete_tnode( ntype );
               cexception_reraise( inner, px );
@@ -13700,7 +13700,7 @@ struct_expression
          //FIXME: 'composite' not used afterwards -- must it not be
          //deleted? (S.G.)
          cexception_guard( inner ) {
-             type_identifier_tnode = $2;
+             type_identifier_tnode = share_tnode( $2 );
              composite = new_tnode_derived( &type_identifier_tnode, &inner );
          }
          cexception_catch {
