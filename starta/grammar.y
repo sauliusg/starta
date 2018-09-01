@@ -3850,8 +3850,10 @@ static void compiler_compile_mdalloc( COMPILER *cc,
                                                    &inner );
             compiler_append_top_expression_type( cc, &array_tnode );
             compiler_append_top_expression_type( cc, element_type );
+            assert( !*element_type );
         }
         cexception_catch {
+            dispose_tnode( element_type );
             delete_tnode( array_tnode );
             cexception_reraise( inner, ex );
         }
