@@ -13737,8 +13737,6 @@ struct_expression
          TNODE *volatile type_identifier_tnode = NULL;
          cexception_t inner;
 
-         //FIXME: 'composite' not used afterwards -- must it not be
-         //deleted? (S.G.) -- fixed.
          cexception_guard( inner ) {
              type_identifier_tnode = share_tnode( $2 );
              composite = new_tnode_derived( &type_identifier_tnode, &inner );
@@ -15434,8 +15432,6 @@ field_designator
         TNODE *volatile composite = NULL;
         cexception_t inner;
 
-        //FIXME: 'composite' not used afterwards -- should we delete
-        //it? S.G. -- fixed
         cexception_guard( inner ) {
             composite = new_tnode_derived( &$2, &inner );
         }
