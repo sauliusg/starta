@@ -3740,7 +3740,7 @@ static void compiler_compile_composite_alloc_operator( COMPILER *cc,
     if( compiler_lookup_operator( cc, composite_type, operator_name,
                                   arity, ex )) {
 	compiler_check_and_compile_operator( cc, composite_type, operator_name,
-					  arity, fixup_values, ex );
+                                             arity, fixup_values, ex );
 	/* Return value pushed by ..._compile_operator() function must
 	   be dropped, since it only describes return value as having
 	   type 'composite'. The caller of the current function will push
@@ -3753,22 +3753,29 @@ static void compiler_compile_composite_alloc_operator( COMPILER *cc,
 }
 
 static void compiler_compile_composite_alloc( COMPILER *cc,
-                                              TNODE *composite_type,
-                                              TNODE *element_type,
+                                              TNODE *volatile *composite_type,
+                                              TNODE *volatile *element_type,
                                               cexception_t *ex )
 {
     TNODE *allocated_type = NULL;
     key_value_t *fixup_values = 
-        make_tnode_key_value_list( composite_type, element_type );
+        make_tnode_key_value_list( *composite_type, *element_type );
+    cexception_t inner;
 
-    allocated_type = new_tnode_composite_synonim( composite_type, element_type,
-						  ex );
+    cexception_guard( inner ) {
+        allocated_type = new_tnode_composite_synonim( composite_type,
+                                                      element_type,
+                                                      &inner );
 
-    compiler_compile_composite_alloc_operator( cc, allocated_type,
-					    fixup_values, ex );
+        compiler_compile_composite_alloc_operator( cc, allocated_type,
+                                                   fixup_values, &inner );
 
-    compiler_push_typed_expression( cc, &allocated_type, ex );
-    /* compiler_push_composite_of_type( cc, composite_type, element_type, ex ); */
+        compiler_push_typed_expression( cc, &allocated_type, &inner );
+    }
+    cexception_catch {
+        delete_tnode( allocated_type );
+        cexception_reraise( inner, ex );
+    }
 }
 
 static void compiler_compile_array_alloc_operator( COMPILER *cc,
@@ -14182,7 +14189,7 @@ generator_new
   | _NEW compact_type_description '[' expression ']' _OF var_type_description
       {
           compiler_check_array_component_is_not_null( $7, compiler->e_stack  );
-          compiler_compile_composite_alloc( compiler, $2, $7, px );
+          compiler_compile_composite_alloc( compiler, &$2, &$7, px );
       }
   | _NEW _BLOB '(' expression ')'
       {

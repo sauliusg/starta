@@ -978,18 +978,18 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_composite_synonim( TNODE *composite_type,
-				    TNODE *element_type,
+TNODE *new_tnode_composite_synonim( TNODE *volatile *composite_type,
+				    TNODE *volatile *element_type,
 				    cexception_t *ex )
 {
     cexception_t inner;
     TNODE *volatile created_type = NULL;
 
     cexception_guard( inner ) {
-	created_type = new_tnode_derived( &composite_type, &inner );
+	created_type = new_tnode_derived( composite_type, &inner );
 	tnode_set_kind( created_type, TK_COMPOSITE );
-	tnode_insert_element_type( created_type, element_type );
-	share_tnode( element_type );
+	tnode_insert_element_type( created_type, *element_type );
+	*element_type = NULL;
     }
     cexception_catch {
 	delete_tnode( created_type );

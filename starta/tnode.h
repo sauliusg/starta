@@ -170,8 +170,8 @@ TNODE *new_tnode_operator_NEW( char *name,
 
 TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
-TNODE *new_tnode_composite_synonim( TNODE *composite_type,
-				    TNODE *element_type,
+TNODE *new_tnode_composite_synonim( TNODE *volatile *composite_type,
+				    TNODE *volatile *element_type,
 				    cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
