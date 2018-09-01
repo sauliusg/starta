@@ -1,48 +1,68 @@
-#--*- C -*--
-# Compiler tests
+#
+# Snail compiler tests
 #
 #
-# Test interfaces
+# Test file open/read/write/close
 #
 
-use * from std;
+include "stdtypes.slib"
 
-interface I1 {
-    method mm() : int;
-    method mn( int i ) : int;
+bytecode function fopen( name : string; mode : string ) : file
+{
+    FOPEN
 }
 
-interface I2: I1 {
-    method nn();
+bytecode function fclose( f : file )
+{
+    FCLOSE
 }
 
-class A implements I2, I1 {
-    int ii;
-
-    constructor( int i = 100 ) { self.ii = i }
-
-    method mm@I1(): int {
-        return self.ii + 1
-    }
-    (*
-    method mm@I2(): int {
-        return self.ii + 2
-    }
-    *)
-    method mn@I1( int i ): int
-    {
-        return self.ii + i
-    }
-
-    method nn@I2() { . "A.i =", self.ii }
+inline bytecode function filename( f : file ) : string
+{
+    FNAME
 }
 
-class A implements I2, I1 {
+bytecode function fread( f : file; m : ref ) : int
+{
+    FREAD
 }
 
-var a = new A(101);
+bytecode function fwrite( f : file; m : ref ) : int
+{
+    FWRITE
+}
 
-. a->mn@I2( 193 );
-a->nn@I2();
+program ( argv : array of string )
+{
 
-// bytecode { PLD %a DUMPVMT }
+var fp : file;
+
+const INT_SIZE = 4;
+
+var m = new blob(4*const(INT_SIZE));
+var n = new blob(4*const(INT_SIZE));
+
+pack m, 0*const(INT_SIZE), "i%d" %% const(INT_SIZE), 1 int;
+pack m, 1*const(INT_SIZE), "i%d" %% const(INT_SIZE), 2 int;
+pack m, 2*const(INT_SIZE), "i%d" %% const(INT_SIZE), 4 int;
+
+var file_name : string = "outputs/file.dat";
+
+fp = fopen( file_name, "w" );
+. filename( fp );
+fwrite( fp, m );
+fclose( fp );
+
+fp = fopen( file_name, "r" );
+fread( fp, n );
+fclose( fp );
+
+var i : int;
+
+var format = "i%d" %% const(INT_SIZE);
+
+for i = 0 to length(n)/const(INT_SIZE) - 1 do
+    (* memleak here: *)
+    . unpack int( n, i * const(INT_SIZE), format );
+enddo
+} // end program

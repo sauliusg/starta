@@ -13226,26 +13226,46 @@ unpack_expression
     '(' expression ',' expression ',' expression ')'
   {
       TNODE *type = $2;
-      if( tnode_kind( type ) == TK_ARRAY ) {
-	  compiler_check_and_compile_operator( compiler,
-					    tnode_element_type( type ),
-					    "unpackarray", 3 /* arity */,
-					    NULL /* fixup_values */, px );
-      } else {
-	  compiler_check_and_compile_operator( compiler, type,
-					    "unpack", 3 /* arity */,
-					    NULL /* fixup_values */, px );
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          if( tnode_kind( type ) == TK_ARRAY ) {
+              compiler_check_and_compile_operator( compiler,
+                                                   tnode_element_type( type ),
+                                                   "unpackarray", 3 /* arity */,
+                                                   NULL /* fixup_values */,
+                                                   &inner );
+          } else {
+              compiler_check_and_compile_operator( compiler, type,
+                                                   "unpack", 3 /* arity */,
+                                                   NULL /* fixup_values */,
+                                                   &inner );
+          }
       }
+      cexception_catch {
+          delete_tnode( $2 );
+          cexception_reraise( inner, px );
+      }
+      delete_tnode( $2 );
       compiler_emit( compiler, px, "\n" );
   }
   | _UNPACK compact_type_description '[' ']'
     '(' expression ',' expression ',' expression ')'
   {
       TNODE *element_type = $2;
-      compiler_check_and_compile_operator( compiler, element_type,
-					"unpackarray", 3 /* arity */,
-					NULL /* fixup_values */, px );
+      cexception_t inner;
 
+      cexception_guard( inner ) {
+          compiler_check_and_compile_operator( compiler, element_type,
+                                               "unpackarray", 3 /* arity */,
+                                               NULL /* fixup_values */,
+                                               &inner );
+      }
+      cexception_catch {
+          delete_tnode( $2 );
+          cexception_reraise( inner, px );
+      }
+      delete_tnode( $2 );
       compiler_emit( compiler, px, "\n" );
   }
   | _UNPACK compact_type_description md_array_allocator '[' ']' 
@@ -13257,19 +13277,19 @@ unpack_expression
       int arity = 3;
       int level = $3;
       TNODE *element_type = $2;
-      TNODE *volatile array_tnode =
-	  new_tnode_array_snail( NULL, compiler->typetab, px );
+      TNODE *volatile array_tnode = NULL;
       cexception_t inner;
 
       cexception_guard( inner ) {
+          array_tnode = new_tnode_array_snail( NULL, compiler->typetab, &inner );
           if( compiler_lookup_operator( compiler, element_type, operator_name,
-                                        arity, px )) {
+                                        arity, &inner )) {
               key_value_t *fixup_values =
                   make_mdalloc_key_value_list( element_type, level );
               compiler_check_and_compile_operator( compiler, element_type,
                                                    operator_name,
                                                    arity, fixup_values,
-                                                   px );
+                                                   &inner );
               /* Return value pushed by ..._compile_operator() function must
                  be dropped, since it only describes return value as having
                  type 'array'. The caller of the current function will push
@@ -13278,8 +13298,10 @@ unpack_expression
               if( compiler_stack_top_is_array( compiler )) {
                   TNODE *volatile shared_element_type =
                       share_tnode( element_type );
-                  compiler_append_top_expression_type( compiler, &array_tnode );
-                  compiler_append_top_expression_type( compiler, &shared_element_type );
+                  compiler_append_top_expression_type( compiler,
+                                                       &array_tnode );
+                  compiler_append_top_expression_type( compiler,
+                                                       &shared_element_type );
               }
           } else {
               compiler_drop_top_expression( compiler );
@@ -13290,8 +13312,10 @@ unpack_expression
       }
       cexception_catch {
           delete_tnode( array_tnode );
+          delete_tnode( $2 );
           cexception_reraise( inner, px );
       }
+      delete_tnode( $2 );
       delete_tnode( array_tnode );
       compiler_emit( compiler, px, "\n" );
   }
