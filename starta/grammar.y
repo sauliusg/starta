@@ -3644,47 +3644,57 @@ static void compiler_compile_next( COMPILER *c,
 }
 
 static void compiler_compile_alloc( COMPILER *cc,
-                                    TNODE *alloc_type,
+                                    TNODE *volatile *alloc_type,
                                     cexception_t *ex )
 {
-    TNODE *volatile pushed_alloc_type = alloc_type;
-    compiler_push_typed_expression( cc, &pushed_alloc_type, ex );
+    TNODE *volatile pushed_alloc_type = share_tnode( *alloc_type );
 
-    if( !tnode_is_reference( alloc_type )) {
+    if( !tnode_is_reference( *alloc_type )) {
 	yyerrorf( "only reference-implemented types can be "
 		  "used in new operator" );
     }
-    if( tnode_kind( alloc_type ) == TK_ARRAY ) {
+    if( tnode_kind( *alloc_type ) == TK_ARRAY ) {
 	yyerrorf( "arrays should be allocated with array-new operator "
 		  "(e.g. 'a = new int[20]')" );
     }
 
-    if ( compiler_lookup_operator( cc, alloc_type, "new",
-                                   /* arity = */ 0, ex )) {
-        key_value_t *fixup_values =
-            make_tnode_key_value_list( alloc_type, NULL );
+    cexception_t inner;
+    cexception_guard( inner ) {
+        compiler_push_typed_expression( cc, &pushed_alloc_type, &inner );
+        if ( compiler_lookup_operator( cc, *alloc_type, "new",
+                                       /* arity = */ 0, &inner )) {
+            key_value_t *fixup_values =
+                make_tnode_key_value_list( *alloc_type, NULL );
 
-	compiler_check_and_compile_operator( cc, alloc_type, "new",
-                                             /* arity = */ 0, 
-                                             fixup_values, ex );
-    } else {
-	ssize_t alloc_size = tnode_size( alloc_type );
-	ssize_t alloc_nref = tnode_number_of_references( alloc_type );
-	ssize_t vmt_offset = tnode_vmt_offset( alloc_type );
+            compiler_check_and_compile_operator( cc, *alloc_type, "new",
+                                                 /* arity = */ 0, 
+                                                 fixup_values, &inner );
+        } else {
+            ssize_t alloc_size = tnode_size( *alloc_type );
+            ssize_t alloc_nref = tnode_number_of_references( *alloc_type );
+            ssize_t vmt_offset = tnode_vmt_offset( *alloc_type );
 
-	if( vmt_offset == 0 ) {
-	    compiler_emit( cc, ex, "\tcee\n", ALLOC, &alloc_size, &alloc_nref );
-	} else {
-	    compiler_emit( cc, ex, "\tceee\n", ALLOCVMT, &alloc_size, &alloc_nref,
-                           &vmt_offset );
-	}
+            if( vmt_offset == 0 ) {
+                compiler_emit( cc, &inner, "\tcee\n", ALLOC, &alloc_size,
+                               &alloc_nref );
+            } else {
+                compiler_emit( cc, ex, "\tceee\n", ALLOCVMT, &alloc_size,
+                               &alloc_nref, &vmt_offset );
+            }
+        }
     }
+    cexception_catch {
+        delete_tnode( pushed_alloc_type );
+        dispose_tnode( alloc_type );
+        cexception_reraise( inner, ex );
+    }
+    dispose_tnode( alloc_type );
 }
 
 static char *compiler_make_typed_operator_name( TNODE *index_type1,
-                                             TNODE *index_type2,
-					     char *name_format,
-					     cexception_t *ex )
+                                                TNODE *index_type2,
+                                                char *name_format,
+                                                cexception_t *ex )
 {
     static char pad[20];
     static char *buff;
@@ -13682,7 +13692,16 @@ array_expression
 struct_expression
   : opt_null_type_designator _STRUCT type_identifier
      {
-	 compiler_compile_alloc( compiler, $3, px );
+         TNODE *volatile shared_tnode = share_tnode( $3 );
+         cexception_t inner;
+         cexception_guard( inner ) {
+             compiler_compile_alloc( compiler, &shared_tnode, &inner );
+         }
+         cexception_catch {
+             delete_tnode( shared_tnode );
+             dispose_tnode( &$3 );
+             cexception_reraise( inner, px );
+         }
          compiler_push_initialised_ref_tables( compiler, px );
      }
     '{' field_initialiser_list opt_comma '}'
@@ -13708,6 +13727,7 @@ struct_expression
             }
         }
 
+        dispose_tnode( &$3 );
         compiler_pop_initialised_ref_tables( compiler );
     }
 
@@ -13718,21 +13738,23 @@ struct_expression
          cexception_t inner;
 
          //FIXME: 'composite' not used afterwards -- must it not be
-         //deleted? (S.G.)
+         //deleted? (S.G.) -- fixed.
          cexception_guard( inner ) {
              type_identifier_tnode = share_tnode( $2 );
              composite = new_tnode_derived( &type_identifier_tnode, &inner );
+
+             tnode_set_kind( composite, TK_COMPOSITE );
+             tnode_insert_element_type( composite, $4 );
+             $4 = NULL;
+
+             compiler_compile_alloc( compiler, &composite, &inner );
+             compiler_push_initialised_ref_tables( compiler, &inner );
          }
          cexception_catch {
              dispose_tnode( &$4 );
              delete_tnode( type_identifier_tnode );
              cexception_reraise( inner, px );
          }
-	 tnode_set_kind( composite, TK_COMPOSITE );
-	 tnode_insert_element_type( composite, $4 );
-
-	 compiler_compile_alloc( compiler, share_tnode( composite ), px );
-         compiler_push_initialised_ref_tables( compiler, px );
      }
     '{' field_initialiser_list opt_comma '}'
     {
@@ -14070,47 +14092,55 @@ generator_new
       {
           TNODE *constructor_tnode;
           DNODE *constructor_dnode;
+          TNODE *volatile shared_tnode = NULL;
+          cexception_t inner;
 
-          compiler_check_type_contains_non_null_ref( $2 );
-          /* The share_tnode($2) is not needed here, since the
-             'compact_type_description' rule already returnes an
-             allocated or shared TNODE: */
-          compiler_compile_alloc( compiler, $2, px );
+          cexception_guard( inner ) {
+              compiler_check_type_contains_non_null_ref( $2 );
+              shared_tnode = share_tnode( $2 );
+              compiler_compile_alloc( compiler, &shared_tnode, &inner );
 
-          constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
+              constructor_dnode = $2 ? tnode_default_constructor( $2 ) : NULL;
 
-          if( constructor_dnode ) {
-              /* --- function (constructor) call generation starts here: */
+              if( constructor_dnode ) {
+                  /* --- function (constructor) call generation starts here: */
 
-              compiler_push_current_interface_nr( compiler, px );
-              compiler_push_current_call( compiler, px );
+                  compiler_push_current_interface_nr( compiler, &inner );
+                  compiler_push_current_call( compiler, &inner );
 
-              compiler->current_interface_nr = 0;
+                  compiler->current_interface_nr = 0;
 
-              constructor_tnode = constructor_dnode ?
-                  dnode_type( constructor_dnode ) : NULL;
+                  constructor_tnode = constructor_dnode ?
+                      dnode_type( constructor_dnode ) : NULL;
 
-              compiler->current_call = share_dnode( constructor_dnode );
+                  compiler->current_call = share_dnode( constructor_dnode );
           
-              compiler->current_arg = constructor_tnode ?
-                  dnode_next( tnode_args( constructor_tnode )) :
-                  NULL;
+                  compiler->current_arg = constructor_tnode ?
+                      dnode_next( tnode_args( constructor_tnode )) :
+                      NULL;
 
-              compiler_compile_dup( compiler, px );
-              compiler_push_guarding_arg( compiler, px );
-              compiler_swap_top_expressions( compiler );
+                  compiler_compile_dup( compiler, &inner );
+                  compiler_push_guarding_arg( compiler, &inner );
+                  compiler_swap_top_expressions( compiler );
               
-              int nretvals;
-              char *constructor_name = constructor_tnode ?
-                  tnode_name( constructor_tnode ) : NULL;
+                  int nretvals;
+                  char *constructor_name = constructor_tnode ?
+                      tnode_name( constructor_tnode ) : NULL;
 
-              nretvals = compiler_compile_multivalue_function_call( compiler, px );
+                  nretvals = compiler_compile_multivalue_function_call( compiler, &inner );
 
-              if( nretvals > 0 ) {
-                  yyerrorf( "constructor '%s()' should not return a value",
-                            constructor_name ? constructor_name : "???" );
+                  if( nretvals > 0 ) {
+                      yyerrorf( "constructor '%s()' should not return a value",
+                                constructor_name ? constructor_name : "???" );
+                  }
               }
           }
+          cexception_catch {
+              dispose_tnode( &$2 );
+              delete_tnode( shared_tnode );
+              cexception_reraise( inner, px );
+          }
+          dispose_tnode( &$2 );
       }
 
   | _NEW type_identifier opt_dot_name
@@ -14120,33 +14150,43 @@ generator_new
           TNODE *type_tnode = $2;
           char  *constructor_name =
               obtain_string_from_strpool( compiler->strpool, $3 );
+          TNODE *volatile shared_tnode = NULL;
+          cexception_t inner;
 
-          compiler_check_type_contains_non_null_ref( type_tnode );
-          compiler_compile_alloc( compiler, type_tnode, px );
-          // compiler_compile_alloc( compiler, &type_tnode, px );
+          cexception_guard( inner ) {
+              compiler_check_type_contains_non_null_ref( type_tnode );
+              shared_tnode = share_tnode( type_tnode );
+              compiler_compile_alloc( compiler, &shared_tnode, &inner );
 
-          /* --- function call generation starts here: */
+              /* --- function call generation starts here: */
 
-          compiler_push_current_interface_nr( compiler, px );
-          compiler_push_current_call( compiler, px );
+              compiler_push_current_interface_nr( compiler, &inner );
+              compiler_push_current_call( compiler, &inner );
 
-          compiler->current_interface_nr = 0;
+              compiler->current_interface_nr = 0;
 
-          constructor_dnode = type_tnode ?
-              tnode_lookup_constructor( type_tnode, constructor_name ) : NULL;
+              constructor_dnode = type_tnode ?
+                  tnode_lookup_constructor( type_tnode, constructor_name ) :
+                  NULL;
 
-          constructor_tnode = constructor_dnode ?
-              dnode_type( constructor_dnode ) : NULL;
+              constructor_tnode = constructor_dnode ?
+                  dnode_type( constructor_dnode ) : NULL;
 
-          compiler->current_call = share_dnode( constructor_dnode );
+              compiler->current_call = share_dnode( constructor_dnode );
 
-          compiler->current_arg = constructor_tnode ?
-              dnode_next( tnode_args( constructor_tnode )) :
-              NULL;
+              compiler->current_arg = constructor_tnode ?
+                  dnode_next( tnode_args( constructor_tnode )) : NULL;
 
-          compiler_compile_dup( compiler, px );
-	  compiler_push_guarding_arg( compiler, px );
-          compiler_swap_top_expressions( compiler );
+              compiler_compile_dup( compiler, &inner );
+              compiler_push_guarding_arg( compiler, &inner );
+              compiler_swap_top_expressions( compiler );
+          }
+          cexception_catch {
+              dispose_tnode( &$2 );
+              delete_tnode( shared_tnode );
+              cexception_reraise( inner, px );
+          }
+          dispose_tnode( &$2 );
           freex( constructor_name );
 	}
     '(' opt_actual_argument_list ')'
@@ -15377,6 +15417,8 @@ constant_integer_expression
     }
 ;
 
+//FIXME: lokked up DNODES must be stared in ths 'field_designator'
+//rule (S.G.):
 field_designator
   : __IDENTIFIER '.' __IDENTIFIER
     {
@@ -15389,15 +15431,17 @@ field_designator
   | '(' type_identifier _OF delimited_type_description ')' '.' __IDENTIFIER
     {
         char *ident = obtain_string_from_strpool( compiler->strpool, $7 );
-        TNODE *volatile composite = $2;
+        TNODE *volatile composite = NULL;
         cexception_t inner;
 
         //FIXME: 'composite' not used afterwards -- should we delete
-        //it? S.G.
+        //it? S.G. -- fixed
         cexception_guard( inner ) {
-            composite = new_tnode_derived( &composite, &inner );
+            composite = new_tnode_derived( &$2, &inner );
         }
         cexception_catch {
+            delete_tnode( composite );
+            dispose_tnode( &$2 );
             dispose_tnode( &$4 );
             cexception_reraise( inner, px );
         }
