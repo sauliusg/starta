@@ -10621,12 +10621,16 @@ delimited_type_description
     }
     struct_or_class_body
     {
+#if 0
         //FIXME (S.G.): strangely, we need to dispose $2, even though
         //we insert it into the tnode produced by the
         //'new_tnode_equivalent()' -- will need to investigate here...
         TNODE *volatile shared_var_type = $2;
 	$$ = new_tnode_equivalent( &shared_var_type, px );
-
+#else
+	$$ = new_tnode_equivalent( &$2, px );
+#endif
+        
 	assert( compiler->current_type );
         assert( $4 );
 
@@ -10639,7 +10643,9 @@ delimited_type_description
 	$$ = tnode_move_operators( $$, $4 );
 
 	dispose_tnode( &$4 );
+#if 0
 	dispose_tnode( &$2 );
+#endif
    }
 
   | type_identifier _OF delimited_type_description
