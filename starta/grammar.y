@@ -10951,21 +10951,34 @@ inheritance_and_implementation_list
   : opt_base_type opt_implemented_interfaces
   {
       TNODE *current_class = compiler->current_type;
-      TNODE *base_type = $1 ?
+      TNODE *volatile base_type = $1 ?
           $1 : share_tnode(typetab_lookup( compiler->typetab, "struct" ));
-      TNODE *shared_base_type = share_tnode( base_type );
-      TLIST *interfaces = $2;
+      TNODE *volatile shared_base_type = share_tnode( base_type );
+      TLIST *volatile interfaces = $2;
+      cexception_t inner;
 
-      if( base_type && current_class != base_type ) {
-          if( !tnode_base_type( current_class )) {
-              tnode_insert_base_type( current_class, &shared_base_type );
+      cexception_guard( inner ) {
+          if( base_type && current_class != base_type ) {
+              if( !tnode_base_type( current_class )) {
+                  tnode_insert_base_type( current_class, &shared_base_type );
+              }
           }
-      }
 
-      if( !tnode_interface_list( current_class )) {
-          tnode_insert_interfaces( current_class, interfaces );
+          if( !tnode_interface_list( current_class )) {
+              tnode_insert_interfaces( current_class, interfaces );
+              interfaces = NULL;
+          } else {
+              dispose_tlist( &interfaces );
+          }
+          compiler_start_virtual_method_table( compiler, current_class,
+                                               &inner );
       }
-      compiler_start_virtual_method_table( compiler, current_class, px );
+      cexception_catch {
+          delete_tlist( interfaces );
+          delete_tnode( shared_base_type );
+          delete_tnode( base_type );
+          cexception_reraise( inner, px );
+      }
 
       delete_tnode( shared_base_type );
       $$ = base_type;
@@ -14974,6 +14987,8 @@ function_header
 	}
   ;
 
+//FIXME: must share the 'opt_method_interface' tnode when assigning to
+//$$ and detele it in the receiver (S.G.):
 opt_method_interface
   : '@' __IDENTIFIER
   {

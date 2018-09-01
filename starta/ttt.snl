@@ -1,40 +1,48 @@
+#--*- C -*--
+# Compiler tests
 #
-# Snail compiler tests
 #
-#
-# Test 
+# Test interfaces
 #
 
 use * from std;
 
-type collection of T = null {
-    reference;
-    size = sizeof native "void*";
-
-    inline bytecode operator "new[char]" ( i : char ) : collection of T
-    {
-      BAALLOC %%element_size %%element_nref
-      SLDC "This is 'collection of T' new[char]" SPRINT NEWLINE
-    };
-
-    inline bytecode operator "[char]" ( a : collection of T; i : char ) : 
-        addressof
-    {
-	BINDEX
-    };
-(*
-*)
+interface I1 {
+    method mm() : int;
+    method mn( int i ) : int;
 }
 
-var c : collection of ldouble;
-var d : collection of long;
+interface I2: I1 {
+    method nn();
+}
 
-// memleak here:
-c = new collection [200 char] of ldouble;
+class A implements I2, I1 {
+    int ii;
 
-c['1'c] = 2.2LD;
+    constructor( int i = 100 ) { self.ii = i }
 
-. c['1'c];
-(*
-*)
-. "done";
+    method mm@I1(): int {
+        return self.ii + 1
+    }
+    (*
+    method mm@I2(): int {
+        return self.ii + 2
+    }
+    *)
+    method mn@I1( int i ): int
+    {
+        return self.ii + i
+    }
+
+    method nn@I2() { . "A.i =", self.ii }
+}
+
+class A implements I2, I1 {
+}
+
+var a = new A(101);
+
+. a->mn@I2( 193 );
+a->nn@I2();
+
+// bytecode { PLD %a DUMPVMT }
