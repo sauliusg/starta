@@ -15449,6 +15449,7 @@ field_designator
         tnode_insert_element_type( composite, $4 );
         
 	$$ = compiler_lookup_tnode_field( compiler, composite, ident );
+        dispose_tnode( &composite );
 
         freex( ident );
     }
