@@ -1,19 +1,35 @@
-// --*- C -*--
+#
+# Snail compiler tests
+#
+#
+# Regression test: stack overflow after taking forward function
+# pointers.
+#
 
-// Test various versions of a shortened function expression syntax:
+use * from std;
 
-use std;
+function f() : string
+{
+    return "I am here!";
+}
 
-var f = function (int x) -> (int) => { x * x * x };
+var phi = f;
 
-. f(20);
+. phi();
 
-var g = function (long x) -> long => x * x ;;
+function g(): string
+{
+    return "This is function g()"
+}
 
-. g(20);
+function h() -> (string)
+{
+    return "This is function h()"
+}
 
-var h = procedure (a, b: float): float => a * b / (a + b) ;;
+var gg, hh = g, h;
 
-. h( 10, 30 );
 (*
- *)
+. gg();
+. hh();
+*)
