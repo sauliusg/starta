@@ -14503,6 +14503,7 @@ indexed_lvalue
 	  } else {
 	      compiler_compile_indexing( compiler, 0, $3, px );
 	  }
+          delete_dnode( $1 );
       }
 
   | lvalue_for_indexing '[' index_expression ']'
