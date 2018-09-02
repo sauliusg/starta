@@ -9314,7 +9314,7 @@ variable_declaration
              foreach_reverse_dnode( var, lst ) {
                  len ++;
                  expr_type = compiler->e_stack ?
-                     share_tnode( enode_type( compiler->e_stack )) : NULL;
+                     enode_type( compiler->e_stack ) : NULL;
                  type_kind_t expr_type_kind = expr_type ?
                      tnode_kind( expr_type ) : TK_NONE;
                  if( expr_type_kind == TK_FUNCTION ||
@@ -9330,6 +9330,9 @@ variable_declaration
                          ( shared_args, shared_retvals, shared_base, &inner );
                      shared_args = shared_retvals = NULL;
                      shared_base = NULL;
+                 } else {
+                     expr_type = compiler->e_stack ?
+                         share_tnode( enode_type( compiler->e_stack )) : NULL;
                  }
                  dnode_append_type( var, expr_type );
                  expr_type = NULL;
