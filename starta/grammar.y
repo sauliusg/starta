@@ -9207,13 +9207,14 @@ variable_declaration
   | variable_declaration_keyword identifier initialiser
     {
      TNODE *expr_type = compiler->e_stack ?
-	 share_tnode( enode_type( compiler->e_stack )) : NULL;
+	 enode_type( compiler->e_stack ) : NULL;
      int readonly = $1;
      DNODE *volatile var = $2;
      DNODE *volatile shared_var = NULL;
      DNODE *volatile shared_args = NULL;
      DNODE *volatile shared_retvals = NULL;
      TNODE *volatile shared_base = NULL;
+     TNODE *volatile returned_type = NULL;
 
      type_kind_t expr_type_kind = expr_type ?
          tnode_kind( expr_type ) : TK_NONE;
@@ -9229,13 +9230,16 @@ variable_declaration
              shared_retvals = share_dnode( tnode_retvals( expr_type ));
              shared_base = share_tnode( base_type );
 
-             expr_type = new_tnode_function_or_proc_ref
+             returned_type = new_tnode_function_or_proc_ref
                  ( shared_args, shared_retvals, shared_base, &inner );
              shared_args = shared_retvals = NULL;
              shared_base = NULL;
+         } else {
+             returned_type = share_tnode( expr_type );
          }
 
-         dnode_list_append_type( var, expr_type );
+         dnode_list_append_type( var, returned_type );
+         returned_type = NULL;
          dnode_list_assign_offsets( var, &compiler->local_offset );
 
          shared_var = share_dnode( var );
@@ -9252,6 +9256,7 @@ variable_declaration
              delete_dnode( shared_args );
              delete_dnode( shared_retvals );
              delete_tnode( shared_base );
+             delete_tnode( returned_type );
          },
          {
              cexception_reraise( inner, px );
