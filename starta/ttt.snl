@@ -1,68 +1,19 @@
-#
-# Snail compiler tests
-#
-#
-# Test file open/read/write/close
-#
+// --*- C -*--
 
-include "stdtypes.slib"
+// Test various versions of a shortened function expression syntax:
 
-bytecode function fopen( name : string; mode : string ) : file
-{
-    FOPEN
-}
+use std;
 
-bytecode function fclose( f : file )
-{
-    FCLOSE
-}
+var f = function (int x) -> (int) => { x * x * x };
 
-inline bytecode function filename( f : file ) : string
-{
-    FNAME
-}
+. f(20);
 
-bytecode function fread( f : file; m : ref ) : int
-{
-    FREAD
-}
+var g = function (long x) -> long => x * x ;;
 
-bytecode function fwrite( f : file; m : ref ) : int
-{
-    FWRITE
-}
+. g(20);
 
-program ( argv : array of string )
-{
+var h = procedure (a, b: float): float => a * b / (a + b) ;;
 
-var fp : file;
-
-const INT_SIZE = 4;
-
-var m = new blob(4*const(INT_SIZE));
-var n = new blob(4*const(INT_SIZE));
-
-pack m, 0*const(INT_SIZE), "i%d" %% const(INT_SIZE), 1 int;
-pack m, 1*const(INT_SIZE), "i%d" %% const(INT_SIZE), 2 int;
-pack m, 2*const(INT_SIZE), "i%d" %% const(INT_SIZE), 4 int;
-
-var file_name : string = "outputs/file.dat";
-
-fp = fopen( file_name, "w" );
-. filename( fp );
-fwrite( fp, m );
-fclose( fp );
-
-fp = fopen( file_name, "r" );
-fread( fp, n );
-fclose( fp );
-
-var i : int;
-
-var format = "i%d" %% const(INT_SIZE);
-
-for i = 0 to length(n)/const(INT_SIZE) - 1 do
-    (* memleak here: *)
-    . unpack int( n, i * const(INT_SIZE), format );
-enddo
-} // end program
+. h( 10, 30 );
+(*
+ *)

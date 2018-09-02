@@ -13068,18 +13068,28 @@ function_expression_header
     {
         DNODE *volatile parameters = $4;
         DNODE *volatile return_values = $6;
-        dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
-        DNODE *funct = new_dnode_function( /* name = */ NULL,
-                                           &parameters,
-                                           &return_values,
-                                           px );
-        if( $1 & DF_BYTECODE )
-            dnode_set_flags( funct, DF_BYTECODE );
-        if( $1 & DF_INLINE )
-            dnode_set_flags( funct, DF_INLINE );
-        dlist_push_dnode( &compiler->current_function_stack,
-                          &compiler->current_function, px );
-        compiler->current_function = funct;
+        cexception_t inner;
+
+        cexception_guard( inner ) {
+            dlist_push_dnode( &compiler->loop_stack, &compiler->loops,
+                              &inner );
+            DNODE *funct = new_dnode_function( /* name = */ NULL,
+                                               &parameters,
+                                               &return_values,
+                                               &inner );
+            if( $1 & DF_BYTECODE )
+                dnode_set_flags( funct, DF_BYTECODE );
+            if( $1 & DF_INLINE )
+                dnode_set_flags( funct, DF_INLINE );
+            dlist_push_dnode( &compiler->current_function_stack,
+                              &compiler->current_function, &inner );
+            compiler->current_function = funct;
+        }
+        cexception_catch {
+            delete_dnode( parameters );
+            delete_dnode( return_values );
+            cexception_reraise( inner, px );
+        }
     }
 ;
 
