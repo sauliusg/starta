@@ -8805,6 +8805,7 @@ variable_access_identifier
          char *ident =
              obtain_string_from_strpool( compiler->strpool, $1 );
 	 $$ = compiler_lookup_dnode( compiler, NULL, ident, "variable" );
+         share_dnode( $$ );
          freex( ident );
      }
   | module_list __COLON_COLON __IDENTIFIER
@@ -8812,6 +8813,7 @@ variable_access_identifier
          char *ident =
              obtain_string_from_strpool( compiler->strpool, $3 );
 	 $$ = compiler_lookup_dnode( compiler, $1, ident, "variable" );
+         share_dnode( $$ );
          freex( ident );
      }
   ;
@@ -8835,6 +8837,7 @@ incdec_statement
                   compiler_compile_store_variable( compiler, $1, px );
               }
           }
+          delete_dnode( $1 );
       }
   | variable_access_identifier __DEC
       {
@@ -8854,6 +8857,7 @@ incdec_statement
                   compiler_compile_store_variable( compiler, $1, px );
               }
           }
+          delete_dnode( $1 );
       }
   | lvalue __INC
       {
@@ -8937,12 +8941,14 @@ stdread_io_statement
               share_tnode( type_tnode );
               compiler_push_typed_expression( compiler, &type_tnode, &inner );
               compiler_emit( compiler, &inner, "\tc\n", STDREAD );
+              compiler_compile_store_variable( compiler, $4, &inner );
           }
           cexception_catch {
               delete_tnode( type_tnode );
+              delete_dnode( $4 );
               cexception_reraise( inner, px );
           }
-          compiler_compile_store_variable( compiler, $4, px );
+          delete_dnode( $4 );
       }
 
   | '<' '>' __LEFT_TO_RIGHT lvalue
@@ -11878,6 +11884,7 @@ assignment_statement
   : variable_access_identifier '=' expression
       {
 	  compiler_compile_store_variable( compiler, $1, px );
+          delete_dnode( $1 );
       }
   | lvalue '=' expression
       {
@@ -11928,6 +11935,7 @@ assignment_statement
           compiler_compile_binop( compiler, opname, px );
           compiler_compile_store_variable( compiler, $1, px );
           freex( opname );
+          delete_dnode( $1 );
       }
   | lvalue
       {
@@ -12003,6 +12011,7 @@ assignment_statement
 	      err = 1;
 	  }
 	  compiler_drop_top_expression( compiler );
+          delete_dnode( $1 );
       }
   ;
 
@@ -12362,6 +12371,7 @@ multivalue_function_call
 	    compiler_compile_load_variable_value( compiler, $1, px );
 	    compiler_drop_top_expression( compiler );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
+            delete_dnode( $1 );
 	}
 
   | lvalue 
@@ -14345,26 +14355,40 @@ lvalue
 
 lvariable
   : variable_access_identifier
-      { compiler_compile_load_variable_address( compiler, $1, px ); }
+      {
+          compiler_compile_load_variable_address( compiler, $1, px );
+          delete_dnode( $1 );
+      }
   | lvalue
   ;
 
 variable
   : variable_access_identifier
       {
-	  DNODE *variable = $1;
-	  TNODE *variable_type = variable ? dnode_type( variable ) : NULL; 
+	  DNODE *volatile variable = $1;
+	  TNODE *variable_type = variable ? dnode_type( variable ) : NULL;
+          cexception_t inner;
 
-	  if( variable_type && tnode_kind( variable_type ) == TK_FUNCTION ) {
-              if( variable && dnode_offset( variable ) == 0 ) {
-                  thrcode_push_forward_function
-                      ( compiler->thrcode, dnode_name( variable ),
-                        thrcode_length( compiler->thrcode ) + 1, px );
+          cexception_guard( inner ) {
+              if( variable_type &&
+                  tnode_kind( variable_type ) == TK_FUNCTION ) {
+                  if( variable && dnode_offset( variable ) == 0 ) {
+                      thrcode_push_forward_function
+                          ( compiler->thrcode, dnode_name( variable ),
+                            thrcode_length( compiler->thrcode ) + 1, &inner );
+                  }
+                  compiler_compile_load_function_address( compiler, variable,
+                                                          &inner );
+              } else {
+                  compiler_compile_load_variable_value( compiler, variable,
+                                                        &inner );
               }
-	      compiler_compile_load_function_address( compiler, variable, px );
-	  } else {
-	      compiler_compile_load_variable_value( compiler, variable, px );
-	  }
+          }
+          cexception_catch {
+              delete_dnode( variable );
+              cexception_reraise( inner, px );
+          }
+          delete_dnode( variable );
       }
   ;
 
@@ -14439,6 +14463,7 @@ indexed_rvalue
 	      }
 	      compiler_compile_ldi( compiler, px );
 	  }
+          delete_dnode( $1 );
       }
   | lvalue_for_indexing '[' index_expression ']'
       {
@@ -14508,6 +14533,7 @@ field_access
 	   compiler_emit( compiler, px, "\tce\n", OFFSET, &field_offset );
        }
        freex( field_name );
+       delete_dnode( $1 );
       }
   | lvalue '.' __IDENTIFIER
       {
@@ -14539,6 +14565,7 @@ assignment_expression
       {
        compiler_compile_dup( compiler, px );
        compiler_compile_store_variable( compiler, $1, px );
+       delete_dnode( $1 );
       }
 
   | '(' assignment_expression ')'
