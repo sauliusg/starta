@@ -11356,6 +11356,7 @@ delimited_type_declaration
         TNODE * volatile ntype = NULL; /* new type */
 	compiler_end_scope( compiler, px );
         cexception_guard( inner ) {
+#if 1
             ntype = new_tnode_derived( &type_description, &inner );
             assert( compiler->current_type );
             tnode_set_name( ntype, tnode_name( compiler->current_type ),
@@ -11370,9 +11371,12 @@ delimited_type_declaration
                 tnode_set_suffix( ntype, tnode_name( compiler->current_type ),
                                   &inner );
             }
-
             dispose_tnode( &struct_body );
             compiler_compile_type_declaration( compiler, &ntype, &inner );
+#else
+            dispose_tnode( &struct_body );
+            compiler_compile_type_declaration( compiler, &type_description, &inner );
+#endif
         }
         cexception_catch {
             delete_tnode( ntype );

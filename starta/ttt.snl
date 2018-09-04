@@ -2,7 +2,11 @@
 
 // Test derived types.
 
-use std;
+//use std;
+
+type struct = {kind = ref};
+
+type int = {};
 
 type synint = int;
 type newint1 = new int {};
