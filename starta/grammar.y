@@ -13001,23 +13001,38 @@ closure_initialisation
     assert( closure_tnode );
 
     current_expr = top_expr;
-    foreach_reverse_dnode( var, closure_var_list ) {
-        TNODE *expr_type = current_expr ?
-            share_tnode( enode_type( current_expr )) : NULL;
-        type_kind_t expr_type_kind = expr_type ?
-            tnode_kind( expr_type ) : TK_NONE;
-        if( expr_type_kind == TK_FUNCTION ||
-            expr_type_kind == TK_OPERATOR ||
-                 expr_type_kind == TK_METHOD ) {
-            TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
-            expr_type = new_tnode_function_or_proc_ref
-                ( share_dnode( tnode_args( expr_type )),
-                  share_dnode( tnode_retvals( expr_type )),
-                  share_tnode( base_type ),
-                  px );
+
+    cexception_t inner;
+    TNODE *volatile shared_expr_type = NULL;
+    TNODE *volatile base_type = NULL;
+    cexception_guard( inner ) {
+        foreach_reverse_dnode( var, closure_var_list ) {
+            TNODE *expr_type = current_expr ?
+                enode_type( current_expr ) : NULL;
+            type_kind_t expr_type_kind = expr_type ?
+                tnode_kind( expr_type ) : TK_NONE;
+            if( expr_type_kind == TK_FUNCTION ||
+                expr_type_kind == TK_OPERATOR ||
+                expr_type_kind == TK_METHOD ) {
+                base_type = typetab_lookup( compiler->typetab, "procedure" );
+                share_tnode( base_type );
+                shared_expr_type = new_tnode_function_or_proc_ref
+                    ( share_dnode( tnode_args( expr_type )),
+                      share_dnode( tnode_retvals( expr_type )),
+                      base_type, &inner );
+                base_type = NULL;
+            } else {
+                shared_expr_type = share_tnode( expr_type );
+            }
+            dnode_append_type( var, shared_expr_type );
+            shared_expr_type = NULL;
+            current_expr = current_expr ? enode_next( current_expr ) : NULL;
         }
-        dnode_append_type( var, expr_type );
-        current_expr = current_expr ? enode_next( current_expr ) : NULL;
+    }
+    cexception_catch {
+        delete_tnode( shared_expr_type );
+        delete_tnode( base_type );
+        cexception_reraise( inner, px );
     }
 
     tnode_insert_fields( closure_tnode, closure_var_list );
