@@ -13117,21 +13117,36 @@ closure_header
   opt_function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
       {
-          TNODE *closure_tnode = new_tnode_ref( px );
-          DNODE *closure_fn_ref = NULL;
+          TNODE *volatile closure_tnode = new_tnode_ref( px );
+          DNODE *volatile closure_fn_ref = NULL;
+          TNODE *volatile fn_pointer_ref = NULL;
           ssize_t zero = 0;
-          /* Allocate the closure structure: */
-          compiler_push_absolute_fixup( compiler, px );
-          compiler_emit( compiler, px, "\tc", ALLOC );
-          compiler_push_absolute_fixup( compiler, px );
-          compiler_emit( compiler, px, "ee\n", &zero, &zero );
-          compiler_emit( compiler, px, "\tc\n", DUP );
-          tnode_set_kind( closure_tnode, TK_STRUCT );
-          /* reserve one stackcell for a function pointer of the
-             closure: */
-          closure_fn_ref = new_dnode_typed( "",  new_tnode_ref( px ), px );
-          tnode_insert_fields( closure_tnode, closure_fn_ref );
-          compiler_push_typed_expression( compiler, &closure_tnode, px );
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              /* Allocate the closure structure: */
+              compiler_push_absolute_fixup( compiler, &inner );
+              compiler_emit( compiler, &inner, "\tc", ALLOC );
+              compiler_push_absolute_fixup( compiler, &inner );
+              compiler_emit( compiler, &inner, "ee\n", &zero, &zero );
+              compiler_emit( compiler, &inner, "\tc\n", DUP );
+              tnode_set_kind( closure_tnode, TK_STRUCT );
+              /* reserve one stackcell for a function pointer of the
+                 closure: */
+              fn_pointer_ref = new_tnode_ref( &inner );
+              closure_fn_ref = new_dnode_typed( "",  fn_pointer_ref, &inner );
+              fn_pointer_ref = NULL;
+              tnode_insert_fields( closure_tnode, closure_fn_ref );
+              closure_fn_ref = NULL;
+              compiler_push_typed_expression( compiler, &closure_tnode, &inner );
+              closure_tnode = NULL;
+          }
+          cexception_catch {
+              delete_tnode( closure_tnode );
+              delete_dnode( closure_fn_ref );
+              delete_tnode( fn_pointer_ref );
+              cexception_reraise( inner, px );
+          }
       }
       opt_closure_initialisation_list
       {
@@ -13139,11 +13154,14 @@ closure_header
               obtain_string_from_strpool( compiler->strpool, $8 );
           DNODE *volatile parameters = $4;
           DNODE *volatile return_values = $6;
-          DNODE *self_dnode = new_dnode_name( closure_name, px );
+          DNODE *volatile self_dnode = NULL;
+          DNODE *volatile funct = NULL;
           ENODE *closure_expr = compiler->e_stack;
           TNODE *closure_type = enode_type( closure_expr );
+          TNODE *volatile shared_closure_tnode = NULL;
 
           ssize_t nref, size;
+          cexception_t inner;
 
           nref = tnode_number_of_references( closure_type );
           size = tnode_size( closure_type );
@@ -13151,20 +13169,37 @@ closure_header
           compiler_fixup( compiler, nref );
           compiler_fixup( compiler, size );
 
-          dnode_insert_type( self_dnode, share_tnode( closure_type ));
+          cexception_guard( inner ) {
+              self_dnode = new_dnode_name( closure_name, &inner );
+              shared_closure_tnode = share_tnode( closure_type );
+              dnode_insert_type( self_dnode, shared_closure_tnode );
+              shared_closure_tnode = NULL;
 
-          parameters = dnode_append( parameters, self_dnode );
-          self_dnode = NULL;
+              parameters = dnode_append( parameters, self_dnode );
+              self_dnode = NULL;
         
-          dlist_push_dnode( &compiler->loop_stack, &compiler->loops, px );
+              dlist_push_dnode( &compiler->loop_stack, &compiler->loops,
+                                &inner );
 
-          DNODE *funct = new_dnode_function( /* name = */ NULL, 
-                                            &parameters, &return_values, px );
-          tnode_set_kind( dnode_type( funct ), TK_CLOSURE );
+              funct = new_dnode_function( /* name = */ NULL, 
+                                          &parameters, &return_values,
+                                          &inner );
+              tnode_set_kind( dnode_type( funct ), TK_CLOSURE );
+              dlist_push_dnode( &compiler->current_function_stack,
+                                &compiler->current_function, &inner );
+              compiler->current_function = funct;
+              funct = NULL;
+          }
+          cexception_catch {
+              delete_dnode( parameters );
+              delete_dnode( return_values );
+              delete_dnode( self_dnode );
+              delete_dnode( funct );
+              delete_tnode( shared_closure_tnode );
+              freex( closure_name );
+              cexception_reraise( inner, px );
+          }
           freex( closure_name );
-          dlist_push_dnode( &compiler->current_function_stack,
-                            &compiler->current_function, px );
-          compiler->current_function = funct;
     }
 ;
 
