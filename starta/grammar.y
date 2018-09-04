@@ -2252,11 +2252,11 @@ typedef struct {
 } operator_description_t;
 
 static void compiler_init_operator_description( operator_description_t *od,
-                                             COMPILER *cc,
-					     TNODE *op_type,
-					     char *op_name,
-					     int arity,
-                                             cexception_t *ex )
+                                                COMPILER *cc,
+                                                TNODE *op_type,
+                                                char *op_name,
+                                                int arity,
+                                                cexception_t *ex )
 {
     assert( od );
 
@@ -3503,7 +3503,6 @@ static int compiler_variable_has_operator( COMPILER *c,
                                         cexception_t *ex )
 {
     TNODE *var_tnode = NULL;
-    DNODE *operator = NULL;
 
     if( ! var_dnode ) {
 	return 0;
@@ -3513,8 +3512,8 @@ static int compiler_variable_has_operator( COMPILER *c,
 	return 0;
     }
     
-    if( !( operator = compiler_lookup_operator( c, var_tnode, operator_name,
-                                                arity, ex ))) {
+    if( !compiler_lookup_operator( c, var_tnode, operator_name,
+                                   arity, ex )) {
 	return 0;
     }
 
@@ -4580,7 +4579,7 @@ static void compiler_compile_ld( COMPILER *cc,
                                                              arity, ex );
 			if( operator ) {
 			    compiler_emit_function_call( cc, operator, NULL,
-						      "", ex );
+                                                         "", ex );
 			} else {
 			    if( tnode_is_reference( var_type )) {
 				compiler_emit( cc, ex, "\tc", PLDGA );
