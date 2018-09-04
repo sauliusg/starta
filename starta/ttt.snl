@@ -1,35 +1,21 @@
-#
-# Snail compiler tests
-#
-#
-# Regression test: stack overflow after taking forward function
-# pointers.
-#
+// --*- C -*--
 
-use * from std;
+// Test derived types.
 
-function f() : string
-{
-    return "I am here!";
-}
+use std;
 
-var phi = f;
-
-. phi();
-
-function g(): string
-{
-    return "This is function g()"
-}
-
-function h() -> (string)
-{
-    return "This is function h()"
-}
-
-var gg, hh = g, h;
+type synint = int;
+type newint1 = new int {};
+type newint2 = new int {};
 
 (*
-. gg();
-. hh();
+var i, j, k : int;
+var x, y, z : synint;
+var a, b, c : newint1;
+var t, u, v : newint2;
 *)
+
+(*
+t = a + t; // ERROR
+t = t + a; // ERROR
+ *)

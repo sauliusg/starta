@@ -11330,7 +11330,7 @@ delimited_type_declaration
   | type_declaration_start '=' _NEW var_type_description
       {
         cexception_t inner;
-        TNODE * type_description = $4;
+        TNODE * volatile type_description = $4;
         TNODE * volatile ntype = NULL; /* new type */
 	compiler_end_scope( compiler, px );
         cexception_guard( inner ) {
@@ -11342,6 +11342,7 @@ delimited_type_declaration
             compiler_compile_type_declaration( compiler, &ntype, &inner );
         }
         cexception_catch {
+            delete_tnode( type_description );
             delete_tnode( ntype );
             cexception_reraise( inner, px );
         }
@@ -11366,11 +11367,11 @@ delimited_type_declaration
             if( tnode_suffix( struct_body )) {
                 tnode_set_suffix( ntype, tnode_suffix( struct_body ), &inner );
             } else {
-                tnode_set_suffix( ntype, tnode_name( compiler->current_type ), &inner );
+                tnode_set_suffix( ntype, tnode_name( compiler->current_type ),
+                                  &inner );
             }
 
             dispose_tnode( &struct_body );
-
             compiler_compile_type_declaration( compiler, &ntype, &inner );
         }
         cexception_catch {
