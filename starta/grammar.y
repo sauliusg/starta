@@ -7429,6 +7429,7 @@ static cexception_t *px; /* parser exception */
 
 %destructor { delete_dnode($$); } <dnode>
 %destructor { delete_tnode($$); } <tnode>
+%destructor { delete_anode($$); } <anode>
 
 %token _ADDRESSOF
 %token _ARRAY
