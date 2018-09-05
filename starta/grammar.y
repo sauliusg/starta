@@ -12607,14 +12607,14 @@ stdio_inpupt_condition
 
         compiler->local_offset ++;
         type_tnode = share_tnode( string_tnode );
+        delete_dnode( default_var );
         default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
         dnode_assign_offset( default_var, &compiler->local_offset );
         type_tnode = NULL;
         compiler_vartab_insert_named_vars( compiler, &default_var, &inner );
 
-        // FIXME: rewrite using the "shared_tnode method".
-        share_tnode( string_tnode );
-        compiler_push_typed_expression( compiler, &string_tnode, &inner );
+        type_tnode = share_tnode( string_tnode );
+        compiler_push_typed_expression( compiler, &type_tnode, &inner );
         compiler_emit( compiler, &inner, "\tc\n", STDREAD );
         compiler_emit( compiler, &inner, "\tc\n", DUP );
         compiler_emit( compiler, &inner, "\tce\n", PST, &default_var_offset );
@@ -12649,6 +12649,7 @@ file_input_condition
 
           compiler->local_offset ++;
           type_tnode = share_tnode( string_type );
+          delete_dnode( default_var );
           default_var = new_dnode_typed( "$ARG", type_tnode, &inner );
           dnode_assign_offset( default_var, &compiler->local_offset );
           type_tnode = NULL;
