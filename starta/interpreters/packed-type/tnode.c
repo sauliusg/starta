@@ -294,7 +294,9 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
     dst_serno = dst->serno;
     dst_element = dst->element_type;
     /* The field dst->base_type is simply copied along with all other
-       fields. */
+       fields, but wee need to delete it first, in case somthing is
+       allocated there:. */
+    delete_tnode( dst->base_type );
     dst_kind = dst->kind;
 
     ssize_t serno = src->serno;
