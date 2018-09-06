@@ -10654,31 +10654,29 @@ delimited_type_description
     }
     struct_or_class_body
     {
-#if 0
-        //FIXME (S.G.): strangely, we need to dispose $2, even though
-        //we insert it into the tnode produced by the
-        //'new_tnode_equivalent()' -- will need to investigate here...
-        TNODE *volatile shared_var_type = $2;
-	$$ = new_tnode_equivalent( &shared_var_type, px );
-#else
-	$$ = new_tnode_equivalent( &$2, px );
-#endif
-        
-	assert( compiler->current_type );
-        assert( $4 );
+        TNODE *volatile var_type_description = $2;
+        cexception_t inner;
 
-        if( tnode_suffix( $4 )) {
-            tnode_set_suffix( $$, tnode_suffix( $4 ), px );
-        } else {
-            tnode_set_suffix( $$, tnode_name( compiler->current_type ), px );
+        cexception_guard( inner ) {
+            $$ = new_tnode_equivalent( &var_type_description, &inner );
+        
+            assert( compiler->current_type );
+            assert( $4 );
+
+            if( tnode_suffix( $4 )) {
+                tnode_set_suffix( $$, tnode_suffix( $4 ), &inner );
+            } else {
+                tnode_set_suffix( $$, tnode_name( compiler->current_type ),
+                                  &inner );
+            }
+        }
+        cexception_catch {
+            delete_tnode( var_type_description );
+            cexception_reraise( inner, px );
         }
 
-	$$ = tnode_move_operators( $$, $4 );
-
+	tnode_move_operators( $$, $4 );
 	dispose_tnode( &$4 );
-#if 0
-	dispose_tnode( &$2 );
-#endif
    }
 
   | type_identifier _OF delimited_type_description
