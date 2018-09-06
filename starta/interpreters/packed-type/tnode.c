@@ -324,6 +324,8 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 	assert( !dst->element_type );
 	dst->element_type = dst_element;
 	dst->kind = dst_kind;
+    } else {
+        delete_tnode( dst_element );
     }
 
     tnode_update_self_parameter_type( dst, src );
