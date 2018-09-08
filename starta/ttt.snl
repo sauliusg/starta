@@ -16,6 +16,8 @@ var i : int;
 
 //use PT1(1,double,x,g);
 use PT2(2,short,i,h);
+//use PT2(2,long,i,h) as long_PT2;
+//use PT2(2,int,i,h) as int_PT2;
 
 // . PT1::pp( 10 ); // 100 + 30.5 + 10 = 140.5
 // . PT2::pp( 10 ); // 100 + 30.5 + 10 = 140.5
