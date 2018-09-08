@@ -7163,10 +7163,6 @@ static void compiler_process_module_parameters( COMPILER *cc,
                                                 DNODE *module_params,
                                                 cexception_t *ex )
 {
-#if 0
-    printf( ">>> There is a requested module '%s'\n",
-            dnode_name( cc->requested_module ));
-#endif
     DNODE *arg, *param, *module_args =
         dnode_module_args( cc->requested_module );
 
