@@ -198,6 +198,7 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
         *tnode = NULL;
     }
 
+    assert(!*tnode);
     return ret;
 }
 
