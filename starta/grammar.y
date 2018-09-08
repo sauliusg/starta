@@ -8231,18 +8231,10 @@ module_import_identifier
                     compiler_find_module( compiler, module_name, &inner ),
                     &inner );
               dnode_set_filename( module_name_dnode, pkg_path, &inner );
-#if 0
-              printf( ">>> inserted filename '%s' for module '%s'\n",
-                  pkg_path, dnode_name( module_name_dnode ));
-#endif
           } else {
               char *filename = dnode_filename( existing_name );
               if( filename ) {
                   dnode_set_filename( module_name_dnode, filename, &inner );
-#if 0
-              printf( ">>> copying filename filename '%s' for module '%s'\n",
-                  filename, dnode_name( module_name_dnode ));
-#endif
               }
           }
       }
