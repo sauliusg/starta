@@ -321,6 +321,8 @@ void bcalloc_run_all_destructors( cexception_t *ex )
             fprintf( stderr, "%d destructor cycles did not eliminte "
                      "unallocated objects -- bailing out...\n", i );
             fflush( NULL );
+            // FIXME: rather than calling 'exit()', we should probably
+            // raise exception here (S.G.):
             exit( 98 );
         }
         /* Append the finalised objects to the newly allocated
