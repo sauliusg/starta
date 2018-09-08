@@ -5751,17 +5751,8 @@ static void compiler_use_module( COMPILER *c,
 
     DNODE *volatile shared_module = NULL;
     
-#if 0
-    printf( "\n>>> module = '%s', filename = '%s'\n",
-            dnode_name( *module_name_dnode ),
-            dnode_filename( *module_name_dnode ));
-#endif
-
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "use" )) {
-#if 0
-            printf( ">>> can use module '%s'\n", module_name );
-#endif
             if( module != NULL ) {
                 char *module_name = module ? dnode_name( module ) : NULL;
                 DNODE *existing_module = module_name ?
@@ -5769,45 +5760,21 @@ static void compiler_use_module( COMPILER *c,
                     ( c->vartab, *module_name_dnode, symtab )
                     : NULL;
                 char *synonim = dnode_synonim( *module_name_dnode );
-#if 0
-                printf( "<<< existing_module == %p, synonim == %p >>>\n", 
-                        existing_module, synonim );
-#endif
                 if( !existing_module || existing_module != module || synonim ) {
-#if 0
-                    printf( ">>> found module '%s' for reuse\n", 
-                            module_name );
-                    printf( ">>> will reinsert module '%s' as '%s'\n", 
-                            module_name, 
-                            synonim ? synonim : dnode_name( module ));
-#endif
                     shared_module = share_dnode( module );
                     if( synonim ) {
-#if 0
-                        printf( ">>> reinserting synonim\n" );
-#endif
                         vartab_insert_module( c->vartab, &shared_module ,
                                               synonim, symtab, &inner );
                     } else {
-#if 0
-                        printf( ">>> reinserting under its own name\n" );
-#endif
                         vartab_insert_named_module( c->vartab, &shared_module,
                                                     symtab, &inner );
                     }
                 }
-#if 0
-                printf( "found compiled module '%s'\n", module_name );
-#endif
                 compiler_use_exported_module_names( c, module, &inner );
             } else {
                 char *pkg_path = c->module_filename ?
                     c->module_filename :
                     compiler_find_module( c, module_name, &inner );
-
-#if 0
-                printf( ">>> about to open file named '%s'\n", pkg_path );
-#endif
 
                 compiler_open_include_file( c, pkg_path, &inner );
 
