@@ -6,13 +6,13 @@
 
 use * from std;
 
-/*
 var x : float;
 var i : int;
+/*
 */
 
 // procedure g(): int { return 1 }
-// procedure h(): int { return 2 }
+ procedure h(): int { return 2 }
 
 //use PT1(1,double,x,g);
 use PT2(2,short,i,h);

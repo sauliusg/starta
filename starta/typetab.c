@@ -226,6 +226,7 @@ static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
                    the inserted TNODE ownership and to free them after
                    the compilation, like it is currently done in
                    vartabs. */
+                delete_tnode( tnode );
             } else {
                 /* another imported type name exists: add the new
                    imported name, but mark that it is present
