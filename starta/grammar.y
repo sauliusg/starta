@@ -5673,22 +5673,10 @@ static void compiler_import_module( COMPILER *c,
 
     DNODE *volatile shared_module = NULL;
 
-#if 0
-    printf( ">>> module = '%s', filename = '%s'\n",
-            dnode_name( *module_name_dnode ),
-            dnode_filename( *module_name_dnode ));
-#endif
-
     cexception_guard( inner ) {
         if( compiler_can_compile_use_statement( c, "import" )) {
-#if 0
-            printf( ">>> can import module '%s'\n", module_name );
-#endif
             if( module != NULL ) {
                 char *synonim = dnode_synonim( *module_name_dnode );
-#if 0
-                printf( ">>> will insert module '%s' as '%s'\n", module_name, synonim );
-#endif
                 shared_module = share_dnode( module );
                 if( synonim ) {
                     vartab_insert_module( c->vartab, &shared_module,
@@ -5697,9 +5685,6 @@ static void compiler_import_module( COMPILER *c,
                     vartab_insert_named_module( c->vartab, &shared_module,
                                                 symtab, &inner );
                 }
-#if 0
-                printf( "found compiled module '%s'\n", module_name );
-#endif
             } else {
                 char *pkg_path = c->module_filename ?
                     c->module_filename : compiler_find_module( c, module_name,
