@@ -203,12 +203,14 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
 }
 
 static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
-                                              type_suffix_t suffix, TNODE *tnode,
+                                              type_suffix_t suffix,
+                                              TNODE *volatile *tnode,
                                               cexception_t *ex )
 {
     TNODE *ret = NULL;
     TYPE_NODE *lookup_node = NULL;
 
+    assert( tnode );
     assert( table );
     assert( name );
 
@@ -221,40 +223,39 @@ static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
                 /* a non-imported name exists in the same scope --
                    silently ignore the imported name:*/
                 ret = lookup_node->tnode;
-                /* probably a duplicate list must be installed in the
-                   type tables (TYPETAB), to keep propert record of
-                   the inserted TNODE ownership and to free them after
-                   the compilation, like it is currently done in
-                   vartabs. */
-                delete_tnode( tnode );
+                dispose_tnode( tnode );
             } else {
                 /* another imported type name exists: add the new
                    imported name, but mark that it is present
                    multiple times: */
-                table->node = new_type_node( tnode, name, suffix,
+                table->node = new_type_node( *tnode, name, suffix,
                                              table->current_scope,
                                              table->current_subscope,
                                              lookup_node->count + 1,
                                              /* next = */ table->node,
                                              ex );
                 table->node->flags |= TNF_IS_IMPORTED;
+                *tnode = NULL;
             }
         } else {
             /* A forward declaration must be overriden: */
             ret = lookup_node->tnode;
+            *tnode = NULL;
         }
     } else {
         /* No node with the same name is present in the current scope:
            add it: */
-        table->node = new_type_node( tnode, name, suffix,
+        table->node = new_type_node( *tnode, name, suffix,
                                      table->current_scope,
                                      table->current_subscope,
                                      /* count = */ 1,
                                      /* next = */ table->node, ex );
         table->node->flags |= TNF_IS_IMPORTED;
-        ret = tnode;
+        ret = *tnode;
+        *tnode = NULL;
     }
 
+    assert( !*tnode );
     return ret;
 }
 
@@ -288,9 +289,8 @@ void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
             TNODE *tnode = curr->tnode;
             type_suffix_t suffix_type = curr->suffix;
             shared_tnode = share_tnode( tnode );
-            typetab_insert_imported_suffix( dst, name, suffix_type, 
-                                            shared_tnode, &inner );
-            shared_tnode = NULL;
+            typetab_insert_imported_suffix( dst, name, suffix_type,
+                                            &shared_tnode, &inner );
         }
     }
     cexception_catch {
