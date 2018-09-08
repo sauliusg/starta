@@ -1151,6 +1151,7 @@ static TNODE *compiler_typetab_insert_msg( COMPILER *cc,
         assert( !shared_tnode );
     }
     cexception_catch {
+        dispose_tnode( tnode );
         delete_tnode( shared_tnode );
         cexception_reraise( inner, ex );
     }
