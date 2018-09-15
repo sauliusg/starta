@@ -218,13 +218,6 @@ TNODE* tnode_break_cycles( TNODE *tnode )
 
         tnode->flags |= TF_CYCLES_BROKEN;
 
-        // dnode_break_cycles( tnode->fields );
-        // dnode_break_cycles( tnode->operators );
-        // dnode_break_cycles( tnode->conversions );
-        // dnode_break_cycles( tnode->methods );
-        // dnode_break_cycles( tnode->args );
-        // dnode_break_cycles( tnode->return_vals );
-
         dispose_dnode( &tnode->fields );
         dispose_dnode( &tnode->operators );
         dispose_dnode( &tnode->conversions );
