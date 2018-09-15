@@ -225,12 +225,9 @@ TNODE* tnode_break_cycles( TNODE *tnode )
         dispose_dnode( &tnode->args );
         dispose_dnode( &tnode->return_vals );
 
-        tnode_break_cycles( tnode->base_type );
-        tnode_break_cycles( tnode->element_type );
         dispose_tnode( &tnode->base_type );
         dispose_tnode( &tnode->element_type );
 
-        tlist_break_cycles( tnode->interfaces );
         dispose_tlist( &tnode->interfaces );
 
         dnode_break_cycles( tnode->constructor );
@@ -238,8 +235,6 @@ TNODE* tnode_break_cycles( TNODE *tnode )
 
         dispose_dnode( &tnode->constructor );
         dispose_dnode( &tnode->destructor );
-
-        tnode_break_cycles( tnode->next );
     }
 
     return tnode;
