@@ -316,6 +316,8 @@ void bcalloc_run_all_destructors( cexception_t *ex )
     alloccell_t *curr;
     alloccell_t *finalised;
     int i = 0;
+    int finished = 0;
+
     do {
         finalised = allocated; allocated = NULL;
         for( curr = finalised; curr != NULL; curr = curr->next ) {
@@ -325,9 +327,20 @@ void bcalloc_run_all_destructors( cexception_t *ex )
             fprintf( stderr, "%d destructor cycles did not eliminte "
                      "unallocated objects -- bailing out...\n", i );
             fflush( NULL );
+            // FIXME: rather than calling 'exit()', we should probably
+            // raise exception here (S.G.):
             exit( 98 );
         }
-    } while( allocated );
+        /* Append the finalised objects to the newly allocated
+           block list: */
+        if( allocated ) {
+            for( curr = allocated; curr->next != NULL; curr = curr->next );
+            curr->next = finalised;
+        } else {
+            allocated = finalised;
+            finished = 1;
+        }
+    } while( !finished );
 }
 
 int bcalloc_is_in_heap( void *p )
