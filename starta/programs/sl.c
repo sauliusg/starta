@@ -438,11 +438,13 @@ int main( int argc, char *argv[], char *env[] )
   cexception_catch {
       fprintf( stderr, "%s: %s\n", argv[0], cexception_message( &inner ));
       delete_thrcode( code );
+      freex( files );
       null_allocated_dnodes();
       null_allocated_tnodes();
       exit(3);
   }
   delete_thrcode( code );
+  freex( files );
   null_allocated_dnodes();
   null_allocated_tnodes();
   fflush(NULL);
