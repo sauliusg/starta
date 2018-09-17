@@ -54,9 +54,11 @@ static DNODE *alloc_dnode( cexception_t *ex )
     node->next_alloc = allocated;
     allocated = node;
     maxalloc ++; curralloc ++;
+#ifdef USE_SERNO
     node->serno = maxalloc;
+#endif
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -88,7 +90,7 @@ static void free_dnode( DNODE *dnode )
     /* printf( "deleting dnode %d\n", (dnode-dnodes) ); */
     assert( dnode->rcount == 0 );
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -127,9 +129,11 @@ static DNODE *alloc_dnode( cexception_t *ex )
     node->next_alloc = allocated;
     allocated = node;
     maxalloc ++; curralloc ++;
+#ifdef USE_SERNO
     node->serno = maxalloc;
+#endif
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -159,7 +163,7 @@ static void free_dnode( DNODE *dnode )
 {
     assert( dnode->rcount == 0 );
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -171,8 +175,8 @@ static void free_dnode( DNODE *dnode )
     }
 
     if( dnode->serno == requested_serno ) {
-        int i;
-        fprintf( stderr, "FREE DNODE: freeing dnode serno = %zd\n", dnode->serno );
+    int i;
+    fprintf( stderr, "FREE DNODE: freeing dnode serno = %zd\n", dnode->serno );
         ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
         strings = backtrace_symbols( buffer, ntraces );
         for( i = 0; i < ntraces; i++ ) {
@@ -205,9 +209,15 @@ void dnode_fprint_allocated( FILE *fp )
     fprintf( fp, "MAX DNODES: %jd (still allocated %jd)\n",
              maxalloc, curralloc );
     for( node = allocated; node != NULL; node = node->next_alloc ) {
-        fprintf( fp, "DNODE: %p rcount = %d rcount2 = %d serno = %zd "
+    fprintf( fp, "DNODE: %p rcount = %d rcount2 = %d "
+#ifdef USE_SERNO
+                 "serno = %zd "
+#endif
                  "%s%s\"%s\" type = \"%s\" next = %p prev = %p\n",
-                 node, node->rcount, node->rcount2, node->serno,
+                 node, node->rcount, node->rcount2,
+#ifdef USE_SERNO
+                 node->serno,
+#endif
                  (node->flags & DF_ACCESSIBLE ? "ACCESSIBLE " : ""),
                  (node->flags & DF_CYCLES_BROKEN ? "CYCLES_BROKEN " : ""),
                  node->name,
