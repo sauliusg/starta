@@ -19,7 +19,7 @@
 #define USE_STACK_TRACES 0
 #endif
 
-#if USE_STACK_TRACES
+#ifdef USE_STACK_TRACES
 #include <execinfo.h>
 #include <stdlib.h>
 #endif
@@ -64,9 +64,11 @@ static TNODE *alloc_tnode( cexception_t *ex )
     node->next_alloc = allocated;
     allocated = node;
     maxalloc ++; curralloc++;
+#ifdef USE_SERNO
     node->serno = maxalloc;
+#endif
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -98,7 +100,7 @@ static void free_tnode( TNODE *tnode )
     /* printf( "deleting tnode %d\n", (tnode-tnodes) ); */
     assert( tnode->rcount == 0 );
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -137,9 +139,11 @@ static TNODE *alloc_tnode( cexception_t *ex )
     node->next_alloc = allocated;
     allocated = node;
     maxalloc ++; curralloc ++;
+#ifdef USE_SERNO
     node->serno = maxalloc;
-
-#if USE_STACK_TRACES
+#endif
+    
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -170,7 +174,7 @@ static void free_tnode( TNODE *tnode )
     assert( tnode->rcount == 0 );
     //printf( "<<<<< freeing tnode %zd\n", tnode->serno ); 
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
     void *buffer[100];
     char **strings;
     int ntraces;
@@ -216,9 +220,15 @@ void tnode_fprint_allocated( FILE *fp )
     fprintf( fp, "MAX TNODES: %jd (still allocated %jd)\n",
              maxalloc, curralloc );
     for( node = allocated; node != NULL; node = node->next_alloc ) {
-        fprintf( fp, "TNODE: %p rcount = %zd rcount2 = %zd serno = %zd "
+        fprintf( fp, "TNODE: %p rcount = %zd rcount2 = %zd "
+#ifdef USE_SERNO
+                 "serno = %zd "
+#endif
                  "%s%s\"%s\" base type = \"%s\" next = %p\n",
-                 node, node->rcount, node->rcount2, node->serno,
+                 node, node->rcount, node->rcount2,
+#ifdef USE_SERNO
+                 node->serno,
+#endif
                  (node->flags & TF_ACCESSIBLE ? "ACCESSIBLE " : ""),
                  (node->flags & TF_CYCLES_BROKEN ? "CYCLES_BROKEN " : ""),
                  node->name,

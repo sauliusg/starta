@@ -33,7 +33,9 @@ struct TNODE {
 			     etc.) that are references and should be garbage
 			     collected */
 
+#ifdef USE_SERNO
     ssize_t serno;
+#endif
 
     ssize_t nextnumoffs;  /* The offset of the next numeric
                              (non-reference) field to be assigned. */
