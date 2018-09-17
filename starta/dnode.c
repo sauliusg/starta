@@ -66,8 +66,10 @@ struct DNODE {
 			      of the function in the bytecode, or
 			      offset of the virtual method in the
 			      virtual method table. */
+#ifdef USE_SERNO
     ssize_t serno;         /* Allocation serial number; used to hunt
                               down memory leaks. */
+#endif
     int rcount;            /* reference count */
     int rcount2;           /* The second reference count, used to
                               count references from cycles. If all
@@ -119,7 +121,7 @@ void delete_dnode( DNODE *node )
     while( node ) {
         next = node->next;
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
         void *buffer[100];
         char **strings;
         int ntraces;
@@ -611,7 +613,7 @@ DNODE *share_dnode( DNODE* node )
     if( node ) {
         node->rcount ++;
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
         void *buffer[100];
         char **strings;
         int ntraces;
