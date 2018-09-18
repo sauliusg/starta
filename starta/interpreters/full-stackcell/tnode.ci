@@ -32,7 +32,9 @@ struct TNODE {
     ssize_t nrefs;        /* number of fields in the type (structure, class,
 			     etc.) that are references and should be garbage
 			     collected */
+#ifdef USE_SERNO
     ssize_t serno;
+#endif
     ssize_t max_vmt_offset;
                           /* maximum Virtual method offset assigned in
 			     this type.*/
