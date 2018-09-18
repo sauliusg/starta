@@ -39,7 +39,7 @@ void delete_tnode( TNODE *tnode )
 {
     if( tnode ) {
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
         void *buffer[100];
         char **strings;
         int ntraces;
@@ -271,7 +271,10 @@ static void tnode_update_self_parameter_type( TNODE *new_tnode,
 
 TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 {
-    int dst_rcount, src_rcount, dst_serno;
+    int dst_rcount, src_rcount;
+#ifdef USE_SERNO
+    int dst_serno;
+#endif
     TNODE *dst_element = NULL;
     type_kind_t dst_kind;
 
@@ -289,7 +292,9 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 
     dst_rcount = dst->rcount;
     src_rcount = src->rcount;
+#ifdef USE_SERNO
     dst_serno = dst->serno;
+#endif
     dst_element = dst->element_type;
     /* The field dst->base_type is simply copied along with all other
        fields, but wee need to delete it first, in case something is
@@ -297,7 +302,9 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
     delete_tnode( dst->base_type );
     dst_kind = dst->kind;
 
+#ifdef USE_SERNO
     ssize_t serno = src->serno;
+#endif
     void *src_next_alloc = src->next_alloc;
     void *src_prev_alloc = src->prev_alloc;
 
@@ -308,8 +315,10 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 
     memset( src, 0, sizeof(*src));
 
+#ifdef USE_SERNO
     dst->serno = dst_serno;
     src->serno = serno;
+#endif
     src->next_alloc = src_next_alloc;
     src->prev_alloc = src_prev_alloc;
 
@@ -347,7 +356,7 @@ TNODE *share_tnode( TNODE* node )
     if( !node ) return NULL;
     node->rcount ++;
 
-#if USE_STACK_TRACES
+#if USE_STACK_TRACES && USE_SERNO
         void *buffer[100];
         char **strings;
         int ntraces;
