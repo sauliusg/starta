@@ -1,2 +1,2 @@
-./sl: Unhandled exception -1 in the bytecode interpreter: class A count negative
+exception (code -1) raised in destructor: class A count negative
 Object 'TheFirstA', counted 1 times

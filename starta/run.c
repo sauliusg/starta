@@ -726,9 +726,14 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
                 thrcode_run_subroutine( istate, code_offset, &inner );
             }
             cexception_catch {
-                /* fprintf( stderr, "!!! exception raised in destructor\n" ); */
-                in_gc = 0;
-                cexception_reraise( inner, ex );
+                char *message = cexception_message( &inner );
+                char *errcode = cexception_error_code( &inner );
+                fprintf( stderr, "exception (code %d) raised in destructor: %s\n",
+                         errcode, message );
+                /* We sould not reraise the exception, since then
+                   garbage collection will not be properly finished.*/
+                //in_gc = 0;
+                //cexception_reraise( inner, ex );
             }
             hdr->vmt_offset = 0; // Not an object any more; prevents
                                  // running destructor twice.
