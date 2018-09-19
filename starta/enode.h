@@ -25,6 +25,8 @@ typedef enum {
     EF_IS_ZERO       = 0x40
 } enode_flag_t;
 
+void dispose_enode( ENODE *volatile *node );
+
 void delete_enode( ENODE* node );
 
 ENODE *enode_make_type_to_element_type( ENODE *enode );
@@ -71,7 +73,7 @@ ENODE *share_enode( ENODE *enode );
 
 ENODE *new_enode( cexception_t *ex );
 
-ENODE *new_enode_typed( TNODE *tnode, cexception_t *ex );
+ENODE *new_enode_typed( TNODE *volatile *tnode, cexception_t *ex );
 
 ENODE *new_enode_return_value( TNODE *retval_tnode, cexception_t *ex );
 
@@ -79,7 +81,7 @@ ENODE *new_enode_guarding_arg( cexception_t *ex );
 
 ENODE *new_enode_varaddr_expr( DNODE *var_dnode, cexception_t *ex );
 
-void enode_append_element_type( ENODE *enode, TNODE *base );
+void enode_append_element_type( ENODE *enode, TNODE *volatile *base );
 
 void enode_list_push( ENODE **ptr_list, ENODE *enode );
 
@@ -91,5 +93,9 @@ void enode_list_swap( ENODE **ptr_list );
 
 #define foreach_enode( NODE, LIST ) \
    for( NODE = LIST; NODE != NULL; NODE = enode_next( NODE ))
+
+void enode_print_allocated(void);
+void enode_print_allocated_to_stderr(void);
+void enode_fprint_allocated( FILE *fp );
 
 #endif

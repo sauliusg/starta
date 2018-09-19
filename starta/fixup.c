@@ -129,6 +129,13 @@ FIXUP *new_fixup_absolute( const char *name,
     return fixup;
 }
 
+void dispose_fixup_list( FIXUP *volatile *fixup_list )
+{
+    assert( fixup_list );
+    delete_fixup_list( *fixup_list );
+    *fixup_list = NULL;
+}
+
 void delete_fixup_list( FIXUP * fixup_list )
 {
     FIXUP *next;

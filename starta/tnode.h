@@ -32,6 +32,19 @@ typedef enum {
     TF_NON_NULL        = 0x40,
     TF_IS_EQUIVALENT   = 0x80,
     TF_HAS_PLACEHOLDER = 0x100,
+    TF_CYCLES_BROKEN   = 0x200,
+    TF_VISITED         = 0x400, /* Specifies that the node has been
+                                   visited during the cycle search. */
+    TF_ACCESSIBLE      = 0x800, /* This flag is set when rcount >
+                                   rcount2 for the given DNODE,
+                                   indicating that there are external
+                                   ponters (roots) leading to this
+                                   DNODE, and thus this node might be
+                                   accessible in the
+                                   program. Otherwise, all reference
+                                   counts come from cycle references,
+                                   and the node can be safely
+                                   collected. */
     last_TYPE_FLAG
 } type_flag_t;
 
@@ -74,6 +87,17 @@ typedef enum {
 } type_kind_t;
 
 void delete_tnode( TNODE *tnode );
+void dispose_tnode( TNODE *volatile *tnode );
+void break_cycles_for_all_tnodes( void );
+void tnode_traverse_rcount2( TNODE *tnode );
+void traverse_all_tnodes( void );
+void tnode_mark_accessible( TNODE *tnode );
+void reset_flags_for_all_tnodes( type_flag_t flags );
+void set_accessible_flag_for_all_tnodes( void );
+void set_rcount2_for_all_tnodes( int value );
+void take_ownership_of_all_tnodes( void );
+void delete_all_tnodes( void );
+TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_struct( char *name, cexception_t *ex );
@@ -83,8 +107,8 @@ TNODE *new_tnode_ptr( cexception_t *ex );
 TNODE *new_tnode_nullref( cexception_t *ex );
 TNODE *new_tnode_ignored( cexception_t *ex );
 TNODE *new_tnode_ref( cexception_t *ex );
-TNODE *new_tnode_derived( TNODE *base, cexception_t *ex );
-TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex );
+TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex );
+TNODE *new_tnode_equivalent( TNODE *volatile *base, cexception_t *ex );
 TNODE *new_tnode_blob( TNODE *base_type, cexception_t *ex );
 TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex );
 TNODE *tnode_set_nref( TNODE *tnode, ssize_t nref );
@@ -103,26 +127,51 @@ TNODE *new_tnode_function_or_proc_ref( DNODE *parameters,
 TNODE *new_tnode_function( char *name, DNODE *parameters, DNODE *return_dnodes,
 			   cexception_t *ex );
 
+TNODE *new_tnode_function_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex );
+
 TNODE *new_tnode_constructor( char *name,
                               DNODE *parameters,
                               DNODE *return_dnodes,
                               cexception_t *ex );
+
+TNODE *new_tnode_constructor_NEW( char *name,
+                                  DNODE *volatile *parameters,
+                                  DNODE *volatile *return_dnodes,
+                                  cexception_t *ex );
 
 TNODE *new_tnode_destructor( char *name,
                              DNODE *parameters,
                              DNODE *return_dnodes,
                              cexception_t *ex );
 
+TNODE *new_tnode_destructor_NEW( char *name,
+                                 DNODE *volatile *parameters,
+                                 DNODE *volatile *return_dnodes,
+                                 cexception_t *ex );
+
 TNODE *new_tnode_method( char *name, DNODE *parameters, DNODE *return_dnodes,
                          cexception_t *ex );
+
+TNODE *new_tnode_method_NEW( char *name,
+                             DNODE *volatile *parameters,
+                             DNODE *volatile *return_dnodes,
+                             cexception_t *ex );
 
 TNODE *new_tnode_operator( char *name, DNODE *parameters, DNODE *return_dnodes,
 			   cexception_t *ex );
 
+TNODE *new_tnode_operator_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex );
+
 TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
-TNODE *new_tnode_composite_synonim( TNODE *composite_type,
-				    TNODE *element_type,
+TNODE *new_tnode_composite_synonim( TNODE *volatile *composite_type,
+				    TNODE *volatile *element_type,
 				    cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
@@ -217,20 +266,20 @@ void tnode_print( TNODE *tnode );
 void tnode_print_indent( TNODE *tnode, int indent );
 
 TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field );
-TNODE *tnode_insert_single_operator( TNODE* tnode, DNODE *operator );
-TNODE *tnode_insert_single_conversion( TNODE* tnode, DNODE *conversion );
-TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method );
-TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member );
+TNODE *tnode_insert_single_operator( TNODE *tnode, DNODE *volatile *operator );
+TNODE *tnode_insert_single_conversion( TNODE *tnode, DNODE *conversion );
+TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method );
+TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member );
 TNODE *tnode_insert_enum_value( TNODE *tnode, DNODE *member );
 TNODE *tnode_insert_enum_value_list( TNODE *tnode, DNODE *list );
-TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor );
-TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor );
+TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *volatile *constructor );
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *volatile *destructor );
 ssize_t tnode_max_vmt_offset( TNODE *tnode );
 ssize_t tnode_vmt_offset( TNODE *tnode );
 ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset );
 DNODE *tnode_methods( TNODE *tnode );
 TNODE *tnode_base_type( TNODE *tnode );
-TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type );
+TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type );
 TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces );
 TNODE *tnode_first_interface( TNODE *class_tnode );
 TNODE *tnode_element_type( TNODE *tnode );
@@ -290,5 +339,11 @@ TNODE *tnode_drop_last_argument( TNODE *tnode );
 
 #define foreach_tnode_base_class( NODE, LIST ) \
    for( NODE = LIST; NODE != NULL; NODE = tnode_base_type( NODE ))
+
+void tnode_print_allocated();
+void tnode_print_allocated_to_stderr();
+void tnode_fprint_allocated( FILE *fp );
+
+void null_allocated_tnodes(void);
 
 #endif

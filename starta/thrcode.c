@@ -86,11 +86,11 @@ typedef struct RUNTIME_DATA_NODE {
 } RUNTIME_DATA_NODE;
 
 static RUNTIME_DATA_NODE*
-alloc_runtime_data_node( ssize_t size )
+alloc_runtime_data_node( ssize_t size, cexception_t *ex )
 {
     RUNTIME_DATA_NODE *rdnode;
 
-    return calloc( 1, sizeof(*rdnode) + size - sizeof(rdnode->value) );
+    return callocx( 1, sizeof(*rdnode) + size - sizeof(rdnode->value), ex );
 }
 
 void delete_runtime_data_nodes( RUNTIME_DATA_NODE *nodes )
@@ -99,7 +99,7 @@ void delete_runtime_data_nodes( RUNTIME_DATA_NODE *nodes )
 
     while( nodes ) {
         next = nodes->next;
-        free( nodes );
+        freex( nodes );
         nodes = next;
     }
 }
@@ -118,6 +118,7 @@ struct THRCODE {
 			        on the vector 'opcodes'. At any given moment,
 			        the following must hold:
 			        thrcode->length <= thrcode->capacity */
+    size_t rcount;           /* reference count */
     FIXUP *fixups;           /* locations containing forward
 				references that need to be fixed up in
 				this code. */
@@ -147,12 +148,30 @@ struct THRCODE {
 
 THRCODE *new_thrcode( cexception_t *ex )
 {
-    return callocx( 1, sizeof(THRCODE), ex );
+    THRCODE *tc = callocx( 1, sizeof(THRCODE), ex );
+    tc->rcount = 1;
+    return tc;
+}
+
+THRCODE *share_thrcode( THRCODE *bc )
+{
+    if( bc )
+        bc->rcount ++;
+    return bc;
 }
 
 void delete_thrcode( THRCODE *bc )
 {
     if( bc ) {
+#ifdef ALLOCX_DEBUG_COUNTS
+        checkptr( bc );
+#endif
+        if( bc->rcount <= 0 ) {
+	    printf( "!!! thrcode->rcount = %ld (%p)!!!\n", bc->rcount, bc );
+	    assert( bc->rcount > 0 );
+	}
+        if( --bc->rcount > 0 )
+	    return;
 	delete_fixup_list( bc->fixups );
 	delete_fixup_list( bc->forward_function_calls );
 	delete_fixup_list( bc->op_continue_fixups );
@@ -191,8 +210,13 @@ void dispose_thrcode( THRCODE * volatile *thrcode )
 void *thrcode_alloc_extra_data( THRCODE *tc, ssize_t size )
 {
     RUNTIME_DATA_NODE *current = tc->extra_data;
+    cexception_t inner;
+    void *volatile data = NULL;
 
-    tc->extra_data = alloc_runtime_data_node( size );
+    cexception_guard( inner ) {
+        data = alloc_runtime_data_node( size, &inner );
+    }
+    tc->extra_data = data;
 
     if( tc->extra_data ) {
         tc->extra_data->next = current;

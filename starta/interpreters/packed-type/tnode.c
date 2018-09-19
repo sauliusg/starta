@@ -19,6 +19,7 @@
 #include <stackcell.h>
 #include <tcodes.h>
 #include <tlist.h>
+#include <dnode.h>
 #include <allocx.h>
 #include <stringx.h>
 #include <assert.h>
@@ -27,9 +28,43 @@
 #include <tnode.ci>
 #include <tnode_a.ci>
 
+#ifndef USE_STACK_TRACES
+#define USE_STACK_TRACES 1
+#endif
+
+#if USE_STACK_TRACES
+#include <execinfo.h>
+#include <stdlib.h>
+#endif
+
 void delete_tnode( TNODE *tnode )
 {
     if( tnode ) {
+
+#if USE_STACK_TRACES && USE_SERNO
+        void *buffer[100];
+        char **strings;
+        int ntraces;
+        int requested_serno = 0;
+        char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+        if( requested_serno_envvar ) {
+            requested_serno = atoi( requested_serno_envvar );
+        }
+
+        if( tnode->serno == requested_serno ) {
+            int i;
+            fprintf( stderr, "DELETE TNODE: deleting tnode serno = %zd, "
+                     "rcount = %jd\n", tnode->serno, tnode->rcount );
+            ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+            strings = backtrace_symbols( buffer, ntraces );
+            for( i = 0; i < ntraces; i++ ) {
+                fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+            }
+            free( strings );
+        }
+#endif
+
         if( tnode->rcount <= 0 ) {
 	    printf( "!!! tnode->rcount = %ld (%s) !!!\n",
 		    tnode->rcount, tnode_kind_name(tnode) );
@@ -55,6 +90,156 @@ void delete_tnode( TNODE *tnode )
     }
 }
 
+void dispose_tnode( TNODE *volatile *tnode )
+{
+    assert( tnode );
+    delete_tnode( *tnode );
+    *tnode = NULL;
+}
+
+void tnode_traverse_rcount2( TNODE *tnode )
+{
+    if( !tnode ) return;
+
+    tnode->rcount2 ++;
+
+    if( tnode->flags & TF_VISITED ) return;
+
+    tnode->flags |= TF_VISITED;
+
+    tlist_traverse_tnodes_and_set_rcount2( tnode->interfaces );
+    tnode_traverse_rcount2( tnode->base_type );
+    tnode_traverse_rcount2( tnode->element_type );
+    
+    dnode_traverse_rcount2( tnode->fields );
+    dnode_traverse_rcount2( tnode->operators );
+    dnode_traverse_rcount2( tnode->conversions );
+    dnode_traverse_rcount2( tnode->methods );
+    dnode_traverse_rcount2( tnode->args );
+    dnode_traverse_rcount2( tnode->return_vals );
+    dnode_traverse_rcount2( tnode->constructor );
+    dnode_traverse_rcount2( tnode->destructor );
+    
+    tnode_traverse_rcount2( tnode->next );
+}
+
+
+void traverse_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        tnode_traverse_rcount2( node );
+    }
+}
+
+void tnode_mark_accessible( TNODE *tnode )
+{
+    if( !tnode ) return;
+
+    if( tnode->flags & TF_ACCESSIBLE ) return;
+
+    tnode->flags |= TF_ACCESSIBLE;
+
+    tlist_traverse_tnodes_and_mark_accessible( tnode->interfaces );
+    tnode_mark_accessible( tnode->base_type );
+    tnode_mark_accessible( tnode->element_type );
+    
+    dnode_mark_accessible( tnode->fields );
+    dnode_mark_accessible( tnode->operators );
+    dnode_mark_accessible( tnode->conversions );
+    dnode_mark_accessible( tnode->methods );
+    dnode_mark_accessible( tnode->args );
+    dnode_mark_accessible( tnode->return_vals );
+    dnode_mark_accessible( tnode->constructor );
+    dnode_mark_accessible( tnode->destructor );
+    
+    tnode_mark_accessible( tnode->next );
+}
+
+
+void reset_flags_for_all_tnodes( type_flag_t flags )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        tnode_reset_flags( node, flags );
+    }
+}
+
+void set_accessible_flag_for_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        if( node->rcount > node->rcount2 )
+            tnode_mark_accessible( node );
+    }
+}
+
+void set_rcount2_for_all_tnodes( int value )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        node->rcount2 = value;
+    }
+}
+
+void break_cycles_for_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        tnode_break_cycles( node );
+    }
+}
+
+void take_ownership_of_all_tnodes( void )
+{
+    TNODE *node;
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+        share_tnode( node );
+    }
+}
+
+void delete_all_tnodes( void )
+{
+    TNODE *node, *next;
+    for( node = allocated; node != NULL; ) {
+        next = node->next_alloc;
+        delete_tnode( node );
+        node = next;
+    }
+}
+
+TNODE* tnode_break_cycles( TNODE *tnode )
+{
+    if( tnode ) {
+
+        if( (tnode->flags & TF_CYCLES_BROKEN) ||
+            (tnode->flags & TF_ACCESSIBLE) )
+            return tnode;
+
+        tnode->flags |= TF_CYCLES_BROKEN;
+
+        dispose_dnode( &tnode->fields );
+        dispose_dnode( &tnode->operators );
+        dispose_dnode( &tnode->conversions );
+        dispose_dnode( &tnode->methods );
+        dispose_dnode( &tnode->args );
+        dispose_dnode( &tnode->return_vals );
+
+        dispose_tnode( &tnode->base_type );
+        dispose_tnode( &tnode->element_type );
+
+        dispose_tlist( &tnode->interfaces );
+
+        dnode_break_cycles( tnode->constructor );
+        dnode_break_cycles( tnode->destructor );
+
+        dispose_dnode( &tnode->constructor );
+        dispose_dnode( &tnode->destructor );
+    }
+
+    return tnode;
+}
+
 static void tnode_update_self_parameter_type( TNODE *new_tnode,
 					      TNODE *old_tnode )
 {
@@ -77,6 +262,9 @@ static void tnode_update_self_parameter_type( TNODE *new_tnode,
 TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 {
     int dst_rcount, src_rcount;
+#ifdef USE_SERNO
+    int dst_serno;
+#endif
     TNODE *dst_element = NULL;
     type_kind_t dst_kind;
 
@@ -94,12 +282,36 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 
     dst_rcount = dst->rcount;
     src_rcount = src->rcount;
+#ifdef USE_SERNO
+    dst_serno = dst->serno;
+#endif
     dst_element = dst->element_type;
     /* The field dst->base_type is simply copied along with all other
-       fields. */
+       fields, but wee need to delete it first, in case something is
+       allocated there:. */
+    delete_tnode( dst->base_type );
     dst_kind = dst->kind;
+
+#ifdef USE_SERNO
+    ssize_t serno = src->serno;
+#endif
+    void *src_next_alloc = src->next_alloc;
+    void *src_prev_alloc = src->prev_alloc;
+
+    src->next_alloc = dst->next_alloc;
+    src->prev_alloc = dst->prev_alloc;
+
     *dst = *src;
+
     memset( src, 0, sizeof(*src));
+
+#ifdef USE_SERNO
+    dst->serno = dst_serno;
+    src->serno = serno;
+#endif
+    src->next_alloc = src_next_alloc;
+    src->prev_alloc = src_prev_alloc;
+
     dst->rcount = dst_rcount;
     src->rcount = src_rcount;
 
@@ -109,6 +321,8 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
 	assert( !dst->element_type );
 	dst->element_type = dst_element;
 	dst->kind = dst_kind;
+    } else {
+        delete_tnode( dst_element );
     }
 
     tnode_update_self_parameter_type( dst, src );
@@ -131,6 +345,31 @@ TNODE *share_tnode( TNODE* node )
 {
     if( !node ) return NULL;
     node->rcount ++;
+
+#if USE_STACK_TRACES && USE_SERNO
+        void *buffer[100];
+        char **strings;
+        int ntraces;
+        int requested_serno = 0;
+        char *requested_serno_envvar = getenv( "STARTA_REQUESTED_TNODE_SERNO" );
+
+        if( requested_serno_envvar ) {
+            requested_serno = atoi( requested_serno_envvar );
+        }
+
+        if( node->serno == requested_serno ) {
+            int i;
+            fprintf( stderr, "SHARE TNODE: sharing tnode serno = %zd, "
+                     "new rcount = %jd\n", node->serno, node->rcount );
+            ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+            strings = backtrace_symbols( buffer, ntraces );
+            for( i = 0; i < ntraces; i++ ) {
+                fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+            }
+            free( strings );
+        }
+#endif
+
     return node;
 }
 
@@ -258,46 +497,49 @@ TNODE *new_tnode_ref( cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_derived( TNODE *base, cexception_t *ex )
+TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
 {
     cexception_t inner;
     TNODE *node = new_tnode( ex );
+    assert( base );
 
     cexception_guard( inner ) {
 	/* node->kind = base->kind; */
 	node->kind = TK_DERIVED;
 	/* base->name is not copied */
 #if 0
-	while( base && base->kind == TK_DERIVED &&
-               tnode_has_flags( base, TF_IS_EQUIVALENT ))
-	    base = base->base_type;
+	while( *base && (*base)->kind == TK_DERIVED &&
+               tnode_has_flags( *base, TF_IS_EQUIVALENT ))
+	    *base = (*base)->base_type;
 #endif
-	assert( node != base );
-	node->base_type = share_tnode( base );
-	if( base ) {
-	    node->element_type = share_tnode( base->element_type );
-	    node->size = base->size;
-	    node->nrefs = base->nrefs;
-	    /* base->rcount is skipped, of cource ;-) */
-	    node->fields = share_dnode( base->fields );
-	    node->flags = base->flags;
+	assert( node != *base );
+	if( *base ) {
+	    node->element_type = share_tnode( (*base)->element_type );
+	    node->size = (*base)->size;
+	    node->nrefs = (*base)->nrefs;
+	    /* (*base)->rcount is skipped, of cource ;-) */
+	    node->fields = share_dnode( (*base)->fields );
+	    node->flags = (*base)->flags;
 #if 0
-	    node->operators = share_dnode( base->operators );
-	    node->conversions = share_dnode( base->conversions );
+	    node->operators = share_dnode( (*base)->operators );
+	    node->conversions = share_dnode( (*base)->conversions );
 #endif
-	    node->args = share_dnode( base->args );
-	    node->return_vals = share_dnode( base->return_vals );
+	    node->args = share_dnode( (*base)->args );
+	    node->return_vals = share_dnode( (*base)->return_vals );
 	}
 	node->flags &= ~TF_IS_FORWARD;
+	node->base_type = *base;
+        *base = NULL;
     }
     cexception_catch {
+        dispose_tnode( base );
 	delete_tnode( node );
 	cexception_reraise( inner, ex );
     }
     return node;
 }
 
-TNODE *new_tnode_equivalent( TNODE *base, cexception_t *ex )
+TNODE *new_tnode_equivalent( TNODE *volatile *base, cexception_t *ex )
 {
     TNODE *node = new_tnode_derived( base, ex );
     node->flags |= TF_IS_EQUIVALENT;
@@ -456,6 +698,20 @@ TNODE *new_tnode_function( char *name,
 					   TK_FUNCTION, ex );
 }
 
+TNODE *new_tnode_function_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_FUNCTION, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
+}
+
 TNODE *new_tnode_constructor( char *name,
                               DNODE *parameters,
                               DNODE *return_dnodes,
@@ -463,6 +719,20 @@ TNODE *new_tnode_constructor( char *name,
 {
     return new_tnode_function_or_operator( name, parameters, return_dnodes,
 					   TK_CONSTRUCTOR, ex );
+}
+
+TNODE *new_tnode_constructor_NEW( char *name,
+                                  DNODE *volatile *parameters,
+                                  DNODE *volatile *return_dnodes,
+                                  cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_CONSTRUCTOR, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
 }
 
 TNODE *new_tnode_destructor( char *name,
@@ -474,6 +744,20 @@ TNODE *new_tnode_destructor( char *name,
 					   TK_DESTRUCTOR, ex );
 }
 
+TNODE *new_tnode_destructor_NEW( char *name,
+                                 DNODE *volatile *parameters,
+                                 DNODE *volatile *return_dnodes,
+                                 cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_DESTRUCTOR, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
+}
+
 TNODE *new_tnode_method( char *name,
                          DNODE *parameters,
                          DNODE *return_dnodes,
@@ -483,6 +767,20 @@ TNODE *new_tnode_method( char *name,
 					   TK_METHOD, ex );
 }
 
+TNODE *new_tnode_method_NEW( char *name,
+                             DNODE *volatile *parameters,
+                             DNODE *volatile *return_dnodes,
+                             cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_METHOD, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
+}
+
 TNODE *new_tnode_operator( char *name,
 			   DNODE *parameters,
 			   DNODE *return_dnodes,
@@ -490,6 +788,20 @@ TNODE *new_tnode_operator( char *name,
 {
     return new_tnode_function_or_operator( name, parameters, return_dnodes,
 					   TK_OPERATOR, ex );
+}
+
+TNODE *new_tnode_operator_NEW( char *name,
+                               DNODE *volatile *parameters,
+                               DNODE *volatile *return_dnodes,
+                               cexception_t *ex )
+{
+    assert( parameters );
+    assert( return_dnodes );
+    TNODE *node =
+        new_tnode_function_or_operator( name, *parameters, *return_dnodes,
+                                        TK_OPERATOR, ex );
+    *parameters = *return_dnodes = NULL;
+    return node;
 }
 
 static int tnode_is_constructor( TNODE *tnode )
@@ -667,8 +979,8 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_composite_synonim( TNODE *composite_type,
-				    TNODE *element_type,
+TNODE *new_tnode_composite_synonim( TNODE *volatile *composite_type,
+				    TNODE *volatile *element_type,
 				    cexception_t *ex )
 {
     cexception_t inner;
@@ -677,8 +989,8 @@ TNODE *new_tnode_composite_synonim( TNODE *composite_type,
     cexception_guard( inner ) {
 	created_type = new_tnode_derived( composite_type, &inner );
 	tnode_set_kind( created_type, TK_COMPOSITE );
-	tnode_insert_element_type( created_type, element_type );
-	share_tnode( element_type );
+	tnode_insert_element_type( created_type, *element_type );
+	*element_type = NULL;
     }
     cexception_catch {
 	delete_tnode( created_type );
@@ -809,8 +1121,7 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
             newretvals = newargs = NULL;
             dnode_replace_type( newop, newtype );
             newtype = NULL;
-            tnode_insert_single_operator( dst, newop );
-            newop = NULL;
+            tnode_insert_single_operator( dst, &newop );
         }
     }
     cexception_catch {
@@ -1155,7 +1466,12 @@ int tnode_align( TNODE *tnode )
     }
 }
 
-type_kind_t tnode_kind( TNODE *tnode ) { assert( tnode ); return tnode->kind; }
+type_kind_t tnode_kind( TNODE *tnode )
+{
+    assert( tnode );
+    assert( tnode->rcount > 0 );
+    return tnode->kind;
+}
 
 DNODE *tnode_args( TNODE* tnode )
 {
@@ -1251,7 +1567,7 @@ void tnode_print_indent( TNODE *tnode, int indent )
     assert( tnode );
     printf( "%*sTNODE ", indent, "" );
     printf( "%s ", tnode_kind_name( tnode ));
-    printf( "size = %d ", tnode->size );
+    printf( "size = %zd ", tnode->size );
     printf( "%s ", tnode->name ? tnode->name : "-" );
     putchar( '\n' );
     if( tnode->element_type )
@@ -1364,18 +1680,20 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
     return tnode;
 }
 
-TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
+TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *volatile *constructor )
 {
     char msg[100];
 
     assert( tnode );
     assert( constructor );
+    assert( *constructor );
 
-    char *constructor_name = dnode_name( constructor );
+    char *constructor_name = dnode_name( *constructor );
     DNODE *current_constructor =
         tnode_lookup_constructor( tnode, constructor_name );
 
-    if( current_constructor == constructor ) {
+    if( current_constructor == *constructor ) {
+        dispose_dnode( constructor );
         return tnode;
     }
 
@@ -1383,55 +1701,64 @@ TNODE *tnode_insert_constructor( TNODE* tnode, DNODE *constructor )
         if( constructor_name && *constructor_name != '\0' ) {
             /* constructor_name is not "": */
             tnode->constructor =
-                dnode_append( tnode->constructor, constructor );
+                dnode_append( tnode->constructor, *constructor );
         } else {
             tnode->constructor =
-                dnode_append( constructor, tnode->constructor );
+                dnode_append( *constructor, tnode->constructor );
+            *constructor = NULL;
         }
     } else {
-        if( !dnode_function_prototypes_match_msg( tnode->constructor, constructor,
+        if( !dnode_function_prototypes_match_msg( tnode->constructor,
+                                                  *constructor,
                                                   msg, sizeof(msg))) {
             yyerrorf( "Prototype of constructor %s() does not match "
-                      "inherited definition -- %s", dnode_name( constructor ),
+                      "inherited definition -- %s", dnode_name( *constructor ),
                       msg );
-            delete_dnode( constructor );
+            dispose_dnode( constructor );
         } else {
             delete_dnode( tnode->constructor );
-            tnode->constructor = constructor;
+            tnode->constructor = *constructor;
+            *constructor = NULL;
         }
     }
     return tnode;
 }
 
-TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *destructor )
+TNODE *tnode_insert_destructor( TNODE* tnode, DNODE *volatile *destructor )
 {
     assert( tnode );
     assert( destructor );
+    assert( *destructor );
 
-    if( !tnode->destructor || tnode->destructor == destructor ) {
-        tnode->destructor = destructor;
+    if( !tnode->destructor || tnode->destructor == *destructor ) {
+        delete_dnode( tnode->destructor );
+        tnode->destructor = *destructor;
+        *destructor = NULL;
     } else {
         yyerrorf( "destructor is already declared for class '%s'", 
                   tnode_name( tnode ));
+        dispose_dnode( destructor );
     }
     return tnode;
 }
 
-TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
+TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
 {
     DNODE *existing_method;
     DNODE *inherited_method;
     ssize_t method_offset;
-    char *method_name = method ? dnode_name( method ) : NULL;
+
+    assert( method );
+    char *method_name = *method ? dnode_name( *method ) : NULL;
     char msg[100];
 
     assert( tnode );
 
     existing_method =
-        tnode_check_method_does_not_exist( tnode, tnode->methods, method );
+        tnode_check_method_does_not_exist( tnode, tnode->methods, *method );
 
     if( !existing_method ) {
-        TNODE *method_type = method ? dnode_type( method ) : NULL;
+        TNODE *method_type = *method ? dnode_type( *method ) : NULL;
         ssize_t method_interface_nr = method_type ?
             tnode_interface_number( method_type ) : 0;
 
@@ -1442,13 +1769,13 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
             if( tnode->kind == TK_INTERFACE ) {
 		yyerrorf( "interface '%s' should not override "
                           "method '%s' inherited from '%s'",
-                          tnode->name, dnode_name( method ),
+                          tnode->name, dnode_name( *method ),
                           tnode->base_type->name );
             } else
-            if( !dnode_function_prototypes_match_msg( inherited_method, method,
+            if( !dnode_function_prototypes_match_msg( inherited_method, *method,
                                                       msg, sizeof(msg))) {
 		yyerrorf( "Prototype of method %s() does not match "
-			  "inherited definition:\n%s", dnode_name( method ),
+			  "inherited definition:\n%s", dnode_name( *method ),
 			  msg );
 	    }
 	    method_offset = dnode_offset( inherited_method );
@@ -1473,32 +1800,36 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *method )
 	}
 
         tnode_set_flags( tnode, TF_IS_REF );
-	tnode->methods = dnode_append( method, tnode->methods );
+	tnode->methods = dnode_append( *method, tnode->methods );
         if( method_interface_nr == 0 ) {
 #if 0
             printf( ">>> setting offset %d for method '%s', interface no. %d\n",
                     method_offset, dnode_name( method ), method_interface_nr );
 #endif
-            dnode_set_offset( method, method_offset );
+            dnode_set_offset( *method, method_offset );
         }
     } else {
- 	if( !dnode_function_prototypes_match_msg( existing_method, method,
+ 	if( !dnode_function_prototypes_match_msg( existing_method, *method,
 						  msg, sizeof(msg))) {
 	    yyerrorf( "Prototype of method %s() does not match "
-		      "previous definition:\n%s", dnode_name( method ),
+		      "previous definition:\n%s", dnode_name( *method ),
 		      msg );
 	}
-	delete_dnode( method );
+	dispose_dnode( method );
     }
+
+    *method = NULL;
 
     return tnode;
 }
 
-TNODE *tnode_insert_single_operator( TNODE* tnode, DNODE *operator )
+TNODE *tnode_insert_single_operator( TNODE *tnode, DNODE *volatile *operator )
 {
     assert( tnode );
-    tnode_check_operator_does_not_exist( tnode, tnode->operators, operator );
-    tnode->operators = dnode_append( tnode->operators, operator );
+    assert( operator );
+    tnode_check_operator_does_not_exist( tnode, tnode->operators, *operator );
+    tnode->operators = dnode_append( tnode->operators, *operator );
+    operator = NULL;
     return tnode;
 }
 
@@ -1511,15 +1842,16 @@ TNODE *tnode_insert_single_conversion( TNODE* tnode, DNODE *conversion )
     return tnode;
 }
 
-TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member )
+TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *volatile *member )
 {
-    TNODE *member_type = member ? dnode_type( member ) : NULL;
+    assert( member );
+    TNODE *member_type = *member ? dnode_type( *member ) : NULL;
 
     assert( tnode );
 
-    if( member ) {
+    if( *member ) {
 	if( tnode_is_conversion( member_type )) {
-	    tnode_insert_single_conversion( tnode, member );
+	    tnode_insert_single_conversion( tnode, *member );
 	} else
 	if( tnode_is_operator( member_type )) {
 	    tnode_insert_single_operator( tnode, member );
@@ -1533,7 +1865,7 @@ TNODE *tnode_insert_type_member( TNODE *tnode, DNODE *member )
 	if( tnode_is_destructor( member_type )) {
 	    tnode_insert_destructor( tnode, member );
 	} else {
-	    tnode_insert_fields( tnode, member );
+	    tnode_insert_fields( tnode, *member );
 	}
     }
     return tnode;
@@ -1619,23 +1951,25 @@ DNODE *tnode_methods( TNODE *tnode )
 TNODE *tnode_base_type( TNODE *tnode )
     { assert( tnode ); return tnode->base_type; }
 
-TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
+TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type )
 {
     DNODE *field;
+    assert( base_type );
     assert( tnode );
     assert( !tnode->base_type );
-    assert( base_type != tnode );
+    assert( *base_type != tnode );
 
-    if( base_type ) {
-        tnode->base_type = base_type;
+    if( *base_type ) {
+        tnode->base_type = *base_type;
+        *base_type = NULL;
         if( tnode->kind != TK_INTERFACE )
-            tnode->max_vmt_offset = base_type->max_vmt_offset;
-	tnode->size += tnode_size( base_type );
-	tnode->nrefs += base_type->nrefs;
-	tnode->nextnumoffs += base_type->nextnumoffs;
-	tnode->nextrefoffs += base_type->nextrefoffs;
-        if( tnode->align < base_type->align ) {
-            tnode->align = base_type->align;
+            tnode->max_vmt_offset = tnode->base_type->max_vmt_offset;
+	tnode->size += tnode_size( tnode->base_type );
+	tnode->nrefs += tnode->base_type->nrefs;
+	tnode->nextnumoffs += tnode->base_type->nextnumoffs;
+	tnode->nextrefoffs += tnode->base_type->nextrefoffs;
+        if( tnode->align < tnode->base_type->align ) {
+            tnode->align = tnode->base_type->align;
         }
 	foreach_dnode( field, tnode->fields ) {
 	    TNODE *field_type = dnode_type( field );
@@ -1645,11 +1979,11 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *base_type )
                 if( tnode_is_reference( field_type )) {
                     dnode_set_offset( field,
                                       dnode_offset( field ) +
-                                      base_type->nextrefoffs );
+                                      tnode->base_type->nextrefoffs );
                 } else {
                     dnode_set_offset( field,
                                       dnode_offset( field ) +
-                                      base_type->nextnumoffs );
+                                      tnode->base_type->nextnumoffs );
                 }
 	    }
 	}

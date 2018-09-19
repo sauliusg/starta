@@ -20,8 +20,10 @@ char *strdupx( const char *str, cexception_t *ex )
 {
     void *s =NULL;
     if( str ) {
-	s = strdup( str );
+	// s = strdup( str );
+        s = mallocx( strlen(str) + 1, ex );
 	if( !s ) merror( ex );
+        strcpy( s, str );
     }
     return s;
 }

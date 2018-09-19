@@ -17,6 +17,7 @@
 struct SLLIST {
     ssize_t rcount;
     void *data;
+    break_cycle_function_t break_cycles_fn;
     delete_function_t delete_fn;
     dispose_function_t dispose_fn;
     SLLIST *next;
@@ -28,7 +29,7 @@ void delete_sllist( SLLIST *list )
 
     while( list ) {
 	if( list->rcount <= 0 ) {
-	    printf( "!!! sllist->rcound == %d !!!\n", list->rcount );
+	    printf( "!!! sllist->rcound == %zd !!!\n", list->rcount );
 	    assert( list->rcount > 0 );
 	}
         if( --list->rcount > 0 )
@@ -46,7 +47,21 @@ void delete_sllist( SLLIST *list )
     }
 }
 
+void sllist_break_cycles( SLLIST *list )
+{
+    SLLIST *current;
+
+    for( current = list; current != NULL; current = current->next ) {
+	if( current->data ) {
+	    if( current->break_cycles_fn ) {
+		(*current->break_cycles_fn)( current->data );
+            }
+        }
+    }
+}
+
 SLLIST* new_sllist( void *data,
+		    break_cycle_function_t break_cycles_fn,
 		    delete_function_t delete_fn,
 		    SLLIST *next,
 		    cexception_t *ex )
@@ -55,6 +70,10 @@ SLLIST* new_sllist( void *data,
 
     list->rcount = 1;
     list->data = data;
+#ifdef ALLOCX_DEBUG_COUNTS
+    checkptr( data );
+#endif
+    list->break_cycles_fn = break_cycles_fn;
     list->delete_fn = delete_fn;
     list->next = next;
 
@@ -71,6 +90,7 @@ SLLIST *share_sllist( SLLIST *list )
 
 void create_sllist( SLLIST * volatile *list,
 		    void * volatile *data,
+		    break_cycle_function_t break_cycles_fn,
 		    dispose_function_t dispose_fn,
 		    SLLIST *next, cexception_t *ex )
 {
@@ -79,9 +99,13 @@ void create_sllist( SLLIST * volatile *list,
     assert( list );
     assert( !*list );
 
-    node = new_sllist( /*data*/ NULL, /*delete_fn*/ NULL, next, ex );
+    node = new_sllist( /*data*/ NULL, break_cycles_fn,
+                       /*delete_fn*/ NULL, next, ex );
     if( data ) {
 	node->data = *data;
+#ifdef ALLOCX_DEBUG_COUNTS
+        checkptr( *data );
+#endif
 	*data = NULL;
     }
     node->dispose_fn = dispose_fn;
@@ -100,6 +124,9 @@ void dispose_sllist( SLLIST* volatile *list )
 void* sllist_data( SLLIST *list )
 {
     if( list ) {
+#ifdef ALLOCX_DEBUG_COUNTS
+        checkptr( list->data );
+#endif
 	return list->data;
     } else {
 	return NULL;
@@ -124,6 +151,9 @@ void sllist_set_data( SLLIST *list, void * volatile *data )
     assert( !list->data );
 
     list->data = *data;
+#ifdef ALLOCX_DEBUG_COUNTS
+    checkptr( *data );
+#endif
     *data = NULL;
 }
 
@@ -160,6 +190,7 @@ void sllist_push( SLLIST *volatile *list,
 
 void sllist_push_data( SLLIST *volatile *list,
 		       void *volatile *data,
+                       break_cycle_function_t break_cycles_fn,
 		       delete_function_t delete_fn,
 		       dispose_function_t dispose_fn,
 		       cexception_t *ex )
@@ -169,7 +200,8 @@ void sllist_push_data( SLLIST *volatile *list,
     assert( list );
     assert( data );
 
-    node = new_sllist( *data, delete_fn, *list, ex );
+    node = new_sllist( *data, break_cycles_fn, delete_fn, *list, ex );
+    
     node->dispose_fn = dispose_fn;
 
     *data = NULL;
@@ -178,6 +210,7 @@ void sllist_push_data( SLLIST *volatile *list,
 
 void sllist_push_shared_data( SLLIST *volatile *list,
 			      void *data,
+                              break_cycle_function_t break_cycles_fn,
 			      delete_function_t delete_fn,
 			      dispose_function_t dispose_fn,
 			      share_function_t share_fn,
@@ -187,7 +220,7 @@ void sllist_push_shared_data( SLLIST *volatile *list,
 
     assert( list );
 
-    node = new_sllist( NULL, delete_fn, *list, ex );
+    node = new_sllist( NULL, break_cycles_fn, delete_fn, *list, ex );
 
     if( share_fn && data ) {
 	node->data = (*share_fn)( data );

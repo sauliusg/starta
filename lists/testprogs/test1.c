@@ -29,12 +29,14 @@ void strdispose( char * volatile *str )
 
 #define create_string_list( LIST, VALUE, NEXT, EXCEPTION ) \
     create_sllist( LIST, (void**)(VALUE), \
+                   (break_cycle_function_t)NULL,   \
                    (dispose_function_t)strdispose, \
                    NEXT, \
                    EXCEPTION )
 
 #define push_shared_string( LIST, VALUE, EXCEPTION ) \
     sllist_push_shared_data( LIST, (void*)(VALUE), \
+                             (break_cycle_function_t)NULL,      \
                              (delete_function_t)free, \
                              (dispose_function_t)NULL, \
                              (share_function_t)strdup, \

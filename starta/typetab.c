@@ -91,6 +91,13 @@ TYPETAB *new_typetab( cexception_t *ex )
     return callocx( sizeof(TYPETAB), 1, ex );
 }
 
+void dispose_typetab( TYPETAB *volatile *table )
+{
+    assert( table );
+    delete_typetab( *table );
+    *table = NULL;
+}
+
 void delete_typetab( TYPETAB *table )
 {
     if( !table ) return;
@@ -98,8 +105,41 @@ void delete_typetab( TYPETAB *table )
     freex( table );
 }
 
+void typetab_break_cycles( TYPETAB *table )
+{
+    TYPE_NODE *node;
+
+    if( table ) {
+        for( node = table->node; node != NULL; node = node->next ) {
+            tnode_break_cycles( node->tnode );
+        }
+    }
+}
+
+void typetab_traverse_tnodes_and_set_rcount2( TYPETAB *table )
+{
+    TYPE_NODE *node;
+
+    if( table ) {
+        for( node = table->node; node != NULL; node = node->next ) {
+            tnode_traverse_rcount2( node->tnode );
+        }
+    }
+}
+
+void typetab_traverse_tnodes_and_mark_accessible( TYPETAB *table )
+{
+    TYPE_NODE *node;
+
+    if( table ) {
+        for( node = table->node; node != NULL; node = node->next ) {
+            tnode_mark_accessible( node->tnode );
+        }
+    }
+}
+
 TNODE *typetab_insert( TYPETAB *table, const char *name,
-		       TNODE *tnode, cexception_t *ex )
+		       TNODE *volatile *tnode, cexception_t *ex )
 {
     return typetab_insert_suffix( table, name, TS_NOT_A_SUFFIX, tnode, 
                                   /* count = */ NULL,
@@ -111,7 +151,7 @@ static TYPE_NODE *typetab_lookup_typenode( TYPETAB *table, const char *name,
                                            type_suffix_t suffix );
 
 TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
-			      type_suffix_t suffix, TNODE *tnode,
+			      type_suffix_t suffix, TNODE *volatile *tnode,
                               int *count, int *is_imported,
 			      cexception_t *ex )
 {
@@ -134,37 +174,43 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
                duplicate; we discard the submitted tnode and return
                the found one: */
             ret = lookup_node->tnode;
+            dispose_tnode( tnode );
         } else {
             /* We mask the imported node and insert the newly created
                one: */
-            table->node = new_type_node( tnode, name, suffix,
+            table->node = new_type_node( *tnode, name, suffix,
                                          table->current_scope,
                                          table->current_subscope,
                                          /* count = */ 1,
                                          /* next = */ table->node, ex );
-            ret = tnode;
+            ret = *tnode;
+            *tnode = NULL;
         }
     } else {
         if( count ) *count = 1;
         if( is_imported ) *is_imported = 0;
-        table->node = new_type_node( tnode, name, suffix,
+        table->node = new_type_node( *tnode, name, suffix,
                                      table->current_scope,
                                      table->current_subscope,
                                      /* count = */ 1,
                                      /* next = */ table->node, ex );
-        ret = tnode;
+        ret = *tnode;
+        *tnode = NULL;
     }
 
+    assert(!*tnode);
     return ret;
 }
 
 static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
-                                              type_suffix_t suffix, TNODE *tnode,
+                                              type_suffix_t suffix,
+                                              TNODE *volatile *tnode,
                                               cexception_t *ex )
 {
     TNODE *ret = NULL;
     TYPE_NODE *lookup_node = NULL;
 
+    assert( tnode );
     assert( table );
     assert( name );
 
@@ -177,68 +223,79 @@ static TNODE *typetab_insert_imported_suffix( TYPETAB *table, const char *name,
                 /* a non-imported name exists in the same scope --
                    silently ignore the imported name:*/
                 ret = lookup_node->tnode;
-                /* probably a duplicate list must be installed in the
-                   type tables (TYPETAB), to keep propert record of
-                   the inserted TNODE ownership and to free them after
-                   the compilation, like it is currently done in
-                   vartabs. */
+                dispose_tnode( tnode );
             } else {
                 /* another imported type name exists: add the new
                    imported name, but mark that it is present
                    multiple times: */
-                table->node = new_type_node( tnode, name, suffix,
+                table->node = new_type_node( *tnode, name, suffix,
                                              table->current_scope,
                                              table->current_subscope,
                                              lookup_node->count + 1,
                                              /* next = */ table->node,
                                              ex );
                 table->node->flags |= TNF_IS_IMPORTED;
+                *tnode = NULL;
             }
         } else {
             /* A forward declaration must be overriden: */
             ret = lookup_node->tnode;
+            *tnode = NULL;
         }
     } else {
         /* No node with the same name is present in the current scope:
            add it: */
-        table->node = new_type_node( tnode, name, suffix,
+        table->node = new_type_node( *tnode, name, suffix,
                                      table->current_scope,
                                      table->current_subscope,
                                      /* count = */ 1,
                                      /* next = */ table->node, ex );
         table->node->flags |= TNF_IS_IMPORTED;
-        ret = tnode;
+        ret = *tnode;
+        *tnode = NULL;
     }
 
+    assert( !*tnode );
     return ret;
 }
 
 void typetab_override_suffix( TYPETAB *table, const char *name,
-                              type_suffix_t suffix, TNODE *tnode,
+                              type_suffix_t suffix, TNODE *volatile *tnode,
                               cexception_t *ex )
 {
+    assert( tnode );
     assert( table );
     assert( name );
-    table->node = new_type_node( tnode, name, suffix,
+    table->node = new_type_node( *tnode, name, suffix,
                                  table->current_scope,
                                  table->current_subscope,
                                  /* count = */ 1,
                                  /* next = */ table->node, ex );
+    *tnode = NULL;
 }
 
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
 {
     TYPE_NODE *curr;
+    TNODE *volatile shared_tnode = NULL;
+    cexception_t inner;
 
     assert( dst );
     assert( src );
 
-    for( curr = src->node; curr != NULL; curr = curr->next ) {
-	char *name = curr->name;
-	TNODE *tnode = curr->tnode;
-	type_suffix_t suffix_type = curr->suffix;
-	typetab_insert_imported_suffix( dst, name, suffix_type, 
-                                        share_tnode( tnode ), ex );
+    cexception_guard( inner ) {
+        for( curr = src->node; curr != NULL; curr = curr->next ) {
+            char *name = curr->name;
+            TNODE *tnode = curr->tnode;
+            type_suffix_t suffix_type = curr->suffix;
+            shared_tnode = share_tnode( tnode );
+            typetab_insert_imported_suffix( dst, name, suffix_type,
+                                            &shared_tnode, &inner );
+        }
+    }
+    cexception_catch {
+        delete_tnode( shared_tnode );
+        cexception_reraise( inner, ex );
     }
 }
 

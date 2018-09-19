@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
-**$Author: saulius $
-**$Date: 2004-11-13 20:51:21 +0200 (Sat, 13 Nov 2004) $ 
-**$Revision: 71 $
-**$URL: svn+ssh://localhost/home/saulius/svn-repositories/compilers/common/common.c $
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
 \*---------------------------------------------------------------------------*/
 
 /* exports: */

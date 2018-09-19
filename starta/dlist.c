@@ -17,23 +17,28 @@ void delete_dlist( DLIST *list )
 }
 
 DLIST* new_dlist( DNODE *dnode,
-		      dnode_delete_function_t delete_fn,
-		      DLIST *next,
-		      cexception_t *ex )
+                  DLIST *next,
+                  cexception_t *ex )
 {
-    return (DLIST*)new_sllist( dnode, (delete_function_t) delete_fn,
-				 (SLLIST*) next, ex );
+    return (DLIST*)new_sllist( dnode, (break_cycle_function_t) dnode_break_cycles,
+                               (delete_function_t) delete_dnode,
+                               (SLLIST*) next, ex );
 }
 
 void create_dlist( DLIST * volatile *list,
-		     DNODE * volatile *data,
-		     dnode_dispose_function_t dispose_fn,
-		     DLIST *next, cexception_t *ex )
+                   DNODE * volatile *data,
+                   DLIST *next, cexception_t *ex )
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
-		   (dispose_function_t) dispose_fn,
+                   (break_cycle_function_t) dnode_break_cycles,
+		   (dispose_function_t) dispose_dnode,
 		   (SLLIST*) next, ex );
+}
+
+void dlist_break_cycles( DLIST *list )
+{
+    sllist_break_cycles( (SLLIST *)list );
 }
 
 void dispose_dlist( DLIST* volatile *list )
@@ -76,13 +81,14 @@ void dlist_push( DLIST *volatile *list,
 }
 
 void dlist_push_data( DLIST *volatile *list,
-			DNODE *volatile *data,
-			dnode_delete_function_t delete_fn,
-			dnode_dispose_function_t dispose_fn,
-			cexception_t *ex )
+                      DNODE *volatile *data,
+                      dnode_delete_function_t delete_fn,
+                      dnode_dispose_function_t dispose_fn,
+                      cexception_t *ex )
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) dnode_break_cycles,
 		      (delete_function_t) delete_fn,
 		      (dispose_function_t) dispose_fn,
 		      ex );
@@ -94,6 +100,7 @@ void dlist_push_dnode( DLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) dnode_break_cycles,
 		      (delete_function_t) delete_dnode,
 		      NULL,
 		      ex );

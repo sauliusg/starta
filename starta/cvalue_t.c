@@ -25,7 +25,8 @@
 void const_value_free( const_value_t *x )
 {
     assert( x );
-    if( x->value_type == VT_STRING ) {
+    if( x->value_type == VT_STRING ||
+        x->value_type == VT_ENUM ) {
 	freex( x->value.s );
 	x->value.s = NULL;
 	x->value_type = VT_NONE;
@@ -71,7 +72,8 @@ void const_value_copy( const_value_t *dst, const_value_t *src,
     assert( src );
     if( src != dst ) {
 	const_value_free( dst );
-	if( src->value_type == VT_STRING ) {
+	if( src->value_type == VT_STRING ||
+            src->value_type == VT_ENUM ) {
 	    dst->value.s = strdupx( src->value.s, ex );
 	} else {
 	    dst->value = src->value;

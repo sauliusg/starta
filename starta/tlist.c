@@ -17,23 +17,50 @@ void delete_tlist( TLIST *list )
 }
 
 TLIST* new_tlist( TNODE *tnode,
-		      tnode_delete_function_t delete_fn,
-		      TLIST *next,
-		      cexception_t *ex )
+                  TLIST *next,
+                  cexception_t *ex )
 {
-    return (TLIST*)new_sllist( tnode, (delete_function_t) delete_fn,
-				 (SLLIST*) next, ex );
+    return (TLIST*)new_sllist( tnode, (break_cycle_function_t) tnode_break_cycles,
+                               (delete_function_t) delete_tnode,
+                               (SLLIST*) next, ex );
 }
 
 void create_tlist( TLIST * volatile *list,
-		     TNODE * volatile *data,
-		     tnode_dispose_function_t dispose_fn,
-		     TLIST *next, cexception_t *ex )
+                   TNODE * volatile *data,
+                   TLIST *next, cexception_t *ex )
 {
     create_sllist( (SLLIST * volatile *)list,
 		   (void * volatile *)data,
-		   (dispose_function_t) dispose_fn,
+                   (break_cycle_function_t) tnode_break_cycles,
+		   (dispose_function_t) dispose_tnode,
 		   (SLLIST*) next, ex );
+}
+
+void tlist_traverse_tnodes_and_set_rcount2( TLIST *tlist )
+{
+    SLLIST *current = (SLLIST*)tlist;
+
+    for( ; current != NULL; current = sllist_next(current) ) {
+	if( sllist_data(current) ) {
+            tnode_traverse_rcount2( (TNODE*)sllist_data(current) );
+        }
+    }
+}
+
+void tlist_traverse_tnodes_and_mark_accessible( TLIST *tlist )
+{
+    SLLIST *current = (SLLIST*)tlist;
+
+    for( ; current != NULL; current = sllist_next(current) ) {
+	if( sllist_data(current) ) {
+            tnode_mark_accessible( (TNODE*)sllist_data(current) );
+        }
+    }
+}
+
+void tlist_break_cycles( TLIST *list )
+{
+    sllist_break_cycles( (SLLIST *)list );
 }
 
 void dispose_tlist( TLIST* volatile *list )
@@ -83,6 +110,7 @@ void tlist_push_data( TLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) tnode_break_cycles,
 		      (delete_function_t) delete_fn,
 		      (dispose_function_t) dispose_fn,
 		      ex );
@@ -94,6 +122,7 @@ void tlist_push_tnode( TLIST *volatile *list,
 {
     sllist_push_data( (SLLIST *volatile *)list,
 		      (void *volatile *)data,
+                      (break_cycle_function_t) tnode_break_cycles,
 		      (delete_function_t) delete_tnode,
 		      NULL,
 		      ex );
