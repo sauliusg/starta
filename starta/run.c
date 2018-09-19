@@ -726,8 +726,8 @@ void thrcode_run_destructor_if_needed( istate_t *istate,
                 thrcode_run_subroutine( istate, code_offset, &inner );
             }
             cexception_catch {
-                char *message = cexception_message( &inner );
-                char *errcode = cexception_error_code( &inner );
+                const char *message = cexception_message( &inner );
+                int errcode = cexception_error_code( &inner );
                 fprintf( stderr, "exception (code %d) raised in destructor: %s\n",
                          errcode, message );
                 /* We sould not reraise the exception, since then
