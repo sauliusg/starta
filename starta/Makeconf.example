@@ -14,7 +14,7 @@ LIBFLAGS ?= -ldl
 # to print out stack traces during alloc_.., free_..., delete_... and
 # share_... calls, use the following option set:
 #
-## OPTFLAGS = -fsanitize=address -rdynamic -DUSE_STACK_TRACES=1 -DUSE_SERNO
+OPTFLAGS = -fsanitize=address -rdynamic -DUSE_STACK_TRACES=1 -DUSE_SERNO
 #
 # And call 'sl' using the following command:
 # STARTA_REQUESTED_TNODE_SERNO=1 ./sl -I . -d memleak t.snl
