@@ -2,16 +2,25 @@
 
 // Test array comprehension syntax
 
-use std;
-use APrint as APint;
-use APrint(long) as APlong;
+// use std;
 
-var m = [for var i in [for var j = 0 to 8: j]: i*i];
+type string = ?{
+    size = sizeof native "char*";
+    kind = string;
+    reference;
+    immutable;
+    suffix = "";
 
-. m;
+    inline bytecode operator "." ( i : string )
+        { SPRINT };
 
-procedure P( int i ) -> int { . i, i*i; return i * i }
+    inline bytecode operator "<" ( i : string )
+        { SPRINT };
 
-var p = [for var n in m: P(n) ];
+    inline bytecode operator "ldc" () : string
+        { SLDC };
+}
 
-. p
+var string s = "some string";
+
+. s;

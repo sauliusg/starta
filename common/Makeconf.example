@@ -1,0 +1,10 @@
+
+LIB_DIRS   ?= ../getoptions ../cexceptions
+
+## LIBFLAGS = -ldl -lduma
+## LIBFLAGS = -ldl -lefence
+LIBFLAGS ?= -ldl
+
+LD_LIBRARY_PATH := .${LD_LIBRARY_PATH:%=:%}
+
+export LD_LIBRARY_PATH

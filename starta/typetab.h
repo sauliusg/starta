@@ -27,22 +27,26 @@ typedef enum {
 #include <cexceptions.h>
 
 TYPETAB *new_typetab( cexception_t *ex );
+void dispose_typetab( TYPETAB *volatile *table );
 void delete_typetab( TYPETAB *table );
+void typetab_break_cycles( TYPETAB *table );
+void typetab_traverse_tnodes_and_set_rcount2( TYPETAB *table );
+void typetab_traverse_tnodes_and_mark_accessible( TYPETAB *table );
 
 TNODE *typetab_insert( TYPETAB *table, const char *name,
-		       TNODE *tnode, cexception_t *ex );
+		       TNODE *volatile *tnode, cexception_t *ex );
 
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex );
 
 TNODE *typetab_lookup( TYPETAB *table, const char *name );
 
 TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
-			      type_suffix_t suffix, TNODE *tnode,
+			      type_suffix_t suffix, TNODE *volatile *tnode,
                               int *count, int *is_imported,
 			      cexception_t *ex );
 
 void typetab_override_suffix( TYPETAB *table, const char *name,
-                              type_suffix_t suffix, TNODE *tnode,
+                              type_suffix_t suffix, TNODE *volatile *tnode,
                               cexception_t *ex );
 
 TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,

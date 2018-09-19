@@ -42,6 +42,7 @@ int thrcode_heapdebug_is_on( void );
 void thrcode_heapdebug_off( void );
 
 THRCODE *new_thrcode( cexception_t *ex );
+THRCODE *share_thrcode( THRCODE *bc );
 
 void delete_thrcode( THRCODE *bc );
 

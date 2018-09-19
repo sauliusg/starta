@@ -12,6 +12,7 @@
 
 typedef struct DNODE DNODE;
 
+#include <stdio.h>
 #include <tnode.h>
 #include <typetab.h>
 #include <vartab.h>
@@ -30,10 +31,36 @@ typedef enum {
     DF_HAS_INITIALISER = 0x20,
     DF_LOOP_HAS_VAL    = 0x40, /* describes 'for' loops that need extra
 				  value on top of the evluation stack. */
-    DF_IS_IMMUTABLE    = 0x80
+    DF_IS_IMMUTABLE    = 0x080,
+    DF_CYCLES_BROKEN   = 0x100,
+    DF_VISITED         = 0x200, /* Specifies that the node has been
+                                   visited during the cycle search. */
+    DF_ACCESSIBLE      = 0x400, /* This flag is set when rcount >
+                                   rcount2 for the given DNODE,
+                                   indicating that there are external
+                                   ponters (roots) leading to this
+                                   DNODE, and thus this node might be
+                                   accessible in the
+                                   program. Otherwise, all reference
+                                   counts come from cycle references,
+                                   and the node can be safely
+                                   collected. */
 } dnode_flag_t;
 
 void delete_dnode( DNODE *node );
+void dnode_traverse_rcount2( DNODE *dnode );
+void traverse_all_dnodes( void );
+void dnode_mark_accessible( DNODE *dnode );
+void reset_flags_for_all_dnodes( dnode_flag_t flags );
+void set_accessible_flag_for_all_dnodes( void );
+void set_rcount2_for_all_dnodes( int value );
+void dispose_dnode( DNODE *volatile *dnode );
+
+void break_cycles_for_all_dnodes( void );
+void take_ownership_of_all_dnodes( void );
+void delete_all_dnodes( void );
+
+DNODE *dnode_break_cycles( DNODE *dnode );
 
 DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex );
 
@@ -62,20 +89,28 @@ DNODE* new_dnode_constant( char *name, const_value_t *value,
 
 DNODE *new_dnode_return_value( TNODE *retval_type, cexception_t *ex );
 
-DNODE* new_dnode_function( char *name, DNODE *parameters, DNODE *return_values, 
+DNODE* new_dnode_function( char *name,
+                           DNODE *volatile *parameters,
+                           DNODE *volatile *return_values, 
 			   cexception_t *ex );
 
-DNODE* new_dnode_constructor( char *name, DNODE *parameters,
-                              DNODE *return_values, 
+DNODE* new_dnode_constructor( char *name,
+                              DNODE *volatile *parameters,
+                              DNODE *volatile *return_values, 
                               cexception_t *ex );
 
-DNODE* new_dnode_destructor( char *name, DNODE *parameters,
+DNODE* new_dnode_destructor( char *name,
+                             DNODE *volatile *parameters,
                              cexception_t *ex );
 
-DNODE* new_dnode_method( char *name, DNODE *parameters, DNODE *return_values,
+DNODE* new_dnode_method( char *name,
+                         DNODE *volatile *parameters,
+                         DNODE *volatile *return_values,
                          cexception_t *ex );
 
-DNODE* new_dnode_operator( char *name, DNODE *parameters, DNODE *return_values,
+DNODE* new_dnode_operator( char *name,
+                           DNODE *volatile *parameters,
+                           DNODE *volatile *return_values,
 			   cexception_t *ex );
 
 DNODE *new_dnode_module( char *name, cexception_t *ex );
@@ -216,7 +251,8 @@ DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code,
 
 thrcode_t *dnode_code( DNODE *dnode, ssize_t *code_length );
 
-void dnode_vartab_insert_dnode( DNODE *dnode, const char *name, DNODE *var,
+void dnode_vartab_insert_dnode( DNODE *dnode, const char *name,
+                                DNODE *volatile *var,
 				cexception_t *ex );
 
 VARTAB *dnode_vartab( DNODE *dnode );
@@ -227,21 +263,24 @@ VARTAB *dnode_operator_vartab( DNODE *dnode );
 
 TYPETAB *dnode_typetab( DNODE *dnode );
 
-void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *var,
+void dnode_vartab_insert_named_dnode( DNODE *dnode, DNODE *volatile *var,
 				      cexception_t *ex );
 
-void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *vars,
+void dnode_vartab_insert_named_vars( DNODE *dnode, DNODE *volatile *vars,
 				     cexception_t *ex );
 
-void dnode_optab_insert_named_operator( DNODE *dnode, DNODE *operator,
+void dnode_optab_insert_named_operator( DNODE *dnode,
+                                        DNODE *volatile *operator,
                                         cexception_t *ex );
 
-void dnode_optab_insert_operator( DNODE *dnode, char *opname, DNODE *operator,
+void dnode_optab_insert_operator( DNODE *dnode, char *opname,
+                                  DNODE *volatile *operator,
                                   cexception_t *ex );
 
 DNODE *dnode_vartab_lookup_var( DNODE *dnode, const char *name );
 
-void dnode_consttab_insert_consts( DNODE *dnode, DNODE *consts,
+void dnode_consttab_insert_consts( DNODE *dnode,
+                                   DNODE *volatile *consts,
 				   cexception_t *ex );
 
 DNODE *dnode_consttab_lookup_const( DNODE *dnode, const char *name );
@@ -264,5 +303,11 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab );
 
 DNODE *dnode_remove_last( DNODE *list );
+
+void dnode_print_allocated();
+void dnode_print_allocated_to_stderr();
+void dnode_fprint_allocated( FILE *fp );
+
+void null_allocated_dnodes(void);
 
 #endif

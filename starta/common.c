@@ -24,29 +24,13 @@ if( (s) == NULL ) \
      exit(99); \
    }
 
-char *moveptr( char **p )
+void *moveptr( void *volatile *p )
 {
     void *q;
     assert( p );
     q = *p;
     *p = NULL;
     return q;
-}
-
-char *strclone( const char *s )
-{
-   char *new;
-   merror( new = strdup(s) );
-   return new;
-}
-
-char *strnclone( const char *s, size_t length )
-{
-   char *new;
-   merror( new = malloc(length + 1) );
-   strncpy( new, s, length );
-   new[length] = '\0';
-   return new;
 }
 
 char *strappend( char *s, const char *suffix )

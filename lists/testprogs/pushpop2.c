@@ -14,6 +14,7 @@
 
 #define push_string( LIST, VALUE, EXCEPTION ) \
     sllist_push_data( LIST, (void*)(VALUE), \
+                      (break_cycle_function_t)NULL, \
                       (delete_function_t)NULL, \
                       (dispose_function_t)NULL, \
                       EXCEPTION )

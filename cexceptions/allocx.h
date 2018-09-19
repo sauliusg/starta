@@ -26,4 +26,8 @@ void *callocx( size_t size, size_t nr, cexception_t *ex );
 void *reallocx( void *buffer, size_t new_size, cexception_t *ex );
 void freex( void* );
 
+#ifdef ALLOCX_DEBUG_COUNTS
+int checkptr( void *p );
+#endif
+
 #endif

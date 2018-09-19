@@ -106,7 +106,7 @@ TST_DEPEND    = ${join ${TST_DIRS}, ${TST_BASENAMES:%.c=.%.d}}
 vpath %.c ${SRC_DIR} ${OTHER_DIRS}
 vpath %.h ${SRC_DIR} ${OTHER_DIRS}
 
-VPATH = ${OTHER_DIRS}
+#VPATH = ${OTHER_DIRS}
 
 OTHER_CFILES := ${notdir $(sort ${wildcard ${addsuffix /*.c, ${OTHER_DIRS}}})}
 OTHER_CFILES := ${filter-out %.tab.c lex.yy.c %.lex.c, ${OTHER_CFILES}}
@@ -316,9 +316,18 @@ ${DIFF_FILES}: ${TARGET}
 
 ${DIFFIL_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
-	unset SL_INCLUDE_PATHS; \
-	./$^ ${TEST_OPTIONS} 2>&1 | diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
-	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
+	if [ ! -f ${TEST_DIR}/$*.chk ] || ${TEST_DIR}/$*.chk; then \
+		unset SL_INCLUDE_PATHS; \
+		./$^ ${TEST_OPTIONS} 2>&1 \
+			| diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
+		if [ $$? = 0 ]; \
+			then echo "OK"; \
+			else echo "FAILED:"; cat $@; \
+		fi; \
+	else \
+		echo " -- SKIPPED"; \
+		touch $@; \
+	fi
 
 ${OUTPUT_DIR}/%.out: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@test -f $@ || echo "$@:"
@@ -365,13 +374,13 @@ tests alltests: test shtests
 listdiff: # test
 	@- if [ -d ${DIFFIL_DIR} ]; then \
 	   find ${DIFFIL_DIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -l; fi
+		| xargs --no-run-if-empty ls -1; fi
 	@- if [ -d ${TST_DIF_DIR} ]; then \
 	   find ${TST_DIF_DIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -l; fi
+		| xargs --no-run-if-empty ls -1; fi
 	@- if [ -d ${SHELL_DIFDIR} ]; then \
 	   find ${SHELL_DIFDIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -l; fi
+		| xargs --no-run-if-empty ls -1; fi
 
 
 #------------------------------------------------------------------------------
