@@ -1833,7 +1833,7 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
     int first = istate.ep[1].num.ssize;
     int last = istate.ep[0].num.ssize;
     char **ptr = NULL;
-    ssize_t i;
+    int i;
 
     TRACE_FUNCTION();
 
@@ -1851,7 +1851,7 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 	STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
 	for( i = first; i <= last; i++ ) {
-            ssize_t k = i - first;
+            int k = i - first;
 	    ptr[k] = bcalloc_blob( strlen( istate.argv[i]) + 1, EXCEPTION );
 	    BC_CHECK_PTR( ptr[k] );
 	    strcpy( ptr[k], istate.argv[i] );
