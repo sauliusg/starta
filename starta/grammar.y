@@ -13554,10 +13554,26 @@ array_expression
         /* ..., loop_counter_addr, loop_limit, array_length */
         compiler_emit( compiler, px, "\n" );
          
+        compiler_push_thrcode( compiler, px );
+    }
+     expression ']'
+    {
+        /* Compile array allocation: */
+        ENODE *element_expr = compiler->e_stack;
+        TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
+        compiler_swap_thrcodes( compiler );
+
+        TNODE *shared_element_type = share_tnode( element_type );
+        compiler_compile_array_alloc( compiler, &shared_element_type, px );
+        /* ..., loop_counter_addr, loop_limit, array */
+        compiler_compile_rot( compiler, px );
+        compiler_emit( compiler, px, "\n" );
+        /* ..., array, loop_counter_addr, loop_limit */
+
         /* Compile loop zero length check: */
-        compiler_compile_peek( compiler, 3, px );
+        compiler_compile_over( compiler, px );
         compiler_compile_ldi( compiler, px );
-        compiler_compile_peek( compiler, 3, px );
+        compiler_compile_over( compiler, px );
         if( compiler_test_top_types_are_identical( compiler, px )) {
             compiler_compile_binop( compiler, ">", px );
             compiler_push_relative_fixup( compiler, px );
@@ -13570,26 +13586,6 @@ array_expression
             compiler_emit( compiler, px, "\tce\n", JMP, &zero );
         }
         compiler_emit( compiler, px, "\n" );
-
-        compiler_push_thrcode( compiler, px );
-    }
-     expression ']'
-    {
-        /* Compile array allocation: */
-        ENODE *element_expr = compiler->e_stack;
-        TNODE *element_type = element_expr ? enode_type( element_expr ) : NULL;
-        compiler_swap_thrcodes( compiler );
-
-        //FIXME: sharing 'element_type' may introduce memory leaks,
-        //not sharing may introduce double-delete. Will need to check
-        //what the pointer balance is (S.G.):
-        //TNODE *shared_element_type = element_type;
-        TNODE *shared_element_type = share_tnode( element_type );
-        compiler_compile_array_alloc( compiler, &shared_element_type, px );
-        /* ..., loop_counter_addr, loop_limit, array */
-        compiler_compile_rot( compiler, px );
-        compiler_emit( compiler, px, "\n" );
-        /* ..., array, loop_counter_addr, loop_limit */
         compiler_push_current_address( compiler, px );
         compiler_merge_top_thrcodes( compiler, px );
         /* ..., array, loop_counter_addr, loop_limit, element_expression */
