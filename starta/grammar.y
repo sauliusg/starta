@@ -5613,6 +5613,7 @@ static void compiler_begin_module( COMPILER *c,
     }
     cexception_catch {
         delete_dnode( shared_module );
+        dispose_dnode( module );
         cexception_reraise( inner, ex );
     }
 }
