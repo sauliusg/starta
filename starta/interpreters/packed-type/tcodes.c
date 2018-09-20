@@ -1830,8 +1830,8 @@ int JMP( INSTRUCTION_FN_ARGS )
 
 int ALLOCARGV( INSTRUCTION_FN_ARGS )
 {
-    ssize_t first = istate.ep[1].num.ssize;
-    ssize_t last = istate.ep[0].num.ssize;
+    int first = istate.ep[1].num.ssize;
+    int last = istate.ep[0].num.ssize;
     char **ptr = NULL;
     ssize_t i;
 
@@ -1844,7 +1844,7 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
     if( last >= first && istate.argv != NULL ) {
 
-        ssize_t length = last - first + 1;
+        int length = last - first + 1;
 	ptr = bcalloc_array( REF_SIZE, length, 1, EXCEPTION );
 
 	BC_CHECK_PTR( ptr );
