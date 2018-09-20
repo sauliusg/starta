@@ -9,43 +9,11 @@ type string;
 type int;
 
 type bool = {
-    size = 1;
-    suffix = b;
-    kind = integer;
-
-    bytecode inline operator "!" ( x : bool ) : bool
-	{ BBOOLNOT };
-
-    bytecode inline operator "==" ( x, y : bool ) : bool
-	{ BEQ };
-
-    bytecode inline operator "!=" ( x, y : bool ) : bool
-	{ BNE };
-
-    inline bytecode operator "ldc" () : bool
-        { BLDCS };
-
-    bytecode inline operator "jnz" ( x : bool )
-        { BJNZ };
-
-    bytecode inline operator "jz" ( x : bool )
-        { BJZ };
-
-    inline bytecode operator "assert" ( x : bool )
-    {
-        ASSERT %%lineno %%file %%line
-    }
 }
 
 } // <-- syntax error, but causes use after delete.
 
 type double = {
-    size = sizeof native "double";
-    kind = real;
-    suffix = "D";
-
-    inline bytecode operator "+" ( i : double ) : double
-        { /* do nothing */ };
 }
 
 end package std1;
