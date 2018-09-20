@@ -8104,6 +8104,8 @@ module_statement
               cexception_reraise( inner, px );
           }
           delete_dnode( module_dnode );
+          $2 = NULL; // Prevent excessive delete by Bison %destructor
+                     // commands.
       }
     statement_list '}' module_keyword __IDENTIFIER
       {
