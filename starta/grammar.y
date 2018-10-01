@@ -15248,6 +15248,8 @@ opt_base_class_initialisation
 
         compiler->current_interface_nr = 0;
 
+#warning FIXME: look up the correct constructore here (S.G.):
+
         constructor_dnode = base_type_tnode ?
             tnode_default_constructor( base_type_tnode ) : NULL;
 
