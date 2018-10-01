@@ -15254,6 +15254,7 @@ opt_base_class_initialisation
         constructor_tnode = constructor_dnode ?
             dnode_type( constructor_dnode ) : NULL;
 
+        assert( !compiler->current_call );
         compiler->current_call = share_dnode( constructor_dnode );
           
         compiler->current_arg = constructor_tnode ?
@@ -15268,7 +15269,7 @@ opt_base_class_initialisation
     {
         ssize_t nretval;
         nretval = compiler_compile_multivalue_function_call( compiler, px );
-        assert( nretval == 0 );
+        assert( nretval == 0 || enode_has_flags( compiler->e_stack, EF_HAS_ERRORS ) );
     }
 | /* empty */
 ;
