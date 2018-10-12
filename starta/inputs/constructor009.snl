@@ -9,6 +9,7 @@ class Alpha {
     constructor( int i = 1 )
     {
         self.i = i;
+        . "Constructing Alpha(), default constructor";
     }
 
     method i(): int { return self.i }
@@ -19,6 +20,7 @@ class Beta: Alpha {
     constructor( int i = 2 )
     {
         self.i = i;
+        . "Constructing Beta(), default constructor";
     }
 }
 
@@ -28,6 +30,7 @@ class Gamma: Beta {
         super( i + 2 )
     {
         self.i = i;
+        . "Constructing Gamma(), default constructor";
     }
 }
 
