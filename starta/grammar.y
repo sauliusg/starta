@@ -7505,6 +7505,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> module_parameter_list
 %type <dnode> operator_definition
 %type <si>     opt_as_identifier
+%type <i>     opt_base_class_initialisation
 %type <si>     opt_default_module_parameter
 %type <si>     opt_dot_name
 %type <si>     opt_identifier
@@ -14895,6 +14896,50 @@ constructor_definition
         { $<dnode>$ = share_dnode( compiler->current_function ); }
     function_or_operator_start
     opt_base_class_initialisation
+    {
+        int base_class_constructor_was_called = $4;
+        if( !base_class_constructor_was_called ) {
+            TNODE *type_tnode = compiler->current_type;
+            TNODE *base_type_tnode =
+                type_tnode ? tnode_base_type( type_tnode ) : NULL;
+            DNODE *constructor_dnode;
+            TNODE *constructor_tnode;
+            DNODE *self_dnode;
+
+            assert( type_tnode );
+
+            constructor_dnode = base_type_tnode ?
+                tnode_default_constructor( base_type_tnode ) : NULL;
+
+            if( constructor_dnode ) {
+                compiler_emit( compiler, px, "T\n", "# Initialising base class, "
+                               "default constructor:" );
+
+                compiler_push_current_interface_nr( compiler, px );
+                compiler_push_current_call( compiler, px );
+
+                compiler->current_interface_nr = 0;
+
+                constructor_tnode = constructor_dnode ?
+                    dnode_type( constructor_dnode ) : NULL;
+
+                assert( !compiler->current_call );
+                compiler->current_call = share_dnode( constructor_dnode );
+          
+                compiler->current_arg = constructor_tnode ?
+                    dnode_next( tnode_args( constructor_tnode )) :
+                    NULL;
+
+                self_dnode = compiler_lookup_dnode( compiler, NULL, "self", "variable" );
+                compiler_push_guarding_arg( compiler, px );
+                compiler_compile_load_variable_value( compiler, self_dnode, px );
+
+                ssize_t nretval;
+                nretval = compiler_compile_multivalue_function_call( compiler, px );
+                assert( nretval == 0 || enode_has_flags( compiler->e_stack, EF_HAS_ERRORS ) );
+            }
+        }
+    }
     function_or_operator_body
     function_or_operator_end
         { $$ = $<dnode>2; }
@@ -15272,8 +15317,10 @@ opt_base_class_initialisation
         ssize_t nretval;
         nretval = compiler_compile_multivalue_function_call( compiler, px );
         assert( nretval == 0 || enode_has_flags( compiler->e_stack, EF_HAS_ERRORS ) );
+        $$ = 1;
     }
 | /* empty */
+    { $$ = 0; }
 ;
 
 constructor_header
