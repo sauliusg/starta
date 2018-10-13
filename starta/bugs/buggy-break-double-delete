@@ -1,0 +1,120 @@
+#! /usr/bin/env starta
+// --*- C -*--
+
+pragma prepend "$D";
+pragma prepend "$D/lib";
+
+use std;
+//use SOptions;
+//use SUsage;
+
+//*
+// Compute steps in Erathostenes sieve to speed up prime number
+// computation.
+//**
+
+//* Usage:
+//     $0 --options
+//     $0 3 10
+//
+//* Options:
+//
+//  --help             Print short usage message (this message) and exit.
+//**
+
+// var options = 
+// [
+//  make_option( null, "--help",   OT_FUNCTION OptionType, proc => SUsage::xusage ),
+// ];
+
+//var args = get_options( arguments(), options );
+var args = arguments();
+var Nprimes = strtoll(args[0]);
+var Nsteps = strtoll(args[1]);
+
+function find_primes( llong Nprimes ): llong[]
+{
+    var primes = new llong[Nprimes];
+    var l = Nprimes;
+    pragma llong;
+
+    if( l == 0 ) {
+        return null;
+    } otherwise if( l == 1 ) {
+        primes[0] = 2;
+        return primes;
+    } else {
+        primes[0] = 2;
+        var llong k = 1; // Next prime number index
+    CANDIDATE:
+        for( var N = 3; k < Nprimes; N += 2 ) {
+            for( var i = 1; i < k; i++ ) {
+                if( N % primes[i] == 0 ) {
+                    continue CANDIDATE;
+                }
+                var square : llong = primes[i];
+                if( square * square > N ) {
+                    break;
+                }
+            }
+            primes[k] = N;
+            k++
+        }
+    }
+    return primes;
+};
+
+var primes = find_primes( Nprimes );
+
+if( true ) {
+    var prefix = "";
+    for( var prime in primes ) {
+        < prefix; < prime;
+        prefix = " ";
+    }
+    . "";
+}
+
+var reminders = new llong[Nprimes];
+
+pragma llong;
+var prime_candidate : llong = 1;
+
+for var i = 1 to Nsteps do
+//for( var i = 1; i <= 10; i++ ) {
+    for var j = 0 to llast(primes)@llong {
+        reminders[j] = prime_candidate % primes[j];
+    }
+    < prime_candidate, "\t";
+    var prefix = "";
+    for var j = 0 to llast(primes)@llong {
+        < prefix, reminders[j];
+        prefix = " ";
+    }
+    // . "";
+    // prefix = "\t";
+    // for var j = 0 to llast(primes)@llong {
+    //     < prefix, primes[j] - reminders[j];
+    //     prefix = " ";
+    // }
+    // . "";
+    var s = 0;
+    var finish = false;
+    NEXT_STEP:
+    while(!finish) {
+        s++;
+        // < "", "s = ", s;
+        for var k = 0 to llast(primes)@llong {
+            if( (s + reminders[k]) % primes[k] == 0 ) {
+                //. " prime", primes[k], "forbids step", s, "reminder", reminders[k], "s + reminder[k] ==", s + reminders[k];
+                //THIS IS A CONTINUE STATEMENT THAT CAUSES A BUG:
+                continue NEXT_STEP;
+            }
+            //. " checked prime", primes[k];
+        }
+        //. " will break the loop";
+        finish = true;
+    }
+    . "\t", s;
+    prime_candidate += s;
+ }
