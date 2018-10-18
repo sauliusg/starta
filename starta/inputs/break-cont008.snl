@@ -29,8 +29,8 @@ use std;
 
 //var args = get_options( arguments(), options );
 var args = arguments();
-var Nprimes = strtoll(args[1]);
-var Nsteps = strtoll(args[2]);
+var Nprimes = narguments() > 1 ? strtoll(args[1]) : 3;
+var Nsteps = narguments() > 2 ? strtoll(args[2]) : 10;
 
 . "Nprimes =", Nprimes;
 . "Nsteps =", Nsteps;
@@ -108,6 +108,7 @@ for var i = 1 to Nsteps { // <- DOES NOT  WORK
         s++;
         // < "", "s = ", s;
         for var k = 0 to llast(primes)@llong {
+        //for( var k = 0; k <= llast(primes)@llong; k++ ) {
             if( (s + reminders[k]) % primes[k] == 0 ) {
                 //. " prime", primes[k], "forbids step", s, "reminder", reminders[k], "s + reminder[k] ==", s + reminders[k];
                 //THIS IS A CONTINUE STATEMENT THAT CAUSES A BUG:
