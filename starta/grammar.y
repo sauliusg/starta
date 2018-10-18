@@ -6012,7 +6012,7 @@ static void compiler_compile_continue( COMPILER *cc, ssize_t label_idx,
             if( name ) {
                 thrcode_push_op_continue_fixup( cc->thrcode, name, &inner );
             }
-	compiler_emit( cc, &inner, "\tce\n", JMP, &zero );
+            compiler_emit( cc, &inner, "\tce\n", JMP, &zero );
         }
     }
     cexception_catch {
