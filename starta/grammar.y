@@ -5931,8 +5931,8 @@ static ssize_t check_loop_types( COMPILER *cc, int omit_last_loop,
     ssize_t count = 0;
 
     foreach_dnode( loop, cc->loops ) {
+        prev_count = count;
 	if( dnode_has_flags( loop, DF_LOOP_HAS_VAL )) {
-            prev_count = count;
 	    count += dnode_loop_counters( loop );
 	}
 	if( strcmp( dnode_name(loop), label ) == 0 ) {
