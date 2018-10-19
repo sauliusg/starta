@@ -123,7 +123,7 @@ DEL_OBJS     = ${LOCAL_OBJS} ${OTHER_OBJS}
 # to build a corresponding library, and simply do 'make -C dir libdir.a'
 # if the library does not exist. If the library exists, we will use
 # whatever it contains, without checking its dependencies. To build the
-# up-to-date libraries in ${LB_DIRS} directoris use 'make libs' command.
+# up-to-date libraries in ${LIB_DIRS} directories use 'make libs' command.
 # We omit the check of library dependencies just for speed; if the library
 # is actively changed and must be constantly recompiled, one should use
 # ${OTHER_DIRS} variable to include the the *.c files of that directory
