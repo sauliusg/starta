@@ -1,0 +1,6 @@
+./sl: inputs/err-for-block001.snl(120,2): ERROR, incorrect syntax
+ }
+ ^
+./sl: compiler could not recover from errors, quitting now
+1 error(s) detected
+

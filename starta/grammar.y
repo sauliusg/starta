@@ -9710,6 +9710,7 @@ control_statement
             delete_dnode( shared_counter );
             cexception_reraise( inner, px );
         }
+        $3 = NULL;
         delete_dnode( loop_counter );
         delete_dnode( shared_counter );
       }
@@ -9824,7 +9825,6 @@ control_statement
             delete_dnode( loop_counter_var );
             cexception_reraise( inner, px );
         }
-        delete_dnode( loop_counter_var );
       }
      loop_body
       {
@@ -9854,6 +9854,9 @@ control_statement
                 compiler_drop_top_expression( compiler );
             }
         }
+
+        $3 = NULL;
+        delete_dnode( loop_counter_var );
 
 	compiler_fixup_op_continue( compiler, px );
         compiler_fixup_here( compiler );
@@ -10020,7 +10023,6 @@ control_statement
             delete_dnode( shared_loop_counter );
             cexception_reraise( inner, px );
         }
-        delete_dnode( loop_counter_var );
         delete_dnode( shared_loop_counter );
       }
      loop_body
@@ -10051,6 +10053,9 @@ control_statement
                 compiler_drop_top_expression( compiler );
             }
         }
+
+        $4 = NULL;
+        delete_dnode( loop_counter_var );
 
 	compiler_fixup_op_continue( compiler, px );
         compiler_fixup_here( compiler );
