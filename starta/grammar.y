@@ -8646,9 +8646,11 @@ pragma_statement
        cexception_catch {
            freex( type_kind_name );
            delete_tnode( default_type );
+           $4 = NULL;
            cexception_reraise( inner, px );
        }
        assert( !default_type );
+       $4 = NULL;
        freex( type_kind_name );
    }
 ;
