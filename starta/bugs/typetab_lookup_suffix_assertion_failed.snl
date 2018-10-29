@@ -1,0 +1,74 @@
+#! /usr/bin/env starta
+// --*- C -*--
+
+//*
+// Output coordinates of an icosahedron of a given edge length.
+//**
+
+pragma prepend "$D";
+pragma prepend "$D/lib";
+
+use std;
+use Math;
+use Icosahedron;
+use CIFPrint;
+use VRML2Print;
+use CMLPrint;
+
+use SOptions;
+use SUsage;
+
+//* Usage:
+//     $0 --options
+//
+//* Options:
+//
+//  --cif-output, --vrml2-output, --cml-output
+//      Select various output formats (CIF, VRML2, CML, ...).
+//
+//  -l, --length 1.0
+//      Specify length of one icosahedron edge.
+//
+//  --help             Print short usage message (this message) and exit.
+//**
+
+var opt_length = new OptionValue;
+var format = "cif";
+
+var options = 
+[
+ make_option( null, "--cif-output", OT_FUNCTION OptionType,
+              proc => procedure( string argv[]; int i ): string
+                      { format = "cif"; return null } ),
+
+ make_option( null, "--vrml2-output", OT_FUNCTION OptionType,
+              proc => procedure( string argv[]; int i ): string 
+                      { format = "vrml2"; return null } ),
+
+ make_option( null, "--cml-output", OT_FUNCTION OptionType,
+              proc => procedure( string argv[]; int i ): string 
+                      { format = "cml"; return null } ),
+
+ make_option( "-l", "--length", OT_FLOAT    OptionType, opt_length ),
+ make_option( null, "--help",   OT_FUNCTION OptionType, proc => SUsage::xusage ),
+];
+
+var files = get_options( arguments(), options );
+
+var L : double = 1.0;
+
+if( opt_length.count ) {
+    L = strtod( opt_length.value );
+}
+
+if( format == "cif" ) then
+    CIFPrint::print( Icosahedron::coordinates, Icosahedron::edges, L );
+elsif( format == "vrml2" ) then
+    VRML2Print::print( Icosahedron::coordinates, Icosahedron::edges, L );
+elsif( format == "cml" ) then
+    CMLPrint::print( Icosahedron::coordinates, Icosahedron::edges, L );
+else
+    var file stderr = stderrors();
+    <stderr> << argument(0) << ": unkown format '" << format << "' specified\n";
+    exit(1);
+endif
