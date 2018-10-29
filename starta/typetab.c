@@ -266,6 +266,7 @@ void typetab_override_suffix( TYPETAB *table, const char *name,
     assert( tnode );
     assert( table );
     assert( name );
+    assert( *tnode );
     table->node = new_type_node( *tnode, name, suffix,
                                  table->current_scope,
                                  table->current_subscope,

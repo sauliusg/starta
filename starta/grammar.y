@@ -8573,14 +8573,25 @@ pragma_statement
        TNODE *default_type = $2;
 
        if( default_type ) {
-           typetab_override_suffix( compiler->typetab, /*name*/ "",
-                                    TS_INTEGER_SUFFIX,
-                                    &default_type, px );
+           TNODE *volatile shared_default = share_tnode( default_type );
+           cexception_t inner;
+           cexception_guard( inner ) {
+               typetab_override_suffix( compiler->typetab, /*name*/ "",
+                                        TS_INTEGER_SUFFIX,
+                                        &shared_default, &inner );
 
-           typetab_override_suffix( compiler->typetab, /*name*/ "",
-                                    TS_FLOAT_SUFFIX, 
-                                    &default_type, px );
+               typetab_override_suffix( compiler->typetab, /*name*/ "",
+                                        TS_FLOAT_SUFFIX, 
+                                        &default_type, &inner );
+           }
+           cexception_catch {
+               delete_tnode( default_type );
+               delete_tnode( shared_default );
+               $2 = NULL;
+               cexception_reraise( inner, px );
+           }
        }
+       $2 = NULL;
    }
 
 | _PRAGMA __IDENTIFIER constant_expression
