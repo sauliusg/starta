@@ -1,0 +1,12 @@
+#! /usr/bin/env starta
+// --*- C -*--
+
+//*
+// Output coordinates of an icosahedron of a given edge length.
+//**
+
+use std;
+
+pragma double;
+
+. 54.0;
