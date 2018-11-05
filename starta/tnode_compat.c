@@ -518,6 +518,8 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                                                 TYPETAB *generic_types,
                                                 cexception_t *ex )
 {
+    assert( abstract );
+
     if( generic_types && abstract->kind == TK_PLACEHOLDER ) {
         TNODE *volatile placeholder_implementation =
             typetab_lookup( generic_types, abstract->name );
