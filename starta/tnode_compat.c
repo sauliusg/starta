@@ -529,17 +529,19 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                           "with a non-reference type '%s'",
                           tnode_name( abstract ), tnode_name( concrete ));
             }
+            TNODE *volatile shared_concrete = share_tnode( concrete );
             cexception_t inner;
             cexception_guard( inner ) {
                 placeholder_implementation =
-                    new_tnode_placeholder( abstract->name, ex );
+                    new_tnode_placeholder( abstract->name, &inner );
                 tnode_insert_base_type( placeholder_implementation,
-                                        share_tnode( concrete ));
+                                        &shared_concrete );
                 placeholder_implementation =
                     typetab_insert( generic_types, abstract->name,
-                                    placeholder_implementation, &inner );
+                                    &placeholder_implementation, &inner );
             }
             cexception_catch {
+                delete_tnode( shared_concrete );
                 delete_tnode( placeholder_implementation );
                 cexception_reraise( inner, ex );
             }

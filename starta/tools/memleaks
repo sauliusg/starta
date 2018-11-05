@@ -1,0 +1,11 @@
+#! /bin/sh
+#*
+# Grep information about leaked memory nodes from the Starta compiler
+# output.
+#
+# USAGE:
+# ./sl -d memleak -I modules/ ttt.snl 2>&1 | $0
+# ./starta -d memleak -I modules/ ttt.snl 2>&1 | $0
+#**
+
+awk '/^(DNODE|TNODE)/{if($5>$8)print}/^After /||/^(In)?(D|d)irect/||/heap-use-after-free/' ${1+"$@"}

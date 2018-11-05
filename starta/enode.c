@@ -38,6 +38,13 @@ struct ENODE {
 
 #include <enode_a.ci>
 
+void dispose_enode( ENODE *volatile *node )
+{
+    assert( node );
+    delete_enode( *node );
+    *node = NULL;
+}
+
 void delete_enode( ENODE* node )
 {
     if( node ) {
@@ -297,10 +304,12 @@ ENODE *new_enode( cexception_t *ex )
     return enode;
 }
 
-ENODE *new_enode_typed( TNODE *tnode, cexception_t *ex )
+ENODE *new_enode_typed( TNODE *volatile *tnode, cexception_t *ex )
 {
     ENODE *enode = new_enode( ex );
-    enode->value.expr_type = tnode;
+    assert( tnode );
+    enode->value.expr_type = *tnode;
+    *tnode = NULL;
     return enode;
 }
 
@@ -330,15 +339,17 @@ ENODE *new_enode_varaddr_expr( DNODE *var_dnode, cexception_t *ex )
     return enode;
 }
 
-void enode_append_element_type( ENODE *enode, TNODE *element_type )
+void enode_append_element_type( ENODE *enode, TNODE *volatile *element_type )
 {
+    assert( element_type );
     assert( enode );
     if( !enode->value.expr_type ) {
-	enode->value.expr_type = element_type;
+	enode->value.expr_type = *element_type;
     } else {
 	enode->value.expr_type =
-	    tnode_append_element_type( enode->value.expr_type, element_type );
+	    tnode_append_element_type( enode->value.expr_type, *element_type );
     }
+    *element_type = NULL;
 }
 
 void enode_list_push( ENODE **ptr_list, ENODE *enode )

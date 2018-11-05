@@ -19,6 +19,8 @@
 #include <grammar_y.h>
 #include <lexer_flex.h>
 #include <run.h>
+#include <dnode.h>
+#include <tnode.h>
 #include <bcalloc.h>
 #include <allocx.h>
 #include <stringx.h>
@@ -162,6 +164,7 @@ static char *usage_text[2] = {
 "      code  - print the generated code in a bytecode assembler notation\n"
 "      dump  - dump the generated code after patching addresses\n"
 "      trace - print opcode names and stack top during program execution\n"
+"      memleak - print leaked strings and nodes\n"
 "\n"
 
 "  -I, --include-path path/to/modules\n"
@@ -331,6 +334,9 @@ int main( int argc, char *argv[], char *env[] )
 	  compiler_flex_debug_lines();
 	  thrcode_debug_on();
       }
+      if( strstr(debug.value.s, "memleak") != NULL ) {
+          compiler_memleak_debug_on();
+      }
   }
 
   cexception_guard( inner ) {
@@ -366,6 +372,8 @@ int main( int argc, char *argv[], char *env[] )
                   printf( "%s: '%s' -- OK\n", progname, files[0] );
               }
           }
+          null_allocated_dnodes();
+          null_allocated_tnodes();
           return 0;
       }
       
@@ -374,7 +382,6 @@ int main( int argc, char *argv[], char *env[] )
 	      i++;
 	  }
 	  code = new_thrcode_from_file( files[0], include_paths, &inner );
-
           if( rstack_length.present ) {
               interpret_rstack_length( rstack_length.value.i );
           }
@@ -401,7 +408,6 @@ int main( int argc, char *argv[], char *env[] )
 	  for( i = 0; files[i] != NULL; i++ ) {
 	      code = new_thrcode_from_file( files[i], include_paths,
                                             &inner );
-
               if( rstack_length.present ) {
                   interpret_rstack_length( rstack_length.value.i );
               }
@@ -432,9 +438,16 @@ int main( int argc, char *argv[], char *env[] )
   cexception_catch {
       fprintf( stderr, "%s: %s\n", argv[0], cexception_message( &inner ));
       delete_thrcode( code );
+      freex( files );
+      null_allocated_dnodes();
+      null_allocated_tnodes();
       exit(3);
   }
   delete_thrcode( code );
+  freex( files );
+  null_allocated_dnodes();
+  null_allocated_tnodes();
+  fflush(NULL);
 
   return 0;
 }

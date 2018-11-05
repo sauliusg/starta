@@ -1,0 +1,21 @@
+// --*- C -*--
+
+// Test struct and class type compatibility
+
+use std;
+
+struct S {
+    float x, y, z;
+    string name;
+};
+
+class R : S {
+    int num;
+};
+
+var r = new R;
+var s : S = new S;
+
+s = r; // OK
+
+r = s; // ERROR, incompatible types

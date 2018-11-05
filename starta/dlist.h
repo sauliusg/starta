@@ -17,13 +17,12 @@ typedef void (*dnode_dispose_function_t)( DNODE* volatile * );
 
 void delete_dlist( DLIST *list );
 DLIST* new_dlist( DNODE *dnode,
-		      dnode_delete_function_t delete_fn,
-		      DLIST *next,
-		      cexception_t *ex );
+                  DLIST *next,
+                  cexception_t *ex );
 void create_dlist( DLIST * volatile *list,
-		     DNODE * volatile *data,
-		     dnode_dispose_function_t dispose_fn,
-		     DLIST *next, cexception_t *ex );
+                   DNODE * volatile *data,
+                   DLIST *next, cexception_t *ex );
+void dlist_break_cycles( DLIST *list );
 void dispose_dlist( DLIST* volatile *list );
 DNODE* dlist_data( DLIST *list );
 DNODE* dlist_extract_data( DLIST *list );

@@ -1,0 +1,90 @@
+#! /usr/bin/env starta
+// --*- C -*--
+
+pragma prepend "$D";
+pragma prepend "$D/lib";
+
+use std;
+
+var args = arguments();
+var Nprimes = narguments() > 1 ? strtoll(args[1]) : 3;
+var Nsteps = narguments() > 2 ? strtoll(args[2]) : 10;
+
+. "Nprimes =", Nprimes;
+. "Nsteps =", Nsteps;
+
+function find_primes( llong Nprimes ): llong[]
+{
+    var primes = new llong[Nprimes];
+    var l = Nprimes;
+    pragma llong;
+
+    if( l == 0 ) {
+        return null;
+    } otherwise if( l == 1 ) {
+        primes[0] = 2;
+        return primes;
+    } else {
+        primes[0] = 2;
+        var llong k = 1; // Next prime number index
+    CANDIDATE:
+        for( var N = 3; k < Nprimes; N += 2 ) {
+            for( var i = 1; i < k; i++ ) {
+                if( N % primes[i] == 0 ) {
+                    continue CANDIDATE;
+                }
+                var square : llong = primes[i];
+                if( square * square > N ) {
+                    break;
+                }
+            }
+            primes[k] = N;
+            k++
+        }
+    }
+    return primes;
+};
+
+var primes = find_primes( Nprimes );
+
+if( true ) {
+    var prefix = "";
+    for( var prime in primes ) {
+        < prefix; < prime;
+        prefix = " ";
+    }
+    . "";
+}
+
+var reminders = new llong[Nprimes];
+
+pragma llong;
+var prime_candidate : llong = 1;
+
+for var i = 1 to Nsteps { // <- Used to work incorrectly.
+    for var j = 0 to llast(primes)@llong {
+        reminders[j] = prime_candidate % primes[j];
+    }
+    < prime_candidate, "\t";
+    var prefix = "";
+    for var j = 0 to llast(primes)@llong {
+        < prefix, reminders[j];
+        prefix = " ";
+    }
+    var s = 0;
+    var finish = false;
+    NEXT_STEP:
+    while(!finish) {
+        s++;
+        // < "", "s = ", s;
+        for var k = 0 to llast(primes)@llong { // Used to work incorrectly.
+            if( (s + reminders[k]) % primes[k] == 0 ) {
+                //THIS IS A CONTINUE STATEMENT THAT USED TO CAUSE A BUG:
+                continue NEXT_STEP;
+            }
+        }
+        finish = true;
+    }
+    . "\t", s;
+    prime_candidate += s;
+}

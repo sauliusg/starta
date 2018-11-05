@@ -18,13 +18,14 @@ typedef void (*tnode_dispose_function_t)( TNODE* volatile * );
 
 void delete_tlist( TLIST *list );
 TLIST* new_tlist( TNODE *tnode,
-		      tnode_delete_function_t delete_fn,
-		      TLIST *next,
-		      cexception_t *ex );
+                  TLIST *next,
+                  cexception_t *ex );
 void create_tlist( TLIST * volatile *list,
-		     TNODE * volatile *data,
-		     tnode_dispose_function_t dispose_fn,
-		     TLIST *next, cexception_t *ex );
+                   TNODE * volatile *data,
+                   TLIST *next, cexception_t *ex );
+void tlist_traverse_tnodes_and_set_rcount2( TLIST *tlist );
+void tlist_traverse_tnodes_and_mark_accessible( TLIST *tlist );
+void tlist_break_cycles( TLIST *list );
 void dispose_tlist( TLIST* volatile *list );
 TNODE* tlist_data( TLIST *list );
 TNODE* tlist_extract_data( TLIST *list );

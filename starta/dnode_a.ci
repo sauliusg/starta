@@ -7,6 +7,7 @@
 
 /* private allocator for dnodes */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <cexceptions.h>
 #include <allocx.h>
@@ -14,6 +15,25 @@
 #if 0
 #define USE_FIXED_NODE_ARRAY
 #endif
+
+/* The doubly-linked list of allocated DNODEs: */
+static DNODE *allocated = NULL;
+static intmax_t maxalloc, curralloc;
+
+static void dnode_exclude_from_allocated_list( DNODE *dnode )
+{
+    if( dnode ) {
+        if( allocated == dnode ) {
+            allocated = dnode->next_alloc;
+        }
+        if( dnode->prev_alloc ) {
+            dnode->prev_alloc->next_alloc = dnode->next_alloc;
+        }
+        if( dnode->next_alloc ) {
+            dnode->next_alloc->prev_alloc = dnode->prev_alloc;
+        }
+    }
+}
 
 #ifdef USE_FIXED_NODE_ARRAY
 
@@ -27,7 +47,41 @@ static DNODE *alloc_dnode( cexception_t *ex )
     /* return callocx( sizeof(DNODE), 1, ex ); */
     assert( last_dnode < MAX_DNODES );
     /* printf( "allocating dnode %ld\n", last_dnode ); */
-    return &dnodes[last_dnode++];
+    DNODE *node = &dnodes[last_dnode++];
+    if( allocated ) {
+        allocated->prev_alloc = node;
+    }
+    node->next_alloc = allocated;
+    allocated = node;
+    maxalloc ++; curralloc ++;
+#ifdef USE_SERNO
+    node->serno = maxalloc;
+#endif
+
+#if USE_STACK_TRACES && USE_SERNO
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_DNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( node->serno == requested_serno ) {
+        int i;
+        fprintf( stderr, "ALLOC DNODE: allocating dnode serno = %zd\n", node->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+    
+    return node;
 }
 
 static void free_dnode( DNODE *dnode )
@@ -35,20 +89,144 @@ static void free_dnode( DNODE *dnode )
     /* freex( dnode ); return; */
     /* printf( "deleting dnode %d\n", (dnode-dnodes) ); */
     assert( dnode->rcount == 0 );
+
+#if USE_STACK_TRACES && USE_SERNO
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_DNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( dnode->serno == requested_serno ) {
+        int i;
+        fprintf( stderr, "FREE DNODE: freeing dnode serno = %zd\n", dnode->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+
+    dnode_exclude_from_allocated_list( dnode );
     dnode->rcount--;
+    curralloc --;
 }
 
 #else
 
 static DNODE *alloc_dnode( cexception_t *ex )
 {
-    return callocx( sizeof(DNODE), 1, ex );
+    DNODE *node = callocx( sizeof(DNODE), 1, ex );
+    if( allocated ) {
+        allocated->prev_alloc = node;
+    }
+    node->next_alloc = allocated;
+    allocated = node;
+    maxalloc ++; curralloc ++;
+#ifdef USE_SERNO
+    node->serno = maxalloc;
+#endif
+
+#if USE_STACK_TRACES && USE_SERNO
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_DNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( node->serno == requested_serno ) {
+        int i;
+        fprintf( stderr, "ALLOC DNODE: allocating dnode serno = %zd\n", node->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+    
+    return node;
 }
 
 static void free_dnode( DNODE *dnode )
 {
     assert( dnode->rcount == 0 );
+
+#if USE_STACK_TRACES && USE_SERNO
+    void *buffer[100];
+    char **strings;
+    int ntraces;
+    int requested_serno = 0;
+    char *requested_serno_envvar = getenv( "STARTA_REQUESTED_DNODE_SERNO" );
+
+    if( requested_serno_envvar ) {
+        requested_serno = atoi( requested_serno_envvar );
+    }
+
+    if( dnode->serno == requested_serno ) {
+    int i;
+    fprintf( stderr, "FREE DNODE: freeing dnode serno = %zd\n", dnode->serno );
+        ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+        strings = backtrace_symbols( buffer, ntraces );
+        for( i = 0; i < ntraces; i++ ) {
+            fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+        }
+        free( strings );
+    }
+#endif
+
+    dnode_exclude_from_allocated_list( dnode );
     freex( dnode );
+    curralloc --;
 }
 
 #endif
+
+void dnode_print_allocated()
+{
+    dnode_fprint_allocated( stdout );
+}
+
+void dnode_print_allocated_to_stderr()
+{
+    dnode_fprint_allocated( stderr );
+}
+
+void dnode_fprint_allocated( FILE *fp )
+{
+    DNODE *node;
+    fprintf( fp, "MAX DNODES: %jd (still allocated %jd)\n",
+             maxalloc, curralloc );
+    for( node = allocated; node != NULL; node = node->next_alloc ) {
+    fprintf( fp, "DNODE: %p rcount = %d rcount2 = %d "
+#ifdef USE_SERNO
+                 "serno = %zd "
+#endif
+                 "%s%s\"%s\" type = \"%s\" next = %p prev = %p\n",
+                 node, node->rcount, node->rcount2,
+#ifdef USE_SERNO
+                 node->serno,
+#endif
+                 (node->flags & DF_ACCESSIBLE ? "ACCESSIBLE " : ""),
+                 (node->flags & DF_CYCLES_BROKEN ? "CYCLES_BROKEN " : ""),
+                 node->name,
+                 node->tnode ? tnode_name( node->tnode ) : "",
+                 node->next, node->prev );
+    }
+}
+
+void null_allocated_dnodes(void)
+{
+    allocated = NULL;
+}

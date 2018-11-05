@@ -10,8 +10,7 @@
 
 #include <stdlib.h>
 
-char *strclone( const char *s );
-char *strnclone( const char *s, size_t length );
+void *moveptr( void *volatile *p );
 char *process_escapes( char *str );
 char translate_escape( char **s );
 

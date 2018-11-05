@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
-**$Author: saulius $
-**$Date: 2004-10-22 17:25:06 +0300 (Fri, 22 Oct 2004) $ 
-**$Revision: 7 $
-**$URL: svn+ssh://localhost/home/saulius/svn-repositories/compilers/common/common.h $
+**$Author$
+**$Date$ 
+**$Revision$
+**$URL$
 \*---------------------------------------------------------------------------*/
 
 #ifndef __FORMATS_H

@@ -1,0 +1,14 @@
+#! /usr/bin/env starta
+// --*- C -*--
+
+// Argument is not returned:
+
+pragma prepend "$D";
+
+use std;
+
+use Pi;
+
+var arg1 = argument(0);
+
+. arg1;

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /* FIXME: use exceptions or return NULL pointers and check in
    strclone() and its clones: */
@@ -23,20 +24,13 @@ if( (s) == NULL ) \
      exit(99); \
    }
 
-char *strclone( const char *s )
+void *moveptr( void *volatile *p )
 {
-   char *new;
-   merror( new = strdup(s) );
-   return new;
-}
-
-char *strnclone( const char *s, size_t length )
-{
-   char *new;
-   merror( new = malloc(length + 1) );
-   strncpy( new, s, length );
-   new[length] = '\0';
-   return new;
+    void *q;
+    assert( p );
+    q = *p;
+    *p = NULL;
+    return q;
 }
 
 char *strappend( char *s, const char *suffix )

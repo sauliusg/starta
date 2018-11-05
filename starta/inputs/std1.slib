@@ -1,0 +1,19 @@
+
+package std1
+
+#
+# Definition of standard types for the SL language.
+#
+
+type string;
+type int;
+
+type bool = {
+}
+
+} // <-- syntax error, but causes use after delete.
+
+type double = {
+}
+
+end package std1;

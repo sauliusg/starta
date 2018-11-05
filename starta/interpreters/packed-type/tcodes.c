@@ -745,7 +745,8 @@ int GLDI( INSTRUCTION_FN_ARGS )
         if( pos_offset < size )
             memcpy( &istate.ep[0].num, num_ptr, copy_size );
 
-        if( neg_offset < 0 ) {
+        if( neg_offset < 0 &&
+            neg_offset >= -sizeof(alloccell_t) + nref * REF_SIZE ) {
             istate.ep[0].PTR = *ref_ptr;
         }
     }
@@ -806,7 +807,8 @@ int GSTI( INSTRUCTION_FN_ARGS )
         if( pos_offset < size )
             memcpy( num_ptr, &istate.ep[0].num, copy_size );
 
-        if( neg_offset < 0 ) {
+        if( neg_offset < 0 &&
+            neg_offset >= -sizeof(alloccell_t) + nref * REF_SIZE ) {
             *ref_ptr = istate.ep[0].PTR;
         }
     }
@@ -1828,10 +1830,10 @@ int JMP( INSTRUCTION_FN_ARGS )
 
 int ALLOCARGV( INSTRUCTION_FN_ARGS )
 {
-    ssize_t first = istate.ep[1].num.ssize;
-    ssize_t last = istate.ep[0].num.ssize;
+    int first = istate.ep[1].num.ssize;
+    int last = istate.ep[0].num.ssize;
     char **ptr = NULL;
-    ssize_t i;
+    int i;
 
     TRACE_FUNCTION();
 
@@ -1842,14 +1844,14 @@ int ALLOCARGV( INSTRUCTION_FN_ARGS )
 
     if( last >= first && istate.argv != NULL ) {
 
-        ssize_t length = last - first + 1;
+        int length = last - first + 1;
 	ptr = bcalloc_array( REF_SIZE, length, 1, EXCEPTION );
 
 	BC_CHECK_PTR( ptr );
 	STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
 	for( i = first; i <= last; i++ ) {
-            ssize_t k = i - first;
+            int k = i - first;
 	    ptr[k] = bcalloc_blob( strlen( istate.argv[i]) + 1, EXCEPTION );
 	    BC_CHECK_PTR( ptr[k] );
 	    strcpy( ptr[k], istate.argv[i] );

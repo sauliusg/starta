@@ -10,6 +10,11 @@
 #include <tlist.h>
 
 struct TNODE {
+    /* Next and previous TNODEs in the allocated TNODE list; used to
+       keep track of the allocated TNODEs and to prevent memory
+       leaks: */
+    TNODE *next_alloc, *prev_alloc;
+
     type_kind_t kind;     /* what kind of type is it: simple type,
 			     struct, class, vector, function type, etc. */
     char *name;           /* name of the type ( 'int', 'real', etc. ) */
@@ -27,6 +32,9 @@ struct TNODE {
     ssize_t nrefs;        /* number of fields in the type (structure, class,
 			     etc.) that are references and should be garbage
 			     collected */
+#ifdef USE_SERNO
+    ssize_t serno;
+#endif
 
     ssize_t nextnumoffs;  /* The offset of the next numeric
                              (non-reference) field to be assigned. */
@@ -55,6 +63,12 @@ struct TNODE {
 			     fields. */
 
     long rcount;          /* reference count */
+    ssize_t rcount2;      /* The second reference count, used to count
+                             references from cycles. If all references
+                             come exclusively from other symbol table
+                             nodes, and there are no more roots
+                             elsewhere in the code, we should have
+                             rcount == rcount2.  */
 
     DNODE *fields;        /* for structure types, contains a list of
 			     definitions of the fields; for enum
@@ -75,7 +89,7 @@ struct TNODE {
 			     function */
 
     DNODE *constructor;   /* class constructor */
-    DNODE *destructor;    /* class dstructor, called from a garbage
+    DNODE *destructor;    /* class destructor, called from a garbage
                              collector */
     TNODE *next;
 };

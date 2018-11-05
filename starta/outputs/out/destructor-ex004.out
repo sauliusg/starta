@@ -1,2 +1,3 @@
+exception (code -1) raised in destructor: class A count negative
 Object 'TheFirstA', counted 1 times
-caught exception: class A count negative
+After the A allocation

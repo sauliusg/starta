@@ -1,0 +1,18 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author: saulius $
+**$Date: 2018-04-18 18:22:59 +0300 (Wed, 18 Apr 2018) $ 
+**$Revision: 4557 $
+**$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/lib/!pi.slib $
+\*---------------------------------------------------------------------------*/
+/*
+    Elementary vector algebra.
+*/
+
+module Pi;
+
+use std;
+use Math;
+
+readonly pi = 4.0D * atan2(1,1);
+
+end module Pi;

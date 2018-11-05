@@ -106,7 +106,7 @@ TST_DEPEND    = ${join ${TST_DIRS}, ${TST_BASENAMES:%.c=.%.d}}
 vpath %.c ${SRC_DIR} ${OTHER_DIRS}
 vpath %.h ${SRC_DIR} ${OTHER_DIRS}
 
-VPATH = ${OTHER_DIRS}
+#VPATH = ${OTHER_DIRS}
 
 OTHER_CFILES := ${notdir $(sort ${wildcard ${addsuffix /*.c, ${OTHER_DIRS}}})}
 OTHER_CFILES := ${filter-out %.tab.c lex.yy.c %.lex.c, ${OTHER_CFILES}}
@@ -123,7 +123,7 @@ DEL_OBJS     = ${LOCAL_OBJS} ${OTHER_OBJS}
 # to build a corresponding library, and simply do 'make -C dir libdir.a'
 # if the library does not exist. If the library exists, we will use
 # whatever it contains, without checking its dependencies. To build the
-# up-to-date libraries in ${LB_DIRS} directoris use 'make libs' command.
+# up-to-date libraries in ${LIB_DIRS} directories use 'make libs' command.
 # We omit the check of library dependencies just for speed; if the library
 # is actively changed and must be constantly recompiled, one should use
 # ${OTHER_DIRS} variable to include the the *.c files of that directory
@@ -316,9 +316,18 @@ ${DIFF_FILES}: ${TARGET}
 
 ${DIFFIL_DIR}/%.diff: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@printf "%-30s " "$*:" ; \
-	unset SL_INCLUDE_PATHS; \
-	./$^ ${TEST_OPTIONS} 2>&1 | diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
-	if [ $$? = 0 ]; then echo "OK"; else echo "FAILED:"; cat $@; fi
+	if [ ! -f ${TEST_DIR}/$*.chk ] || ${TEST_DIR}/$*.chk; then \
+		unset SL_INCLUDE_PATHS; \
+		./$^ ${TEST_OPTIONS} 2>&1 \
+			| diff -u ${OUTPUT_DIR}/$*.out - > $@ ; \
+		if [ $$? = 0 ]; \
+			then echo "OK"; \
+			else echo "FAILED:"; cat $@; \
+		fi; \
+	else \
+		echo " -- SKIPPED"; \
+		touch $@; \
+	fi
 
 ${OUTPUT_DIR}/%.out: ${TARGET} ${TEST_DIR}/%${EXT}
 	-@test -f $@ || echo "$@:"
@@ -365,13 +374,13 @@ tests alltests: test shtests
 listdiff: # test
 	@- if [ -d ${DIFFIL_DIR} ]; then \
 	   find ${DIFFIL_DIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -l; fi
+		| xargs --no-run-if-empty ls -1; fi
 	@- if [ -d ${TST_DIF_DIR} ]; then \
 	   find ${TST_DIF_DIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -l; fi
+		| xargs --no-run-if-empty ls -1; fi
 	@- if [ -d ${SHELL_DIFDIR} ]; then \
 	   find ${SHELL_DIFDIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -l; fi
+		| xargs --no-run-if-empty ls -1; fi
 
 
 #------------------------------------------------------------------------------
