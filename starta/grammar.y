@@ -7524,6 +7524,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> opt_module_parameters
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
+%type <i>     opt_type_keyword
 %type <i>     opt_variable_declaration_keyword
 %type <dnode> module_name
 %type <dnode> raised_exception_identifier;
@@ -10595,6 +10596,13 @@ opt_null_type_designator
       { $$ = 1; }
   ; 
 
+opt_type_keyword
+  : _TYPE
+      { $$ = _TYPE; }
+  | /* empty */
+      { $$ = 0; }
+;
+
 delimited_type_description
   : type_identifier
     { 
@@ -10694,10 +10702,10 @@ delimited_type_description
 	$$ = tnode;
     }
 
-  | '<' __IDENTIFIER '>'
+  | '<' opt_type_keyword __IDENTIFIER '>'
   {
 	char *type_name =
-            obtain_string_from_strpool( compiler->strpool, $2 );
+            obtain_string_from_strpool( compiler->strpool, $3 );
 	TNODE *volatile tnode =
             share_tnode( typetab_lookup( compiler->typetab, type_name ));
         TNODE *volatile shared_tnode = NULL;
