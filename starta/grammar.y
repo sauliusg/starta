@@ -10674,6 +10674,34 @@ delimited_type_description
   | _ARRAY dimension_list _OF delimited_type_description
     { $$ = tnode_append_element_type( $2, $4 ); }
 
+  | _TYPE __IDENTIFIER
+    {
+	char *volatile type_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
+	TNODE *volatile tnode =
+            share_tnode( typetab_lookup( compiler->typetab, type_name ));
+	TNODE *volatile shared_tnode = NULL;
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( !tnode ) {
+                tnode = new_tnode_placeholder( type_name, &inner );
+                shared_tnode = share_tnode( tnode );
+                typetab_insert( compiler->typetab, type_name,
+                                &shared_tnode, &inner );
+                assert( !shared_tnode );
+            }
+        }
+        cexception_catch {
+            freex( type_name );
+            delete_tnode( tnode );
+            delete_tnode( shared_tnode );
+            cexception_reraise( inner, px );
+        }
+        freex( type_name );
+	$$ = tnode;
+    }
+
   | '<' opt_type_keyword __IDENTIFIER '>'
   {
 	char *type_name =
