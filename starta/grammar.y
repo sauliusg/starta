@@ -8059,6 +8059,8 @@ opt_default_module_parameter
     { $$ = -1; }
 | '=' __IDENTIFIER
     { $$ = $2; }
+| '=' '<' opt_type_keyword __IDENTIFIER '>'
+    { $$ = $4; }
 ;
 
 module_statement

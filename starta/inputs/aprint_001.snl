@@ -1,1 +1,8 @@
-use std; var m = new long[0]; use APrint(long); . push(push(m,10L),20L)
+use std;
+
+var m = new long[0];
+
+use APrint(long);
+use APush(long);
+
+. APush::push(APush::push(m,10L),20L)

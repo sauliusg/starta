@@ -1,0 +1,18 @@
+# --*- C -*--
+
+module APush( type T = <type X> )
+
+// Push an element ont an array
+
+inline bytecode procedure push( a : array of T; value : T ) -> array of T
+{
+    APUSH
+}
+
+inline bytecode procedure pop( a : array of T ) : T
+{
+    APOP
+}
+
+
+end module APush;
