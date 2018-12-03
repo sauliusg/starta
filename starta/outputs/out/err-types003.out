@@ -10,9 +10,6 @@ inline bytecode function F_as_float( t : F ): float {};
 ./sl: inputs/err-types003.snl(10,48): ERROR, type 'float' is not declared in the current scope
 inline bytecode function float_as_C( x : float ): C {};
                                                ^
-./sl: inputs/err-types003.snl(13,1): ERROR, type with unknown size can not be used for local variable 't'
-{
-^
 ./sl: inputs/err-types003.snl(14,17): ERROR, type 'float' is not declared in the current scope
     pragma float;
                 ^
@@ -55,5 +52,5 @@ inline bytecode function float_as_C( x : float ): C {};
 ./sl: inputs/err-types003.snl(25,20): ERROR, type 'C' has no unary operator named '.'
 . C_from_F( 100 F );
                    ^
-./sl: 18 error(s) detected
+./sl: 17 error(s) detected
 

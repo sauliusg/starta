@@ -1,5 +1,0 @@
-./sl: inputs/decl001.snl(10,10): ERROR, type with unknown size can not be used for local variable 'a'
-var a : T;
-         ^
-./sl: 1 error(s) detected
-
