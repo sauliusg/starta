@@ -18,13 +18,6 @@ inline bytecode function nref( a : array ): int { NREF }
 inline bytecode function capacity( a : array ): int { CAPACITY }
 inline bytecode function trim( a : array of T ): array of T { TRIM }
 
-function print_array( array of type T a; function ( T element ) print )
-{
-    foreach var T e in a do
-        print( e );
-    enddo
-}
-
 var m = new int[0];
 
 . "length(m) ==" string, length(m);
