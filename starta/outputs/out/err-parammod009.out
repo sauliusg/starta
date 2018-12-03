@@ -1,12 +1,24 @@
 ./sl: inputs/Parametrised.slib(2,60): ERROR, type is not defined for module parameter 'inttype'
 module Parametrised( type inttype, type floattype = double )
                                                            ^
+./sl: inputs/Parametrised.slib(4,16): ERROR, type with unknown size can not be used for local variable 'i'
+var i : inttype;
+               ^
+./sl: inputs/Parametrised.slib(17,1): ERROR, type with unknown size can not be used for local variable 'i'
+{
+^
 ./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no conversion from type 'inttype'
     return x/i@floattype;
                         ^
 ./sl: inputs/Parametrised.slib(2,60): ERROR, type is not defined for module parameter 'floattype'
 module Parametrised( type inttype, type floattype = double )
                                                            ^
+./sl: inputs/Parametrised.slib(7,1): ERROR, type with unknown size can not be used for local variable 'y'
+{
+^
+./sl: inputs/Parametrised.slib(7,1): ERROR, type with unknown size can not be used for local variable 'x'
+{
+^
 ./sl: inputs/Parametrised.slib(8,15): ERROR, type 'floattype' has no binary operator named '*'
     return x*y/(x+y);
               ^
@@ -16,12 +28,18 @@ module Parametrised( type inttype, type floattype = double )
 ./sl: inputs/Parametrised.slib(8,21): ERROR, type 'floattype' has no binary operator named '/'
     return x*y/(x+y);
                     ^
+./sl: inputs/Parametrised.slib(12,1): ERROR, type with unknown size can not be used for local variable 'x'
+{
+^
 ./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no operator named 'ldc'
     return x * 2 floattype;
                           ^
 ./sl: inputs/Parametrised.slib(13,27): ERROR, type 'floattype' has no binary operator named '*'
     return x * 2 floattype;
                           ^
+./sl: inputs/Parametrised.slib(17,1): ERROR, type with unknown size can not be used for local variable 'x'
+{
+^
 ./sl: inputs/Parametrised.slib(18,25): ERROR, type 'floattype' has no conversion from type 'inttype'
     return x/i@floattype;
                         ^
@@ -76,5 +94,5 @@ ldP::i = 40000 ldP::inttype;
 ./sl: inputs/err-parammod009.snl(22,9): ERROR, name 'i' is imported more than once -- please use explicit module name for disambiguation
 . ifP::i;
         ^
-./sl: 26 error(s) detected
+./sl: 32 error(s) detected
 

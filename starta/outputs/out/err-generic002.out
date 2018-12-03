@@ -1,6 +1,9 @@
+./sl: inputs/err-generic002.snl(11,1): ERROR, type with unknown size can not be used for local variable 'point'
+{
+^
 Debug statement reached in line 12
 ./sl: inputs/err-generic002.snl(15,60): ERROR, incompatible types for assignment to variable 'simplex'
     var simplex: array [][][][] of T = makearray( ndim+1L );
                                                            ^
-./sl: 1 error(s) detected
+./sl: 2 error(s) detected
 

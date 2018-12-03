@@ -35,6 +35,9 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(22,28): ERROR, method add() does not match method add it should implement - old or new prototype has undefined argument 2
     method add@I1( int i ) { self.value += i; . "This is add@I1()" }
                            ^
+./sl: inputs/err-types004.snl(22,28): ERROR, type with unknown size can not be used for local variable 'self'
+    method add@I1( int i ) { self.value += i; . "This is add@I1()" }
+                           ^
 ./sl: inputs/err-types004.snl(22,68): ERROR, type with empty suffix is not defined in this scope for types of kind 'string'
 
     method add@I1( int i ) { self.value += i; . "This is add@I1()" }
@@ -50,6 +53,9 @@ old or new prototype has undefined argument 2
     method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
                        ^
 ./sl: inputs/err-types004.snl(23,28): ERROR, method sub() does not match method sub it should implement - old or new prototype has undefined argument 2
+    method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
+                           ^
+./sl: inputs/err-types004.snl(23,28): ERROR, type with unknown size can not be used for local variable 'self'
     method sub@I1( int i ) { self.value -= i; . "This is sub@I1()" }
                            ^
 ./sl: inputs/err-types004.snl(23,68): ERROR, type with empty suffix is not defined in this scope for types of kind 'string'
@@ -69,6 +75,9 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(28,26): ERROR, interface 'I2' does not implement method 'get'
     method get@I2(): int { return self.value }
                          ^
+./sl: inputs/err-types004.snl(28,26): ERROR, type with unknown size can not be used for local variable 'self'
+    method get@I2(): int { return self.value }
+                         ^
 ./sl: inputs/err-types004.snl(28,46): ERROR, incompatible types of returned value 1 of function 'get@I2'
     method get@I2(): int { return self.value }
                                              ^
@@ -80,6 +89,9 @@ old or new prototype undefined return values
     method put@I2( int i )
                        ^
 ./sl: inputs/err-types004.snl(30,5): ERROR, method put() does not match method put it should implement - old or new prototype has undefined argument 2
+    {
+    ^
+./sl: inputs/err-types004.snl(30,5): ERROR, type with unknown size can not be used for local variable 'self'
     {
     ^
 ./sl: inputs/err-types004.snl(32,55): ERROR, type with empty suffix is not defined in this scope for types of kind 'string'
@@ -105,6 +117,9 @@ old or new prototype has undefined argument 2
 ./sl: inputs/err-types004.snl(34,1): ERROR, class 'C' does not implement method 'put' from interface 'I2'
 }
 ^
+./sl: inputs/err-types004.snl(36,14): ERROR, type with unknown size can not be used for local variable 'c'
+var c = new C;
+             ^
 ./sl: inputs/err-types004.snl(38,15): ERROR, type with empty suffix is not defined in this scope for types of kind 'integer'
 
 c->add@I1( 10 );
@@ -139,5 +154,5 @@ c->put@I2( 33 );
 ./sl: inputs/err-types004.snl(44,15): ERROR, too little arguments in call to function 'put'
 c->put@I2( 33 );
               ^
-./sl: 42 error(s) detected
+./sl: 47 error(s) detected
 
