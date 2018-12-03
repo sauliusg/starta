@@ -7,9 +7,51 @@
 
 use * from std;
 
-procedure printmax( a, b : type T;
-                    gt : function( x, y : type T ) -> (bool);
-                    print : procedure( t : type T ))
+class Integer {
+    value: int;
+    constructor( int i ) { self.value = i }
+    operator "@int"( int i ): Integer
+    {
+        return new Integer(i);
+    }
+    operator ">"( Integer i, j ): bool
+    {
+        return i.value > j.value
+    }
+    operator "<"( Integer i, j ): bool
+    {
+        return i.value < j.value
+    }
+    operator "." (Integer i)
+    {
+        < i.value;
+    }
+}
+
+class Float {
+    value: float;
+    constructor( float i ) { self.value = i }
+    operator "@float"( float i ): Float
+    {
+        return new Float(i);
+    }
+    operator ">"( Float i, j ): bool
+    {
+        return i.value > j.value
+    }
+    operator "<"( Float i, j ): bool
+    {
+        return i.value < j.value
+    }
+    operator "." (Float i)
+    {
+        < i.value;
+    }
+}
+
+procedure printmax( a, b : <type T>;
+                    gt : function( x, y : <type T> ) -> (bool);
+                    print : procedure( t : <type T> ))
 begin
     if( gt( a, b )) {
         print( a );
@@ -18,25 +60,25 @@ begin
     }
 end
 
-function gt_int( i, j : int ) : bool
+function gt_int( i, j : Integer ) : bool
 begin
     return i > j ? true : false;
 end
 
-function gt_float( i, j : float ) : bool
+function gt_float( i, j : Float ) : bool
 begin
     return i > j ? true : false;
 end
 
-function print_int( i : int )
+function print_int( i : Integer )
 begin
     . i;
 end
 
-function print_float( x : float )
+function print_float( x : Float )
 begin
     . x;
 end
 
-printmax( 7, 8, gt_int, print_int );
-printmax( 11.5, 9.3, gt_float, print_float );
+printmax( 7@Integer, 8@Integer, gt_int, print_int );
+printmax( 11.5@Float, 9.3@Float, gt_float, print_float );
