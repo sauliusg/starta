@@ -4,13 +4,6 @@
 
 use * from std;
 
-function print_array( array of type T a; function ( T element ) print )
-{
-    foreach var T e in a do
-        print( e );
-    enddo
-}
-
 var m = new int[0];
 
 . "length(m) ==", length(m);

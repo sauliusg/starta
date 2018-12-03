@@ -3,6 +3,7 @@
 //
 
 use * from std;
+use APrint(int);
 
 inline bytecode procedure push( a : array of type T; value : T )
     -> array of type T
@@ -13,13 +14,6 @@ inline bytecode procedure push( a : array of type T; value : T )
 inline bytecode function nref( a : array ): int { NREF }
 inline bytecode function capacity( a : array ): int { CAPACITY }
 inline bytecode function trim( a : array of T ): array of T { TRIM }
-
-function print_array( array of type T a; function ( T element ) print )
-{
-    foreach var T e in a do
-        print( e );
-    enddo
-}
 
 var m = new int[0];
 
