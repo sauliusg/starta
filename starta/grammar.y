@@ -10717,6 +10717,7 @@ delimited_type_description
             if( !tnode ) {
                 tnode = new_tnode_placeholder( type_name, &inner );
                 tnode_set_flags( tnode, TF_IS_REF );
+                tnode_set_size( tnode, REF_SIZE );
                 shared_tnode = share_tnode( tnode );
                 typetab_insert( compiler->typetab, type_name,
                                 &shared_tnode, &inner );
