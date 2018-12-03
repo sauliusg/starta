@@ -1035,6 +1035,10 @@ void dnode_assign_offset( DNODE *dnode, ssize_t *offset )
     stackcells = 1; /* size of variable in stackcells */
     *offset += delta * stackcells;
     dnode->offset = *offset - delta;
+    if( dnode->tnode && tnode_size( dnode->tnode ) == 0 ) {
+        yyerrorf( "type with unknown size can not be used for "
+                  "local variable '%s'", dnode_name(dnode) );
+    }
 }
 
 void dnode_list_assign_offsets( DNODE *dnode_list, ssize_t *offset )

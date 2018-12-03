@@ -614,6 +614,7 @@ TNODE *new_tnode_array( TNODE *element_type,
     assert( tnode != base_type );
     tnode->base_type = base_type;
     tnode->flags |= TF_IS_REF;
+    tnode_set_size( tnode, REF_SIZE );
 
     return tnode;
 }
@@ -2214,6 +2215,9 @@ TNODE *tnode_set_integer_attribute( TNODE *tnode, const char *attr_name,
     }
     if( strcmp( attr_name, "reference" ) == 0 ) {
 	tnode->flags |= TF_IS_REF;
+        if( tnode_size( tnode ) == 0 ) {
+            tnode_set_size( tnode, REF_SIZE );
+        }
 	return tnode;
     }
     if( strcmp( attr_name, "immutable" ) == 0 ) {
