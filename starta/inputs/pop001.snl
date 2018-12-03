@@ -5,33 +5,25 @@
 // Checking 'push()' and 'pop()' functions:
 
 use * from std;
-
-function print_array( array of type T a; function ( T element ) print )
-{
-    var i = 0;
-    foreach var T e in a do
-        < "[", i , "]: ";
-        print( e );
-        i ++;
-    enddo
-}
+use APrint(int);
+use APrint(float);
 
 var m = new int[0];
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+. m;
 
 var n = new float[0];
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+. n;
 
 . "========================================";
 
 m = push( push( push( m, 10 ), 12 ), 15 );
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+. m;
 
 n = push( n, 123.12 );
 n = push( n, 3.14 );
@@ -39,7 +31,7 @@ n = push( n, 2.7 );
 n = push( n, 0.18 );
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+. n;
 
 . "========================================";
 
@@ -47,11 +39,11 @@ print_array( n, function( float i ) { . i } );
 . "popped value =", pop( m );
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+. m;
 
 . "popped value =", pop( n );
 . "popped value =", pop( n );
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+. n;
 
