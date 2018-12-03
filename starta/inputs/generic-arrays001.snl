@@ -12,7 +12,9 @@
 use * from std;
 use * from Math;
 
-use Simplex;
+type point = array of float;
+
+use Simplex( point );
 use * from FloatSimplexFns;
 
 function energy( float x[] ): float
