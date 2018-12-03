@@ -1038,7 +1038,7 @@ void dnode_assign_offset( DNODE *dnode, ssize_t *offset )
     if( dnode->tnode &&
         tnode_kind( dnode->tnode ) == TK_PLACEHOLDER &&
         tnode_size( dnode->tnode ) == 0 ) {
-        yyerrorf( "type with unknown size can not be used for "
+        yyerrorf( "generic type with unknown size can not be used for "
                   "local variable '%s'", dnode_name(dnode) );
     }
 }

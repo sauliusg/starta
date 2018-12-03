@@ -1,10 +1,10 @@
-./sl: inputs/err-generic001.snl(11,1): ERROR, type with unknown size can not be used for local variable 'b'
+./sl: inputs/err-generic001.snl(11,1): ERROR, generic type with unknown size can not be used for local variable 'b'
 begin
 ^
-./sl: inputs/err-generic001.snl(11,1): ERROR, type with unknown size can not be used for local variable 'a'
+./sl: inputs/err-generic001.snl(11,1): ERROR, generic type with unknown size can not be used for local variable 'a'
 begin
 ^
-./sl: inputs/err-generic001.snl(12,19): ERROR, type with unknown size can not be used for local variable 'n'
+./sl: inputs/err-generic001.snl(12,19): ERROR, generic type with unknown size can not be used for local variable 'n'
     var n : type T;
                   ^
 ./sl: inputs/err-generic001.snl(20,11): ERROR, incompatible types for function 'g' argument nr. 1

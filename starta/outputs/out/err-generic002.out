@@ -1,4 +1,4 @@
-./sl: inputs/err-generic002.snl(11,1): ERROR, type with unknown size can not be used for local variable 'point'
+./sl: inputs/err-generic002.snl(11,1): ERROR, generic type with unknown size can not be used for local variable 'point'
 {
 ^
 Debug statement reached in line 12
