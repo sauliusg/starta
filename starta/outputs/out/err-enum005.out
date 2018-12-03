@@ -1,6 +1,15 @@
 ./sl: inputs/err-enum005.snl(36,1): ERROR, one can only extend previously defined enumeration types
 );
 ^
+./sl: inputs/err-enum005.snl(38,11): ERROR, type with unknown size can not be used for local variable 'e1'
+var e1 : E;
+          ^
+./sl: inputs/err-enum005.snl(39,15): ERROR, type with unknown size can not be used for local variable 'e2'
+var e2, e3 : E;
+              ^
+./sl: inputs/err-enum005.snl(39,15): ERROR, type with unknown size can not be used for local variable 'e3'
+var e2, e3 : E;
+              ^
 ./sl: inputs/err-enum005.snl(41,11): ERROR, type 'E' has no operator named 'ldc'
 e1 = six E;
           ^
@@ -16,5 +25,5 @@ e3 = two E;
 ./sl: inputs/err-enum005.snl(48,5): ERROR, type 'E' has no unary operator named '.'
 . e3;
     ^
-./sl: 6 error(s) detected
+./sl: 9 error(s) detected
 
