@@ -13,31 +13,34 @@ inline bytecode procedure push( a : array of type T; value : T )
     APUSH
 }
 
-function print_array( array of type T a; function ( T element ) print )
+function print_array( array of <T2> a; function ( <T2> element ) print )
 {
-    foreach var T e in a do
+    foreach var <T2> e in a do
         print( e );
     enddo
 }
 
+import ArrayPrintFunction( int ) as Pint;
+import ArrayPrintFunction( float ) as Preal;
+
 var m = [ 1, 3, 5, 7 ];
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+Pint::print_array( m, function( int i ) { . i } );
 
 var n = [ 1.0, 3.0, 5.0, 7.0 ];
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+Preal::print_array( n, function( float i ) { . i } );
 
 . "========================================";
 
 m = push( m, 10 );
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+Pint::print_array( m, function( int i ) { . i } );
 
 n = push( n, 123.12 );
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+Preal::print_array( n, function( float i ) { . i } );

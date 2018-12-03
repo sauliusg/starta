@@ -1,0 +1,13 @@
+
+module ArrayPrintFunction( type T )
+
+use * from std;
+
+function print_array( array of T a; function ( T element ) print )
+{
+    foreach var T e in a do
+        print( e );
+    enddo
+}
+
+end module ArrayPrintFunction;
