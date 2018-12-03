@@ -7,17 +7,50 @@
 
 use * from std;
 
-procedure g( type T a; b : type T ) : int
-begin
-    var n : type T;
+class Integer {
+    value: int;
+    constructor( int i ) { self.value = i }
+    operator "@int"( int i ): Integer
+    {
+        return new Integer(i);
+    }
+    operator ">"( Integer i, j ): bool
+    {
+        return i.value > j.value
+    }
+    operator "<"( Integer i, j ): bool
+    {
+        return i.value < j.value
+    }
+    operator "." (Integer i)
+    {
+        < i.value;
+    }
+}
 
-    n = a;
+class Float {
+    value: float;
+    constructor( float i ) { self.value = i }
+    operator "@float"( float i ): Float
+    {
+        return new Float(i);
+    }
+    operator ">"( Float i, j ): bool
+    {
+        return i.value > j.value
+    }
+    operator "<"( Float i, j ): bool
+    {
+        return i.value < j.value
+    }
+    operator "." (Float i)
+    {
+        < i.value;
+    }
+}
 
-    return 1;
-end
-
-procedure max( a, b : type T; 
-               gt : function( x, y : type T ) -> (bool) ) : type T
+procedure max( a, b : <type T>; 
+               gt : function( x, y : <type T> ) -> (bool) ) : <type T>
 begin
     if( gt( a, b )) {
         return a
@@ -26,12 +59,12 @@ begin
     }
 end
 
-function gt_int( i, j : int ) : bool
+function gt_int( i, j : Integer ) : bool
 begin
     return i > j ? true : false;
 end
 
-function gt_float( i, j : float ) : bool
+function gt_float( i, j : Float ) : bool
 begin
     return i > j ? true : false;
 end
@@ -46,8 +79,8 @@ begin
     STRLE
 end
 
-. max( 7, 8, gt_int );
-. max( 7.1, 5.5, gt_float );
+. max( new Integer(7), 8@Integer, gt_int );
+. max( new Float(7.1), 5.5@Float, gt_float );
 . max( "more", "less", gt_string );
 . max( "less", "more", gt_string );
 . max( "more", "less", le_string );
