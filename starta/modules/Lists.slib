@@ -2,7 +2,7 @@
 # Generic lists.
 #
 
-package Lists;
+package Lists( type T = <TT> );
 
 use * from std;
 
