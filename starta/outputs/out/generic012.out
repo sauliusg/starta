@@ -4,5 +4,23 @@
 ./sl: inputs/generic012.snl(22,26): ERROR, can not store generic type vatiables
     s.x = xmanager( s.x );
                          ^
-./sl: 2 error(s) detected
+./sl: inputs/generic012.snl(38,37): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( is, iprinter );
+                                    ^
+./sl: inputs/generic012.snl(39,37): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( is, iupdater );
+                                    ^
+./sl: inputs/generic012.snl(40,37): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( is, iprinter );
+                                    ^
+./sl: inputs/generic012.snl(44,37): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( fs, fprinter );
+                                    ^
+./sl: inputs/generic012.snl(45,37): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( fs, fupdater );
+                                    ^
+./sl: inputs/generic012.snl(46,37): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
+    generic_procedure( fs, fprinter );
+                                    ^
+./sl: 8 error(s) detected
 

@@ -1632,6 +1632,8 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                 }
             }
 	}
+#if 0
+        // To be removed (S.G.):
         if( field_kind == TK_PLACEHOLDER ) {
             /* For generic type value placeholders, we must allocte
                also memory at a positive structure field offset to
@@ -1668,6 +1670,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
             tnode->size += tnode->nextnumoffs - old_offset;
             tnode_set_flags( tnode, TF_HAS_PLACEHOLDER );
         }
+#endif
         if( field_size == 0 && field_type && field_kind != TK_FUNCTION &&
             field_kind != TK_PLACEHOLDER ) {
             yyerrorf( "field '%s' has zero size", dnode_name( current ));
