@@ -6,7 +6,7 @@ package Lists( type T = <TT> );
 
 use * from std;
 
-type list of T = ?{
+type list of X = ?{
     next : list of T;
     value : T;
 
