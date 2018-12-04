@@ -1,3 +1,5 @@
-ONE
-TWO
-THREE
+./sl: inputs/map004.snl(9,24): ERROR, generic type with unknown size can not be used for local variable 'e'
+    foreach var e in m do
+                       ^
+./sl: 1 error(s) detected
+
