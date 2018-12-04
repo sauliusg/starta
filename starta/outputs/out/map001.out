@@ -1,3 +1,8 @@
-2
-3
-4
+./sl: inputs/map001.snl(11,22): ERROR, can not store generic type vatiables
+        m[i] = p(m[i]);
+                     ^
+./sl: inputs/map001.snl(11,23): ERROR, can not store generic type vatiables
+        m[i] = p(m[i]);
+                      ^
+./sl: 2 error(s) detected
+
