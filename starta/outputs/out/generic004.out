@@ -1,5 +1,11 @@
 ./sl: inputs/generic004.snl(29,48): ERROR, in this type representation, can not allocate array of generic type T
     var new_p: array [] of T = new T[length(p)];
                                                ^
-./sl: 1 error(s) detected
+./sl: inputs/generic004.snl(32,33): ERROR, can not store generic type vatiables
+        new_p[i] = shifter( p[i], i );
+                                ^
+./sl: inputs/generic004.snl(32,38): ERROR, can not store generic type vatiables
+        new_p[i] = shifter( p[i], i );
+                                     ^
+./sl: 3 error(s) detected
 

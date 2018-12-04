@@ -2998,7 +2998,8 @@ static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
             if( element_type && tnode_is_reference( element_type )) {
 		compiler_emit( cc, ex, "\tc\n", PLDI );
 	    } else if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
-		compiler_emit( cc, ex, "\tc\n", GLDI );
+		/* compiler_emit( cc, ex, "\tc\n", GLDI ); */
+                yyerrorf( "can not store generic type vatiables" );
 	    } else {
 		compiler_emit( cc, ex, "\tcs\n", LDI, &element_size );
 	    }
@@ -3082,7 +3083,8 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		if( expr_type && tnode_is_reference( expr_type )) {
 		    compiler_emit( cc, &inner, "\tc\n", PSTI );
 		} else if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
-		    compiler_emit( cc, &inner, "\tc\n", GSTI );
+		    /* compiler_emit( cc, &inner, "\tc\n", GSTI ); */
+                    yyerrorf( "can not store generic type vatiables" );
                 } else {
 		    compiler_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}

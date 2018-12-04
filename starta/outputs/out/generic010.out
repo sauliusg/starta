@@ -1,3 +1,5 @@
-Struct p
-12
-3.14
+./sl: inputs/generic010.snl(18,19): ERROR, can not store generic type vatiables
+    xprinter( s.x );
+                  ^
+./sl: 1 error(s) detected
+
