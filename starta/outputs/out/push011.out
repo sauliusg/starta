@@ -1,23 +1,8 @@
-length(m) == 4
-1
-3
-5
-7
-length(n) == 4
-1
-3
-5
-7
-========================================
-length(m) == 5
-1
-3
-5
-7
-10
-length(n) == 5
-1
-3
-5
-7
-123.12
+./sl: inputs/push011.snl(12,19): ERROR, generic type with unknown size can not be used for local variable 'e'
+    foreach var T e in a do
+                  ^
+./sl: inputs/push011.snl(12,26): ERROR, generic type with unknown size can not be used for local variable 'e'
+    foreach var T e in a do
+                         ^
+./sl: 2 error(s) detected
+

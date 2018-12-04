@@ -1,5 +1,8 @@
-length(m) == 0
-========================================
-length(m) == 2
-10
-12
+./sl: inputs/push012.snl(15,19): ERROR, generic type with unknown size can not be used for local variable 'e'
+    foreach var T e in a do
+                  ^
+./sl: inputs/push012.snl(15,26): ERROR, generic type with unknown size can not be used for local variable 'e'
+    foreach var T e in a do
+                         ^
+./sl: 2 error(s) detected
+
