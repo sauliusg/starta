@@ -4,15 +4,15 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
-    -> array of type T
+inline bytecode procedure push( a : array of <type T>; value : <T> )
+    -> array of <type T>
 {
     APUSH
 }
 
 inline bytecode function nref( a : array ): int { NREF }
 
-function print_array( array of type T a; function ( T element ) print )
+function print_array( array of <type T> a; function ( <T> element ) print )
 {
     foreach var T e in a do
         print( e );
