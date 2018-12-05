@@ -2006,6 +2006,12 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 		target_type ?
                 compiler_lookup_conversion( cc, target_type, expr_type ) :
                 NULL;
+
+            if( !conversion && tnode_base_type( target_type ) ) {
+                conversion =
+                    compiler_lookup_conversion( cc, tnode_base_type( target_type ),
+                                                expr_type );
+            }
 	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
 	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
 	    int retval_nr = dnode_list_length( retvals );
@@ -14071,8 +14077,10 @@ arithmetic_expression
       {
           //FIXME: the conversion must take var_type_description into
           //       account, shouldn't it? (S.G.).
-          delete_tnode( $4 );
-          compiler_compile_named_type_conversion( compiler, NULL, px );
+          TNODE *target_type = $4;
+          assert( target_type );
+          compiler_compile_type_conversion( compiler, target_type,
+                                            tnode_name(target_type), px );
       }
 
   | expression '?'
