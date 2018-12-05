@@ -575,7 +575,7 @@ DNODE* new_dnode_operator( char *name,
 	    DNODE *arg1 = op_type ? tnode_args( op_type ) : NULL;
 	    TNODE *arg1_type = arg1 ? dnode_type( arg1 ) : NULL;
 	    char *arg1_type_name = arg1_type ? tnode_name( arg1_type ) : NULL;
-	    if( arg1 ) {
+	    if( arg1_type_name ) {
 		freex( op->name );
 		op->name = NULL;
 		op->name = strdupx( arg1_type_name, &inner );
