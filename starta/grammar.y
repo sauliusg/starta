@@ -2007,7 +2007,7 @@ static void compiler_compile_type_conversion( COMPILER *cc,
                 compiler_lookup_conversion( cc, target_type, expr_type ) :
                 NULL;
 
-            if( !conversion && tnode_base_type( target_type ) ) {
+            if( !conversion && target_type && tnode_base_type( target_type ) ) {
                 conversion =
                     compiler_lookup_conversion( cc, tnode_base_type( target_type ),
                                                 expr_type );
