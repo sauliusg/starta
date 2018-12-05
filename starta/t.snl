@@ -90,8 +90,8 @@ l = s + p;
 l = s + cons( 2@(list of int) );
 l = l + cons( 11@(list of int),
               cons( 22@(list of int) ) ) +
-              cons( 3@(list of int),
-                    cons( 4@(list of int) );
+        cons( 3@(list of int),
+              cons( 4@(list of int) ));
 
 < "( ";
 foreach var i in l do
