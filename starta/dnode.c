@@ -796,6 +796,7 @@ DNODE *dnode_list_lookup( DNODE *dnode_list, const char *name )
     if( !name ) return NULL;
 
     for( dnode = dnode_list; dnode != NULL; dnode = dnode->next ) {
+        assert( dnode->name );
         if( strcmp( name, dnode->name ) == 0 ) {
 	    return dnode;
 	}
