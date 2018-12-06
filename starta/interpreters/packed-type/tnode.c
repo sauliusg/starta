@@ -1613,8 +1613,7 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
         }
 
 	if( field_kind != TK_FUNCTION ) {
-            if( tnode_is_reference( field_type ) ||
-                field_kind == TK_PLACEHOLDER ) {
+            if( tnode_is_reference( field_type )) {
                 dnode_set_offset( current, tnode->nextrefoffs -
                                   sizeof(alloccell_t) - REF_SIZE );
                 tnode->nextrefoffs -= REF_SIZE;
