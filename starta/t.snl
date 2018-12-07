@@ -106,5 +106,6 @@ l = l + cons( 11@(list of int),
 ## foreach var i in l do
 ##     < i, ""
 ## enddo
+. *l;
 . @l;
 . ")"
