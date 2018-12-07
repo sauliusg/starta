@@ -10598,8 +10598,6 @@ opt_null_type_designator
       { $$ = 1; }
   | _NULL
       { $$ = 0; }
-  | '*' /* synonim of 'not null' */
-      { $$ = 1; }
   | '?' /* synonim of 'null' */
       { $$ = 0; }
   | /* default: 1 == not null, 0 == null */
@@ -14045,6 +14043,11 @@ arithmetic_expression
   | '/' expression %prec __UNARY
       {
        compiler_compile_unop( compiler, "/", px );
+      }
+
+  | '*' expression %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "*", px );
       }
 
   | expression __DOUBLE_PERCENT expression
