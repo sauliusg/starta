@@ -46,6 +46,12 @@ type list of T = ?{
       ROT ROT STI const(int.size)
     };
 
+    inline bytecode operator "*" () : addressof
+    {}
+
+    inline bytecode operator "@" () : addressof
+    {}
+
     inline bytecode operator "next"( l : list of T )
     { NEXT const((list of T).next.offset) const((list of T).value.offset) }
 
@@ -97,7 +103,8 @@ l = l + cons( 11@(list of int),
               cons( 4@(list of int) ));
 
 < "( ";
-foreach var i in l do
-    < i, ""
-enddo
+## foreach var i in l do
+##     < i, ""
+## enddo
+. @l;
 . ")"
