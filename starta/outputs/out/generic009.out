@@ -1,11 +1,5 @@
 ./sl: inputs/generic009.snl(18,19): ERROR, can not store generic type vatiables
     xprinter( s.x );
                   ^
-./sl: inputs/generic009.snl(28,64): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
-    generic_procedure( struct IS { i => 2, j => 12 }, iprinter );
-                                                               ^
-./sl: inputs/generic009.snl(29,66): ERROR, incompatible types for function 'generic_procedure' argument nr. 1 - offset of the generic field 'x' is incompatible with the concrete implementation
-    generic_procedure( struct FS { i => 2, f => 3.14 }, fprinter );
-                                                                 ^
-./sl: 3 error(s) detected
+./sl: 1 error(s) detected
 
