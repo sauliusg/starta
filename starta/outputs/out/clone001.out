@@ -4,16 +4,16 @@
 ./sl: inputs/clone001.snl(46,42): ERROR, in this type representation, can not allocate array of generic type T
     var new_p: array [] of T = new T[2+1];
                                          ^
-./sl: inputs/clone001.snl(49,17): ERROR, can not store generic type vatiables
+./sl: inputs/clone001.snl(49,17): ERROR, can not store generic type variables
     new_p[0] = p;
                 ^
-./sl: inputs/clone001.snl(51,35): ERROR, can not store generic type vatiables
+./sl: inputs/clone001.snl(51,35): ERROR, can not store generic type variables
         new_p[i] = shifter( p, i );
                                   ^
-./sl: inputs/clone001.snl(55,27): ERROR, can not store generic type vatiables
+./sl: inputs/clone001.snl(55,27): ERROR, can not store generic type variables
         printer( new_p[i] );
                           ^
-./sl: inputs/clone001.snl(59,20): ERROR, can not store generic type vatiables
+./sl: inputs/clone001.snl(59,20): ERROR, can not store generic type variables
     return new_p[0];
                    ^
 ./sl: 6 error(s) detected

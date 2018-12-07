@@ -1,4 +1,4 @@
-./sl: inputs/packed-type/generic011.snl(19,19): ERROR, can not store generic type vatiables
+./sl: inputs/packed-type/generic011.snl(19,19): ERROR, can not store generic type variables
     xprinter( s.x );
                   ^
 ./sl: 1 error(s) detected

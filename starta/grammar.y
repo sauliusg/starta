@@ -3005,7 +3005,7 @@ static void compiler_compile_ldi( COMPILER *cc, cexception_t *ex )
 		compiler_emit( cc, ex, "\tc\n", PLDI );
 	    } else if( element_type && tnode_kind( element_type ) == TK_PLACEHOLDER ) {
 		/* compiler_emit( cc, ex, "\tc\n", GLDI ); */
-                yyerrorf( "can not store generic type vatiables" );
+                yyerrorf( "can not store generic type variables" );
 	    } else {
 		compiler_emit( cc, ex, "\tcs\n", LDI, &element_size );
 	    }
@@ -3090,7 +3090,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		    compiler_emit( cc, &inner, "\tc\n", PSTI );
 		} else if( expr_type && tnode_kind( expr_type ) == TK_PLACEHOLDER ) {
 		    /* compiler_emit( cc, &inner, "\tc\n", GSTI ); */
-                    yyerrorf( "can not store generic type vatiables" );
+                    yyerrorf( "can not store generic type variables" );
                 } else {
 		    compiler_emit( cc, &inner, "\tcs\n", STI, &expr_size );
 		}

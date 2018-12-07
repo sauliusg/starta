@@ -1,7 +1,7 @@
-./sl: inputs/generic012.snl(22,25): ERROR, can not store generic type vatiables
+./sl: inputs/generic012.snl(22,25): ERROR, can not store generic type variables
     s.x = xmanager( s.x );
                         ^
-./sl: inputs/generic012.snl(22,26): ERROR, can not store generic type vatiables
+./sl: inputs/generic012.snl(22,26): ERROR, can not store generic type variables
     s.x = xmanager( s.x );
                          ^
 ./sl: 2 error(s) detected
