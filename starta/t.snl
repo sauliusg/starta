@@ -34,13 +34,16 @@ type list of T = ?{
     }; // operator "+"
 
     inline bytecode operator "new" () : list of T
-    { ALLOC %%alloc_size %%nref };
+    // { ALLOC %%alloc_size %%nref };
+    { ALLOC 64 %%nref };
 
     inline bytecode operator "@list" ( i : int ) : list of int
     {
-      ALLOC %%alloc_size %%nref
+      // ALLOC %%alloc_size %%nref
+      ALLOC 64 %%nref
+      DUP
       OFFSET const((list of T).value.offset)
-      SWAP STI
+      ROT ROT STI const(int.size)
     };
 
     inline bytecode operator "next"( l : list of T )
