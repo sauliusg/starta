@@ -14032,6 +14032,21 @@ arithmetic_expression
        compiler_compile_unop( compiler, "~", px );
       }
 
+  | '%' expression %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "%", px );
+      }
+
+  | '\\' expression %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "\\", px );
+      }
+
+  | '/' expression %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "/", px );
+      }
+
   | expression __DOUBLE_PERCENT expression
       {
        compiler_compile_binop( compiler, "%%", px );
