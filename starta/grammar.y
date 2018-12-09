@@ -14146,14 +14146,9 @@ arithmetic_expression
   | '(' simple_expression ')'
   | '(' function_call ')'
 
-  | '@' expression  %prec __UNARY
-      {
-       compiler_compile_unop( compiler, "@", px );
-      }
-
   | ':' expression  %prec __UNARY
       {
-       compiler_compile_unop( compiler, "@", px );
+       compiler_compile_unop( compiler, ":", px );
       }
 
   | __COLON_COLON expression  %prec __UNARY
@@ -14163,7 +14158,7 @@ arithmetic_expression
 
   | '_' expression  %prec __UNARY
       {
-       compiler_compile_unop( compiler, "@", px );
+       compiler_compile_unop( compiler, "_", px );
       }
 
   | __QQ expression  %prec __UNARY
