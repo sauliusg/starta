@@ -90,7 +90,7 @@ var l, p : list of int;
 
 var s : list of int = new list of int;
 
-s = 1@(list of int);
+s = 156@(list of int);
 
 l = s + p;
 l = s + cons( 2@(list of int) );
