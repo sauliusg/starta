@@ -1,5 +1,11 @@
+./sl: inputs/err-generic004.snl(36,10): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
+. sort( b, function( a, b: int ): int { return a > b ? 1 : 0 } );
+         ^
 ./sl: inputs/err-generic004.snl(36,64): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
 . sort( b, function( a, b: int ): int { return a > b ? 1 : 0 } );
                                                                ^
-./sl: 1 error(s) detected
+./sl: inputs/err-generic004.snl(36,64): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
+. sort( b, function( a, b: int ): int { return a > b ? 1 : 0 } );
+                                                               ^
+./sl: 3 error(s) detected
 
