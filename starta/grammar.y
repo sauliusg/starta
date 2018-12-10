@@ -2354,16 +2354,16 @@ static void compiler_check_operator_args( COMPILER *cc,
                 expr_type = enode_type( expr );
 
 #if 0
-                if( strcmp( od->name, "[]" ) == 0 ) {
-                fprintf( stderr, ">>> %s(): '%s': arg = '%s', targ = '%s' (%s), "
-                         "expr = '%s' (%s)\n",
-                         cc->current_function ? dnode_name(cc->current_function):"<main>",
-                         od->name, dnode_name(arg),
-                         tnode_name(argument_type),
-                         tnode_kind_name(argument_type),
-                         tnode_name(expr_type),
-                         tnode_kind_name(expr_type)
-                );
+                if( strcmp( od->name, "*" ) == 0 ) {
+                    fprintf( stderr, ">>> %s(): '%s': arg = '%s', targ = '%s' (%s), "
+                             "expr = '%s' (%s)\n",
+                             cc->current_function ? dnode_name(cc->current_function):"<main>",
+                             od->name, dnode_name(arg),
+                             tnode_name(argument_type),
+                             tnode_kind_name(argument_type),
+                             tnode_name(expr_type),
+                             tnode_kind_name(expr_type)
+                             );
                 }
 #endif
                 if( !tnode_types_are_compatible( argument_type, expr_type,
