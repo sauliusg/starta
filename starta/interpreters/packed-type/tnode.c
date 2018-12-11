@@ -1170,11 +1170,8 @@ TNODE *tnode_rename_conversions( TNODE *tnode, char *old_name, char *other_name,
                                  cexception_t *ex )
 {
     DNODE *dnow;
-    printf( ">>> checking '%s' -> '%s'\n", old_name, other_name );
     for( dnow = tnode->conversions; dnow != NULL; dnow = dnode_next( dnow )) {
-        printf( ">>> checking conversion %p \"%s\"\n", dnow, dnode_name(dnow) );
         if( strcmp(dnode_name(dnow), old_name) == 0 ) {
-            printf( ">>> renaming '%s' to '%s'\n", old_name, other_name );
             dnode_rename( dnow, other_name, ex );
         }
     }
