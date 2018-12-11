@@ -111,4 +111,7 @@ l = l + cons( 11@(list of int),
 < *tail(l);
 < " ";
 < *tail(tail(l));
-. " )"
+. " )";
+
+
+. *(2.3@(list of float));
