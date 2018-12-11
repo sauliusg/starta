@@ -115,3 +115,5 @@ l = l + cons( 11@(list of int),
 
 
 . *(2.3@(list of float));
+
+// . *("labas"@(list of string));
