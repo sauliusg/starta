@@ -14126,8 +14126,6 @@ arithmetic_expression
 
   | expression '@' '(' var_type_description ')'
       {
-          //FIXME: the conversion must take var_type_description into
-          //       account, shouldn't it? (S.G.).
           TNODE *target_type = $4;
           assert( target_type );
           compiler_compile_type_conversion( compiler, target_type,
