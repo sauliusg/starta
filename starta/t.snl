@@ -37,7 +37,7 @@ type list of T = ?{
     // { ALLOC %%alloc_size %%nref };
     { ALLOC 12 %%nref };
 
-    inline bytecode operator "@list" ( i : type T ) : list of T
+    inline bytecode operator "@list" ( i : T ) : list of T
     {
       // ALLOC %%alloc_size %%nref
       // LDC %%alloc_size IPRINT NEWLINE
@@ -47,7 +47,7 @@ type list of T = ?{
       ROT ROT STI const(int.size)
     };
 
-    inline bytecode operator "*" ( l : list of type T ) : addressof
+    inline bytecode operator "*" ( l : list of T ) : addressof
     { OFFSET const((list of T).value.offset) }
 
     inline bytecode operator "next"( l : list of T )
