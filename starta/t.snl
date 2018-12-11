@@ -68,7 +68,7 @@ procedure cat( l1, l2 : list of T ) : list of T
 
 exception NullPointerException;
 
-procedure tail( l : list of type T ) : list of type int
+procedure tail( l : list of type T ) : list of int
 {
     if( l ) {
         return l.next
