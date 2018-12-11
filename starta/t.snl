@@ -46,7 +46,7 @@ type list of T = ?{
       ROT ROT STI const(int.size)
     };
 
-    inline bytecode operator "*" ( l : list of int ) : addressof
+    inline bytecode operator "*" ( l : list of type T ) : addressof
     { OFFSET const((list of T).value.offset) }
 
     inline bytecode operator "next"( l : list of T )
