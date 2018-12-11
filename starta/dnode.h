@@ -175,6 +175,8 @@ DNODE *dnode_list_insert_type( DNODE *dnode, TNODE *tnode );
 
 DNODE *dnode_replace_type( DNODE *dnode, TNODE *tnode );
 
+DNODE *dnode_rename( DNODE *dnode, char *name, cexception_t *ex );
+
 DNODE *dnode_set_filename( DNODE *dnode, char *filename, cexception_t *ex );
 
 DNODE *dnode_set_name( DNODE *dnode, char *name, cexception_t *ex );

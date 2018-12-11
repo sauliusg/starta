@@ -1183,6 +1183,17 @@ DNODE *dnode_replace_type( DNODE *dnode, TNODE *tnode )
     return dnode;
 }
 
+DNODE *dnode_rename( DNODE *dnode, char *name, cexception_t *ex )
+{
+    assert( dnode );
+    if( dnode->name ) {
+        freex( dnode->name );
+        dnode->name = NULL;
+    }
+    dnode->name = strdupx( name, ex );
+    return dnode;
+}
+
 DNODE *dnode_function_args( DNODE *dnode )
 {
     return tnode_args( dnode->tnode );

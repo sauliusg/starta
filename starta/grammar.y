@@ -10692,8 +10692,15 @@ delimited_type_description
 
       cexception_guard( inner ) {
           $$ = new_tnode_derived( &composite, &inner );
-          if( shared_composite )
+          if( shared_composite ) {
               tnode_copy_operators( $$, shared_composite, &inner );
+              tnode_copy_conversions( $$, shared_composite, &inner );
+              if( tnode_element_type( shared_composite ) && $3 ) {
+                  tnode_rename_conversions
+                      ( $$, tnode_name( tnode_element_type( shared_composite )),
+                        tnode_name( $3 ), &inner );
+              }
+          }
           if( shared_composite ) {
               tnode_set_name( $$, tnode_name( shared_composite ), &inner );
               dispose_tnode( &shared_composite );
