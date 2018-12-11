@@ -352,6 +352,10 @@ DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex )
     memcpy( dst->code, src->code, sizeof(dst->code[0]) * src->code_length );
     dst->code_length = src->code_length;
 
+    if( dst->code_fixups )
+        delete_fixup_list( dst->code_fixups );
+    dst->code_fixups = clone_fixup_list( src->code_fixups, ex );
+
     /* dst->scope = src->scope; */
     assert( dst->scope == src->scope );
     // dst->offset = src->offset;

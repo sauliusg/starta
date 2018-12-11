@@ -175,3 +175,45 @@ void fixup_list_adjust_addresses( FIXUP *fixup_list, ssize_t address )
 	fixup_adjust_address( fixup, address );
     }
 }
+
+FIXUP *clone_fixup( FIXUP *fixup, cexception_t *ex )
+{
+    return new_fixup( fixup->name,
+                      fixup->address,
+                      fixup->is_absolute,
+                      /*next = */ NULL,
+                      ex );
+}
+
+FIXUP *clone_fixup_list( FIXUP *fixup_list, cexception_t *ex )
+{
+    FIXUP *volatile cloned_fixup_list = NULL;
+    FIXUP *volatile fixup = NULL;
+    FIXUP *last_fixup = NULL;
+    cexception_t inner;
+
+    cexception_guard( inner ) {
+        FIXUP *current_fixup;
+        for( current_fixup = fixup_list;
+             current_fixup != NULL;
+             current_fixup = current_fixup->next ) {
+            fixup = clone_fixup( current_fixup, &inner );
+            if( last_fixup ) {
+                fixup_append( last_fixup, fixup );
+                last_fixup = last_fixup->next;
+            } else {
+                last_fixup = fixup;
+            }
+            if( !cloned_fixup_list ) {
+                cloned_fixup_list = fixup;
+            }
+            fixup = NULL;
+        }
+    }
+    cexception_catch {
+        delete_fixup_list( cloned_fixup_list );
+        delete_fixup( fixup );
+        cexception_reraise( inner, ex );
+    }
+    return cloned_fixup_list;
+}
