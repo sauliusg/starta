@@ -1107,6 +1107,7 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
         for( dnow = src->operators; dnow != NULL; dnow = dnode_next( dnow )) {
             TNODE *old_type = dnode_type( dnow );
             newop = clone_dnode( dnow, &inner );
+            dnode_set_offset( newop, dnode_offset( dnow ));
 
             newargs =
                 clone_dnode_list_with_replaced_types( tnode_args( old_type ),

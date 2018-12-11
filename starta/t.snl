@@ -37,7 +37,7 @@ type list of T = ?{
     // { ALLOC %%alloc_size %%nref };
     { ALLOC 64 %%nref };
 
-    inline bytecode operator "@list" ( i : int ) : list of int
+    inline bytecode operator "@list" ( i : type T ) : list of int
     {
       // ALLOC %%alloc_size %%nref
       ALLOC 64 %%nref
