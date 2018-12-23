@@ -2006,6 +2006,12 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 		target_type ?
                 compiler_lookup_conversion( cc, target_type, expr_type ) :
                 NULL;
+
+            if( !conversion && target_type && tnode_base_type( target_type ) ) {
+                conversion =
+                    compiler_lookup_conversion( cc, tnode_base_type( target_type ),
+                                                expr_type );
+            }
 	    TNODE *optype = conversion ? dnode_type( conversion ) : NULL;
 	    DNODE *retvals = optype ? tnode_retvals( optype ) : NULL;
 	    int retval_nr = dnode_list_length( retvals );
@@ -2695,220 +2701,6 @@ static void compiler_compile_binop( COMPILER *cc,
     delete_typetab( generic_types );
 }
 
-static void compiler_compile_unop( COMPILER *cc,
-                                   char *unop_name,
-                                   cexception_t *ex )
-{
-    cexception_t inner;
-    ENODE * volatile expr = cc->e_stack;
-    ENODE * volatile top = NULL;
-    TYPETAB *volatile generic_types = NULL;
-
-    generic_types = new_typetab( ex );
-    cexception_guard( inner ) {
-	if( !expr ) {
-	    yyerrorf( "not enough values on the stack for unary operator '%s'",
-		      unop_name );
-	} else {
-	    TNODE *expr_type = enode_type( expr );
-	    operator_description_t od;
-	    key_value_t *fixup_values = NULL;
-            if( expr_type && tnode_kind( expr_type ) == TK_ARRAY ) {
-		fixup_values = make_tnode_key_value_list( expr_type, NULL );
-            } else {
-                fixup_values =
-                    make_compiler_tnode_key_value_list( cc, expr_type, ex );
-            }
-
-	    compiler_init_operator_description( &od, cc, expr_type,
-                                                unop_name, 1, ex );
-	    compiler_check_operator_args( cc, &od, generic_types, &inner );
-
-	    top = enode_list_pop( &cc->e_stack );
-
-	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
-                                                      "\n", ex );
-	    compiler_check_operator_retvals( cc, &od, 0, 1 );
-	    compiler_push_operator_retvals( cc, &od, &top, generic_types, &inner );
-	}
-    }
-    cexception_catch {
-	delete_enode( top );
-        delete_typetab( generic_types );
-	cexception_reraise( inner, ex );	
-    }
-    delete_enode( top );
-    delete_typetab( generic_types );
-}
-
-static void compiler_emit_st( COMPILER *cc,
-                              TNODE *expr_type,
-                              char *var_name,
-                              ssize_t var_offset,
-                              int var_scope,
-                              cexception_t *ex )
-{
-    operator_description_t od;
-
-    if( var_scope == compiler_current_scope( cc )) {
-
-	compiler_init_operator_description( &od, cc, expr_type, "st", 1, ex );
-	compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
-
-	if( od.operator ) {
-	    compiler_emit_function_call( cc, od.operator, NULL, "", ex );
-	    compiler_emit( cc, ex, "eN\n", &var_offset, var_name );
-	} else {
-	    if( tnode_is_reference( expr_type )) {
-		compiler_emit( cc, ex, "\tceN\n", PST, &var_offset, var_name );
-	    } else {
-		compiler_emit( cc, ex, "\tceN\n", ST, &var_offset, var_name );
-	    }
-	}
-    } else {
-	if( var_scope == 0 ) {
-	    compiler_init_operator_description( &od, cc, expr_type, "stg", 1, ex );
-	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
-
-	    if( od.operator ) {
-		compiler_emit_function_call( cc, od.operator, NULL, "", ex );
-		compiler_emit( cc, ex, "eN\n", &var_offset, var_name );
-	    } else {
-		if( tnode_is_reference( expr_type )) {
-		    compiler_emit( cc, ex, "\tceN\n", PSTG, &var_offset, var_name );
-		} else {
-		    compiler_emit( cc, ex, "\tceN\n", STG, &var_offset, var_name );
-		}
-	    }
-	} else {
-	    yyerrorf( "can only store variables in the current scope"
-		      "or in the scope 0" );
-	}
-    }
-
-    compiler_check_operator_retvals( cc, &od, 0, 0 );
-}
-
-static void compiler_compile_variable_assignment_or_init(
-    COMPILER *cc,
-    DNODE *variable,
-    int (*enode_is_readonly_compatible)( ENODE *, DNODE * ),
-    cexception_t *ex )
-{
-    ENODE *expr = cc->e_stack;
-
-    if( !expr ) {
-	yyerrorf( "not enough values on the stack for assignment to "
-		  "variable '%s'", dnode_name( variable ));
-    } else {
-	TNODE *expr_type = enode_type( expr );
-
-	char *var_name = variable ? dnode_name( variable ) : NULL;
-	TNODE *var_type = variable ? dnode_type( variable ) : NULL;
-	ssize_t var_offset = variable ? dnode_offset( variable ) : 0;
-	int var_scope = variable ? dnode_scope( variable ) : -1;
-
-        /* TYPETAB *generic_types = new_typetab( ex ); */
-        TYPETAB *generic_types = NULL;
-        int has_errors = 0;
-        char msg[300] = "";
-        if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
-                                                    generic_types,
-                                                    msg, sizeof(msg)-1, ex )) {
-	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
-	    if( expr_type && dst_name &&
-		compiler_lookup_conversion( cc, var_type, expr_type )) {
-		compiler_compile_named_type_conversion( cc, dst_name, ex );
-		expr = cc->e_stack;
-		expr_type = enode_type( expr );
-	    } else {
-		if( var_name ) {
-                    if( msg[0] ) {
-                        yyerrorf( "incompatible types for assignment to "
-                                  "variable '%s' - %s", var_name, msg );
-                    } else {
-                        yyerrorf( "incompatible types for assignment to "
-                                  "variable '%s'", var_name );
-                    }
-		} else {
-                    if( msg[0] ) {
-                        yyerrorf( "incompatible types for assignment to "
-                                  "variable - %s", msg );
-                    } else {
-                        yyerrorf( "incompatible types for assignment to "
-                                  "variable" );
-                    }
-		}
-                has_errors = 1;
-	    }
-	}
-        if( variable && !has_errors ) {
-            if( !(*enode_is_readonly_compatible)( expr, variable )) {
-                char *name = variable ? dnode_name( variable ) : NULL;
-                if( dnode_has_flags( variable, DF_IS_READONLY )) {
-                    if( name ) {
-                        yyerrorf( "can not assign to the readonly variable '%s'",
-                                  name );
-                    } else {
-                        yyerrorf( "can not assign to a readonly variable" );
-                    }
-                } else {
-                    if( name ) {
-                        yyerrorf( "can not assign readonly content to variable '%s'",
-                                  name );
-                    } else {
-                        yyerrorf( "can not assign readonly content to this "
-                                  "variable" );
-                    }
-                }
-            } else {
-                compiler_emit_st( cc, expr_type, var_name, var_offset,
-                                  var_scope, ex );
-            }
-        }
-        delete_typetab( generic_types );
-        compiler_drop_top_expression( cc );
-    }
-}
-
-static void compiler_compile_variable_assignment( COMPILER *cc,
-                                                  DNODE *variable,
-                                                  cexception_t *ex )
-{
-    compiler_compile_variable_assignment_or_init(
-        cc, variable, enode_is_readonly_compatible_with_var, ex );
-}
-
-static void compiler_compile_variable_initialisation( COMPILER *cc,
-                                                      DNODE *variable,
-                                                      cexception_t *ex )
-{
-    compiler_compile_variable_assignment_or_init(
-        cc, variable, enode_is_readonly_compatible_for_init, ex );
-}
-
-static void compiler_compile_store_variable( COMPILER *cc,
-                                             DNODE *varnode,
-                                             cexception_t *ex )
-{
-    if( varnode ) {
-        compiler_compile_variable_assignment( cc, varnode, ex );
-    } else {
-        compiler_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
-    }
-}
-
-static void compiler_compile_initialise_variable( COMPILER *cc,
-                                                  DNODE *varnode,
-                                                  cexception_t *ex )
-{
-    if( varnode ) {
-        compiler_compile_variable_initialisation( cc, varnode, ex );
-    } else {
-        compiler_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
-    }
-}
-
 static void compiler_stack_top_dereference( COMPILER *cc )
 {
     if( cc->e_stack ) {
@@ -3096,6 +2888,254 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
     }
     delete_enode( top1 );
     delete_enode( top2 );
+}
+
+static void compiler_make_stack_top_element_type( COMPILER *cc )
+{
+    if( cc->e_stack ) {
+	enode_make_type_to_element_type( cc->e_stack );
+    } else {
+	yyerror( "not enough values on the evaluation stack for "
+		 "taking base type?" );
+    }
+}
+
+static void compiler_make_stack_top_addressof( COMPILER *cc,
+					    cexception_t *ex )
+{
+    if( cc->e_stack ) {
+	enode_make_type_to_addressof( cc->e_stack, ex );
+    } else {
+	yyerror( "not enough values on the evaluation stack for "
+		 "taking address?" );
+    }    
+}
+
+static void compiler_compile_unop( COMPILER *cc,
+                                   char *unop_name,
+                                   cexception_t *ex )
+{
+    cexception_t inner;
+    ENODE * volatile expr = cc->e_stack;
+    ENODE * volatile top = NULL;
+    TYPETAB *volatile generic_types = NULL;
+
+    generic_types = new_typetab( ex );
+    cexception_guard( inner ) {
+	if( !expr ) {
+	    yyerrorf( "not enough values on the stack for unary operator '%s'",
+		      unop_name );
+	} else {
+	    TNODE *expr_type = enode_type( expr );
+	    operator_description_t od;
+	    key_value_t *fixup_values = NULL;
+            if( expr_type && tnode_kind( expr_type ) == TK_ARRAY ) {
+		fixup_values = make_tnode_key_value_list( expr_type, NULL );
+            } else {
+                fixup_values =
+                    make_compiler_tnode_key_value_list( cc, expr_type, ex );
+            }
+
+	    compiler_init_operator_description( &od, cc, expr_type,
+                                                unop_name, 1, ex );
+	    compiler_check_operator_args( cc, &od, generic_types, &inner );
+
+	    top = enode_list_pop( &cc->e_stack );
+
+	    compiler_emit_operator_or_report_missing( cc, &od, fixup_values,
+                                                      "\n", ex );
+	    compiler_check_operator_retvals( cc, &od, 0, 1 );
+	    compiler_push_operator_retvals( cc, &od, &top, generic_types, &inner );
+            //printf( ">>>> operator: %s\n", unop_name );
+            //printf( ">>>> type kind: %s\n", tnode_kind_name(enode_type( cc->e_stack )) );
+            if( cc->e_stack && enode_type( cc->e_stack ) &&
+                tnode_kind(enode_type( cc->e_stack )) == TK_ADDRESSOF ) {
+                //printf( ">>>> dereferencing address.\n" );
+                enode_replace_type( cc->e_stack, share_tnode( expr_type ));
+                compiler_make_stack_top_element_type( cc );
+                compiler_make_stack_top_addressof( cc, ex );
+                //printf( ">>>> type kind before dereferencing: %s\n", tnode_kind_name(enode_type( cc->e_stack )) );
+                compiler_compile_ldi( cc, ex );
+                //printf( ">>>> type kind after dereferencing: %s\n", tnode_kind_name(enode_type( cc->e_stack )) );
+                //printf( ">>>> tnode address after dereferencing: %s\n", tnode_name(enode_type( cc->e_stack )) );
+            }
+	}
+    }
+    cexception_catch {
+	delete_enode( top );
+        delete_typetab( generic_types );
+	cexception_reraise( inner, ex );	
+    }
+    delete_enode( top );
+    delete_typetab( generic_types );
+}
+
+static void compiler_emit_st( COMPILER *cc,
+                              TNODE *expr_type,
+                              char *var_name,
+                              ssize_t var_offset,
+                              int var_scope,
+                              cexception_t *ex )
+{
+    operator_description_t od;
+
+    if( var_scope == compiler_current_scope( cc )) {
+
+	compiler_init_operator_description( &od, cc, expr_type, "st", 1, ex );
+	compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+
+	if( od.operator ) {
+	    compiler_emit_function_call( cc, od.operator, NULL, "", ex );
+	    compiler_emit( cc, ex, "eN\n", &var_offset, var_name );
+	} else {
+	    if( tnode_is_reference( expr_type )) {
+		compiler_emit( cc, ex, "\tceN\n", PST, &var_offset, var_name );
+	    } else {
+		compiler_emit( cc, ex, "\tceN\n", ST, &var_offset, var_name );
+	    }
+	}
+    } else {
+	if( var_scope == 0 ) {
+	    compiler_init_operator_description( &od, cc, expr_type, "stg", 1, ex );
+	    compiler_check_operator_args( cc, &od, NULL /*generic_types*/, ex );
+
+	    if( od.operator ) {
+		compiler_emit_function_call( cc, od.operator, NULL, "", ex );
+		compiler_emit( cc, ex, "eN\n", &var_offset, var_name );
+	    } else {
+		if( tnode_is_reference( expr_type )) {
+		    compiler_emit( cc, ex, "\tceN\n", PSTG, &var_offset, var_name );
+		} else {
+		    compiler_emit( cc, ex, "\tceN\n", STG, &var_offset, var_name );
+		}
+	    }
+	} else {
+	    yyerrorf( "can only store variables in the current scope"
+		      "or in the scope 0" );
+	}
+    }
+
+    compiler_check_operator_retvals( cc, &od, 0, 0 );
+}
+
+static void compiler_compile_variable_assignment_or_init(
+    COMPILER *cc,
+    DNODE *variable,
+    int (*enode_is_readonly_compatible)( ENODE *, DNODE * ),
+    cexception_t *ex )
+{
+    ENODE *expr = cc->e_stack;
+
+    if( !expr ) {
+	yyerrorf( "not enough values on the stack for assignment to "
+		  "variable '%s'", dnode_name( variable ));
+    } else {
+	TNODE *expr_type = enode_type( expr );
+
+	char *var_name = variable ? dnode_name( variable ) : NULL;
+	TNODE *var_type = variable ? dnode_type( variable ) : NULL;
+	ssize_t var_offset = variable ? dnode_offset( variable ) : 0;
+	int var_scope = variable ? dnode_scope( variable ) : -1;
+
+        /* TYPETAB *generic_types = new_typetab( ex ); */
+        TYPETAB *generic_types = NULL;
+        int has_errors = 0;
+        char msg[300] = "";
+        if( !tnode_types_are_assignment_compatible( var_type, expr_type, 
+                                                    generic_types,
+                                                    msg, sizeof(msg)-1, ex )) {
+	    char *dst_name = var_type ? tnode_name( var_type ) : NULL;
+	    if( expr_type && dst_name &&
+		compiler_lookup_conversion( cc, var_type, expr_type )) {
+		compiler_compile_named_type_conversion( cc, dst_name, ex );
+		expr = cc->e_stack;
+		expr_type = enode_type( expr );
+	    } else {
+		if( var_name ) {
+                    if( msg[0] ) {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable '%s' - %s", var_name, msg );
+                    } else {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable '%s'", var_name );
+                    }
+		} else {
+                    if( msg[0] ) {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable - %s", msg );
+                    } else {
+                        yyerrorf( "incompatible types for assignment to "
+                                  "variable" );
+                    }
+		}
+                has_errors = 1;
+	    }
+	}
+        if( variable && !has_errors ) {
+            if( !(*enode_is_readonly_compatible)( expr, variable )) {
+                char *name = variable ? dnode_name( variable ) : NULL;
+                if( dnode_has_flags( variable, DF_IS_READONLY )) {
+                    if( name ) {
+                        yyerrorf( "can not assign to the readonly variable '%s'",
+                                  name );
+                    } else {
+                        yyerrorf( "can not assign to a readonly variable" );
+                    }
+                } else {
+                    if( name ) {
+                        yyerrorf( "can not assign readonly content to variable '%s'",
+                                  name );
+                    } else {
+                        yyerrorf( "can not assign readonly content to this "
+                                  "variable" );
+                    }
+                }
+            } else {
+                compiler_emit_st( cc, expr_type, var_name, var_offset,
+                                  var_scope, ex );
+            }
+        }
+        delete_typetab( generic_types );
+        compiler_drop_top_expression( cc );
+    }
+}
+
+static void compiler_compile_variable_assignment( COMPILER *cc,
+                                                  DNODE *variable,
+                                                  cexception_t *ex )
+{
+    compiler_compile_variable_assignment_or_init(
+        cc, variable, enode_is_readonly_compatible_with_var, ex );
+}
+
+static void compiler_compile_variable_initialisation( COMPILER *cc,
+                                                      DNODE *variable,
+                                                      cexception_t *ex )
+{
+    compiler_compile_variable_assignment_or_init(
+        cc, variable, enode_is_readonly_compatible_for_init, ex );
+}
+
+static void compiler_compile_store_variable( COMPILER *cc,
+                                             DNODE *varnode,
+                                             cexception_t *ex )
+{
+    if( varnode ) {
+        compiler_compile_variable_assignment( cc, varnode, ex );
+    } else {
+        compiler_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
+    }
+}
+
+static void compiler_compile_initialise_variable( COMPILER *cc,
+                                                  DNODE *varnode,
+                                                  cexception_t *ex )
+{
+    if( varnode ) {
+        compiler_compile_variable_initialisation( cc, varnode, ex );
+    } else {
+        compiler_emit( cc, ex, "\tcNN\n", ST, "???", "???" );
+    }
 }
 
 static void compiler_duplicate_top_expression( COMPILER *cc,
@@ -4045,16 +4085,6 @@ static type_kind_t compiler_stack_top_type_kind( COMPILER *cc )
     }
 }
 
-static void compiler_make_stack_top_element_type( COMPILER *cc )
-{
-    if( cc->e_stack ) {
-	enode_make_type_to_element_type( cc->e_stack );
-    } else {
-	yyerror( "not enough values on the evaluation stack for "
-		 "taking base type?" );
-    }
-}
-
 static DNODE* compiler_make_stack_top_field_type( COMPILER *cc,
 					       char *field_name )
 {
@@ -4090,17 +4120,6 @@ static DNODE* compiler_make_stack_top_field_type( COMPILER *cc,
 		 "taking base type?" );
 	return NULL;
     }
-}
-
-static void compiler_make_stack_top_addressof( COMPILER *cc,
-					    cexception_t *ex )
-{
-    if( cc->e_stack ) {
-	enode_make_type_to_addressof( cc->e_stack, ex );
-    } else {
-	yyerror( "not enough values on the evaluation stack for "
-		 "taking address?" );
-    }    
 }
 
 static void compiler_check_and_drop_function_args( COMPILER *cc,
@@ -5257,16 +5276,29 @@ static void compiler_convert_function_argument( COMPILER *cc,
     TNODE *exp_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
 
     if( arg_type && exp_type ) {
-	if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
-	    !tnode_types_are_assignment_compatible( arg_type, exp_type,
-                                                    NULL, NULL /* msg */,
-                                                    0 /* msglen */, ex )) {
-            char *arg_type_name = tnode_name( arg_type );
-            if( arg_type_name ) {
-                compiler_compile_type_conversion
-                    ( cc, arg_type, /* target_name: */NULL,  ex );
+        TYPETAB *volatile generic_types = NULL;
+        cexception_t inner;
+
+        cexception_guard( inner ) {
+            generic_types = new_typetab( &inner );
+            if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
+                !tnode_types_are_assignment_compatible( arg_type, exp_type,
+                                                        generic_types,
+                                                        NULL /* msg */,
+                                                        0 /* msglen */,
+                                                        &inner )) {
+                char *arg_type_name = tnode_name( arg_type );
+                if( arg_type_name ) {
+                    compiler_compile_type_conversion
+                        ( cc, arg_type, /* target_name: */NULL,  ex );
+                }
             }
-	}
+        }
+        cexception_catch {
+            delete_typetab( generic_types );
+            cexception_reraise( inner, ex );
+        }
+        dispose_typetab( &generic_types );
     }
     cc->current_arg = cc->current_arg ? dnode_next( cc->current_arg ) : NULL;
 }
@@ -10587,8 +10619,6 @@ opt_null_type_designator
       { $$ = 1; }
   | _NULL
       { $$ = 0; }
-  | '*' /* synonim of 'not null' */
-      { $$ = 1; }
   | '?' /* synonim of 'null' */
       { $$ = 0; }
   | /* default: 1 == not null, 0 == null */
@@ -10645,17 +10675,31 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *volatile composite = moveptr( (void**)&$1 );
+      TNODE *volatile shared_composite = share_tnode( composite );
       cexception_t inner;
 
       cexception_guard( inner ) {
           $$ = new_tnode_derived( &composite, &inner );
+          if( shared_composite ) {
+              tnode_copy_operators( $$, shared_composite, &inner );
+              tnode_copy_conversions( $$, shared_composite, &inner );
+              if( tnode_element_type( shared_composite ) && $3 ) {
+                  tnode_rename_conversions
+                      ( $$, tnode_name( tnode_element_type( shared_composite )),
+                        tnode_name( $3 ), &inner );
+              }
+              tnode_set_name( $$, tnode_name( shared_composite ), &inner );
+              dispose_tnode( &shared_composite );
+          }
       }
       cexception_catch {
           dispose_tnode( &$3 );
+          delete_tnode( shared_composite );
           cexception_reraise( inner, px );
       }
       tnode_set_kind( $$, TK_COMPOSITE );
       tnode_insert_element_type( $$, $3 );
+      $3 = NULL;
     }
   | _ADDRESSOF
     { $$ = new_tnode_addressof( NULL, px ); }
@@ -13968,13 +14012,20 @@ arithmetic_expression
       {
        compiler_compile_unop( compiler, "+", px );
       }
+
   | '-' expression %prec __UNARY
       {
        compiler_compile_unop( compiler, "-", px );
       }
+
   | '~' expression %prec __UNARY
       {
        compiler_compile_unop( compiler, "~", px );
+      }
+
+  | '*' expression %prec __UNARY
+      {
+       compiler_compile_unop( compiler, "*", px );
       }
 
   | expression __DOUBLE_PERCENT expression
