@@ -14071,10 +14071,10 @@ arithmetic_expression
 
   | expression '@' '(' var_type_description ')'
       {
-          //FIXME: the conversion must take var_type_description into
-          //       account, shouldn't it? (S.G.).
-          delete_tnode( $4 );
-          compiler_compile_named_type_conversion( compiler, NULL, px );
+          TNODE *target_type = $4;
+          assert( target_type );
+          compiler_compile_type_conversion( compiler, target_type,
+                                            tnode_name(target_type), px );
       }
 
   | expression '?'
