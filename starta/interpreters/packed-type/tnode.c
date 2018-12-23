@@ -1031,8 +1031,7 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
         } else {
             return share_tnode( generic_tnode );
         }
-    } else if( generic_tnode->kind == TK_COMPOSITE &&
-	       !generic_tnode->name ) {
+    } else if( generic_tnode->kind == TK_COMPOSITE ) {
 	cexception_t inner;
 	TNODE *volatile element_tnode =
 	    new_tnode_implementation( generic_tnode->element_type,
@@ -1085,8 +1084,12 @@ TNODE *tnode_move_operators( TNODE *dst, TNODE *src )
     return dst;
 }
 
-TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+static DNODE *copy_dnode_list( DNODE *src,
+                               TNODE *dst_tnode,
+                               TNODE *src_tnode,
+                               cexception_t *ex )
 {
+    DNODE *volatile dst = NULL;
     DNODE *dnow = NULL;
     DNODE * volatile newop = NULL;
     TNODE * volatile newtype = NULL;
@@ -1094,26 +1097,22 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
     DNODE * volatile newretvals = NULL;
     cexception_t inner;
 
-    assert( dst );
-    assert( src );
-    assert( !dst->operators );
-    assert( !dst->conversions );
-
     /* dst->operators = src->operators; */
     /* dst->conversions = src->conversions; */
 
     cexception_guard( inner ) {
-        for( dnow = src->operators; dnow != NULL; dnow = dnode_next( dnow )) {
+        for( dnow = src; dnow != NULL; dnow = dnode_next( dnow )) {
             TNODE *old_type = dnode_type( dnow );
             newop = clone_dnode( dnow, &inner );
+            dnode_set_offset( newop, dnode_offset( dnow ));
 
             newargs =
                 clone_dnode_list_with_replaced_types( tnode_args( old_type ),
-                                                      src, dst, &inner );
+                                                      src_tnode, dst_tnode, &inner );
 
             newretvals =
                 clone_dnode_list_with_replaced_types( tnode_retvals( old_type ),
-                                                      src, dst, &inner );
+                                                      src_tnode, dst_tnode, &inner );
 
             newtype = new_tnode_operator( tnode_name(old_type), newargs, 
                                           newretvals, &inner );
@@ -1121,10 +1120,12 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
             newretvals = newargs = NULL;
             dnode_replace_type( newop, newtype );
             newtype = NULL;
-            tnode_insert_single_operator( dst, &newop );
+            dst = dnode_append( dst, newop );
+            newop = NULL;
         }
     }
     cexception_catch {
+        delete_dnode( dst );
         delete_dnode( newop );
         delete_tnode( newtype );
         delete_dnode( newargs );
@@ -1133,6 +1134,46 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
     }
 
     return dst;
+}
+
+TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    assert( dst );
+    assert( src );
+    assert( !dst->operators );
+
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    dst->operators = copy_dnode_list( src->operators, dst, src, ex );
+    
+    return dst;
+}
+
+TNODE *tnode_copy_conversions( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    assert( dst );
+    assert( src );
+    assert( !dst->conversions );
+
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    dst->conversions = copy_dnode_list( src->conversions, dst, src, ex );
+    
+    return dst;
+}
+
+TNODE *tnode_rename_conversions( TNODE *tnode, char *old_name, char *other_name,
+                                 cexception_t *ex )
+{
+    DNODE *dnow;
+    for( dnow = tnode->conversions; dnow != NULL; dnow = dnode_next( dnow )) {
+        if( strcmp(dnode_name(dnow), old_name) == 0 ) {
+            dnode_rename( dnow, other_name, ex );
+        }
+    }
+    return tnode;
 }
 
 static TNODE *tnode_finish_struct_or_class( TNODE * volatile node,
