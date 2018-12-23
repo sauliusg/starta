@@ -13097,17 +13097,19 @@ function_expression_header
 :   opt_function_attributes function_or_procedure_keyword '(' argument_list ')'
          opt_retval_description_list
     {
+        int is_function = $2;
         DNODE *volatile parameters = $4;
         DNODE *volatile return_values = $6;
+        DNODE *volatile funct = NULL;
         cexception_t inner;
 
         cexception_guard( inner ) {
             dlist_push_dnode( &compiler->loop_stack, &compiler->loops,
                               &inner );
-            DNODE *funct = new_dnode_function( /* name = */ NULL,
-                                               &parameters,
-                                               &return_values,
-                                               &inner );
+            funct = new_dnode_function( /* name = */ NULL,
+                                        &parameters,
+                                        &return_values,
+                                        &inner );
             if( $1 & DF_BYTECODE )
                 dnode_set_flags( funct, DF_BYTECODE );
             if( $1 & DF_INLINE )
@@ -13115,12 +13117,17 @@ function_expression_header
             dlist_push_dnode( &compiler->current_function_stack,
                               &compiler->current_function, &inner );
             compiler->current_function = funct;
+            if( is_function ) {
+                compiler_set_function_arguments_readonly( dnode_type( funct ));
+            }
         }
         cexception_catch {
             delete_dnode( parameters );
             delete_dnode( return_values );
+            delete_dnode( funct );
             cexception_reraise( inner, px );
         }
+        $4 = $6 = NULL;
     }
 ;
 
