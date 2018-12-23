@@ -2055,8 +2055,87 @@ TNODE *tnode_first_interface( TNODE *class_tnode )
 TNODE *tnode_element_type( TNODE *tnode )
     { assert( tnode ); return tnode->element_type; }
 
+/* FIXME: duplicated code! Call this function from
+   'tnode_insert_fields()' S.G. */
+static TNODE*
+tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
+{
+    TNODE *field_type = dnode_type( field );
+    size_t field_size = tnode_is_reference( field_type ) ?
+        REF_SIZE : ( field_type ? tnode_size( field_type ) : 0 );
+    size_t field_align = field_type ? tnode_align( field_type ) : 0;
+
+    if( tnode_is_reference( field_type )) {
+        dnode_set_offset( field, tnode->nextrefoffs -
+                          sizeof(alloccell_t) - REF_SIZE );
+        tnode->nextrefoffs -= REF_SIZE;
+        tnode->nrefs -= 1;
+        tnode->size += REF_SIZE;
+    } else {
+        type_kind_t field_kind = field_type ?
+            tnode_kind( field_type ) : TK_NONE;
+        if( field_size != 0 ) {
+            ssize_t old_offset = tnode->nextnumoffs;
+            ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+            dnode_set_offset( field, tnode->nextnumoffs );
+            tnode->nextnumoffs += field_size;
+            tnode->size += tnode->nextnumoffs - old_offset;
+            if( tnode->align < field_align )
+                tnode->align = field_align;
+        } else {
+            if( field_kind == TK_PLACEHOLDER ) {
+                /* For generic type value placeholders, we must allocte
+                   also memory at a positive structure field offset to
+                   hold numeric value of the future type, in addition to
+                   the reference value for which the memory at the
+                   negative offset has just been allocated before: */
+                ssize_t bytes = sizeof(ssize_t);
+                ssize_t bits = (CHAR_BIT * bytes)/2;
+                ssize_t max_size = ((ssize_t)1) << bits;
+                ssize_t old_offset = tnode->nextnumoffs;
+                field_size = sizeof(union stackunion);
+#if 1
+                field_align = sizeof(int);
+                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+#endif
+                /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
+                if( dnode_offset( field ) >= max_size ||
+                    tnode->nextnumoffs >= max_size ) {
+                    yyerrorf( "placeholder field '%s' has offset %d "
+                              "which is larger than the size %d which we can "
+                              "handle in this implementation",
+                              dnode_name( field ), max_size );
+                }
+#if 0
+                ssize_t combined_offset = (dnode_offset( field ) << bits) |
+                    tnode->nextnumoffs;
+                printf( ">>> pos offset = %d, neg offset = %d, combined offset = %d\n",
+                        tnode->nextnumoffs, dnode_offset( field ), combined_offset );
+#endif
+                dnode_update_offset( field, 
+                                     (dnode_offset( field ) << bits) |
+                                     tnode->nextnumoffs );
+                tnode->nextnumoffs += field_size;
+                tnode->size += tnode->nextnumoffs - old_offset;
+                tnode_set_flags( tnode, TF_HAS_PLACEHOLDER );
+            }
+        }
+        if( field_size == 0 && field_type && field_kind != TK_FUNCTION &&
+            field_kind != TK_PLACEHOLDER ) {
+            yyerrorf( "field '%s' has zero size", dnode_name( field ));
+	}
+    }
+
+    // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
+
+    return tnode;
+}
+
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 {
+    DNODE *volatile cloned_fields = NULL;
+    DNODE *volatile cloned_field = NULL;
+
     assert( tnode );
 
     if( !element_type )
@@ -2065,6 +2144,33 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
     assert( !tnode->element_type || 
 	    (tnode->kind == TK_COMPOSITE &&
 	     tnode->element_type->kind == TK_PLACEHOLDER));
+
+    if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
+        tnode && tnode->kind == TK_COMPOSITE &&
+        tnode->element_type && tnode->element_type->kind == TK_PLACEHOLDER ) {
+        DNODE *field;
+        cexception_t inner;
+
+        cexception_guard( inner ) {
+            foreach_dnode( field, tnode->fields ) {
+                TNODE *field_type = dnode_type( field );
+                cloned_field = clone_dnode( field, &inner );
+                if( field_type == tnode->element_type ) {
+                    dnode_replace_type( cloned_field, share_tnode( element_type ));
+                    tnode_set_size_and_field_offset( tnode, cloned_field );
+                }
+                cloned_fields = dnode_append( cloned_fields, cloned_field );
+                cloned_field = NULL;
+            }
+            dispose_dnode( &tnode->fields );
+            tnode->fields = cloned_fields;
+            cloned_fields = NULL;
+        }
+        cexception_catch {
+            delete_dnode( cloned_fields );
+            delete_dnode( cloned_field );
+        }
+    }
 
     if( tnode->element_type ) {
 	delete_tnode( tnode->element_type );

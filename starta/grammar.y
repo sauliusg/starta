@@ -10675,13 +10675,26 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *volatile composite = moveptr( (void**)&$1 );
+      TNODE *volatile shared_composite = share_tnode( composite );
       cexception_t inner;
 
       cexception_guard( inner ) {
           $$ = new_tnode_derived( &composite, &inner );
+          if( shared_composite ) {
+              tnode_copy_operators( $$, shared_composite, &inner );
+              tnode_copy_conversions( $$, shared_composite, &inner );
+              if( tnode_element_type( shared_composite ) && $3 ) {
+                  tnode_rename_conversions
+                      ( $$, tnode_name( tnode_element_type( shared_composite )),
+                        tnode_name( $3 ), &inner );
+              }
+              tnode_set_name( $$, tnode_name( shared_composite ), &inner );
+              dispose_tnode( &shared_composite );
+          }
       }
       cexception_catch {
           dispose_tnode( &$3 );
+          delete_tnode( shared_composite );
           cexception_reraise( inner, px );
       }
       tnode_set_kind( $$, TK_COMPOSITE );
