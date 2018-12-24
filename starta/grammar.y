@@ -7583,6 +7583,11 @@ static cexception_t *px; /* parser exception */
 
 %right __UNARY
 
+/* Expect two (resolved) shift-reduce conflicts on dangling 'else'
+   statements: */
+
+%expect 2
+
 %%
 
 Program
