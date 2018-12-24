@@ -13363,11 +13363,27 @@ unpack_expression
   }
   ;
 
+key_value
+: expression ':' expression
+;
+
+key_value_list
+: key_value
+| key_value_list ',' key_value
+;
+/*
+*/
+
 array_expression
   : '[' expression_list opt_comma ']'
      {
 	 compiler_compile_array_expression( compiler, $2, px );
      }
+  /* List expression syntax: */
+  | '(' expression ',' ')' 
+  | '(' expression ',' expression_list opt_comma ')' 
+  /* Hash (dictionary) expression syntax: */
+  | '(' key_value_list opt_comma ')' 
   /* Array 'comprehensions' (aka array 'for' epxressions): */
   | '[' labeled_for lvariable
      {
