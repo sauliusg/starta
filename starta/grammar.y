@@ -13422,8 +13422,6 @@ key_value_list
 : key_value
 | key_value_list ',' key_value
 ;
-/*
-*/
 
 array_expression
   : '[' expression_list opt_comma ']'
