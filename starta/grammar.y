@@ -2942,7 +2942,7 @@ static void compiler_make_stack_top_element_type( COMPILER *cc )
 }
 
 static void compiler_make_stack_top_addressof( COMPILER *cc,
-					    cexception_t *ex )
+                                               cexception_t *ex )
 {
     if( cc->e_stack ) {
 	enode_make_type_to_addressof( cc->e_stack, ex );
@@ -3274,7 +3274,7 @@ static void compiler_check_and_compile_top_operator( COMPILER *cc,
 	    }
 	}
 	compiler_check_and_compile_operator( cc, tnode, operator, arity, 
-					  /*fixup_values:*/ NULL, ex );
+                                             /*fixup_values:*/ NULL, ex );
     }
 }
 
@@ -3614,8 +3614,8 @@ static void compiler_compile_jnz_or_jz( COMPILER *c,
 
     if( compiler_lookup_operator( c, top_tnode, operator_name, 1, ex )) {
 	compiler_check_and_compile_operator( c, top_tnode, operator_name,
-					  /*arity:*/ 1,
-					  /*fixup_values:*/ NULL, ex );
+                                             /*arity:*/ 1,
+                                             /*fixup_values:*/ NULL, ex );
 	compiler_emit( c, ex, "e\n", &offset );
     } else {
 	if( tnode_is_reference( top_tnode )) {
@@ -3674,8 +3674,8 @@ static void compiler_compile_loop( COMPILER *c,
     if( limit_tnode ) {
 	if( compiler_lookup_operator( c, limit_tnode, "loop", 2, ex )) {
 	    compiler_check_and_compile_operator( c, limit_tnode, "loop",
-					      /*arity:*/ 2,
-					      /*fixup_values:*/ NULL, ex );
+                                                 /*arity:*/ 2,
+                                                 /*fixup_values:*/ NULL, ex );
 	    compiler_emit( c, ex, "e\n", &offset );
 	} else {
 	    tnode_report_missing_operator( limit_tnode, "loop", 2 );
@@ -7771,17 +7771,17 @@ pack_statement
 		fixup_values =
 		    make_mdalloc_key_value_list( element_type, level );
 		compiler_check_and_compile_operator( compiler, element_type,
-						  "packmdarray", 4 /* arity */,
-						  fixup_values, px );
+                                                     "packmdarray", 4 /* arity */,
+                                                     fixup_values, px );
 	    } else {
 		compiler_check_and_compile_operator( compiler, element_type,
-						  "packarray", 4 /* arity */,
-						  NULL /* fixup_values */, px );
+                                                     "packarray", 4 /* arity */,
+                                                     NULL /* fixup_values */, px );
 	    }
 	} else {
 	    compiler_check_and_compile_operator( compiler, type_to_pack,
-					      "pack", 4 /* arity */,
-					  NULL /* fixup_values */, px );
+                                                 "pack", 4 /* arity */,
+                                                 NULL /* fixup_values */, px );
 	}
 	compiler_emit( compiler, px, "\n" );
     } else {
@@ -13529,7 +13529,7 @@ array_expression
   /* List expression syntax: */
   | '(' expression ',' ')' opt_type_identifier
      {
-         ENODE *volatile top_expr = enode_list_pop( &compiler->e_stack );
+         ENODE *top_expr = compiler->e_stack;
          TNODE *volatile list_type = $5;
          TNODE *volatile shared_list_type = NULL;
          TNODE *volatile result_type = NULL;
@@ -13559,27 +13559,44 @@ array_expression
                                  &inner );
              }
              tnode_set_kind( result_type, TK_COMPOSITE );
+             share_tnode( top_expr_type );
              tnode_insert_element_type( result_type, top_expr_type );
              top_expr_type = NULL;
              /* Generate code for list creation: */
              /* FIXME: change later to generation of the code for the
                 "mklist" inline bytecode operator (S.G.):*/
-             ssize_t list_node_size = tnode_size( result_type );
-             ssize_t list_node_nref =
-                 tnode_number_of_references( result_type );
-             ssize_t list_value_offs =
-                 dnode_offset( tnode_lookup_field( result_type, "value" ));
-             ssize_t list_value_size =
-                 tnode_size( tnode_element_type( result_type ));
-             compiler_emit( compiler, &inner, "\tceeee\n", MKLIST, &list_node_size,
-                            &list_node_nref, &list_value_offs, &list_value_size );
-             /* Push the resulting list type onto the stack: */
-             compiler_push_typed_expression( compiler, &result_type, &inner );
+             if( tnode_lookup_operator( result_type, "mklist",
+                                        /* arity = */ 1 ) ) {
+                 
+                 key_value_t *fixup_values =
+                     make_compiler_tnode_key_value_list( compiler,
+                                                         result_type, px );
+
+                 compiler_check_and_compile_operator
+                     ( compiler, result_type,
+                       /* operator_name = */ "mklist",
+                       /* arity = */ 1,
+                       fixup_values, px );
+                 /* deallocate inner buffers: */
+                 make_compiler_tnode_key_value_list( NULL, NULL, NULL );
+             } else {
+                 ssize_t list_node_size = tnode_size( result_type );
+                 ssize_t list_node_nref =
+                     tnode_number_of_references( result_type );
+                 ssize_t list_value_offs =
+                     dnode_offset( tnode_lookup_field( result_type, "value" ));
+                 ssize_t list_value_size =
+                     tnode_size( tnode_element_type( result_type ));
+                 delete_enode( enode_list_pop( &compiler->e_stack ));
+                 compiler_emit( compiler, &inner, "\tceeee\n", MKLIST, &list_node_size,
+                                &list_node_nref, &list_value_offs, &list_value_size );
+                 /* Push the resulting list type onto the stack: */
+                 compiler_push_typed_expression( compiler, &result_type, &inner );
+             }
              dispose_tnode( &shared_list_type );
          }
          cexception_finally (
              {
-                 delete_enode( top_expr );
                  delete_tnode( list_type );
                  delete_tnode( shared_list_type );
                  delete_tnode( result_type );

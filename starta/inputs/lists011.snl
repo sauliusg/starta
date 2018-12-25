@@ -24,8 +24,6 @@ type list of T = ?{
 
 var b = new (list of int);
 var a = (21,);
-//var a = new (list of int);
-//a.value = 12;
 
 . *a;
 
