@@ -13565,9 +13565,12 @@ array_expression
              /* FIXME: change later to generation of the code for the
                 "mklist" inline bytecode operator (S.G.):*/
              ssize_t list_node_size = tnode_size( result_type );
-             ssize_t list_node_nref = tnode_number_of_references( result_type );
-             ssize_t list_value_offs = 0;
-             ssize_t list_value_size = 4;
+             ssize_t list_node_nref =
+                 tnode_number_of_references( result_type );
+             ssize_t list_value_offs =
+                 dnode_offset( tnode_lookup_field( result_type, "value" ));
+             ssize_t list_value_size =
+                 tnode_size( tnode_element_type( result_type ));
              compiler_emit( compiler, &inner, "\tceeee\n", MKLIST, &list_node_size,
                             &list_node_nref, &list_value_offs, &list_value_size );
              /* Push the resulting list type onto the stack: */

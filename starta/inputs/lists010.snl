@@ -24,3 +24,7 @@ type list of T = ?{
 var a = (21,);
 
 . *a;
+
+var b = ("a string",);
+
+. *b;
