@@ -22,7 +22,7 @@ type list of T = ?{
 
 }; // type "list of T"
 
-var b : list of int  = new (list of int);
+var b = new (list of int);
 
 //*b = 12;
 b.value = 12;
