@@ -7617,6 +7617,7 @@ static cexception_t *px; /* parser exception */
 %type <tnode> compact_type_description
 %type <si>     type_declaration_name
 %type <tnode> type_identifier
+%type <tnode> opt_type_identifier
 %type <tnode> var_type_description
 %type <tnode> undelimited_or_structure_description
 %type <tnode> undelimited_type_description
@@ -10660,6 +10661,13 @@ type_identifier
      }
   ;
 
+opt_type_identifier
+: type_identifier
+     { $$ = $1; }
+| /* empty */
+     { $$ = NULL; }
+;
+
 opt_null_type_designator
   : _NOT _NULL
       { $$ = 1; }
@@ -13519,8 +13527,83 @@ array_expression
 	 compiler_compile_array_expression( compiler, $2, px );
      }
   /* List expression syntax: */
-  | '(' expression ',' ')' 
-  | '(' expression ',' expression_list opt_comma ')' 
+  | '(' expression ',' ')' opt_type_identifier
+     {
+         ENODE *volatile top_expr = enode_list_pop( &compiler->e_stack );
+         TNODE *volatile list_type = $5;
+         TNODE *volatile shared_list_type = NULL;
+         TNODE *volatile result_type = NULL;
+         cexception_t inner;
+         cexception_guard( inner ) {
+             /* Synthesise type of the resulting return value: */
+             TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
+             if( !list_type ) {
+                 list_type = compiler_lookup_tnode( compiler,
+                                                    /* module = */ NULL,
+                                                    /* identifier = */ "list",
+                                                    /* message = */ "type" );
+                 share_tnode( list_type );
+             }
+             shared_list_type = share_tnode( list_type );
+             result_type = new_tnode_derived( &list_type, &inner );
+             if( shared_list_type ) {
+                 tnode_copy_operators( result_type, shared_list_type, &inner );
+                 tnode_copy_conversions( result_type, shared_list_type, &inner );
+                 if( tnode_element_type( shared_list_type ) && top_expr_type ) {
+                     tnode_rename_conversions
+                         ( result_type,
+                           tnode_name( tnode_element_type( shared_list_type  )),
+                           tnode_name( top_expr_type ), &inner );
+                 }
+                 tnode_set_name( result_type, tnode_name( shared_list_type ),
+                                 &inner );
+             }
+             tnode_set_kind( result_type, TK_COMPOSITE );
+             tnode_insert_element_type( result_type, top_expr_type );
+             top_expr_type = NULL;
+             /* Generate code for list creation: */
+             /* FIXME: change later to generation of the code for the
+                "mklist" inline bytecode operator (S.G.):*/
+             ssize_t list_node_size = tnode_size( result_type );
+             ssize_t list_node_nref = tnode_number_of_references( result_type );
+             ssize_t list_value_offs = 0;
+             ssize_t list_value_size = 4;
+             compiler_emit( compiler, &inner, "\tceeee\n", MKLIST, &list_node_size,
+                            &list_node_nref, &list_value_offs, &list_value_size );
+             /* Push the resulting list type onto the stack: */
+             compiler_push_typed_expression( compiler, &result_type, &inner );
+             dispose_tnode( &shared_list_type );
+         }
+         cexception_finally (
+             {
+                 delete_enode( top_expr );
+                 delete_tnode( list_type );
+                 delete_tnode( shared_list_type );
+                 delete_tnode( result_type );
+             },
+             {
+                 cexception_reraise( inner, px );
+             }
+         );
+         $5 = NULL;
+     }
+  | '(' expression ',' expression_list opt_comma ')'  opt_type_identifier
+     {
+         ENODE *volatile top_expr = NULL;
+         //enode_list_pop( &compiler->e_stack );
+         cexception_t inner;
+         cexception_guard( inner ) {
+             //TNODE *top_type = enode_type( top_expr );
+         }
+         cexception_catch {
+             delete_enode( top_expr );
+             delete_tnode( $7 );
+             cexception_reraise( inner, px );
+         }
+         delete_enode( top_expr );
+         delete_tnode( $7 );
+         $7 = NULL;
+     }
   /* Hash (dictionary) expression syntax: */
   | '(' key_value_list opt_comma ')' 
   /* Array 'comprehensions' (aka array 'for' epxressions): */
