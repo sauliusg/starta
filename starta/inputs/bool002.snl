@@ -1,0 +1,12 @@
+#
+# Snail language compiler tests
+#
+# Test of boolean input-output operators.
+#
+
+use std;
+
+var b = 2 > 3;
+
+. b;
+. !b;
