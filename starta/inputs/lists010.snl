@@ -13,7 +13,7 @@ type list of T = ?{
     // { ALLOC 12 %%nref };
 
     inline bytecode operator "*" ( l : list of T ) : addressof
-    //{ OFFSET 0 }
+    // { OFFSET 0 }
     { OFFSET %.value }
 
     inline bytecode operator "next"( l : list of T )
@@ -21,13 +21,6 @@ type list of T = ?{
 
 }; // type "list of T"
 
-var b = new (list of int);
 var a = (21,);
-//var a = new (list of int);
-//a.value = 12;
 
 . *a;
-
-var c = ("a string",);
-
-. *c;
