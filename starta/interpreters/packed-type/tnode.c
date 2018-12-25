@@ -1039,8 +1039,14 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
 	cexception_guard( inner ) {
 	    TNODE *composite_type =
 		new_tnode_composite( generic_tnode->name,
-				     element_tnode, &inner );
+				     share_tnode(generic_tnode->element_type),
+                                     &inner );
+            assert( !composite_type->fields );
+            composite_type->fields =
+                share_dnode( generic_tnode->fields );
             composite_type->base_type = share_tnode( generic_tnode );
+            tnode_insert_element_type( composite_type, element_tnode );
+            //printf( ">>> element type name is '%s'\n", tnode_name(element_tnode) );
             return composite_type;
 	}
 	cexception_catch {

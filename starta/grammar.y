@@ -1782,8 +1782,19 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
         /* 8 */ { "file" },
 	{ NULL },
     };
+    static key_value_t *allocated_list = NULL;
+    int i;
 
-    if( !tnode ) return empty_list;
+    if( allocated_list ) {
+        for( i = 0; allocated_list[i].key != NULL; i++ )
+            freex( allocated_list[i].key );
+        freex( allocated_list );
+        allocated_list = NULL;
+    }
+
+    if( !tnode ) {
+        return empty_list;
+    }
 
     list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
     list[1].val = tnode_is_reference( tnode ) ? 
@@ -1809,7 +1820,37 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
     list[0].val = tnode_is_reference( tnode ) ? 1 : 
         (tnode_kind(tnode) == TK_PLACEHOLDER ? 1 : 0);
 
-    return list;
+    //printf( ">>> %s: building k/v list for %s\n", __FUNCTION__, tnode ? tnode_name(tnode) : "?" );
+    
+    ssize_t field_number =
+        tnode ? dnode_list_length( tnode_fields( tnode )) : 0;
+    if( field_number > 0 ) {
+        //printf( ">>> %s: adding fields for %s\n", __FUNCTION__, tnode ? tnode_name(tnode) : "?" );
+        allocated_list =
+            callocx( sizeof(list)/sizeof(list[0]) + field_number,
+                     sizeof(list[0]), ex );
+        i = 0;
+        while( list[i].key != NULL ) {
+            allocated_list[i].key = strdupx( list[i].key, ex );
+            allocated_list[i].val = list[i].val;
+            i++;
+        }
+        DNODE *field;
+        foreach_dnode( field, tnode_fields( tnode )) {
+            char *field_name = dnode_name(field);
+            if( !field_name )
+                field_name = "";
+            char *field_id = callocx( 1, strlen(field_name) + 2, ex );
+            field_id[0] = '.';
+            strcat( field_id, field_name );
+            allocated_list[i].key = field_id;
+            allocated_list[i].val = dnode_offset( field );
+            i++;
+        }
+        assert( i == sizeof(list)/sizeof(list[0]) + field_number - 1 );
+    }
+    
+    return allocated_list ? allocated_list : list;
 }
 
 static key_value_t *make_mdalloc_key_value_list( TNODE *tnode, ssize_t level )
@@ -10887,9 +10928,11 @@ undelimited_type_description
       }
       cexception_catch {
           dispose_tnode( &$3 );
+          /*FIXME: delete 'composite' here (S.G.): */
           cexception_reraise( inner, px );
       }
       tnode_insert_element_type( $$, $3 );
+      /*FIXME: NULL-ify $3 here (S.G.): */
     }
 
   | '(' var_type_description ')'
@@ -12080,6 +12123,53 @@ variable_reference
           }
           freex( ident );
       }
+  | '%' '.'  __IDENTIFIER
+      {
+          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
+          TNODE *containing_type = compiler->current_type;
+          if( !containing_type ) {
+              yyerrorf( "field reference '.%s' can only be compiled in "
+                        "type descriptions", ident );
+              
+          } else {
+              DNODE *varnode = tnode_lookup_field( containing_type, ident );
+
+              if( varnode ) {
+                  ssize_t var_offset = dnode_offset( varnode );
+                  compiler_emit( compiler, px, "\teN\n", &var_offset, ident );
+                  char *volatile fixup_name = NULL;
+                  FIXUP *volatile type_attribute_fixup = NULL;
+                  cexception_t inner;
+
+                  cexception_guard( inner ) {
+                      fixup_name = callocx( 1, strlen(ident) + 2, &inner );
+                      fixup_name[0] = '.';
+                      strcat( fixup_name, ident );
+                      type_attribute_fixup =
+                          new_fixup_absolute
+                          ( fixup_name, thrcode_length( compiler->thrcode ) - 1,
+                            NULL /* next */, &inner );
+                      freex( fixup_name );
+                      fixup_name = NULL;
+                      dnode_insert_code_fixup( compiler->current_function,
+                                               type_attribute_fixup );
+                      type_attribute_fixup = NULL;
+                  }
+                  cexception_catch {
+                      freex( ident );
+                      freex( fixup_name );
+                      delete_fixup( type_attribute_fixup );
+                      cexception_reraise( inner, px );
+                  }
+              } else {
+                  yyerrorf( "type '%s' does not have field '%s'",
+                            tnode_name(containing_type), ident );
+              }
+          }
+          freex( ident );
+      }
+  ;
+
   ;
 
 bytecode_constant
