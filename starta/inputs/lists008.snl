@@ -34,8 +34,7 @@ type list of T = ?{
     }; // operator "+"
 
     inline bytecode operator "*" ( l : list of T ) : addressof
-    // { OFFSET const((list of T).value.offset) }
-    { OFFSET 0 }
+    { OFFSET %.value }
 
 } // type "list of T"
 
