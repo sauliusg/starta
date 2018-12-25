@@ -10936,11 +10936,11 @@ undelimited_type_description
       }
       cexception_catch {
           dispose_tnode( &$3 );
-          /*FIXME: delete 'composite' here (S.G.): */
+          delete_tnode( composite );
           cexception_reraise( inner, px );
       }
       tnode_insert_element_type( $$, $3 );
-      /*FIXME: NULL-ify $3 here (S.G.): */
+      $1 = $3 = NULL;
     }
 
   | '(' var_type_description ')'
