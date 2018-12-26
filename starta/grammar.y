@@ -3729,6 +3729,7 @@ static void compiler_compile_alloc( COMPILER *cc,
                                     cexception_t *ex )
 {
     TNODE *volatile pushed_alloc_type = share_tnode( *alloc_type );
+    TYPETAB *volatile generic_types = NULL;
 
     if( !tnode_is_reference( *alloc_type )) {
 	yyerrorf( "only reference-implemented types can be "
@@ -3750,7 +3751,17 @@ static void compiler_compile_alloc( COMPILER *cc,
             compiler_check_and_compile_operator( cc, *alloc_type, "new",
                                                  /* arity = */ 0, 
                                                  fixup_values, &inner );
-            enode_replace_type( cc->e_stack, share_tnode(*alloc_type) );
+            generic_types = new_typetab( &inner );
+            TNODE *top_expr_type =
+                cc->e_stack ? enode_type( cc->e_stack ) : NULL;
+            char msg[300];
+            if( top_expr_type &&
+                tnode_types_are_assignment_compatible( *alloc_type,
+                                                       top_expr_type,
+                                                       generic_types, msg,
+                                                       sizeof(msg), &inner )) {
+                enode_replace_type( cc->e_stack, share_tnode(*alloc_type) );
+            }
         } else {
             ssize_t alloc_size = tnode_size( *alloc_type );
             ssize_t alloc_nref = tnode_number_of_references( *alloc_type );
@@ -3768,9 +3779,11 @@ static void compiler_compile_alloc( COMPILER *cc,
     cexception_catch {
         delete_tnode( pushed_alloc_type );
         dispose_tnode( alloc_type );
+        delete_typetab( generic_types );
         cexception_reraise( inner, ex );
     }
     dispose_tnode( alloc_type );
+    delete_typetab( generic_types );
 }
 
 static char *compiler_make_typed_operator_name( TNODE *index_type1,
