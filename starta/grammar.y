@@ -3750,6 +3750,7 @@ static void compiler_compile_alloc( COMPILER *cc,
             compiler_check_and_compile_operator( cc, *alloc_type, "new",
                                                  /* arity = */ 0, 
                                                  fixup_values, &inner );
+            enode_replace_type( cc->e_stack, share_tnode(*alloc_type) );
         } else {
             ssize_t alloc_size = tnode_size( *alloc_type );
             ssize_t alloc_nref = tnode_number_of_references( *alloc_type );
