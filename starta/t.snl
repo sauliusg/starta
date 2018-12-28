@@ -35,7 +35,6 @@ type list of T = ?{
 
     inline bytecode operator "new" () : list of T
     { ALLOC %%alloc_size %%nref };
-    // { ALLOC 12 %%nref };
 
     inline bytecode operator "@list" ( i : T ) : list of T
     {
@@ -56,10 +55,10 @@ type list of T = ?{
     };
 
     inline bytecode operator "*" ( l : list of T ) : addressof
-    { OFFSET const((list of T).value.offset) }
+    { OFFSET %.value }
 
     inline bytecode operator "next"( l : list of T )
-    { NEXT const((list of T).next.offset) const((list of T).value.offset) }
+    { NEXT const((list of T).next.offset) %.value }
 
 } // type "list of T"
 
@@ -99,14 +98,14 @@ var l, p : list of int;
 
 var s : list of int = new list of int;
 
-s = 156@(list of int);
+s = (156,);
 
 l = s + p;
-l = s + cons( 2@(list of int) );
-l = l + cons( 11@(list of int),
-              cons( 22@(list of int) ) ) +
-        cons( 3@(list of int),
-              cons( 4@(list of int) ));
+l = s + cons( (2,) );
+l = l + cons( (11,),
+              (22,) ) +
+        cons( (3,),
+              cons( (4,) ));
 // < "( ";
 // foreach var i in l do
 //     < i, ""
@@ -122,6 +121,6 @@ l = l + cons( 11@(list of int),
 . " )";
 
 
-. *(2.3@(list of float));
+. *(2.3,);
 
-// . *("labas"@(list of string));
+. *("labas",);
