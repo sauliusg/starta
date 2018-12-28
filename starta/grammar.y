@@ -7439,7 +7439,93 @@ static void compiler_insert_new_type( COMPILER *c, char *name, int not_null,
         cexception_reraise( inner, ex );
     }
 }
- 
+
+static void compiler_compile_list_expression( COMPILER *cc,
+                                              TNODE *volatile *list_type_ptr,
+                                              cexception_t *ex )
+{
+    ENODE *top_expr = cc->e_stack;
+    TNODE *volatile list_type = *list_type_ptr;
+    TNODE *volatile shared_list_type = NULL;
+    TNODE *volatile result_type = NULL;
+
+    *list_type_ptr = NULL;
+    cexception_t inner;
+    cexception_guard( inner ) {
+        /* Synthesise type of the resulting return value: */
+        TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
+        if( !list_type ) {
+            list_type = compiler_lookup_tnode( cc,
+                                               /* module = */ NULL,
+                                               /* identifier = */ "list",
+                                               /* message = */ "type" );
+            share_tnode( list_type );
+        }
+        shared_list_type = share_tnode( list_type );
+        result_type = new_tnode_derived( &list_type, &inner );
+        if( shared_list_type ) {
+            tnode_copy_operators( result_type, shared_list_type, &inner );
+            tnode_copy_conversions( result_type, shared_list_type, &inner );
+            if( tnode_element_type( shared_list_type ) && top_expr_type ) {
+                tnode_rename_conversions
+                    ( result_type,
+                      tnode_name( tnode_element_type( shared_list_type  )),
+                      tnode_name( top_expr_type ), &inner );
+            }
+            tnode_set_name( result_type, tnode_name( shared_list_type ),
+                            &inner );
+        }
+        tnode_set_kind( result_type, TK_COMPOSITE );
+        share_tnode( top_expr_type );
+        tnode_insert_element_type( result_type, top_expr_type );
+        top_expr_type = NULL;
+        /* Generate code for list creation: */
+        /* FIXME: change later to generation of the code for the
+           "mklist" inline bytecode operator (S.G.):*/
+        if( tnode_lookup_operator( result_type, "mklist",
+                                   /* arity = */ 1 ) ) {
+                 
+            key_value_t *fixup_values =
+                make_compiler_tnode_key_value_list( cc,
+                                                    result_type, &inner );
+
+            compiler_check_and_compile_operator
+                ( cc, result_type,
+                  /* operator_name = */ "mklist",
+                  /* arity = */ 1,
+                  fixup_values, &inner );
+            /* deallocate inner buffers: */
+            make_compiler_tnode_key_value_list( NULL, NULL, NULL );
+        } else {
+            ssize_t list_node_size = tnode_size( result_type );
+            ssize_t list_node_nref =
+                tnode_number_of_references( result_type );
+            ssize_t list_value_offs =
+                dnode_offset( tnode_lookup_field( result_type, "value" ));
+            ssize_t list_value_size =
+                tnode_size( tnode_element_type( result_type ));
+            delete_enode( enode_list_pop( &cc->e_stack ));
+            compiler_emit( cc, &inner, "\tceeee\n", MKLIST, &list_node_size,
+                           &list_node_nref, &list_value_offs, &list_value_size );
+            /* Push the resulting list type onto the stack: */
+            compiler_push_typed_expression( cc, &result_type, &inner );
+        }
+        dispose_tnode( &shared_list_type );
+    }
+    cexception_finally (
+        {
+            delete_tnode( list_type );
+            delete_tnode( shared_list_type );
+            delete_tnode( result_type );
+        },
+        {
+            cexception_reraise( inner, ex );
+        }
+    );
+    assert( !list_type );
+    assert( *list_type_ptr == NULL );
+}
+
 static COMPILER * volatile compiler;
 
 static cexception_t *px; /* parser exception */
@@ -13543,83 +13629,7 @@ array_expression
   /* List expression syntax: */
   | '(' expression ',' ')' opt_type_identifier
      {
-         ENODE *top_expr = compiler->e_stack;
-         TNODE *volatile list_type = $5;
-         TNODE *volatile shared_list_type = NULL;
-         TNODE *volatile result_type = NULL;
-         cexception_t inner;
-         cexception_guard( inner ) {
-             /* Synthesise type of the resulting return value: */
-             TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
-             if( !list_type ) {
-                 list_type = compiler_lookup_tnode( compiler,
-                                                    /* module = */ NULL,
-                                                    /* identifier = */ "list",
-                                                    /* message = */ "type" );
-                 share_tnode( list_type );
-             }
-             shared_list_type = share_tnode( list_type );
-             result_type = new_tnode_derived( &list_type, &inner );
-             if( shared_list_type ) {
-                 tnode_copy_operators( result_type, shared_list_type, &inner );
-                 tnode_copy_conversions( result_type, shared_list_type, &inner );
-                 if( tnode_element_type( shared_list_type ) && top_expr_type ) {
-                     tnode_rename_conversions
-                         ( result_type,
-                           tnode_name( tnode_element_type( shared_list_type  )),
-                           tnode_name( top_expr_type ), &inner );
-                 }
-                 tnode_set_name( result_type, tnode_name( shared_list_type ),
-                                 &inner );
-             }
-             tnode_set_kind( result_type, TK_COMPOSITE );
-             share_tnode( top_expr_type );
-             tnode_insert_element_type( result_type, top_expr_type );
-             top_expr_type = NULL;
-             /* Generate code for list creation: */
-             /* FIXME: change later to generation of the code for the
-                "mklist" inline bytecode operator (S.G.):*/
-             if( tnode_lookup_operator( result_type, "mklist",
-                                        /* arity = */ 1 ) ) {
-                 
-                 key_value_t *fixup_values =
-                     make_compiler_tnode_key_value_list( compiler,
-                                                         result_type, px );
-
-                 compiler_check_and_compile_operator
-                     ( compiler, result_type,
-                       /* operator_name = */ "mklist",
-                       /* arity = */ 1,
-                       fixup_values, px );
-                 /* deallocate inner buffers: */
-                 make_compiler_tnode_key_value_list( NULL, NULL, NULL );
-             } else {
-                 ssize_t list_node_size = tnode_size( result_type );
-                 ssize_t list_node_nref =
-                     tnode_number_of_references( result_type );
-                 ssize_t list_value_offs =
-                     dnode_offset( tnode_lookup_field( result_type, "value" ));
-                 ssize_t list_value_size =
-                     tnode_size( tnode_element_type( result_type ));
-                 delete_enode( enode_list_pop( &compiler->e_stack ));
-                 compiler_emit( compiler, &inner, "\tceeee\n", MKLIST, &list_node_size,
-                                &list_node_nref, &list_value_offs, &list_value_size );
-                 /* Push the resulting list type onto the stack: */
-                 compiler_push_typed_expression( compiler, &result_type, &inner );
-             }
-             dispose_tnode( &shared_list_type );
-         }
-         cexception_finally (
-             {
-                 delete_tnode( list_type );
-                 delete_tnode( shared_list_type );
-                 delete_tnode( result_type );
-             },
-             {
-                 cexception_reraise( inner, px );
-             }
-         );
-         $5 = NULL;
+         compiler_compile_list_expression( compiler, &$5, px );
      }
   | '(' expression ',' expression_list opt_comma ')'  opt_type_identifier
      {
