@@ -7480,14 +7480,10 @@ static void compiler_compile_list_expression( COMPILER *cc,
         tnode_insert_element_type( result_type, top_expr_type );
         top_expr_type = NULL;
         /* Generate code for list creation: */
-        /* FIXME: change later to generation of the code for the
-           "mklist" inline bytecode operator (S.G.):*/
         if( tnode_lookup_operator( result_type, "mklist",
                                    /* arity = */ 1 ) ) {
-                 
             key_value_t *fixup_values =
-                make_compiler_tnode_key_value_list( cc,
-                                                    result_type, &inner );
+                make_compiler_tnode_key_value_list( cc, result_type, &inner );
 
             compiler_check_and_compile_operator
                 ( cc, result_type,
@@ -13631,7 +13627,7 @@ array_expression
      {
          compiler_compile_list_expression( compiler, &$5, px );
      }
-  | '(' expression ',' expression_list opt_comma ')'  opt_type_identifier
+  | '(' expression ',' expression_list opt_comma ')' opt_type_identifier
      {
          ENODE *volatile top_expr = NULL;
          //enode_list_pop( &compiler->e_stack );
