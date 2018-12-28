@@ -36,24 +36,6 @@ type list of T = ?{
     inline bytecode operator "new" () : list of T
     { ALLOC %%alloc_size %%nref };
 
-    inline bytecode operator "@list" ( i : T ) : list of T
-    {
-      ALLOC %%alloc_size %%nref
-      // LDC %%alloc_size IPRINT NEWLINE
-      // LDC %%nref IPRINT NEWLINE
-      // ALLOC 12 %%nref
-      DUP
-      OFFSET  const((list of T).value.offset)
-      ROT ROT STI const(int.size)
-      // OFFSET %.value
-      // OFFSET %%.value.offset
-      // ROT ROT %%sti %%.value.size
-      // ROT ROT %%sti (%%.value.is_ref? %%.value.size : "")
-      // ROT ROT %%value.sti  // should compile to one or two
-                              // codecells, depending on the concrete type
-                              // of the "value".
-    };
-
     inline bytecode operator "*" ( l : list of T ) : addressof
     { OFFSET %.value }
 
