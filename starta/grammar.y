@@ -14137,6 +14137,108 @@ struct_expression
         compiler_pop_initialised_ref_tables( compiler );
     }
 
+  | '(' type_identifier _OF delimited_type_description ')'
+     {
+         /* FIXME: code duplication with the above rule (S.G.) */
+	 TNODE *volatile composite = NULL;
+         TNODE *volatile type_identifier_tnode = NULL;
+         cexception_t inner;
+
+         cexception_guard( inner ) {
+             type_identifier_tnode = share_tnode( $2 );
+             composite = new_tnode_derived( &type_identifier_tnode, &inner );
+
+             tnode_set_kind( composite, TK_COMPOSITE );
+             tnode_insert_element_type( composite, $4 );
+             $4 = NULL;
+
+             compiler_compile_alloc( compiler, &composite, &inner );
+             compiler_push_initialised_ref_tables( compiler, &inner );
+         }
+         cexception_catch {
+             dispose_tnode( &$4 );
+             delete_tnode( type_identifier_tnode );
+             cexception_reraise( inner, px );
+         }
+     }
+    '{' field_initialiser_list opt_comma '}'
+    {
+        /* FIXME: code duplication with the above rule (S.G.) */
+        DNODE *field, *field_list;
+
+        field_list = tnode_fields( $2 );
+        foreach_dnode( field, field_list ) {
+            TNODE *field_type = dnode_type( field );
+            char * field_name = dnode_name( field );
+            if( tnode_is_non_null_reference( field_type ) &&
+                !vartab_lookup( compiler->initialised_references,
+                                field_name )) {
+                char *field_type_name = $2 ? tnode_name( $2 ) : NULL;
+                if( field_type_name ) {
+                    yyerrorf( "non-null field '%s' of type '%s' "
+                              "is not initialised",
+                              field_name, field_type_name );
+                } else {
+                    yyerrorf( "non-null field '%s' is not initialised",
+                              field_name );
+                }
+            }
+        }
+        dispose_tnode( &$2 );
+        compiler_pop_initialised_ref_tables( compiler );
+    }
+
+  | type_identifier _OF delimited_type_description
+     {
+         /* FIXME: code duplication with the above rule (S.G.) */
+	 TNODE *volatile composite = NULL;
+         TNODE *volatile type_identifier_tnode = NULL;
+         cexception_t inner;
+
+         cexception_guard( inner ) {
+             type_identifier_tnode = share_tnode( $1 );
+             composite = new_tnode_derived( &type_identifier_tnode, &inner );
+
+             tnode_set_kind( composite, TK_COMPOSITE );
+             tnode_insert_element_type( composite, $3 );
+             $3 = NULL;
+
+             compiler_compile_alloc( compiler, &composite, &inner );
+             compiler_push_initialised_ref_tables( compiler, &inner );
+         }
+         cexception_catch {
+             dispose_tnode( &$3 );
+             delete_tnode( type_identifier_tnode );
+             cexception_reraise( inner, px );
+         }
+     }
+    '{' field_initialiser_list opt_comma '}'
+    {
+        /* FIXME: code duplication with the above rule (S.G.) */
+        DNODE *field, *field_list;
+
+        field_list = tnode_fields( $1 );
+        foreach_dnode( field, field_list ) {
+            TNODE *field_type = dnode_type( field );
+            char * field_name = dnode_name( field );
+            if( tnode_is_non_null_reference( field_type ) &&
+                !vartab_lookup( compiler->initialised_references,
+                                field_name )) {
+                char *field_type_name = $1 ? tnode_name( $1 ) : NULL;
+                if( field_type_name ) {
+                    yyerrorf( "non-null field '%s' of type '%s' "
+                              "is not initialised",
+                              field_name, field_type_name );
+                } else {
+                    yyerrorf( "non-null field '%s' is not initialised",
+                              field_name );
+                }
+            }
+        }
+        dispose_tnode( &$1 );
+        compiler_pop_initialised_ref_tables( compiler );
+    }
+
   ;
 
 field_initialiser_list
