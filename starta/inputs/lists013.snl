@@ -12,7 +12,8 @@ type list of T = ?{
     { ALLOC %%alloc_size %%nref };
 
     inline bytecode operator "mklist"( value : T ): list of T
-    { MKLIST %%alloc_size %%nref %.value %%element_size }
+    { MKLIST %%alloc_size %%nref const((list of T).next.offset)
+             %.value %%element_size }
     
     inline bytecode operator "*" ( l : list of T ) : addressof
     { OFFSET %.value }
