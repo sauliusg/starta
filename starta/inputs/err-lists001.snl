@@ -1,0 +1,47 @@
+// --*- C -*--
+
+// Test list expressions:
+
+use std;
+
+type list of T = ?{
+    next : list of T;
+    value : T;
+
+    inline bytecode operator "new" () : list of T
+    { ALLOC %%alloc_size %%nref };
+
+    inline bytecode operator "mklist"( value : T ): list of T
+    { MKLIST %%alloc_size %%nref const((list of T).next.offset)
+             %.value %%element_size }
+    
+    inline bytecode operator "*" ( l : list of T ) : addressof
+    { OFFSET %.value }
+
+    inline bytecode operator "next"( l : list of T )
+    { NEXT const((list of T).next.offset) %.value }
+
+}; // type "list of T"
+
+var b = new (list of int);
+
+//*b = 12;
+b.value = 12;
+. *b;
+. b.value;
+. "";
+
+var a = (23,29.,31,"labas");
+
+while( a ) {
+    . *a;
+    a = a.next;
+}
+. "";
+
+var c = ("a string","another string", "third string", "and so on...");
+
+while( c ) {
+    . *c;
+    c = c.next;
+}
