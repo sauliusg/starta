@@ -7449,10 +7449,28 @@ static void compiler_compile_list_expression( COMPILER *cc,
     TNODE *volatile list_type = *list_type_ptr;
     TNODE *volatile shared_list_type = NULL;
     TNODE *volatile result_type = NULL;
+    TYPETAB *volatile generic_types = NULL;
 
     *list_type_ptr = NULL;
     cexception_t inner;
     cexception_guard( inner ) {
+        /* Check compatibility of list component types: */
+        {
+            ssize_t i = 1;
+            TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
+            generic_types = new_typetab( &inner );
+            ENODE *expr = enode_next( top_expr );
+            while( i < nexpressions && expr ) {
+                TNODE *current_type = enode_type( expr );
+                if( !tnode_types_are_compatible( top_expr_type, current_type,
+                                                 generic_types, &inner ) ) {
+                    yyerrorf( "incompatible component types in list expression" );
+                }
+                compiler_drop_top_expression( cc );
+                expr = enode_next( expr );
+                i++;
+            }
+        }
         /* Synthesise type of the resulting return value: */
         TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
         if( !list_type ) {
@@ -7517,6 +7535,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
             delete_tnode( list_type );
             delete_tnode( shared_list_type );
             delete_tnode( result_type );
+            delete_typetab( generic_types );
         },
         {
             cexception_reraise( inner, ex );

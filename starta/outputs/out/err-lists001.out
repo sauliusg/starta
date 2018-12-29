@@ -1,0 +1,11 @@
+./sl: inputs/err-lists001.snl(34,28): ERROR, incompatible component types in list expression
+var a = (23,29.,31,"labas");
+                           ^
+./sl: inputs/err-lists001.snl(34,28): ERROR, incompatible component types in list expression
+var a = (23,29.,31,"labas");
+                           ^
+./sl: inputs/err-lists001.snl(34,28): ERROR, incompatible component types in list expression
+var a = (23,29.,31,"labas");
+                           ^
+./sl: 3 error(s) detected
+
