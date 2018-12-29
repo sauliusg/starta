@@ -954,12 +954,13 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
  * MKLIST size nref value_offset value_size
  *
  * stack:
- * ..., value --> list of value
+ * ..., [value, ..., ] value, nexpressions --> list of values
  */
 
 int MKLIST( INSTRUCTION_FN_ARGS )
 {
     void *ptr;
+    long nexpressions = istate.ep[0].num.l;
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t nref = istate.code[istate.ip+2].ssizeval;
     ssize_t value_offset = istate.code[istate.ip+3].ssizeval;
@@ -974,13 +975,15 @@ int MKLIST( INSTRUCTION_FN_ARGS )
 
     if( value_offset >= 0 ) {
         ssize_t copy_size = value_size;
-        if( copy_size > sizeof(istate.ep[0].num) )
-            copy_size = sizeof(istate.ep[0].num);
-	memcpy( ((char*)ptr) + value_offset, &istate.ep[0].num, copy_size );
+        if( copy_size > sizeof(istate.ep[1].num) )
+            copy_size = sizeof(istate.ep[1].num);
+	memcpy( ((char*)ptr) + value_offset, &istate.ep[1].num, copy_size );
     } else {
-	*((void**)((char*)ptr + value_offset)) = STACKCELL_PTR(istate.ep[0]);
+	*((void**)((char*)ptr + value_offset)) = STACKCELL_PTR(istate.ep[1]);
+        STACKCELL_ZERO_PTR( istate.ep[1] );
     }
 
+    istate.ep += nexpressions;
     STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
     return 5;

@@ -29,10 +29,10 @@ b.value = 12;
 . *b;
 . b.value;
 
-var a = (21,);
+var a = (21,23);
 
 . *a;
 
-var c = ("a string",);
+var c = ("a string","another string");
 
 . *c;
