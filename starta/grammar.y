@@ -7441,6 +7441,7 @@ static void compiler_insert_new_type( COMPILER *c, char *name, int not_null,
 }
 
 static void compiler_compile_list_expression( COMPILER *cc,
+                                              ssize_t nexpressions,
                                               TNODE *volatile *list_type_ptr,
                                               cexception_t *ex )
 {
@@ -13625,24 +13626,14 @@ array_expression
   /* List expression syntax: */
   | '(' expression ',' ')' opt_type_identifier
      {
-         compiler_compile_list_expression( compiler, &$5, px );
+         compiler_compile_list_expression( compiler, /* nexpressions = */ 1,
+                                           &$5, px );
      }
   | '(' expression ',' expression_list opt_comma ')' opt_type_identifier
      {
-         ENODE *volatile top_expr = NULL;
-         //enode_list_pop( &compiler->e_stack );
-         cexception_t inner;
-         cexception_guard( inner ) {
-             //TNODE *top_type = enode_type( top_expr );
-         }
-         cexception_catch {
-             delete_enode( top_expr );
-             delete_tnode( $7 );
-             cexception_reraise( inner, px );
-         }
-         delete_enode( top_expr );
-         delete_tnode( $7 );
-         $7 = NULL;
+         compiler_compile_list_expression( compiler,
+                                           /* nexpressions = */ 1 + $4,
+                                           &$7, px );
      }
   /* Hash (dictionary) expression syntax: */
   | '(' key_value_list opt_comma ')' 
