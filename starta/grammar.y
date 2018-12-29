@@ -7494,6 +7494,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
             /* deallocate inner buffers: */
             make_compiler_tnode_key_value_list( NULL, NULL, NULL );
         } else {
+            ssize_t next_link_offset = 0;
             ssize_t list_node_size = tnode_size( result_type );
             ssize_t list_node_nref =
                 tnode_number_of_references( result_type );
@@ -7502,8 +7503,9 @@ static void compiler_compile_list_expression( COMPILER *cc,
             ssize_t list_value_size =
                 tnode_size( tnode_element_type( result_type ));
             delete_enode( enode_list_pop( &cc->e_stack ));
-            compiler_emit( cc, &inner, "\tceeee\n", MKLIST, &list_node_size,
-                           &list_node_nref, &list_value_offs, &list_value_size );
+            compiler_emit( cc, &inner, "\tceeeee\n", MKLIST, &list_node_size,
+                           &list_node_nref, &next_link_offset,
+                           &list_value_offs, &list_value_size );
             /* Push the resulting list type onto the stack: */
             compiler_push_typed_expression( cc, &result_type, &inner );
         }
