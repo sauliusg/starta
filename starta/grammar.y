@@ -7456,8 +7456,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
         /* Synthesise type of the resulting return value: */
         TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
         if( !list_type ) {
-            list_type = compiler_lookup_tnode( cc,
-                                               /* module = */ NULL,
+            list_type = compiler_lookup_tnode( cc, /* module = */ NULL,
                                                /* identifier = */ "list",
                                                /* message = */ "type" );
             share_tnode( list_type );
@@ -7481,6 +7480,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
         tnode_insert_element_type( result_type, top_expr_type );
         top_expr_type = NULL;
         /* Generate code for list creation: */
+        compiler_emit( cc, &inner, "\tce\n", LLDC, &nexpressions );
         if( tnode_lookup_operator( result_type, "mklist",
                                    /* arity = */ 1 ) ) {
             key_value_t *fixup_values =
