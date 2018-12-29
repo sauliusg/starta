@@ -2164,9 +2164,9 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
                 if( field_type == tnode->element_type ) {
                     dnode_replace_type( cloned_field, share_tnode( element_type ));
                     //printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
-                    tnode_set_size_and_field_offset( tnode, cloned_field );
-                    //printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
                 }
+                tnode_set_size_and_field_offset( tnode, cloned_field );
+                //printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
                 cloned_fields = dnode_append( cloned_fields, cloned_field );
                 cloned_field = NULL;
             }

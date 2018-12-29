@@ -986,10 +986,16 @@ int MKLIST( INSTRUCTION_FN_ARGS )
             *((void**)((char*)ptr + value_offset)) = STACKCELL_PTR(istate.ep[i]);
             STACKCELL_ZERO_PTR( istate.ep[i] );
         }
+
+        if( i > 1 ) {
+            *((void**)((char*)ptr + next_link_offset)) = STACKCELL_PTR(istate.ep[0]);
+        }
+        STACKCELL_SET_ADDR( istate.ep[0], ptr );
     }
 
+    STACKCELL_SET_ADDR( istate.ep[nexpressions], ptr );
+    STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep += nexpressions;
-    STACKCELL_SET_ADDR( istate.ep[0], ptr );
 
     return 6;
 }

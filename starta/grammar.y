@@ -7494,7 +7494,8 @@ static void compiler_compile_list_expression( COMPILER *cc,
             /* deallocate inner buffers: */
             make_compiler_tnode_key_value_list( NULL, NULL, NULL );
         } else {
-            ssize_t next_link_offset = 0;
+            ssize_t next_link_offset =
+                dnode_offset( tnode_lookup_field( result_type, "next" ));
             ssize_t list_node_size = tnode_size( result_type );
             ssize_t list_node_nref =
                 tnode_number_of_references( result_type );
