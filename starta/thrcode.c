@@ -441,7 +441,7 @@ static void thrcode_emit_float( THRCODE *tc, float fval,
   e assembles ssize_t, must get an address of the ssize_t variable.
   s assembles element size of ssize_t, must get an address of the ssize_t variable.
     May be ignored by those implementations that do not need it (e.g. which 
-    have all slement slots of the same size).
+    have all element slots of the same size).
   f assembles float
   p assembles pointer
   S assembles string
