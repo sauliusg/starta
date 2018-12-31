@@ -1977,8 +1977,13 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
 
     cexception_guard( inner ) {
         foreach_dnode( retval_dnode, function_retvals ) {
-            retval_tnode = new_tnode_implementation( dnode_type( retval_dnode ),
-                                                     generic_types, &inner );
+            TNODE *retval_dnode_type = share_tnode( dnode_type( retval_dnode ));
+            if( tnode_has_placeholder_element( retval_dnode_type )) {
+                retval_tnode = new_tnode_implementation( retval_dnode_type,
+                                                         generic_types, &inner );
+            } else {
+                retval_tnode = share_tnode( retval_dnode_type );
+            }
             retval_enode = new_enode_return_value( retval_tnode, &inner );
             enode_list_push( &cc->e_stack, retval_enode );
             retval_tnode = NULL;
