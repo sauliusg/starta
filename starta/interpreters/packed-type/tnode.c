@@ -2226,6 +2226,16 @@ TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags )
     return node;
 }
 
+int tnode_has_placeholder_element( TNODE *tnode )
+{
+    while( tnode ) {
+        if( tnode->kind == TK_PLACEHOLDER )
+            return 1;
+        tnode = tnode->element_type;
+    }
+    return 0;
+}
+
 int tnode_has_flags( TNODE *tnode, type_flag_t flags )
 {
     assert( tnode );

@@ -59,13 +59,6 @@ procedure extend_growing_areas( int row[]; long row_nr; int color;
     return areas;
 }
 
-procedure finish_areas( list of Area finished_areas;
-                        list of Area growing_areas ):
-    list of Area, list of Area
-{
-    return finished_areas, growing_areas;
-}
-
 function find_areas( raster: int[][]; int color = 0 ): list of Area
 {
     pragma long;
@@ -77,12 +70,12 @@ function find_areas( raster: int[][]; int color = 0 ): list of Area
         growing_areas =
             extend_growing_areas( row, irow,
                                   color, growing_areas );
-        finished_areas, growing_areas =
-            finish_areas( finished_areas, growing_areas );
+        //finished_areas, growing_areas =
+        //    finish_areas( finished_areas, growing_areas );
 
     }
 
-    return areas;
+    return finished_areas;
 }
 
 end module Areas;
