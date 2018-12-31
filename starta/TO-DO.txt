@@ -1,3 +1,5 @@
+-- Implement default subroutine paramaters with type designators.
+-- Do not require conversion from a type to itself.
 -- Add pragma to warn about unused return value for functions, very important for 'push()'.
 -- Implement check to see if constructors initialise non-null fields in classes.
 ++ Implement 'pragma path' to manage include, module and library paths
