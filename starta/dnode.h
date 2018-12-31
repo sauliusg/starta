@@ -237,6 +237,8 @@ DNODE *dnode_list_last( DNODE* dnode );
 #define foreach_reverse_dnode( NODE, LIST ) \
     for( NODE = dnode_list_last(LIST); NODE != NULL; NODE = dnode_prev( NODE ))
 
+DNODE *dnode_rename( DNODE *dnode, char *name, cexception_t *ex );
+
 DNODE *dnode_function_args( DNODE *dnode );
 
 DNODE *dnode_insert_code_fixup( DNODE *dnode, FIXUP *fixup );

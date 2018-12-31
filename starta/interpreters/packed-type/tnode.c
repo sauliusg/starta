@@ -1031,8 +1031,7 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
         } else {
             return share_tnode( generic_tnode );
         }
-    } else if( generic_tnode->kind == TK_COMPOSITE &&
-	       !generic_tnode->name ) {
+    } else if( generic_tnode->kind == TK_COMPOSITE ) {
 	cexception_t inner;
 	TNODE *volatile element_tnode =
 	    new_tnode_implementation( generic_tnode->element_type,
@@ -1040,8 +1039,14 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
 	cexception_guard( inner ) {
 	    TNODE *composite_type =
 		new_tnode_composite( generic_tnode->name,
-				     element_tnode, &inner );
+				     share_tnode(generic_tnode->element_type),
+                                     &inner );
+            assert( !composite_type->fields );
+            composite_type->fields =
+                share_dnode( generic_tnode->fields );
             composite_type->base_type = share_tnode( generic_tnode );
+            tnode_insert_element_type( composite_type, element_tnode );
+            //printf( ">>> element type name is '%s'\n", tnode_name(element_tnode) );
             return composite_type;
 	}
 	cexception_catch {
@@ -1085,8 +1090,12 @@ TNODE *tnode_move_operators( TNODE *dst, TNODE *src )
     return dst;
 }
 
-TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+static DNODE *copy_dnode_list( DNODE *src,
+                               TNODE *dst_tnode,
+                               TNODE *src_tnode,
+                               cexception_t *ex )
 {
+    DNODE *volatile dst = NULL;
     DNODE *dnow = NULL;
     DNODE * volatile newop = NULL;
     TNODE * volatile newtype = NULL;
@@ -1094,26 +1103,22 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
     DNODE * volatile newretvals = NULL;
     cexception_t inner;
 
-    assert( dst );
-    assert( src );
-    assert( !dst->operators );
-    assert( !dst->conversions );
-
     /* dst->operators = src->operators; */
     /* dst->conversions = src->conversions; */
 
     cexception_guard( inner ) {
-        for( dnow = src->operators; dnow != NULL; dnow = dnode_next( dnow )) {
+        for( dnow = src; dnow != NULL; dnow = dnode_next( dnow )) {
             TNODE *old_type = dnode_type( dnow );
             newop = clone_dnode( dnow, &inner );
+            dnode_set_offset( newop, dnode_offset( dnow ));
 
             newargs =
                 clone_dnode_list_with_replaced_types( tnode_args( old_type ),
-                                                      src, dst, &inner );
+                                                      src_tnode, dst_tnode, &inner );
 
             newretvals =
                 clone_dnode_list_with_replaced_types( tnode_retvals( old_type ),
-                                                      src, dst, &inner );
+                                                      src_tnode, dst_tnode, &inner );
 
             newtype = new_tnode_operator( tnode_name(old_type), newargs, 
                                           newretvals, &inner );
@@ -1121,10 +1126,12 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
             newretvals = newargs = NULL;
             dnode_replace_type( newop, newtype );
             newtype = NULL;
-            tnode_insert_single_operator( dst, &newop );
+            dst = dnode_append( dst, newop );
+            newop = NULL;
         }
     }
     cexception_catch {
+        delete_dnode( dst );
         delete_dnode( newop );
         delete_tnode( newtype );
         delete_dnode( newargs );
@@ -1133,6 +1140,46 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
     }
 
     return dst;
+}
+
+TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    assert( dst );
+    assert( src );
+    assert( !dst->operators );
+
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    dst->operators = copy_dnode_list( src->operators, dst, src, ex );
+    
+    return dst;
+}
+
+TNODE *tnode_copy_conversions( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    assert( dst );
+    assert( src );
+    assert( !dst->conversions );
+
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    dst->conversions = copy_dnode_list( src->conversions, dst, src, ex );
+    
+    return dst;
+}
+
+TNODE *tnode_rename_conversions( TNODE *tnode, char *old_name, char *other_name,
+                                 cexception_t *ex )
+{
+    DNODE *dnow;
+    for( dnow = tnode->conversions; dnow != NULL; dnow = dnode_next( dnow )) {
+        if( strcmp(dnode_name(dnow), old_name) == 0 ) {
+            dnode_rename( dnow, other_name, ex );
+        }
+    }
+    return tnode;
 }
 
 static TNODE *tnode_finish_struct_or_class( TNODE * volatile node,
@@ -2014,8 +2061,87 @@ TNODE *tnode_first_interface( TNODE *class_tnode )
 TNODE *tnode_element_type( TNODE *tnode )
     { assert( tnode ); return tnode->element_type; }
 
+/* FIXME: duplicated code! Call this function from
+   'tnode_insert_fields()' S.G. */
+static TNODE*
+tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
+{
+    TNODE *field_type = dnode_type( field );
+    size_t field_size = tnode_is_reference( field_type ) ?
+        REF_SIZE : ( field_type ? tnode_size( field_type ) : 0 );
+    size_t field_align = field_type ? tnode_align( field_type ) : 0;
+
+    if( tnode_is_reference( field_type )) {
+        dnode_set_offset( field, tnode->nextrefoffs -
+                          sizeof(alloccell_t) - REF_SIZE );
+        tnode->nextrefoffs -= REF_SIZE;
+        tnode->nrefs -= 1;
+        tnode->size += REF_SIZE;
+    } else {
+        type_kind_t field_kind = field_type ?
+            tnode_kind( field_type ) : TK_NONE;
+        if( field_size != 0 ) {
+            ssize_t old_offset = tnode->nextnumoffs;
+            ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+            dnode_set_offset( field, tnode->nextnumoffs );
+            tnode->nextnumoffs += field_size;
+            tnode->size += tnode->nextnumoffs - old_offset;
+            if( tnode->align < field_align )
+                tnode->align = field_align;
+        } else {
+            if( field_kind == TK_PLACEHOLDER ) {
+                /* For generic type value placeholders, we must allocte
+                   also memory at a positive structure field offset to
+                   hold numeric value of the future type, in addition to
+                   the reference value for which the memory at the
+                   negative offset has just been allocated before: */
+                ssize_t bytes = sizeof(ssize_t);
+                ssize_t bits = (CHAR_BIT * bytes)/2;
+                ssize_t max_size = ((ssize_t)1) << bits;
+                ssize_t old_offset = tnode->nextnumoffs;
+                field_size = sizeof(union stackunion);
+#if 1
+                field_align = sizeof(int);
+                ALIGN_NUMBER( tnode->nextnumoffs, field_align );
+#endif
+                /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
+                if( dnode_offset( field ) >= max_size ||
+                    tnode->nextnumoffs >= max_size ) {
+                    yyerrorf( "placeholder field '%s' has offset %d "
+                              "which is larger than the size %d which we can "
+                              "handle in this implementation",
+                              dnode_name( field ), max_size );
+                }
+#if 0
+                ssize_t combined_offset = (dnode_offset( field ) << bits) |
+                    tnode->nextnumoffs;
+                printf( ">>> pos offset = %d, neg offset = %d, combined offset = %d\n",
+                        tnode->nextnumoffs, dnode_offset( field ), combined_offset );
+#endif
+                dnode_update_offset( field, 
+                                     (dnode_offset( field ) << bits) |
+                                     tnode->nextnumoffs );
+                tnode->nextnumoffs += field_size;
+                tnode->size += tnode->nextnumoffs - old_offset;
+                tnode_set_flags( tnode, TF_HAS_PLACEHOLDER );
+            }
+        }
+        if( field_size == 0 && field_type && field_kind != TK_FUNCTION &&
+            field_kind != TK_PLACEHOLDER ) {
+            yyerrorf( "field '%s' has zero size", dnode_name( field ));
+	}
+    }
+
+    // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
+
+    return tnode;
+}
+
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 {
+    DNODE *volatile cloned_fields = NULL;
+    DNODE *volatile cloned_field = NULL;
+
     assert( tnode );
 
     if( !element_type )
@@ -2024,6 +2150,35 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
     assert( !tnode->element_type || 
 	    (tnode->kind == TK_COMPOSITE &&
 	     tnode->element_type->kind == TK_PLACEHOLDER));
+
+    if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
+        tnode && tnode->kind == TK_COMPOSITE &&
+        tnode->element_type && tnode->element_type->kind == TK_PLACEHOLDER ) {
+        DNODE *field;
+        cexception_t inner;
+
+        cexception_guard( inner ) {
+            foreach_dnode( field, tnode->fields ) {
+                TNODE *field_type = dnode_type( field );
+                cloned_field = clone_dnode( field, &inner );
+                if( field_type == tnode->element_type ) {
+                    dnode_replace_type( cloned_field, share_tnode( element_type ));
+                    //printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
+                }
+                tnode_set_size_and_field_offset( tnode, cloned_field );
+                //printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
+                cloned_fields = dnode_append( cloned_fields, cloned_field );
+                cloned_field = NULL;
+            }
+            dispose_dnode( &tnode->fields );
+            tnode->fields = cloned_fields;
+            cloned_fields = NULL;
+        }
+        cexception_catch {
+            delete_dnode( cloned_fields );
+            delete_dnode( cloned_field );
+        }
+    }
 
     if( tnode->element_type ) {
 	delete_tnode( tnode->element_type );

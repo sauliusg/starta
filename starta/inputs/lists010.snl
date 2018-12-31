@@ -1,0 +1,30 @@
+// --*- C -*--
+
+// Test list expressions:
+
+use std;
+
+type list of T = ?{
+    next : list of T;
+    value : T;
+
+    inline bytecode operator "new" () : list of T
+    { ALLOC %%alloc_size %%nref };
+    // { ALLOC 12 %%nref };
+
+    inline bytecode operator "*" ( l : list of T ) : addressof
+    // { OFFSET 0 }
+    { OFFSET %.value }
+
+    inline bytecode operator "next"( l : list of T )
+    { NEXT const((list of T).next.offset) %.value }
+
+}; // type "list of T"
+
+var a = (21,);
+
+. *a;
+
+var b = ("a string",);
+
+. *b;
