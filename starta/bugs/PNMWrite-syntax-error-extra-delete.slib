@@ -1,0 +1,33 @@
+//--*- C -*--
+
+module PNMWrite( type pixel = int )
+
+// A Starta module to write rasters as PNM (PBM, PGN, PPM) images.
+
+use std;
+
+function print_pgm( pixels: pixel[][]; comment: string )
+{
+    var cols, rows = length(pixels[0]), length(pixels);
+    
+    . "P2";
+    do . comment if comment;
+    . cols, rows;
+    . 65535;
+
+    var n = 0;
+    for var ix = 0 to last(pixels) {
+        for var iy = 0 to last(pixels[ix]) {
+            var pixel = pixels[ix][iy];
+            < pixel > 0 ? pixel : 0, " ";
+            n ++;
+            if( n > 24 && iy < length(pixels[ix] ) {
+                . "";
+                n = 0;
+            }
+        }
+        . "";
+    }
+}
+
+end module PNMWrite;
