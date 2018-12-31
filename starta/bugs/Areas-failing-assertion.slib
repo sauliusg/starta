@@ -1,0 +1,88 @@
+// --*- C -*--
+
+// Find connected areas of the same color in an image raster, and
+// return a list of such areas.
+
+module Areas
+
+use std;
+use Lists;
+
+struct PixelRun {
+    llong row;
+    llong left, right;
+}
+
+class Area {
+    curr : list of PixelRun;
+    tail : list of PixelRun;
+    body : list of PixelRun;
+    var stretches: array [][] of int;
+}
+
+function locate_pixel_run( int row[]; int color;
+                           long start ): long, long
+{
+    pragma long;
+    var row_size = llength( row );
+    var l = start;
+
+    while( l < row_size && row[l] < color ) {
+        l ++;
+    }
+
+    var r = l;
+
+    while( r + 1 < row_size && row[r + 1] >= color ) {
+        r ++;
+    }
+
+    return l, r;
+}
+
+procedure extend_growing_areas( int row[]; long row_nr; int color;
+                                list of Area areas ): list of Area
+{
+    pragma long;
+    var l, r = 0, 0;
+    for( var j = 0; j < llength(row); j++ ) {
+        l, r = locate_pixel_run( row, color, j );
+        // l and r now either point past the end of the array, or
+        // describe a new stretch of pixels with the color in the
+        // current row.
+        if( l < llength(row) ) {
+            // We have a new stretch:
+            // ...
+        }
+        j = r;
+    }
+    return areas;
+}
+
+procedure finish_areas( list of Area finished_areas;
+                        list of Area growing_areas ):
+    list of Area, list of Area
+{
+    return finished_areas, growing_areas;
+}
+
+function find_areas( raster: int[][]; int color = 0 ): list of Area
+{
+    pragma long;
+    var list of Area growing_areas;
+    var list of Area finished_areas;
+
+    for( var irow = 0; irow < llength(raster); irow++ ) {
+        var row = raster[irow];
+        growing_areas =
+            extend_growing_areas( row, irow,
+                                  color, growing_areas );
+        finished_areas, growing_areas =
+            finish_areas( finished_areas, growing_areas );
+
+    }
+
+    return areas;
+}
+
+end module Areas;
