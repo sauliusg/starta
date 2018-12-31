@@ -3,6 +3,7 @@
 // Test list and hash (dictionary) expressions:
 
 use std;
+use Lists;
 
 var a = (1,);
 var b = (3,4,7);

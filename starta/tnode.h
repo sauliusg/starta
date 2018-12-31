@@ -184,6 +184,11 @@ TNODE *tnode_move_operators( TNODE *dst, TNODE *src );
 
 TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex );
 
+TNODE *tnode_copy_conversions( TNODE *dst, TNODE *src, cexception_t *ex );
+
+TNODE *tnode_rename_conversions( TNODE *tnode, char *old_name, char *other_name,
+                                 cexception_t *ex );
+
 TNODE *tnode_finish_struct( TNODE * volatile node,
 			    cexception_t *ex );
 

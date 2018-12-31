@@ -28,6 +28,12 @@ type bool = {
     bytecode inline operator "jz" ( x : bool )
         { BJZ };
 
+    inline bytecode operator "<" ( x : bool )
+        { BJZ +7 SLDC "T" SPRINT JMP +5 SLDC "F" SPRINT };
+
+    inline bytecode operator "." ( x : bool )
+        { BJZ +7 SLDC "T" SPRINT JMP +5 SLDC "F" SPRINT };
+
     inline bytecode operator "assert" ( x : bool )
     {
         ASSERT %%lineno %%file %%line

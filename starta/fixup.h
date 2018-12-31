@@ -48,6 +48,8 @@ FIXUP *fixup_adjust_address( FIXUP *fixup, ssize_t address );
 
 void fixup_list_adjust_addresses( FIXUP *fixup_list, ssize_t address );
 
+FIXUP *clone_fixup_list( FIXUP *fixup_list, cexception_t *ex );
+
 #define foreach_fixup( FIXUP, LIST ) \
    for( FIXUP = LIST; FIXUP != NULL; FIXUP = fixup_next( FIXUP ))
 

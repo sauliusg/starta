@@ -1,10 +1,10 @@
 ./sl: inputs/err-composite001.snl(22,62): ERROR, type 'hash' is not declared in the current scope
     inline bytecode operator "new[char]" ( i : char ) : hash of T
                                                              ^
-./sl: inputs/err-composite001.snl(38,4): ERROR, this type has no unary operator named '.'
+./sl: inputs/err-composite001.snl(38,4): ERROR, type 'collection' has no unary operator named '.'
 . c;
    ^
-./sl: inputs/err-composite001.snl(39,4): ERROR, this type has no unary operator named '.'
+./sl: inputs/err-composite001.snl(39,4): ERROR, type 'collection' has no unary operator named '.'
 . d;
    ^
 ./sl: 3 error(s) detected

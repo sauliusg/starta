@@ -4,6 +4,4 @@ use * from std;
 var int[] m;
 var bool b;
 
-for var i = 1 to last(m) do
-    . b;
-enddo;
+b = -b;
