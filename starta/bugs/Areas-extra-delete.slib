@@ -1,0 +1,248 @@
+// --*- C -*--
+
+// Find connected areas of the same color in an image raster, and
+// return a list of such areas.
+
+module Areas(type pixel = int)
+
+use std;
+use Lists;
+
+struct PixelRun {
+    llong row;
+    llong left, right;
+}
+
+class Area {
+    curr : list of PixelRun;
+    tail : list of PixelRun;
+    body : list of PixelRun;
+    var stretches: array [][] of int;
+}
+
+function locate_pixel_run( int row[]; pixel threshold;
+                           long start ): long, long
+{
+    pragma long;
+    var row_size = llength( row );
+    var l = start;
+
+    while( l < row_size && row[l] < threshold ) {
+        l ++;
+    }
+
+    var r = l;
+
+    while( r + 1 < row_size && row[r + 1] >= threshold ) {
+        r ++;
+    }
+
+    return l, r;
+}
+
+function new_pixel_run( long row_nr; long left; long right ): PixelRun
+{
+    var PixelRun new_run = new PixelRun;
+
+    new_run.row = row_nr;
+    new_run.left = left;
+    new_run.right = right;
+
+    return new_run;
+}
+
+function new_pixel_area( PixelRun first_run ): list of Area
+{
+    var Area new_area = new Area;
+
+    new_area.curr = new_area.tail = (first_run,);
+    return (new_area,);
+}
+
+procedure extend_area( Area area; list of PixelRun run )
+{
+    // run.next = area.curr does not work because of incompatible
+    // types.
+    cat( run, area.curr );
+    area.curr = run;
+    if( !area.tail ) {
+        area.tail = run;
+    }
+}
+
+procedure join_pixel_areas( Area dst; Area src )
+{
+    var list of PixelRun dstbody, srcbody, bodytail;
+    assert src != null;
+    assert dst != null;
+    assert src != dst;
+
+    /* join lists of detected pixel runs from the current row: */
+    if( src.curr != null ) {
+        assert src.tail != null ;
+        assert src.tail.next == null;
+        if( dst.curr != null ) {
+            assert dst.tail != null;
+            assert src.tail.next == null;
+            cat( dst.tail, src.curr);
+            dst.tail = src.tail;
+        } else {
+            assert dst.tail == null;
+            dst.curr = src.curr;
+            dst.tail = src.tail;
+        }
+        src.curr = src.tail = null;
+    }
+
+    /* join bodies */
+    if( src.body != null ) {
+        if( dst.body == null ) {
+            dst.body = src.body;
+            src.body = null;
+        } else {
+            /* merge two sorted bodies */
+            if( dst.body.value.row >= src.body.value.row ) {
+                dstbody = dst.body.next;
+                srcbody = src.body;
+            } else {
+                dstbody = dst.body;
+                srcbody = src.body.next;
+                dst.body = src.body;
+            }
+            bodytail = dst.body;
+            while( srcbody && dstbody ) {
+                if( dstbody.value.row >= srcbody.value.row ) {
+                    cat( bodytail, dstbody );
+                    dstbody = dstbody.next;
+                } else {
+                    cat( bodytail, srcbody );
+                    srcbody = srcbody.next;
+                }
+                bodytail = bodytail.next;
+            }
+            if( srcbody ) {
+                cat( bodytail, srcbody );
+            } else {
+                cat( bodytail, dstbody );
+            }
+            src.body = null;
+        }
+    }
+}
+
+procedure append_pixel_run( list of Area area;
+                            PixelRun run ): list of Area
+{
+    var list of Area a, prev, next, extended;
+
+    for( a = area; a != null; a = next ) {
+        next = a.next;
+        //. ">>> Checking area from the list...", a.value.body != null;
+        for( var pr in a.value.body ) {
+            //. ">>>> Checking pixel run:", pr.row, run.row;
+            if( pr.row + 1LL != run.row ) {
+                break;
+            }
+            //. ">>> checking:", pr.left, run.right, pr.right, run.left;
+            if( pr.left <= run.right && pr.right >= run.left ) {
+                if( !extended ) {
+                    extend_area( a.value, (run,) );
+                    extended = a;
+                    prev = a;
+                    break;
+                } else {
+                    assert area != a;
+                    join_pixel_areas(extended.value, a.value);
+                    //exclude_middle_area(a):
+                    cat( prev, next );
+                    // prev stays where it was.
+                    break;
+                }
+            }
+        }
+    }
+
+    return extended ? area : area + new_pixel_area(run);
+}
+
+procedure extend_growing_areas( int row[]; long row_nr; pixel threshold;
+                                list of Area areas ): list of Area
+{
+    pragma long;
+    var left, right = 0, 0;
+    for( var j = 0; j < llength(row); j++ ) {
+        left, right = locate_pixel_run( row, threshold, j );
+        // left and right now either point past the end of the array,
+        // or describe a new stretch of pixels with the threshold in the
+        // current row.
+        if( left < llength(row) ) {
+            // We have a new stretch:
+	    var run = new_pixel_run( row_nr, left, right );
+	    areas = append_pixel_run( areas, run );
+        }
+        j = right;
+    }
+    return areas;
+}
+
+procedure finish_areas( list of Area finished_areas;
+                        list of Area growing_areas ):
+    list of Area, list of Area
+{
+    var list of Area finished, finished_tail;
+    var list of Area growing, growing_tail;
+
+    for( var area = growing_areas; area != null; area = area.next ) {
+        if( area.value.curr == null ) {
+            /* area was not extended by the current row -- 
+               move it to the finished list */
+            assert area.value.tail == null;
+            if( !finished ) {
+                finished = finished_tail = area;
+            } else {
+                assert finished_tail != null;
+                cat( finished_tail, area );
+                finished_tail = area;
+            }
+            //growing = exclude_area( growing, area );
+            //finished = append_head( finished, area );
+        } else {
+            /* area has been extended -- 
+               leave it in the growing area list */
+            assert area.value.tail != null;
+            cat( area.value.tail, area.value.body );
+            area.value.body = area.value.curr;
+            area.value.curr = area.value.tail = null;
+            if( !growing ) {
+                growing = growing_tail = area;
+            } else {
+                assert growing_tail != null;
+                cat( growing_tail, area );
+                growing_tail = area;
+            }
+        }
+    }
+
+    return finished, growing;
+}
+
+function find_areas( raster: int[][]; pixel threshold = const(0 pixel) ): list of Area
+{
+    pragma long;
+    var list of Area growing_areas;
+    var list of Area finished_areas;
+
+    for( var irow = 0; irow < llength(raster); irow++ ) {
+        var row = raster[irow];
+        growing_areas =
+            extend_growing_areas( row, irow,
+                                  threshold, growing_areas );
+        finished_areas, growing_areas =
+            finish_areas( finished_areas, growing_areas );
+
+    }
+
+    return growing_areas + finished_areas;
+}
+
+end module Areas;
