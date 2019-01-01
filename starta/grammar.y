@@ -1767,6 +1767,7 @@ const char *skip_leading_spaces( const char *s )
 static 
 key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
                                                  TNODE *tnode,
+                                                 char *constant_value,
                                                  cexception_t *ex )
 {
     static key_value_t empty_list[1] = {{ NULL }};
@@ -1780,6 +1781,7 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
         /* 6 */ { "lineno" },
         /* 7 */ { "line" },
         /* 8 */ { "file" },
+        /* 9 */ { "constant_text" },
 	{ NULL },
     };
     static key_value_t *allocated_list = NULL;
@@ -1809,7 +1811,14 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
     list[7].val = compiler_assemble_static_string
         ( cc, (char*)skip_leading_spaces(compiler_flex_current_line()), ex );
     list[8].val = compiler_assemble_static_string
-        ( cc, (char*)cc->filename, ex );;
+        ( cc, (char*)cc->filename, ex );
+
+    if( constant_value ) {
+        list[9].val = compiler_assemble_static_string
+            ( cc, constant_value, ex );;
+    } else {
+        list[9].val = 0;
+    }
 
     /* For placeholders, we just in case allocate arrays thay say they
        contain references. This is necessary so that GC does not
@@ -2979,7 +2988,9 @@ static void compiler_compile_unop( COMPILER *cc,
 		fixup_values = make_tnode_key_value_list( expr_type, NULL );
             } else {
                 fixup_values =
-                    make_compiler_tnode_key_value_list( cc, expr_type, ex );
+                    make_compiler_tnode_key_value_list( cc, expr_type,
+                                                        /*const_value =*/ NULL,
+                                                        ex );
             }
 
 	    compiler_init_operator_description( &od, cc, expr_type,
@@ -3008,12 +3019,12 @@ static void compiler_compile_unop( COMPILER *cc,
 	}
     }
     cexception_catch {
-        make_compiler_tnode_key_value_list( NULL, NULL, NULL );
+        make_compiler_tnode_key_value_list( NULL, NULL, NULL, NULL );
 	delete_enode( top );
         delete_typetab( generic_types );
 	cexception_reraise( inner, ex );	
     }
-    make_compiler_tnode_key_value_list( NULL, NULL, NULL );
+    make_compiler_tnode_key_value_list( NULL, NULL, NULL, NULL );
     delete_enode( top );
     delete_typetab( generic_types );
 }
@@ -3201,6 +3212,37 @@ static void compiler_duplicate_top_expression( COMPILER *cc,
 	compiler_push_typed_expression( cc, &expr_type, ex );
     }
 }
+ 
+static void compiler_compile_operator_with_constant( COMPILER *cc,
+                                                     TNODE *tnode,
+                                                     char *operator_name,
+                                                     int arity,
+                                                     char *const_value,
+                                                     cexception_t *ex )
+{
+    cexception_t inner;
+    operator_description_t od;
+
+    share_tnode( tnode );
+    cexception_guard( inner ) {
+        key_value_t *fixup_values =
+            make_compiler_tnode_key_value_list( cc, tnode, const_value, ex );
+
+        compiler_init_operator_description( &od, cc, tnode, operator_name, arity,
+                                            &inner );
+
+        compiler_emit_operator_or_report_missing( cc, &od, fixup_values, "", &inner );
+        compiler_check_operator_retvals( cc, &od, 0, 1 );
+        compiler_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, &inner );
+    }
+    cexception_catch {
+        make_compiler_tnode_key_value_list( NULL, NULL, NULL, NULL );
+        delete_tnode( tnode );
+	cexception_reraise( inner, ex );
+    }
+    make_compiler_tnode_key_value_list( NULL, NULL, NULL, NULL );
+    delete_tnode( tnode );
+}
 
 static void compiler_compile_operator( COMPILER *cc,
                                        TNODE *tnode,
@@ -3208,24 +3250,11 @@ static void compiler_compile_operator( COMPILER *cc,
                                        int arity,
                                        cexception_t *ex )
 {
-    cexception_t inner;
-    operator_description_t od;
-
-    share_tnode( tnode );
-    cexception_guard( inner ) {
-        compiler_init_operator_description( &od, cc, tnode, operator_name, arity,
-                                            &inner );
-        compiler_emit_operator_or_report_missing( cc, &od, NULL, "", &inner );
-        compiler_check_operator_retvals( cc, &od, 0, 1 );
-        compiler_push_operator_retvals( cc, &od, NULL, NULL /* generic_types */, &inner );
-    }
-    cexception_catch {
-        delete_tnode( tnode );
-	cexception_reraise( inner, ex );
-    }
-    delete_tnode( tnode );
+    compiler_compile_operator_with_constant( cc, tnode, operator_name,
+                                             arity, /* const_value = */ NULL,
+                                             ex );
 }
-
+ 
 static void compiler_check_and_compile_operator( COMPILER *cc,
                                                  TNODE *tnode,
                                                  char *operator_name,
@@ -4549,8 +4578,12 @@ static void compiler_compile_typed_constant( COMPILER *cc,
 	    }
 	}
 
-	if( compiler_lookup_operator( cc, const_type, "ldc", 0, ex ) != NULL ) {
-	    compiler_compile_operator( cc, const_type, "ldc", 0, ex );
+        DNODE *operator_dnode;
+	if( (operator_dnode =
+             compiler_lookup_operator( cc, const_type, "ldc", 0, ex ))
+            != NULL ) {
+	    compiler_compile_operator_with_constant( cc, const_type, "ldc",
+                                                     0, value, ex );
 	} else {
 	    TNODE *pushed_type = share_tnode( const_type );
 	    compiler_push_typed_expression( cc, &pushed_type, ex );
@@ -4562,8 +4595,12 @@ static void compiler_compile_typed_constant( COMPILER *cc,
         if( strcmp( value, "0" ) == 0 ) {
             enode_set_flags( expr, EF_IS_ZERO );
         }
-	string_offset = compiler_assemble_static_string( cc, value, ex );
-	compiler_emit( cc, ex, "e\n", &string_offset );
+        if( operator_dnode && !dnode_code_fixups( operator_dnode )) {
+            /* We only need to emit constant value offset if it was
+               not inserted by eventual fixups: */
+            string_offset = compiler_assemble_static_string( cc, value, ex );
+            compiler_emit( cc, ex, "e\n", &string_offset );
+        }
     }
 }
 
@@ -7509,7 +7546,9 @@ static void compiler_compile_list_expression( COMPILER *cc,
         if( tnode_lookup_operator( result_type, "mklist",
                                    /* arity = */ 1 ) ) {
             key_value_t *fixup_values =
-                make_compiler_tnode_key_value_list( cc, result_type, &inner );
+                make_compiler_tnode_key_value_list( cc, result_type,
+                                                    /* const_value = */ NULL,
+                                                    &inner );
 
             compiler_check_and_compile_operator
                 ( cc, result_type,
@@ -7539,7 +7578,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
         {
             /* deallocate inner (static) buffers in
                'make_compiler_tnode_key_value_list()': */
-            make_compiler_tnode_key_value_list( NULL, NULL, NULL );
+            make_compiler_tnode_key_value_list( NULL, NULL, NULL, NULL );
             delete_tnode( list_type );
             delete_tnode( shared_list_type );
             delete_tnode( result_type );
