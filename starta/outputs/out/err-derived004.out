@@ -1,0 +1,30 @@
+./sl: inputs/Verlet.slib(9,35): ERROR, keyword '%%constant_text_mistyped' is not available here
+    return x + v * dt + 0.5 Point * acceleration * dt * dt ;
+                                  ^
+available keywords are:
+'%%element_nref'
+'%%element_size'
+'%%element_align'
+'%%nref'
+'%%alloc_size'
+'%%vmt_offset'
+'%%lineno'
+'%%line'
+'%%file'
+'%%constant_text'
+./sl: inputs/Verlet.slib(14,20): ERROR, keyword '%%constant_text_mistyped' is not available here
+    return 2 Point * x - prev + acceleration * dt * dt;
+                   ^
+available keywords are:
+'%%element_nref'
+'%%element_size'
+'%%element_align'
+'%%nref'
+'%%alloc_size'
+'%%vmt_offset'
+'%%lineno'
+'%%line'
+'%%file'
+'%%constant_text'
+./sl: 2 error(s) detected
+
