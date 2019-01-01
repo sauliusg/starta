@@ -3008,10 +3008,12 @@ static void compiler_compile_unop( COMPILER *cc,
 	}
     }
     cexception_catch {
+        make_compiler_tnode_key_value_list( NULL, NULL, NULL );
 	delete_enode( top );
         delete_typetab( generic_types );
 	cexception_reraise( inner, ex );	
     }
+    make_compiler_tnode_key_value_list( NULL, NULL, NULL );
     delete_enode( top );
     delete_typetab( generic_types );
 }
@@ -7514,8 +7516,6 @@ static void compiler_compile_list_expression( COMPILER *cc,
                   /* operator_name = */ "mklist",
                   /* arity = */ 1,
                   fixup_values, &inner );
-            /* deallocate inner buffers: */
-            make_compiler_tnode_key_value_list( NULL, NULL, NULL );
         } else {
             ssize_t next_link_offset =
                 dnode_offset( tnode_lookup_field( result_type, "next" ));
@@ -7537,6 +7537,9 @@ static void compiler_compile_list_expression( COMPILER *cc,
     }
     cexception_finally (
         {
+            /* deallocate inner (static) buffers in
+               'make_compiler_tnode_key_value_list()': */
+            make_compiler_tnode_key_value_list( NULL, NULL, NULL );
             delete_tnode( list_type );
             delete_tnode( shared_list_type );
             delete_tnode( result_type );
