@@ -353,6 +353,12 @@ type short = {
     inline bytecode operator "<" ( i : short )
         { HPRINT };
 
+    inline bytecode operator "<<" ( f : file; i : short ) : file
+    	{ HFILEPRINT };
+
+    inline bytecode operator ">>" ( f : file ) : short
+    	{ HFILESCAN };
+
     inline bytecode operator "%%" ( format : string; x : short ) : string
         { HSPRINTF };
 
