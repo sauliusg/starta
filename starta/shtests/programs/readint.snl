@@ -1,0 +1,15 @@
+
+use * from std;
+
+for var filename in arguments()[1:]
+do
+    . "\"" _ filename _ "\"";
+    var inp = fopen( filename, "r" );
+    var number : int;
+    while( !feof(inp) ) {
+        try {
+            <inp> >> number;
+            . number;
+        }
+    }
+enddo
