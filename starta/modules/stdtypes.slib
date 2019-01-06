@@ -756,6 +756,12 @@ type llong = {
     inline bytecode operator "<" ( i : llong )
         { LLPRINT };
 
+    inline bytecode operator "<<" ( f : file; i : llong ) : file
+    	{ LLFILEPRINT };
+
+    inline bytecode operator ">>" ( f : file ) : llong
+    	{ LLFILESCAN };
+
     inline bytecode operator "%%" ( format : string; x : llong ) : string
         { LLSPRINTF };
 
