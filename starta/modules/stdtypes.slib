@@ -619,6 +619,12 @@ type long = {
     inline bytecode operator "<" ( i : long )
         { LPRINT };
 
+    inline bytecode operator "<<" ( f : file; i : long ) : file
+    	{ LFILEPRINT };
+
+    inline bytecode operator ">>" ( f : file ) : long
+    	{ LFILESCAN };
+
     inline bytecode operator "%%" ( format : string; x : long ) : string
         { LSPRINTF };
 
