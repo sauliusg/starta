@@ -9028,7 +9028,8 @@ incdec_statement
               yyerrorf( "may not increment readonly variable '%s'",
                         dnode_name( $1 ));
           } else {
-              if( compiler_variable_has_operator( compiler, $1, "incvar", 0, px )) {
+              if( compiler_variable_has_operator( compiler, $1, "incvar", 0, px ) &&
+                  dnode_scope( $1 ) != 0 ) {
                   TNODE *var_type = dnode_type( $1 );
                   ssize_t var_offset = dnode_offset( $1 );
 
@@ -9048,7 +9049,8 @@ incdec_statement
               yyerrorf( "may not decrement readonly variable '%s'",
                         dnode_name( $1 ));
           } else {
-              if( compiler_variable_has_operator( compiler, $1, "decvar", 0, px )) {
+              if( compiler_variable_has_operator( compiler, $1, "decvar", 0, px ) &&
+                  dnode_scope( $1 ) != 0 ) {
                   TNODE *var_type = dnode_type( $1 );
                   ssize_t var_offset = dnode_offset( $1 );
 
