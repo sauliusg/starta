@@ -2045,6 +2045,7 @@ static void compiler_compile_type_conversion( COMPILER *cc,
     cexception_t inner;
     ENODE * volatile expr = enode_list_pop( &cc->e_stack );
     ENODE * volatile converted_expr = NULL;
+    TYPETAB *volatile generic_types = NULL;
     TNODE * expr_type = expr ? enode_type( expr ) : NULL;
     char *source_name = expr_type ? tnode_name( expr_type ) : NULL;
 
@@ -2062,6 +2063,8 @@ static void compiler_compile_type_conversion( COMPILER *cc,
                 compiler_lookup_conversion( cc, target_type, expr_type ) :
                 NULL;
 
+            generic_types = new_typetab( &inner );
+
             if( !conversion && target_type && tnode_base_type( target_type ) ) {
                 conversion =
                     compiler_lookup_conversion( cc, tnode_base_type( target_type ),
@@ -2076,36 +2079,38 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 			  "target type '%s' not defined in the current scope",
 			  target_name );
 	    } else
-	    if( !conversion ) {
-		if( source_name && target_name ) {
-		    yyerrorf( "type '%s' has no conversion from type '%s'",
-			      target_name, source_name );
-		} else {
-		    if( target_name ) {
-			yyerrorf( "type '%s' has no conversion from the given "
-				  "type",  target_name );
-		    } else {
-			yyerrorf( "the required type has no conversion from "
-				  "the given type" );
-		    }
-		}
-	    } else
-	    if( retval_nr != 1 ) {
-		yyerrorf( "type conversion operators should return "
-			  "a single value, but conversion to from '%s' to '%s' "
-			  "returns %d values",
-			  target_name, source_name, retval_nr );
-	    }
-	    if( conversion ) {
-                key_value_t *fixup_values = NULL;
+            if( !tnode_types_are_identical( target_type, expr_type, generic_types, &inner ) ) {
+                if( !conversion ) {
+                    if( source_name && target_name ) {
+                        yyerrorf( "type '%s' has no conversion from type '%s'",
+                                  target_name, source_name );
+                    } else {
+                        if( target_name ) {
+                            yyerrorf( "type '%s' has no conversion from the given "
+                                      "type",  target_name );
+                        } else {
+                            yyerrorf( "the required type has no conversion from "
+                                      "the given type" );
+                        }
+                    }
+                } else
+                    if( retval_nr != 1 ) {
+                        yyerrorf( "type conversion operators should return "
+                                  "a single value, but conversion to from '%s' to '%s' "
+                                  "returns %d values",
+                                  target_name, source_name, retval_nr );
+                    }
+                if( conversion ) {
+                    key_value_t *fixup_values = NULL;
+                    
+                    TNODE *element_tnode = tnode_element_type( target_type );
+                    if( element_tnode ) {
+                        fixup_values = make_tnode_key_value_list( target_type, element_tnode );
+                    }
 
-                TNODE *element_tnode = tnode_element_type( target_type );
-                if( element_tnode ) {
-                    fixup_values = make_tnode_key_value_list( target_type, element_tnode );
+                    compiler_emit_function_call( cc, conversion, fixup_values, "\n", ex );
                 }
-
-		compiler_emit_function_call( cc, conversion, fixup_values, "\n", ex );
-	    }
+            }
 
 	    if( target_type ) {
 		share_tnode( target_type );
@@ -2116,8 +2121,10 @@ static void compiler_compile_type_conversion( COMPILER *cc,
 		enode_list_push( &cc->e_stack, expr );
 	    }
 	}
+        delete_typetab( generic_types );
     }
     cexception_catch {
+        delete_typetab( generic_types );
 	enode_list_push( &cc->e_stack, expr );
 	cexception_reraise( inner, ex );
     }
