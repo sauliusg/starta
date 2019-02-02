@@ -1,17 +1,14 @@
-./sl: inputs/err-typecompat004a.snl(29,23): ERROR, incompatible types for function 'my_length' argument nr. 1
-    return my_length(m); // ???
-                      ^
 ./sl: inputs/err-typecompat004a.snl(34,23): ERROR, incompatible types for function 'my_length' argument nr. 1
     return my_length(m); // ERROR
                       ^
 ./sl: inputs/err-typecompat004a.snl(42,12): ERROR, incompatible types for assignment to variable 'a'
-a = [1,2,4]; // ??!
+a = [1,2,4]; // ERROR, convert with a function if needed
            ^
 ./sl: inputs/err-typecompat004a.snl(45,6): ERROR, incompatible types for assignment to variable 'a'
-a = m; // ??
+a = m; // ERROR, convert with a function if needed
      ^
 ./sl: inputs/err-typecompat004a.snl(46,6): ERROR, incompatible types for assignment to variable 'm'
-m = a; // ??
+m = a; // ERROR, convert with a function if needed
      ^
 ./sl: inputs/err-typecompat004a.snl(48,8): ERROR, incompatible types for function 'p' argument nr. 1
 . p( a ); // ERROR
@@ -22,9 +19,6 @@ m = a; // ??
 ./sl: inputs/err-typecompat004a.snl(51,8): ERROR, incompatible types for function 'p' argument nr. 1
 . p( r ); // ERROR
        ^
-./sl: inputs/err-typecompat004a.snl(53,9): ERROR, incompatible types for function 'p1' argument nr. 1
-. p1( a ); // ERROR
-        ^
 ./sl: inputs/err-typecompat004a.snl(56,9): ERROR, incompatible types for function 'p1' argument nr. 1
 . p1( r ); // ERROR
         ^
@@ -37,5 +31,5 @@ m = a; // ??
 ./sl: inputs/err-typecompat004a.snl(61,9): ERROR, type 'A' has no conversion from type 'ref'
 . p2( r ); // ERROR
         ^
-./sl: 13 error(s) detected
+./sl: 11 error(s) detected
 

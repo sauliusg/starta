@@ -26,7 +26,7 @@ function p1( m : array ) : int
 
 function p2( m : A ) : int
 {
-    return my_length(m); // ???
+    return my_length(m); // OK
 }
 
 function p3( m : ref ) : int
@@ -39,18 +39,18 @@ var m : array of int;
 var x : array;
 var r : ref;
 
-a = [1,2,4]; // ??!
+a = [1,2,4]; // ERROR, convert with a function if needed
 m = [0,3,6]; // OK
 
-a = m; // ??
-m = a; // ??
+a = m; // ERROR, convert with a function if needed
+m = a; // ERROR, convert with a function if needed
 
 . p( a ); // ERROR
 . p( m ); // OK
 . p( x ); // ERROR
 . p( r ); // ERROR
 
-. p1( a ); // ERROR
+. p1( a ); // OK
 . p1( m ); // OK
 . p1( x ); // OK
 . p1( r ); // ERROR
