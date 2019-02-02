@@ -4,26 +4,38 @@
 ./sl: inputs/err-typecompat004a.snl(34,23): ERROR, incompatible types for function 'my_length' argument nr. 1
     return my_length(m); // ERROR
                       ^
-./sl: inputs/err-typecompat004a.snl(42,8): ERROR, incompatible types for function 'p' argument nr. 1
+./sl: inputs/err-typecompat004a.snl(42,12): ERROR, incompatible types for assignment to variable 'a'
+a = [1,2,4]; // ??!
+           ^
+./sl: inputs/err-typecompat004a.snl(45,6): ERROR, incompatible types for assignment to variable 'a'
+a = m; // ??
+     ^
+./sl: inputs/err-typecompat004a.snl(46,6): ERROR, incompatible types for assignment to variable 'm'
+m = a; // ??
+     ^
+./sl: inputs/err-typecompat004a.snl(48,8): ERROR, incompatible types for function 'p' argument nr. 1
 . p( a ); // ERROR
        ^
-./sl: inputs/err-typecompat004a.snl(44,8): ERROR, incompatible types for function 'p' argument nr. 1
+./sl: inputs/err-typecompat004a.snl(50,8): ERROR, incompatible types for function 'p' argument nr. 1
 . p( x ); // ERROR
        ^
-./sl: inputs/err-typecompat004a.snl(45,8): ERROR, incompatible types for function 'p' argument nr. 1
+./sl: inputs/err-typecompat004a.snl(51,8): ERROR, incompatible types for function 'p' argument nr. 1
 . p( r ); // ERROR
        ^
-./sl: inputs/err-typecompat004a.snl(47,9): ERROR, incompatible types for function 'p1' argument nr. 1
-. p1( a ); // OK!!
+./sl: inputs/err-typecompat004a.snl(53,9): ERROR, incompatible types for function 'p1' argument nr. 1
+. p1( a ); // OK??
         ^
-./sl: inputs/err-typecompat004a.snl(50,9): ERROR, incompatible types for function 'p1' argument nr. 1
+./sl: inputs/err-typecompat004a.snl(56,9): ERROR, incompatible types for function 'p1' argument nr. 1
 . p1( r ); // ERROR
         ^
-./sl: inputs/err-typecompat004a.snl(53,9): ERROR, type 'A' has no conversion from the given type
-. p2( m ); // OK
+./sl: inputs/err-typecompat004a.snl(59,9): ERROR, type 'A' has no conversion from the given type
+. p2( m ); // OK??
         ^
-./sl: inputs/err-typecompat004a.snl(54,9): ERROR, type 'A' has no conversion from the given type
+./sl: inputs/err-typecompat004a.snl(60,9): ERROR, type 'A' has no conversion from the given type
 . p2( x ); // ERROR
         ^
-./sl: 9 error(s) detected
+./sl: inputs/err-typecompat004a.snl(61,9): ERROR, type 'A' has no conversion from type 'ref'
+. p2( r ); // ERROR
+        ^
+./sl: 13 error(s) detected
 

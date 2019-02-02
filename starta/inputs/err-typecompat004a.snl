@@ -39,18 +39,24 @@ var m : array of int;
 var x : array;
 var r : ref;
 
+a = [1,2,4]; // ??!
+m = [0,3,6]; // OK
+
+a = m; // ??
+m = a; // ??
+
 . p( a ); // ERROR
 . p( m ); // OK
 . p( x ); // ERROR
 . p( r ); // ERROR
 
-. p1( a ); // OK!!
+. p1( a ); // OK??
 . p1( m ); // OK
 . p1( x ); // OK
 . p1( r ); // ERROR
 
 . p2( a ); // OK
-. p2( m ); // OK
+. p2( m ); // OK??
 . p2( x ); // ERROR
 . p2( r ); // ERROR
 
