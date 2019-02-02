@@ -560,7 +560,8 @@ TNODE *new_tnode_derived_composite( TNODE *volatile *base,
     TNODE *volatile result_type = new_tnode_derived( base, ex );
     cexception_t inner;
     
-    printf( ">>>>>>>> %s: size = %zd (base = %p, element type name = %s, "
+    fprintf( stderr,
+             ">>>>>>>> %s: size = %zd (base = %p, element type name = %s, "
             "element kind = %s (%p, *%p)) \n",
             __FUNCTION__, tnode_size( result_type ),
             shared_base, tnode_name(*element_type),
@@ -2068,9 +2069,10 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
         cexception_t inner;
 
 #if 1
-        printf( "\n>>> tnode '%s' (%p), base = %p, size = %zd, kind = %s\n",
-                tnode_name(tnode), tnode, tnode->base_type, tnode_size(tnode),
-                tnode_kind_name(tnode) );
+        fprintf( stderr,
+                 "\n>>> tnode '%s' (%p), base = %p, size = %zd, kind = %s\n",
+                 tnode_name(tnode), tnode, tnode->base_type, tnode_size(tnode),
+                 tnode_kind_name(tnode) );
 #endif
         cexception_guard( inner ) {
             foreach_dnode( field, tnode->fields ) {
@@ -2078,10 +2080,10 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
                 cloned_field = clone_dnode( field, &inner );
                 if( field_type == tnode->element_type ) {
                     dnode_replace_type( cloned_field, share_tnode( element_type ));
-                    printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
+                    fprintf( stderr, ">>> resetting field type for '%s'\n", dnode_name(field) );
                 }
                 tnode_set_size_and_field_offset( tnode, cloned_field );
-                printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
+                fprintf( stderr, ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
                 cloned_fields = dnode_append( cloned_fields, cloned_field );
                 cloned_field = NULL;
             }
