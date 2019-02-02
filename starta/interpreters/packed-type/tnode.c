@@ -549,6 +549,8 @@ TNODE *new_tnode_derived_composite( TNODE *volatile *base,
     TNODE *shared_base = share_tnode( *base );
     TNODE *volatile result_type = new_tnode_derived( base, ex );
     cexception_t inner;
+
+    printf( ">>>>>>>> %s: %zd \n", __FUNCTION__, tnode_size( result_type ) );
     
     assert( !*base );
 
