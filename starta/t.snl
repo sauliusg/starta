@@ -14,5 +14,6 @@ function print_pixel( px : pixel )
     . "pixel =", px;
 }
 
+print_pixel( 22 );
 print_pixel( 22@int );
 print_pixel( 22@pixel );
