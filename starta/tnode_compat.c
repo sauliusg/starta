@@ -253,9 +253,6 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t2->kind == TK_REF ) {
 	return tnode_is_reference( t1 );
     }
-    if( t2->kind == TK_REF ) {
-	return tnode_is_reference( t1 );
-    }
     if( t1->kind == TK_BLOB && t2->kind == TK_BLOB ) {
 	return 1;
     }
