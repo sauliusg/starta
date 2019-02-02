@@ -23,13 +23,13 @@ m = a; // ??
 . p( r ); // ERROR
        ^
 ./sl: inputs/err-typecompat004a.snl(53,9): ERROR, incompatible types for function 'p1' argument nr. 1
-. p1( a ); // OK??
+. p1( a ); // ERROR
         ^
 ./sl: inputs/err-typecompat004a.snl(56,9): ERROR, incompatible types for function 'p1' argument nr. 1
 . p1( r ); // ERROR
         ^
 ./sl: inputs/err-typecompat004a.snl(59,9): ERROR, type 'A' has no conversion from the given type
-. p2( m ); // OK??
+. p2( m ); // ERROR
         ^
 ./sl: inputs/err-typecompat004a.snl(60,9): ERROR, type 'A' has no conversion from the given type
 . p2( x ); // ERROR
