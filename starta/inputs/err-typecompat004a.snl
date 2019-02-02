@@ -50,13 +50,13 @@ m = a; // ??
 . p( x ); // ERROR
 . p( r ); // ERROR
 
-. p1( a ); // OK??
+. p1( a ); // ERROR
 . p1( m ); // OK
 . p1( x ); // OK
 . p1( r ); // ERROR
 
 . p2( a ); // OK
-. p2( m ); // OK??
+. p2( m ); // ERROR
 . p2( x ); // ERROR
 . p2( r ); // ERROR
 
