@@ -2175,16 +2175,17 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
         DNODE *field;
         cexception_t inner;
 
+        printf( "\n>>> tnode '%s' (%p), base = %p, size = %zd, kind = %s\n", tnode_name(tnode), tnode, tnode->base_type, tnode_size(tnode), tnode_kind_name(tnode) );
         cexception_guard( inner ) {
             foreach_dnode( field, tnode->fields ) {
                 TNODE *field_type = dnode_type( field );
                 cloned_field = clone_dnode( field, &inner );
                 if( field_type == tnode->element_type ) {
                     dnode_replace_type( cloned_field, share_tnode( element_type ));
-                    //printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
+                    printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
                 }
                 tnode_set_size_and_field_offset( tnode, cloned_field );
-                //printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
+                printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
                 cloned_fields = dnode_append( cloned_fields, cloned_field );
                 cloned_field = NULL;
             }
