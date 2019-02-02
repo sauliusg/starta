@@ -778,7 +778,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
  * MKLIST create a list (node) from a computed expression on the stack
  *
  * bytecode:
- * MKLIST size nref next_link_offset value_offset value_size
+ * MKLIST size nref next_link_offset value_offset
  *
  * stack:
  * ..., [value, ..., ] value, nexpressions --> list of values
@@ -786,13 +786,12 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
 int MKLIST( INSTRUCTION_FN_ARGS )
 {
-    void *ptr;
+    stackcell_t *ptr;
     long nexpressions = istate.ep[0].num.l;
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t nref = istate.code[istate.ip+2].ssizeval;
     ssize_t next_link_offset = istate.code[istate.ip+3].ssizeval;
     ssize_t value_offset = istate.code[istate.ip+4].ssizeval;
-    ssize_t value_size = istate.code[istate.ip+5].ssizeval;
     ssize_t i;
 
     TRACE_FUNCTION();
@@ -803,18 +802,11 @@ int MKLIST( INSTRUCTION_FN_ARGS )
 
         BC_CHECK_PTR( ptr );
 
-        if( value_offset >= 0 ) {
-            ssize_t copy_size = value_size;
-            if( copy_size > sizeof(istate.ep[i].num) )
-                copy_size = sizeof(istate.ep[i].num);
-            memcpy( ((char*)ptr) + value_offset, &istate.ep[i].num, copy_size );
-        } else {
-            *((void**)((char*)ptr + value_offset)) = STACKCELL_PTR(istate.ep[i]);
-            STACKCELL_ZERO_PTR( istate.ep[i] );
-        }
+        *((stackcell_t*)((char*)ptr + value_offset)) = istate.ep[i];
+	STACKCELL_ZERO_PTR( istate.ep[i] );
 
         if( i > 1 ) {
-            *((void**)((char*)ptr + next_link_offset)) = STACKCELL_PTR(istate.ep[0]);
+            *((stackcell_t*)((char*)ptr + next_link_offset)) = istate.ep[0];
         }
         STACKCELL_SET_ADDR( istate.ep[0], ptr );
     }
@@ -823,7 +815,7 @@ int MKLIST( INSTRUCTION_FN_ARGS )
     STACKCELL_ZERO_PTR( istate.ep[0] );
     istate.ep += nexpressions;
 
-    return 6;
+    return 5;
 }
 
 /*
