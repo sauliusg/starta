@@ -539,6 +539,44 @@ TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
     return node;
 }
 
+TNODE *new_tnode_derived_composite( TNODE *volatile *base,
+                                    TNODE *volatile *element_type,
+                                    cexception_t *ex )
+{
+    assert( base );
+    assert( element_type );
+
+    TNODE *shared_base = share_tnode( *base );
+    TNODE *volatile result_type = new_tnode_derived( base, ex );
+    cexception_t inner;
+    
+    assert( !*base );
+
+    if( shared_base ) {
+        cexception_guard( inner ) {
+            tnode_copy_operators( result_type, shared_base, &inner );
+            tnode_copy_conversions( result_type, shared_base, &inner );
+            if( tnode_element_type( shared_base ) && *element_type ) {
+                tnode_rename_conversions
+                    ( result_type,
+                      tnode_name( tnode_element_type( shared_base  )),
+                      tnode_name( *element_type ), &inner );
+            }
+            tnode_set_name( result_type, tnode_name( shared_base ),
+                            &inner );
+        }
+        cexception_catch {
+            delete_tnode( result_type );
+            dispose_tnode( element_type );
+            cexception_reraise( inner, ex );
+        }
+    }
+    tnode_set_kind( result_type, TK_COMPOSITE );
+    tnode_insert_element_type( result_type, *element_type );
+    element_type = NULL;
+    return result_type;
+}
+
 TNODE *new_tnode_equivalent( TNODE *volatile *base, cexception_t *ex )
 {
     TNODE *node = new_tnode_derived( base, ex );
