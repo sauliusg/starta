@@ -7537,29 +7537,8 @@ static void compiler_compile_list_expression( COMPILER *cc,
             share_tnode( list_type );
         }
         shared_list_type = share_tnode( list_type );
-
-#if 0
-        result_type = new_tnode_derived( &list_type, &inner );
-        if( shared_list_type ) {
-            tnode_copy_operators( result_type, shared_list_type, &inner );
-            tnode_copy_conversions( result_type, shared_list_type, &inner );
-            if( tnode_element_type( shared_list_type ) && top_expr_type ) {
-                tnode_rename_conversions
-                    ( result_type,
-                      tnode_name( tnode_element_type( shared_list_type  )),
-                      tnode_name( top_expr_type ), &inner );
-            }
-            tnode_set_name( result_type, tnode_name( shared_list_type ),
-                            &inner );
-        }
-        tnode_set_kind( result_type, TK_COMPOSITE );
-        share_tnode( top_expr_type );
-        tnode_insert_element_type( result_type, top_expr_type );
-        top_expr_type = NULL;
-#else
         result_type = new_tnode_derived_composite( &list_type, &top_expr_type,
                                                    &inner );
-#endif
         /* Generate code for list creation: */
         compiler_emit( cc, &inner, "\tce\n", LLDC, &nexpressions );
         if( tnode_lookup_operator( result_type, "mklist",
@@ -10916,41 +10895,15 @@ delimited_type_description
   | type_identifier _OF delimited_type_description
     {
       TNODE *volatile composite = moveptr( (void**)&$1 );
-#if 0
-      TNODE *volatile shared_composite = share_tnode( composite );
-#endif
       cexception_t inner;
 
       cexception_guard( inner ) {
-#if 0
-          $$ = new_tnode_derived( &composite, &inner );
-          if( shared_composite ) {
-              tnode_copy_operators( $$, shared_composite, &inner );
-              tnode_copy_conversions( $$, shared_composite, &inner );
-              if( tnode_element_type( shared_composite ) && $3 ) {
-                  tnode_rename_conversions
-                      ( $$, tnode_name( tnode_element_type( shared_composite )),
-                        tnode_name( $3 ), &inner );
-              }
-              tnode_set_name( $$, tnode_name( shared_composite ), &inner );
-              dispose_tnode( &shared_composite );
-          }
-#else
           $$ = new_tnode_derived_composite( &composite, &$3, &inner );
-#endif
       }
       cexception_catch {
           dispose_tnode( &$3 );
-#if 0
-          delete_tnode( shared_composite );
-#endif
           cexception_reraise( inner, px );
       }
-#if 0
-      tnode_set_kind( $$, TK_COMPOSITE );
-      tnode_insert_element_type( $$, $3 );
-      $3 = NULL;
-#endif
     }
   | _ADDRESSOF
     { $$ = new_tnode_addressof( NULL, px ); }
