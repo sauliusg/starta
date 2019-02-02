@@ -7504,7 +7504,6 @@ static void compiler_compile_list_expression( COMPILER *cc,
 {
     ENODE *top_expr = cc->e_stack;
     TNODE *volatile list_type = *list_type_ptr;
-    TNODE *volatile shared_list_type = NULL;
     TNODE *volatile result_type = NULL;
     TYPETAB *volatile generic_types = NULL;
 
@@ -7536,7 +7535,6 @@ static void compiler_compile_list_expression( COMPILER *cc,
                                                /* message = */ "type" );
             share_tnode( list_type );
         }
-        shared_list_type = share_tnode( list_type );
         result_type = new_tnode_derived_composite( &list_type, &top_expr_type,
                                                    &inner );
         /* Generate code for list creation: */
@@ -7570,7 +7568,6 @@ static void compiler_compile_list_expression( COMPILER *cc,
             /* Push the resulting list type onto the stack: */
             compiler_push_typed_expression( cc, &result_type, &inner );
         }
-        dispose_tnode( &shared_list_type );
     }
     cexception_finally (
         {
@@ -7578,7 +7575,6 @@ static void compiler_compile_list_expression( COMPILER *cc,
                'make_compiler_tnode_key_value_list()': */
             make_compiler_tnode_key_value_list( NULL, NULL, NULL, NULL );
             delete_tnode( list_type );
-            delete_tnode( shared_list_type );
             delete_tnode( result_type );
             delete_typetab( generic_types );
         },
