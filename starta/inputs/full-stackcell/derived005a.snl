@@ -1,0 +1,110 @@
+#! /usr/bin/env starta
+
+pragma append "$D/inputs";
+pragma append "$D";
+
+use std;
+
+type real = float;
+
+pragma real const real;
+
+type point = like array of real {
+
+    inline bytecode operator "ldc"(): point
+    {
+        FLDCS %%constant_text DUP
+        MKARRAY 0 2
+    }
+
+    inline bytecode operator "@double"( x : double ): point
+    {
+        DUP
+        MKARRAY 0 2
+    }
+
+    inline bytecode operator "@ldouble"( x : ldouble ): point
+    {
+        DUP
+        MKARRAY 0 2
+    }
+
+    inline bytecode operator "@float"( x : float ): point
+    {
+        DUP
+        MKARRAY 0 2
+    }
+
+    inline bytecode operator "[]" ( point p; int i ): real
+    {
+        INDEX
+    }
+
+    operator "+" ( point a; point b ): point
+    {
+        return [ a[0]+b[0], a[1]+b[1] ];
+    }
+    
+    operator "*" ( point a; point b ): point
+    {
+        return [ a[0]*b[0], a[1]*b[1] ];
+    }
+    
+    operator "-" ( point a; point b ): point
+    {
+        return [ a[0]-b[0], a[1]-b[1] ];
+    }
+
+    operator "." ( point a )
+    {
+        < a[0], a[1];
+    }
+
+    operator "%%" ( format: string; p: point ): string
+    {
+        return format %% p[0] _ " " _ format %%p[1];
+    }
+};
+
+var x, y, z: point;
+
+x = [1.0, 1.0];
+y = [2.0, 2.0];
+
+z = x + y;
+. z[0], z[1];
+
+z = y * z;
+. z[0], z[1];
+
+use Verlet(point);
+
+readonly var x0 = [ 0.0, 1.0 ];
+readonly var v0 = [ 1.0, 0.0 ];
+
+var dt = 0.01;
+var t: real;
+var xprev = x0;
+
+function force( point x ): point
+{
+    return [ -x[0], -x[1] ];
+}
+
+x = Verlet::start( x0, v0, force(x0), dt );
+t += dt;
+
+. t, x;
+
+var int N = 10;
+
+var args = arguments();
+if length(args) > 1 then
+    N = strtoi( args[1] );
+endif
+
+for var int i = 1 to N do
+    x, xprev = Verlet::step( xprev, x, force(x), dt ), x;
+    t += dt;
+    . t, x;
+enddo;
