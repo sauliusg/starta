@@ -3917,7 +3917,7 @@ static void compiler_compile_composite_alloc( COMPILER *cc,
     cexception_t inner;
 
     cexception_guard( inner ) {
-        allocated_type = new_tnode_composite_synonim( composite_type,
+        allocated_type = new_tnode_derived_composite( composite_type,
                                                       element_type,
                                                       &inner );
 
