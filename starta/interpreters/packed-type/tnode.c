@@ -2175,7 +2175,11 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
         DNODE *field;
         cexception_t inner;
 
-        printf( "\n>>> tnode '%s' (%p), base = %p, size = %zd, kind = %s\n", tnode_name(tnode), tnode, tnode->base_type, tnode_size(tnode), tnode_kind_name(tnode) );
+#if 1
+        printf( "\n>>> tnode '%s' (%p), base = %p, size = %zd, kind = %s\n",
+                tnode_name(tnode), tnode, tnode->base_type, tnode_size(tnode),
+                tnode_kind_name(tnode) );
+#endif
         cexception_guard( inner ) {
             foreach_dnode( field, tnode->fields ) {
                 TNODE *field_type = dnode_type( field );
