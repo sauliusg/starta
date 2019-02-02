@@ -250,6 +250,10 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t1->kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
+    // FIXME: too relaxed, should transfer these two TK_REF checks to
+    // the 'types are compatible' or 'types are assignment compatible'
+    // checks, and require strict equivalence, t{1,2}->kind == TK_REF,
+    // here (S.G.):
     if( t2->kind == TK_REF ) {
 	return tnode_is_reference( t1 );
     }
