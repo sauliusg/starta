@@ -549,6 +549,44 @@ TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
     return node;
 }
 
+TNODE *new_tnode_derived_composite( TNODE *volatile *base,
+                                    TNODE *volatile *element_type,
+                                    cexception_t *ex )
+{
+    assert( base );
+    assert( element_type );
+
+    TNODE *shared_base = share_tnode( *base );
+    TNODE *volatile result_type = new_tnode_derived( base, ex );
+    cexception_t inner;
+    
+    assert( !*base );
+
+    if( shared_base ) {
+        cexception_guard( inner ) {
+            tnode_copy_operators( result_type, shared_base, &inner );
+            tnode_copy_conversions( result_type, shared_base, &inner );
+            if( tnode_element_type( shared_base ) && *element_type ) {
+                tnode_rename_conversions
+                    ( result_type,
+                      tnode_name( tnode_element_type( shared_base  )),
+                      tnode_name( *element_type ), &inner );
+            }
+            tnode_set_name( result_type, tnode_name( shared_base ),
+                            &inner );
+        }
+        cexception_catch {
+            delete_tnode( result_type );
+            dispose_tnode( element_type );
+            cexception_reraise( inner, ex );
+        }
+    }
+    tnode_set_kind( result_type, TK_COMPOSITE );
+    tnode_insert_element_type( result_type, *element_type );
+    element_type = NULL;
+    return result_type;
+}
+
 TNODE *new_tnode_equivalent( TNODE *volatile *base, cexception_t *ex )
 {
     TNODE *node = new_tnode_derived( base, ex );
@@ -989,26 +1027,6 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex )
     return node;
 }
 
-TNODE *new_tnode_composite_synonim( TNODE *volatile *composite_type,
-				    TNODE *volatile *element_type,
-				    cexception_t *ex )
-{
-    cexception_t inner;
-    TNODE *volatile created_type = NULL;
-
-    cexception_guard( inner ) {
-	created_type = new_tnode_derived( composite_type, &inner );
-	tnode_set_kind( created_type, TK_COMPOSITE );
-	tnode_insert_element_type( created_type, *element_type );
-	*element_type = NULL;
-    }
-    cexception_catch {
-	delete_tnode( created_type );
-	cexception_reraise( inner, ex );
-    }
-    return created_type;
-}
-
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex )
 {
     cexception_t inner;
@@ -1041,8 +1059,7 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
         } else {
             return share_tnode( generic_tnode );
         }
-    } else if( generic_tnode->kind == TK_COMPOSITE &&
-	       !generic_tnode->name ) {
+    } else if( generic_tnode->kind == TK_COMPOSITE ) {
 	cexception_t inner;
 	TNODE *volatile element_tnode =
 	    new_tnode_implementation( generic_tnode->element_type,
@@ -1050,8 +1067,14 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
 	cexception_guard( inner ) {
 	    TNODE *composite_type =
 		new_tnode_composite( generic_tnode->name,
-				     element_tnode, &inner );
+				     share_tnode(generic_tnode->element_type),
+                                     &inner );
+            assert( !composite_type->fields );
+            composite_type->fields =
+                share_dnode( generic_tnode->fields );
             composite_type->base_type = share_tnode( generic_tnode );
+            tnode_insert_element_type( composite_type, element_tnode );
+            //printf( ">>> element type name is '%s'\n", tnode_name(element_tnode) );
             return composite_type;
 	}
 	cexception_catch {
@@ -1095,8 +1118,12 @@ TNODE *tnode_move_operators( TNODE *dst, TNODE *src )
     return dst;
 }
 
-TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+static DNODE *copy_dnode_list( DNODE *src,
+                               TNODE *dst_tnode,
+                               TNODE *src_tnode,
+                               cexception_t *ex )
 {
+    DNODE *volatile dst = NULL;
     DNODE *dnow = NULL;
     DNODE * volatile newop = NULL;
     TNODE * volatile newtype = NULL;
@@ -1104,26 +1131,22 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
     DNODE * volatile newretvals = NULL;
     cexception_t inner;
 
-    assert( dst );
-    assert( src );
-    assert( !dst->operators );
-    assert( !dst->conversions );
-
     /* dst->operators = src->operators; */
     /* dst->conversions = src->conversions; */
 
     cexception_guard( inner ) {
-        for( dnow = src->operators; dnow != NULL; dnow = dnode_next( dnow )) {
+        for( dnow = src; dnow != NULL; dnow = dnode_next( dnow )) {
             TNODE *old_type = dnode_type( dnow );
             newop = clone_dnode( dnow, &inner );
+            dnode_set_offset( newop, dnode_offset( dnow ));
 
             newargs =
                 clone_dnode_list_with_replaced_types( tnode_args( old_type ),
-                                                      src, dst, &inner );
+                                                      src_tnode, dst_tnode, &inner );
 
             newretvals =
                 clone_dnode_list_with_replaced_types( tnode_retvals( old_type ),
-                                                      src, dst, &inner );
+                                                      src_tnode, dst_tnode, &inner );
 
             newtype = new_tnode_operator( tnode_name(old_type), newargs, 
                                           newretvals, &inner );
@@ -1131,10 +1154,12 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
             newretvals = newargs = NULL;
             dnode_replace_type( newop, newtype );
             newtype = NULL;
-            tnode_insert_single_operator( dst, &newop );
+            dst = dnode_append( dst, newop );
+            newop = NULL;
         }
     }
     cexception_catch {
+        delete_dnode( dst );
         delete_dnode( newop );
         delete_tnode( newtype );
         delete_dnode( newargs );
@@ -1143,6 +1168,46 @@ TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
     }
 
     return dst;
+}
+
+TNODE *tnode_copy_operators( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    assert( dst );
+    assert( src );
+    assert( !dst->operators );
+
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    dst->operators = copy_dnode_list( src->operators, dst, src, ex );
+    
+    return dst;
+}
+
+TNODE *tnode_copy_conversions( TNODE *dst, TNODE *src, cexception_t *ex )
+{
+    assert( dst );
+    assert( src );
+    assert( !dst->conversions );
+
+    /* dst->operators = src->operators; */
+    /* dst->conversions = src->conversions; */
+
+    dst->conversions = copy_dnode_list( src->conversions, dst, src, ex );
+    
+    return dst;
+}
+
+TNODE *tnode_rename_conversions( TNODE *tnode, char *old_name, char *other_name,
+                                 cexception_t *ex )
+{
+    DNODE *dnow;
+    for( dnow = tnode->conversions; dnow != NULL; dnow = dnode_next( dnow )) {
+        if( strcmp(dnode_name(dnow), old_name) == 0 ) {
+            dnode_rename( dnow, other_name, ex );
+        }
+    }
+    return tnode;
 }
 
 static TNODE *tnode_finish_struct_or_class( TNODE * volatile node,
@@ -1952,8 +2017,34 @@ TNODE *tnode_first_interface( TNODE *class_tnode )
 TNODE *tnode_element_type( TNODE *tnode )
     { assert( tnode ); return tnode->element_type; }
 
+/* FIXME: duplicated code! Call this function from
+   'tnode_insert_fields()' S.G. */
+static TNODE*
+tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
+{
+    TNODE *field_type = dnode_type( field );
+    type_kind_t field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
+
+    if( field_kind != TK_FUNCTION ) {
+        dnode_set_offset( field, tnode->size );
+        tnode->size += STRUCT_FIELD_SIZE;
+        tnode_set_flags( tnode, TF_IS_REF );
+        if( field_type && ( tnode_is_reference( field_type ) ||
+                            field_type->kind == TK_PLACEHOLDER )) {
+            tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
+        }
+    }
+
+    // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
+
+    return tnode;
+}
+
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 {
+    DNODE *volatile cloned_fields = NULL;
+    DNODE *volatile cloned_field = NULL;
+
     assert( tnode );
 
     if( !element_type )
@@ -1962,6 +2053,35 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
     assert( !tnode->element_type || 
 	    (tnode->kind == TK_COMPOSITE &&
 	     tnode->element_type->kind == TK_PLACEHOLDER));
+
+    if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
+        tnode && tnode->kind == TK_COMPOSITE &&
+        tnode->element_type && tnode->element_type->kind == TK_PLACEHOLDER ) {
+        DNODE *field;
+        cexception_t inner;
+
+        cexception_guard( inner ) {
+            foreach_dnode( field, tnode->fields ) {
+                TNODE *field_type = dnode_type( field );
+                cloned_field = clone_dnode( field, &inner );
+                if( field_type == tnode->element_type ) {
+                    dnode_replace_type( cloned_field, share_tnode( element_type ));
+                    //printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
+                }
+                tnode_set_size_and_field_offset( tnode, cloned_field );
+                //printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
+                cloned_fields = dnode_append( cloned_fields, cloned_field );
+                cloned_field = NULL;
+            }
+            dispose_dnode( &tnode->fields );
+            tnode->fields = cloned_fields;
+            cloned_fields = NULL;
+        }
+        cexception_catch {
+            delete_dnode( cloned_fields );
+            delete_dnode( cloned_field );
+        }
+    }
 
     if( tnode->element_type ) {
 	delete_tnode( tnode->element_type );
@@ -2007,6 +2127,16 @@ TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags )
     assert( node );
     node->flags &= ~flags;
     return node;
+}
+
+int tnode_has_placeholder_element( TNODE *tnode )
+{
+    while( tnode ) {
+        if( tnode->kind == TK_PLACEHOLDER )
+            return 1;
+        tnode = tnode->element_type;
+    }
+    return 0;
 }
 
 int tnode_has_flags( TNODE *tnode, type_flag_t flags )

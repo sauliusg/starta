@@ -1,15 +1,15 @@
 This is add@I1()
 This is add@I1()
 NUMBER OF INTERFCES = 3
-INTERFACE[1]: vmt offset = 5775
+INTERFACE[1]: vmt offset = 10399
 VMT[0]: 0
-INTERFACE[2]: vmt offset = 5783
+INTERFACE[2]: vmt offset = 10407
 VMT[0]: 3
-VMT[1]: 1086
-VMT[2]: 1105
-VMT[3]: 1124
-INTERFACE[3]: vmt offset = 5815
+VMT[1]: 1120
+VMT[2]: 1139
+VMT[3]: 1158
+INTERFACE[3]: vmt offset = 10439
 VMT[0]: 1
-VMT[1]: 1132
+VMT[1]: 1166
 1
 put@I2 implemented by A: setting self.i to 33
