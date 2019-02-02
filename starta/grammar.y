@@ -7537,6 +7537,8 @@ static void compiler_compile_list_expression( COMPILER *cc,
             share_tnode( list_type );
         }
         shared_list_type = share_tnode( list_type );
+
+#if 0
         result_type = new_tnode_derived( &list_type, &inner );
         if( shared_list_type ) {
             tnode_copy_operators( result_type, shared_list_type, &inner );
@@ -7554,6 +7556,10 @@ static void compiler_compile_list_expression( COMPILER *cc,
         share_tnode( top_expr_type );
         tnode_insert_element_type( result_type, top_expr_type );
         top_expr_type = NULL;
+#else
+        result_type = new_tnode_derived_composite( &list_type, &top_expr_type,
+                                                   &inner );
+#endif
         /* Generate code for list creation: */
         compiler_emit( cc, &inner, "\tce\n", LLDC, &nexpressions );
         if( tnode_lookup_operator( result_type, "mklist",
