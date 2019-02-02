@@ -560,6 +560,13 @@ TNODE *new_tnode_derived_composite( TNODE *volatile *base,
     TNODE *volatile result_type = new_tnode_derived( base, ex );
     cexception_t inner;
     
+    printf( ">>>>>>>> %s: size = %zd (base = %p, element type name = %s, "
+            "element kind = %s (%p, *%p)) \n",
+            __FUNCTION__, tnode_size( result_type ),
+            shared_base, tnode_name(*element_type),
+            tnode_kind_name(*element_type),
+            element_type, *element_type );
+    
     assert( !*base );
 
     if( shared_base ) {
