@@ -7515,6 +7515,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
            it just in case it's only reference will be in the stack
            top ENODE whick will be deleted in theblock below: */
         top_expr_type = top_expr ? share_tnode( enode_type( top_expr )) : NULL;
+        share_tnode( top_expr_type );
         /* Check compatibility of list component types: */
         {
             ssize_t i = 1;
