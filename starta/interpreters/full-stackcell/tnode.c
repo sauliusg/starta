@@ -559,7 +559,8 @@ TNODE *new_tnode_derived_composite( TNODE *volatile *base,
     TNODE *shared_base = share_tnode( *base );
     TNODE *volatile result_type = new_tnode_derived( base, ex );
     cexception_t inner;
-    
+
+#if DPRINT
     fprintf( stderr,
              ">>>>>>>> %s: size = %zd (base = %p, element type name = %s, "
             "element kind = %s (%p, *%p)) \n",
@@ -567,7 +568,8 @@ TNODE *new_tnode_derived_composite( TNODE *volatile *base,
             shared_base, tnode_name(*element_type),
             tnode_kind_name(*element_type),
             element_type, *element_type );
-    
+#endif
+
     assert( !*base );
 
     if( shared_base ) {
@@ -2068,7 +2070,7 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
         DNODE *field;
         cexception_t inner;
 
-#if 1
+#if DPRINT
         fprintf( stderr,
                  "\n>>> tnode '%s' (%p), base = %p, size = %zd, kind = %s\n",
                  tnode_name(tnode), tnode, tnode->base_type, tnode_size(tnode),
@@ -2080,10 +2082,14 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
                 cloned_field = clone_dnode( field, &inner );
                 if( field_type == tnode->element_type ) {
                     dnode_replace_type( cloned_field, share_tnode( element_type ));
+#if DPRINT
                     fprintf( stderr, ">>> resetting field type for '%s'\n", dnode_name(field) );
+#endif
                 }
                 tnode_set_size_and_field_offset( tnode, cloned_field );
+#if DPRINT
                 fprintf( stderr, ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
+#endif
                 cloned_fields = dnode_append( cloned_fields, cloned_field );
                 cloned_field = NULL;
             }
