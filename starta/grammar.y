@@ -7506,14 +7506,18 @@ static void compiler_compile_list_expression( COMPILER *cc,
     TNODE *volatile list_type = *list_type_ptr;
     TNODE *volatile result_type = NULL;
     TYPETAB *volatile generic_types = NULL;
+    TNODE *volatile top_expr_type = NULL;
 
     *list_type_ptr = NULL;
     cexception_t inner;
     cexception_guard( inner ) {
+        /* Retain the top expression type for future reference; share
+           it just in case it's only reference will be in the stack
+           top ENODE whick will be deleted in theblock below: */
+        top_expr_type = top_expr ? share_tnode( enode_type( top_expr )) : NULL;
         /* Check compatibility of list component types: */
         {
             ssize_t i = 1;
-            TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
             generic_types = new_typetab( &inner );
             ENODE *expr = enode_next( top_expr );
             while( i < nexpressions && expr ) {
@@ -7526,9 +7530,10 @@ static void compiler_compile_list_expression( COMPILER *cc,
                 expr = enode_next( expr );
                 i++;
             }
+            /* Make sure the deleted expression is not used after delete: */
+            top_expr = NULL;
         }
         /* Synthesise type of the resulting return value: */
-        TNODE *top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
         if( !list_type ) {
             list_type = compiler_lookup_tnode( cc, /* module = */ NULL,
                                                /* identifier = */ "list",
@@ -7577,6 +7582,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
             delete_tnode( list_type );
             delete_tnode( result_type );
             delete_typetab( generic_types );
+            delete_tnode( top_expr_type );
         },
         {
             cexception_reraise( inner, ex );
