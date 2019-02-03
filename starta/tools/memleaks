@@ -8,4 +8,4 @@
 # ./starta -d memleak -I modules/ ttt.snl 2>&1 | $0
 #**
 
-awk '/^(DNODE|TNODE)/{if($5>$8)print}/^After /||/^(In)?(D|d)irect/||/heap-use-after-free/' ${1+"$@"}
+awk '/^.NODE/{if($5>$8)print}/^After /||/^(In)?(D|d)irect/||/heap-use-after-free/' ${1+"$@"}
