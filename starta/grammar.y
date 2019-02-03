@@ -7514,9 +7514,7 @@ static void compiler_compile_list_expression( COMPILER *cc,
         /* Retain the top expression type for future reference; share
            it just in case it's only reference will be in the stack
            top ENODE whick will be deleted in theblock below: */
-        top_expr_type = top_expr ? enode_type( top_expr ) : NULL;
-        share_tnode( top_expr_type );
-        //share_tnode( top_expr_type );
+        top_expr_type = top_expr ? share_tnode( enode_type( top_expr )) : NULL;
         /* Check compatibility of list component types: */
         {
             ssize_t i = 1;
@@ -7544,7 +7542,6 @@ static void compiler_compile_list_expression( COMPILER *cc,
         }
         result_type = new_tnode_derived_composite( &list_type, &top_expr_type,
                                                    &inner );
-        assert( !top_expr_type );
         /* Generate code for list creation: */
         compiler_emit( cc, &inner, "\tce\n", LLDC, &nexpressions );
         if( tnode_lookup_operator( result_type, "mklist",
