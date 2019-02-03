@@ -10898,6 +10898,7 @@ delimited_type_description
       }
       cexception_catch {
           dispose_tnode( &$3 );
+          delete_tnode( composite );
           cexception_reraise( inner, px );
       }
     }
