@@ -587,13 +587,15 @@ TNODE *new_tnode_derived_composite( TNODE *volatile *base,
         }
         cexception_catch {
             delete_tnode( result_type );
+            delete_tnode( shared_base );
             dispose_tnode( element_type );
             cexception_reraise( inner, ex );
         }
     }
+    delete_tnode( shared_base );
     tnode_set_kind( result_type, TK_COMPOSITE );
     tnode_insert_element_type( result_type, *element_type );
-    element_type = NULL;
+    *element_type = NULL;
     return result_type;
 }
 
