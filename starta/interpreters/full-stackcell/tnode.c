@@ -2079,6 +2079,7 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
                  tnode_kind_name(tnode) );
 #endif
         cexception_guard( inner ) {
+            tnode->size = 0;
             foreach_dnode( field, tnode->fields ) {
                 TNODE *field_type = dnode_type( field );
                 cloned_field = clone_dnode( field, &inner );
