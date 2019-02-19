@@ -1,0 +1,76 @@
+// --*- C -*--
+
+// Compute coordinates of a sphere triangulation mesh by splitting
+// faces of a triangulating polyhedron.
+
+module SplitFaces;
+
+use std;
+use Math;
+use FaceSet;
+
+pragma real const double;
+
+procedure split_faces_in_nine( vertices: double[][]; edges: int[][];
+                               FaceSet faces; int Npoints )
+    -> double[][], int[][] // new vertices, new edges
+{
+    // Using Euler characteristic
+    // (https://en.wikipedia.org/wiki/Euler_characteristic):
+    var face_count = 2 + length(edges) - length(vertices);
+    var new_vertex_count = length(vertices) + 7 * face_count;
+    var new_vertices = new (double[])[new_vertex_count];
+    var new_edges = new (int[])[0];
+    var FaceSet new_faces = new FaceSet( new_vertex_count );
+
+    //                      v0
+    //                      +
+    //                     / \       
+    //                    /   \      
+    //                   /     \     
+    //                  /   1   \    
+    //                 /         \
+    //                +-----------+
+    //               / \         / \  
+    //              /   \   3   /   \ 
+    //             /     \     /     \ 
+    //            /   2   \   /   4   \
+    //           /         \ /         \
+    //          +-----------+-----------+ 
+    //         / \         / \         / \              
+    //        /   \   6   /   \   8   /   \ 
+    //       /     \     /     \     /     \
+    //      /   5   \   /   7   \   /   9   \
+    //     /         \ /         \ /         \
+    //    +-----------+-----------+-----------+
+    //   v1                                   v2
+    
+    for( var face_list in faces->get_face_table() ) {
+        for( var i = 0; i < length(face_list); i++ ) {
+            for( var face in face_list[i] ) {
+                // coordinates:
+                var v0c, v1c, v3c =
+                    vertices[face[0]], vertices[face[1]], vertices[face[2]];
+            }
+        }
+    }
+
+    return new_vertices, new_edges;
+}
+
+function triangulate( vertices: double[][]; edges: int[][]; int Npoints = 1 )
+    -> double[][], int[][]
+{
+    var new_vertices = clone( vertices, 2 );
+    var new_edges = new (int[])[0];
+    var cur_edges = edges;
+    var FaceSet faces = new FaceSet( length(vertices) );
+
+    while( length( new_vertices ) < Npoints ) {
+
+    }
+
+    return new_vertices, cur_edges;
+}
+
+end module SplitFaces;
