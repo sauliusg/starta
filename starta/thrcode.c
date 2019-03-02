@@ -826,7 +826,7 @@ static void thrcode_merge_line_lists( THRCODE *code1, THRCODE *code2,
 	code1->lines[len] = NULL;
     
 	for( i = 0; i < len2; i ++ ) {
-	    code2->lines = NULL;
+	    code2->lines[i] = NULL;
 	}
     }
 }
