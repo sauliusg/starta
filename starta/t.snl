@@ -5,15 +5,7 @@
 # Conversion @sometype: sometype -> sometype
 #
 
-use * from std;
+use std;
 
-type pixel = int;
-
-function print_pixel( px : pixel )
-{
-    . "pixel =", px;
+while( true ) {
 }
-
-print_pixel( 22 );
-print_pixel( 22@int );
-print_pixel( 22@pixel );
