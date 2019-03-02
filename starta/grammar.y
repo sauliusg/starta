@@ -7567,9 +7567,14 @@ static void compiler_compile_list_expression( COMPILER *cc,
             ssize_t list_value_size =
                 tnode_size( tnode_element_type( result_type ));
             delete_enode( enode_list_pop( &cc->e_stack ));
-            compiler_emit( cc, &inner, "\tceeeee\n", MKLIST, &list_node_size,
+            compiler_emit( cc, &inner, "\tceeee", MKLIST, &list_node_size,
                            &list_node_nref, &next_link_offset,
-                           &list_value_offs, &list_value_size );
+                           &list_value_offs );
+
+            if( implementation_has_attribute( "element_size" )) {
+                compiler_emit( cc, &inner, "e", &list_value_size );
+            }
+            compiler_emit( cc, &inner, "\n" );
             /* Push the resulting list type onto the stack: */
             compiler_push_typed_expression( cc, &result_type, &inner );
         }
