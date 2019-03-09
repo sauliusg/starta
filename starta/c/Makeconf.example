@@ -8,7 +8,7 @@ OTHER_DIRS = .. ${INTERPRETER_DIR}
 
 ## LIBFLAGS = -ldl -lduma
 ## LIBFLAGS = -ldl -lefence
-LIBFLAGS = -ldl
+LIBFLAGS = -ldl -lm
 
 EXT = .snl
 TEST_OPTIONS = -I inputs -I modules -I . -G
