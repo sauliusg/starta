@@ -958,7 +958,7 @@ int MKLIST( INSTRUCTION_FN_ARGS )
         }
 
         if( i > 1 ) {
-            *((stackcell_t*)((char*)ptr + next_link_offset)) = istate.ep[0];
+            *((void**)((char*)ptr + next_link_offset)) = STACKCELL_PTR(istate.ep[0]);
         }
         STACKCELL_SET_ADDR( istate.ep[0], ptr );
     }
