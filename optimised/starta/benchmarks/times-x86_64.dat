@@ -1,0 +1,19 @@
+Sat Mar  9 22:26:55 EET 2019
+Linux 4.4.0-53-generic x86_64
+Intel(R) Core(TM) i3-6100U CPU @ 2.30GHz
+Intel(R) Core(TM) i3-6100U CPU @ 2.30GHz
+Intel(R) Core(TM) i3-6100U CPU @ 2.30GHz
+Intel(R) Core(TM) i3-6100U CPU @ 2.30GHz
+gcc (Ubuntu 5.4.0-6ubuntu1~16.04.10) 5.4.0 20160609
+fib.snl              real 0m2.257s
+fn001-loop.snl       real 0m0.011s
+fn001.snl            real 0m0.060s
+l-slow.snl           real 0m0.119s
+l-slower.snl         real 0m0.384s
+l.snl                real 0m0.099s
+mat001.snl           real 0m13.899s
+mat001asm.snl        real 0m5.612s
+mat002.snl           ./sl: ./benchmarks/mat002.snl(44,21):
+pl-slow.snl          real 0m0.055s
+pl-slower.snl        real 0m0.187s
+pl.snl               real 0m0.052s

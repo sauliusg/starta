@@ -1,0 +1,15 @@
+Sat Mar  9 22:27:17 EET 2019
+Linux 4.4.0-53-generic x86_64
+gcc (Ubuntu 5.4.0-6ubuntu1~16.04.10) 5.4.0 20160609
+fib.snl              1199
+fn001-loop.snl         91
+fn001.snl              96
+l-slow.snl            101
+l-slower.snl          103
+l.snl                  57
+mat001.snl            189
+mat001asm.snl         175
+mat002.snl              0
+pl-slow.snl            83
+pl-slower.snl          83
+pl.snl                 54
