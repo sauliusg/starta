@@ -1798,10 +1798,25 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
         return empty_list;
     }
 
-    list[0].val = tnode_is_reference( tnode ) ? 1 : 0;
-    list[1].val = tnode_is_reference( tnode ) ? 
-        REF_SIZE : tnode_size( tnode );
-    list[2].val = tnode_align( tnode );
+    TNODE *element_tnode = tnode ? tnode_element_type( tnode ) : NULL;
+    
+    if( element_tnode ) {
+        /* For placeholders, we just in case allocate arrays thay say
+           they contain references. This is necessary so that GC does
+           not collect allocated elements in case the generic type is
+           indeed a reference, and we assign them as elements to an
+           allocated array of generic type: */
+
+        list[0].val = tnode_is_reference( element_tnode ) ? 1 : 
+            (tnode_kind(element_tnode) == TK_PLACEHOLDER ? 1 : 0);
+
+        list[1].val = tnode_is_reference( element_tnode ) ? 
+            REF_SIZE : tnode_size( element_tnode );
+        list[2].val = tnode_align( element_tnode );
+
+    } else {
+        list[0].val = list[1].val = list[2].val = 0;
+    }
 
     list[3].val = tnode_number_of_references( tnode );
     list[4].val = tnode_size( tnode );
