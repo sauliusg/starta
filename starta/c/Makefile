@@ -29,17 +29,27 @@ XO = ${C:%.c=%_o}
 
 all: ${X} ## ${XO}
 
+.PHONY: display
+
+VARIABLE = PATH
+
+display:
+	@echo ${VARIABLE}=${${VARIABLE}}
+
 # A file can be create from a repository-committed example; used for
 # Makeconfig files:
 
 %: %.example
 	cp $< $@
 
+%: %.c
+	${CC} ${CFLAGS} $< -o $@ ${LIBFLAGS}
+
 %.o: %.c
 	${CC} ${CFLAGS} $< -o $@
 
 lsopcodes: lsopcodes.o
-	${CC} ${LDFLAFS} $< -o $@ -ldl
+	${CC} ${LDFLAFS} $< -o $@
 
 clean cleanAll distclean:
 	rm -f ${X} ${XO} interpret.o
