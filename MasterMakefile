@@ -164,11 +164,11 @@ ifeq (${SVN_VERSION},Unversioned directory)
     SVN_MESSAGE := GIT commit ${SVN_VERSION}
 endif
 
-ifeq (${CC},gcc)
-    CFLAGS = -Wall -g -fPIC ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
+ifeq (${CC},tcc)
+    CFLAGS = ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
 	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 else
-    CFLAGS = ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
+    CFLAGS = -Wall -g -fPIC ${OPTFLAGS} -DYYDEBUG=1 -D_YACC_ ${INCLUDES} \
 	-DSVN_VERSION="\"${SVN_MESSAGE}\""
 endif
 
