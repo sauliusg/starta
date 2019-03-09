@@ -2066,14 +2066,53 @@ tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
     type_kind_t field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
 
     if( field_kind != TK_FUNCTION ) {
-        dnode_set_offset( field, tnode->size );
-        tnode->size += STRUCT_FIELD_SIZE;
-        tnode_set_flags( tnode, TF_IS_REF );
-        if( field_type && ( tnode_is_reference( field_type ) ||
-                            field_type->kind == TK_PLACEHOLDER )) {
-            tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
+        if( tnode_is_reference( field_type ) ||
+            field_kind == TK_PLACEHOLDER ) {
+            dnode_set_offset( field, tnode->nextrefoffs -
+                              sizeof(alloccell_t) - REF_SIZE );
+            tnode->nrefs -= 1;
+            tnode->nextrefoffs -= REF_SIZE;
+            tnode->size += REF_SIZE;
+        } else {
+            dnode_set_offset( field, tnode->nextnumoffs );
+            tnode->nextnumoffs += sizeof(stackunion_t);
+            tnode->size += sizeof(stackunion_t);
         }
     }
+    if( field_kind == TK_PLACEHOLDER ) {
+        /* For generic type value placeholders, we must allocte
+           also memory at a positive structure field offset to
+           hold numeric value of the future type, in addition to
+           the reference value for which the memory at the
+           negative offset has just been allocated before: */
+        ssize_t bytes = sizeof(ssize_t);
+        ssize_t bits = (CHAR_BIT * bytes)/2;
+        ssize_t max_size = ((ssize_t)1) << bits;
+        ssize_t field_size = sizeof(union stackunion);
+
+        if( dnode_offset( field ) >= max_size ||
+            tnode->nextnumoffs >= max_size ) {
+            yyerrorf( "placeholder field '%s' has offset %d "
+                      "which is larger than the size %d which we can "
+                      "handle in this implementation",
+                      dnode_name( field ), max_size );
+        }
+
+        dnode_update_offset( field, 
+                             (dnode_offset( field ) << bits) |
+                             tnode->nextnumoffs );
+        tnode->nextnumoffs += field_size;
+        tnode->size += field_size;
+    }
+
+//        dnode_set_offset( field, tnode->size );
+//        tnode->size += STRUCT_FIELD_SIZE;
+//        tnode_set_flags( tnode, TF_IS_REF );
+//        if( field_type && ( tnode_is_reference( field_type ) ||
+//                            field_type->kind == TK_PLACEHOLDER )) {
+//            tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
+//        }
+//    }
 
     // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
 
