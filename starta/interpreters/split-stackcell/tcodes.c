@@ -938,11 +938,13 @@ int MKLIST( INSTRUCTION_FN_ARGS )
 
     for( i = 1; i <= nexpressions; i ++ ) {
 
+#if DEBUG_PRINT
         fprintf( stderr, ">>>> value_offset = %zd, next_link_offset = %zd, "
-                 "nref = %zd, size = %zd, nexpressions = %ld",
+                 "nref = %zd, size = %zd, nexpressions = %ld\n",
                  value_offset, next_link_offset, nref, size,
                  nexpressions );
-        
+#endif
+
         ptr = bcalloc( size, /*length =*/ -1, nref, EXCEPTION );
 
         BC_CHECK_PTR( ptr );
@@ -951,8 +953,8 @@ int MKLIST( INSTRUCTION_FN_ARGS )
             ssize_t copy_size = sizeof(istate.ep[i].num);
             memcpy( ((char*)ptr) + value_offset, &istate.ep[i].num, copy_size );
         } else {
-            STACKCELL_ZERO_PTR( istate.ep[i] );
             *((void**)((char*)ptr + value_offset)) = STACKCELL_PTR(istate.ep[i]);
+            STACKCELL_ZERO_PTR( istate.ep[i] );
         }
 
         if( i > 1 ) {
