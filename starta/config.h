@@ -106,5 +106,10 @@
 /**/
 #endif
 
+#if _XOPEN_SOURCE >= 600 || _ISOC99_SOURCE || _POSIX_C_SOURCE >= 200112L
+#define SSIZE_T_FORMAT "zd"
+#else
+#define SSIZE_T_FORMAT SSIZE_FMT
+#endif
 
 #endif
