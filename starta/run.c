@@ -545,11 +545,11 @@ static void thrcode_dump_single_stack( stackcell_t *stack,
     for( curr = stack; curr < bottom; curr++ ) {
 	char *ptr = curr->PTR;
 	if( stack == istate.sp ) {
-	    printf( "%10p %4d %4d %10d  ",
+	    printf( "%10p %4"LONG_FMT"d %4"LONG_FMT"d %10d  ",
 		    curr, istate.bottom-curr-1, curr-istate.fp, curr->num.i );
 	} else
 	if( stack == istate.ep ) {
-	    printf( "%10p %4d %4s %10d  ",
+	    printf( "%10p %4"LONG_FMT"d %4s %10d  ",
 		    curr, istate.ep_bottom-curr-1, "", curr->num.i );
 	} else {
 	    printf( "%10p %4s %4s %10d  ",
