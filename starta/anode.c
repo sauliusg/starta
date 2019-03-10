@@ -34,7 +34,7 @@ void delete_anode( ANODE* node )
 {
     if( node ) {
 	if( node->rcount <= 0 ) {
-	    printf( "!!! anode->rcound == %d !!!\n", node->rcount );
+	    printf( "!!! anode->rcound == %"SSIZE_T_FORMAT" !!!\n", node->rcount );
 	    assert( node->rcount > 0 );
 	}
         if( --node->rcount > 0 )
