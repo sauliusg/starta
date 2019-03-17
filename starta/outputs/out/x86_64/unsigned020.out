@@ -1,0 +1,12 @@
+255
+STRTOUB - '256' unsigned value too large
+65535
+STRTOUH - '65536' unsigned value too large
+4294967295
+STRTOU - '4294967296' unsigned value too large
+4294967295
+4294967296
+18446744073709551615
+STRTOUL - '18446744073709551616' numerical result out of range
+18446744073709551615
+STRTOULL - '18446744073709551616' numerical result out of range
