@@ -1406,8 +1406,15 @@ int @PREFIX1@SUBSTR( INSTRUCTION_FN_ARGS )
  * ..., str -> ..., integer
  */
 
-#define atob atoi
-#define atos atoi
+/* The 'libc' library does not have unsigned conversion functions
+   similar to 'atoi'; thus, redirect calls to those functions to their
+   signed equivalents:*/
+
+#define atoc atoi
+#define atous atoi
+#define atoui atoi
+#define atoul(S) strtoul( S, NULL, 10 )
+#define atoull(S) strtoull( S, NULL, 10 )
 
 int ATO@PREFIX@( INSTRUCTION_FN_ARGS )
 {
@@ -1426,8 +1433,11 @@ int ATO@PREFIX@( INSTRUCTION_FN_ARGS )
     return 1;
 }
 
-#undef atob
-#undef atos
+#undef atoc
+#undef atous
+#undef atoui
+#undef atoul
+#undef atoull
 
 /*
  * STRTOI Convert an ASCII string to number in the machine's
