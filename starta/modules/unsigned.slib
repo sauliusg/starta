@@ -762,4 +762,56 @@ inline bytecode operator "@ldouble"( i: uint ): ldouble { libunsigned:U2LD }
 inline bytecode operator "@ldouble"( i: ulong ): ldouble { libunsigned:UL2LD }
 inline bytecode operator "@ldouble"( i: ullong ): ldouble { libunsigned:ULL2LD }
 
+// String to number conversions:
+
+inline bytecode function atoub( s: string ): ubyte
+{
+    libunsigned:ATOUB
+}
+
+inline bytecode function atouh( s: string ): ushort
+{
+    libunsigned:ATOUH
+}
+
+inline bytecode function atoui( s: string ): uint
+{
+    libunsigned:ATOU
+}
+
+inline bytecode function atoul( s: string ): ulong
+{
+    libunsigned:ATOUL
+}
+
+inline bytecode function atoull( s: string ): ullong
+{
+    libunsigned:ATOULL
+}
+
+inline bytecode function strtoub( s: string; base: int = 0 ): ubyte, long
+{
+    libunsigned:STRTOUB
+}
+
+inline bytecode function strtouh( s: string; base: int = 0 ): ushort, long
+{
+    libunsigned:STRTOUH
+}
+
+inline bytecode function strtoui( s: string; base: int = 0 ): uint, long
+{
+    libunsigned:STRTOU
+}
+
+inline bytecode function strtoul( s: string; base: int = 0 ): ulong, long
+{
+    libunsigned:STRTOUL
+}
+
+inline bytecode function strtoull( s: string; base: int = 0 ): ullong, long
+{
+    libunsigned:STRTOULL
+}
+
 end package unsigned;
