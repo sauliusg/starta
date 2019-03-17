@@ -27,7 +27,7 @@
 void *module_id = &module_id;
 
 char *OPCODES[] = {
-
+    
 #include "locally-generated/unsigned_ubyte.tab.c"
 #include "locally-generated/unsigned_ushort.tab.c"
 #include "locally-generated/unsigned_uint.tab.c"
