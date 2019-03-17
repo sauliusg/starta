@@ -2,7 +2,7 @@
 # Snail compiler tests
 #
 #
-# Test uncheched unsigned int conversions.
+# Test checked unsigned int conversions.
 #
 
 use std;
