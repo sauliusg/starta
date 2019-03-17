@@ -49,7 +49,7 @@ void bctraverse( void *root )
 {
     alloccell_t *p, *q, *r;
     stackcell_t *s;
-    int k;
+    ssize_t k;
     int debug = thrcode_heapdebug_is_on();
 
     if( !root ) return;
@@ -61,7 +61,9 @@ void bctraverse( void *root )
 	k = p[-1].rcount;
 	s = (stackcell_t*)p + k;
 	if( debug ) {
-	    printf( "%10p (%10p) (up: %10p) nref = %4d length = %8d, k = %d\n",
+	    printf( "%10p (%10p) (up: %10p) nref = %4"SSIZE_FMT"d "
+                    "length = %8"SSIZE_FMT"d, "
+                    "k = %"SSIZE_FMT"d\n",
 		    p-1, p, q, p[-1].nref, p[-1].length, k );
 	}
 	p[-1].flags |= AF_USED;
