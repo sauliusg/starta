@@ -959,7 +959,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
 int MKLIST( INSTRUCTION_FN_ARGS )
 {
-    void *ptr;
+    void *ptr = NULL;
     long nexpressions = istate.ep[0].num.l;
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t nref = istate.code[istate.ip+2].ssizeval;
