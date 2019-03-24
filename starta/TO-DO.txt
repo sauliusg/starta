@@ -1,3 +1,4 @@
+-- IMplement rounding of f.p. numbers to lower precision ones
 -- Implement COW :)
 -- Implement "readonly" run-time flag
 -- Compile to Java using doubled Java stackcells for subroutine arguments
