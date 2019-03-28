@@ -1,0 +1,28 @@
+# Sorting; uses the bubble method...
+
+module Bubble(type element = int);
+
+use * from std;
+
+procedure sort( m : array of element; ascending: bool = 1 ): array of element
+{
+    var swapped = false;
+    repeat {
+        swapped = false;
+        for var i = 0 to last(m) - 1 {
+            if( (ascending ? m[i] > m[i+1] : m[i] < m[i+1]) == true ) {
+                m[i], m[i+1] = m[i+1], m[i];
+                swapped = true;
+            }
+        }
+    } while( swapped );
+
+    return m;
+}
+
+function sorted( element m[]; ascending: bool = 1 ): element[]
+{
+    return sort( m[], ascending );
+}
+
+end module Bubble;

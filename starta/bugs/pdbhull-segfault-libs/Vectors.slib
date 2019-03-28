@@ -1,0 +1,54 @@
+/*--*- C -*------------------------------------------------------------------*\
+**$Author: saulius $
+**$Date: 2018-06-04 18:23:02 +0300 (Mon, 04 Jun 2018) $ 
+**$Revision: 4844 $
+**$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/lib/Vectors.slib $
+\*---------------------------------------------------------------------------*/
+/*
+    Elementary vector algebra.
+*/
+
+module Vectors;
+
+use std;
+use Math;
+use BiomoleculeAtom;
+
+readonly Pi = 4.0D * atan2(1,1);
+
+function vcross( v1, v2 : array of double ): array of double
+{
+    return [
+            v1[1]*v2[2] - v1[2]*v2[1],
+            v1[2]*v2[0] - v1[0]*v2[2],
+            v1[0]*v2[1] - v1[1]*v2[0]
+           ];
+}
+
+function vdot( v1, v2 : array of double ): double
+{
+    return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
+}
+
+function vlength( v: array of double ): double
+{
+    return sqrt(vdot(v,v));
+}
+
+function dihedral( aa: array of Atom ): double
+{
+    var vectors = [
+                   [ aa[0].x-aa[1].x, aa[0].y-aa[1].y, aa[0].z-aa[1].z ],
+                   [ aa[2].x-aa[1].x, aa[2].y-aa[1].y, aa[2].z-aa[1].z ],
+                   [ aa[3].x-aa[2].x, aa[3].y-aa[2].y, aa[3].z-aa[2].z ],
+                  ];
+
+    var n1 = vcross( vectors[0], vectors[1] );
+    var n2 = vcross( vectors[2], vectors[1] );
+    var dotprod = vdot( n1, n2 )/(vlength(n1)*vlength(n2));
+    var sign = vdot( vcross(n1,n2), vectors[1] ) > 0.0D ? +1.0D : -1.0D;
+    
+    return sign * 180.0D * acos( dotprod ) / Pi;
+}
+
+end module Vectors;
