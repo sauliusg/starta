@@ -1,0 +1,53 @@
+// --*- C -*--
+// Implement an object to hold a set of edges of a graph.
+
+module EdgeSet
+
+use std;
+use InsertionSort(int);
+
+function lookup_edge( elist : int[][]; edge: int[] ): bool
+{
+    for( var element in elist ) {
+        if( element[0] == edge[0] &&
+            element[1] == edge[1] ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+class EdgeSet {
+ edges: array [][][] of int;
+    
+ constructor ( int N ) {
+     self.edges = new (int[][])[N];
+     for var i = 0 to N-1 {
+         self.edges[i] = new (int[])[0];
+     }
+ }
+
+ method add_edge( int [] edge )
+ {
+     assert length(edge) == 2;
+     var sorted_edge = sorted( edge );
+     var e0 = sorted_edge[0];
+     if( ! lookup_edge( self.edges[e0], sorted_edge ) ) {
+         self.edges[e0] = push( self.edges[e0], sorted_edge );
+     }
+ }
+
+ method has_edge( int [] edge ): bool
+ {
+     var sorted_edge = sorted( edge );
+     var e0 = sorted_edge[0];     
+     return lookup_edge( self.edges[e0], sorted_edge );
+ }
+ 
+ method get_edge_table(): int[][][]
+ {
+     return self.edges;
+ }
+};
+
+end module EdgeSet;

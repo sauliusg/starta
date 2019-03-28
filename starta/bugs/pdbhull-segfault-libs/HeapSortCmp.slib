@@ -1,0 +1,75 @@
+// --*- C -*--
+// Sorting; uses the heap sort method (complexity N*log(N)).
+
+module HeapSortCmp;
+
+use * from std;
+
+// https://en.wikipedia.org/wiki/Heapsort
+
+function iparent( int i ): int => (i-1)/2;
+function ileft( int i ): int => 2*i + 1;
+function iright( int i ): int => 2*i + 2;
+
+procedure sift_down( a : array of type element;
+                     ro cmp: function( a, b: element ) -> (int);
+                     int start; int iend )
+{
+    var root = start;
+
+    while( ileft(root) <= iend ) {
+        var child = ileft(root);
+        var swap = root;
+
+        if( cmp( a[swap], a[child] ) < 0 ) {
+            swap = child;
+        }
+        if( child+1 <= iend && cmp( a[swap], a[child+1] ) < 0 ) {
+            swap = child + 1;
+        }
+        if( swap == root ) {
+            return;
+        } else {
+            a[root], a[swap] = a[swap], a[root];
+            root = swap;
+        }
+    }
+}
+
+procedure heapify( a : array of element;
+                   ro cmp: function( a, b: element ) -> (int);
+                   int count )
+{
+    var start = iparent( count - 1 );
+
+    while( start >= 0 ) {
+        sift_down( a, cmp, start, count-1 );
+        start --;
+    }
+}
+
+procedure sort( a : array of element;
+                ro cmp: function( a, b: element ) -> (int)
+              ): array of element
+{
+    heapify( a, cmp, last(a) );
+
+    var iend = last(a);
+
+    while( iend > 0 ) {
+        a[iend], a[0] = a[0], a[iend];
+        iend --;
+        sift_down(a, cmp, 0, iend);
+    }
+
+    return a;
+}
+
+function sorted( element m[];
+                 cmp: function( a, b: element ) -> (int)
+               ): element[]
+{
+    return sort( m[], cmp );
+}
+
+end module HeapSortCmp;
