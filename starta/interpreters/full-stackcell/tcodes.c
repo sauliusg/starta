@@ -363,12 +363,6 @@ int COPY( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     if( ptr0 && ptr1 ) {
-	ssize_t length0 = ptr0[-1].size/sizeof(stackcell_t);
-	ssize_t length1 = ptr1[-1].size/sizeof(stackcell_t);
-	ssize_t length = length0 < length1 ? length0 : length1;
-	ssize_t nref0 = ptr0[-1].nref <= length ? ptr0[-1].nref : length;
-	ssize_t nref1 = ptr1[-1].nref <= length ? ptr1[-1].nref : length;
-        assert( nref0 == nref1 );
 	memcpy( ptr1, ptr0, size );
     }
 
