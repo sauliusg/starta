@@ -356,25 +356,59 @@ int COPY( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *ptr0 = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *ptr1 = STACKCELL_PTR( istate.ep[1] );
-    ssize_t size0 = ptr0 ? (ptr0[-1].element_size * ptr0[-1].length ) : 0;
-    ssize_t size1 = ptr1 ? (ptr1[-1].element_size * ptr1[-1].length ) : 0;
-    ssize_t size = size1 < size0 ? size1 : size0;
+    ssize_t size0 = 0, size1 = 0;
+    ssize_t nref0 = 0, nref1 = 0;
     ssize_t length = 0;
-
-    if( ptr0 && ptr1 ) {
-        length = ptr0[-1].length < ptr1[-1].length ?
-            ptr0[-1].length : ptr1[-1].length;
-    }
-
+    
     TRACE_FUNCTION();
 
     if( ptr0 && ptr1 ) {
-        ssize_t nref0 = length >= 0 && ptr0[-1].nref < length ?
-            ptr0[-1].nref : length;
-        ssize_t nref1 = length >= 0 && ptr1[-1].nref < length ?
-            ptr1[-1].nref : length;
-        assert( nref0 == nref1 );
-	memcpy( ptr1, ptr0, size );
+        ssize_t size = 0;
+
+        length = ptr0[-1].length < ptr1[-1].length ?
+            ptr0[-1].length : ptr1[-1].length;
+
+        if( length >= 0 ) {
+            nref0 = length >= 0 && ptr0[-1].nref < length ?
+                ptr0[-1].nref : length;
+            nref1 = length >= 0 && ptr1[-1].nref < length ?
+                ptr1[-1].nref : length;
+
+            assert( nref0 == nref1 );
+
+            size0 = ptr0[-1].element_size * ptr0[-1].length;
+            size1 = ptr1[-1].element_size * ptr1[-1].length;
+
+            size = size1 < size0 ? size1 : size0;
+
+            memcpy( ptr1, ptr0, size );
+        } else { /* length < 0 */
+            ssize_t min_nref = 0;
+
+            if( ptr0[-1].nref < 0 ) {
+                assert( ptr1[-1].nref < 0 );
+                min_nref = ptr0[-1].nref > ptr1[-1].nref ? -ptr0[-1].nref : -ptr1[-1].nref;
+            }
+
+            assert( min_nref >= 0 );
+
+            size0 = ptr0[-1].size;
+            size1 = ptr1[-1].size;
+            size = size1 < size0 ? size1 : size0;
+
+            if( min_nref > 0 ) size -= min_nref * REF_SIZE;
+
+            /* copy numbers of the structure body: */
+            memcpy( ptr1, ptr0, size );
+
+            if( min_nref > 0 ) {
+                /* copy references at negative offsets: */
+                char *ref0_start = (char*)(&(ptr0[-1])) - min_nref * REF_SIZE;
+                char *ref1_start = (char*)(&(ptr1[-1])) - min_nref * REF_SIZE;
+                memcpy( ref1_start, ref0_start, min_nref * REF_SIZE );
+            }
+        }
+
     }
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
