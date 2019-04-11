@@ -1,0 +1,5 @@
+./sl: inputs/err-valcopy005.snl(38,7): ERROR, incopatible types for value-copy assignment ':='
+a := b;
+      ^
+./sl: 1 error(s) detected
+

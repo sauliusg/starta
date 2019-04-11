@@ -29,10 +29,22 @@ inline operator "." ( R s )
 }
 
 var a : S = struct S { name => "The First",  x => 12.36 D };
-var b : R = struct R {
+var b : S = struct S { name => "The Second", x => 11.55 D };
+var c : R = struct R {
     name => "The Third",
     title => "Derived structure",
     x => 1.0D, y => 2.0, z => 3.5
 };
 
-a := b;
+. a;
+. b;
+. c;
+. "";
+
+b := a;
+c := b;
+
+. a;
+. b;
+. c;
+. "";
