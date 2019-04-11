@@ -26,11 +26,12 @@ typedef struct alloccell_t {
     struct alloccell_t *prev; /* Previous node in a garbage colector's list */
     ssize_t length;           /* contains number of elements if the
 				 allocated block is an array; for
-				 non-array elements contains value
-				 0. For strings should contain
-				 strlen() of the string, which will be
-				 as a rule size - 1 (the last '\0'
-				 byte is not counted in 'length'. */
+				 non-array elements contains value 0
+				 (in the new design -- -1). For
+				 strings should contain strlen() of
+				 the string, which will be as a rule
+				 size - 1 (the last '\0' byte is not
+				 counted in 'length'. */
     ssize_t size;             /* Contains size the allocated memory
 			         block in bytes (NOT including
 			         sizeof(alloccell_t) ). */

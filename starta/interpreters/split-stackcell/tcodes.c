@@ -362,13 +362,26 @@ int COPY( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     if( ptr0 && ptr1 ) {
-	ssize_t length0 = ptr0[-1].size/sizeof(stackcell_t);
-	ssize_t length1 = ptr1[-1].size/sizeof(stackcell_t);
-	ssize_t length = length0 < length1 ? length0 : length1;
-	ssize_t nref0 = ptr0[-1].nref <= length ? ptr0[-1].nref : length;
-	ssize_t nref1 = ptr1[-1].nref <= length ? ptr1[-1].nref : length;
-        assert( nref0 == nref1 );
+        ssize_t min_nref = 0;
+
+        if( ptr0[-1].nref < 0 ) {
+            assert( ptr1[-1].nref < 0 );
+            min_nref = ptr0[-1].nref > ptr1[-1].nref ? -ptr0[-1].nref : -ptr1[-1].nref;
+        }
+
+        assert( min_nref >= 0 );
+
+        if( min_nref > 0 ) size -= min_nref * REF_SIZE;
+
+        /* copy numbers of the structure body: */
 	memcpy( ptr1, ptr0, size );
+
+        if( min_nref > 0 ) {
+            /* copy references at negative offsets: */
+            char *ref0_start = (char*)(&(ptr0[-1])) - min_nref * REF_SIZE;
+            char *ref1_start = (char*)(&(ptr1[-1])) - min_nref * REF_SIZE;
+            memcpy( ref1_start, ref0_start, min_nref * REF_SIZE );
+        }
     }
 
     STACKCELL_ZERO_PTR( istate.ep[0] );
