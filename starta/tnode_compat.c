@@ -236,6 +236,11 @@ tnode_implements_interface( TNODE *class_tnode, TNODE *interface_tnode )
     return 0;
 }
 
+static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
+                                                    TYPETAB *generic_types,
+                                                    char *msg, int msglen,
+                                                    cexception_t *ex );
+
 static int
 tnode_check_type_identity( TNODE *t1, TNODE *t2,
                            TYPETAB *generic_types,
@@ -318,6 +323,18 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 	return tnode_structures_are_identical( t1, t2,
 					       generic_types, ex );
     }
+
+    if( t1->kind == TK_FUNCTION_REF && 
+        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
+	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
+                                                        NULL, 0, ex );
+    }
+
+    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
+	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
+                                                        NULL, 0, ex );
+    }
+
     return 0;
 }
 
@@ -375,11 +392,6 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 
     return 0;
 }
-
-static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
-                                                    TYPETAB *generic_types,
-                                                    char *msg, int msglen,
-                                                    cexception_t *ex );
 
 int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                            TYPETAB *generic_types,
