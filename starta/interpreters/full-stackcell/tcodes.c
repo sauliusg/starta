@@ -1359,12 +1359,24 @@ int ICALL( INSTRUCTION_FN_ARGS )
     /* STACKCELL_ZERO_PTR( istate.sp[0] ); */
     STACKCELL_ZERO_PTR( istate.sp[1] );
 
-    if( fn_ptr < istate.code || fn_ptr > istate.code + istate.code_length ) {
+    if( fn_ptr &&
+        (fn_ptr < istate.code || fn_ptr > istate.code + istate.code_length) ) {
         /* we are calling a closure: */
         fn_ptr = STACKCELL_PTR( *(stackcell_t*)fn_ptr );
     } else {
         /* we are calling a function: */
         istate.ep ++;
+    }
+
+    if( fn_ptr == NULL ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -5,
+	      /* message = */
+	      "calling NULL function reference",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_UNIMPLEMENTED_INTERFACE,
+	      EXCEPTION );
+	return 0;
     }
 
     istate.ip = fn_ptr - istate.code;
