@@ -6153,7 +6153,7 @@ int GCPOLICY( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * GCOLLECT Run grabage collector
+ * GCOLLECT Run garbage collector
  *
  * bytecode:
  * GCOLLECT

@@ -5765,3 +5765,93 @@ int NEXT( INSTRUCTION_FN_ARGS )
         return 4;
     }
 }
+
+/*
+ * GCPOLICY Set the following GC policy during run-time:
+ *
+ * bytecode:
+ * GCPOLICY
+ * 
+ * stack:
+ * new_policy -> old_policy
+ */
+
+int GCPOLICY( INSTRUCTION_FN_ARGS )
+{
+    ssize_t gc_policy = istate.ep[0].num.i;
+    int old_gc_policy;
+
+    TRACE_FUNCTION();
+
+    old_gc_policy = bcalloc_gc_collector_policy();
+
+    switch( gc_policy ) {
+    case 0:
+        /* Do not change the GC policy, return the existing one: */
+        break;
+    case 1:
+        bcalloc_set_gc_collector_policy( GC_ON_LIMIT_HIT );
+        break;
+    case 2:
+        bcalloc_set_gc_collector_policy( GC_ALWAYS );
+        break;
+    case 3:
+        bcalloc_set_gc_collector_policy( GC_NEVER );
+        break;
+    default:
+        break;
+    }
+
+    switch( old_gc_policy ) {
+    case GC_ON_LIMIT_HIT:
+        istate.ep[0].num.i = 1;
+        break;
+    case GC_ALWAYS:
+        istate.ep[0].num.i = 2;
+        break;
+    case GC_NEVER:
+        istate.ep[0].num.i = 3;
+        break;
+    default:
+        istate.ep[0].num.i = 0;
+        break;
+    }
+    
+    return 1;
+}
+
+/*
+ * GCOLLECT Run garbage collector
+ *
+ * bytecode:
+ * GCOLLECT
+ * 
+ * stack:
+ * -> reclaimed_bytes
+ */
+
+int GCOLLECT( INSTRUCTION_FN_ARGS )
+{
+    cexception_t inner;
+    
+    TRACE_FUNCTION();
+
+    istate.ep --;
+
+    cexception_guard( inner ) {
+        thrcode_gc_mark_and_sweep( &inner );
+        istate.ep[0].num.ssize = bccollect( &inner );
+    }
+    cexception_catch {
+        interpret_raise_exception_with_bcalloc_message
+            ( /* err_code = */ -4,
+              /* message = */ (char*)cxprintf
+              ( "error running garbage collector from '%s'", __FUNCTION__ ),
+              /* module_id = */ 0,
+              /* exception_id = */ SL_EXCEPTION_GC_ERROR,
+              EXCEPTION );
+	return 0;        
+    }
+
+    return 1;
+}
