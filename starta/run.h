@@ -18,7 +18,7 @@
 /* leave some stack cells unused at the begining and at the end of the
    stack -- to minimise segfaults and facilitate stack under/overflow
    diagnostics: */
-#define STACK_SAFETY_MARGIN 5
+#define STACK_SAFETY_MARGIN 10
 
 typedef struct interpret_exception_t interpret_exception_t;
 
