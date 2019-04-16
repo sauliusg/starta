@@ -1,0 +1,38 @@
+/*--*- C -*--*/
+/* PL/I version of Knuth's "man or boy" test        */
+/* expected results at:                             */
+/*    https://en.wikipedia.org/wiki/Man_or_boy_test */
+/* This version courtesy of Robert AH Prins         */
+
+use std;
+
+function x1(): int begin return(1);  end;
+function x2(): int begin return(-1); end;
+function x3(): int begin return(-1); end;
+function x4(): int begin return(1);  end;
+function x5(): int begin return(0);  end;
+
+function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
+{
+    var b: function()->(int);
+
+    b = closure function(): int
+    local {
+        k: int = k;
+        b, y1, y2, y3, y4: function()->(int) = b, y1, y2, y3, y4;
+    }
+    {
+        local.k = local.k - 1;
+        return a(local.k, local.b, local.y1, local.y2, local.y3, local.y4);
+    };
+
+    if k <= 0 then
+        return y4() + y5();
+    else
+        return b();
+    endif;
+}
+
+for var i = 0 to 15 do
+    . 'i =', i, a( i, x1, x2, x3, x4, x5 ) ;
+enddo;
