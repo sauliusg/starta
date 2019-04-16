@@ -4811,7 +4811,9 @@ static void compiler_fixup_function_calls( THRCODE *tc, DNODE *funct )
     name = dnode_name( funct );
     address = dnode_offset( funct );
 
-    thrcode_fixup_function_calls( tc, name, address );
+    if( name ) {
+        thrcode_fixup_function_calls( tc, name, address );
+    }
 }
 
 static void compiler_compile_function_thrcode( COMPILER *cc )
