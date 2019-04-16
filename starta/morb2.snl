@@ -21,11 +21,11 @@ function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
         y1, y2, y3, y4: function()->(int) = y1, y2, y3, y4;
     }
     {
-        local.k = local.k - 1;
         if( b ) {
             local.b = b;
             return 0;
         } else {
+            local.k = local.k - 1;
             return a(local.k, local.b, local.y1, local.y2, local.y3, local.y4);
         }
     };
