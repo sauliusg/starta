@@ -1298,6 +1298,10 @@ int ENTER( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.sp -= nvars;
+
+    assert( istate.sp >= istate.top ||
+            istate.top - istate.sp < STACK_SAFETY_MARGIN );
+
     memset( istate.sp, 0, sizeof(*istate.sp) * nvars );
 
     return 2;
