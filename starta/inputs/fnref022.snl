@@ -1,0 +1,14 @@
+#
+# Snail compiler tests
+#
+#
+# Test function and procedure references
+#
+
+use * from std;
+
+var p : procedure ( i : int ) -> ( int );
+
+p = null;
+
+. p( 3 );
