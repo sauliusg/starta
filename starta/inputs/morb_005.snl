@@ -14,32 +14,16 @@ function x5(): int begin return(0);  end;
 
 function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
 {
-    var b2 = closure ( b: function()->(int) ): int
+    var b = closure function()->(int)
     local {
         k: int = k;
-        b: function()->(int) = null;
         y1, y2, y3, y4: function()->(int) = y1, y2, y3, y4;
     }
     {
-        if( b ) {
-            local.b = b;
-            return 0;
-        } else {
-            local.k = local.k - 1;
-            return a(local.k, local.b, local.y1, local.y2, local.y3, local.y4);
-        }
+        local.k = local.k - 1;
+        return a(local.k, local.self, local.y1, local.y2, local.y3, local.y4);
     };
 
-    var b = closure (): int
-    local {
-        b2: function( f: function()->(int) )->(int) = b2;
-    }
-    {
-        return local.b2( null );
-    };
-
-    b2( b ); // b2 now stores b address in its saved context.
-    
     if k <= 0 then
         return y4() + y5();
     else
@@ -47,6 +31,13 @@ function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
     endif;
 }
 
+inline bytecode function set_gc_policy( int policy ): int
+{
+    GCPOLICY
+}
+
+set_gc_policy( 1 );
+                                   
 for var i = 0 to 15 do
-    . 'i =', i, a( i, x1, x2, x3, x4, x5 ) ;
+    . 'i =', "%2d" %% i, "%12d" %% a( i, x1, x2, x3, x4, x5 ) ;
 enddo;
