@@ -13423,6 +13423,7 @@ closure_header
           TNODE *volatile closure_tnode = new_tnode_ref( px );
           DNODE *volatile closure_fn_ref = NULL;
           TNODE *volatile fn_pointer_ref = NULL;
+          DNODE *volatile closure_self_ref = NULL;
           ssize_t zero = 0;
           cexception_t inner;
 
@@ -13441,6 +13442,16 @@ closure_header
               fn_pointer_ref = NULL;
               tnode_insert_fields( closure_tnode, closure_fn_ref );
               closure_fn_ref = NULL;
+              /* Reserve another reference slot for the closure 'self'
+                 reference, so that the closure can call iself
+                 recursively: */
+              closure_self_ref = new_dnode_name( "self", &inner );
+              dnode_insert_type( closure_self_ref, new_tnode_ref( &inner ));
+              tnode_insert_fields( closure_tnode, closure_self_ref );
+              closure_self_ref = NULL;
+              
+              /* Mark that the the closure data sructure is on the
+                 evaluation stack: */
               compiler_push_typed_expression( compiler, &closure_tnode, &inner );
               closure_tnode = NULL;
           }
@@ -13448,6 +13459,7 @@ closure_header
               delete_tnode( closure_tnode );
               delete_dnode( closure_fn_ref );
               delete_tnode( fn_pointer_ref );
+              delete_dnode( closure_self_ref );
               cexception_reraise( inner, px );
           }
       }
@@ -13492,6 +13504,14 @@ closure_header
                                 &compiler->current_function, &inner );
               compiler->current_function = funct;
               funct = NULL;
+
+              /* Update the closure self-referece type: */
+              DNODE *closure_self_ref =
+                  tnode_lookup_field( closure_type, "self" );
+              shared_closure_tnode =
+                  share_tnode( dnode_type( compiler->current_function ));
+              dnode_replace_type( closure_self_ref, shared_closure_tnode );
+              shared_closure_tnode = NULL;
           }
           cexception_catch {
               delete_dnode( parameters );
@@ -13541,6 +13561,17 @@ function_expression
         /* assert( offs == -sizeof(alloccell_t)-sizeof(void*) ); */
 
         compiler->loops = dlist_pop_data( &compiler->loop_stack );
+
+        /* Store address of the closer itsepf into its 'self'
+           field: */
+        DNODE *self_field = tnode_lookup_field( closure_type, "self" );
+        ssize_t self_offset = dnode_offset( self_field );
+        compiler_emit( compiler, px, "\tc\n", DUP );
+        compiler_emit( compiler, px, "\tce\n", OFFSET, &self_offset );
+        compiler_emit( compiler, px, "\tc\n", OVER );
+        compiler_emit( compiler, px, "\tc\n", PSTI );
+
+        /* Store the closure code reference: */
         compiler_emit( compiler, px, "\tce\n", OFFSET, &offs );
 
         cexception_t inner;
