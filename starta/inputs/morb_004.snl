@@ -14,9 +14,7 @@ function x5(): int begin return(0);  end;
 
 function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
 {
-    var b: function()->(int);
-
-    b = closure function()->(int)
+    var b: function()->(int) = closure function()->(int)
     local {
         k: int = k;
         y1, y2, y3, y4: function()->(int) = y1, y2, y3, y4;
@@ -33,6 +31,13 @@ function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
     endif;
 }
 
+inline bytecode function set_gc_policy( int policy ): int
+{
+    GCPOLICY
+}
+
+set_gc_policy( 1 );
+                                   
 for var i = 0 to 15 do
-    . 'i =', i, a( i, x1, x2, x3, x4, x5 ) ;
+    . 'i =', "%2d" %% i, "%12d" %% a( i, x1, x2, x3, x4, x5 ) ;
 enddo;
