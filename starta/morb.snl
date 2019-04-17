@@ -16,14 +16,14 @@ function a( k: int; y1, y2, y3, y4, y5 : function()->(int) ): int
 {
     var b: function()->(int);
 
-    b = closure function(): int
+    b = closure function()->(int)
     local {
         k: int = k;
-        b, y1, y2, y3, y4: function()->(int) = b, y1, y2, y3, y4;
+        y1, y2, y3, y4: function()->(int) = y1, y2, y3, y4;
     }
     {
         local.k = local.k - 1;
-        return a(local.k, local.b, local.y1, local.y2, local.y3, local.y4);
+        return a(local.k, local.self, local.y1, local.y2, local.y3, local.y4);
     };
 
     if k <= 0 then
