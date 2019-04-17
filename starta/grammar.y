@@ -12515,7 +12515,8 @@ multivalue_function_call
 	      dnode_insert_type( compiler->current_call,
 				 share_tnode( fn_tnode ));
 	  }
-	  if( fn_tnode && tnode_kind( fn_tnode ) != TK_FUNCTION_REF ) {
+	  if( fn_tnode && tnode_kind( fn_tnode ) != TK_FUNCTION_REF &&
+              tnode_kind( fn_tnode ) != TK_CLOSURE ) {
 	      yyerrorf( "called object is not a function pointer" );
 	  }
 
