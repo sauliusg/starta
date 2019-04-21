@@ -6,33 +6,15 @@
 #
 
 use std;
-use APrint(string);
 
-struct S {
-    name: string;
-    x: double;
-};
-
-struct R: S {
-    title: string;
-    y, z: float;
-}
-
-inline operator "." ( S s )
+function f(int x, y) -> int, int
 {
-    < s.name, s.x;
+    return x + y, x - y;
 }
 
-inline operator "." ( R s )
-{
-    < s.name, s.title, s.x, s.y, s.z;
-}
+var p: function (int a; int b) -> (int, int);
 
-var a : S = struct S { name => "The First",  x => 12.36 D };
-var b : R = struct R {
-    name => "The Third",
-    title => "Derived structure",
-    x => 1.0D, y => 2.0, z => 3.5
-};
+p = f;
 
-a := b;
+. f(2,3);
+. p(2,3);
