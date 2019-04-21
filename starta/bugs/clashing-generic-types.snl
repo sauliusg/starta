@@ -7,7 +7,7 @@
 
 use std;
 use Lists;
-//use APrint(int);
+use APrint(int);
 
 function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int;
 
