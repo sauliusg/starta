@@ -939,22 +939,22 @@ void thrcode_dump( THRCODE *code )
         case OCT_OPCODE:
             name = tcode_lookup_name( opcode->fn );
             if( name ) {
-                printf( "OPCODE: %-10s ", name );
+                printf( "%-10s ", name );
             } else
             if( opcode->fn == NULL ) {
-                printf( "OPCODE: NULL" );
+                printf( "NULL" );
             } else {
-                printf( "OPCODE: %p (name unresolved)", opcode->fn );
+                printf( "%p (name unresolved)", opcode->fn );
             }
             break;
         case OCT_INT:
-            printf( "INT   : %10Ld ", (llong)opcode->ssizeval );
+            printf( "%10Ld ", (llong)opcode->ssizeval );
             break;
         case OCT_FLOAT:
-            printf( "FLOAT : %12.7f ", opcode->fval );
+            printf( "%12.7f ", opcode->fval );
             break;
         case OCT_POINTER:
-            printf( "PTR   : %10p", opcode->ptr );
+            printf( "%10p", opcode->ptr );
             break;
         default:
             printf( "UNKNOWN FLAG %d: %012Lx",
