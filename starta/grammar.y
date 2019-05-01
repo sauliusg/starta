@@ -1937,6 +1937,7 @@ static void compiler_emit_function_call( COMPILER *cc,
 	    thrcode_emit( cc->thrcode, ex, "\t" );
 	    for( i = 0; i < code_length; i++ ) {
 		if( code[i].ssizeval > 1000 ) {
+#warning FIXME: use code flags to determine the right opcode type
 		    thrcode_emit( cc->thrcode, ex, "c", code[i].fn );
 		} else {
 		    thrcode_emit( cc->thrcode, ex, "e", &code[i].ssizeval );
