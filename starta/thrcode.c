@@ -109,6 +109,24 @@ typedef enum {
     THRF_IMMEDIATE_PRINTOUT = 0x01
 } thrcode_flag_t;
 
+typedef enum {
+    OCT_UNKNOWN = 0,
+    OCT_OPCODE  = 1,
+    OCT_INT     = 2,
+    OCT_FLOAT   = 3,
+    OCT_POINTER = 4,
+    last_opcode_flag_t
+} opcode_type_t;
+
+typedef enum {
+    OCF_UNKNOWN = 0,
+    OCF_JMP = 0x10, /* Is set for a JMP, JNZ and other control flow
+                       change opcodes, indicating the end of a basic
+                       block. A CALL and similar subroutine invocation
+                       opcodes do not terminate a basic block and do
+                       not have this flag set. */
+} opcode_flag_t;
+
 struct THRCODE {
     thrcode_flag_t flags;    /* bit-set flags, see thrcode_flag_t for values */
     size_t length;           /* number of vector 'opcodes' elemets used
@@ -133,7 +151,9 @@ struct THRCODE {
     char **lines;            /* human-readable emitted code lines that
 			        should be printed out in debug output
 			        mode. Last pointer must be NULL; */
-    thrcode_t *opcodes;
+    thrcode_t *opcodes;      /* The actual opcodes, 'length' of them. */
+    char *opflags;           /* Flags indicating what every element in
+                                'opcodes' is, also 'length' of them. */
     thrcode_t last_opcode;   /* last assembled opcode */
     char *data;              /* static data used by some commands */
     ssize_t data_size;
@@ -185,6 +205,7 @@ void delete_thrcode( THRCODE *bc )
 	    freex( bc->lines );
 	}
         if( bc->opcodes ) freex( bc->opcodes );
+        if( bc->opflags ) freex( bc->opflags );
 	if( bc->data ) freex( bc->data );
 	freex( bc );
     }
@@ -389,9 +410,19 @@ static void thrcode_alloc( THRCODE *bc, size_t delta, cexception_t *ex )
         return;
 
     new_capacity = bc->capacity + (ALLOC_CHUNK > delta ? ALLOC_CHUNK : delta);
+
     bc->opcodes =
         reallocx( bc->opcodes, new_capacity * sizeof(bc->opcodes[0]), ex );
+
+    bc->opflags =
+        reallocx( bc->opflags, new_capacity * sizeof(bc->opflags[0]), ex );
+
     bc->capacity = new_capacity;
+}
+
+static void thrcode_set_flag( THRCODE *tc, int flag )
+{
+    tc->opflags[tc->length-1] = flag;
 }
 
 static void thrcode_emit_tcode( THRCODE *tc, void *tcode,
@@ -399,6 +430,7 @@ static void thrcode_emit_tcode( THRCODE *tc, void *tcode,
 {
     thrcode_alloc( tc, 1, ex );
     tc->opcodes[tc->length++].fn = tcode;
+    thrcode_set_flag( tc, OCT_OPCODE );
 }
 
 #if 0
@@ -407,6 +439,7 @@ static void thrcode_emit_int( THRCODE *tc, int ival,
 {
     thrcode_alloc( tc, 1, ex );
     tc->opcodes[tc->length++].ival = ival;
+    thrcode_set_flag( tc, OCT_INT );
 }
 #endif
 
@@ -415,6 +448,7 @@ static void thrcode_emit_ssize_t( THRCODE *tc, ssize_t sszval,
 {
     thrcode_alloc( tc, 1, ex );
     tc->opcodes[tc->length++].ssizeval = sszval;
+    thrcode_set_flag( tc, OCT_INT );
 }
 
 static void thrcode_emit_ptr( THRCODE *tc, void *pval,
@@ -422,6 +456,7 @@ static void thrcode_emit_ptr( THRCODE *tc, void *pval,
 {
     thrcode_alloc( tc, 1, ex );
     tc->opcodes[tc->length++].ptr = pval;
+    thrcode_set_flag( tc, OCT_POINTER );
 }
 
 static void thrcode_emit_float( THRCODE *tc, float fval,
@@ -429,6 +464,7 @@ static void thrcode_emit_float( THRCODE *tc, float fval,
 {
     thrcode_alloc( tc, 1, ex );
     tc->opcodes[tc->length++].fval = fval;
+    thrcode_set_flag( tc, OCT_FLOAT );
 }
 
 /*
@@ -861,6 +897,11 @@ THRCODE *thrcode_merge( THRCODE *dst, THRCODE *src, cexception_t *ex )
 
     memcpy( dst_code + dst_len, src_code, src_len * sizeof( src_code[0] ));
 
+    char *src_flags = src->opflags;
+    char *dst_flags = dst->opflags;
+
+    memcpy( dst_flags + dst_len, src_flags, src_len * sizeof( src_flags[0] ));
+
     dst->length += src_len;
 
     dst->fixups =
@@ -889,13 +930,39 @@ void thrcode_dump( THRCODE *code )
 
     for( i = 0; i < code->length; i++ ) {
 	thrcode_t *opcode = &code->opcodes[i];
-	char *name = tcode_lookup_name( opcode->fn );
+        int opflag = code->opflags[i];
+        char *name;
 
 	printf( "%08d ", i );
-	printf( "%-10s ", name ? name : "" );
-	printf( "%10Ld ", (llong)opcode->ssizeval );
-	printf( "%12.7f ", opcode->fval );
-	printf( "%10p\n", opcode->ptr );
+
+        switch( opflag & 0x0F ) {
+        case OCT_OPCODE:
+            name = tcode_lookup_name( opcode->fn );
+            if( name ) {
+                printf( "OPCODE: %-10s ", name );
+            } else
+            if( opcode->fn == NULL ) {
+                printf( "OPCODE: NULL" );
+            } else {
+                printf( "OPCODE: %p (name unresolved)", opcode->fn );
+            }
+            break;
+        case OCT_INT:
+            printf( "INT   : %10Ld ", (llong)opcode->ssizeval );
+            break;
+        case OCT_FLOAT:
+            printf( "FLOAT : %12.7f ", opcode->fval );
+            break;
+        case OCT_POINTER:
+            printf( "PTR   : %10p", opcode->ptr );
+            break;
+        default:
+            printf( "UNKNOWN FLAG %d: %012Lx",
+                    opflag, (llong)opcode->ssizeval );
+            break;
+        }
+
+        printf( "\n" );
     }
 }
 
@@ -911,6 +978,9 @@ thrcode_t *obtain_thrcode( THRCODE *thrcode, ssize_t *length )
 
     opcodes = thrcode->opcodes;
 
+    freex( thrcode->opflags );
+    thrcode->opflags = NULL;
+    
     thrcode->opcodes = NULL;
     thrcode->length = 0;
     thrcode->capacity = 0;
