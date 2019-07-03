@@ -1,16 +1,71 @@
-//--*- C -*--
-// Snail compiler tests
-//
-//
-// Compatibility of several generic types.
-//
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check classes with multiple constructors.
+#
 
 use std;
-use Lists;
 
-var l1: list of int;
+class SomeBaseClass {
+    int i;
+    
+    constructor( int i )
+    {
+        self.i = i;
+    }
 
-l1 = (44, 55, 66, 77, 11);
+    constructor default_values()
+    {
+        self.i = 10;
+    }
 
-. l1.value;
-. l1.next.value;
+    method get_i(): int { return self.i }
+};
+
+class MultiplyConstructed: SomeBaseClass {
+    string name;
+    float value;
+
+    // This class has several constructors. When the constructor is
+    // not specified explicitly, the default constructor is called.
+
+    constructor( string name; float value; int i )
+        super( i )
+    {
+        self.name = name;
+        self.value = value;
+    }
+
+    constructor fromName( string name )
+        super( 1 );
+    {
+        self.name = name;
+    }
+
+    constructor fromValue( float val )
+        default_values();        
+    {
+        self.name = "... default name from the value '%f' ..." %% val;
+        self.value = val;
+    }
+
+    method name() -> string { return self.name }
+    method value() -> float { return self.value }
+};
+
+var a = new MultiplyConstructed( "constructed a", 1.2, 12 );
+
+. a->name();
+. a->value();
+. a->get_i();
+. "";
+
+var b = new MultiplyConstructed.fromName( "Given Name" );
+
+. b->name();
+. b->value();
+. "";
+
+var c = new MultiplyConstructed.fromValue( 0.371 );
+
+. c->name();
