@@ -43,7 +43,7 @@ class MultiplyConstructed: SomeBaseClass {
     }
 
     constructor fromValue( float val )
-        default_values();        
+        super.default_values();
     {
         self.name = "... default name from the value '%f' ..." %% val;
         self.value = val;
