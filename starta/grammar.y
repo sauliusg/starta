@@ -7767,6 +7767,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> module_parameter_list
 %type <dnode> operator_definition
 %type <si>     opt_as_identifier
+%type <si>     opt_base_class_constructor_name
 %type <i>     opt_base_class_initialisation
 %type <si>     opt_default_module_parameter
 %type <si>     opt_dot_name
@@ -15787,8 +15788,15 @@ opt_semicolon
   | /* empty */
   ;
 
+opt_base_class_constructor_name
+:  '.'  __IDENTIFIER
+{ $$ = $2; }
+| /* empty */
+{ $$ = -1; }
+;
+
 opt_base_class_initialisation
-: __IDENTIFIER 
+: __IDENTIFIER opt_base_class_constructor_name
     {
         TNODE *type_tnode = compiler->current_type;
         TNODE *base_type_tnode =
@@ -15805,7 +15813,7 @@ opt_base_class_initialisation
 
         compiler->current_interface_nr = 0;
 
-#warning FIXME: look up the correct constructore here (S.G.):
+#warning FIXME: look up the correct constructor here (S.G.):
 
         constructor_dnode = base_type_tnode ?
             tnode_default_constructor( base_type_tnode ) : NULL;

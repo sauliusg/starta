@@ -26,7 +26,7 @@ class MultiplyConstructed: SomeBaseClass {
     string name;
     float value;
 
-    // This class has several constructors. When the constructor is
+    // This class has several constructors. When a constructor is
     // not specified explicitly, the default constructor is called.
 
     constructor( string name; float value; int i )
