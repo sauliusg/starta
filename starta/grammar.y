@@ -15799,38 +15799,56 @@ opt_base_class_initialisation
 : __IDENTIFIER opt_base_class_constructor_name
     {
         TNODE *type_tnode = compiler->current_type;
+        char * volatile initialisable_object_name =
+            obtain_string_from_strpool( compiler->strpool, $1 );
+        char * volatile constructor_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
         TNODE *base_type_tnode =
             type_tnode ? tnode_base_type( type_tnode ) : NULL;
         DNODE *constructor_dnode;
         TNODE *constructor_tnode;
         DNODE *self_dnode;
+        cexception_t inner;
 
-        assert( type_tnode );
-        compiler_emit( compiler, px, "T\n", "# Initialising base class:" );
+        cexception_guard( inner ) {
+            assert( type_tnode );
+            compiler_emit( compiler, &inner,
+                           "T\n", "# Initialising base class:" );
 
-        compiler_push_current_interface_nr( compiler, px );
-        compiler_push_current_call( compiler, px );
+            compiler_push_current_interface_nr( compiler, &inner );
+            compiler_push_current_call( compiler, &inner );
 
-        compiler->current_interface_nr = 0;
+            compiler->current_interface_nr = 0;
 
 #warning FIXME: look up the correct constructor here (S.G.):
 
-        constructor_dnode = base_type_tnode ?
-            tnode_default_constructor( base_type_tnode ) : NULL;
+            constructor_dnode = base_type_tnode ?
+                tnode_default_constructor( base_type_tnode ) : NULL;
 
-        constructor_tnode = constructor_dnode ?
-            dnode_type( constructor_dnode ) : NULL;
+            constructor_tnode = constructor_dnode ?
+                dnode_type( constructor_dnode ) : NULL;
 
-        assert( !compiler->current_call );
-        compiler->current_call = share_dnode( constructor_dnode );
+            assert( !compiler->current_call );
+            compiler->current_call = share_dnode( constructor_dnode );
           
-        compiler->current_arg = constructor_tnode ?
-            dnode_next( tnode_args( constructor_tnode )) :
-            NULL;
+            compiler->current_arg = constructor_tnode ?
+                dnode_next( tnode_args( constructor_tnode )) :
+                NULL;
 
-        self_dnode = compiler_lookup_dnode( compiler, NULL, "self", "variable" );
-        compiler_push_guarding_arg( compiler, px );
-        compiler_compile_load_variable_value( compiler, self_dnode, px );
+            self_dnode = compiler_lookup_dnode( compiler, NULL,
+                                                "self", "variable" );
+            compiler_push_guarding_arg( compiler, &inner );
+            compiler_compile_load_variable_value( compiler, self_dnode,
+                                                  &inner );
+        }
+        cexception_catch {
+            freex( initialisable_object_name );
+            freex( constructor_name );
+            cexception_reraise( inner, px );
+        }
+        freex( initialisable_object_name );
+        freex( constructor_name );
+
     }
 '(' opt_actual_argument_list ')' opt_semicolon
     {
