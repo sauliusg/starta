@@ -55,6 +55,7 @@ class MultiplyConstructed: SomeBaseClass {
 
 var a = new MultiplyConstructed( "constructed a", 1.2, 12 );
 
+. "(should print out \"constructed a\", 1.2, 12)";
 . a->name();
 . a->value();
 . a->get_i();
@@ -62,10 +63,15 @@ var a = new MultiplyConstructed( "constructed a", 1.2, 12 );
 
 var b = new MultiplyConstructed.fromName( "Given Name" );
 
+. "(should print out \"Given Name\", 0, 1)";
 . b->name();
 . b->value();
+. b->get_i();
 . "";
 
 var c = new MultiplyConstructed.fromValue( 0.371 );
 
+. "(should print out \"Given Name\", 0.371, 10)";
 . c->name();
+. c->value();
+. c->get_i();
