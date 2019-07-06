@@ -71,8 +71,7 @@ var b = new MultiplyConstructed.fromName( "Given Name" );
 
 var c = new MultiplyConstructed.fromValue( 0.371 );
 
-. "(should print out \"... default name from the value '0.371000 ...\", " _
-  "0.371, 10)";
+. "(should print out \"Given Name\", 0.371, 10)";
 . c->name();
 . c->value();
 . c->get_i();
