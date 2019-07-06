@@ -15820,10 +15820,37 @@ opt_base_class_initialisation
 
             compiler->current_interface_nr = 0;
 
-#warning FIXME: look up the correct constructor here (S.G.):
+            // #warning FIXME: look up the correct constructor here (S.G.):
 
-            constructor_dnode = base_type_tnode ?
-                tnode_default_constructor( base_type_tnode ) : NULL;
+            if( constructor_name ) {
+                if( strcmp( initialisable_object_name, "super" ) == 0 ) {
+                    constructor_dnode = base_type_tnode ?
+                        tnode_lookup_constructor( base_type_tnode,
+                                                  constructor_name )
+                        : NULL;
+                } else if( strcmp( initialisable_object_name, "self" ) == 0 ) {
+                    constructor_dnode =
+                        tnode_lookup_constructor( type_tnode,
+                                                  constructor_name );
+                } else {
+                    yyerrorf( "can not look up constructor '%s'"
+                              "for object '%s'",
+                              constructor_name, initialisable_object_name );
+                }
+            } else {
+                if( strcmp( initialisable_object_name, "super" ) == 0 ) {
+                    constructor_dnode = base_type_tnode ?
+                        tnode_default_constructor( base_type_tnode ) : NULL;
+                } else if( strcmp( initialisable_object_name, "self" ) == 0 ) {
+                    constructor_dnode =
+                        tnode_default_constructor( type_tnode );
+                } else {
+                    constructor_dnode = base_type_tnode ?
+                        tnode_lookup_constructor( base_type_tnode,
+                                                  initialisable_object_name )
+                        : NULL;
+                }
+            }
 
             constructor_tnode = constructor_dnode ?
                 dnode_type( constructor_dnode ) : NULL;
