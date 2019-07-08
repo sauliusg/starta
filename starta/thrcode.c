@@ -109,24 +109,6 @@ typedef enum {
     THRF_IMMEDIATE_PRINTOUT = 0x01
 } thrcode_flag_t;
 
-typedef enum {
-    OCT_UNKNOWN = 0,
-    OCT_OPCODE  = 1,
-    OCT_INT     = 2,
-    OCT_FLOAT   = 3,
-    OCT_POINTER = 4,
-    last_opcode_flag_t
-} opcode_type_t;
-
-typedef enum {
-    OCF_UNKNOWN = 0,
-    OCF_JMP = 0x10, /* Is set for a JMP, JNZ and other control flow
-                       change opcodes, indicating the end of a basic
-                       block. A CALL and similar subroutine invocation
-                       opcodes do not terminate a basic block and do
-                       not have this flag set. */
-} opcode_flag_t;
-
 struct THRCODE {
     thrcode_flag_t flags;    /* bit-set flags, see thrcode_flag_t for values */
     size_t length;           /* number of vector 'opcodes' elemets used
@@ -152,7 +134,7 @@ struct THRCODE {
 			        should be printed out in debug output
 			        mode. Last pointer must be NULL; */
     thrcode_t *opcodes;      /* The actual opcodes, 'length' of them. */
-    char *opflags;           /* Flags indicating what every element in
+    ubyte *opflags;          /* Flags indicating what every element in
                                 'opcodes' is, also 'length' of them. */
     thrcode_t last_opcode;   /* last assembled opcode */
     char *data;              /* static data used by some commands */
@@ -252,6 +234,12 @@ void *thrcode_instructions( THRCODE *bc )
 {
     assert( bc );
     return bc->opcodes;
+}
+
+ubyte *thrcode_code_flags( THRCODE *bc )
+{
+    assert( bc );
+    return bc->opflags;
 }
 
 size_t thrcode_length( THRCODE *bc )
@@ -897,8 +885,8 @@ THRCODE *thrcode_merge( THRCODE *dst, THRCODE *src, cexception_t *ex )
 
     memcpy( dst_code + dst_len, src_code, src_len * sizeof( src_code[0] ));
 
-    char *src_flags = src->opflags;
-    char *dst_flags = dst->opflags;
+    ubyte *src_flags = src->opflags;
+    ubyte *dst_flags = dst->opflags;
 
     memcpy( dst_flags + dst_len, src_flags, src_len * sizeof( src_flags[0] ));
 

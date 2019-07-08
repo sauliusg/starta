@@ -247,11 +247,13 @@ DNODE *dnode_adjust_code_fixups( DNODE *dnode, ssize_t address );
 
 FIXUP *dnode_code_fixups( DNODE *dnode );
 
-DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code,
+DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code, ubyte *cod_flags,
 		       ssize_t code_length,
 		       cexception_t *ex );
 
 thrcode_t *dnode_code( DNODE *dnode, ssize_t *code_length );
+
+ubyte *dnode_code_flags( DNODE *dnode, ssize_t *code_length );
 
 void dnode_vartab_insert_dnode( DNODE *dnode, const char *name,
                                 DNODE *volatile *var,
