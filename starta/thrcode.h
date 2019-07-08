@@ -25,6 +25,24 @@ typedef enum {
   last_THRCODE_ERROR
 } THRCODE_ERROR;
 
+typedef enum {
+    OCT_UNKNOWN = 0,
+    OCT_OPCODE  = 1,
+    OCT_INT     = 2,
+    OCT_FLOAT   = 3,
+    OCT_POINTER = 4,
+    last_opcode_flag_t
+} opcode_type_t;
+
+typedef enum {
+    OCF_UNKNOWN = 0,
+    OCF_JMP = 0x10, /* Is set for a JMP, JNZ and other control flow
+                       change opcodes, indicating the end of a basic
+                       block. A CALL and similar subroutine invocation
+                       opcodes do not terminate a basic block and do
+                       not have this flag set. */
+} opcode_flag_t;
+
 extern int thrcode_debug;
 extern int thrcode_trace;
 extern void *thrcode_subsystem;
@@ -53,6 +71,8 @@ void dispose_thrcode( THRCODE * volatile *thrcode );
 void *thrcode_alloc_extra_data( THRCODE *tc, ssize_t size );
 
 void *thrcode_instructions( THRCODE *bc );
+
+ubyte *thrcode_code_flags( THRCODE *bc );
 
 size_t thrcode_length( THRCODE *bc );
 

@@ -83,6 +83,8 @@ struct DNODE {
 			      operator or an inline function, if the
 			      current dnode represents one of such
 			      objects. */
+    ubyte *code_flags;     /* code fragment flags describe each opcode
+                              in the 'code' array. */
     FIXUP *code_fixups;    /* Fixups that need to be applied to the
 			      code fragment from the 'code' field,
 			      after it is emitted. May contain, e.g.,
@@ -159,6 +161,7 @@ void delete_dnode( DNODE *node )
         freex( node->filename );
         freex( node->synonim );
         freex( node->code );
+        freex( node->code_flags );
 
         delete_vartab( node->vartab );
         delete_vartab( node->consts );
@@ -1218,7 +1221,7 @@ FIXUP *dnode_code_fixups( DNODE *dnode )
     return dnode->code_fixups;
 }
 
-DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code,
+DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code, ubyte *code_flags,
 		       ssize_t code_length,
 		       cexception_t *ex )
 {
@@ -1227,12 +1230,24 @@ DNODE *dnode_set_code( DNODE *dnode, thrcode_t *code,
     if( dnode->code ) {
 	freex( dnode->code );
 	dnode->code = NULL;
-	dnode->code_length = 0;
     }
+
+    if( dnode->code_flags ) {
+	freex( dnode->code_flags );
+	dnode->code_flags = NULL;
+    }
+
+    dnode->code_length = 0;
 
     if( code ) {
 	dnode->code = callocx( sizeof(code[0]), code_length, ex );
 	memmove( dnode->code, code, sizeof(code[0]) * code_length );
+	dnode->code_length = code_length;
+    }
+
+    if( code_flags ) {
+	dnode->code_flags = callocx( sizeof(code_flags[0]), code_length, ex );
+	memmove( dnode->code_flags, code_flags, sizeof(code_flags[0]) * code_length );
 	dnode->code_length = code_length;
     }
 
@@ -1246,6 +1261,15 @@ thrcode_t *dnode_code( DNODE *dnode, ssize_t *code_length )
 	*code_length = dnode->code_length;
     }
     return dnode->code;
+}
+
+ubyte *dnode_code_flags( DNODE *dnode, ssize_t *code_length )
+{
+    assert( dnode );
+    if( code_length ) {
+	*code_length = dnode->code_length;
+    }
+    return dnode->code_flags;
 }
 
 VARTAB *dnode_vartab( DNODE *dnode )

@@ -1927,6 +1927,7 @@ static void compiler_emit_function_call( COMPILER *cc,
     if( dnode_has_flags( function, DF_INLINE )) {
 	ssize_t code_length, i;
 	thrcode_t *code = dnode_code( function, &code_length );
+        ubyte *opflags = dnode_code_flags( function, NULL );
 	ssize_t code_start = thrcode_length( cc->thrcode );
 
 	if( code_length > 0 ) {
@@ -1936,11 +1937,18 @@ static void compiler_emit_function_call( COMPILER *cc,
 	    }
 	    thrcode_emit( cc->thrcode, ex, "\t" );
 	    for( i = 0; i < code_length; i++ ) {
-		if( code[i].ssizeval > 1000 ) {
-#warning FIXME: use code flags to determine the right opcode type
-		    thrcode_emit( cc->thrcode, ex, "c", code[i].fn );
-		} else {
-		    thrcode_emit( cc->thrcode, ex, "e", &code[i].ssizeval );
+                ubyte opflag = opflags ? opflags[i] : 0;
+                switch( opflag ) {
+                case OCT_OPCODE: 
+		    thrcode_emit( cc->thrcode, ex, "c", code[i].fn ); break;
+                case OCT_INT:
+		    thrcode_emit( cc->thrcode, ex, "e", &code[i].ssizeval ); break;
+                case OCT_FLOAT:
+		    thrcode_emit( cc->thrcode, ex, "f", code[i].fval ); break;
+                case OCT_POINTER:
+		    thrcode_emit( cc->thrcode, ex, "p", code[i].ptr ); break;
+                default:
+		    thrcode_emit( cc->thrcode, ex, "e", &code[i].ssizeval ); break;
 		}
 	    }
 	    if( trailer && trailer[0] != '\0' ) {
@@ -4906,9 +4914,14 @@ static void compiler_get_inline_code( COMPILER *cc,
     int is_inline = dnode_has_flags( function, DF_INLINE );
 
     if( code_length > 0 && is_inline ) {
-	thrcode_t *opcodes = NULL;
+	thrcode_t *opcodes;
+        ubyte *opcode_flags;
 	opcodes = thrcode_instructions( cc->thrcode );
-	dnode_set_code( function, opcodes + code_start, code_length, ex );
+	opcode_flags = thrcode_code_flags( cc->thrcode );
+	dnode_set_code( function,
+                        opcodes + code_start,
+                        opcode_flags + code_start,
+                        code_length, ex );
 	dnode_adjust_code_fixups( function, code_start );
     }
 }
