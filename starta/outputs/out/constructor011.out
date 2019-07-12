@@ -1,0 +1,14 @@
+(should print out "constructed a", 1.2, 12)
+constructed a
+1.2
+12
+
+(should print out "Given Name", 0.1, 1)
+Given Name
+0.1
+1
+
+(should print out "... default name from the value '0.371000 ...", 0.371, 10)
+... default name from the value '0.371000' ...
+0.371
+10
