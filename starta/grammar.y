@@ -5433,7 +5433,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
                 char *arg_type_name = tnode_name( arg_type );
                 if( arg_type_name ) {
                     compiler_compile_type_conversion
-                        ( cc, arg_type, /* target_name: */NULL,  ex );
+                        ( cc, arg_type, /* target_name: */NULL, &inner );
                 }
             }
         }
