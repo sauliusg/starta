@@ -7800,6 +7800,7 @@ static cexception_t *px; /* parser exception */
 %type <dnode> opt_module_parameters
 %type <i>     opt_readonly
 %type <dnode> opt_retval_description_list
+%type <i>     opt_type_keyword
 %type <i>     opt_variable_declaration_keyword
 %type <dnode> module_name
 %type <dnode> raised_exception_identifier;
@@ -8335,11 +8336,20 @@ module_parameter
     }
 ;
 
+opt_type_keyword
+  : _TYPE
+      { $$ = _TYPE; }
+  | /* empty */
+      { $$ = 0; }
+;
+
 opt_default_module_parameter
 : /* empty */
     { $$ = -1; }
 | '=' __IDENTIFIER
     { $$ = $2; }
+| '=' '<' opt_type_keyword __IDENTIFIER '>'
+    { $$ = $4; }
 ;
 
 module_statement
@@ -10978,6 +10988,38 @@ delimited_type_description
             delete_tnode( shared_tnode );
             cexception_reraise( inner, px );
         }
+        freex( type_name );
+	$$ = tnode;
+    }
+
+  | '<' opt_type_keyword __IDENTIFIER '>'
+  {
+	char *type_name =
+            obtain_string_from_strpool( compiler->strpool, $3 );
+	TNODE *volatile tnode =
+            share_tnode( typetab_lookup( compiler->typetab, type_name ));
+        TNODE *volatile shared_tnode = NULL;
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            if( !tnode ) {
+                // FIXME: use different type kind, TK_GENERIC_REF
+                // instead of TK_PLACEHOLDER (S.G.):
+                tnode = new_tnode_placeholder( type_name, &inner );
+                tnode_set_flags( tnode, TF_IS_REF );
+                tnode_set_size( tnode, REF_SIZE );
+                shared_tnode = share_tnode( tnode );
+                typetab_insert( compiler->typetab, type_name,
+                                &shared_tnode, &inner );
+            }
+        }
+        cexception_catch {
+            freex( type_name );
+            delete_tnode( tnode );
+            delete_tnode( shared_tnode );
+            cexception_reraise( inner, px );
+        }
+
         freex( type_name );
 	$$ = tnode;
     }
