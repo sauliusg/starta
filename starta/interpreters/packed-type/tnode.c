@@ -1662,8 +1662,6 @@ static TNODE *tnode_insert_single_enum_value( TNODE* tnode, DNODE *field )
 
 #define ALIGN_NUMBER(N,lim)  ( (N) += ((lim) - ((int)(N)) % (lim)) % (lim) )
 
-/* FIXME: duplicated code! Call this function from
-   'tnode_insert_fields()' S.G. */
 static TNODE*
 tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
 {
@@ -1705,10 +1703,8 @@ tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
         ssize_t max_size = ((ssize_t)1) << bits;
         ssize_t old_offset = tnode->nextnumoffs;
         field_size = sizeof(union stackunion);
-#if 1
         field_align = sizeof(int);
         ALIGN_NUMBER( tnode->nextnumoffs, field_align );
-#endif
         /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
         if( dnode_offset( field ) >= max_size ||
             tnode->nextnumoffs >= max_size ) {
@@ -1717,13 +1713,7 @@ tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
                       "handle in this implementation",
                       dnode_name( field ), max_size );
         }
-#if 0
-        ssize_t combined_offset = (dnode_offset( field ) << bits) |
-            tnode->nextnumoffs;
-        printf( ">>> pos offset = %d, neg offset = %d, combined offset = %d\n",
-                tnode->nextnumoffs, dnode_offset( field ), combined_offset );
-#endif
-        dnode_update_offset( field, 
+        dnode_update_offset( field,
                              (dnode_offset( field ) << bits) |
                              tnode->nextnumoffs );
         tnode->nextnumoffs += field_size;
@@ -1742,25 +1732,12 @@ tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
 
 TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 {
-#if 0
-    TNODE *field_type;
-    type_kind_t field_kind;
-    size_t field_size, field_align;
-#endif
     DNODE *current;
 
     assert( tnode );
     tnode_check_field_does_not_exist( tnode, tnode->fields, "field", field );
 
     foreach_dnode( current, field ) {
-#if 0
-	field_type = dnode_type( current );
-	field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
-        field_size = tnode_is_reference( field_type ) ?
-            REF_SIZE : 
-            ( field_type ? tnode_size( field_type ) : 0 );
-        field_align = field_type ? tnode_align( field_type ) : 0;
-#endif
 
         DNODE *last_field =
             tnode->fields ? dnode_list_last( tnode->fields ) : NULL;
@@ -1772,68 +1749,6 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 
         tnode_set_size_and_field_offset( tnode, current );
 
-#if 0
-        if( field_kind != TK_FUNCTION ) {
-            if( tnode_is_reference( field_type ) ||
-                field_kind == TK_PLACEHOLDER ) {
-                dnode_set_offset( current, tnode->nextrefoffs -
-                                  sizeof(alloccell_t) - REF_SIZE );
-                tnode->nextrefoffs -= REF_SIZE;
-                tnode->nrefs -= 1;
-                tnode->size += REF_SIZE;
-            } else {
-                if( field_size != 0 ) {
-                    ssize_t old_offset = tnode->nextnumoffs;
-                    ALIGN_NUMBER( tnode->nextnumoffs, field_align );
-                    dnode_set_offset( current, tnode->nextnumoffs );
-                    tnode->nextnumoffs += field_size;
-                    tnode->size += tnode->nextnumoffs - old_offset;
-                    if( tnode->align < field_align )
-                        tnode->align = field_align;
-                }
-            }
-	}
-        if( field_kind == TK_PLACEHOLDER ) {
-            /* For generic type value placeholders, we must allocte
-               also memory at a positive structure field offset to
-               hold numeric value of the future type, in addition to
-               the reference value for which the memory at the
-               negative offset has just been allocated before: */
-            ssize_t bytes = sizeof(ssize_t);
-            ssize_t bits = (CHAR_BIT * bytes)/2;
-            ssize_t max_size = ((ssize_t)1) << bits;
-            ssize_t old_offset = tnode->nextnumoffs;
-            field_size = sizeof(union stackunion);
-#if 1
-            field_align = sizeof(int);
-            ALIGN_NUMBER( tnode->nextnumoffs, field_align );
-#endif
-            /* printf( ">>> bits = %d, max_size = %d\n", bits, max_size ); */
-            if( dnode_offset( current ) >= max_size ||
-                tnode->nextnumoffs >= max_size ) {
-                yyerrorf( "placeholder field '%s' has offset %d "
-                          "which is larger than the size %d which we can "
-                          "handle in this implementation",
-                          dnode_name( current ), max_size );
-            }
-#if 0
-            ssize_t combined_offset = (dnode_offset( current ) << bits) |
-                tnode->nextnumoffs;
-            printf( ">>> pos offset = %d, neg offset = %d, combined offset = %d\n",
-                    tnode->nextnumoffs, dnode_offset( current ), combined_offset );
-#endif
-            dnode_update_offset( current, 
-                                 (dnode_offset( current ) << bits) |
-                                 tnode->nextnumoffs );
-            tnode->nextnumoffs += field_size;
-            tnode->size += tnode->nextnumoffs - old_offset;
-            tnode_set_flags( tnode, TF_HAS_PLACEHOLDER );
-        }
-        if( field_size == 0 && field_type && field_kind != TK_FUNCTION &&
-            field_kind != TK_PLACEHOLDER ) {
-            yyerrorf( "field '%s' has zero size", dnode_name( current ));
-	}
-#endif
     }
     // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
 
