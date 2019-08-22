@@ -21,6 +21,15 @@ function print_array( array of <type T> a; function ( <T> element ) print )
     enddo
 }
 
+var mi = [ 1, 4, 8 ];
+
+mi = push( mi, 2 );
+. "length(mi) ==", length(mi);
+. "nref(mi)   ==", nref(mi);
+print_array( mi, function( int i ) { . i } );
+
+. "----------------------------------------";
+
 var m = [ "alpha", "beta", "gamma" ];
 
 . "length(m) ==", length(m);
