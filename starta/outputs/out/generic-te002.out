@@ -1,0 +1,8 @@
+This test should fail, since integers may not be used to instantiate generic references.
+
+length(mi) == 4
+nref(mi)   == 0
+1
+4
+8
+2

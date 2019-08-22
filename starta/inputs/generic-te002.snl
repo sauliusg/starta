@@ -1,0 +1,29 @@
+//--*- Java -*--
+// Starta compiler tests.
+//
+// Check "type erasure" generic types
+//
+
+use * from std;
+
+inline bytecode procedure push( a : array of <type T>; value : <T> )
+    -> array of <type T>
+{
+    APUSH
+}
+
+inline bytecode function nref( a : array ): int { NREF }
+
+function print_array( array of <type T> a; function ( <T> element ) print )
+{
+    foreach var <T> e in a do
+        print( e );
+    enddo
+}
+
+var mi = [ 1, 4, 8 ];
+
+mi = push( mi, 2 );
+. "length(mi) ==", length(mi);
+. "nref(mi)   ==", nref(mi);
+print_array( mi, function( int i ) { . i } );
