@@ -69,6 +69,8 @@ typedef enum {
     TK_CONSTRUCTOR,
     TK_DESTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
+    TK_GENERIC_REF, /* type-erased generic reference types, such 'T'
+                       in '<T>' or '<type T>'. */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
     TK_DERIVED,     /* A new derived type inherits implementation and
                        interface (operators) from its parent, or base,
