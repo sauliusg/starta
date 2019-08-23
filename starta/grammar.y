@@ -11003,11 +11003,7 @@ delimited_type_description
         cexception_t inner;
         cexception_guard( inner ) {
             if( !tnode ) {
-                // FIXME: use different type kind, TK_GENERIC_REF
-                // instead of TK_PLACEHOLDER (S.G.):
-                tnode = new_tnode_placeholder( type_name, &inner );
-                tnode_set_flags( tnode, TF_IS_REF );
-                tnode_set_size( tnode, REF_SIZE );
+                tnode = new_tnode_generic_ref( type_name, &inner );
                 shared_tnode = share_tnode( tnode );
                 typetab_insert( compiler->typetab, type_name,
                                 &shared_tnode, &inner );

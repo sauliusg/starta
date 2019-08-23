@@ -177,6 +177,8 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
 
+TNODE *new_tnode_generic_ref( char *name, cexception_t *ex );
+
 TNODE *new_tnode_implementation( TNODE *generic_tnode,
                                  TYPETAB *generic_types,
                                  cexception_t *ex );
