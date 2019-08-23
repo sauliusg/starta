@@ -1678,7 +1678,8 @@ static key_value_t *make_tnode_key_value_list( TNODE *tnode,
            allocated array of generic type: */
 
         list[0].val = tnode_is_reference( element_tnode ) ? 1 : 
-            (tnode_kind(element_tnode) == TK_PLACEHOLDER ? 1 : 0);
+            (tnode_kind(element_tnode) == TK_PLACEHOLDER ||
+             tnode_kind(element_tnode) == TK_GENERIC_REF ? 1 : 0);
 
         list[1].val = tnode_is_reference( element_tnode ) ? 
             REF_SIZE : tnode_size( element_tnode );
@@ -1808,7 +1809,8 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
            allocated array of generic type: */
 
         list[0].val = tnode_is_reference( element_tnode ) ? 1 : 
-            (tnode_kind(element_tnode) == TK_PLACEHOLDER ? 1 : 0);
+            (tnode_kind(element_tnode) == TK_PLACEHOLDER ||
+             tnode_kind(element_tnode) == TK_GENERIC_REF ? 1 : 0);
 
         list[1].val = tnode_is_reference( element_tnode ) ? 
             REF_SIZE : tnode_size( element_tnode );
@@ -1842,7 +1844,8 @@ key_value_t *make_compiler_tnode_key_value_list( COMPILER *cc,
        of generic type: */
 
     list[0].val = tnode_is_reference( tnode ) ? 1 : 
-        (tnode_kind(tnode) == TK_PLACEHOLDER ? 1 : 0);
+        (tnode_kind(tnode) == TK_PLACEHOLDER ||
+         tnode_kind(tnode) == TK_GENERIC_REF ? 1 : 0);
 
     //printf( ">>> %s: building k/v list for %s\n", __FUNCTION__, tnode ? tnode_name(tnode) : "?" );
     
@@ -2524,7 +2527,8 @@ static void compiler_push_operator_retvals( COMPILER *cc,
     }
 
     if( od->containing_type && retval_type &&
-        tnode_kind( retval_type ) == TK_PLACEHOLDER ) {
+        (tnode_kind( retval_type ) == TK_PLACEHOLDER ||
+         tnode_kind( retval_type ) == TK_GENERIC_REF )) {
         TNODE *element_type = tnode_element_type( od->containing_type );
         if( element_type ) {
             delete_tnode( retval_type );
@@ -3989,7 +3993,9 @@ static void compiler_compile_array_alloc( COMPILER *cc,
     key_value_t *fixup_values =
         make_tnode_key_value_list( NULL, *element_type );
 
-    if( *element_type && tnode_kind( *element_type ) != TK_PLACEHOLDER ) {
+    if( *element_type &&
+        tnode_kind( *element_type ) != TK_PLACEHOLDER &&
+        tnode_kind( *element_type ) != TK_GENERIC_REF ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
         if( *element_type ) {
@@ -5425,6 +5431,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
         cexception_guard( inner ) {
             generic_types = new_typetab( &inner );
             if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
+                tnode_kind( arg_type ) != TK_GENERIC_REF &&
                 !tnode_types_are_assignment_compatible( arg_type, exp_type,
                                                         generic_types,
                                                         NULL /* msg */,
@@ -10153,7 +10160,7 @@ control_statement
                                                   loop_counter_var, px );
             if( aggregate_expression_type &&
                 tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
-                tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+                tnode_kind( element_type ) != TK_PLACEHOLDER) {
                 compiler_compile_sti( compiler, px );
             } else {
                 compiler_emit( compiler, px, "\tc\n", GSTI );
@@ -11004,6 +11011,7 @@ delimited_type_description
         cexception_guard( inner ) {
             if( !tnode ) {
                 tnode = new_tnode_generic_ref( type_name, &inner );
+                // tnode = new_tnode_placeholder( type_name, &inner );
                 shared_tnode = share_tnode( tnode );
                 typetab_insert( compiler->typetab, type_name,
                                 &shared_tnode, &inner );

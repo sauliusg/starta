@@ -31,17 +31,21 @@ static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
 	tf2 = dnode_type( f2 );
         if( tf1 && tf2 && 
             ( tnode_kind( tf1 ) == TK_PLACEHOLDER ||
-              tnode_kind( tf2 ) == TK_PLACEHOLDER )) {
+              tnode_kind( tf1 ) == TK_GENERIC_REF ||
+              tnode_kind( tf2 ) == TK_PLACEHOLDER ||
+              tnode_kind( tf2 ) == TK_GENERIC_REF )) {
             ssize_t bytes = sizeof(ssize_t);
             ssize_t bits = (CHAR_BIT * bytes)/2;
             size_t mask = ~(~((ssize_t)0) << bits);
             ssize_t offs1 = dnode_offset( f1 );
             ssize_t offs2 = dnode_offset( f2 );
             //printf( ">>> mask = 0x%08X\n", mask );
-            if( tnode_kind( tf1 ) == TK_PLACEHOLDER ) {
+            if( tnode_kind( tf1 ) == TK_PLACEHOLDER ||
+                tnode_kind( tf1 ) == TK_GENERIC_REF ) {
                 offs1 &= mask;
             }
-            if( tnode_kind( tf2 ) == TK_PLACEHOLDER ) {
+            if( tnode_kind( tf2 ) == TK_PLACEHOLDER ||
+                tnode_kind( tf2 ) == TK_GENERIC_REF ) {
                 offs2 &= mask;
             }
             //printf( ">>> f1 offset = %d\n", offs1 );
@@ -194,8 +198,10 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                                       cexception_t *ex )
 {
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
-			   t2->kind == TK_PLACEHOLDER )) {
-        if( t2->kind == TK_PLACEHOLDER ) {
+                           t1->kind == TK_GENERIC_REF ||
+			   t2->kind == TK_PLACEHOLDER ||
+                           t2->kind == TK_GENERIC_REF )) {
+        if( t2->kind == TK_PLACEHOLDER || t2->kind == TK_GENERIC_REF ) {
             if( t2->base_type ) {
                 /* placeholder is already implemented: */
                 return tnode_check_types
@@ -287,7 +293,10 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					    generic_types, ex );
     }
 
-    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
+    if( t1->kind == TK_PLACEHOLDER ||
+        t1->kind == TK_GENERIC_REF ||
+        t2->kind == TK_PLACEHOLDER ||
+        t2->kind == TK_GENERIC_REF ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -297,8 +306,12 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     }
 
     if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
-	if( (t1->element_type && t1->element_type->kind == TK_PLACEHOLDER) &&
-	    (t2->element_type && t2->element_type->kind == TK_PLACEHOLDER) ) {
+	if( (t1->element_type &&
+             (t1->element_type->kind == TK_PLACEHOLDER ||
+              t1->element_type->kind == TK_GENERIC_REF)) &&
+	    (t2->element_type &&
+             (t2->element_type->kind == TK_PLACEHOLDER ||
+              t2->element_type->kind == TK_GENERIC_REF)) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
@@ -432,7 +445,9 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return 1;
     }
     if( t2->kind == TK_NULLREF ) {
-        if( generic_types && t1->kind == TK_PLACEHOLDER ) {
+        if( generic_types &&
+            (t1->kind == TK_PLACEHOLDER ||
+             t1->kind == TK_GENERIC_REF)) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
         } else {
@@ -475,7 +490,10 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return tnode_implements_interface( t2, t1 );
     }
 
-    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
+    if( t1->kind == TK_PLACEHOLDER ||
+        t1->kind == TK_GENERIC_REF ||
+        t2->kind == TK_PLACEHOLDER ||
+        t2->kind == TK_GENERIC_REF ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -485,13 +503,18 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     }
 
     if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
-	if( (t1->element_type && t1->element_type->kind == TK_PLACEHOLDER) &&
-	    (t2->element_type && t2->element_type->kind == TK_PLACEHOLDER) ) {
+	if( (t1->element_type &&
+             (t1->element_type->kind == TK_PLACEHOLDER ||
+              t1->element_type->kind == TK_GENERIC_REF)) &&
+	    (t2->element_type &&
+             (t2->element_type->kind == TK_PLACEHOLDER ||
+              t2->element_type->kind == TK_GENERIC_REF)) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
             if( t2->element_type &&
-                t2->element_type->kind == TK_PLACEHOLDER &&
+                (t2->element_type->kind == TK_PLACEHOLDER ||
+                 t2->element_type->kind == TK_GENERIC_REF) &&
                 t1->base_type ) {
                 return
                     tnode_types_are_assignment_compatible
@@ -539,7 +562,9 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                                                 TYPETAB *generic_types,
                                                 cexception_t *ex )
 {
-    if( generic_types && abstract->kind == TK_PLACEHOLDER ) {
+    if( generic_types &&
+        (abstract->kind == TK_PLACEHOLDER ||
+         abstract->kind == TK_GENERIC_REF) ) {
         TNODE *volatile placeholder_implementation =
             typetab_lookup( generic_types, abstract->name );
 
@@ -582,7 +607,9 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 	TNODE *f1_arg_type = dnode_type( f1_arg );
 	TNODE *f2_arg_type = dnode_type( f2_arg );
 
-        if( f1_arg_type && f1_arg_type->kind == TK_PLACEHOLDER ) {
+        if( f1_arg_type &&
+            (f1_arg_type->kind == TK_PLACEHOLDER ||
+             f1_arg_type->kind == TK_GENERIC_REF )) {
             f1_arg_type =
                 tnode_placeholder_implementation( f1_arg_type, f2_arg_type,
                                                   generic_types, ex );

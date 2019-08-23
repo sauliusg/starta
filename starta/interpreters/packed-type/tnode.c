@@ -1072,7 +1072,8 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
     if( !generic_tnode ) return NULL;
     if( !generic_types ) return share_tnode( generic_tnode );
 
-    if( generic_tnode->kind == TK_PLACEHOLDER ) {
+    if( generic_tnode->kind == TK_PLACEHOLDER ||
+        generic_tnode->kind == TK_GENERIC_REF ) {
         TNODE *concrete_type = typetab_lookup( generic_types,
                                                tnode_name( generic_tnode ));
         if( concrete_type ) {
