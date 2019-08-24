@@ -21,12 +21,28 @@ function print_array( array of <type T> a; function ( <T> element ) print )
     enddo
 }
 
+function print_array_shared_generic( array of type X a; function ( X element ) print )
+{
+    foreach var X e in a do
+        print( e );
+    enddo
+}
+
 var mi = [ 1, 4, 8 ];
 
 mi = push( mi, 2 );
 . "length(mi) ==", length(mi);
 . "nref(mi)   ==", nref(mi);
 print_array( mi, function( int i ) { . i } );
+
+. "----------------------------------------";
+
+mi = [ 1, 4, 8 ];
+
+mi = push( mi, 2 );
+. "length(mi) ==", length(mi);
+. "nref(mi)   ==", nref(mi);
+print_array_shared_generic( mi, function( int i ) { . i } );
 
 . "----------------------------------------";
 
