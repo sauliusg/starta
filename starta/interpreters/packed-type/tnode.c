@@ -2214,7 +2214,8 @@ TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags )
 int tnode_has_placeholder_element( TNODE *tnode )
 {
     while( tnode ) {
-        if( tnode->kind == TK_PLACEHOLDER )
+        if( tnode->kind == TK_PLACEHOLDER ||
+            tnode->kind == TK_GENERIC_REF )
             return 1;
         tnode = tnode->element_type;
     }
