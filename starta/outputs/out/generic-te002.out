@@ -1,8 +1,8 @@
-This test should fail, since integers may not be used to instantiate generic references.
+./sl: inputs/generic-te002.snl(29,44): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
+print_array( mi, function( int i ) { . i } );
+                                           ^
+./sl: inputs/generic-te002.snl(29,44): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
+print_array( mi, function( int i ) { . i } );
+                                           ^
+./sl: 2 error(s) detected
 
-length(mi) == 4
-nref(mi)   == 0
-1
-4
-8
-2

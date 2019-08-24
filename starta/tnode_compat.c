@@ -569,6 +569,12 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
             typetab_lookup( generic_types, abstract->name );
 
         if( !placeholder_implementation ) {
+            if( abstract->kind == TK_GENERIC_REF &&
+                !tnode_is_reference( concrete )) {
+                yyerrorf( "can not implement reference placeholder '%s' "
+                          "with a non-reference type '%s'",
+                          tnode_name( abstract ), tnode_name( concrete ));
+            }
             TNODE *volatile shared_concrete = share_tnode( concrete );
             cexception_t inner;
             cexception_guard( inner ) {
