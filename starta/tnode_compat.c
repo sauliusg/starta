@@ -193,19 +193,20 @@ tnode_placeholder_implementation( TNODE *abstract,
 }
 
 static int
-tnode_create_and_check_placeholder_implementation( TNODE *concrete, TNODE *abstract,
+tnode_create_and_check_placeholder_implementation( TNODE *concrete,
+                                                   TNODE *abstract,
                                                    TYPETAB *generic_types,
                                                    int (*tnode_check_types)
-                                                       ( TNODE *t1, TNODE *t2,
-                                                         TYPETAB *generic_types,
-                                                         cexception_t *ex ),
+                                                    ( TNODE *t1, TNODE *t2,
+                                                      TYPETAB *generic_types,
+                                                      cexception_t *ex ),
                                                    cexception_t *ex)
 {
     TNODE *volatile placeholder_implementation =
         typetab_lookup( generic_types, abstract->name );
 
     if( placeholder_implementation ) {
-        return tnode_check_types
+        return (*tnode_check_types)
             ( concrete, placeholder_implementation->base_type,
               generic_types, ex );
     } else {
