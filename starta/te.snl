@@ -34,14 +34,14 @@ function print_array( array of <type X> a; function ( <X> element ) print )
 //     enddo
 // }
 
-// var mi = [ 1, 4, 8 ];
-// 
-// mi = apush( mi, 2 );
-// . "length(mi) ==", length(mi);
-// . "nref(mi)   ==", nref(mi);
-// print_array( mi, function( int i ) { . i } );
-// 
-// . "----------------------------------------";
+var mi = [ 1, 4, 8 ];
+
+mi = apush( mi, 2 );
+. "length(mi) ==", length(mi);
+. "nref(mi)   ==", nref(mi);
+print_array( mi, function( int i ) { . i } );
+
+. "----------------------------------------";
 // 
 // mi = [ 1, 4, 8 ];
 // 
@@ -53,19 +53,19 @@ function print_array( array of <type X> a; function ( <X> element ) print )
 // . "----------------------------------------";
 //
 
-struct S { name: string; position: int };
+// struct S { name: string; position: int };
+// 
+// var mm: array of struct { name: string; position: int } = new S[0];
+// var m = [ "alpha", "beta", "gamma" ];
+// 
+// mm = apush( mm, struct S{ name => "first struct", position => 11 } );
+// mm = apush( mm, struct S{ name => "second struct", position => 222 } );
+// . "length(m) ==", length(m);
+// . "nref(m)   ==", nref(m);
+// print_array( mm, function( string i ) { . i } );
+// print_array( m, function( struct { name: string; position: int } s ) { . s.name, s.position } );
 
-var mm: array of struct { name: string; position: int } = new S[0];
-var m = [ "alpha", "beta", "gamma" ];
-
-mm = apush( mm, struct S{ name => "first struct", position => 11 } );
-mm = apush( mm, struct S{ name => "second struct", position => 222 } );
-. "length(m) ==", length(m);
-. "nref(m)   ==", nref(m);
-//print_array( mm, function( string i ) { . i } );
-print_array( mm, function( struct { name: string; position: int } s ) { . s.name, s.position } );
-
-. "========================================";
+// . "========================================";
 // 
 // m = push( m, "delta" );
 // 
