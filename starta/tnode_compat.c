@@ -201,7 +201,6 @@ tnode_create_and_check_placeholder_implementation( TNODE *concrete, TNODE *abstr
                                                          cexception_t *ex ),
                                                    cexception_t *ex)
 {
-    TNODE *volatile shared_concrete = NULL;
     TNODE *volatile placeholder_implementation =
         typetab_lookup( generic_types, abstract->name );
 
