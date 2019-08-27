@@ -6,8 +6,8 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of <type P>; value : <P> )
-    -> array of <type P>
+inline bytecode procedure apush( a : array of <P>; value : <P> )
+    -> array of <P>
 {
     APUSH
 }
@@ -20,12 +20,12 @@ inline bytecode procedure push( a : array of <type P>; value : <P> )
 
 inline bytecode function nref( a : array ): int { NREF }
 
-// function print_array( array of <type X> a; function ( <X> element ) print )
-// {
-//     foreach var <X> e in a do
-//         print( e );
-//     enddo
-// }
+function print_array( array of <type X> a; function ( <X> element ) print )
+{
+    foreach var <X> e in a do
+        print( e );
+    enddo
+}
 // 
 // function print_array_shared_generic( array of type Y a; function ( Y element ) print )
 // {
@@ -36,10 +36,10 @@ inline bytecode function nref( a : array ): int { NREF }
 
 var mi = [ 1, 4, 8 ];
 
-mi = push( mi, 2 );
-// . "length(mi) ==", length(mi);
-// . "nref(mi)   ==", nref(mi);
-// print_array_shared_generic( mi, function( int i ) { . i } );
+mi = apush( mi, 2 );
+. "length(mi) ==", length(mi);
+. "nref(mi)   ==", nref(mi);
+print_array( mi, function( int i ) { . i } );
 // 
 // . "----------------------------------------";
 // 
