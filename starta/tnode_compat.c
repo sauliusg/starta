@@ -151,10 +151,6 @@ static int tnode_structures_are_identical( TNODE *t1, TNODE *t2,
     }
 }
 
-// FIXME: the code in 'tnode_placeholder_implementation()' duplicates
-// the code in the
-// 'tnode_create_and_check_placeholder_implementation()' function and
-// needs to be merged to preserve SPOT (S.G.).
 static TNODE *
 tnode_placeholder_implementation( TNODE *abstract,
                                   TNODE *concrete,
@@ -214,27 +210,8 @@ tnode_create_and_check_placeholder_implementation( TNODE *concrete, TNODE *abstr
             ( concrete, placeholder_implementation->base_type,
               generic_types, ex );
     } else {
-        if( abstract->kind == TK_GENERIC_REF &&
-            !tnode_is_reference( concrete )) {
-            yyerrorf( "can not implement reference placeholder '%s' "
-                      "with a non-reference type '%s'",
-                      tnode_name( abstract ), tnode_name( concrete ));
-        }
-        cexception_t inner;
-        cexception_guard( inner ) {
-            placeholder_implementation =
-                new_tnode_placeholder( abstract->name, &inner );
-            shared_concrete = share_tnode( concrete );
-            tnode_insert_base_type( placeholder_implementation,
-                                    &shared_concrete );
-            typetab_insert( generic_types, abstract->name,
-                            &placeholder_implementation, &inner );
-        }
-        cexception_catch {
-            delete_tnode( shared_concrete );
-            delete_tnode( placeholder_implementation );
-            cexception_reraise( inner, ex );
-        }
+        tnode_placeholder_implementation( abstract, concrete,
+                                          generic_types, ex );
         return 1;
     }
 }
