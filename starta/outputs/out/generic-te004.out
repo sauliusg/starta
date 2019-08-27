@@ -1,0 +1,4 @@
+length(m) == 3
+nref(m)   == 3
+first struct 11
+second struct 222

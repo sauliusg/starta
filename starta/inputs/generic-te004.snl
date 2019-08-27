@@ -1,0 +1,34 @@
+//--*- Java -*--
+// Starta compiler tests.
+//
+// Check "type erasure" generic types
+//
+
+use * from std;
+
+inline bytecode procedure apush( a : array of <P>; value : <P> )
+    -> array of <P>
+{
+    APUSH
+}
+
+inline bytecode function nref( a : array ): int { NREF }
+
+function print_array( array of <type X> a; function ( <X> element ) print )
+{
+    foreach var <X> e in a do
+        print( e );
+    enddo
+}
+
+struct S { name: string; position: int };
+
+var mm: array of struct { name: string; position: int } = new S[0];
+var m = [ "alpha", "beta", "gamma" ];
+
+mm = apush( mm, struct S{ name => "first struct", position => 11 } );
+mm = apush( mm, struct S{ name => "second struct", position => 222 } );
+. "length(m) ==", length(m);
+. "nref(m)   ==", nref(m);
+
+print_array( mm, function( s : S ) { . s.name, s.position } );
