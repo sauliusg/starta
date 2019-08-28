@@ -168,6 +168,8 @@ typedef struct {
     VARTAB *vartab;   /* declared variables, with scopes */
     VARTAB *consts;   /* declared constants, with scopes */
     TYPETAB *typetab; /* declared types and their scopes */
+    TYPETAB *generic_types; /* generic type implementations in
+                               function and method calls */
     VARTAB *operators; /* operators declared outside of type definitions */
 
     STLIST *symtab_stack; /* pushed symbol tables */
@@ -307,6 +309,7 @@ static void delete_compiler( COMPILER *c )
 	delete_vartab( c->consts );
 	delete_vartab( c->compiled_modules );
 	delete_typetab( c->typetab );
+	delete_typetab( c->generic_types );
 	delete_vartab( c->operators );
 
 	delete_stlist( c->symtab_stack );
@@ -422,6 +425,7 @@ static COMPILER *new_compiler( char *filename,
 	cc->compiled_modules = new_vartab( &inner );
 	cc->typetab = new_typetab( &inner );
 	cc->operators = new_vartab( &inner );
+        cc->generic_types = new_typetab( &inner );
 
 	cc->local_offset = starting_local_offset;
 
@@ -5433,7 +5437,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
             if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
                 tnode_kind( arg_type ) != TK_GENERIC_REF &&
                 !tnode_types_are_assignment_compatible( arg_type, exp_type,
-                                                        generic_types,
+                                                        cc->generic_types,
                                                         NULL /* msg */,
                                                         0 /* msglen */,
                                                         &inner )) {
@@ -12873,8 +12877,10 @@ function_call
   ;
 
 opt_actual_argument_list
-  : actual_argument_list
-  |
+  : { typetab_begin_subscope( compiler->generic_types, px ); }
+    actual_argument_list
+    { typetab_end_subscope( compiler->generic_types, px ); }
+  | /* empty */
   ;
 
 actual_argument_list
