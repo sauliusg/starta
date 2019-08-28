@@ -1,8 +1,5 @@
-./sl: inputs/err-generic003.snl(21,19): ERROR, incompatible types for function 'push' argument nr. 1
+./sl: inputs/err-generic003.snl(21,19): ERROR, incompatible types for function 'push' argument nr. 2
 s = push( s, null );
                   ^
-./sl: inputs/err-generic003.snl(21,20): ERROR, incompatible types for assignment to variable 's'
-s = push( s, null );
-                   ^
-./sl: 2 error(s) detected
+./sl: 1 error(s) detected
 

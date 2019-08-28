@@ -6593,14 +6593,15 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
 	generic_types = new_typetab( &inner );
         if( funct && fn_type ) {
             compiler_emit_default_arguments( cc, NULL, &inner );
-            compiler_check_and_drop_function_args( cc, funct, generic_types,
+            compiler_check_and_drop_function_args( cc, funct,
+                                                   cc->generic_types,
                                                    &inner );
             compiler_emit_function_call( cc, funct, NULL, "\n", &inner );
             if( tnode_kind( fn_type ) == TK_FUNCTION_REF ||
                 tnode_kind( fn_type ) == TK_CLOSURE ) {
                 compiler_drop_top_expression( cc );
             }
-            compiler_push_function_retvals( cc, funct, generic_types, &inner );
+            compiler_push_function_retvals( cc, funct, cc->generic_types, &inner );
             rval_nr = compiler_count_return_values( funct );
         } else {
             while( cc->e_stack &&
@@ -6624,6 +6625,7 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
 
     delete_dnode( cc->current_call );
 
+    typetab_end_subscope( cc->generic_types, ex );
     compiler_pop_current_interface_nr( cc, ex );
     compiler_pop_current_call( cc, ex );
 
@@ -12879,8 +12881,8 @@ function_call
 opt_actual_argument_list
   : { typetab_begin_subscope( compiler->generic_types, px ); }
     actual_argument_list
-    { typetab_end_subscope( compiler->generic_types, px ); }
-  | /* empty */
+  | { typetab_begin_subscope( compiler->generic_types, px ); }
+    /* empty */
   ;
 
 actual_argument_list

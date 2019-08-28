@@ -1,17 +1,8 @@
 ./sl: inputs/generic-te002.snl(26,14): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
 mi = push( mi, 2 );
              ^
-./sl: inputs/generic-te002.snl(26,18): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
-mi = push( mi, 2 );
-                 ^
 ./sl: inputs/generic-te002.snl(29,16): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
 print_array( mi, function( int i ) { . i } );
                ^
-./sl: inputs/generic-te002.snl(29,44): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
-print_array( mi, function( int i ) { . i } );
-                                           ^
-./sl: inputs/generic-te002.snl(29,44): ERROR, can not implement reference placeholder 'T' with a non-reference type 'int'
-print_array( mi, function( int i ) { . i } );
-                                           ^
-./sl: 5 error(s) detected
+./sl: 2 error(s) detected
 
