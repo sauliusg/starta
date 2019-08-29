@@ -7771,7 +7771,7 @@ static cexception_t *px; /* parser exception */
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
 %type <i>     function_or_procedure_start
-%type <i>     function_or_procedure_type_keyword
+%type <i>     function_or_procedure_keyword
 %type <si>     opt_closure_initialisation_list
 %type <i>     opt_null_type_designator
 %type <tnode> opt_base_type
@@ -8744,7 +8744,7 @@ selective_use_statement
            delete_dnode( imported_identifiers );
        }
 
-   | _USE function_or_procedure_type_keyword identifier_list
+   | _USE function_or_procedure_keyword identifier_list
      _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *volatile module_name =
@@ -8766,7 +8766,7 @@ selective_use_statement
            freex( module_name );
            delete_dnode( imported_identifiers );
        }
-   | _IMPORT function_or_procedure_type_keyword identifier_list 
+   | _IMPORT function_or_procedure_keyword identifier_list 
      _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *volatile module_name =
@@ -8816,7 +8816,7 @@ identifier_list
      { $$ = dnode_append( $1, $3 ); }
    ;
 
-function_or_procedure_type_keyword
+function_or_procedure_keyword
   : _FUNCTION
       { $$ = 1; }
   | _PROCEDURE
@@ -8824,7 +8824,7 @@ function_or_procedure_type_keyword
   ;
 
 function_or_procedure_start
-  : function_code_start function_or_procedure_type_keyword
+  : function_code_start function_or_procedure_keyword
       { $$ = $2; }
  ;
 
@@ -11013,7 +11013,7 @@ delimited_type_description
 	$$ = tnode;
     }
 
-  | function_or_procedure_type_keyword '(' argument_list ')'
+  | function_or_procedure_keyword '(' argument_list ')'
     {
 	int is_function = $1;
 	TNODE *base_type = typetab_lookup( compiler->typetab, "procedure" );
@@ -11024,7 +11024,7 @@ delimited_type_description
 	    compiler_set_function_arguments_readonly( $$ );
 	}
     }
-  | function_or_procedure_type_keyword '(' argument_list ')'
+  | function_or_procedure_keyword '(' argument_list ')'
     __ARROW '(' retval_description_list ')'
     {
 	int is_function = $1;
@@ -13453,7 +13453,7 @@ function_expression_header
 ;
 
 opt_function_or_procedure_keyword
-: function_or_procedure_type_keyword
+: function_or_procedure_keyword
 | /* empty */
     { $$ = 1; }
 ;
