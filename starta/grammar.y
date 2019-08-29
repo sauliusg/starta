@@ -12870,6 +12870,8 @@ function_call
 opt_actual_argument_list
   : { typetab_begin_subscope( compiler->generic_types, px ); }
     actual_argument_list
+    /* The corresponding ..._end_subscope call happens in the
+       'compiler_compile_multivalue_function_call()' function. */
   | { typetab_begin_subscope( compiler->generic_types, px ); }
     /* empty */
   ;
