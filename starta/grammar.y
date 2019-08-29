@@ -5429,30 +5429,19 @@ static void compiler_convert_function_argument( COMPILER *cc,
     TNODE *exp_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
 
     if( arg_type && exp_type ) {
-        TYPETAB *volatile generic_types = NULL;
-        cexception_t inner;
-
-        cexception_guard( inner ) {
-            generic_types = new_typetab( &inner );
-            if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
-                tnode_kind( arg_type ) != TK_GENERIC_REF &&
-                !tnode_types_are_assignment_compatible( arg_type, exp_type,
-                                                        cc->generic_types,
-                                                        NULL /* msg */,
-                                                        0 /* msglen */,
-                                                        &inner )) {
-                char *arg_type_name = tnode_name( arg_type );
-                if( arg_type_name ) {
-                    compiler_compile_type_conversion
-                        ( cc, arg_type, /* target_name: */NULL, &inner );
-                }
+        if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
+            tnode_kind( arg_type ) != TK_GENERIC_REF &&
+            !tnode_types_are_assignment_compatible( arg_type, exp_type,
+                                                    cc->generic_types,
+                                                    NULL /* msg */,
+                                                    0 /* msglen */,
+                                                    ex )) {
+            char *arg_type_name = tnode_name( arg_type );
+            if( arg_type_name ) {
+                compiler_compile_type_conversion
+                    ( cc, arg_type, /* target_name: */NULL, ex );
             }
         }
-        cexception_catch {
-            delete_typetab( generic_types );
-            cexception_reraise( inner, ex );
-        }
-        dispose_typetab( &generic_types );
     }
     cc->current_arg = cc->current_arg ? dnode_next( cc->current_arg ) : NULL;
 }
