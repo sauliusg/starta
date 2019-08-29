@@ -11753,8 +11753,8 @@ type_of_type_declaration
                 share_tnode( typetab_lookup( compiler->typetab, type_name ));
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
 
-	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
+	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -11811,8 +11811,8 @@ type_of_type_declaration
                 share_tnode( typetab_lookup( compiler->typetab, type_name ));
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
 
-	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
+	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -11871,8 +11871,8 @@ type_of_type_declaration
 
             assert( !compiler->current_type );
 	    compiler->current_type = moveptr( (void**)&tnode );
-	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	    compiler_begin_scope( compiler, &inner );
+	    compiler_typetab_insert( compiler, &shared_base, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -16168,8 +16168,12 @@ field_designator
         }
         tnode_set_kind( composite, TK_COMPOSITE );
         tnode_insert_element_type( composite, $4 );
-        
+
 	$$ = compiler_lookup_tnode_field( compiler, composite, ident );
+        // A temporary work-around to keep the 'composite' node
+        // alocated: make it into a loop, and let the final
+        // loop-destructing 'mark-and-sweep' collector collect it:
+        tnode_append( composite, composite );
         dispose_tnode( &composite );
 
         freex( ident );

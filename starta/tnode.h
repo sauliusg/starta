@@ -293,6 +293,7 @@ TNODE *tnode_first_interface( TNODE *class_tnode );
 TNODE *tnode_element_type( TNODE *tnode );
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type );
 TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type );
+TNODE *tnode_append( TNODE* tnode, TNODE *next_tnode );
 
 #if 0
 TNODE *tnode_insert_function_parameters( TNODE* tnode, DNODE *parameters );

@@ -235,6 +235,8 @@ TNODE* tnode_break_cycles( TNODE *tnode )
 
         dispose_dnode( &tnode->constructor );
         dispose_dnode( &tnode->destructor );
+
+        dispose_tnode( &tnode->next );
     }
 
     return tnode;
@@ -2128,8 +2130,7 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 	    (tnode->kind == TK_COMPOSITE &&
 	     tnode->element_type->kind == TK_PLACEHOLDER));
 
-    if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
-        tnode && tnode->kind == TK_COMPOSITE &&
+    if( tnode && tnode->kind == TK_COMPOSITE &&
         tnode->element_type && tnode->element_type->kind == TK_PLACEHOLDER ) {
         DNODE *field;
         cexception_t inner;
@@ -2187,6 +2188,14 @@ TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type )
     } else {
 	tnode_append_element_type( tnode->element_type, element_type );
     }
+    return tnode;
+}
+
+TNODE *tnode_append( TNODE* tnode, TNODE *next_tnode )
+{
+    assert( tnode );
+    assert( !tnode->next );
+    tnode->next = share_tnode( next_tnode );
     return tnode;
 }
 
