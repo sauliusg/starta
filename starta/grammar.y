@@ -6573,13 +6573,8 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
     DNODE *funct = cc->current_call;
     TNODE *fn_type = funct ? dnode_type( funct ) : NULL;
     ssize_t rval_nr = 0;
-    /* Generic types represented by "placeholder" tnodes pointing to
-       the actual instances of these types in a particular function
-       call: */
-    TYPETAB *volatile generic_types = NULL; 
 
     cexception_guard( inner ) {
-	generic_types = new_typetab( &inner );
         if( funct && fn_type ) {
             compiler_emit_default_arguments( cc, NULL, &inner );
             compiler_check_and_drop_function_args( cc, funct,
@@ -6605,10 +6600,9 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
             compiler_push_error_type( cc, &inner );
             rval_nr = 1;
         }
-	delete_typetab( generic_types );
     }
     cexception_catch {
-	delete_typetab( generic_types );
+        typetab_end_subscope( cc->generic_types, ex );
         cexception_reraise( inner, ex );
     }
 
