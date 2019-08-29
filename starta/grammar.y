@@ -13460,6 +13460,7 @@ opt_function_or_procedure_keyword
 
 closure_header
 : _CLOSURE
+  function_code_start
   opt_function_or_procedure_keyword '(' argument_list ')'
       opt_retval_description_list
       {
@@ -13509,9 +13510,9 @@ closure_header
       opt_closure_initialisation_list
       {
           char *closure_name =
-              obtain_string_from_strpool( compiler->strpool, $8 );
-          DNODE *volatile parameters = $4;
-          DNODE *volatile return_values = $6;
+              obtain_string_from_strpool( compiler->strpool, $9 );
+          DNODE *volatile parameters = $5;
+          DNODE *volatile return_values = $7;
           DNODE *volatile self_dnode = NULL;
           DNODE *volatile funct = NULL;
           ENODE *closure_expr = compiler->e_stack;
