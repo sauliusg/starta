@@ -6,19 +6,26 @@
 
 use * from std;
 
-inline bytecode procedure apush( a : array of <P>; value : <P> )
-    -> array of <P>
+inline bytecode procedure gpush( a : array of type T; value : type T )
+    -> array of type T
 {
     APUSH
 }
 
-// inline bytecode procedure gpush( a : array of type T; value : type T )
-//     -> array of type T
-// {
-//     APUSH
-// }
+inline bytecode procedure apush( a : array of <T>; value : <T> )
+    -> array of <T>
+{
+    APUSH
+}
 
 inline bytecode function nref( a : array ): int { NREF }
+
+function print_array_shared_generic( array of type X a; function ( X element ) print )
+{
+    foreach var X e in a do
+        print( e );
+    enddo
+}
 
 function print_array( array of <type X> a; function ( <X> element ) print )
 {
@@ -26,13 +33,6 @@ function print_array( array of <type X> a; function ( <X> element ) print )
         print( e );
     enddo
 }
-// 
-// function print_array_shared_generic( array of type Y a; function ( Y element ) print )
-// {
-//     foreach var Y e in a do
-//         print( e );
-//     enddo
-// }
 
 var mi = [ 1, 4, 8 ];
 

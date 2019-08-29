@@ -291,7 +291,13 @@ void delete_all_dnodes( void )
         delete_dnode( node );
         node = next;
     }
-    //allocated = NULL;
+    /* If there are no DNODEs that have external references (not just
+       were participating in reference cycles that were presumably
+       broken before), and there are no DNODEs that were not
+       deallocated correctly (i.e. for which delete_dnode() was not
+       called the appropriate number of times), then at this point
+       'allocated' should be NULL, since delete_dnode() excludes the
+       deteled DNODE from the allocated DNODE list. */
 }
 
 DNODE *dnode_break_cycles( DNODE *dnode )
