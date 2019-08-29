@@ -13415,8 +13415,9 @@ closure_initialisation
 ;
 
 function_expression_header
-:   opt_function_attributes function_or_procedure_header_start '(' argument_list ')'
-         opt_retval_description_list
+:   opt_function_attributes function_or_procedure_header_start
+    '(' argument_list ')'
+    opt_retval_description_list
     {
         int is_function = $2;
         DNODE *volatile parameters = $4;
