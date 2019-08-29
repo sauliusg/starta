@@ -7770,7 +7770,7 @@ static cexception_t *px; /* parser exception */
 %type <si>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
-%type <i>     function_or_procedure_keyword
+%type <i>     function_or_procedure_start
 %type <i>     function_or_procedure_type_keyword
 %type <si>     opt_closure_initialisation_list
 %type <i>     opt_null_type_designator
@@ -8744,7 +8744,7 @@ selective_use_statement
            delete_dnode( imported_identifiers );
        }
 
-   | _USE function_or_procedure identifier_list
+   | _USE function_or_procedure_type_keyword identifier_list
      _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *volatile module_name =
@@ -8766,7 +8766,7 @@ selective_use_statement
            freex( module_name );
            delete_dnode( imported_identifiers );
        }
-   | _IMPORT function_or_procedure identifier_list 
+   | _IMPORT function_or_procedure_type_keyword identifier_list 
      _FROM /* module_import_identifier */  __IDENTIFIER
        {
            char *volatile module_name =
@@ -8816,7 +8816,17 @@ identifier_list
      { $$ = dnode_append( $1, $3 ); }
    ;
 
-function_or_procedure: _FUNCTION | _PROCEDURE;
+function_or_procedure_type_keyword
+  : _FUNCTION
+      { $$ = 1; }
+  | _PROCEDURE
+      { $$ = 0; }
+  ;
+
+function_or_procedure_start
+  : function_code_start function_or_procedure_type_keyword
+      { $$ = $2; }
+ ;
 
 load_library_statement
    : _LOAD __STRING_CONST
@@ -11029,14 +11039,6 @@ delimited_type_description
 
   | _BLOB
     { $$ = new_tnode_blob_snail( compiler->typetab, px ); }
-  ;
-
-
-function_or_procedure_type_keyword
-  : _FUNCTION
-      { $$ = 1; }
-  | _PROCEDURE
-      { $$ = 0; }
   ;
 
 opt_base_type
@@ -13413,7 +13415,7 @@ closure_initialisation
 ;
 
 function_expression_header
-:   opt_function_attributes function_or_procedure_keyword '(' argument_list ')'
+:   opt_function_attributes function_or_procedure_start '(' argument_list ')'
          opt_retval_description_list
     {
         int is_function = $2;
@@ -13451,7 +13453,7 @@ function_expression_header
 ;
 
 opt_function_or_procedure_keyword
-: function_or_procedure_keyword
+: function_or_procedure_start
 | /* empty */
     { $$ = 1; }
 ;
@@ -15591,15 +15593,8 @@ function_code_start
     }
   ;
 
-function_or_procedure_keyword
-  : function_code_start _FUNCTION
-      { $$ = 1; }
-  | function_code_start _PROCEDURE
-      { $$ = 0; }
- ;
-
 function_header
-  : opt_function_attributes function_or_procedure_keyword
+  : opt_function_attributes function_or_procedure_start
     __IDENTIFIER '(' argument_list ')'
     opt_retval_description_list
         {
