@@ -13453,7 +13453,7 @@ function_expression_header
 ;
 
 opt_function_or_procedure_keyword
-: function_or_procedure_start
+: function_or_procedure_type_keyword
 | /* empty */
     { $$ = 1; }
 ;
