@@ -7770,7 +7770,7 @@ static cexception_t *px; /* parser exception */
 %type <si>     opt_identifier
 %type <tnode> opt_method_interface
 %type <i>     function_attributes
-%type <i>     function_or_procedure_start
+%type <i>     function_or_procedure_header_start
 %type <i>     function_or_procedure_keyword
 %type <si>     opt_closure_initialisation_list
 %type <i>     opt_null_type_designator
@@ -8823,7 +8823,7 @@ function_or_procedure_keyword
       { $$ = 0; }
   ;
 
-function_or_procedure_start
+function_or_procedure_header_start
   : function_code_start function_or_procedure_keyword
       { $$ = $2; }
  ;
@@ -13415,7 +13415,7 @@ closure_initialisation
 ;
 
 function_expression_header
-:   opt_function_attributes function_or_procedure_start '(' argument_list ')'
+:   opt_function_attributes function_or_procedure_header_start '(' argument_list ')'
          opt_retval_description_list
     {
         int is_function = $2;
@@ -15595,7 +15595,7 @@ function_code_start
   ;
 
 function_header
-  : opt_function_attributes function_or_procedure_start
+  : opt_function_attributes function_or_procedure_header_start
     __IDENTIFIER '(' argument_list ')'
     opt_retval_description_list
         {
