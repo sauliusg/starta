@@ -16,7 +16,7 @@ inline bytecode procedure push( a : array of type T; value : T )
 
 inline bytecode function nref( a : array ): int { NREF }
 inline bytecode function capacity( a : array ): int { CAPACITY }
-inline bytecode function trim( a : array of T ): array of T { TRIM }
+inline bytecode function trim( a : array of type T ): array of type T { TRIM }
 
 function print_array( array of type T a; function ( T element ) print )
 {

@@ -8946,14 +8946,15 @@ opt_identifier
 ;
 
 program_header
-  :  _PROGRAM opt_identifier '(' argument_list ')' opt_retval_description_list
+  :  function_code_start _PROGRAM opt_identifier '(' argument_list ')'
+     opt_retval_description_list
         {
 	  cexception_t inner;
           char *volatile program_name =
-              obtain_string_from_strpool( compiler->strpool, $2 );
+              obtain_string_from_strpool( compiler->strpool, $3 );
 	  DNODE *volatile funct = NULL;
-          DNODE *volatile arguments = $4;
-          DNODE *volatile retvals = $6;
+          DNODE *volatile arguments = $5;
+          DNODE *volatile retvals = $7;
           DNODE *volatile shared_retvals = NULL;
           TNODE *retval_type = retvals ? dnode_type( retvals ) : NULL;
           ssize_t program_addr;
@@ -8966,7 +8967,7 @@ program_header
 	      funct =
 		  compiler_check_and_set_fn_proto( compiler, funct, &inner );
 
-              compiler_check_and_emit_program_arguments( compiler, $4,
+              compiler_check_and_emit_program_arguments( compiler, $5,
                                                          &inner );
               program_addr = thrcode_length( compiler->function_thrcode );
               compiler_emit( compiler, &inner, "\tce\n", CALL, &program_addr );
@@ -15434,6 +15435,8 @@ function_or_operator_end
           delete_dnode( compiler->current_function );
 	  compiler->current_function = 
               dlist_pop_data( &compiler->current_function_stack );
+
+          typetab_end_scope( compiler->typetab, px );
 	}
 ;
 
@@ -15580,6 +15583,7 @@ opt_function_attributes
 function_code_start
   :
     {
+      typetab_begin_scope( compiler->typetab, px );
       if( thrcode_debug_is_on()) {
 	  const char *currentLine = compiler_flex_current_line();
 	  const char *first_nonblank = currentLine;
