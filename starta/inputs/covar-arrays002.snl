@@ -70,10 +70,10 @@ an = ai;
 . ai[2]->get_name(), ai[2]->get_value();
 
 
-// A type problem for 'array of Integer' ai:
-an[2] = new Number;
 // Also a type problem for 'array of Integer' ai:
 an[2] = af[2];
+// A type problem for 'array of Integer' ai:
+an[2] = new Number;
 . ai[2]->get_name();
 // Exception should be triggered gere since wrong method is called:
 . ai[2]->get_value();
