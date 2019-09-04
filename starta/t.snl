@@ -1,76 +1,76 @@
 #--*- Java -*--
 # Starta compiler tests.
 #
-# Check classes with multiple constructors.
+# Check classes and arrays
 #
 
 use std;
 
-class SomeBaseClass {
-    int i;
-    
-    constructor( int i )
-    {
-        self.i = i;
-    }
-
-    constructor default_values()
-    {
-        self.i = 10;
-    }
-
-    method get_i(): int { return self.i }
-};
-
-class MultiplyConstructed: SomeBaseClass {
+class Number {
     string name;
-    float value;
-
-    // This class has several constructors. When a constructor is
-    // not specified explicitly, the default constructor is called.
-
-    constructor( string name; float value; int i )
-        super( i )
-    {
-        self.name = name;
-        self.value = value;
-    }
 
     constructor fromName( string name )
-        self( name, 0.1, 1 );
-    {}
-
-    constructor fromValue( float val )
-        super.default_values();
     {
-        self.name = "... default name from the value '%f' ..." %% val;
+        self.name = name;
+    }
+    
+    constructor ()
+        self.fromName( "Number" )
+    {}
+    
+    method get_name(): string => self.name;
+}
+
+class Integer: Number {
+    int value;
+
+    constructor ( int val )
+        super.fromName( "Integer" )
+    {
         self.value = val;
     }
 
-    method name() -> string { return self.name }
-    method value() -> float { return self.value }
-};
+    method get_value(): int => self.value;
+}
 
-var a = new MultiplyConstructed( "constructed a", 1.2, 12 );
+class Float: Number {
+    float value;
 
-. "(should print out \"constructed a\", 1.2, 12)";
-. a->name();
-. a->value();
-. a->get_i();
-. "";
+    constructor ( float val )
+        super.fromName( "Float" )
+    {
+        self.value = val;
+    }
 
-var b = new MultiplyConstructed.fromName( "Given Name" );
+    method get_value(): float => self.value;
+}
 
-. "(should print out \"Given Name\", 0.1, 1)";
-. b->name();
-. b->value();
-. b->get_i();
-. "";
+var n: Number = new Number;
 
-var c = new MultiplyConstructed.fromValue( 0.371 );
+var ii: Integer = new Integer( 234 );
+var ff: Float = new Float( 23.4 );
 
-. "(should print out \"... default name from the value '0.371000 ...\", " _
-  "0.371, 10)";
-. c->name();
-. c->value();
-. c->get_i();
+. n->get_name();
+. "=================";
+
+. ii->get_name(), ii->get_value();
+. ff->get_name(), ff->get_value();
+. "=================";
+
+var an = new Number * new [10];
+var ai = new Integer( 11 ) * new [10];
+var af = new Float( 3.14 ) * new [10];
+
+. an[1]->get_name();
+. ai[1]->get_name(), ai[1]->get_value();
+. af[1]->get_name(), af[1]->get_value();
+
+an = ai;
+. an[1]->get_name();
+. ai[2]->get_name(), ai[2]->get_value();
+
+
+// Problem here:
+an[2] = af[2];
+an[2] = new Number;
+. ai[2]->get_name(), ai[2]->get_value();
