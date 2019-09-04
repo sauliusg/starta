@@ -1869,6 +1869,7 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
                 }
                 tnode->max_vmt_offset++;
                 if( tnode->base_type &&
+                    tnode->name && // we are not compiling an anonymous class...
                     (!tnode->base_type->name ||
                      strcmp( tnode->base_type->name, "struct" ) != 0) )
                     tnode->base_type->max_vmt_offset++;
