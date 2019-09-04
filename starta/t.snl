@@ -71,6 +71,6 @@ an = ai;
 
 
 // Problem here:
-an[2] = af[2];
 an[2] = new Number;
+an[2] = af[2];
 . ai[2]->get_name(), ai[2]->get_value();
