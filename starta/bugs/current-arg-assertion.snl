@@ -1,0 +1,19 @@
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check classes and arrays
+#
+
+use std;
+
+class Number {
+    string name;
+
+    constructor ( string name )
+    {
+        self->name = name;
+    }
+    
+    method get_name(): string => self.name;
+}
+
