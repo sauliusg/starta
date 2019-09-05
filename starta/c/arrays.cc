@@ -60,5 +60,15 @@ int main()
     
     cout << ai[1]->get_name() << " " << ai[1]->get_value() << "\n";
 
+    cout << "========\n";
+    Number mn[10];
+    cout << mn[2].get_name() << "\n";
+    Integer mi[3] = { Integer(12), Integer(13), Integer(15) };
+    cout << mn[2].get_name() << "\n";
+    cout << mi[2].get_name() << " " << mi[2].get_value() << "\n";
+
+    // C++ makes this assignment incompatible:
+    // mn = mi;
+    
     return 0;
 }
