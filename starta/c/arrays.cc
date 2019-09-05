@@ -41,6 +41,11 @@ public:
     }
 };
 
+Number** foo( Number *a[] )
+{
+    return a;
+}
+
 int main()
 {
     Number n;
@@ -69,6 +74,10 @@ int main()
 
     // C++ makes this assignment incompatible:
     // mn = mi;
+
+    foo( an );
+    // Invalid conversion:
+    // foo( ai );
     
     return 0;
 }
