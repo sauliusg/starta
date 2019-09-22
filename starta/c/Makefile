@@ -19,10 +19,9 @@ INCLUDES = -I. ${addprefix -I, ${sort ${SRC_DIR} ${OTHER_DIRS} ${LIB_DIRS}}}
 CC = gcc
 CFLAGS = -g -Wall ${INCLUDES}
 
-C   = ${wildcard *.c}
-CPP = ${wildcard *.cc}
-X   = ${C:%.c=%} ${CPP:%.cc=%}
-XO  = ${C:%.c=%_o} ${CPP:%.cc=%_o}
+C  = ${wildcard *.c}
+X  = ${C:%.c=%}
+XO = ${C:%.c=%_o}
 
 .PHONY: all test tests alltests listdiff
 .PHONY: bench benchmark benchmarks
@@ -46,14 +45,8 @@ display:
 %: %.c
 	${CC} ${CFLAGS} $< -o $@ ${LIBFLAGS}
 
-%: %.cc
-	${CXX} ${CFLAGS} $< -o $@ ${LIBFLAGS}
-
 %.o: %.c
 	${CC} ${CFLAGS} $< -o $@
-
-%.o: %.cc
-	${CXX} ${CFLAGS} $< -o $@
 
 lsopcodes: lsopcodes.o
 	${CC} ${LDFLAFS} $< -o $@

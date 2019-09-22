@@ -1868,18 +1868,9 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
                     tnode->max_vmt_offset++;
                 }
                 tnode->max_vmt_offset++;
-                if( tnode->base_type &&
-                    tnode->name && // we are not compiling an anonymous class...
-                    (!tnode->base_type->name ||
-                     strcmp( tnode->base_type->name, "struct" ) != 0) )
-                    tnode->base_type->max_vmt_offset++;
 #if 0
-                printf( ">>> advancing VMT offset to %zd for type '%s'\n",
+                printf( ">>> advancing VMT offset to %d for type '%s'\n",
                         tnode->max_vmt_offset, tnode_name( tnode ));
-                if( tnode->base_type )
-                    printf( ">>> global VMT offset to %zd for type '%s'\n",
-                            tnode->base_type->max_vmt_offset,
-                            tnode_name( tnode->base_type ));
 #endif
                 method_offset = tnode->max_vmt_offset;
             }
