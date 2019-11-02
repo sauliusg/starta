@@ -271,10 +271,12 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t2->kind == TK_NULLREF ) {
 	return tnode_is_reference( t1 );
     }
+#if 0
     if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
 	return tnode_types_are_identical( t1, t2->base_type,
 					  generic_types, ex );
     }
+#endif
     if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }
@@ -525,9 +527,14 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	if( t1->element_type == NULL ) {
 	    return t2->kind == TK_ARRAY;
 	} else {
+#if 0
 	    return tnode_types_are_assignment_compatible
                 ( t1->element_type, t2->element_type, generic_types,
                   msg, msglen, ex );
+#else
+	    return tnode_types_are_identical
+                ( t1->element_type, t2->element_type, generic_types, ex );
+#endif
 	}
     }
 
