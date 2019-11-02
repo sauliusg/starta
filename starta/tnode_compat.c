@@ -310,6 +310,13 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					   generic_types, ex );
 	}
     }
+
+    if( t1->kind == TK_FUNCTION_REF && 
+        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
+	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
+                                                        NULL, 0, ex );
+    }
+
     if( t1->name && t2->name ) return 0;
     if( (t1->kind == TK_ARRAY && t2->kind == TK_ARRAY) ||
 	(t1->kind == TK_ADDRESSOF && t2->kind == TK_ADDRESSOF) ) {
@@ -324,12 +331,6 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t1->kind == TK_STRUCT && t2->kind == TK_STRUCT ) {
 	return tnode_structures_are_identical( t1, t2,
 					       generic_types, ex );
-    }
-
-    if( t1->kind == TK_FUNCTION_REF && 
-        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
     }
 
     if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
