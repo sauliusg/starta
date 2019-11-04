@@ -601,7 +601,7 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
         if( narg == 1 &&
             (f2_arg_type->base_type == f1_arg_type ||
              (f1_arg_type->kind == TK_CLASS && f2_arg_type->kind == TK_CLASS &&
-              !f1_arg_type->name && !f2_arg_type->name)) &&
+              (!f1_arg_type->name || !f2_arg_type->name))) &&
             (f1->kind == TK_METHOD || f1->kind == TK_CONSTRUCTOR ||
              f1->kind == TK_DESTRUCTOR)) {
             /* 'self' arguments for methods are always compatible: `*/
