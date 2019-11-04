@@ -589,6 +589,7 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
     while( f1_arg && f2_arg ) {
 	TNODE *f1_arg_type = dnode_type( f1_arg );
 	TNODE *f2_arg_type = dnode_type( f2_arg );
+        int arguments_are_compatible;
 
         if( f1_arg_type && f1_arg_type->kind == TK_PLACEHOLDER ) {
             f1_arg_type =
@@ -597,8 +598,18 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
         }
 
 	narg++;
-	if( !tnode_types_are_identical( f1_arg_type, f2_arg_type,
-					generic_types, ex )) {
+        if( narg == 1 && f2_arg_type->base_type == f1_arg_type &&
+            (f1->kind == TK_METHOD || f1->kind == TK_CONSTRUCTOR ||
+             f1->kind == TK_DESTRUCTOR)) {
+            /* 'self' arguments for methods are always compatible: `*/
+            arguments_are_compatible = 1;
+        } else {
+            arguments_are_compatible =
+                tnode_types_are_identical( f1_arg_type, f2_arg_type,
+                                           generic_types, ex );
+        }
+             
+	if( !arguments_are_compatible ) {
 	    if( msg ) {
                 if( f1_arg_type && f2_arg_type ) {
                     char *name1 = tnode_name( f1_arg_type );
