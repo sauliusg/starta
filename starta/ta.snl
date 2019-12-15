@@ -65,7 +65,9 @@ var af = new Float( 3.14 ) * new [10];
 . ai[1]->get_name(), ai[1]->get_value();
 . af[1]->get_name(), af[1]->get_value();
 
-an = ai;
+// The assignment below should not compile, thus preventing the
+// problems described below:
+an = ai; // ERROR, incompatible array types.
 . an[1]->get_name();
 . ai[2]->get_name(), ai[2]->get_value();
 
@@ -75,5 +77,6 @@ an[2] = new Number;
 // Also a type problem for 'array of Integer' ai:
 an[2] = af[2];
 . ai[2]->get_name();
-// Exception should be triggered here since a wrong method is called:
+// Exception should be triggered here since a wrong method is called;
+// but in this implementations we should not even get here...
 . ai[2]->get_value();
