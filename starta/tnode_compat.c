@@ -618,9 +618,8 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
             arguments_are_compatible = tnode_types_are_compatible
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         } else {
-            arguments_are_compatible =
-                tnode_types_are_identical( f1_arg_type, f2_arg_type,
-                                           generic_types, ex );
+            arguments_are_compatible = tnode_types_are_identical
+                ( f1_arg_type, f2_arg_type, generic_types, ex );
         }
              
 	if( !arguments_are_compatible ) {
