@@ -79,7 +79,8 @@ var ai = new Integer( 11 ) * new [10];
 var af = new Float( 3.14 ) * new [3];
 
 g( an, f );
-// The following call is incompatinbe since f2() expecs Float argument
+
+// The following call is incompatinbe since f2() expects Float argument
 // but g() will pass only a number to it:
 // g( an, f2 ); // INCOMPATIBLE arg 2
 
@@ -102,4 +103,4 @@ g2( af, f2 ); // OK
 // FIXME:
 // g2( an, f ); // incompatible types for 'an'; 'f' should be OK.
 
-g2( an, f2 ); // incompatible types for 'an', 'f2' is OK.
+// g2( an, f2 ); // incompatible types for 'an', 'f2' is OK.
