@@ -402,6 +402,49 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
 }
 
 static int
+tnode_types_are_contravariant( TNODE *t1, TNODE *t2,
+                               TYPETAB *generic_types,
+                               cexception_t *ex )
+{
+    if( !t1 || !t2 ) return 0;
+
+    if( tnode_types_are_identical( t1, t2, generic_types, ex )) {
+        return 1;
+    }
+
+    if( tnode_is_non_null_reference( t1 )) {
+        if( !tnode_is_non_null_reference( t2 )) {
+            return 0;
+        }
+    }
+
+    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+        int compat = tnode_types_are_identical( t1->base_type, t2,
+                                                generic_types, ex ) &&
+            t1->base_type && tnode_kind( t1->base_type ) != TK_REF;
+#if 0
+        fprintf( stderr, ">>> t1: \"%s\" (%s), t2: \"%s\" (%s), compat: %d\n",
+                 tnode_name(t1), tnode_kind_name(t1),
+                 tnode_name(t2), tnode_kind_name(t2),
+                 compat
+                 );
+#endif
+         return compat;
+    }
+    
+    if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
+	return tnode_types_are_identical( t1->base_type, t2,
+					  generic_types, ex );
+    }
+    if( t2->kind == TK_ENUM && t1->kind != TK_ENUM ) {
+	return tnode_types_are_identical( t1, t2->base_type,
+					  generic_types, ex );
+    }
+
+    return 0;
+}
+
+static int
 tnode_generic_functions_are_assignment_compatible( TNODE *f1, TNODE *f2,
                                                    TYPETAB *generic_types,
                                                    char *msg, int msglen,
@@ -757,7 +800,7 @@ tnode_generic_functions_are_assignment_compatible( TNODE *f1, TNODE *f2,
 {
     return
 	tnode_function_arguments_match_msg( f1, f2, generic_types,
-                                            tnode_types_are_compatible,
+                                            tnode_types_are_contravariant,
                                             msg, msglen, ex ) &&
 	tnode_function_retvals_match_msg( f1, f2, generic_types, msg, msglen, ex );
 }

@@ -61,38 +61,59 @@ class Float: TypedNumber {
     method get_value(): float => self.value;
 }
 
-var n: Number = new Number;
+var n: TypedNumber = new TypedNumber;
 
 var ii: Integer = new Integer( 234 );
 var ff: Float = new Float( 23.4 );
 
-. n->get_name();
-. "=================";
+procedure f( a: TypedNumber )
+{
+    . "f():", a->get_name();
+}
 
-. ii->get_name(), ii->get_value();
-. ff->get_name(), ff->get_value();
-. "=================";
+procedure f2( a: Float )
+{
+    . "f():", a->get_name(), a->get_value();
+}
 
-var an = new Number * new [10];
+procedure g( a: array of TypedNumber; x: procedure(a: TypedNumber) )
+{
+    for var n in a {
+        x( n );
+    }
+}
+
+procedure g2( a: array of Float; x: procedure(a: Float) )
+{
+    for var n in a {
+        x( n );
+    }
+}
+
+var an = new TypedNumber * new [4];
 var ai = new Integer( 11 ) * new [10];
-var af = new Float( 3.14 ) * new [10];
+var af = new Float( 3.14 ) * new [3];
 
-an[2] = new Float(1.11);
+g( an, f );
 
-. an[1]->get_name();
-. an[2]->get_name();
+// The following call is incompatinbe since f2() expects Float argument
+// but g() will pass only a number to it:
+// g( an, f2 ); // INCOMPATIBLE arg 2
 
-. "";
-. ai[1]->get_name(), ai[1]->get_value();
-. af[1]->get_name(), af[1]->get_value();
+// g( af, f2 ); // both arguments incompatible
 
-. "";
-//an = ai; // INCOMPATIBLE
-. an[1]->get_name();
-. ai[2]->get_name(), ai[2]->get_value();
+// If the call below would compile, procedure g() might assign TypedNumber
+// to the Float array 'af' -- too bad:
+g( af, f ); // First argument incompatible
 
+g( an, f ); // OK
 
-// No longer a problem here:
-an[2] = af[2];
-// an[2] = new Number; // The ai[2]->get_value() will call unimplemented method if this line is executed. 
-. ai[2]->get_name(), ai[2]->get_value(); // OK
+. "===========";
+
+g2( af, f2 ); // OK
+
+g2( af, f ); // OK function arguments should be contravariant
+
+// g2( an, f ); // incompatible types for 'an'; 'f' should be OK.
+
+// g2( an, f2 ); // incompatible types for 'an', 'f2' is OK.
