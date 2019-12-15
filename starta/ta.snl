@@ -1,0 +1,79 @@
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check classes and arrays
+#
+
+use std;
+
+class Number {
+    string name;
+
+    constructor fromName( string name )
+    {
+        self.name = name;
+    }
+    
+    constructor ()
+        self.fromName( "Number" )
+    {}
+    
+    method get_name(): string => self.name;
+}
+
+class Integer: Number {
+    int value;
+
+    constructor ( int val )
+        super.fromName( "Integer" )
+    {
+        self.value = val;
+    }
+
+    method get_value(): int => self.value;
+}
+
+class Float: Number {
+    float value;
+
+    constructor ( float val )
+        super.fromName( "Float" )
+    {
+        self.value = val;
+    }
+
+    method get_value(): float => self.value;
+}
+
+var n: Number = new Number;
+
+var ii: Integer = new Integer( 234 );
+var ff: Float = new Float( 23.4 );
+
+. n->get_name();
+. "=================";
+
+. ii->get_name(), ii->get_value();
+. ff->get_name(), ff->get_value();
+. "=================";
+
+var an = new Number * new [10];
+var ai = new Integer( 11 ) * new [10];
+var af = new Float( 3.14 ) * new [10];
+
+. an[1]->get_name();
+. ai[1]->get_name(), ai[1]->get_value();
+. af[1]->get_name(), af[1]->get_value();
+
+an = ai;
+. an[1]->get_name();
+. ai[2]->get_name(), ai[2]->get_value();
+
+
+// A type problem for 'array of Integer' ai:
+an[2] = new Number;
+// Also a type problem for 'array of Integer' ai:
+an[2] = af[2];
+. ai[2]->get_name();
+// Exception should be triggered here since a wrong method is called:
+. ai[2]->get_value();
