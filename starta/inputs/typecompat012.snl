@@ -114,6 +114,7 @@ g2( af, f2 ); // OK
 
 g2( af, f ); // OK function arguments should be contravariant
 
+// FIXME:
 // g2( an, f ); // incompatible types for 'an'; 'f' should be OK.
 
 // g2( an, f2 ); // incompatible types for 'an', 'f2' is OK.
