@@ -401,6 +401,12 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
     return 0;
 }
 
+static int
+tnode_generic_functions_are_assignment_compatible( TNODE *f1, TNODE *f2,
+                                                   TYPETAB *generic_types,
+                                                   char *msg, int msglen,
+                                                   cexception_t *ex );
+
 int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                            TYPETAB *generic_types,
                                            char *msg, ssize_t msglen,
@@ -518,15 +524,15 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( t1->kind == TK_FUNCTION_REF && 
         (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
+	return tnode_generic_functions_are_assignment_compatible
+            ( t1, t2, generic_types, NULL, 0, ex );
     }
 
     if( t1->name && t2->name ) return 0;
 
     if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
+	return tnode_generic_functions_are_assignment_compatible
+            ( t1, t2, generic_types, NULL, 0, ex );
     }
 
     if( t1->kind == TK_ARRAY && t2->kind == TK_ARRAY ) {
@@ -585,6 +591,11 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
 
 static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
                                                TYPETAB *generic_types,
+                                               int (*check_argument_types)
+                                               ( TNODE *f1_arg_type,
+                                                 TNODE *f2_arg_type,
+                                                 TYPETAB *generic_types,
+                                                 cexception_t *ex ),
 					       char *msg, int msglen,
                                                cexception_t *ex )
 {
@@ -618,7 +629,8 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
             arguments_are_compatible = tnode_types_are_compatible
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         } else {
-            arguments_are_compatible = tnode_types_are_identical
+            // arguments_are_compatible = tnode_types_are_identical
+            arguments_are_compatible = (*check_argument_types)
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         }
              
@@ -732,6 +744,20 @@ static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
 {
     return
 	tnode_function_arguments_match_msg( f1, f2, generic_types,
+                                            tnode_types_are_identical,
+                                            msg, msglen, ex ) &&
+	tnode_function_retvals_match_msg( f1, f2, generic_types, msg, msglen, ex );
+}
+
+static int
+tnode_generic_functions_are_assignment_compatible( TNODE *f1, TNODE *f2,
+                                                   TYPETAB *generic_types,
+                                                   char *msg, int msglen,
+                                                   cexception_t *ex )
+{
+    return
+	tnode_function_arguments_match_msg( f1, f2, generic_types,
+                                            tnode_types_are_compatible,
                                             msg, msglen, ex ) &&
 	tnode_function_retvals_match_msg( f1, f2, generic_types, msg, msglen, ex );
 }
