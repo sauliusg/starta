@@ -1,0 +1,5 @@
+./sl: inputs/typecompat003.snl(70,8): ERROR, incompatible types for assignment to variable 'an'
+an = ai; // ERROR, incompatible array types.
+       ^
+./sl: 1 error(s) detected
+
