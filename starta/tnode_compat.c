@@ -305,10 +305,12 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t2->kind == TK_NULLREF ) {
 	return tnode_is_reference( t1 );
     }
-    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
-	return tnode_types_are_identical( t1, t2->base_type,
-					  generic_types, ex );
-    }
+    
+    // if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+    //     return tnode_types_are_identical( t1, t2->base_type,
+    //     				  generic_types, ex );
+    // }
+    
     if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }
@@ -349,6 +351,18 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					   generic_types, ex );
 	}
     }
+
+    if( t1->kind == TK_FUNCTION_REF && 
+        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
+	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
+                                                        NULL, 0, ex );
+    }
+
+    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
+	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
+                                                        NULL, 0, ex );
+    }
+
     if( t1->name && t2->name ) return 0;
     if( (t1->kind == TK_ARRAY && t2->kind == TK_ARRAY) ||
 	(t1->kind == TK_ADDRESSOF && t2->kind == TK_ADDRESSOF) ) {
@@ -363,17 +377,6 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t1->kind == TK_STRUCT && t2->kind == TK_STRUCT ) {
 	return tnode_structures_are_identical( t1, t2,
 					       generic_types, ex );
-    }
-
-    if( t1->kind == TK_FUNCTION_REF && 
-        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
-    }
-
-    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
     }
 
     return 0;
@@ -422,6 +425,11 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
+    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+        return tnode_types_are_compatible( t1, t2->base_type,
+                                           generic_types, ex );
+    }
+    
     if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
 	return tnode_types_are_identical( t1->base_type, t2,
 					  generic_types, ex );
@@ -576,9 +584,17 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	if( t1->element_type == NULL ) {
 	    return t2->kind == TK_ARRAY;
 	} else {
-	    return tnode_types_are_assignment_compatible
-                ( t1->element_type, t2->element_type, generic_types,
-                  msg, msglen, ex );
+	    // return tnode_types_are_assignment_compatible
+            // ( t1->element_type, t2->element_type, generic_types,
+            // msg, msglen, ex );
+#if 0
+            fprintf( stderr, ">>> checking array element identity for assignment, "
+                     "t1 element type: '%s' (%s), t2 element type: '%s' (%s)\n",
+                     tnode_name(t1->element_type), tnode_kind_name(t1->element_type),
+                     tnode_name(t2->element_type), tnode_kind_name(t2->element_type) );
+#endif
+	    return tnode_types_are_identical
+                ( t1->element_type, t2->element_type, generic_types, ex );
 	}
     }
 
@@ -610,8 +626,17 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
         }
 
 	narg++;
-	if( !tnode_types_are_identical( f1_arg_type, f2_arg_type,
-					generic_types, ex )) {
+        int arguments_are_compatible;
+        if( narg == 1 &&
+            tnode_kind( f1 ) == TK_METHOD &&
+            tnode_kind( f2 ) == TK_METHOD ) {
+            arguments_are_compatible = tnode_types_are_compatible
+                ( f1_arg_type, f2_arg_type, generic_types, ex );
+        } else {
+            arguments_are_compatible = tnode_types_are_identical
+                ( f1_arg_type, f2_arg_type, generic_types, ex );
+        }
+	if( !arguments_are_compatible ) {
 	    if( msg ) {
                 if( f1_arg_type && f2_arg_type ) {
                     char *name1 = tnode_name( f1_arg_type );
