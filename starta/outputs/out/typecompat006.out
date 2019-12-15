@@ -1,0 +1,5 @@
+./sl: inputs/typecompat006.snl(90,10): ERROR, incompatible types for function 'g' argument nr. 1
+g( af, f ); // First argument incompatible, since now arrays must have *identical* elements
+         ^
+./sl: 1 error(s) detected
+
