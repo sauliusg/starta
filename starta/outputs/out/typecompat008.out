@@ -1,8 +1,5 @@
-./sl: inputs/typecompat008.snl(101,11): ERROR, incompatible types for function 'g2' argument nr. 2
-g2( an, f ); // incompatible types for 'an'; 'f' should be OK.
-          ^
 ./sl: inputs/typecompat008.snl(101,11): ERROR, incompatible types for function 'g2' argument nr. 1
 g2( an, f ); // incompatible types for 'an'; 'f' should be OK.
           ^
-./sl: 2 error(s) detected
+./sl: 1 error(s) detected
 
