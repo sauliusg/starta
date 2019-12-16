@@ -1,0 +1,104 @@
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check classes and arrays
+#
+
+use std;
+
+class Number {
+    string name;
+
+    constructor fromName( string name )
+    {
+        self.name = name;
+    }
+    
+    constructor ()
+        self.fromName( "Number" )
+    {}
+    
+    method get_name(): string => self.name;
+}
+
+class Integer: Number {
+    int value;
+
+    constructor ( int val )
+        super.fromName( "Integer" )
+    {
+        self.value = val;
+    }
+
+    method get_value(): int => self.value;
+}
+
+class Float: Number {
+    float value;
+
+    constructor ( float val )
+        super.fromName( "Float" )
+    {
+        self.value = val;
+    }
+
+    method get_value(): float => self.value;
+}
+
+var n: Number = new Number;
+
+var ii: Integer = new Integer( 234 );
+var ff: Float = new Float( 23.4 );
+
+procedure f( a: Number )
+{
+    . "f():", a->get_name();
+}
+
+procedure f2( a: Float )
+{
+    . "f():", a->get_name(), a->get_value();
+}
+
+procedure g( a: array of Number; x: procedure(a: Number) )
+{
+    for var n in a {
+        x( n );
+    }
+}
+
+procedure g2( a: array of Float; x: procedure(a: Float) )
+{
+    for var n in a {
+        x( n );
+    }
+}
+
+var an = new Number * new [4];
+var ai = new Integer( 11 ) * new [10];
+var af = new Float( 3.14 ) * new [3];
+
+g( an, f );
+// The following call is incompatinbe since f2() expecs Float argument
+// but g() will pass only a number to it:
+// g( an, f2 ); // INCOMPATIBLE arg 2
+
+// g( af, f2 ); // both arguments incompatible
+
+// If the call below would compile, procedure g() might assign Number
+// to the Float array 'af' -- too bad:
+// g( af, f ); // First argument incompatible
+
+g( an, f ); // OK
+
+. "===========";
+
+g2( af, f2 ); // OK
+(*
+g2( af, f ); // OK
+
+g2( an, f ); // incompatible types for 'an'.
+
+g2( an, f2 ); // incompatible types for 'an', although should be also
+              // incompatible for 'f2'.
+ *)

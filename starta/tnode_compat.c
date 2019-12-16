@@ -31,21 +31,17 @@ static int tnode_structures_are_compatible( TNODE *t1, TNODE *t2,
 	tf2 = dnode_type( f2 );
         if( tf1 && tf2 && 
             ( tnode_kind( tf1 ) == TK_PLACEHOLDER ||
-              tnode_kind( tf1 ) == TK_GENERIC_REF ||
-              tnode_kind( tf2 ) == TK_PLACEHOLDER ||
-              tnode_kind( tf2 ) == TK_GENERIC_REF )) {
+              tnode_kind( tf2 ) == TK_PLACEHOLDER )) {
             ssize_t bytes = sizeof(ssize_t);
             ssize_t bits = (CHAR_BIT * bytes)/2;
             size_t mask = ~(~((ssize_t)0) << bits);
             ssize_t offs1 = dnode_offset( f1 );
             ssize_t offs2 = dnode_offset( f2 );
             //printf( ">>> mask = 0x%08X\n", mask );
-            if( tnode_kind( tf1 ) == TK_PLACEHOLDER ||
-                tnode_kind( tf1 ) == TK_GENERIC_REF ) {
+            if( tnode_kind( tf1 ) == TK_PLACEHOLDER ) {
                 offs1 &= mask;
             }
-            if( tnode_kind( tf2 ) == TK_PLACEHOLDER ||
-                tnode_kind( tf2 ) == TK_GENERIC_REF ) {
+            if( tnode_kind( tf2 ) == TK_PLACEHOLDER ) {
                 offs2 &= mask;
             }
             //printf( ">>> f1 offset = %d\n", offs1 );
@@ -151,67 +147,39 @@ static int tnode_structures_are_identical( TNODE *t1, TNODE *t2,
     }
 }
 
-static TNODE *
-tnode_placeholder_implementation( TNODE *abstract,
-                                  TNODE *concrete,
-                                  TYPETAB *generic_types,
-                                  cexception_t *ex )
-{
-    if( generic_types &&
-        (abstract->kind == TK_PLACEHOLDER ||
-         abstract->kind == TK_GENERIC_REF) ) {
-        TNODE *volatile placeholder_implementation =
-            typetab_lookup( generic_types, abstract->name );
-
-        if( !placeholder_implementation ) {
-            if( abstract->kind == TK_GENERIC_REF &&
-                !tnode_is_reference( concrete )) {
-                yyerrorf( "can not implement reference placeholder '%s' "
-                          "with a non-reference type '%s'",
-                          tnode_name( abstract ), tnode_name( concrete ));
-            }
-            TNODE *volatile shared_concrete = share_tnode( concrete );
-            cexception_t inner;
-            cexception_guard( inner ) {
-                placeholder_implementation =
-                    new_tnode_placeholder( abstract->name, &inner );
-                tnode_insert_base_type( placeholder_implementation,
-                                        &shared_concrete );
-                placeholder_implementation =
-                    typetab_insert( generic_types, abstract->name,
-                                    &placeholder_implementation, &inner );
-            }
-            cexception_catch {
-                delete_tnode( shared_concrete );
-                delete_tnode( placeholder_implementation );
-                cexception_reraise( inner, ex );
-            }
-        }
-        return placeholder_implementation;
-    }
-    return abstract;
-}
-
 static int
-tnode_create_and_check_placeholder_implementation( TNODE *concrete,
-                                                   TNODE *abstract,
+tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
                                                    TYPETAB *generic_types,
                                                    int (*tnode_check_types)
-                                                    ( TNODE *t1, TNODE *t2,
-                                                      TYPETAB *generic_types,
-                                                      cexception_t *ex ),
+                                                       ( TNODE *t1, TNODE *t2,
+                                                         TYPETAB *generic_types,
+                                                         cexception_t *ex ),
                                                    cexception_t *ex)
 {
+    TNODE *volatile shared_t1 = NULL;
     TNODE *volatile placeholder_implementation =
-        typetab_lookup( generic_types, abstract->name );
+        typetab_lookup( generic_types, t2->name );
 
     if( placeholder_implementation ) {
-        return (*tnode_check_types)
-            ( concrete, placeholder_implementation->base_type,
+        return tnode_check_types
+            ( t1, placeholder_implementation->base_type,
               generic_types, ex );
     } else {
-        tnode_placeholder_implementation( abstract, concrete,
-                                          generic_types, ex );
+        cexception_t inner;
+        cexception_guard( inner ) {
+            placeholder_implementation =
+                new_tnode_placeholder( t2->name, &inner );
+            shared_t1 = share_tnode( t1 );
+            tnode_insert_base_type( placeholder_implementation,
+                                    &shared_t1 );
+            typetab_insert( generic_types, t2->name,
+                            &placeholder_implementation, &inner );
+        }
+        cexception_catch {
+            delete_tnode( shared_t1 );
+            delete_tnode( placeholder_implementation );
+            cexception_reraise( inner, ex );
+        }
         return 1;
     }
 }
@@ -226,10 +194,8 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                                       cexception_t *ex )
 {
     if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
-                           t1->kind == TK_GENERIC_REF ||
-			   t2->kind == TK_PLACEHOLDER ||
-                           t2->kind == TK_GENERIC_REF )) {
-        if( t2->kind == TK_PLACEHOLDER || t2->kind == TK_GENERIC_REF ) {
+			   t2->kind == TK_PLACEHOLDER )) {
+        if( t2->kind == TK_PLACEHOLDER ) {
             if( t2->base_type ) {
                 /* placeholder is already implemented: */
                 return tnode_check_types
@@ -305,15 +271,11 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t2->kind == TK_NULLREF ) {
 	return tnode_is_reference( t1 );
     }
-    
-    // if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
-    //     return tnode_types_are_identical( t1, t2->base_type,
-    //     				  generic_types, ex );
-    // }
-    
+
     if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }
+
     if( t1->kind == TK_OPERATOR && t2->kind == TK_OPERATOR ) {
         return
 	    dnode_lists_are_type_identical( t1->args, t2->args,
@@ -323,10 +285,7 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					    generic_types, ex );
     }
 
-    if( t1->kind == TK_PLACEHOLDER ||
-        t1->kind == TK_GENERIC_REF ||
-        t2->kind == TK_PLACEHOLDER ||
-        t2->kind == TK_GENERIC_REF ) {
+    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -336,12 +295,8 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     }
 
     if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
-	if( (t1->element_type &&
-             (t1->element_type->kind == TK_PLACEHOLDER ||
-              t1->element_type->kind == TK_GENERIC_REF)) &&
-	    (t2->element_type &&
-             (t2->element_type->kind == TK_PLACEHOLDER ||
-              t2->element_type->kind == TK_GENERIC_REF)) ) {
+	if( (t1->element_type && t1->element_type->kind == TK_PLACEHOLDER) &&
+	    (t2->element_type && t2->element_type->kind == TK_PLACEHOLDER) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
@@ -442,6 +397,48 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
     return 0;
 }
 
+static int
+tnode_types_are_contravariant( TNODE *t1, TNODE *t2,
+                               TYPETAB *generic_types,
+                               cexception_t *ex )
+{
+    if( !t1 || !t2 ) return 0;
+
+    if( tnode_types_are_identical( t1, t2, generic_types, ex )) {
+        return 1;
+    }
+
+    if( tnode_is_non_null_reference( t1 )) {
+        if( !tnode_is_non_null_reference( t2 )) {
+            return 0;
+        }
+    }
+
+    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+        return tnode_types_are_identical
+            ( t1->base_type, t2, generic_types, ex ) &&
+            t1->base_type &&
+            tnode_kind( t1->base_type ) != TK_REF;
+    }
+    
+    if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
+	return tnode_types_are_identical( t1->base_type, t2,
+					  generic_types, ex );
+    }
+    if( t2->kind == TK_ENUM && t1->kind != TK_ENUM ) {
+	return tnode_types_are_identical( t1, t2->base_type,
+					  generic_types, ex );
+    }
+
+    return 0;
+}
+
+static int
+tnode_generic_functions_are_assignment_compatible( TNODE *f1, TNODE *f2,
+                                                   TYPETAB *generic_types,
+                                                   char *msg, int msglen,
+                                                   cexception_t *ex );
+
 int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                            TYPETAB *generic_types,
                                            char *msg, ssize_t msglen,
@@ -481,9 +478,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return 1;
     }
     if( t2->kind == TK_NULLREF ) {
-        if( generic_types &&
-            (t1->kind == TK_PLACEHOLDER ||
-             t1->kind == TK_GENERIC_REF)) {
+        if( generic_types && t1->kind == TK_PLACEHOLDER ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
         } else {
@@ -526,10 +521,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return tnode_implements_interface( t2, t1 );
     }
 
-    if( t1->kind == TK_PLACEHOLDER ||
-        t1->kind == TK_GENERIC_REF ||
-        t2->kind == TK_PLACEHOLDER ||
-        t2->kind == TK_GENERIC_REF ) {
+    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -539,18 +531,13 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     }
 
     if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
-	if( (t1->element_type &&
-             (t1->element_type->kind == TK_PLACEHOLDER ||
-              t1->element_type->kind == TK_GENERIC_REF)) &&
-	    (t2->element_type &&
-             (t2->element_type->kind == TK_PLACEHOLDER ||
-              t2->element_type->kind == TK_GENERIC_REF)) ) {
+	if( (t1->element_type && t1->element_type->kind == TK_PLACEHOLDER) &&
+	    (t2->element_type && t2->element_type->kind == TK_PLACEHOLDER) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
             if( t2->element_type &&
-                (t2->element_type->kind == TK_PLACEHOLDER ||
-                 t2->element_type->kind == TK_GENERIC_REF) &&
+                t2->element_type->kind == TK_PLACEHOLDER &&
                 t1->base_type ) {
                 return
                     tnode_types_are_assignment_compatible
@@ -569,30 +556,21 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( t1->kind == TK_FUNCTION_REF && 
         (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
+	return tnode_generic_functions_are_assignment_compatible
+            ( t1, t2, generic_types, NULL, 0, ex );
     }
 
     if( t1->name && t2->name ) return 0;
 
     if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
-	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
-                                                        NULL, 0, ex );
+	return tnode_generic_functions_are_assignment_compatible
+            ( t1, t2, generic_types, NULL, 0, ex );
     }
 
     if( t1->kind == TK_ARRAY && t2->kind == TK_ARRAY ) {
 	if( t1->element_type == NULL ) {
 	    return t2->kind == TK_ARRAY;
 	} else {
-	    // return tnode_types_are_assignment_compatible
-            // ( t1->element_type, t2->element_type, generic_types,
-            // msg, msglen, ex );
-#if 0
-            fprintf( stderr, ">>> checking array element identity for assignment, "
-                     "t1 element type: '%s' (%s), t2 element type: '%s' (%s)\n",
-                     tnode_name(t1->element_type), tnode_kind_name(t1->element_type),
-                     tnode_name(t2->element_type), tnode_kind_name(t2->element_type) );
-#endif
 	    return tnode_types_are_identical
                 ( t1->element_type, t2->element_type, generic_types, ex );
 	}
@@ -601,8 +579,45 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     return 0;
 }
 
+static TNODE *tnode_placeholder_implementation( TNODE *abstract,
+                                                TNODE *concrete,
+                                                TYPETAB *generic_types,
+                                                cexception_t *ex )
+{
+    if( generic_types && abstract->kind == TK_PLACEHOLDER ) {
+        TNODE *volatile placeholder_implementation =
+            typetab_lookup( generic_types, abstract->name );
+
+        if( !placeholder_implementation ) {
+            TNODE *volatile shared_concrete = share_tnode( concrete );
+            cexception_t inner;
+            cexception_guard( inner ) {
+                placeholder_implementation =
+                    new_tnode_placeholder( abstract->name, &inner );
+                tnode_insert_base_type( placeholder_implementation,
+                                        &shared_concrete );
+                placeholder_implementation =
+                    typetab_insert( generic_types, abstract->name,
+                                    &placeholder_implementation, &inner );
+            }
+            cexception_catch {
+                delete_tnode( shared_concrete );
+                delete_tnode( placeholder_implementation );
+                cexception_reraise( inner, ex );
+            }
+        }
+        return placeholder_implementation;
+    }
+    return abstract;
+}
+
 static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
                                                TYPETAB *generic_types,
+                                               int (*check_argument_types)
+                                               ( TNODE *f1_arg_type,
+                                                 TNODE *f2_arg_type,
+                                                 TYPETAB *generic_types,
+                                                 cexception_t *ex ),
 					       char *msg, int msglen,
                                                cexception_t *ex )
 {
@@ -616,26 +631,30 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
     while( f1_arg && f2_arg ) {
 	TNODE *f1_arg_type = dnode_type( f1_arg );
 	TNODE *f2_arg_type = dnode_type( f2_arg );
+        int arguments_are_compatible;
 
-        if( f1_arg_type &&
-            (f1_arg_type->kind == TK_PLACEHOLDER ||
-             f1_arg_type->kind == TK_GENERIC_REF )) {
+        if( f1_arg_type && f1_arg_type->kind == TK_PLACEHOLDER ) {
             f1_arg_type =
                 tnode_placeholder_implementation( f1_arg_type, f2_arg_type,
                                                   generic_types, ex );
         }
 
 	narg++;
-        int arguments_are_compatible;
+
         if( narg == 1 &&
-            tnode_kind( f1 ) == TK_METHOD &&
-            tnode_kind( f2 ) == TK_METHOD ) {
+            (f2_arg_type->base_type == f1_arg_type ||
+             (f1_arg_type->kind == TK_CLASS && f2_arg_type->kind == TK_CLASS &&
+              (!f1_arg_type->name || !f2_arg_type->name))) &&
+            (f1->kind == TK_METHOD || f1->kind == TK_CONSTRUCTOR ||
+             f1->kind == TK_DESTRUCTOR) &&
+             f1->kind == f2->kind ) {
             arguments_are_compatible = tnode_types_are_compatible
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         } else {
-            arguments_are_compatible = tnode_types_are_identical
+            arguments_are_compatible = (*check_argument_types)
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         }
+             
 	if( !arguments_are_compatible ) {
 	    if( msg ) {
                 if( f1_arg_type && f2_arg_type ) {
@@ -746,6 +765,20 @@ static int tnode_generic_function_prototypes_match( TNODE *f1, TNODE *f2,
 {
     return
 	tnode_function_arguments_match_msg( f1, f2, generic_types,
+                                            tnode_types_are_identical,
+                                            msg, msglen, ex ) &&
+	tnode_function_retvals_match_msg( f1, f2, generic_types, msg, msglen, ex );
+}
+
+static int
+tnode_generic_functions_are_assignment_compatible( TNODE *f1, TNODE *f2,
+                                                   TYPETAB *generic_types,
+                                                   char *msg, int msglen,
+                                                   cexception_t *ex )
+{
+    return
+	tnode_function_arguments_match_msg( f1, f2, generic_types,
+                                            tnode_types_are_contravariant,
                                             msg, msglen, ex ) &&
 	tnode_function_retvals_match_msg( f1, f2, generic_types, msg, msglen, ex );
 }
