@@ -271,15 +271,11 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     if( t2->kind == TK_NULLREF ) {
 	return tnode_is_reference( t1 );
     }
-    
-    // if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
-    //     return tnode_types_are_identical( t1, t2->base_type,
-    //     				  generic_types, ex );
-    // }
-    
+
     if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }
+
     if( t1->kind == TK_OPERATOR && t2->kind == TK_OPERATOR ) {
         return
 	    dnode_lists_are_type_identical( t1->args, t2->args,
@@ -419,17 +415,10 @@ tnode_types_are_contravariant( TNODE *t1, TNODE *t2,
     }
 
     if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
-        int compat = tnode_types_are_identical( t1->base_type, t2,
-                                                generic_types, ex ) &&
-            t1->base_type && tnode_kind( t1->base_type ) != TK_REF;
-#if 0
-        fprintf( stderr, ">>> t1: \"%s\" (%s), t2: \"%s\" (%s), compat: %d\n",
-                 tnode_name(t1), tnode_kind_name(t1),
-                 tnode_name(t2), tnode_kind_name(t2),
-                 compat
-                 );
-#endif
-         return compat;
+        return tnode_types_are_identical
+            ( t1->base_type, t2, generic_types, ex ) &&
+            t1->base_type &&
+            tnode_kind( t1->base_type ) != TK_REF;
     }
     
     if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
@@ -582,16 +571,6 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	if( t1->element_type == NULL ) {
 	    return t2->kind == TK_ARRAY;
 	} else {
-
-	    // return tnode_types_are_assignment_compatible
-            // ( t1->element_type, t2->element_type, generic_types,
-            // msg, msglen, ex );
-#if 0
-            fprintf( stderr, ">>> checking array element identity for assignment, "
-                     "t1 element type: '%s' (%s), t2 element type: '%s' (%s)\n",
-                     tnode_name(t1->element_type), tnode_kind_name(t1->element_type),
-                     tnode_name(t2->element_type), tnode_kind_name(t2->element_type) );
-#endif
 	    return tnode_types_are_identical
                 ( t1->element_type, t2->element_type, generic_types, ex );
 	}
@@ -672,7 +651,6 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
             arguments_are_compatible = tnode_types_are_compatible
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         } else {
-            // arguments_are_compatible = tnode_types_are_identical
             arguments_are_compatible = (*check_argument_types)
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         }
