@@ -1,0 +1,5 @@
+./sl: inputs/typecompat014.snl(119,12): ERROR, incompatible types for function 'g2' argument nr. 1
+g2( an, f2 ); // incompatible types for 'an', 'f2' is OK.
+           ^
+./sl: 1 error(s) detected
+
