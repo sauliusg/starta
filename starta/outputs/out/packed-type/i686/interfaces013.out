@@ -1,11 +1,11 @@
 293
 NUMBER OF INTERFCES = 3
-INTERFACE[1]: vmt offset = 2526
+INTERFACE[1]: vmt offset = 4750
 VMT[0]: 0
-INTERFACE[2]: vmt offset = 2530
+INTERFACE[2]: vmt offset = 4754
 VMT[0]: 2
-VMT[1]: 1109
-VMT[2]: 1121
-INTERFACE[3]: vmt offset = 2542
+VMT[1]: 1143
+VMT[2]: 1155
+INTERFACE[3]: vmt offset = 4766
 VMT[0]: 1
-VMT[1]: 1135
+VMT[1]: 1169
