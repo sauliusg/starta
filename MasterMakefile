@@ -145,7 +145,7 @@ LIB_FILES := ${join ${LIB_DIRS}, ${LIB_FILES} }
 CC    = gcc
 CCVER = ${CC} --version
 GCC   = gcc
-YACC  = bison -y
+YACC  = bison
 FLEX  = flex
 
 INCLUDES = -I. ${addprefix -I, ${sort ${SRC_DIR} ${OTHER_DIRS} ${LIB_DIRS}}}
