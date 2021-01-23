@@ -74,7 +74,7 @@ class B: A
     operator "@B" ( a : A ): B
     {
         if( a.type_name == "B" ) {
-            return new B( a.name, a.value, 0, 0, 0 );
+            return bytecode: B { PLD %a }
         } else {
             raise TYPE_CONVERSION_ERROR( "can not convert class A of type '" _
                                          a.type_name _ "' to B" );
