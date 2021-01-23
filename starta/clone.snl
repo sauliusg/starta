@@ -89,7 +89,6 @@ var b: B = new B( "class B", 22, 1.12, 3.11, 8.55 );
 . b->value();
 . b->x(), b->y(), b->z();
 
-
 var a3 = b->clone();
 var b1 = b->cloneB();
 
