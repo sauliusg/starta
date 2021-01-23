@@ -1,0 +1,105 @@
+//--*- Java -*--
+// Starta compiler tests.
+//
+// Check the 'clone' method
+//
+
+use std;
+
+class A {
+    string name;
+    int value;
+    string type_name; // RTTI ? :)
+
+    constructor fromName( string name )
+    {
+        self.name = name;
+    }
+    
+    constructor ( string name; int value )
+        self.fromName( name )
+    {
+        self.value = value;
+    }
+    
+    method name(): string => self.name;
+    method value(): int => self.value;
+
+    method clone(): A
+    {
+        return new A( self->name(), self->value() );
+    }
+}
+
+var a = new A( "class A", 12 );
+
+. a->name();
+. a->value();
+
+var a2 = a->clone();
+
+. a2->name();
+. a2->value();
+
+exception TYPE_CONVERSION_ERROR;
+
+class B: A
+{
+    float x, y, z;
+
+    constructor ( string name; int value;
+                  float x, y, z )
+        super( name, value )
+    {
+        self.type_name = "B";
+        self.x = x;
+        self.y = y;
+        self.z = z;
+    }
+    
+    method x(): float => self.x;
+    method y(): float => self.y;
+    method z(): float => self.z;
+
+    method clone(): A
+    {
+        return new B( self.name, self.value, self.x, self.y, self.z );
+    }
+
+    method cloneB(): B
+    {
+        return new B( self.name, self.value, self.x, self.y, self.z );
+    }
+
+    operator "@B" ( a : A ): B
+    {
+        if( a.type_name == "B" ) {
+            return new B( a.name, a.value, 0, 0, 0 );
+        } else {
+            raise TYPE_CONVERSION_ERROR( "can not convert class A of type '" _
+                                         a.type_name _ "' to B" );
+        }
+    }
+}
+
+var b: B = new B( "class B", 22, 1.12, 3.11, 8.55 );
+
+. "";
+. b->name();
+. b->value();
+. b->x(), b->y(), b->z();
+
+
+var a3 = b->clone();
+var b1 = b->cloneB();
+
+. b1->name();
+. b1->value();
+. b1->x(), b->y(), b->z();
+. a3->name();
+. a3->value();
+
+b1 = a3@B;
+. b1->name();
+. b1->value();
+. b1->x(), b1->y(), b1->z();
