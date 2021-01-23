@@ -1,0 +1,3 @@
+-- A method that returns a subclass variable in a subclass
+   (e.g. 'clone()') shouold be allowed to override analogous method in
+   a superclass that returns a superclass variable.
