@@ -359,6 +359,13 @@ DNODE *dnode_shallow_copy( DNODE *dst, DNODE *src, cexception_t *ex )
     if( dst->code ) freex( dst->code );
     dst->code = callocx( sizeof(dst->code[0]), src->code_length, ex );
     memcpy( dst->code, src->code, sizeof(dst->code[0]) * src->code_length );
+
+    if( dst->code_flags ) freex( dst->code_flags );
+    dst->code_flags =
+        callocx( sizeof(dst->code_flags[0]), src->code_length, ex );
+    memcpy( dst->code_flags, src->code_flags,
+            sizeof(dst->code_flags[0]) * src->code_length );
+
     dst->code_length = src->code_length;
 
     if( dst->code_fixups )
