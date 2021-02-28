@@ -652,6 +652,8 @@ void thrcode_append( THRCODE *code, THRCODE *source, cexception_t *ex )
 	thrcode_alloc( code, src_len, ex );
 	memcpy( &code->opcodes[code->length], source->opcodes,
 	         sizeof(code->opcodes[0]) * src_len );
+	memcpy( &code->opflags[code->length], source->opflags,
+	         sizeof(code->opflags[0]) * src_len );
 	code->length += src_len;
     }
 }
