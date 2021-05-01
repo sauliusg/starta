@@ -1,0 +1,8 @@
+
+use std;
+use Lists;
+
+function f() : list of struct { x, y : int }
+{
+    return null;
+}
