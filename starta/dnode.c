@@ -150,6 +150,21 @@ void delete_dnode( DNODE *node )
 	if( node->rcount <= 0 ) {
 	    printf( "!!! dnode->rcound == %d (%p) !!!\n",
 		    node->rcount, node );
+#if USE_STACK_TRACES && USE_SERNO
+            void *buffer[100];
+            char **strings;
+            int ntraces;
+
+            int i;
+            fprintf( stderr, "DELETE DNODE: deleting dnode serno = %zd, "
+                     "rcount = %d\n", node->serno, node->rcount );
+            ntraces = backtrace( buffer, sizeof(buffer)/sizeof(buffer[0]) );
+            strings = backtrace_symbols( buffer, ntraces );
+            for( i = 0; i < ntraces; i++ ) {
+                fprintf( stderr, "\t%3d: %s\n", i, strings[i] );
+            }
+            free( strings );
+#endif
 	    assert( node->rcount > 0 );
 	}
         if( --node->rcount > 0 )
