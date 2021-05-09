@@ -8335,6 +8335,8 @@ module_statement
           DNODE *volatile module_dnode = $2;
           DNODE *volatile shared_module_dnode = NULL;
           DNODE *module_params = $3;
+          $3 = NULL; // Make sure yydestruct does not double-free
+                     // module parameters if syntax error occurs.
 
           dnode_insert_module_args( module_dnode, &module_params );
 
