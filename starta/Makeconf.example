@@ -15,6 +15,8 @@ LIBFLAGS ?= -ldl
 # share_... calls, use the following option set:
 #
 ## OPTFLAGS = -fsanitize=address -rdynamic -DUSE_STACK_TRACES=1 -DUSE_SERNO
+## OPTFLAGS = -DUSE_STACK_TRACES=1 -DUSE_SERNO -rdynamic
+## OPTFLAGS = -DUSE_STACK_TRACES=1 -DUSE_SERNO -static
 #
 # And call 'sl' using the following command:
 # STARTA_REQUESTED_TNODE_SERNO=1 ./sl -I . -d memleak t.snl
