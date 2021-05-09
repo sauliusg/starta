@@ -23,3 +23,9 @@ if( (p > q || r > q) && l != null ) {
 } else {
     . "Oh dear....";
 }
+
+if( l ) {
+    . "YES!"; // Should print this message
+} else {
+    . "Oh dear....";
+}
