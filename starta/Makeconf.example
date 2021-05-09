@@ -15,10 +15,19 @@ LIBFLAGS ?= -ldl
 # share_... calls, use the following option set:
 #
 ## OPTFLAGS = -fsanitize=address -rdynamic -DUSE_STACK_TRACES=1 -DUSE_SERNO
+## OPTFLAGS = -DUSE_STACK_TRACES=1 -DUSE_SERNO -rdynamic
+## OPTFLAGS = -DUSE_STACK_TRACES=1 -DUSE_SERNO -static
 #
 # And call 'sl' using the following command:
 # STARTA_REQUESTED_TNODE_SERNO=1 ./sl -I . -d memleak t.snl
 # STARTA_REQUESTED_DNODE_SERNO=1 ./sl -I . -d memleak t.snl
+#
+# After compiling with '-static', the following command can be used to
+# get function names and line numbers on a 64-bit platform:
+#
+# STARTA_REQUESTED_DNODE_SERNO=21 ./sl -I modules/ bugs/Areas-extra-delete.slib 2>&1 \
+# | perl -lne 'print; if( /^\s*(\d+):\s*\[([0-9abcdefx]+)\]/ ) \
+#   { chomp; print $_, ": ", `addr2line -f -e sl $2 | tr "\n" "\t"`}'
 
 # To check memory leaks using the gcc address "sanitiser", use the
 # following option:
