@@ -4,13 +4,13 @@ if a > b then
 ./sl: inputs/err-bool002.snl(141,10): ERROR, type 'int' has no unary operator named 'jz'
 if a > b && f < g then
          ^
-./sl: inputs/err-bool002.snl(141,19): ERROR, type 'int' has no unary operator named 'jz'
+./sl: inputs/err-bool002.snl(141,19): ERROR, type 'long' has no unary operator named 'jz'
 if a > b && f < g then
                   ^
 ./sl: inputs/err-bool002.snl(153,11): ERROR, type 'long' has no unary operator named 'jnz'
 if g == h || c == d then
           ^
-./sl: inputs/err-bool002.snl(153,21): ERROR, type 'long' has no unary operator named 'jz'
+./sl: inputs/err-bool002.snl(153,21): ERROR, type 'int' has no unary operator named 'jz'
 if g == h || c == d then
                     ^
 ./sl: 5 error(s) detected

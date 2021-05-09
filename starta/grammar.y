@@ -14619,6 +14619,7 @@ boolean_expression
       }
     expression
       {
+        compiler_swap_top_expressions( compiler );
 	compiler_check_top_2_expressions_and_drop( compiler, "and", px );
         compiler_fixup_here( compiler );
       }
@@ -14632,6 +14633,7 @@ boolean_expression
       }
     expression
       {
+        compiler_swap_top_expressions( compiler );
 	compiler_check_top_2_expressions_and_drop( compiler, "or", px );
 	compiler_fixup_here( compiler );
       }
