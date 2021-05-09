@@ -18,6 +18,12 @@ if( (p > q || r > q) && l ) {
     . "Oh dear....";
 }
 
+if( l && (p > q || r > q) ) {
+    . "YES!"; // Should print this message
+} else {
+    . "Oh dear....";
+}
+
 if( (p > q || r > q) && l != null ) {
     . "YES!"; // Should print this message
 } else {
