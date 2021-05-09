@@ -1,0 +1,24 @@
+./sl: inputs/modules025.snl(23,45): ERROR, type 'pixel' is not declared in the current scope
+function locate_pixel_run( int row[]; pixel threshold;
+                                            ^
+./sl: inputs/modules025.snl(30,47): ERROR, incompatible type of argument 2 for operator '<'
+    while( l < row_size && row[l] < threshold ) {
+                                              ^
+./sl: inputs/modules025.snl(36,56): ERROR, incompatible type of argument 2 for operator '>='
+    while( r + 1 < row_size && row[r + 1] >= threshold ) {
+                                                       ^
+./sl: inputs/modules025.snl(168,63): ERROR, type 'pixel' is not declared in the current scope
+procedure extend_growing_areas( int row[]; long row_nr; pixel threshold;
+                                                              ^
+./sl: inputs/modules025.snl(174,59): ERROR, incompatible types for function 'locate_pixel_run' argument nr. 2
+        left, right = locate_pixel_run( row, threshold, j );
+                                                          ^
+./sl: inputs/modules025.snl(229,45): ERROR, type 'pixel' is not declared in the current scope
+function find_areas( raster: int[][]; pixel threshold = const(0 pixel) ): list of Area
+                                            ^
+./sl: inputs/modules025.snl(229,57): ERROR, incorrect syntax
+function find_areas( raster: int[][]; pixel threshold = const(0 pixel) ): list of Area
+                                                        ^
+./sl: compiler could not recover from errors, quitting now
+7 error(s) detected
+

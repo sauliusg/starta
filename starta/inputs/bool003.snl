@@ -1,0 +1,37 @@
+//--*- C -*--
+
+use std;
+use Lists;
+
+var p,q,r = 1,2,3;
+
+var l: list of int;
+
+l = cat( (10,), (20,30) );
+
+for var i in l do . i enddo;
+."";
+
+if( (p > q || r > q) && l ) {
+    . "YES!"; // Should print this message
+} else {
+    . "Oh dear....";
+}
+
+if( l && (p > q || r > q) ) {
+    . "YES!"; // Should print this message
+} else {
+    . "Oh dear....";
+}
+
+if( (p > q || r > q) && l != null ) {
+    . "YES!"; // Should print this message
+} else {
+    . "Oh dear....";
+}
+
+if( l ) {
+    . "YES!"; // Should print this message
+} else {
+    . "Oh dear....";
+}

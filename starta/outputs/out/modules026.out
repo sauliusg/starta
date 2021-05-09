@@ -1,0 +1,27 @@
+./sl: inputs/modules026.snl(25,34): ERROR, type 'pixel' is not declared in the current scope
+function locate_pixel_run( pixel row[]; pixel threshold;
+                                 ^
+./sl: inputs/modules026.snl(25,47): ERROR, type 'pixel' is not declared in the current scope
+function locate_pixel_run( pixel row[]; pixel threshold;
+                                              ^
+./sl: inputs/modules026.snl(32,35): ERROR, can not index array with unknown element type
+    while( l < row_size && row[l] < threshold ) {
+                                  ^
+./sl: inputs/modules026.snl(38,43): ERROR, can not index array with unknown element type
+    while( r + 1 < row_size && row[r + 1] >= threshold ) {
+                                          ^
+./sl: inputs/modules026.snl(170,39): ERROR, type 'pixel' is not declared in the current scope
+procedure extend_growing_areas( pixel row[]; long row_nr; pixel threshold;
+                                      ^
+./sl: inputs/modules026.snl(170,65): ERROR, type 'pixel' is not declared in the current scope
+procedure extend_growing_areas( pixel row[]; long row_nr; pixel threshold;
+                                                                ^
+./sl: inputs/modules026.snl(176,59): ERROR, incompatible types for function 'locate_pixel_run' argument nr. 2
+        left, right = locate_pixel_run( row, threshold, j );
+                                                          ^
+./sl: inputs/modules026.snl(190,38): ERROR, incorrect syntax
+function count_nodes( list of type T : l ) int
+                                     ^
+./sl: compiler could not recover from errors, quitting now
+8 error(s) detected
+
