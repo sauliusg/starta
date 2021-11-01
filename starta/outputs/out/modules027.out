@@ -1,0 +1,13 @@
+12 3
+Calling g() from M
+ 4
+3
+Calling f() from M
+ 9
+11 9
+Calling g() from M2
+ 4
+2
+Calling f() from M2
+ 4
+M loaded
