@@ -227,8 +227,8 @@ typedef struct {
     ELIST *saved_estacks;
 
     /* labels and fixups in the 'bytecode' statements: */
-    DNODE *bytecode_labels;
-    FIXUP *bytecode_fixups;
+    //DNODE *bytecode_labels;
+    //FIXUP *bytecode_fixups;
 
     /* loop stack for the describing nested loops, needed to implement
        'break' and 'continue' statements: */
@@ -306,8 +306,8 @@ static void delete_compiler( COMPILER *c )
 
 	delete_stlist( c->symtab_stack );
 
-	delete_dnode( c->bytecode_labels );
-	delete_fixup_list( c->bytecode_fixups );
+	//delete_dnode( c->bytecode_labels );
+	//delete_fixup_list( c->bytecode_fixups );
 
 	delete_dnode( c->loops );
         delete_dlist( c->loop_stack );
