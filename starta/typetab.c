@@ -326,9 +326,18 @@ TNODE *typetab_lookup_suffix( TYPETAB *table, const char *name,
 
     if( node ) {
         if( node && node->count > 1 ) {
-            yyerrorf( "type '%s' is imported more than once -- "
-                      "please use explicit package name for disambiguation",
-                      name );
+            if( name && name[0] != '\0' ) {
+                yyerrorf( "type '%s' is imported more than once "
+                          "-- please use explicit package name "
+                          "for disambiguation", name );
+            } else {
+                TNODE *tnode = node->tnode;
+                yyerrorf( "type with empty suffix is imported more than once "
+                          "(in one instance as type '%s' of kind '%s') -- "
+                          "please use explicit package name "
+                          "for disambiguation",
+                          tnode_name( tnode ), tnode_kind_name( tnode ) );
+            }
         }
         assert( node->tnode );
         return node->tnode;
