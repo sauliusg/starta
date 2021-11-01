@@ -1,0 +1,10 @@
+#! /usr/bin/env starta
+//--*- Java -*--
+
+pragma append "$D";
+
+use std;
+
+use M;
+
+. "M loaded";
