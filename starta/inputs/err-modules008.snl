@@ -1,0 +1,16 @@
+#! /usr/bin/env starta
+
+pragma prepend "$D/modules/err-modules008";
+
+use std;
+
+use M;
+import M1;
+
+. "M is loaded";
+
+. 12, 3, g(12,3);
+
+. 4, f(4);
+
+. 12, 3, M1::(M1::g(12,3));

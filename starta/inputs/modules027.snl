@@ -1,0 +1,10 @@
+#! /usr/bin/env starta
+//--*- Java -*--
+
+pragma prepend "$D/modules/modules027";
+
+use std;
+
+use M;
+
+. "M loaded";

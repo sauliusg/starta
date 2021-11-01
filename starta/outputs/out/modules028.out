@@ -1,0 +1,5 @@
+./sl: inputs/modules028.snl(8,13): ERROR, type with empty suffix is imported more than once (in one instance as type 'string' of kind 'string') -- please use explicit package name for disambiguation
+. "M loaded";
+            ^
+./sl: 1 error(s) detected
+

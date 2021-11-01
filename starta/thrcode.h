@@ -68,6 +68,10 @@ void create_thrcode( THRCODE * volatile *thrcode, cexception_t *ex );
 
 void dispose_thrcode( THRCODE * volatile *thrcode );
 
+void thrcode_push_function_call_fixups( THRCODE *tc, cexception_t *ex );
+
+void thrcode_pop_function_call_fixups( THRCODE *tc );
+
 void *thrcode_alloc_extra_data( THRCODE *tc, ssize_t size );
 
 void *thrcode_instructions( THRCODE *bc );
