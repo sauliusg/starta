@@ -1,0 +1,6 @@
+./sl: inputs/err-modules008.snl(16,14): ERROR, incorrect syntax
+. 12, 3, M1::(M1::g(12,3));
+             ^
+./sl: compiler could not recover from errors, quitting now
+1 error(s) detected
+

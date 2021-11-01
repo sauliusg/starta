@@ -1,6 +1,6 @@
 #! /usr/bin/env starta
 
-pragma append "$D";
+pragma prepend "$D/modules/err-modules008";
 
 use std;
 
