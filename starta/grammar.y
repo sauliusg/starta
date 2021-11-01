@@ -5760,6 +5760,7 @@ static void compiler_begin_module( COMPILER *c,
 
     cexception_t inner;
     cexception_guard( inner ) {
+        thrcode_push_function_call_fixups( c->thrcode, &inner );
         compiler_push_symbol_tables( c, &inner );
         shared_module = share_dnode( *module );
         vartab_insert_named_module( c->compiled_modules, &shared_module, 
@@ -5785,6 +5786,7 @@ static void compiler_end_module( COMPILER *c, cexception_t *ex )
     compiler_pop_symbol_tables( c );
     delete_dnode( c->current_module );
     c->current_module = dlist_pop_data( &c->current_module_stack );
+    thrcode_pop_function_call_fixups( c->thrcode );
 }
 
 static char *compiler_find_module( COMPILER *c,
