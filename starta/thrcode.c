@@ -104,6 +104,65 @@ void delete_runtime_data_nodes( RUNTIME_DATA_NODE *nodes )
     }
 }
 
+/* We need to push fixup lists onto a stack when a new module is being
+   compiled, and pop the fixup lists when the module ends (after
+   fixing up all function calls). We will use FIXUP_NODE for this.
+
+   Since at the moment this stack is used only in the thrcode object,
+   we declare the structure inside this file and make all functions
+   static.
+ */
+
+typedef struct FIXUP_NODE {
+    FIXUP *fixup;
+    struct FIXUP_NODE *next;
+} FIXUP_NODE;
+
+static FIXUP_NODE* new_fixup_node( FIXUP * volatile *fixup,
+                                   FIXUP_NODE *next,
+                                   cexception_t *ex )
+{
+    assert( fixup );
+    FIXUP_NODE *new_node = callocx( sizeof(FIXUP_NODE), 1, ex );
+    new_node->fixup = *fixup;
+    *fixup = NULL;
+    new_node->next = next;
+    return new_node;
+}
+
+static void delete_fixup_node_list( FIXUP_NODE *node )
+{
+    FIXUP_NODE *current = node;
+    FIXUP_NODE *next;
+
+    while( current ) {
+        next = current->next;
+        delete_fixup( current->fixup );
+        freex( current );
+        current = next;
+    }
+}
+
+static FIXUP* obtain_fixup_node_fixup( FIXUP_NODE *node )
+{
+    assert( node );
+    FIXUP *fixup = node->fixup;
+    node->fixup = NULL;
+    return fixup;
+}
+
+static FIXUP_NODE *fixup_node_disconnect( FIXUP_NODE *node )
+{
+    FIXUP_NODE *next_node = NULL;
+
+    if( node ) {
+        next_node = node->next;
+        node->next = NULL;
+    }
+
+    return next_node;
+}
+
 typedef enum {
     THRF_NONE = 0,
     THRF_IMMEDIATE_PRINTOUT = 0x01
@@ -127,6 +186,8 @@ struct THRCODE {
 				defined must be accurately reported,
 				therefore fixup list for such
 				functions is kept separately. */
+    FIXUP_NODE *forward_function_call_stack;
+
     FIXUP *op_continue_fixups; /* fixups of the 'continue' operators */
     FIXUP *op_break_fixups;    /* fixups of the 'break' operators */
 
@@ -178,6 +239,9 @@ void delete_thrcode( THRCODE *bc )
 	delete_fixup_list( bc->forward_function_calls );
 	delete_fixup_list( bc->op_continue_fixups );
 	delete_fixup_list( bc->op_break_fixups );
+        /* The bc->forward_function_call_stack might be non-null after
+           the syntax error: */
+        delete_fixup_node_list( bc->forward_function_call_stack );
         delete_runtime_data_nodes( bc->extra_data );
 	if( bc->lines ) {
 	    int i;
@@ -208,6 +272,34 @@ void dispose_thrcode( THRCODE * volatile *thrcode )
 	delete_thrcode( *thrcode );
 	*thrcode = NULL;
     }
+}
+
+void thrcode_push_function_call_fixups( THRCODE *tc, cexception_t *ex )
+{
+    assert( tc );
+
+    tc->forward_function_call_stack =
+        new_fixup_node( &tc->forward_function_calls,
+                        tc->forward_function_call_stack,
+                        ex );
+}
+
+void thrcode_pop_function_call_fixups( THRCODE *tc )
+{
+    assert( tc );
+    assert( !tc->forward_function_calls );
+
+    delete_fixup_list( tc->forward_function_calls );
+
+    tc->forward_function_calls =
+        obtain_fixup_node_fixup( tc->forward_function_call_stack );
+
+    FIXUP_NODE *popped_node = tc->forward_function_call_stack;
+
+    tc->forward_function_call_stack =
+        fixup_node_disconnect( tc->forward_function_call_stack );
+
+    delete_fixup_node_list( popped_node );
 }
 
 void *thrcode_alloc_extra_data( THRCODE *tc, ssize_t size )

@@ -227,8 +227,8 @@ typedef struct {
     ELIST *saved_estacks;
 
     /* labels and fixups in the 'bytecode' statements: */
-    DNODE *bytecode_labels;
-    FIXUP *bytecode_fixups;
+    //DNODE *bytecode_labels;
+    //FIXUP *bytecode_fixups;
 
     /* loop stack for the describing nested loops, needed to implement
        'break' and 'continue' statements: */
@@ -306,8 +306,8 @@ static void delete_compiler( COMPILER *c )
 
 	delete_stlist( c->symtab_stack );
 
-	delete_dnode( c->bytecode_labels );
-	delete_fixup_list( c->bytecode_fixups );
+	//delete_dnode( c->bytecode_labels );
+	//delete_fixup_list( c->bytecode_fixups );
 
 	delete_dnode( c->loops );
         delete_dlist( c->loop_stack );
@@ -5760,6 +5760,7 @@ static void compiler_begin_module( COMPILER *c,
 
     cexception_t inner;
     cexception_guard( inner ) {
+        thrcode_push_function_call_fixups( c->thrcode, &inner );
         compiler_push_symbol_tables( c, &inner );
         shared_module = share_dnode( *module );
         vartab_insert_named_module( c->compiled_modules, &shared_module, 
@@ -5785,6 +5786,7 @@ static void compiler_end_module( COMPILER *c, cexception_t *ex )
     compiler_pop_symbol_tables( c );
     delete_dnode( c->current_module );
     c->current_module = dlist_pop_data( &c->current_module_stack );
+    thrcode_pop_function_call_fixups( c->thrcode );
 }
 
 static char *compiler_find_module( COMPILER *c,
@@ -8150,6 +8152,7 @@ raised_exception_identifier
       {
           char *name = obtain_string_from_strpool( compiler->strpool, $3 );
           $$ = compiler_lookup_dnode( compiler, $1, name, "exception" );
+          dispose_dnode( &$1 );
           freex( name );
       }
   ;
@@ -9007,7 +9010,7 @@ module_list
         yyerrorf( "module '%s' is not available in the current scope",
                   module_name );
     }
-    $$ = module;
+    $$ = share_dnode( module );
     freex( module_name );
 }
 | module_list __COLON_COLON __IDENTIFIER
@@ -9023,7 +9026,8 @@ module_list
                       module_name );
         }
     }
-    $$ = module;
+    dispose_dnode( &$1 );
+    $$ = share_dnode( module );
     freex( module_name );
 }
 ;
@@ -9042,6 +9046,7 @@ variable_access_identifier
          char *ident =
              obtain_string_from_strpool( compiler->strpool, $3 );
 	 $$ = compiler_lookup_dnode( compiler, $1, ident, "variable" );
+         dispose_dnode( &$1 );
          share_dnode( $$ );
          freex( ident );
      }
@@ -10683,8 +10688,10 @@ exception_identifier_list
         }
         cexception_catch {
             freex( ident );
+            dispose_dnode( &$1 );
             cexception_reraise( inner, px );
         }
+        dispose_dnode( &$1 );
         freex( ident );
         $$ = 0;
     }
@@ -10719,9 +10726,11 @@ exception_identifier_list
         }
         cexception_catch {
             freex( ident );
+            dispose_dnode( &$3 );
             cexception_reraise( inner, px );
         }
         freex( ident );
+        dispose_dnode( &$3 );
         $$ = $1 + 1;
     }
   ;
@@ -10840,6 +10849,7 @@ type_identifier
          char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
 	 $$ = compiler_lookup_tnode( compiler, $1, ident, "type" );
          share_tnode( $$ );
+         dispose_dnode( &$1 );
          freex( ident );
      }
   | module_list __COLON_COLON __IDENTIFIER _UNITS ':' __STRING_CONST
@@ -10850,6 +10860,7 @@ type_identifier
 	 $$ = compiler_lookup_tnode( compiler, $1, ident, "type" );
          share_tnode( $$ );
 
+         dispose_dnode( &$1 );
          freex( units );
          freex( ident );
      }
@@ -12285,6 +12296,7 @@ opcode
           char *opcode = obtain_string_from_strpool( compiler->strpool, $3 );
           compiler_emit( compiler, px, "\tMC\n", 
                          $1 ? dnode_name($1) : "???", opcode );
+          dispose_dnode( &$1 );
           freex( opcode );
       }
   | __IDENTIFIER ':' __IDENTIFIER
@@ -12457,6 +12469,7 @@ function_identifier
 	{
             char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
 	    compiler_check_and_push_function_name( compiler, $1, ident, px );
+            dispose_dnode( &$1 );
             freex( ident );
 	}
   ;
@@ -14512,6 +14525,7 @@ arithmetic_expression
 
           compiler_compile_type_conversion( compiler, target_type, 
                                             target_name, px );
+          dispose_dnode( &$3 );
           freex( target_name );
       }
 
@@ -15102,6 +15116,7 @@ constant
           char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
           compiler_compile_constant( compiler, TS_INTEGER_SUFFIX,
                                      $2, ident, "integer", int_text, px );
+          dispose_dnode( &$2 );
           freex( int_text );
           freex( ident );
       }
@@ -15127,6 +15142,7 @@ constant
           char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
           compiler_compile_constant( compiler, TS_FLOAT_SUFFIX,
                                      $2, ident, "real", real, px );
+          dispose_dnode( &$2 );
           freex( real );
           freex( ident );
       }
@@ -15152,6 +15168,7 @@ constant
           char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
           compiler_compile_constant( compiler, TS_STRING_SUFFIX,
                                      $2, ident, "string", str, px );
+          dispose_dnode( &$2 );
           freex( str );
           freex( ident );
       }
@@ -15171,6 +15188,7 @@ constant
           char *tenum = obtain_string_from_strpool( compiler->strpool, $4 );
           compiler_compile_enumeration_constant( compiler, $2,
                                                  value, tenum, px );
+          dispose_dnode( &$2 );
           freex( value );
           freex( tenum );
       }
@@ -15197,6 +15215,7 @@ constant
           char *ident = obtain_string_from_strpool( compiler->strpool, $4 );
           DNODE *const_dnode = compiler_lookup_constant( compiler, $2, ident,
                                                          "constant" );
+          dispose_dnode( &$2 );
           freex( ident );
           if( const_dnode ) {
               char pad[80];
@@ -15225,8 +15244,16 @@ constant
     module_list __COLON_COLON __IDENTIFIER
       {
           char *ident = obtain_string_from_strpool( compiler->strpool, $7 );
-	  compiler_compile_multitype_const_value( compiler, &$3, $5,
-                                                  ident, px );
+          cexception_t inner;
+
+          cexception_guard( inner ) {
+              compiler_compile_multitype_const_value( compiler, &$3, $5,
+                                                      ident, &inner );
+          }
+          cexception_finally(
+                             {dispose_dnode( &$5 );},
+                             {cexception_reraise(inner,px);}
+                             );
           freex( ident );
       }
 
@@ -15623,6 +15650,7 @@ opt_method_interface
           obtain_string_from_strpool( compiler->strpool, $4 );
       $$ = compiler_lookup_tnode( compiler, module,
                                   interface_name, "interface" );
+      dispose_dnode( &$2 );
       freex( interface_name );
   }
   | /* empty */
@@ -16144,6 +16172,7 @@ field_designator
         char *structure = obtain_string_from_strpool( compiler->strpool, $3 );
         char *field = obtain_string_from_strpool( compiler->strpool, $5 );
 	$$ = compiler_lookup_type_field( compiler, $1, structure, field );
+        dispose_dnode( &$1 );
         freex( structure );
         freex( field );
     }
@@ -16237,6 +16266,7 @@ constant_expression
           char *ident = obtain_string_from_strpool( compiler->strpool, $3 );
           DNODE *const_dnode = compiler_lookup_constant( compiler, $1, ident,
                                                          "constant" );
+          dispose_dnode( &$1 );
           $$ = make_zero_const_value();
           if( const_dnode ) {
               const_value_copy( &$$, dnode_value( const_dnode ), px );
@@ -16269,6 +16299,7 @@ constant_expression
           char *field = obtain_string_from_strpool( compiler->strpool, $5 );
 	  $$ = compiler_make_compile_time_value( compiler, $1,
                                                  structure, field, px );
+          dispose_dnode( &$1 );
           freex( structure );
           freex( field );
       }

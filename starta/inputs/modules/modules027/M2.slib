@@ -1,0 +1,25 @@
+//--*- Java -*--
+
+module M2;
+
+use std;
+
+function f(int x) -> int;
+function g(int x, y) -> int;
+
+. 11, 9, g(12,3);
+. 2, f(2);
+
+function f(int x): int
+{
+    . "\nCalling f() from M2";
+    return x * x;
+}
+
+function g( int a, b ): int
+{
+    . "\nCalling g() from M2";
+    return a/b;
+}
+
+end module M2;

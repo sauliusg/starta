@@ -1,0 +1,8 @@
+#! /usr/bin/env starta
+//--*- Java -*--
+
+use std;
+
+use M;
+
+. "M loaded";
