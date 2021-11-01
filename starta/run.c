@@ -418,7 +418,8 @@ void interpret_raise_exception_with_static_message( int error_code,
 						    int exception_id,
 						    cexception_t *ex )
 {
-    strncpy( err_message.text, message, sizeof( err_message.text ));
+    strncpy( err_message.text, message, sizeof( err_message.text ) - 1);
+    err_message.text[sizeof( err_message.text ) - 1] = '\0';
     interpret_raise_exception( error_code, err_message.text,
 			       module_id, exception_id, ex );
 }
