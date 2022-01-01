@@ -1,0 +1,46 @@
+#! /usr/bin/env starta
+// --*- Java -*--
+
+pragma prepend "$D";
+pragma prepend "$D/lib";
+
+use std;
+
+struct A {
+    int i, j, k;
+    string name;
+
+    // get the name of the object:
+    get_name: function (A) -> (string);
+
+    // Get the integer i, j or k value depending on 'n':
+    get_int: function (A; int n) -> (int);
+};
+
+exception RANGE_ERROR;
+
+var a = struct A {
+    i: 10,
+    j: 20,
+    name: "default",
+    get_name: function(A a): string { return a.name },
+    get_int: function(A a;int n): int {
+        if(n==0) {
+            return a.i;
+        } else {
+            if(n==1) {
+                return a.j;
+            } else {
+                if(n==3) {
+                    return a.k;
+                } else {
+                    raise RANGE_ERROR( "Variable 'n' is out of range" );
+                }
+            }
+        }
+    }
+};
+
+function f_get_name(A a): string { return a.name }
+
+. a.get_name(a);
