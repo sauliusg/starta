@@ -7671,6 +7671,7 @@ static cexception_t *px; /* parser exception */
 %token _FORWARD
 %token _FROM
 %token _FUNCTION
+%token _GENERIC
 %token _IF
 %token _IMPLEMENTS
 %token _IMPORT
@@ -7711,6 +7712,7 @@ static cexception_t *px; /* parser exception */
 %token _UNPACK
 %token _USE
 %token _VAR
+%token _WITH
 %token _WHILE
 
 %token __ASSIGN /* := */
