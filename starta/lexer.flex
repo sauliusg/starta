@@ -245,6 +245,7 @@ foreach     { MARK; return _FOR; }
 forward     { MARK; return _FORWARD; }
 from        { MARK; return _FROM; }
 function    { MARK; return _FUNCTION; }
+generic     { MARK; return _GENERIC; }
 if          { MARK; return _IF; }
 implements  { MARK; return _IMPLEMENTS; }
 import      { MARK; return _IMPORT; }
@@ -287,6 +288,7 @@ units       { MARK; return _UNITS; }
 unpack      { MARK; return _UNPACK; }
 use         { MARK; return _USE; }
 var         { MARK; return _VAR; }
+with        { MARK; return _WITH; }
 while       { MARK; return _WHILE; }
 
  /********************** identifiers *************************/
