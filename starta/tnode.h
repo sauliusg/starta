@@ -45,6 +45,18 @@ typedef enum {
                                    counts come from cycle references,
                                    and the node can be safely
                                    collected. */
+    TF_HAS_GENERICS    = 0x1000, /* Specifies that a (composite) type
+                                    has fields (for classes and
+                                    structures), elements (for arrays
+                                    ot hashes), parameters or reteru
+                                    values (for functions and
+                                    procedure) of some generic
+                                    type. Types that have
+                                    TF_HAS_GENERICS flag set need to
+                                    be recursively re-described
+                                    (re-instantiated) when a concrete
+                                    type is substituted for a generic
+                                    one.*/
     last_TYPE_FLAG
 } type_flag_t;
 
@@ -70,6 +82,11 @@ typedef enum {
     TK_DESTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
+    TK_GENERIC,     /* generic types a-la Ada. The compiler MUST have
+                       some base type that shares size and load/store
+                       operators to compile the generic code; later a
+                       specific type will be substituted for the
+                       generic via type-erasure mechanism. */
     TK_DERIVED,     /* A new derived type inherits implementation and
                        interface (operators) from its parent, or base,
                        type, but which itself can not be assigned to
@@ -174,6 +191,8 @@ TNODE *new_tnode_operator_NEW( char *name,
 TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
+
+TNODE *new_tnode_generic( char *name, cexception_t *ex );
 
 TNODE *new_tnode_implementation( TNODE *generic_tnode,
                                  TYPETAB *generic_types,
