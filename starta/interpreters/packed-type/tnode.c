@@ -1048,10 +1048,20 @@ TNODE *new_tnode_placeholder( char *name, cexception_t *ex )
 
 TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex )
 {
+    assert( base_type );
+
     TNODE * volatile node = new_tnode( ex );
 
     node->kind = TK_GENERIC;
     node->base_type = *base_type;
+
+    if( *base_type ) {
+        node->size = (*base_type)->size;
+        if( tnode_is_reference( *base_type )) {
+            node->flags |= TF_IS_REF;
+        }
+    }
+    
     *base_type = NULL;
 
     return node;
