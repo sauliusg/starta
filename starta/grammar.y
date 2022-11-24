@@ -1386,6 +1386,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
         case TK_REF:
         case TK_FUNCTION_REF:
         case TK_DERIVED:
+        case TK_GENERIC:
             break;
         default:
             yyerrorf( "types of kind '%s' do not have suffix table",
