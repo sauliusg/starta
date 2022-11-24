@@ -10988,24 +10988,19 @@ delimited_type_description
     {
 	char *volatile type_name =
             obtain_string_from_strpool( compiler->strpool, $2 );
-	TNODE *volatile tnode =
+	TNODE *volatile base_tnode =
             share_tnode( typetab_lookup( compiler->typetab, type_name ));
-	TNODE *volatile shared_tnode = NULL;
+	TNODE *volatile tnode = NULL;
 
         cexception_t inner;
         cexception_guard( inner ) {
-            if( !tnode ) {
-                tnode = new_tnode_generic( type_name, &inner );
-                shared_tnode = share_tnode( tnode );
-                typetab_insert( compiler->typetab, type_name,
-                                &shared_tnode, &inner );
-                assert( !shared_tnode );
-            }
+            tnode = new_tnode_generic( &base_tnode, &inner );
+            assert( !base_tnode );
         }
         cexception_catch {
             freex( type_name );
             delete_tnode( tnode );
-            delete_tnode( shared_tnode );
+            delete_tnode( base_tnode );
             cexception_reraise( inner, px );
         }
         freex( type_name );
