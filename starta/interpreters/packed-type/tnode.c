@@ -1629,6 +1629,7 @@ const char *tnode_kind_name( TNODE *tnode )
         case TK_FUNCTION:      return "function";
 
         case TK_PLACEHOLDER:   return "placeholder";
+        case TK_GENERIC:       return "generic";
         case TK_DERIVED:       return "derived";
         case TK_REF:           return "ref";
         case TK_FUNCTION_REF:  return "functionref";
