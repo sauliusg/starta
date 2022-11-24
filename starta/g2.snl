@@ -8,10 +8,11 @@
 
 use * from std;
 
-generic type T : ref
+type T = generic ref;
+
 class A {
     T value;
-    array of T : value_list;
+    array of T value_list;
 };
 
 var a : A with ( T => ref );
