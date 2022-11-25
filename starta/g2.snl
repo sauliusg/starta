@@ -10,7 +10,7 @@ use * from std;
 
 type T = generic ref;
 
-class A {
+null class A {
     T value;
     array of T value_list;
 };

@@ -1053,6 +1053,7 @@ TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex )
     TNODE * volatile node = new_tnode( ex );
 
     node->kind = TK_GENERIC;
+    node->flags |= TF_HAS_GENERICS;
     node->base_type = *base_type;
 
     if( *base_type ) {
@@ -1776,6 +1777,11 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 
     tnode->fields = dnode_append( tnode->fields, field );
 
+    TNODE *field_type = dnode_type( field );
+    if( field_type && tnode_has_flags( field_type, TF_HAS_GENERICS )) {
+        tnode->flags |= TF_HAS_GENERICS;
+    }
+    
     return tnode;
 }
 
@@ -1917,6 +1923,11 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
 	dispose_dnode( method );
     }
 
+    TNODE *method_type = dnode_type( *method );
+    if( method_type && tnode_has_flags( method_type, TF_HAS_GENERICS )) {
+        tnode->flags |= TF_HAS_GENERICS;
+    }
+    
     *method = NULL;
 
     return tnode;
