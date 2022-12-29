@@ -43,8 +43,6 @@ typedef enum {
                        not have this flag set. */
 } opcode_flag_t;
 
-extern int thrcode_debug;
-extern int thrcode_trace;
 extern void *thrcode_subsystem;
 
 void thrcode_debug_on( void );

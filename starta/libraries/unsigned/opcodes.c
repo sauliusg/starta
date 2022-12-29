@@ -54,7 +54,7 @@ char *OPCODES[] = {
 
 static int strict_unsigned_conversions = 0;
 
-int trace = 0;
+int libunsigned_trace = 0;
 
 istate_t *istate_ptr;
 
@@ -76,7 +76,7 @@ istate_t *istate_ptr;
 
 #ifdef TRACE
 #define TRACE_FUNCTION() \
-    if( trace ) printf( "%s\t" \
+    if( libunsigned_trace ) printf( "%s\t" \
                         "%4ld(%9p) %4ld(%9p) " \
                         "%4ld(%9p) %4ld(%9p) " \
                         "%4ld(%9p) %4ld(%9p) ...\n", \
@@ -103,10 +103,10 @@ int init( istate_t *global_istate )
     return 0;
 }
 
-int trace_on( int trace_flag )
+int libunsigned_trace_on( int trace_flag )
 {
-    int old_trace_flag = trace;
-    trace = trace_flag;
+    int old_trace_flag = libunsigned_trace;
+    libunsigned_trace = trace_flag;
     return old_trace_flag;
 }
 
