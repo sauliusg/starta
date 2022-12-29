@@ -380,6 +380,23 @@ TNODE *new_tnode( cexception_t *ex )
    return tnode;
 }
 
+TNODE *new_tnode_type_pair( TNODE *volatile *t1, TNODE *volatile *t2,
+                            cexception_t *ex )
+{
+    assert( t1 );
+    assert( t2 );
+
+    TNODE *t = new_tnode( ex );
+
+    t->kind = TK_PAIR;
+    t->base_type = *t1;
+    *t1 = NULL;
+    t->element_type = *t2;
+    *t2 = NULL;
+    
+    return t;
+}
+
 TNODE *new_tnode_forward( char *name, cexception_t *ex )
 {
     cexception_t inner;
@@ -1129,6 +1146,14 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
     }
 }
 
+TNODE *tnode_append( TNODE *head, TNODE *volatile *tail )
+{
+    assert( tail );
+    head->next = *tail;
+    *tail = NULL;
+    return head;
+}
+
 TNODE *tnode_move_operators( TNODE *dst, TNODE *src )
 {
     assert( dst );
@@ -1646,6 +1671,7 @@ const char *tnode_kind_name( TNODE *tnode )
         case TK_FUNCTION_REF:  return "functionref";
         case TK_NULLREF:       return "nullref";
         case TK_TYPE:          return "type";
+        case TK_PAIR:          return "pair";
         default:
             snprintf( buffer, sizeof(buffer)-1, "type kind %d", tnode->kind );
             buffer[sizeof(buffer)-1] = '\0';

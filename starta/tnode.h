@@ -100,6 +100,9 @@ typedef enum {
     TK_TYPE, /* for module parameters that represent types */
     TK_CONST, /* for module parameters that represent constants */
     TK_VAR, /* for module parameters that represent variables */
+    TK_PAIR, /* TNODE used to represent type pair; two TNODE
+                references will be stored in the 'base_type' and
+                'element_type' fields. */
     last_type_kind_t
 } type_kind_t;
 
@@ -116,6 +119,8 @@ void take_ownership_of_all_tnodes( void );
 void delete_all_tnodes( void );
 TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
+TNODE *new_tnode_type_pair( TNODE *volatile *t1, TNODE *volatile *t2,
+                            cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_struct( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_class( char *name, cexception_t *ex );
@@ -197,6 +202,8 @@ TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex );
 TNODE *new_tnode_implementation( TNODE *generic_tnode,
                                  TYPETAB *generic_types,
                                  cexception_t *ex );
+
+TNODE *tnode_append( TNODE *head, TNODE *volatile *tail );
 
 TNODE *tnode_move_operators( TNODE *dst, TNODE *src );
 

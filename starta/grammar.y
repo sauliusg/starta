@@ -7817,6 +7817,8 @@ static cexception_t *px; /* parser exception */
 %type <tnode> undelimited_or_structure_description
 %type <tnode> undelimited_type_description
 %type <tnode> delimited_type_description
+%type <tnode> type_binding
+%type <tnode> type_binding_list
 %type <anode> type_attribute
 %type <dnode> use_statement
 %type <dnode> variable_access_identifier
@@ -10887,6 +10889,34 @@ opt_null_type_designator
       { $$ = 1; }
   ; 
 
+type_binding
+  : type_identifier __THICK_ARROW var_type_description
+  {
+      cexception_t inner;
+
+      $$ = NULL;
+      cexception_guard( inner ) {
+          $$ = new_tnode_type_pair( &$1, &$3, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$1 );
+          dispose_tnode( &$3 );
+          cexception_reraise( inner, px );
+      }
+  }
+  ;
+
+type_binding_list
+  : type_binding
+  {
+      $$ = $1;
+  }
+  | type_binding_list ',' type_binding
+  {
+      $$ = tnode_append( $3, &$1 );
+  }
+  ;
+
 delimited_type_description
   : type_identifier
     { 
@@ -11008,6 +11038,13 @@ delimited_type_description
 	$$ = tnode;
     }
 
+  | type_identifier _WITH '(' type_binding_list ')'
+
+  {
+      dispose_tnode( &$4 );
+      $$ = $1;
+  }
+  
   | function_or_procedure_type_keyword '(' argument_list ')'
     {
 	int is_function = $1;
