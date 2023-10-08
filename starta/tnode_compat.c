@@ -848,6 +848,8 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
 
                 concrete_tnode->interfaces =
                     clone_tlist( tnode_with_generics->interfaces, &inner );
+
+                assert("Need to add implementations for each interface in the list as well!" == NULL);
             }
             cexception_catch {
                 delete_tnode( concrete_tnode );
