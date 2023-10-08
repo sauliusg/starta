@@ -282,7 +282,8 @@ TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type,
     assert( table );
     assert( generic_type );
     for( node = table->node; node != NULL; node = node->next ) {
-        if( node->tnode== generic_type ) {
+        if( node->tnode &&
+            tnode_generic_type( node->tnode ) == generic_type ) {
 	    return node->tnode;
 	}
     }
@@ -292,7 +293,12 @@ TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type,
 TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type,
                                    cexception_t *ex )
 {
-    return NULL;
+    TNODE *tnode = typetab_lookup_type_pair( table, generic_type, ex );
+    if( tnode ) {
+        return tnode_concrete_type( tnode );
+    } else {
+        return NULL;
+    }
 }
 
 TNODE *typetab_insert_type_pair( TYPETAB *table, TNODE *volatile *pair,

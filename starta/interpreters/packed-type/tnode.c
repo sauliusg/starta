@@ -82,6 +82,8 @@ void delete_tnode( TNODE *tnode )
 	delete_dnode( tnode->return_vals );
 	delete_tnode( tnode->base_type );
 	delete_tnode( tnode->element_type );
+	delete_tnode( tnode->generic_type );
+	delete_tnode( tnode->concrete_type );
         delete_tlist( tnode->interfaces );
 	delete_dnode( tnode->constructor );
 	delete_dnode( tnode->destructor );
@@ -110,6 +112,8 @@ void tnode_traverse_rcount2( TNODE *tnode )
     tlist_traverse_tnodes_and_set_rcount2( tnode->interfaces );
     tnode_traverse_rcount2( tnode->base_type );
     tnode_traverse_rcount2( tnode->element_type );
+    tnode_traverse_rcount2( tnode->generic_type );
+    tnode_traverse_rcount2( tnode->concrete_type );
     
     dnode_traverse_rcount2( tnode->fields );
     dnode_traverse_rcount2( tnode->operators );
@@ -142,6 +146,8 @@ void tnode_mark_accessible( TNODE *tnode )
 
     tlist_traverse_tnodes_and_mark_accessible( tnode->interfaces );
     tnode_mark_accessible( tnode->base_type );
+    tnode_mark_accessible( tnode->element_type );
+    tnode_mark_accessible( tnode->generic_type );
     tnode_mark_accessible( tnode->element_type );
     
     dnode_mark_accessible( tnode->fields );
@@ -227,6 +233,8 @@ TNODE* tnode_break_cycles( TNODE *tnode )
 
         dispose_tnode( &tnode->base_type );
         dispose_tnode( &tnode->element_type );
+        dispose_tnode( &tnode->generic_type );
+        dispose_tnode( &tnode->concrete_type );
 
         dispose_tlist( &tnode->interfaces );
 
@@ -288,8 +296,11 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
     dst_element = dst->element_type;
     /* The field dst->base_type is simply copied along with all other
        fields, but wee need to delete it first, in case something is
-       allocated there:. */
+       allocated there. Same for the 'generic_type' and
+       'concrete_type' fields: */
     delete_tnode( dst->base_type );
+    delete_tnode( dst->generic_type );
+    delete_tnode( dst->concrete_type );
     dst_kind = dst->kind;
 
 #ifdef USE_SERNO
@@ -380,19 +391,20 @@ TNODE *new_tnode( cexception_t *ex )
    return tnode;
 }
 
-TNODE *new_tnode_type_pair( TNODE *volatile *t1, TNODE *volatile *t2,
+TNODE *new_tnode_type_pair( TNODE *volatile *generic_type,
+                            TNODE *volatile *concrete_type,
                             cexception_t *ex )
 {
-    assert( t1 );
-    assert( t2 );
+    assert( generic_type );
+    assert( concrete_type );
 
     TNODE *t = new_tnode( ex );
 
     t->kind = TK_PAIR;
-    t->base_type = *t1;
-    *t1 = NULL;
-    t->element_type = *t2;
-    *t2 = NULL;
+    t->generic_type = *generic_type;
+    *generic_type = NULL;
+    t->concrete_type = *concrete_type;
+    *concrete_type = NULL;
     
     return t;
 }
@@ -2149,6 +2161,12 @@ TNODE *tnode_first_interface( TNODE *class_tnode )
 
 TNODE *tnode_element_type( TNODE *tnode )
     { assert( tnode ); return tnode->element_type; }
+
+TNODE *tnode_generic_type( TNODE *tnode )
+    { assert( tnode ); return tnode->generic_type; }
+
+TNODE *tnode_concrete_type( TNODE *tnode )
+    { assert( tnode ); return tnode->concrete_type; }
 
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 {

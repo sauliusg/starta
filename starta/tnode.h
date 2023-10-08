@@ -119,7 +119,8 @@ void take_ownership_of_all_tnodes( void );
 void delete_all_tnodes( void );
 TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
-TNODE *new_tnode_type_pair( TNODE *volatile *t1, TNODE *volatile *t2,
+TNODE *new_tnode_type_pair( TNODE *volatile *generic_type,
+                            TNODE *volatile *concrete_type,
                             cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_struct( char *name, cexception_t *ex );
@@ -313,6 +314,8 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type );
 TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces );
 TNODE *tnode_first_interface( TNODE *class_tnode );
 TNODE *tnode_element_type( TNODE *tnode );
+TNODE *tnode_generic_type( TNODE *tnode );
+TNODE *tnode_concrete_type( TNODE *tnode );
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type );
 TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type );
 
