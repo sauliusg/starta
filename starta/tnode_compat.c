@@ -832,18 +832,28 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                 return share_tnode( tnode_with_generics );
             }
         } else {
-            TNODE *concrete_tnode = new_tnode( ex );
+            TNODE *volatile concrete_tnode = new_tnode( ex );
+            cexception_t inner;
 
-            concrete_tnode->kind = tnode_with_generics->kind;
+            cexception_guard( inner ) {
+                concrete_tnode->kind = tnode_with_generics->kind;
 
-            concrete_tnode->base_type = new_tnode_with_concrete_types
-                ( tnode_with_generics->base_type,
-                  generic_table, has_generics, ex );
+                concrete_tnode->base_type = new_tnode_with_concrete_types
+                    ( tnode_with_generics->base_type,
+                      generic_table, has_generics, &inner );
 
-            concrete_tnode->element_type = new_tnode_with_concrete_types
-                ( tnode_with_generics->element_type,
-                  generic_table, has_generics, ex );
+                concrete_tnode->element_type = new_tnode_with_concrete_types
+                    ( tnode_with_generics->element_type,
+                      generic_table, has_generics, &inner );
 
+                concrete_tnode->interfaces =
+                    clone_tlist( tnode_with_generics->interfaces, &inner );
+            }
+            cexception_catch {
+                delete_tnode( concrete_tnode );
+                cexception_reraise( inner, ex );
+            }
+            
             if( *has_generics ) {
                 tnode_set_has_generics( concrete_tnode );
             }
