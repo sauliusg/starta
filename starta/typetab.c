@@ -301,10 +301,15 @@ TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type,
     }
 }
 
-TNODE *typetab_insert_type_pair( TYPETAB *table, TNODE *volatile *pair,
+TNODE *typetab_insert_type_pair( TYPETAB *table,
+                                 TNODE *volatile *generic_type,
+                                 TNODE *volatile *concrete_type,
                                  cexception_t *ex )
 {
-    return NULL;
+    TNODE *volatile type_pair =
+        new_tnode_type_pair( generic_type, concrete_type, ex );
+
+    return typetab_insert( table, /*name =*/ NULL, &type_pair, ex );
 }
 
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
