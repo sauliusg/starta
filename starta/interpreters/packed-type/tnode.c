@@ -2268,6 +2268,24 @@ TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags )
     return node;
 }
 
+TNODE *tnode_set_has_references( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode_set_flags( tnode, TF_HAS_REFS );    
+}
+
+TNODE *tnode_set_has_no_numbers( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode_set_flags( tnode, TF_HAS_NO_NUMBERS );
+}
+
+TNODE *tnode_set_has_generics( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode_set_flags( tnode, TF_HAS_GENERICS );
+}
+
 int tnode_has_placeholder_element( TNODE *tnode )
 {
     while( tnode ) {
@@ -2284,16 +2302,10 @@ int tnode_has_flags( TNODE *tnode, type_flag_t flags )
     return (tnode->flags & flags);
 }
 
-TNODE *tnode_set_has_references( TNODE *tnode )
+int tnode_has_generic_type( TNODE *tnode )
 {
     assert( tnode );
-    return tnode_set_flags( tnode, TF_HAS_REFS );    
-}
-
-TNODE *tnode_set_has_no_numbers( TNODE *tnode )
-{
-    assert( tnode );
-    return tnode_set_flags( tnode, TF_HAS_NO_NUMBERS );
+    return ( tnode->flags & TF_HAS_GENERICS ) != 0;
 }
 
 int tnode_has_references( TNODE *tnode )

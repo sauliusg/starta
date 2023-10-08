@@ -36,11 +36,9 @@ void typetab_traverse_tnodes_and_mark_accessible( TYPETAB *table );
 TNODE *typetab_insert( TYPETAB *table, const char *name,
 		       TNODE *volatile *tnode, cexception_t *ex );
 
-TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type,
-                                 cexception_t *ex );
+TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type );
 
-TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type,
-                                   cexception_t *ex );
+TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type );
 
 TNODE *typetab_insert_type_pair( TYPETAB *table,
                                  TNODE *volatile *generic_type,

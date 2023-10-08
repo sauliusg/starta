@@ -797,3 +797,58 @@ int tnode_function_prototypes_match( TNODE *f1, TNODE *f2 )
 {
     return tnode_function_prototypes_match_msg( f1, f2, NULL, 0 );
 }
+
+/*
+  The 'new_tnode_with_concrete_types' creates a new TNODE that
+  describes a type with all generic types specified in the
+  'generic_table' recursively replaced with the concrete
+  implementations from the same table. Intended to compile statements
+  like:
+
+  var b : A with ( T => string ); // here A is a structure with the fields
+                                  // of generic type T.
+*/
+
+TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
+                                      TYPETAB *generic_table,
+                                      int *has_generics,
+                                      cexception_t *ex )
+{
+    assert( has_generics != NULL );
+
+    if( !tnode_has_generic_type( tnode_with_generics )) {
+        *has_generics = 0;
+        return share_tnode( tnode_with_generics );
+    } else {
+        if( tnode_kind( tnode_with_generics ) == TK_GENERIC ) {
+            TNODE *tnode_implementation =
+                typetab_lookup_paired_type( generic_table,
+                                            tnode_with_generics );
+            if( tnode_implementation != NULL ) {
+                *has_generics = 0;
+                return share_tnode( tnode_implementation );
+            } else {
+                *has_generics = 1;
+                return share_tnode( tnode_with_generics );
+            }
+        } else {
+            TNODE *concrete_tnode = new_tnode( ex );
+
+            concrete_tnode->kind = tnode_with_generics->kind;
+
+            concrete_tnode->base_type = new_tnode_with_concrete_types
+                ( tnode_with_generics->base_type,
+                  generic_table, has_generics, ex );
+
+            concrete_tnode->element_type = new_tnode_with_concrete_types
+                ( tnode_with_generics->element_type,
+                  generic_table, has_generics, ex );
+
+            if( *has_generics ) {
+                tnode_set_has_generics( concrete_tnode );
+            }
+            
+            return concrete_tnode;
+        }
+    }
+}
