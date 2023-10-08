@@ -330,10 +330,12 @@ int tnode_function_prototypes_match( TNODE *f1, TNODE *f2 );
 
 TNODE *tnode_set_flags( TNODE* node, type_flag_t flags );
 TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags );
-int tnode_has_placeholder_element( TNODE *tnode );
-int tnode_has_flags( TNODE* node, type_flag_t flags );
 TNODE *tnode_set_has_references( TNODE *tnode );
 TNODE *tnode_set_has_no_numbers( TNODE *tnode );
+TNODE *tnode_set_has_generics( TNODE *tnode );
+int tnode_has_placeholder_element( TNODE *tnode );
+int tnode_has_flags( TNODE* node, type_flag_t flags );
+int tnode_has_generic_type( TNODE *tnode );
 int tnode_has_references( TNODE *tnode );
 int tnode_has_numbers( TNODE *tnode );
 int tnode_is_addressof( TNODE *tnode );

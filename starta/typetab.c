@@ -275,8 +275,7 @@ void typetab_override_suffix( TYPETAB *table, const char *name,
     *tnode = NULL;
 }
 
-TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type,
-                                 cexception_t *ex )
+TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type )
 {
     TYPE_NODE *node;
     assert( table );
@@ -290,10 +289,9 @@ TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type,
     return NULL;
 }
 
-TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type,
-                                   cexception_t *ex )
+TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type )
 {
-    TNODE *tnode = typetab_lookup_type_pair( table, generic_type, ex );
+    TNODE *tnode = typetab_lookup_type_pair( table, generic_type );
     if( tnode ) {
         return tnode_concrete_type( tnode );
     } else {
