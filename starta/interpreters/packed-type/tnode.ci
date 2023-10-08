@@ -21,12 +21,29 @@ struct TNODE {
     char *suffix;         /* suffix that distinguishes constants of this type */
     TNODE *base_type;     /* base type of the current type, if any;
 			     for functions this is a type of the
-			     returned value */
+			     returned value. For generic types, this
+			     will be a universal implementation of
+			     that generic type (e.g. 'ref'); the code
+			     will be compile dafterh the 'type
+			     earsure' of the generic type,
+			     substituting the base type foreach
+			     generic type instance instead. */
     TLIST *interfaces;    /* lists interfaces that this class must
                              implement */
     TNODE *element_type;  /* for arrays, contains trype of the array
 			     element; for 'addressof' type, contains
 			     description of the addressed element. */
+    TNODE *generic_type;  /* for a TK_PAIR TNODE, this is an generic
+                             type for which the 'concrete_type' will
+                             provide a particular interpretation. */
+    TNODE *concrete_type; /* for a TK_PAIR TNODE, this TNODE will
+                             provide the type of a particular
+                             interpretation of a generic type in the
+                             'generic_type' field; thsi intepretation
+                             must be compatible with the type in the
+                             'base_type' field (e.g. if the 'base_type
+                             is a 'ref', then 'concrete_type' mys also
+                             be implemented as 'ref'. */
     type_flag_t flags;    /* flags for different modifiers */
     ssize_t size;         /* size of variable of a given type, in bytes */
     ssize_t nrefs;        /* number of fields in the type (structure, class,
