@@ -36,6 +36,31 @@ void create_tlist( TLIST * volatile *list,
 		   (SLLIST*) next, ex );
 }
 
+TLIST* clone_tlist( TLIST *tlist, cexception_t *ex )
+{
+    TLIST *volatile clone = NULL;
+    TLIST *volatile next = NULL;
+    TNODE *volatile tnode = share_tnode( tlist_data( tlist ));
+    cexception_t inner;
+
+    cexception_guard( inner ) {
+        if( tlist != NULL ) {
+            next = clone_tlist( tlist_next( tlist ), &inner );
+            clone = new_tlist( /*tnode =*/ NULL, next, &inner );
+            next = NULL;
+            tlist_set_data( clone, &tnode );
+        }
+    }
+    cexception_catch {
+        delete_tlist( clone );
+        delete_tlist( next );
+        delete_tnode( tnode );
+        cexception_reraise( inner, ex );
+    }
+
+    return clone;
+}
+
 void tlist_traverse_tnodes_and_set_rcount2( TLIST *tlist )
 {
     SLLIST *current = (SLLIST*)tlist;
