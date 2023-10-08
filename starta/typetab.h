@@ -42,7 +42,9 @@ TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type,
 TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type,
                                    cexception_t *ex );
 
-TNODE *typetab_insert_type_pair( TYPETAB *table, TNODE *volatile *pair,
+TNODE *typetab_insert_type_pair( TYPETAB *table,
+                                 TNODE *volatile *generic_type,
+                                 TNODE *volatile *concrete_type,
                                  cexception_t *ex );
 
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex );
