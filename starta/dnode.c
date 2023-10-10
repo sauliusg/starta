@@ -1566,3 +1566,28 @@ DNODE *dnode_remove_last( DNODE *list )
     }
     return list;
 }
+
+DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
+                                           TYPETAB *generic_table,
+                                           int *has_generics,
+                                           cexception_t *ex )
+{
+    DNODE *volatile updated_dnode_list = NULL;
+    DNODE *volatile next = NULL;
+    cexception_t inner;
+
+    cexception_guard( inner ) {
+        if( dnode_with_generics->next != NULL ) {
+            next = new_dnode_list_with_concrete_types
+                ( dnode_with_generics->next, generic_table,
+                  has_generics, &inner );
+        }
+    }
+    cexception_catch {
+        delete_dnode( updated_dnode_list );
+        delete_dnode( next );
+        cexception_reraise( inner, ex );
+    }
+    
+    return updated_dnode_list;
+}
