@@ -1636,6 +1636,7 @@ DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
         assert( !dnode_with_generics->module_args );
 
         updated_dnode_list->next = next;
+
         if( next ) {
             next->prev = updated_dnode_list;
             if( next->last ) {
