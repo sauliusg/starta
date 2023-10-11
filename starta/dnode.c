@@ -1621,7 +1621,29 @@ DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
                 sizeof(updated_dnode_list->code_flags[0]) *
                 updated_dnode_list->code_length);
 
+        assert( !dnode_with_generics->code_fixups );
+
+        updated_dnode_list->value =
+            dnode_with_generics->value;
+            
+        const_value_copy( &updated_dnode_list->cvalue,
+                          &dnode_with_generics->cvalue, &inner );
+
+        assert( !dnode_with_generics->vartab );
+        assert( !dnode_with_generics->consts );
+        assert( !dnode_with_generics->typetab );
+        assert( !dnode_with_generics->operators );
+        assert( !dnode_with_generics->module_args );
+
         updated_dnode_list->next = next;
+        if( next ) {
+            next->prev = updated_dnode_list;
+            if( next->last ) {
+                updated_dnode_list->last = next->last;
+            } else {
+                updated_dnode_list->last = next;
+            }
+        }
     }
     cexception_catch {
         delete_dnode( updated_dnode_list );
