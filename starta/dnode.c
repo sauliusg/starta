@@ -1576,12 +1576,52 @@ DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
     DNODE *volatile next = NULL;
     cexception_t inner;
 
+    if( !dnode_with_generics ) {
+        return NULL;
+    }
+    
     cexception_guard( inner ) {
-        if( dnode_with_generics->next != NULL ) {
-            next = new_dnode_list_with_concrete_types
-                ( dnode_with_generics->next, generic_table,
-                  has_generics, &inner );
-        }
+        next = new_dnode_list_with_concrete_types
+            ( dnode_with_generics->next, generic_table,
+              has_generics, &inner );
+
+        updated_dnode_list = new_dnode_name( dnode_with_generics->name,
+                                             &inner );
+
+        updated_dnode_list->filename =
+            strdupx( dnode_with_generics->filename, &inner );
+
+        updated_dnode_list->synonim =
+            strdupx( dnode_with_generics->synonim, &inner );
+        
+        updated_dnode_list->flags = dnode_with_generics->flags;
+
+        updated_dnode_list->tnode = new_tnode_with_concrete_types
+            ( dnode_with_generics->tnode, generic_table, has_generics,
+              &inner );
+        
+        updated_dnode_list->scope = dnode_with_generics->scope;
+        updated_dnode_list->offset = dnode_with_generics->offset;
+
+        updated_dnode_list->code =
+            callocx( sizeof(updated_dnode_list->code[0]),
+                     updated_dnode_list->code_length,
+                     &inner );
+        memcpy( updated_dnode_list->code,
+                dnode_with_generics->code,
+                sizeof(updated_dnode_list->code[0]) *
+                updated_dnode_list->code_length);
+
+        updated_dnode_list->code_flags =
+            callocx( sizeof(updated_dnode_list->code_flags[0]),
+                     updated_dnode_list->code_length,
+                     &inner );
+        memcpy( updated_dnode_list->code_flags,
+                dnode_with_generics->code_flags,
+                sizeof(updated_dnode_list->code_flags[0]) *
+                updated_dnode_list->code_length);
+
+        updated_dnode_list->next = next;
     }
     cexception_catch {
         delete_dnode( updated_dnode_list );
