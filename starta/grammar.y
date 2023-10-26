@@ -7632,6 +7632,7 @@ static cexception_t *px; /* parser exception */
   DNODE *dnode;
   ENODE *enode;
   TLIST *tlist;
+  TYPETAB *typetab;
   int token;           /* token value returned by lexer */
   int op;              /* type of the assign operator; for simple assignement
 			  operator, contains '='; for operators like '+=' and
@@ -7645,6 +7646,8 @@ static cexception_t *px; /* parser exception */
 %destructor { delete_dnode($$); } <dnode>
 %destructor { delete_tnode($$); } <tnode>
 %destructor { delete_anode($$); } <anode>
+%destructor { delete_tlist($$); } <tlist>
+%destructor { delete_typetab($$); } <typetab>
 
 %token _ADDRESSOF
 %token _ARRAY
@@ -7818,7 +7821,7 @@ static cexception_t *px; /* parser exception */
 %type <tnode> undelimited_type_description
 %type <tnode> delimited_type_description
 %type <tnode> type_binding
-%type <tnode> type_binding_list
+%type <typetab> type_binding_list
 %type <anode> type_attribute
 %type <dnode> use_statement
 %type <dnode> variable_access_identifier
@@ -10909,11 +10912,34 @@ type_binding
 type_binding_list
   : type_binding
   {
-      $$ = $1;
+      cexception_t inner;
+
+      $$ = new_typetab( px );
+
+      cexception_guard( inner ) {
+          typetab_insert( $$, /*name = */"", &$1, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$1 );
+          dispose_typetab( &$$ );
+          cexception_reraise( inner, px );
+      }
   }
   | type_binding_list ',' type_binding
   {
-      $$ = tnode_append( $3, &$1 );
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          typetab_insert( $1, /*name = */"", &$3, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$3 );
+          dispose_typetab( &$1 );
+          cexception_reraise( inner, px );
+      }
+
+      $$ = $1;
+      $1 = NULL;
   }
   ;
 
@@ -11041,7 +11067,7 @@ delimited_type_description
   | type_identifier _WITH '(' type_binding_list ')'
 
   {
-      dispose_tnode( &$4 );
+      dispose_typetab( &$4 );
       $$ = $1;
   }
   
