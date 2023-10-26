@@ -115,6 +115,10 @@ DNODE* new_dnode_operator( char *name,
 
 DNODE *new_dnode_module( char *name, cexception_t *ex );
 
+DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
+                                           TYPETAB *generic_table,
+                                           int *has_generics,
+                                           cexception_t *ex );
 DNODE *share_dnode( DNODE* node );
 
 DNODE *dnode_set_ssize_value( DNODE *dnode, ssize_t val );
