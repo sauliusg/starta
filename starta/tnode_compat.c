@@ -815,7 +815,12 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                                       cexception_t *ex )
 {
     assert( has_generics != NULL );
+    assert( generic_table );
 
+    if( !tnode_with_generics ) {
+        return NULL;
+    }
+    
     if( !tnode_has_generic_type( tnode_with_generics )) {
         *has_generics = 0;
         return share_tnode( tnode_with_generics );
