@@ -11067,8 +11067,22 @@ delimited_type_description
   | type_identifier _WITH '(' type_binding_list ')'
 
   {
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          int has_generics = 0;
+          $$ = new_tnode_with_concrete_types
+              ( /* tnode_with_generics = */ $1,
+                /* generic_table = */ $4,
+                &has_generics, &inner );
+      }
+      cexception_catch {
+          dispose_typetab( &$4 );
+          $$ = NULL;
+          cexception_reraise( inner, px );
+      }
+
       dispose_typetab( &$4 );
-      $$ = $1;
   }
   
   | function_or_procedure_type_keyword '(' argument_list ')'
