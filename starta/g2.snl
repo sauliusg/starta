@@ -16,3 +16,11 @@ null class A {
 
 var a : A with ( T => ref );
 var b : A with ( T => string );
+
+b.value = "foo";
+
+. b.value;
+
+a.value = "bar";
+
+// . a.value;
