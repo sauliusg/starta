@@ -23,4 +23,4 @@ b.value = "foo";
 
 a.value = "bar";
 
-// . a.value;
+. "%p" %% a.value;
