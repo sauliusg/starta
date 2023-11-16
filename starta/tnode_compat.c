@@ -864,6 +864,34 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                     ( tnode_with_generics->fields, generic_table,
                       has_generics, &inner );
 
+                concrete_tnode->operators = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->operators, generic_table,
+                      has_generics, &inner );
+
+                concrete_tnode->conversions = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->conversions, generic_table,
+                      has_generics, &inner );
+
+                concrete_tnode->methods = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->methods, generic_table,
+                      has_generics, &inner );
+
+                concrete_tnode->args = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->args, generic_table,
+                      has_generics, &inner );
+
+                concrete_tnode->return_vals = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->return_vals, generic_table,
+                      has_generics, &inner );
+
+                concrete_tnode->constructor = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->constructor, generic_table,
+                      has_generics, &inner );
+
+                concrete_tnode->destructor = new_dnode_list_with_concrete_types
+                    ( tnode_with_generics->destructor, generic_table,
+                      has_generics, &inner );
+
             }
             cexception_catch {
                 delete_tnode( concrete_tnode );
