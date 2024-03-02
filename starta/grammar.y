@@ -5413,6 +5413,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
         cexception_guard( inner ) {
             generic_types = new_typetab( &inner );
             if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
+                tnode_kind( arg_type ) != TK_GENERIC &&
                 !tnode_types_are_assignment_compatible( arg_type, exp_type,
                                                         generic_types,
                                                         NULL /* msg */,

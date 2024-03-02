@@ -101,8 +101,8 @@ typedef enum {
     TK_CONST, /* for module parameters that represent constants */
     TK_VAR, /* for module parameters that represent variables */
     TK_PAIR, /* TNODE used to represent type pair; two TNODE
-                references will be stored in the 'base_type' and
-                'element_type' fields. */
+                references will be stored in the 'generic_type' and
+                'concrete_type' fields. */
     last_type_kind_t
 } type_kind_t;
 
@@ -366,6 +366,10 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 DNODE *tnode_default_constructor( TNODE *tnode );
 
 DNODE *tnode_lookup_constructor( TNODE *tnode, const char *name );
+
+TNODE *tnode_type_pair_left( TNODE *tnode );
+
+TNODE *tnode_type_pair_right( TNODE *tnode );
 
 DNODE *tnode_destructor( TNODE *tnode );
 

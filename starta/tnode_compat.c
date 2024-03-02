@@ -208,6 +208,26 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
             return tnode_create_and_check_placeholder_implementation
                 ( t2, t1, generic_types, tnode_check_types, ex );
         }
+    } else if( generic_types && t1->kind == TK_GENERIC ) {
+        TNODE *concrete_type = typetab_lookup_paired_type( generic_types, t1 );
+
+        if( concrete_type ) {
+            return tnode_check_types( concrete_type, t2, generic_types, ex );
+        } else {
+            cexception_t inner;
+            TNODE *volatile generic_type = share_tnode( t1 );
+            TNODE *volatile implementation_type = share_tnode( t2 );
+            cexception_guard( inner ) {
+                typetab_insert_type_pair( generic_types, &generic_type,
+                                          &implementation_type, &inner );
+                return 1;
+            }
+            cexception_catch {
+                delete_tnode( generic_type );
+                delete_tnode( implementation_type );
+                cexception_reraise( inner, ex );
+            }
+        }
     }
 
     return 0;
@@ -285,7 +305,9 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					    generic_types, ex );
     }
 
-    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
+    if( t1->kind == TK_GENERIC ||
+        t1->kind == TK_PLACEHOLDER ||
+        t2->kind == TK_PLACEHOLDER ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
