@@ -2486,6 +2486,20 @@ DNODE *tnode_destructor( TNODE *tnode )
     return tnode->destructor;
 }
 
+TNODE *tnode_type_pair_left( TNODE *tnode )
+{
+    assert( tnode );
+    assert( tnode->kind == TK_PAIR );
+    return tnode->generic_type;
+}
+
+TNODE *tnode_type_pair_right( TNODE *tnode )
+{
+    assert( tnode );
+    assert( tnode->kind == TK_PAIR );
+    return tnode->concrete_type;
+}
+
 TNODE *tnode_next( TNODE* list )
 {
     if( !list ) return NULL;

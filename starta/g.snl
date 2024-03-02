@@ -1,50 +1,75 @@
 // --*- C -*--
 
-// This file illustrates a problem with the current generic type
-// design. When a structure is declared with the field of generic
-// type, the assumptions about the field alignment, offset and
-// position hold only when a generic type field is the last field in
-// the structure.
+// Test the new generic type implementation (a-la Ada).
 
 use * from std;
 
-function sprinter( s : string ): string { . s; return s };
-function iprinter( i : int ): int { . i; return i };
-function fprinter( x : float ): float { . x; return x };
+exception UNIMPLEMENTED_METHOD;
 
-function supdater( s : string ): string { return s + " with extra part" };
-function iupdater( i : int ): int { return i + 2 };
-function fupdater( x : float ): float { return x + 1.5 };
+type R = generic ref;
 
-procedure generic_procedure( s : null struct { int i; type T x }; 
-                             function (x : type T)->(type T) xmanager )
+type Number = class {
+
+    method print()
+    {
+     raise UNIMPLEMENTED_METHOD( "unimplemented method \"print\"" );
+    }
+};
+
+class Integer : Number {
+    int ival;
+
+    constructor ( i : int )
+    {
+        self.ival = i;
+    }
+    
+    method print()
+    {
+        . self.ival;
+    }
+}
+
+class Float : Number {
+    float fval;
+
+    constructor ( x : float )
+    {
+        self.fval = x;
+    }
+    
+    method print()
+    {
+        . self.fval;
+    }
+}
+
+operator "+" (i : Integer; delta : int) -> Integer
 {
-    s.x = xmanager( s.x );
+    var Integer ret = new Integer( i.ival + delta );
+    return ret;
 }
 
-struct IS { int i; int j }
-struct FS { int i; float f }
-
-try {
-    var p = new null struct { int i; string name };
-    p.name = "Struct p";
-
-    generic_procedure( p, sprinter );
-    generic_procedure( p, supdater );
-    generic_procedure( p, sprinter );
-    . "";
-
-    var is = struct IS { i => 2, j => 12 };
-    generic_procedure( is, iprinter );
-    generic_procedure( is, iupdater );
-    generic_procedure( is, iprinter );
-    . "";
-
-    var fs = struct FS { i => 2, f => 3.14 };
-    generic_procedure( fs, fprinter );
-    generic_procedure( fs, fupdater );
-    generic_procedure( fs, fprinter );
+operator "+" (x : Float; delta : float) -> Float
+{
+    var Float ret = new Float( x.fval + delta );
+    return ret;
 }
-catch( var errno : int; var message : string ) {
-    . message;
+
+procedure sprinter( s : string ): string { . s; return s };
+procedure iprinter( i : Integer ): Integer { i->print(); return i };
+procedure fprinter( x : Float ): Float { x->print(); return x };
+
+procedure supdater( s : string ): string { return s + " with extra part" };
+procedure iupdater( i : Integer ): Integer { return i + 2 };
+procedure fupdater( x : Float ): Float { return x + 1.5 };
+
+procedure generic_processor( s : R; procedure (x : R)->(R) xmanager ): R
+{
+    s = xmanager( s );
+    return s;
 }
+
+generic_processor( "foo", sprinter );
+
+. generic_processor( "bar", supdater );
