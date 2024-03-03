@@ -1,2 +1,3 @@
 break /home/saulius/src/compilers/branches/saulius-generic-classes-and-functions/starta/grammar.y:12605
-  condition $bpnum function && function->name && strcmp (function->name, "generic_processor") == 0
+  condition $bpnum function && function->name && (int) strcmp (function->name, "generic_processor") == 0
+break /home/saulius/src/compilers/branches/saulius-generic-classes-and-functions/starta/tnode_compat.c:674

@@ -2001,7 +2001,12 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
             TNODE *retval_dnode_type = dnode_type( retval_dnode );
             if( tnode_has_placeholder_element( retval_dnode_type )) {
                 retval_tnode = new_tnode_implementation( retval_dnode_type,
-                                                         generic_types, &inner );
+                                                         generic_types,
+                                                         &inner );
+            } else if( tnode_has_generic_type( retval_dnode_type )) {
+                int has_generics = 0;
+                retval_tnode = new_tnode_with_concrete_types
+                    ( retval_dnode_type, generic_types, &has_generics, &inner );
             } else {
                 retval_tnode = share_tnode( retval_dnode_type );
             }
