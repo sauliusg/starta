@@ -543,7 +543,9 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return tnode_implements_interface( t2, t1 );
     }
 
-    if( t1->kind == TK_PLACEHOLDER || t2->kind == TK_PLACEHOLDER ) {
+    if( t1->kind == TK_GENERIC ||
+        t1->kind == TK_PLACEHOLDER ||
+        t2->kind == TK_PLACEHOLDER ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
