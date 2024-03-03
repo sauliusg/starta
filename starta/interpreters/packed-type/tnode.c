@@ -1534,14 +1534,20 @@ char *tnode_suffix( TNODE *tnode )
 
 ssize_t tnode_size( TNODE *tnode )
 {
-    assert( tnode );
-    return tnode->size;
+    if( tnode ) {
+        return tnode->size;
+    } else {
+        return 0;
+    }
 }
 
 ssize_t tnode_number_of_references( TNODE *tnode )
 {
-    assert( tnode );
-    return tnode->nrefs;
+    if( tnode ) {
+        return tnode->nrefs;
+    } else {
+        return 0;
+    }
 }
 
 ssize_t tnode_interface_number( TNODE *tnode )
@@ -1604,9 +1610,11 @@ int tnode_align( TNODE *tnode )
 
 type_kind_t tnode_kind( TNODE *tnode )
 {
-    assert( tnode );
-    assert( tnode->rcount > 0 );
-    return tnode->kind;
+    if( tnode ) {
+        return tnode->kind;
+    } else {
+        return TK_NONE;
+    }
 }
 
 DNODE *tnode_args( TNODE* tnode )
@@ -2080,8 +2088,11 @@ ssize_t tnode_max_vmt_offset( TNODE *tnode )
 
 ssize_t tnode_vmt_offset( TNODE *tnode )
 {
-    assert( tnode );
-    return tnode->vmt_offset;
+    if( tnode ) {
+        return tnode->vmt_offset;
+    } else {
+        return 0;
+    }
 }
 
 ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset )
