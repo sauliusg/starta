@@ -2304,8 +2304,11 @@ int tnode_has_flags( TNODE *tnode, type_flag_t flags )
 
 int tnode_has_generic_type( TNODE *tnode )
 {
-    assert( tnode );
-    return ( tnode->flags & TF_HAS_GENERICS ) != 0;
+    if( tnode ) {
+        return ( tnode->flags & TF_HAS_GENERICS ) != 0;
+    } else {
+        return 0;
+    }
 }
 
 int tnode_has_references( TNODE *tnode )
