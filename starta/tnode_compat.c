@@ -822,6 +822,47 @@ int tnode_function_prototypes_match( TNODE *f1, TNODE *f2 )
     return tnode_function_prototypes_match_msg( f1, f2, NULL, 0 );
 }
 
+TLIST *new_tlist_with_concrete_types( TLIST *tlist_with_generics,
+                                      TYPETAB *generic_table,
+                                      int *has_generics,
+                                      cexception_t *ex )
+{
+    TLIST *volatile ret = NULL;
+    TLIST *volatile next = NULL;
+    TNODE *volatile shared_tnode = NULL;
+    cexception_t inner;
+
+    if( !tlist_with_generics ) {
+        return NULL;
+    }
+    
+    cexception_guard( inner ) {
+        TNODE *tnode = tlist_data( tlist_with_generics );
+        next = new_tlist_with_concrete_types
+            (
+             tlist_next( tlist_with_generics ),
+             generic_table, has_generics, &inner
+            );
+
+        if( tnode_has_generic_type( tnode )) {
+            shared_tnode = new_tnode_with_concrete_types
+                ( tnode, generic_table, has_generics, &inner );
+        } else {
+            shared_tnode = share_tnode( tnode );
+        }
+        create_tlist( &ret, &shared_tnode, next, &inner );
+        next = NULL;
+    }
+    cexception_catch {
+        delete_tlist( ret );
+        delete_tlist( next );
+        delete_tnode( shared_tnode );
+        cexception_reraise( inner, ex );
+    }
+
+    return ret;
+}
+
 /*
   The 'new_tnode_with_concrete_types' creates a new TNODE that
   describes a type with all generic types specified in the
@@ -875,15 +916,10 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                     ( tnode_with_generics->element_type,
                       generic_table, has_generics, &inner );
 
-                concrete_tnode->interfaces =
-                    clone_tlist( tnode_with_generics->interfaces, &inner );
-
-#if 0
-                assert("Need to add implementations for each interface in the list as well!" == NULL);
-#else
-#warning "Need to add implementations for each interface in the list as well!"
-#endif
-
+                concrete_tnode->interfaces = new_tlist_with_concrete_types
+                    ( tnode_with_generics->interfaces, generic_table,
+                      has_generics, &inner );
+                
                 concrete_tnode->fields = new_dnode_list_with_concrete_types
                     ( tnode_with_generics->fields, generic_table,
                       has_generics, &inner );
