@@ -1,6 +1,6 @@
 // --*- C -*--
 
-// Test the new generic type implementation (a-la Ada) in interfaces.
+// Test the new generic type implementation (a-la Ada) in classes.
 
 use std;
 
