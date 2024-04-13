@@ -99,7 +99,7 @@ generic_processor( is, iprinter );
 
 . "\n================\n";
 
-var fs = struct FS { i => 2, f => new FLOAT(3.14) };
+var fs = struct FS { i => 2, f => new Float(3.14) };
 generic_processor( fs, fprinter );
 generic_processor( fs, fupdater );
 generic_processor( fs, fprinter );
