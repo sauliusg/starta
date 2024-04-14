@@ -21,23 +21,14 @@ type G = class {
     }
 };
 
-type C = G with (R => string);
-type D = G with (R => array [][] of int);
-type E = G with (R => G); // recursive instantiation...
+type E = G with (R => E); // recursive instantiation...
 
-var c = new C;
-var d = new D;
 var e = new E;
+var f = new E;
 
-c->set( "haha" );
-. c->get();
-
-// d->set( "coocoo" ); // ERROR, incompatible types for function 'set' argument nr. 2
-d->set( [[10, 20, 30], [14, 15]] );
-. d->get()[0][1];
-. d->get()[1][0];
-
-e->set( new G );
+f->set( new E );
+e->set( f );
+// e->set( new G ); // ERROR, type 'E' has no conversion from type 'G'
 
 var int length = 0;
 
