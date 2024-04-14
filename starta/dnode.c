@@ -1654,3 +1654,16 @@ DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
     
     return updated_dnode_list;
 }
+
+int dnode_list_has_generic_type( DNODE *dnode_list )
+{
+    DNODE *current;
+
+    foreach_dnode( current, dnode_list ) {
+        if( tnode_has_generic_type( dnode_type( current ))) {
+            return 1;
+        }
+    }
+
+    return 0;
+}

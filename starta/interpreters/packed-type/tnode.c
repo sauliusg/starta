@@ -723,6 +723,11 @@ TNODE *new_tnode_function_or_proc_ref( DNODE *parameters,
 	tnode->args = parameters;
 	tnode->return_vals = return_dnodes;
 	tnode_set_flags( tnode, TF_IS_REF );
+        if( tnode_has_generic_type( base_type ) ||
+            dnode_list_has_generic_type( parameters ) ||
+            dnode_list_has_generic_type( return_dnodes )) {
+            tnode->flags |= TF_HAS_GENERICS;
+        }
 	if( return_dnodes ) {
 	    tnode->element_type = share_tnode( dnode_type( return_dnodes ));
 	}
@@ -750,6 +755,10 @@ static TNODE *new_tnode_function_or_operator( char *name,
 				   addresses, thus having size of
 				   REF_SIZE */
 	tnode_set_flags( tnode, TF_IS_REF );
+        if( dnode_list_has_generic_type( parameters ) ||
+            dnode_list_has_generic_type( return_dnodes )) {
+            tnode->flags |= TF_HAS_GENERICS;
+        }
 	tnode->args = parameters;
 	tnode->return_vals = return_dnodes;
 	if( return_dnodes ) {

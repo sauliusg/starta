@@ -310,6 +310,8 @@ TNODE *dnode_typetab_lookup_suffix( DNODE *dnode, const char *name,
 
 int dnode_module_args_are_identical( DNODE *m1, DNODE *m2, SYMTAB *symtab );
 
+int dnode_list_has_generic_type( DNODE *dnode_list );
+
 DNODE *dnode_remove_last( DNODE *list );
 
 void dnode_print_allocated();
