@@ -16,9 +16,14 @@ interface I2 {
     method get() : R;
 };
 
-class G1 implements I1, I2 {
+class G implements I1, I2 {
     R x;
 
+    method set(R r)
+    {
+        self.x = r;
+    }
+    
     method set@I1( R r )
     {
         self.x = r;
@@ -40,4 +45,10 @@ class G1 implements I1, I2 {
     }
 }
 
-type C_string = G1 with (R => string);
+type G_string = G with (R => string);
+type G_array = G with (R => array of string);
+
+var a = new G_string;
+var b = new G_array;
+ 
+a->set@I1( "a string to set" );
