@@ -12699,9 +12699,11 @@ multivalue_function_call
                         method = tnode_lookup_method( interface_type, method_name );
                     }
                 } else {
-                    class_has_interface =
-                        tnode_lookup_interface( object_type, interface_name )
-                        != NULL;
+                    TNODE *concrete_interface =
+                        tnode_lookup_interface( object_type, interface_name );
+
+                    class_has_interface = (concrete_interface != NULL);
+
                     if( !class_has_interface ) {
                         char *class_name =
                             object_type ? tnode_name( object_type ) : NULL;
@@ -12715,7 +12717,8 @@ multivalue_function_call
                                       interface_name );
                         }
                     } else {
-                        method = tnode_lookup_method( interface_type, method_name );
+                        method = tnode_lookup_method( concrete_interface,
+                                                      method_name );
                     }
                 }
             } else {
