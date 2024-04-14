@@ -935,6 +935,13 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                 
                 cexception_guard( inner ) {
 
+                    // Interface names are inherited:
+                    if( tnode_kind( tnode_with_generics ) == TK_INTERFACE ) {
+                        tnode_set_name( concrete_tnode,
+                                        tnode_name( tnode_with_generics ),
+                                        &inner);
+                    }
+                    
                     type_pair = new_tnode_type_pair
                         ( &shared_generic_tnode, &shared_concrete_tnode,
                           &inner );
