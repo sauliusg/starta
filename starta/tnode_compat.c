@@ -902,64 +902,93 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                 return share_tnode( tnode_with_generics );
             }
         } else {
-            TNODE *volatile concrete_tnode = new_tnode( ex );
-            cexception_t inner;
+            TNODE *existing_implementation =
+                typetab_lookup_paired_type( generic_table,
+                                            tnode_with_generics );
 
-            cexception_guard( inner ) {
-                concrete_tnode->kind = tnode_with_generics->kind;
-
-                concrete_tnode->base_type = new_tnode_with_concrete_types
-                    ( tnode_with_generics->base_type,
-                      generic_table, has_generics, &inner );
-
-                concrete_tnode->element_type = new_tnode_with_concrete_types
-                    ( tnode_with_generics->element_type,
-                      generic_table, has_generics, &inner );
-
-                concrete_tnode->interfaces = new_tlist_with_concrete_types
-                    ( tnode_with_generics->interfaces, generic_table,
-                      has_generics, &inner );
-                
-                concrete_tnode->fields = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->fields, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->operators = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->operators, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->conversions = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->conversions, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->methods = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->methods, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->args = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->args, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->return_vals = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->return_vals, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->constructor = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->constructor, generic_table,
-                      has_generics, &inner );
-
-                concrete_tnode->destructor = new_dnode_list_with_concrete_types
-                    ( tnode_with_generics->destructor, generic_table,
-                      has_generics, &inner );
-
-            }
-            cexception_catch {
-                delete_tnode( concrete_tnode );
-                cexception_reraise( inner, ex );
-            }
+            TNODE *volatile concrete_tnode = NULL;
             
-            if( *has_generics ) {
-                tnode_set_has_generics( concrete_tnode );
+            if( existing_implementation ) {
+                concrete_tnode = share_tnode( existing_implementation );
+            } else {
+                concrete_tnode = new_tnode( ex );
+                TNODE *volatile type_pair = NULL;
+                TNODE *volatile shared_concrete_tnode =
+                    share_tnode( concrete_tnode );
+                TNODE *volatile shared_generic_tnode =
+                    share_tnode( tnode_with_generics );
+                cexception_t inner;
+
+                cexception_guard( inner ) {
+                    concrete_tnode->kind = tnode_with_generics->kind;
+
+                    type_pair = new_tnode_type_pair
+                        ( &shared_generic_tnode, &shared_concrete_tnode,
+                          &inner );
+
+                    typetab_insert( generic_table,
+                                    tnode_name( tnode_with_generics ),
+                                    &type_pair, &inner );
+                
+                    concrete_tnode->base_type = new_tnode_with_concrete_types
+                        ( tnode_with_generics->base_type,
+                          generic_table, has_generics, &inner );
+
+                    concrete_tnode->element_type = new_tnode_with_concrete_types
+                        ( tnode_with_generics->element_type,
+                          generic_table, has_generics, &inner );
+
+                    concrete_tnode->interfaces = new_tlist_with_concrete_types
+                        ( tnode_with_generics->interfaces, generic_table,
+                          has_generics, &inner );
+                
+                    concrete_tnode->fields = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->fields, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->operators = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->operators, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->conversions = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->conversions, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->methods = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->methods, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->args = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->args, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->return_vals = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->return_vals, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->constructor = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->constructor, generic_table,
+                          has_generics, &inner );
+
+                    concrete_tnode->destructor = new_dnode_list_with_concrete_types
+                        ( tnode_with_generics->destructor, generic_table,
+                          has_generics, &inner );
+
+                }
+                cexception_catch {
+                    delete_tnode( type_pair );
+                    delete_tnode( shared_concrete_tnode );
+                    delete_tnode( shared_generic_tnode );
+                    delete_tnode( concrete_tnode );
+                    cexception_reraise( inner, ex );
+                }
+            
+                if( *has_generics ) {
+                    tnode_set_has_generics( concrete_tnode );
+                }
+                delete_tnode( type_pair );
+                delete_tnode( shared_concrete_tnode );
+                delete_tnode( shared_generic_tnode );
             }
             
             return concrete_tnode;
