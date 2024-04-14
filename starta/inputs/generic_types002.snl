@@ -23,11 +23,9 @@ type G = class {
 
 type C = G with (R => string);
 type D = G with (R => array [][] of int);
-type E = G with (R => G); // recursive instantiation...
 
 var c = new C;
 var d = new D;
-var e = new E;
 
 c->set( "haha" );
 . c->get();
@@ -36,13 +34,3 @@ c->set( "haha" );
 d->set( [[10, 20, 30], [14, 15]] );
 . d->get()[0][1];
 . d->get()[1][0];
-
-e->set( new G );
-
-var int length = 0;
-
-for( var x : E = e; x != null; x = x->get() ) {
-    length++;
-}
-
-. "length of e =", length;

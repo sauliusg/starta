@@ -17,13 +17,5 @@ null class A {
 var a : A with ( T => ref );
 var b : A with ( T => string );
 
-a = new A with ( T => ref );
-b = new A with ( T => string );
-
-b.value = "foo";
-
-. b.value;
-
-a.value = "bar";
-
-// . a.value; // ERROR, type 'ref' has no unary operator named '.'
+a = new A with ( T => string ); // compiles at the moment, but it shold not...
+b = new A with ( T => ref );    // compiles at the moment, but it shold not...
