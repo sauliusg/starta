@@ -14,6 +14,11 @@ procedure s( r : R )
     x = r;
 }
 
+procedure g( r : R ): R
+{
+    return x;
+}
+
 procedure sv( a : array of R; r : R )
 {
     a[0] = r;
@@ -32,4 +37,7 @@ sv( ia, [11, 12] );
 . ia[0][1];
 
 s( "evil!" );
+. g( "crash" );
+
 s( [666] );
+. g( [616] )[0];
