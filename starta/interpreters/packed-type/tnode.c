@@ -1827,16 +1827,18 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 
         tnode_set_size_and_field_offset( tnode, current );
 
+        TNODE *field_type = dnode_type( field );
+        if( field_type &&
+            (tnode_has_flags( field_type, TF_HAS_GENERICS ) ||
+             tnode_has_generic_type( field_type ) ||
+             tnode_has_generic_fields( field_type ))) {
+            tnode->flags |= TF_HAS_GENERICS;
+        }
     }
     // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
 
     tnode->fields = dnode_append( tnode->fields, field );
 
-    TNODE *field_type = dnode_type( field );
-    if( field_type && tnode_has_flags( field_type, TF_HAS_GENERICS )) {
-        tnode->flags |= TF_HAS_GENERICS;
-    }
-    
     return tnode;
 }
 
@@ -2248,6 +2250,10 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 
     tnode->element_type = element_type;
 
+    if( tnode_has_generic_type( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERICS );
+    }
+    
     return tnode;
 }
 
@@ -2261,6 +2267,11 @@ TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type )
     } else {
 	tnode_append_element_type( tnode->element_type, element_type );
     }
+
+    if( tnode_has_generic_type( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERICS );
+    }
+    
     return tnode;
 }
 
