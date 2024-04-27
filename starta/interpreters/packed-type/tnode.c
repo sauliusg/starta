@@ -2331,6 +2331,21 @@ int tnode_has_generic_type( TNODE *tnode )
     }
 }
 
+int tnode_has_generic_fields( TNODE *tnode )
+{
+    DNODE *field;
+
+    if( tnode ) {
+        foreach_dnode( field, tnode->fields ) {
+            if( tnode_has_generic_type( dnode_type( field ))) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 int tnode_has_references( TNODE *tnode )
 {
     assert( tnode );
