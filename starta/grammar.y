@@ -2148,7 +2148,8 @@ static void compiler_compile_type_conversion( COMPILER *cc,
                             ( target_type, element_tnode );
                     }
 
-                    compiler_emit_function_call( cc, conversion, fixup_values, "\n", ex );
+                    compiler_emit_function_call( cc, conversion,
+                                                 fixup_values, "\n", &inner );
                 }
             }
 
