@@ -1207,7 +1207,7 @@ void compiler_check_generic_types( DNODE *vars )
     foreach_dnode( current, vars ) {
         TNODE *var_type = dnode_type( current );
         if( dnode_scope( current ) == 0 &&
-            (tnode_has_generic_type( var_type ) ||
+            (tnode_has_generic_fields( var_type ) ||
              tnode_kind( var_type ) == TK_GENERIC )) {
             yyerrorf( "Variables with generic types ('%s') can not be "
                       "declared in the global (zero) scope",
