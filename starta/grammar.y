@@ -1200,6 +1200,23 @@ static void compiler_typetab_insert( COMPILER *cc,
     } 
 }
 
+void compiler_check_generic_types( DNODE *vars )
+{
+    DNODE *current;
+
+    foreach_dnode( current, vars ) {
+        TNODE *var_type = dnode_type( current );
+        if( dnode_scope( current ) == 0 &&
+            (tnode_has_generic_type( var_type ) ||
+             tnode_kind( var_type ) == TK_GENERIC )) {
+            yyerrorf( "Variables with generic types ('%s') can not be "
+                      "declared in the global (zero) scope",
+                      dnode_name( current ));
+        }
+    }
+}
+
+
 static void compiler_vartab_insert_named_vars( COMPILER *cc,
                                                DNODE *volatile *vars,
                                                cexception_t *ex )
@@ -1209,6 +1226,7 @@ static void compiler_vartab_insert_named_vars( COMPILER *cc,
 
     cexception_t inner;
     cexception_guard( inner ) {
+        compiler_check_generic_types( *vars );
         vartab_insert_named_vars( cc->vartab, vars, &inner );
         if( cc->current_module && dnode_scope( shared_vars ) == 0 ) {
             dnode_vartab_insert_named_vars( cc->current_module,
