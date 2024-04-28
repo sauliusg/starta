@@ -15,8 +15,6 @@ struct TNODE {
        leaks: */
     TNODE *next_alloc, *prev_alloc;
 
-    type_kind_t kind;     /* what kind of type is it: simple type,
-			     struct, class, vector, function type, etc. */
     char *name;           /* name of the type ( 'int', 'real', etc. ) */
     char *suffix;         /* suffix that distinguishes constants of this type */
     TNODE *base_type;     /* base type of the current type, if any;
@@ -45,36 +43,47 @@ struct TNODE {
                              is a 'ref', then 'concrete_type' mys also
                              be implemented as 'ref'. */
     type_flag_t flags;    /* flags for different modifiers */
-    ssize_t size;         /* size of variable of a given type, in bytes */
-    ssize_t nrefs;        /* number of fields in the type (structure, class,
-			     etc.) that are references and should be garbage
-			     collected */
 
 #ifdef USE_SERNO
     ssize_t serno;
 #endif
 
-    ssize_t nextnumoffs;  /* The offset of the next numeric
-                             (non-reference) field to be assigned. */
+    struct {
+        type_kind_t kind;     /* what kind of type is it: simple type,
+                                 struct, class, vector, function type,
+                                 etc. */
+        ssize_t size;         /* size of variable of a given type, in
+                                 bytes */
+        ssize_t nrefs;        /* number of fields in the type
+                                 (structure, class, etc.) that are
+                                 references and should be garbage
+                                 collected */
 
-    ssize_t nextrefoffs;  /* The offset of the next reference field to
-                             be assigned. */
+        ssize_t nextnumoffs;  /* The offset of the next numeric
+                                 (non-reference) field to be
+                                 assigned. */
 
-    ssize_t max_vmt_offset;
-                          /* maximum Virtual method offset assigned in
-			     this type.*/
-    ssize_t vmt_offset;   /* offset of the VMT in the static data area. */
+        ssize_t nextrefoffs;  /* The offset of the next reference
+                                 field to be assigned. */
 
-    int interface_nr;     /* For interfaces, a number assigned to the
-                             interface; specifies also the interface
-                             offset in the virtual method table. For
-                             method types, specifies thye number of
-                             the interface that declared this method;
-                             it must be used when computing VMT offset
-                             to call this method. */
+        ssize_t max_vmt_offset;
+                              /* maximum Virtual method offset
+                                 assigned in this type.*/
+        ssize_t vmt_offset;   /* offset of the VMT in the static data
+                                 area. */
 
-    int  align;           /* alignment of variable of a given type */
+        int interface_nr;     /* For interfaces, a number assigned to
+                                 the interface; specifies also the
+                                 interface offset in the virtual
+                                 method table. For method types,
+                                 specifies thye number of the
+                                 interface that declared this method;
+                                 it must be used when computing VMT
+                                 offset to call this method. */
 
+        int  align;           /* alignment of variable of a given type */
+    } params;
+        
     long rcount;          /* reference count */
     ssize_t rcount2;      /* The second reference count, used to count
                              references from cycles. If all references
