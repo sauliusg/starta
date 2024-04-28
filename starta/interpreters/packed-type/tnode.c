@@ -2162,6 +2162,17 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type )
 	}
     }
 
+    if( tnode->base_type ) {
+        if( tnode->base_type->kind == TK_GENERIC ||
+            tnode_has_generic_type( tnode->base_type )) {
+            tnode_set_flags( tnode, TF_HAS_GENERICS );
+        }
+        if( tnode->base_type->kind == TK_GENERIC ||
+            tnode_has_generic_field( tnode->base_type )) {
+            tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
+        }
+    }
+    
     return tnode;
 }
 

@@ -1,0 +1,5 @@
+./sl: inputs/err-generic008.snl(28,18): ERROR, Variables with generic types ('g') can not be declared in the global (zero) scope
+var g : G = new G;
+                 ^
+./sl: 1 error(s) detected
+
