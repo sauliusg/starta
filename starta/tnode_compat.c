@@ -193,9 +193,9 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                                             cexception_t *ex ),
                                       cexception_t *ex )
 {
-    if( generic_types && ( t1->kind == TK_PLACEHOLDER ||
-			   t2->kind == TK_PLACEHOLDER )) {
-        if( t2->kind == TK_PLACEHOLDER ) {
+    if( generic_types && ( t1->params.kind == TK_PLACEHOLDER ||
+			   t2->params.kind == TK_PLACEHOLDER )) {
+        if( t2->params.kind == TK_PLACEHOLDER ) {
             if( t2->base_type ) {
                 /* placeholder is already implemented: */
                 return tnode_check_types
@@ -208,7 +208,7 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
             return tnode_create_and_check_placeholder_implementation
                 ( t2, t1, generic_types, tnode_check_types, ex );
         }
-    } else if( generic_types && t1->kind == TK_GENERIC ) {
+    } else if( generic_types && t1->params.kind == TK_GENERIC ) {
         TNODE *concrete_type = typetab_lookup_paired_type( generic_types, t1 );
 
         if( concrete_type ) {
@@ -268,35 +268,35 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
     if( t1 == t2 ) return 1;
-    if( t1->kind == TK_IGNORE || t2->kind == TK_IGNORE ) {
+    if( t1->params.kind == TK_IGNORE || t2->params.kind == TK_IGNORE ) {
 	return 1;
     }
 
-    if( t1->kind == TK_REF ) {
+    if( t1->params.kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
     // FIXME: too relaxed, should transfer these two TK_REF checks to
     // the 'types are compatible' or 'types are assignment compatible'
-    // checks, and require strict equivalence, t{1,2}->kind == TK_REF,
+    // checks, and require strict equivalence, t{1,2}->params.kind == TK_REF,
     // here (S.G.):
-    if( t2->kind == TK_REF ) {
+    if( t2->params.kind == TK_REF ) {
 	return tnode_is_reference( t1 );
     }
-    if( t1->kind == TK_BLOB && t2->kind == TK_BLOB ) {
+    if( t1->params.kind == TK_BLOB && t2->params.kind == TK_BLOB ) {
 	return 1;
     }
-    if( t1->kind == TK_NULLREF ) {
+    if( t1->params.kind == TK_NULLREF ) {
 	return tnode_is_reference( t2 );
     }
-    if( t2->kind == TK_NULLREF ) {
+    if( t2->params.kind == TK_NULLREF ) {
 	return tnode_is_reference( t1 );
     }
 
-    if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
+    if( t1->params.kind == TK_INTERFACE && t2->params.kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }
 
-    if( t1->kind == TK_OPERATOR && t2->kind == TK_OPERATOR ) {
+    if( t1->params.kind == TK_OPERATOR && t2->params.kind == TK_OPERATOR ) {
         return
 	    dnode_lists_are_type_identical( t1->args, t2->args,
 					    generic_types, ex ) &&
@@ -305,9 +305,9 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					    generic_types, ex );
     }
 
-    if( t1->kind == TK_GENERIC ||
-        t1->kind == TK_PLACEHOLDER ||
-        t2->kind == TK_PLACEHOLDER ) {
+    if( t1->params.kind == TK_GENERIC ||
+        t1->params.kind == TK_PLACEHOLDER ||
+        t2->params.kind == TK_PLACEHOLDER ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -316,9 +316,9 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
         }
     }
 
-    if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
-	if( (t1->element_type && t1->element_type->kind == TK_PLACEHOLDER) &&
-	    (t2->element_type && t2->element_type->kind == TK_PLACEHOLDER) ) {
+    if( t1->params.kind == TK_COMPOSITE && t2->params.kind == TK_COMPOSITE ) {
+	if( (t1->element_type && t1->element_type->params.kind == TK_PLACEHOLDER) &&
+	    (t2->element_type && t2->element_type->params.kind == TK_PLACEHOLDER) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
@@ -329,20 +329,20 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 	}
     }
 
-    if( t1->kind == TK_FUNCTION_REF && 
-        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
+    if( t1->params.kind == TK_FUNCTION_REF && 
+        (t2->params.kind == TK_FUNCTION || t2->params.kind == TK_CLOSURE )) {
 	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
                                                         NULL, 0, ex );
     }
 
-    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
+    if( t1->params.kind == TK_FUNCTION_REF && t2->params.kind == TK_FUNCTION_REF ) {
 	return tnode_generic_function_prototypes_match( t1, t2, generic_types,
                                                         NULL, 0, ex );
     }
 
     if( t1->name && t2->name ) return 0;
-    if( (t1->kind == TK_ARRAY && t2->kind == TK_ARRAY) ||
-	(t1->kind == TK_ADDRESSOF && t2->kind == TK_ADDRESSOF) ) {
+    if( (t1->params.kind == TK_ARRAY && t2->params.kind == TK_ARRAY) ||
+	(t1->params.kind == TK_ADDRESSOF && t2->params.kind == TK_ADDRESSOF) ) {
 	if( t1->element_type == NULL || t2->element_type == NULL ) {
 	    return 1;
 	} else {
@@ -351,7 +351,7 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 					   generic_types, ex );
 	}
     }
-    if( t1->kind == TK_STRUCT && t2->kind == TK_STRUCT ) {
+    if( t1->params.kind == TK_STRUCT && t2->params.kind == TK_STRUCT ) {
 	return tnode_structures_are_identical( t1, t2,
 					       generic_types, ex );
     }
@@ -365,21 +365,21 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 {
     if( !t1 || !t2 ) return 0;
     if( t1 == t2 ) return 1;
-    if( t1->kind == TK_IGNORE || t2->kind == TK_IGNORE ) {
+    if( t1->params.kind == TK_IGNORE || t2->params.kind == TK_IGNORE ) {
 	return 1;
     }
 
-    if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
+    if( t1->params.kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
         return tnode_types_are_identical( t1->base_type, t2, 
                                           generic_types, ex );
     }
-    if( t2->kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
+    if( t2->params.kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
         return tnode_types_are_identical( t1, t2->base_type, 
                                           generic_types, ex );
     }
 
-    if( (t1->kind == TK_NULLREF && tnode_is_non_null_reference( t2 )) ||
-        (t2->kind == TK_NULLREF && tnode_is_non_null_reference( t1 ))) {
+    if( (t1->params.kind == TK_NULLREF && tnode_is_non_null_reference( t2 )) ||
+        (t2->params.kind == TK_NULLREF && tnode_is_non_null_reference( t1 ))) {
         return 0;
     }
 
@@ -402,16 +402,16 @@ int tnode_types_are_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
-    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+    if( t1->params.kind == TK_CLASS && t2->params.kind == TK_CLASS ) {
         return tnode_types_are_compatible( t1, t2->base_type,
                                            generic_types, ex );
     }
     
-    if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
+    if( t1->params.kind == TK_ENUM && t2->params.kind != TK_ENUM ) {
 	return tnode_types_are_identical( t1->base_type, t2,
 					  generic_types, ex );
     }
-    if( t2->kind == TK_ENUM && t1->kind != TK_ENUM ) {
+    if( t2->params.kind == TK_ENUM && t1->params.kind != TK_ENUM ) {
 	return tnode_types_are_identical( t1, t2->base_type,
 					  generic_types, ex );
     }
@@ -436,18 +436,18 @@ tnode_types_are_contravariant( TNODE *t1, TNODE *t2,
         }
     }
 
-    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+    if( t1->params.kind == TK_CLASS && t2->params.kind == TK_CLASS ) {
         return tnode_types_are_identical
             ( t1->base_type, t2, generic_types, ex ) &&
             t1->base_type &&
             tnode_kind( t1->base_type ) != TK_REF;
     }
     
-    if( t1->kind == TK_ENUM && t2->kind != TK_ENUM ) {
+    if( t1->params.kind == TK_ENUM && t2->params.kind != TK_ENUM ) {
 	return tnode_types_are_identical( t1->base_type, t2,
 					  generic_types, ex );
     }
-    if( t2->kind == TK_ENUM && t1->kind != TK_ENUM ) {
+    if( t2->params.kind == TK_ENUM && t1->params.kind != TK_ENUM ) {
 	return tnode_types_are_identical( t1, t2->base_type,
 					  generic_types, ex );
     }
@@ -469,17 +469,17 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     if( !t1 || !t2 ) return 0;
     if( t1 == t2 ) return 1;
 
-    if( t1->kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
+    if( t1->params.kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
         return tnode_types_are_assignment_compatible
             ( t1->base_type, t2, generic_types, msg, msglen, ex );
     }
-    if( t2->kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
+    if( t2->params.kind == TK_DERIVED && tnode_has_flags( t2, TF_IS_EQUIVALENT )) {
         return tnode_types_are_assignment_compatible
             ( t1, t2->base_type, generic_types, msg, msglen, ex );
     }
 
-    if( t1->kind == TK_ARRAY && t1->element_type == NULL &&
-        t2->kind == TK_DERIVED ) {
+    if( t1->params.kind == TK_ARRAY && t1->element_type == NULL &&
+        t2->params.kind == TK_DERIVED ) {
         return tnode_types_are_assignment_compatible
             ( t1, t2->base_type, generic_types,
               msg, msglen, ex );
@@ -490,17 +490,17 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         return 0;
     }
 
-    if( t1->kind == TK_REF ) {
+    if( t1->params.kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
-    if( t2->kind == TK_REF ) {
-	return t1->kind == TK_REF;
+    if( t2->params.kind == TK_REF ) {
+	return t1->params.kind == TK_REF;
     }
-    if( t1->kind == TK_BLOB && t2->kind == TK_BLOB ) {
+    if( t1->params.kind == TK_BLOB && t2->params.kind == TK_BLOB ) {
 	return 1;
     }
-    if( t2->kind == TK_NULLREF ) {
-        if( generic_types && t1->kind == TK_PLACEHOLDER ) {
+    if( t2->params.kind == TK_NULLREF ) {
+        if( generic_types && t1->params.kind == TK_PLACEHOLDER ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
         } else {
@@ -508,7 +508,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
-    if( t1->kind == TK_STRUCT && t2->kind == TK_STRUCT ) {
+    if( t1->params.kind == TK_STRUCT && t2->params.kind == TK_STRUCT ) {
 	return tnode_structures_are_compatible( t1, t2, generic_types, 
                                                 msg, msglen, ex ) ||
             tnode_structures_are_compatible( t1, t2->base_type,
@@ -519,7 +519,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                                    ex );
     }
 
-    if( t1->kind == TK_CLASS && t2->kind == TK_CLASS ) {
+    if( t1->params.kind == TK_CLASS && t2->params.kind == TK_CLASS ) {
         return (!t1->name && tnode_classes_are_compatible( t1, t2,
 							   generic_types,
                                                            msg, msglen,
@@ -529,7 +529,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                                    msg, msglen, ex );
     }
 
-    if( t1->kind == TK_INTERFACE && t2->kind == TK_INTERFACE ) {
+    if( t1->params.kind == TK_INTERFACE && t2->params.kind == TK_INTERFACE ) {
         return (!t1->name && tnode_classes_are_compatible( t1, t2,
 							   generic_types,
                                                            msg, msglen,
@@ -539,13 +539,13 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
                                                    msg, msglen, ex );
     }
 
-    if( t1->kind == TK_INTERFACE && t2->kind == TK_CLASS ) {
+    if( t1->params.kind == TK_INTERFACE && t2->params.kind == TK_CLASS ) {
 	return tnode_implements_interface( t2, t1 );
     }
 
-    if( t1->kind == TK_GENERIC ||
-        t1->kind == TK_PLACEHOLDER ||
-        t2->kind == TK_PLACEHOLDER ) {
+    if( t1->params.kind == TK_GENERIC ||
+        t1->params.kind == TK_PLACEHOLDER ||
+        t2->params.kind == TK_PLACEHOLDER ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -554,14 +554,14 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
-    if( t1->kind == TK_COMPOSITE && t2->kind == TK_COMPOSITE ) {
-	if( (t1->element_type && t1->element_type->kind == TK_PLACEHOLDER) &&
-	    (t2->element_type && t2->element_type->kind == TK_PLACEHOLDER) ) {
+    if( t1->params.kind == TK_COMPOSITE && t2->params.kind == TK_COMPOSITE ) {
+	if( (t1->element_type && t1->element_type->params.kind == TK_PLACEHOLDER) &&
+	    (t2->element_type && t2->element_type->params.kind == TK_PLACEHOLDER) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
             if( t2->element_type &&
-                t2->element_type->kind == TK_PLACEHOLDER &&
+                t2->element_type->params.kind == TK_PLACEHOLDER &&
                 t1->base_type ) {
                 return
                     tnode_types_are_assignment_compatible
@@ -578,22 +578,22 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
         }
     }
 
-    if( t1->kind == TK_FUNCTION_REF && 
-        (t2->kind == TK_FUNCTION || t2->kind == TK_CLOSURE )) {
+    if( t1->params.kind == TK_FUNCTION_REF && 
+        (t2->params.kind == TK_FUNCTION || t2->params.kind == TK_CLOSURE )) {
 	return tnode_generic_functions_are_assignment_compatible
             ( t1, t2, generic_types, NULL, 0, ex );
     }
 
     if( t1->name && t2->name ) return 0;
 
-    if( t1->kind == TK_FUNCTION_REF && t2->kind == TK_FUNCTION_REF ) {
+    if( t1->params.kind == TK_FUNCTION_REF && t2->params.kind == TK_FUNCTION_REF ) {
 	return tnode_generic_functions_are_assignment_compatible
             ( t1, t2, generic_types, NULL, 0, ex );
     }
 
-    if( t1->kind == TK_ARRAY && t2->kind == TK_ARRAY ) {
+    if( t1->params.kind == TK_ARRAY && t2->params.kind == TK_ARRAY ) {
 	if( t1->element_type == NULL ) {
-	    return t2->kind == TK_ARRAY;
+	    return t2->params.kind == TK_ARRAY;
 	} else {
 	    return tnode_types_are_identical
                 ( t1->element_type, t2->element_type, generic_types, ex );
@@ -608,7 +608,7 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                                                 TYPETAB *generic_types,
                                                 cexception_t *ex )
 {
-    if( generic_types && abstract->kind == TK_PLACEHOLDER ) {
+    if( generic_types && abstract->params.kind == TK_PLACEHOLDER ) {
         TNODE *volatile placeholder_implementation =
             typetab_lookup( generic_types, abstract->name );
 
@@ -657,7 +657,7 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 	TNODE *f2_arg_type = dnode_type( f2_arg );
         int arguments_are_compatible;
 
-        if( f1_arg_type && f1_arg_type->kind == TK_PLACEHOLDER ) {
+        if( f1_arg_type && f1_arg_type->params.kind == TK_PLACEHOLDER ) {
             f1_arg_type =
                 tnode_placeholder_implementation( f1_arg_type, f2_arg_type,
                                                   generic_types, ex );
@@ -667,11 +667,11 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 
         if( narg == 1 &&
             (f2_arg_type->base_type == f1_arg_type ||
-             (f1_arg_type->kind == TK_CLASS && f2_arg_type->kind == TK_CLASS &&
+             (f1_arg_type->params.kind == TK_CLASS && f2_arg_type->params.kind == TK_CLASS &&
               (!f1_arg_type->name || !f2_arg_type->name))) &&
-            (f1->kind == TK_METHOD || f1->kind == TK_CONSTRUCTOR ||
-             f1->kind == TK_DESTRUCTOR) &&
-             f1->kind == f2->kind ) {
+            (f1->params.kind == TK_METHOD || f1->params.kind == TK_CONSTRUCTOR ||
+             f1->params.kind == TK_DESTRUCTOR) &&
+             f1->params.kind == f2->params.kind ) {
             arguments_are_compatible = tnode_types_are_compatible
                 ( f1_arg_type, f2_arg_type, generic_types, ex );
         } else {
@@ -923,15 +923,17 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
                     tnode_set_flags( concrete_tnode, TF_IS_REF );
                 }
 
-                concrete_tnode->kind = tnode_with_generics->kind;
-                concrete_tnode->size = tnode_with_generics->size;
-                concrete_tnode->align = tnode_with_generics->align;
-                concrete_tnode->nrefs = tnode_with_generics->nrefs;
-                concrete_tnode->vmt_offset = tnode_with_generics->vmt_offset;
-                concrete_tnode->max_vmt_offset = tnode_with_generics->max_vmt_offset;
-                concrete_tnode->nextnumoffs = tnode_with_generics->nextnumoffs;
-                concrete_tnode->nextrefoffs = tnode_with_generics->nextrefoffs;
-                concrete_tnode->interface_nr = tnode_with_generics->interface_nr;
+                concrete_tnode->params = tnode_with_generics->params;
+                
+                // concrete_tnode->kind = tnode_with_generics->kind;
+                // concrete_tnode->size = tnode_with_generics->size;
+                // concrete_tnode->align = tnode_with_generics->align;
+                // concrete_tnode->nrefs = tnode_with_generics->nrefs;
+                // concrete_tnode->vmt_offset = tnode_with_generics->vmt_offset;
+                // concrete_tnode->max_vmt_offset = tnode_with_generics->max_vmt_offset;
+                // concrete_tnode->nextnumoffs = tnode_with_generics->nextnumoffs;
+                // concrete_tnode->nextrefoffs = tnode_with_generics->nextrefoffs;
+                // concrete_tnode->interface_nr = tnode_with_generics->interface_nr;
                 
                 cexception_guard( inner ) {
 
