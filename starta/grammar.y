@@ -8849,9 +8849,15 @@ identifier
 
 identifier_list
    : identifier
-     { $$ = $1; }
+     {
+         $$ = $1;
+         $1 = NULL;
+     }
    | identifier_list ',' identifier
-     { $$ = dnode_append( $1, $3 ); }
+     {
+         $$ = dnode_append( $1, $3 );
+         $3 = NULL;
+     }
    ;
 
 function_or_procedure: _FUNCTION | _PROCEDURE;
