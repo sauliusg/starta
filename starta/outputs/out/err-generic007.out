@@ -1,4 +1,4 @@
-./sl: inputs/err-generic007.snl(20,18): ERROR, Variables with generic types ('g') can not be declared in the global (zero) scope
+./sl: inputs/err-generic007.snl(20,18): ERROR, Variables with generic fields ('g') can not be declared in the global (zero) scope
 var g : G = new G;
                  ^
 ./sl: 1 error(s) detected
