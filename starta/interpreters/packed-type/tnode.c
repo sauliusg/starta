@@ -1092,6 +1092,7 @@ TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex )
 
     node->kind = TK_GENERIC;
     node->flags |= TF_HAS_GENERICS;
+    node->flags |= TF_HAS_GENERIC_FIELD;
     node->base_type = *base_type;
 
     if( *base_type ) {
@@ -1829,10 +1830,12 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
 
         TNODE *field_type = dnode_type( field );
         if( field_type &&
-            (tnode_has_flags( field_type, TF_HAS_GENERICS ) ||
-             tnode_has_generic_type( field_type ) ||
-             tnode_has_generic_fields( field_type ))) {
+            tnode_has_flags( field_type, TF_HAS_GENERICS )) {
             tnode->flags |= TF_HAS_GENERICS;
+        }
+        if( field_type &&
+            tnode_has_flags( field_type, TF_HAS_GENERIC_FIELD )) {
+            tnode->flags |= TF_HAS_GENERIC_FIELD;
         }
     }
     // printf( ">>> field '%s' offset = %d\n", dnode_name( field ), dnode_offset( field ));
@@ -2250,8 +2253,15 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 
     tnode->element_type = element_type;
 
-    if( tnode_has_generic_type( element_type )) {
+    if( element_type->kind == TK_GENERIC ||
+        // tnode_has_generic_fields( element_type ) ||
+        tnode_has_generic_type( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERICS );
+    }
+    if( element_type->kind == TK_GENERIC ||
+        tnode_has_generic_type( element_type ) ||
+        tnode_has_generic_fields( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
     }
     
     return tnode;
@@ -2270,6 +2280,9 @@ TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type )
 
     if( tnode_has_generic_type( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERICS );
+    }
+    if( tnode_has_generic_fields( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
     }
     
     return tnode;
@@ -2344,6 +2357,13 @@ int tnode_has_generic_type( TNODE *tnode )
 
 int tnode_has_generic_fields( TNODE *tnode )
 {
+#if 1
+    if( tnode ) {
+        return ( tnode->flags & TF_HAS_GENERIC_FIELD ) != 0;
+    } else {
+        return 0;
+    }
+#else
     DNODE *field;
 
     if( tnode ) {
@@ -2353,6 +2373,7 @@ int tnode_has_generic_fields( TNODE *tnode )
             }
         }
     }
+#endif
 
     return 0;
 }

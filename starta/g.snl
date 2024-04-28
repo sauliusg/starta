@@ -6,8 +6,16 @@ use std;
 
 type R = generic ref;
 
-type G = ?class {
+type F = ?class {
     r : array [][] of R;
+
+    method funny ( x : R ) -> R
+    {
+        return null;
+    }
+}
+
+type G = ?class : F {
     s : string;
     n : int;
 
