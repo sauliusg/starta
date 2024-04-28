@@ -1,4 +1,4 @@
-./sl: inputs/err-generic005.snl(9,10): ERROR, Variables with generic types ('x') can not be declared in the global (zero) scope
+./sl: inputs/err-generic005.snl(9,10): ERROR, Variables of generic types ('x') can not be declared in the global (zero) scope
 var x : R;
          ^
 ./sl: 1 error(s) detected
