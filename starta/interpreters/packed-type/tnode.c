@@ -2258,7 +2258,6 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
         tnode_set_flags( tnode, TF_HAS_GENERICS );
     }
     if( element_type->kind == TK_GENERIC ||
-        tnode_has_generic_type( element_type ) || // REMOVE ???
         tnode_has_generic_field( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
     }
