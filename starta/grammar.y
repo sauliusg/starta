@@ -11114,11 +11114,13 @@ delimited_type_description
                 &has_generics, &inner );
       }
       cexception_catch {
+          dispose_tnode( &$1 );
           dispose_typetab( &$4 );
           $$ = NULL;
           cexception_reraise( inner, px );
       }
 
+      dispose_tnode( &$1 );
       dispose_typetab( &$4 );
   }
   
