@@ -2254,13 +2254,12 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
     tnode->element_type = element_type;
 
     if( element_type->kind == TK_GENERIC ||
-        // tnode_has_generic_fields( element_type ) ||
         tnode_has_generic_type( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERICS );
     }
     if( element_type->kind == TK_GENERIC ||
-        tnode_has_generic_type( element_type ) ||
-        tnode_has_generic_fields( element_type )) {
+        tnode_has_generic_type( element_type ) || // REMOVE ???
+        tnode_has_generic_field( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
     }
     
@@ -2281,7 +2280,7 @@ TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type )
     if( tnode_has_generic_type( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERICS );
     }
-    if( tnode_has_generic_fields( element_type )) {
+    if( tnode_has_generic_field( element_type )) {
         tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
     }
     
@@ -2355,7 +2354,7 @@ int tnode_has_generic_type( TNODE *tnode )
     }
 }
 
-int tnode_has_generic_fields( TNODE *tnode )
+int tnode_has_generic_field( TNODE *tnode )
 {
     if( tnode ) {
         return ( tnode->flags & TF_HAS_GENERIC_FIELD ) != 0;
