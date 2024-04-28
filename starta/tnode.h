@@ -57,6 +57,17 @@ typedef enum {
                                     (re-instantiated) when a concrete
                                     type is substituted for a generic
                                     one.*/
+    TF_HAS_GENERIC_FIELD = 0x2000, /* Specifies that a (composite)
+                                    type has fields (for classes and
+                                    structures), elements (for arrays
+                                    ot hashes). It is *not* set when a
+                                    class has methods with generic
+                                    parameters – only persistently
+                                    assignable generic values
+                                    coun. Types that have
+                                    TF_HAS_GENERIC_FILEDS flag can not
+                                    be used for variables on the
+                                    global (0) scope..*/
     last_TYPE_FLAG
 } type_flag_t;
 
