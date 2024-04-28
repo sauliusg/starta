@@ -347,7 +347,7 @@ TNODE *tnode_set_has_generics( TNODE *tnode );
 int tnode_has_placeholder_element( TNODE *tnode );
 int tnode_has_flags( TNODE* node, type_flag_t flags );
 int tnode_has_generic_type( TNODE *tnode );
-int tnode_has_generic_fields( TNODE *tnode );
+int tnode_has_generic_field( TNODE *tnode );
 int tnode_has_references( TNODE *tnode );
 int tnode_has_numbers( TNODE *tnode );
 int tnode_is_addressof( TNODE *tnode );
