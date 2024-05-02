@@ -1917,6 +1917,11 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
 	dispose_dnode( method );
     }
 
+    TNODE *method_type = dnode_type( *method );
+    if( method_type && tnode_has_flags( method_type, TF_HAS_GENERICS )) {
+        tnode->flags |= TF_HAS_GENERICS;
+    }
+    
     *method = NULL;
 
     return tnode;
