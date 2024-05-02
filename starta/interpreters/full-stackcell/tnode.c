@@ -80,6 +80,8 @@ void delete_tnode( TNODE *tnode )
 	delete_dnode( tnode->return_vals );
 	delete_tnode( tnode->base_type );
 	delete_tnode( tnode->element_type );
+	delete_tnode( tnode->generic_type );
+	delete_tnode( tnode->concrete_type );
         delete_tlist( tnode->interfaces );
 	delete_dnode( tnode->constructor );
 	delete_dnode( tnode->destructor );
@@ -300,7 +302,7 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
        fields, but wee need to delete it first, in case something is
        allocated there:. */
     delete_tnode( dst->base_type );
-    dst_kind = dst->kind;
+    dst_kind = dst->params.kind;
 
 #ifdef USE_SERNO
     ssize_t serno = src->serno;
@@ -330,7 +332,7 @@ TNODE *tnode_shallow_copy( TNODE *dst, TNODE *src )
     if( dst_kind == TK_COMPOSITE ) {
 	assert( !dst->element_type );
 	dst->element_type = dst_element;
-	dst->kind = dst_kind;
+	dst->params.kind = dst_kind;
     } else {
         delete_tnode( dst_element );
     }
@@ -390,6 +392,24 @@ TNODE *new_tnode( cexception_t *ex )
     return tnode;
 }
 
+TNODE *new_tnode_type_pair( TNODE *volatile *generic_type,
+                            TNODE *volatile *concrete_type,
+                            cexception_t *ex )
+{
+    assert( generic_type );
+    assert( concrete_type );
+
+    TNODE *t = new_tnode( ex );
+
+    t->params.kind = TK_PAIR;
+    t->generic_type = *generic_type;
+    *generic_type = NULL;
+    t->concrete_type = *concrete_type;
+    *concrete_type = NULL;
+    
+    return t;
+}
+
 TNODE *new_tnode_forward( char *name, cexception_t *ex )
 {
     cexception_t inner;
@@ -398,7 +418,7 @@ TNODE *new_tnode_forward( char *name, cexception_t *ex )
     assert( name );
     cexception_guard( inner ) {
 	node->name = strdupx( name, &inner );
-	node->kind = TK_NONE;
+	node->params.kind = TK_NONE;
 	tnode_set_flags( node, TF_IS_FORWARD );
     }
     cexception_catch {
@@ -416,7 +436,7 @@ TNODE *new_tnode_forward_struct( char *name, cexception_t *ex )
     cexception_guard( inner ) {
         if( name )
             node->name = strdupx( name, &inner );
-	node->kind = TK_STRUCT;
+	node->params.kind = TK_STRUCT;
 	tnode_set_flags( node, TF_IS_FORWARD | TF_IS_REF );
     }
     cexception_catch {
@@ -434,7 +454,7 @@ TNODE *new_tnode_forward_class( char *name, cexception_t *ex )
     cexception_guard( inner ) {
         if( name )
             node->name = strdupx( name, &inner );
-	node->kind = TK_CLASS;
+	node->params.kind = TK_CLASS;
 	tnode_set_flags( node, TF_IS_FORWARD | TF_IS_REF );
     }
     cexception_catch {
@@ -452,7 +472,7 @@ TNODE *new_tnode_forward_interface( char *name, cexception_t *ex )
     assert( name );
     cexception_guard( inner ) {
 	node->name = strdupx( name, &inner );
-	node->kind = TK_INTERFACE;
+	node->params.kind = TK_INTERFACE;
 	tnode_set_flags( node, TF_IS_REF );
     }
     cexception_catch {
@@ -466,7 +486,7 @@ TNODE *new_tnode_ptr( cexception_t *ex )
 {
     TNODE * volatile node = new_tnode( ex );
 
-    node->kind = TK_REF;
+    node->params.kind = TK_REF;
     tnode_set_flags( node, TF_IS_REF );
     return node;
 }
@@ -475,7 +495,7 @@ TNODE *new_tnode_nullref( cexception_t *ex )
 {
     TNODE * volatile node = new_tnode( ex );
 
-    node->kind = TK_NULLREF;
+    node->params.kind = TK_NULLREF;
     tnode_set_flags( node, TF_IS_REF );
     return node;
 }
@@ -485,7 +505,7 @@ TNODE *new_tnode_any( cexception_t *ex )
 {
     TNODE * volatile node = new_tnode( ex );
 
-    node->kind = TK_ANY;
+    node->params.kind = TK_ANY;
     return node;
 }
 #endif
@@ -494,7 +514,7 @@ TNODE *new_tnode_ignored( cexception_t *ex )
 {
     TNODE * volatile node = new_tnode( ex );
 
-    node->kind = TK_IGNORE;
+    node->params.kind = TK_IGNORE;
     return node;
 }
 
@@ -502,7 +522,7 @@ TNODE *new_tnode_ref( cexception_t *ex )
 {
     TNODE * volatile node = new_tnode( ex );
 
-    node->kind = TK_REF;
+    node->params.kind = TK_REF;
     tnode_set_flags( node, TF_IS_REF );
     return node;
 }
@@ -514,19 +534,19 @@ TNODE *new_tnode_derived( TNODE *volatile *base, cexception_t *ex )
     assert( base );
 
     cexception_guard( inner ) {
-	/* node->kind = base->kind; */
-	node->kind = TK_DERIVED;
+	/* node->params.kind = base->params.kind; */
+	node->params.kind = TK_DERIVED;
 	/* base->name is not copied */
 #if 0
-	while( *base && (*base)->kind == TK_DERIVED &&
+	while( *base && (*base)->params.kind == TK_DERIVED &&
                tnode_has_flags( *base, TF_IS_EQUIVALENT ))
 	    *base = (*base)->base_type;
 #endif
 	assert( node != *base );
 	if( *base ) {
 	    node->element_type = share_tnode( (*base)->element_type );
-	    node->size = (*base)->size;
-	    node->nrefs = (*base)->nrefs;
+	    node->params.size = (*base)->params.size;
+	    node->params.nrefs = (*base)->params.nrefs;
 	    /* (*base)->rcount is skipped, of cource ;-) */
 	    node->fields = share_dnode( (*base)->fields );
 	    node->flags = (*base)->flags;
@@ -613,8 +633,8 @@ TNODE *new_tnode_blob( TNODE *base_type,
     TNODE * volatile node = new_tnode( ex );
 
     cexception_guard( inner ) {
-	node->kind = TK_BLOB;
-	node->size = 1;
+	node->params.kind = TK_BLOB;
+	node->params.size = 1;
         node->base_type = base_type;
 	tnode_set_flags( node, TF_IS_REF );
     }
@@ -632,12 +652,12 @@ TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex )
 
     cexception_guard( inner ) {
 	assert( tnode );
-        copy->kind = tnode->kind;
+        copy->params.kind = tnode->params.kind;
 	copy->flags = tnode->flags;
         /* tnode->name is not copied */
         copy->element_type = share_tnode( tnode->element_type );
-        copy->size = tnode->size;
-        copy->nrefs = tnode->nrefs;
+        copy->params.size = tnode->params.size;
+        copy->params.nrefs = tnode->params.nrefs;
         /* tnode->rcount is skipped, of cource ;-) */
         copy->fields = share_dnode( tnode->fields );
         copy->flags = tnode->flags;
@@ -656,8 +676,8 @@ TNODE *copy_unnamed_tnode( TNODE *tnode, cexception_t *ex )
 TNODE * tnode_set_nref( TNODE *tnode, ssize_t nref )
 {
     assert( tnode );
-    /* assert( tnode->nrefs == 0 || tnode->nrefs == nref ); */
-    tnode->nrefs = nref;
+    /* assert( tnode->params.nrefs == 0 || tnode->params.nrefs == nref ); */
+    tnode->params.nrefs = nref;
     if( nref > 0 )
 	tnode_set_has_references( tnode );
     return tnode;
@@ -669,7 +689,7 @@ TNODE *new_tnode_array( TNODE *element_type,
 {
     TNODE * volatile tnode = new_tnode( ex );
 
-    tnode->kind = TK_ARRAY;
+    tnode->params.kind = TK_ARRAY;
     tnode->element_type = element_type;
     assert( tnode != base_type );
     tnode->base_type = base_type;
@@ -682,9 +702,9 @@ TNODE *new_tnode_addressof( TNODE *element_type, cexception_t *ex )
 {
     TNODE * volatile tnode = new_tnode( ex );
 
-    tnode->kind = TK_ADDRESSOF;
+    tnode->params.kind = TK_ADDRESSOF;
     tnode->element_type = element_type;
-    tnode->size = 0;
+    tnode->params.size = 0;
     return tnode;
 }
 
@@ -697,13 +717,18 @@ TNODE *new_tnode_function_or_proc_ref( DNODE *parameters,
     TNODE * volatile tnode = new_tnode( ex );
 
     cexception_guard( inner ) {
-	tnode->kind = TK_FUNCTION_REF;
-	tnode->size = REF_SIZE;
+	tnode->params.kind = TK_FUNCTION_REF;
+	tnode->params.size = REF_SIZE;
 	assert( tnode != base_type );
 	tnode->base_type = base_type;
 	tnode->args = parameters;
 	tnode->return_vals = return_dnodes;
 	tnode_set_flags( tnode, TF_IS_REF );
+        if( tnode_has_generic_type( base_type ) ||
+            dnode_list_has_generic_type( parameters ) ||
+            dnode_list_has_generic_type( return_dnodes )) {
+            tnode->flags |= TF_HAS_GENERICS;
+        }
 	if( return_dnodes ) {
 	    tnode->element_type = share_tnode( dnode_type( return_dnodes ));
 	}
@@ -725,12 +750,16 @@ static TNODE *new_tnode_function_or_operator( char *name,
     TNODE * volatile tnode = new_tnode( ex );
 
     cexception_guard( inner ) {
-	tnode->kind = kind;
-	tnode->size = REF_SIZE; /* in assignments, functions and
+	tnode->params.kind = kind;
+	tnode->params.size = REF_SIZE; /* in assignments, functions and
 				   procedures are represented by
 				   addresses, thus having size of
 				   REF_SIZE */
 	tnode_set_flags( tnode, TF_IS_REF );
+        if( dnode_list_has_generic_type( parameters ) ||
+            dnode_list_has_generic_type( return_dnodes )) {
+            tnode->flags |= TF_HAS_GENERICS;
+        }
 	tnode->args = parameters;
 	tnode->return_vals = return_dnodes;
 	if( return_dnodes ) {
@@ -866,22 +895,22 @@ TNODE *new_tnode_operator_NEW( char *name,
 
 static int tnode_is_constructor( TNODE *tnode )
 {
-    return tnode && tnode->kind == TK_CONSTRUCTOR;
+    return tnode && tnode->params.kind == TK_CONSTRUCTOR;
 }
 
 static int tnode_is_destructor( TNODE *tnode )
 {
-    return tnode && tnode->kind == TK_DESTRUCTOR;
+    return tnode && tnode->params.kind == TK_DESTRUCTOR;
 }
 
 static int tnode_is_method( TNODE *tnode )
 {
-    return tnode && tnode->kind == TK_METHOD;
+    return tnode && tnode->params.kind == TK_METHOD;
 }
 
 static int tnode_is_operator( TNODE *tnode )
 {
-    return tnode && tnode->kind == TK_OPERATOR;
+    return tnode && tnode->params.kind == TK_OPERATOR;
 }
 
 int tnode_is_conversion( TNODE *tnode )
@@ -889,7 +918,7 @@ int tnode_is_conversion( TNODE *tnode )
     char *name = tnode ? tnode_name( tnode ) : NULL;
     int l = name ? strlen( name ) : 0;
 
-    return tnode && tnode->kind == TK_OPERATOR &&
+    return tnode && tnode->params.kind == TK_OPERATOR &&
 	dnode_list_length( tnode->args ) == 1 &&
 	l >= 1 && name[0] == '@';
 }
@@ -1026,7 +1055,7 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex )
     TNODE * volatile node = new_tnode( ex );
 
     cexception_guard( inner ) {
-	node->kind = TK_COMPOSITE;
+	node->params.kind = TK_COMPOSITE;
 	node->flags |= TF_IS_REF;
 	node->name = strdupx( name, &inner );
 	node->element_type = element_type;
@@ -1045,13 +1074,36 @@ TNODE *new_tnode_placeholder( char *name, cexception_t *ex )
     TNODE * volatile node = new_tnode( ex );
 
     cexception_guard( inner ) {
-	node->kind = TK_PLACEHOLDER;
+	node->params.kind = TK_PLACEHOLDER;
 	node->name = strdupx( name, &inner );
     }
     cexception_catch {
 	delete_tnode( node );
 	cexception_reraise( inner, ex );
     }
+
+    return node;
+}
+
+TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex )
+{
+    assert( base_type );
+
+    TNODE * volatile node = new_tnode( ex );
+
+    node->params.kind = TK_GENERIC;
+    node->flags |= TF_HAS_GENERICS;
+    node->flags |= TF_HAS_GENERIC_FIELD;
+    node->base_type = *base_type;
+
+    if( *base_type ) {
+        node->params.size = (*base_type)->params.size;
+        if( tnode_is_reference( *base_type )) {
+            node->flags |= TF_IS_REF;
+        }
+    }
+    
+    *base_type = NULL;
 
     return node;
 }
@@ -1063,7 +1115,7 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
     if( !generic_tnode ) return NULL;
     if( !generic_types ) return share_tnode( generic_tnode );
 
-    if( generic_tnode->kind == TK_PLACEHOLDER ) {
+    if( generic_tnode->params.kind == TK_PLACEHOLDER ) {
         TNODE *concrete_type = typetab_lookup( generic_types,
                                                tnode_name( generic_tnode ));
         if( concrete_type ) {
@@ -1071,7 +1123,7 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
         } else {
             return share_tnode( generic_tnode );
         }
-    } else if( generic_tnode->kind == TK_COMPOSITE ) {
+    } else if( generic_tnode->params.kind == TK_COMPOSITE ) {
 	cexception_t inner;
 	TNODE *volatile element_tnode =
 	    new_tnode_implementation( generic_tnode->element_type,
@@ -1094,7 +1146,7 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
 	    cexception_reraise( inner, ex );
 	}
 	return NULL; // control should not reach this point
-    } else if( generic_tnode->kind == TK_ARRAY &&
+    } else if( generic_tnode->params.kind == TK_ARRAY &&
                !generic_tnode->name ) {
 	cexception_t inner;
 	TNODE *volatile element_tnode =
@@ -1226,7 +1278,7 @@ static TNODE *tnode_finish_struct_or_class( TNODE * volatile node,
                                             type_kind_t type_kind,
                                             cexception_t *ex )
 {
-    node->kind = type_kind;
+    node->params.kind = type_kind;
     node->flags |= TF_IS_REF;
     if( node->base_type && node->base_type->destructor &&
         !node->destructor ) {
@@ -1254,11 +1306,11 @@ TNODE *tnode_finish_interface( TNODE * volatile node,
 {
     DNODE *curr_method;
 
-    node->interface_nr = interface_nr;
+    node->params.interface_nr = interface_nr;
 
     foreach_dnode( curr_method, node->methods ) {
         TNODE *curr_method_type = dnode_type( curr_method );
-        curr_method_type->interface_nr = node->interface_nr;
+        curr_method_type->params.interface_nr = node->params.interface_nr;
     }
 
     return 
@@ -1270,18 +1322,18 @@ TNODE *tnode_finish_enum( TNODE * volatile node,
 			  TNODE *base_type,
 			  cexception_t *ex )
 {
-    node->kind = TK_ENUM;
+    node->params.kind = TK_ENUM;
 
     assert( !node->name );
     node->name = strdupx( name, ex );
 
     if( base_type ) {
-	if( node->size == 0 ) {
-	    node->size = tnode_size( base_type );
+	if( node->params.size == 0 ) {
+	    node->params.size = tnode_size( base_type );
 	}
 	node->base_type = share_tnode( base_type );
     } else {
-	node->size = 0;
+	node->params.size = 0;
 	node->base_type = NULL;
     }
 
@@ -1359,7 +1411,7 @@ DNODE *tnode_lookup_method_prototype( TNODE *tnode, char *method_name )
 
     if( method ) {
 	return method;
-    } else if( tnode->base_type && tnode->kind != TK_INTERFACE ) {
+    } else if( tnode->base_type && tnode->params.kind != TK_INTERFACE ) {
 	return tnode_lookup_method_prototype( tnode->base_type, method_name );
     } else {
 	return NULL;
@@ -1406,12 +1458,12 @@ DNODE *tnode_lookup_conversion( TNODE *tnode, TNODE *src_type )
 	NULL;
 
     if( !conversion && tnode && src_type->base_type &&
-	( src_type->kind == TK_DERIVED || src_type->kind == TK_ENUM )) {
+	( src_type->params.kind == TK_DERIVED || src_type->params.kind == TK_ENUM )) {
 	conversion = tnode_lookup_conversion( tnode, src_type->base_type );
     }
 
     if( !conversion && tnode && tnode->base_type &&
-	tnode->kind == TK_DERIVED && tnode_has_flags( tnode, TF_IS_EQUIVALENT )) {
+	tnode->params.kind == TK_DERIVED && tnode_has_flags( tnode, TF_IS_EQUIVALENT )) {
 	conversion = tnode_lookup_conversion( tnode->base_type, src_type );
     }
 
@@ -1466,8 +1518,8 @@ TNODE *tnode_set_suffix( TNODE* node, const char *suffix, cexception_t *ex )
 TNODE *tnode_set_interface_nr( TNODE* node, ssize_t nr )
 {
     assert( node );
-    assert( node->interface_nr == 0 );
-    node->interface_nr = nr;
+    assert( node->params.interface_nr == 0 );
+    node->params.interface_nr = nr;
     return node;
 }
 
@@ -1485,20 +1537,26 @@ char *tnode_suffix( TNODE *tnode )
 
 ssize_t tnode_size( TNODE *tnode )
 {
-    assert( tnode );
-    return tnode->size + tnode->attr_size;
+    if( tnode ) {
+        return tnode->params.size + tnode->params.attr_size;
+    } else {
+        return 0;
+    }
 }
 
 ssize_t tnode_number_of_references( TNODE *tnode )
 {
-    assert( tnode );
-    return tnode->nrefs;
+    if( tnode ) {
+        return tnode->params.nrefs;
+    } else {
+        return 0;
+    }
 }
 
 ssize_t tnode_interface_number( TNODE *tnode )
 {
     assert( tnode );
-    return tnode->interface_nr;
+    return tnode->params.interface_nr;
 }
 
 TLIST *tnode_interface_list( TNODE *tnode )
@@ -1532,7 +1590,7 @@ ssize_t tnode_base_class_count( TNODE *tnode )
     if( !tnode )
         return 0;
 
-    while( tnode->base_type && tnode->base_type->kind == TK_CLASS ) {
+    while( tnode->base_type && tnode->base_type->params.kind == TK_CLASS ) {
         count ++;
         tnode = tnode->base_type;
     }
@@ -1552,9 +1610,11 @@ int tnode_align( TNODE *tnode )
 
 type_kind_t tnode_kind( TNODE *tnode )
 {
-    assert( tnode );
-    assert( tnode->rcount > 0 );
-    return tnode->kind;
+    if( tnode ) {
+        return tnode->params.kind;
+    } else {
+        return TK_NONE;
+    }
 }
 
 DNODE *tnode_args( TNODE* tnode )
@@ -1597,8 +1657,8 @@ DNODE *tnode_retval_next( TNODE* tnode, DNODE *retval )
 TNODE *tnode_set_size( TNODE *tnode, int size )
 {
     assert( tnode );
-    assert( tnode->size == 0 );
-    tnode->size = size;
+    assert( tnode->params.size == 0 );
+    tnode->params.size = size;
     return tnode;
 }
 
@@ -1609,7 +1669,7 @@ const char *tnode_kind_name( TNODE *tnode )
     if( !tnode )
         return "(null)";
 
-    switch( tnode->kind ) {
+    switch( tnode->params.kind ) {
         case TK_NONE:          return "<no kind>";
         case TK_BOOL:          return "bool";
         case TK_INTEGER:       return "integer";
@@ -1625,12 +1685,15 @@ const char *tnode_kind_name( TNODE *tnode )
         case TK_FUNCTION:      return "function";
 
         case TK_PLACEHOLDER:   return "placeholder";
+        case TK_GENERIC:       return "generic";
         case TK_DERIVED:       return "derived";
         case TK_REF:           return "ref";
         case TK_FUNCTION_REF:  return "functionref";
         case TK_NULLREF:       return "nullref";
+        case TK_TYPE:          return "type";
+        case TK_PAIR:          return "pair";
         default:
-            snprintf( buffer, sizeof(buffer)-1, "type kind %d", tnode->kind );
+            snprintf( buffer, sizeof(buffer)-1, "type kind %d", tnode->params.kind );
             buffer[sizeof(buffer)-1] = '\0';
             return buffer;
     }
@@ -1650,7 +1713,7 @@ void tnode_print_indent( TNODE *tnode, int indent )
     assert( tnode );
     printf( "%*sTNODE ", indent, "" );
     printf( "%s ", tnode_kind_name( tnode ));
-    printf( "size = %zd ", tnode->size );
+    printf( "size = %zd ", tnode->params.size );
     printf( "%s ", tnode->name ? tnode->name : "-" );
     putchar( '\n' );
     if( tnode->element_type )
@@ -1693,13 +1756,23 @@ TNODE *tnode_insert_fields( TNODE* tnode, DNODE *field )
                       "field in a structure", dnode_name( last_field ));
         }
 
+        TNODE *field_type = dnode_type( field );
+        if( field_type &&
+            tnode_has_flags( field_type, TF_HAS_GENERICS )) {
+            tnode->flags |= TF_HAS_GENERICS;
+        }
+        if( field_type &&
+            tnode_has_flags( field_type, TF_HAS_GENERIC_FIELD )) {
+            tnode->flags |= TF_HAS_GENERIC_FIELD;
+        }
+
 	if( field_kind != TK_FUNCTION ) {
-	    dnode_set_offset( current, tnode->size );
-	    tnode->size += STRUCT_FIELD_SIZE;
+	    dnode_set_offset( current, tnode->params.size );
+	    tnode->params.size += STRUCT_FIELD_SIZE;
             tnode_set_flags( tnode, TF_IS_REF );
 	    if( field_type && ( tnode_is_reference( field_type ) ||
-                                field_type->kind == TK_PLACEHOLDER )) {
-		tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
+                                field_type->params.kind == TK_PLACEHOLDER )) {
+		tnode->params.nrefs = tnode->params.size / STRUCT_FIELD_SIZE;
 	    }
 	}
     }
@@ -1795,7 +1868,7 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
 	    tnode_lookup_method( tnode->base_type, method_name ) : NULL;
 
 	if( inherited_method ) {
-            if( tnode->kind == TK_INTERFACE ) {
+            if( tnode->params.kind == TK_INTERFACE ) {
 		yyerrorf( "interface '%s' should not override "
                           "method '%s' inherited from '%s'",
                           tnode->name, dnode_name( *method ),
@@ -1810,18 +1883,18 @@ TNODE *tnode_insert_single_method( TNODE* tnode, DNODE *volatile *method )
 	    method_offset = dnode_offset( inherited_method );
 	} else {
             if( method_interface_nr == 0 ) {
-                if( tnode->max_vmt_offset == 0 &&
-                    tnode->kind != TK_INTERFACE ) {
+                if( tnode->params.max_vmt_offset == 0 &&
+                    tnode->params.kind != TK_INTERFACE ) {
                     /* Reserve the 0-th offset of the VMT for the
                        destructor: */
-                    tnode->max_vmt_offset++;
+                    tnode->params.max_vmt_offset++;
                 }
-                tnode->max_vmt_offset++;
+                tnode->params.max_vmt_offset++;
 #if 0
                 printf( ">>> advancing VMT offset to %d for type '%s'\n",
-                        tnode->max_vmt_offset, tnode_name( tnode ));
+                        tnode->params.max_vmt_offset, tnode_name( tnode ));
 #endif
-                method_offset = tnode->max_vmt_offset;
+                method_offset = tnode->params.max_vmt_offset;
             }
 	}
 
@@ -1953,19 +2026,22 @@ TNODE *tnode_insert_enum_value( TNODE *tnode, DNODE *member )
 ssize_t tnode_max_vmt_offset( TNODE *tnode )
 {
     assert( tnode );
-    return tnode->max_vmt_offset;
+    return tnode->params.max_vmt_offset;
 }
 
 ssize_t tnode_vmt_offset( TNODE *tnode )
 {
-    assert( tnode );
-    return tnode->vmt_offset;
+    if( tnode ) {
+        return tnode->params.vmt_offset;
+    } else {
+        return 0;
+    }
 }
 
 ssize_t tnode_set_vmt_offset( TNODE *tnode, ssize_t offset )
 {
     assert( tnode );
-    return tnode->vmt_offset = offset;
+    return tnode->params.vmt_offset = offset;
 }
 
 DNODE *tnode_methods( TNODE *tnode )
@@ -1988,10 +2064,10 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type )
     if( *base_type ) {
         tnode->base_type = *base_type;
         *base_type = NULL;
-        if( tnode->kind != TK_INTERFACE )
-            tnode->max_vmt_offset = tnode->base_type->max_vmt_offset;
-	tnode->size += tnode_size( tnode->base_type );
-	tnode->nrefs += tnode->base_type->nrefs;
+        if( tnode->params.kind != TK_INTERFACE )
+            tnode->params.max_vmt_offset = tnode->base_type->params.max_vmt_offset;
+	tnode->params.size += tnode_size( tnode->base_type );
+	tnode->params.nrefs += tnode->base_type->params.nrefs;
 	foreach_dnode( field, tnode->fields ) {
 	    TNODE *field_type = dnode_type( field );
 	    type_kind_t field_kind =
@@ -2004,6 +2080,17 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type )
 	}
     }
 
+    if( tnode->base_type ) {
+        if( tnode->base_type->params.kind == TK_GENERIC ||
+            tnode_has_generic_type( tnode->base_type )) {
+            tnode_set_flags( tnode, TF_HAS_GENERICS );
+        }
+        if( tnode->base_type->params.kind == TK_GENERIC ||
+            tnode_has_generic_field( tnode->base_type )) {
+            tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
+        }
+    }
+    
     return tnode;
 }
 
@@ -2029,6 +2116,12 @@ TNODE *tnode_first_interface( TNODE *class_tnode )
 TNODE *tnode_element_type( TNODE *tnode )
     { assert( tnode ); return tnode->element_type; }
 
+TNODE *tnode_generic_type( TNODE *tnode )
+    { assert( tnode ); return tnode->generic_type; }
+
+TNODE *tnode_concrete_type( TNODE *tnode )
+    { assert( tnode ); return tnode->concrete_type; }
+
 /* FIXME: duplicated code! Call this function from
    'tnode_insert_fields()' S.G. */
 static TNODE*
@@ -2038,12 +2131,12 @@ tnode_set_size_and_field_offset( TNODE *tnode, DNODE *field )
     type_kind_t field_kind = field_type ? tnode_kind( field_type ) : TK_NONE;
 
     if( field_kind != TK_FUNCTION ) {
-        dnode_set_offset( field, tnode->size );
-        tnode->size += STRUCT_FIELD_SIZE;
+        dnode_set_offset( field, tnode->params.size );
+        tnode->params.size += STRUCT_FIELD_SIZE;
         tnode_set_flags( tnode, TF_IS_REF );
         if( field_type && ( tnode_is_reference( field_type ) ||
-                            field_type->kind == TK_PLACEHOLDER )) {
-            tnode->nrefs = tnode->size / STRUCT_FIELD_SIZE;
+                            field_type->params.kind == TK_PLACEHOLDER )) {
+            tnode->params.nrefs = tnode->params.size / STRUCT_FIELD_SIZE;
         }
     }
 
@@ -2063,12 +2156,12 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 	return tnode;
 
     assert( !tnode->element_type || 
-	    (tnode->kind == TK_COMPOSITE &&
-	     tnode->element_type->kind == TK_PLACEHOLDER));
+	    (tnode->params.kind == TK_COMPOSITE &&
+	     tnode->element_type->params.kind == TK_PLACEHOLDER));
 
     if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
-        tnode && tnode->kind == TK_COMPOSITE &&
-        tnode->element_type && tnode->element_type->kind == TK_PLACEHOLDER ) {
+        tnode && tnode->params.kind == TK_COMPOSITE &&
+        tnode->element_type && tnode->element_type->params.kind == TK_PLACEHOLDER ) {
         DNODE *field;
         cexception_t inner;
 
@@ -2079,7 +2172,7 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
                  tnode_kind_name(tnode) );
 #endif
         cexception_guard( inner ) {
-            tnode->size = 0;
+            tnode->params.size = 0;
             foreach_dnode( field, tnode->fields ) {
                 TNODE *field_type = dnode_type( field );
                 cloned_field = clone_dnode( field, &inner );
@@ -2112,6 +2205,15 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 
     tnode->element_type = element_type;
 
+    if( element_type->params.kind == TK_GENERIC ||
+        tnode_has_generic_type( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERICS );
+    }
+    if( element_type->params.kind == TK_GENERIC ||
+        tnode_has_generic_field( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
+    }
+    
     return tnode;
 }
 
@@ -2125,6 +2227,14 @@ TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type )
     } else {
 	tnode_append_element_type( tnode->element_type, element_type );
     }
+
+    if( tnode_has_generic_type( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERICS );
+    }
+    if( tnode_has_generic_field( element_type )) {
+        tnode_set_flags( tnode, TF_HAS_GENERIC_FIELD );
+    }
+    
     return tnode;
 }
 
@@ -2152,10 +2262,16 @@ TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags )
     return node;
 }
 
+TNODE *tnode_set_has_generics( TNODE *tnode )
+{
+    assert( tnode );
+    return tnode_set_flags( tnode, TF_HAS_GENERICS );
+}
+
 int tnode_has_placeholder_element( TNODE *tnode )
 {
     while( tnode ) {
-        if( tnode->kind == TK_PLACEHOLDER )
+        if( tnode->params.kind == TK_PLACEHOLDER )
             return 1;
         tnode = tnode->element_type;
     }
@@ -2180,6 +2296,26 @@ TNODE *tnode_set_has_no_numbers( TNODE *tnode )
     return tnode_set_flags( tnode, TF_HAS_NO_NUMBERS );
 }
 
+int tnode_has_generic_type( TNODE *tnode )
+{
+    if( tnode ) {
+        return ( tnode->flags & TF_HAS_GENERICS ) != 0;
+    } else {
+        return 0;
+    }
+}
+
+int tnode_has_generic_field( TNODE *tnode )
+{
+    if( tnode ) {
+        return ( tnode->flags & TF_HAS_GENERIC_FIELD ) != 0;
+    } else {
+        return 0;
+    }
+
+    return 0;
+}
+
 int tnode_has_references( TNODE *tnode )
 {
     assert( tnode );
@@ -2195,7 +2331,7 @@ int tnode_has_numbers( TNODE *tnode )
 int tnode_is_addressof( TNODE *tnode )
 {
     assert( tnode );
-    return (tnode->kind == TK_ADDRESSOF);
+    return (tnode->params.kind == TK_ADDRESSOF);
 }
 
 int tnode_is_reference( TNODE *tnode )
@@ -2233,7 +2369,7 @@ int tnode_has_non_null_ref_field( TNODE *tnode )
 int tnode_is_integer( TNODE *tnode )
 {
     if( tnode )
-	return ( tnode->kind == TK_INTEGER ) != 0;
+	return ( tnode->params.kind == TK_INTEGER ) != 0;
     else
 	return 0;
 }
@@ -2241,7 +2377,7 @@ int tnode_is_integer( TNODE *tnode )
 TNODE *tnode_set_kind( TNODE *tnode, type_kind_t kind )
 {
     assert( tnode );
-    tnode->kind = kind;
+    tnode->params.kind = kind;
     return tnode;
 }
 
@@ -2300,7 +2436,7 @@ TNODE *tnode_set_integer_attribute( TNODE *tnode, const char *attr_name,
 {
     assert( tnode );
     if( strcmp( attr_name, "size" ) == 0 ) {
-        tnode->attr_size = attr_value;
+        tnode->params.attr_size = attr_value;
 	return tnode;
     }
     if( strcmp( attr_name, "reference" ) == 0 ) {
@@ -2356,6 +2492,20 @@ DNODE *tnode_destructor( TNODE *tnode )
 {
     assert( tnode );
     return tnode->destructor;
+}
+
+TNODE *tnode_type_pair_left( TNODE *tnode )
+{
+    assert( tnode );
+    assert( tnode->params.kind == TK_PAIR );
+    return tnode->generic_type;
+}
+
+TNODE *tnode_type_pair_right( TNODE *tnode )
+{
+    assert( tnode );
+    assert( tnode->params.kind == TK_PAIR );
+    return tnode->concrete_type;
 }
 
 TNODE *tnode_next( TNODE* list )
