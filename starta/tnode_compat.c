@@ -925,16 +925,6 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
 
                 concrete_tnode->params = tnode_with_generics->params;
                 
-                // concrete_tnode->kind = tnode_with_generics->kind;
-                // concrete_tnode->size = tnode_with_generics->size;
-                // concrete_tnode->align = tnode_with_generics->align;
-                // concrete_tnode->nrefs = tnode_with_generics->nrefs;
-                // concrete_tnode->vmt_offset = tnode_with_generics->vmt_offset;
-                // concrete_tnode->max_vmt_offset = tnode_with_generics->max_vmt_offset;
-                // concrete_tnode->nextnumoffs = tnode_with_generics->nextnumoffs;
-                // concrete_tnode->nextrefoffs = tnode_with_generics->nextrefoffs;
-                // concrete_tnode->interface_nr = tnode_with_generics->interface_nr;
-                
                 cexception_guard( inner ) {
 
                     // Interface names are inherited:
