@@ -388,7 +388,7 @@ TNODE *new_tnode( cexception_t *ex )
 {
     TNODE *tnode = alloc_tnode( ex );
     tnode->rcount = 1;
-   return tnode;
+    return tnode;
 }
 
 TNODE *new_tnode_type_pair( TNODE *volatile *generic_type,
