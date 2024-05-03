@@ -13,7 +13,9 @@ LIBFLAGS ?= -lm -ldl
 OPTFLAGS ?= -O3 \
     -funroll-loops \
     -fomit-frame-pointer \
-    -foptimize-register-move 
+    -foptimize-register-move  \
+#    -fsanitize=address -rdynamic \
+#
 
 EXT ?= .snl
 TEST_OPTIONS ?= -I inputs -I modules -I . -G
