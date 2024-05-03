@@ -628,7 +628,15 @@ int LDI( INSTRUCTION_FN_ARGS )
     }
 
     assert( offset >= 0 );
-    istate.ep[0].num = *((stackunion_t*)STACKCELL_PTR(istate.ep[0]));
+    // With GCC 9.4.0-1ubuntu1~20.04.1 and gcc (GCC) 14.0.0 20231214
+    // (experimental), the following assignment causes SEGFAULT under
+    // -O3 optimisations (S.G. 2024-05-03):
+    // istate.ep[0].num = *((stackunion_t*)STACKCELL_PTR(istate.ep[0]));
+    //
+    // It was therefore replaced by memmove():
+    memmove( &istate.ep[0].num, STACKCELL_PTR(istate.ep[0]),
+             sizeof(istate.ep[0].num));
+
     STACKCELL_ZERO_PTR( istate.ep[0] );
 
     return 1;
@@ -939,7 +947,7 @@ int ALLOCVMT( INSTRUCTION_FN_ARGS )
 
 int MKLIST( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *ptr;
+    stackcell_t *ptr = NULL;
     long nexpressions = istate.ep[0].num.l;
     ssize_t size = istate.code[istate.ip+1].ssizeval;
     ssize_t nref = istate.code[istate.ip+2].ssizeval;
@@ -5080,7 +5088,9 @@ int HASHVAL( INSTRUCTION_FN_ARGS )
 	    memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	} else {
 	    if( hash_keys[current_index] ) {
-                istate.ep[1].num = hash_values[current_index];
+                // istate.ep[1].num = hash_values[current_index];
+                memmove( &istate.ep[1].num, &hash_values[current_index],
+                        sizeof(istate.ep[1].num));
 	    } else {
 		memset( &istate.ep[1], '\0', sizeof( istate.ep[1] ));
 	    }
