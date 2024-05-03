@@ -369,19 +369,20 @@ ${SHELL_DIFDIR}/%.diff: ${SHELL_TSTDIR}/%.sh ${TARGET}
 
 tests alltests: test shtests
 
-.PHONY: listdiff
+.PHONY: listdiff failed
 
-listdiff: # test
-	@- if [ -d ${DIFFIL_DIR} ]; then \
-	   find ${DIFFIL_DIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -1; fi
-	@- if [ -d ${TST_DIF_DIR} ]; then \
-	   find ${TST_DIF_DIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -1; fi
-	@- if [ -d ${SHELL_DIFDIR} ]; then \
-	   find ${SHELL_DIFDIR} -name '*.diff' -size +0 \
-		| xargs --no-run-if-empty ls -1; fi
-
+listdiff failed: # test
+	@- ( \
+	if [ -d ${DIFFIL_DIR} ]; then \
+	find ${DIFFIL_DIR} -name '*.diff' -size +0; \
+	fi; \
+	if [ -d ${TST_DIF_DIR} ]; then \
+	find ${TST_DIF_DIR} -name '*.diff' -size +0; \
+	fi; \
+	if [ -d ${SHELL_DIFDIR} ]; then \
+	find ${SHELL_DIFDIR} -name '*.diff' -size +0; \
+	fi \
+	) | sort -u
 
 #------------------------------------------------------------------------------
 
