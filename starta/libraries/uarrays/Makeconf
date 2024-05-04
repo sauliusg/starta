@@ -1,8 +1,14 @@
 include ../../Makeconf
 
-CFLAGS = -I. -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions
+CWD = $(shell pwd -L)
+
+TOP1  = $(dir ${CWD})
+TOP2 = $(dir ${TOP1:%/=%})
+TOP4 = $(dir $(patsubst %/,%,$(dir ${TOP2:%/=%})))
+
+CFLAGS = -I. -I${TOP2} -I${TOP2}${INTERPRETER_DIR} -I${TOP4}cexceptions
 
 LIBFLAGS = \
-../../libstarta.so \
-../../../getoptions/libgetoptions.a \
-../../../cexceptions/libcexceptions.a
+${TOP2}libstarta.so \
+${TOP4}getoptions/libgetoptions.a \
+${TOP4}cexceptions/libcexceptions.a
