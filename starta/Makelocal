@@ -16,8 +16,8 @@ cleanlibraries:
 	${MAKE} -C libraries cleanAll
 
 libraries: ${LOCAL_SO}
-	${MAKE} OPTFLAGS="${OPTFLAGS}" INTERPRETER_DIR="${INTERPRETER_DIR}" \
-		-C $@ CC=gcc LD=ld
+	cd $@; ${MAKE} OPTFLAGS="${OPTFLAGS}" INTERPRETER_DIR="${INTERPRETER_DIR}" \
+		CC=gcc LD=ld
 
 #-----------------------------------------------------------------------------
 
