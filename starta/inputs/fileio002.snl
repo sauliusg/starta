@@ -14,7 +14,14 @@ var a, b : int;
 b = 10;
 a = 20;
 
-var fname : string = "outputs/text.dat";
+var basename = arguments(0)[0][0..-5];
+var basename_start = strrchr(basename, '/' char);
+
+if( basename_start > 0 L ) {
+    basename = basename[basename_start .. -1L];
+}
+
+var fname : string = "outputs" + basename + ".dat";
 
 f = fopen( fname, "w" );
 
