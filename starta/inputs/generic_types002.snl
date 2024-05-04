@@ -1,0 +1,36 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada) in classes.
+
+use std;
+
+type R = generic ref;
+
+type G = class {
+    name : string;
+    x : R
+
+    method set( R x )
+    {
+        self.x = x;
+    }
+
+    method get() : R
+    {
+        return self.x;
+    }
+};
+
+type C = G with (R => string);
+type D = G with (R => array [][] of int);
+
+var c = new C;
+var d = new D;
+
+c->set( "haha" );
+. c->get();
+
+// d->set( "coocoo" ); // ERROR, incompatible types for function 'set' argument nr. 2
+d->set( [[10, 20, 30], [14, 15]] );
+. d->get()[0][1];
+. d->get()[1][0];

@@ -6,16 +6,7 @@ use std;
 
 type R = generic ref;
 
-type F = ?class {
-    f : float;
-
-    method funny ( x : R ) -> R
-    {
-        return null;
-    }
-}
-
-type G = ?class : F {
+type G = ?class {
     s : string;
     n : int;
 

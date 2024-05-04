@@ -1,0 +1,23 @@
+./sl: inputs/err-generic004.snl(102,44): ERROR, type 'FLOAT' is not declared in the current scope
+var fs = struct FS { i => 2, f => new FLOAT(3.14) };
+                                           ^
+./sl: inputs/err-generic004.snl(102,44): ERROR, only reference-implemented types can be used in new operator
+var fs = struct FS { i => 2, f => new FLOAT(3.14) };
+                                           ^
+./sl: inputs/err-generic004.snl(102,49): ERROR, constructor '???()' should not return a value
+var fs = struct FS { i => 2, f => new FLOAT(3.14) };
+                                                ^
+./sl: inputs/err-generic004.snl(102,51): ERROR, lvalue is needed for assignment
+var fs = struct FS { i => 2, f => new FLOAT(3.14) };
+                                                  ^
+./sl: inputs/err-generic004.snl(103,33): ERROR, incompatible types for function 'generic_processor' argument nr. 1
+generic_processor( fs, fprinter );
+                                ^
+./sl: inputs/err-generic004.snl(104,33): ERROR, incompatible types for function 'generic_processor' argument nr. 1
+generic_processor( fs, fupdater );
+                                ^
+./sl: inputs/err-generic004.snl(105,33): ERROR, incompatible types for function 'generic_processor' argument nr. 1
+generic_processor( fs, fprinter );
+                                ^
+./sl: 7 error(s) detected
+

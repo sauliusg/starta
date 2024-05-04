@@ -1,0 +1,39 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada) in classes.
+
+use std;
+
+type R = generic ref;
+
+type G = class {
+    name : string;
+    x : R
+
+    method set( R x )
+    {
+        self.x = x;
+    }
+
+    method get() : R
+    {
+        return self.x;
+    }
+};
+
+type E = G with (R => E); // recursive instantiation...
+
+var e = new E;
+var f = new E;
+
+f->set( new E );
+e->set( (new E)->set(f) );
+// e->set( new G ); // ERROR, type 'E' has no conversion from type 'G'
+
+var int length = 0;
+
+for( var x : E = e; x != null; x = x->get() ) {
+    length++;
+}
+
+. "length of e =", length;

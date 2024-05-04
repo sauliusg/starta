@@ -1,0 +1,5 @@
+./sl: inputs/err-generic006.snl(15,10): ERROR, Variables with generic fields ('g') can not be declared in the global (zero) scope
+var g : G;
+         ^
+./sl: 1 error(s) detected
+
