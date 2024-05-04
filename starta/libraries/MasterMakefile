@@ -41,11 +41,13 @@ endif
 
 include ${DEPEND_FILES}
 
+INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
+
 .%.d: %.c
-	${GCC} ${CFLAGS} -M -MG $< > $@
+	${GCC} ${CFLAGS} -M -MG ${INTERPRETER_OPT} ${OPTFLAGS} $< > $@
 
 %.o: %.c
-	${CC} -c ${CFLAGS} -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1 ${OPTFLAGS} -o $@ $<
+	${CC} -c ${CFLAGS} ${INTERPRETER_OPT} ${OPTFLAGS} -o $@ $<
 
 %.so.${SO_VERSION}: ${OFILES}
 	${GCC} -shared -Xlinker -soname=$*.so.${SO_MAJOR} -o $@ $^ ${LIBFLAGS}
