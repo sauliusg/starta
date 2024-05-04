@@ -12,9 +12,10 @@
 %x	comment
 %x	m2comment
 
-DECIMAL_DIGIT  [0-9]
+DECIMAL_DIGIT  [0-9_]
+HEX_DIGIT      [0-9A-Fa-f_]
 NAME	       [a-zA-Z$_][a-zA-Z0-9_]*
-INTEGER	       {DECIMAL_DIGIT}+
+INTEGER	       {DECIMAL_DIGIT}+|0x{HEX_DIGIT}+
 FIXED	       ({DECIMAL_DIGIT}+"."{DECIMAL_DIGIT}*)|("."{DECIMAL_DIGIT}+)
 REAL           ({FIXED}|{INTEGER})([eE]([-+]?)[0-9]+)?
 
@@ -313,27 +314,6 @@ while       { MARK; return _WHILE; }
 			%}
 
 {INTEGER}		%{
-                           MARK;
-                           yylval.si = strnpool(yytext, yyleng);
-                           process_escapes(get_pool_string(yylval.si));
-			   return __INTEGER_CONST;
-			%}
-
-"0x"{INTEGER}		%{
-                           MARK;
-                           yylval.si = strnpool(yytext, yyleng);
-                           process_escapes(get_pool_string(yylval.si));
-			   return __INTEGER_CONST;
-			%}
-
-"0b"{INTEGER}		%{
-                           MARK;
-                           yylval.si = strnpool(yytext, yyleng);
-                           process_escapes(get_pool_string(yylval.si));
-			   return __INTEGER_CONST;
-			%}
-
-"0o"{INTEGER}		%{
                            MARK;
                            yylval.si = strnpool(yytext, yyleng);
                            process_escapes(get_pool_string(yylval.si));
