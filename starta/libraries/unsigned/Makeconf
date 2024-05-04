@@ -1,3 +1,5 @@
+#--*- Makefile -*--
+
 include ../../Makeconf
 
 CWD = $(shell pwd -L)
@@ -5,16 +7,10 @@ CWD = $(shell pwd -L)
 TOP1  = $(dir ${CWD})
 TOP2 = $(dir ${TOP1:%/=%})
 TOP3 = $(dir ${TOP2:%/=%})
-TOP4 = $(dir ${TOP3:%/=%})
 
-CFLAGS = -I. -I${TOP2} -I${TOP3} -I${TOP4} -I${TOP2}${INTERPRETER_DIR} -I${TOP3}cexceptions -I${TOP4}cexceptions
+CFLAGS = -I. -I${TOP2} -I${TOP3} -I${TOP2}${INTERPRETER_DIR} -I${TOP3}cexceptions
 
 LIBFLAGS = \
 ${TOP2}libstarta.so \
--L ${TOP3}getoptions \
--L ${TOP3}cexceptions \
--L ${TOP4}getoptions \
--L ${TOP4}cexceptions \
--lcexceptions \
--lgetoptions \
-
+${TOP3}cexceptions/libcexceptions.a \
+#

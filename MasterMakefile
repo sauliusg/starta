@@ -135,7 +135,7 @@ LIB_FILES := ${addprefix /lib, ${addsuffix .a, ${LIB_NAMES} }}
 LIB_FILES := ${join ${LIB_DIRS}, ${LIB_FILES} }
 
 %.a:
-	${MAKE} -C ${dir $@} ${notdir $@}
+	cd $(dir $@); ${MAKE} $(notdir $@)
 
 #------------------------------------------------------------------------------
 #
@@ -193,8 +193,8 @@ all: ${LOCAL_LIB} ${LOCAL_SO} ${EXE_FILES} ${TST_DRIVERS}
 lib libs: ${LIB_DIRS}
 
 ${LIB_DIRS}: FORCE
-	${MAKE} OPTFLAGS="${OPTFLAGS}" INTERPRETER_DIR="${INTERPRETER_DIR}" \
-		-C $@
+	cd $@; ${MAKE} OPTFLAGS="${OPTFLAGS}" \
+		INTERPRETER_DIR="${INTERPRETER_DIR}"
 
 FORCE:;
 
