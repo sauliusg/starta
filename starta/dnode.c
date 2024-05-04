@@ -1566,3 +1566,104 @@ DNODE *dnode_remove_last( DNODE *list )
     }
     return list;
 }
+
+DNODE *new_dnode_list_with_concrete_types( DNODE *dnode_with_generics,
+                                           TYPETAB *generic_table,
+                                           int *has_generics,
+                                           cexception_t *ex )
+{
+    DNODE *volatile updated_dnode_list = NULL;
+    DNODE *volatile next = NULL;
+    cexception_t inner;
+
+    if( !dnode_with_generics ) {
+        return NULL;
+    }
+    
+    cexception_guard( inner ) {
+        next = new_dnode_list_with_concrete_types
+            ( dnode_with_generics->next, generic_table,
+              has_generics, &inner );
+
+        updated_dnode_list = new_dnode_name( dnode_with_generics->name,
+                                             &inner );
+
+        updated_dnode_list->filename =
+            strdupx( dnode_with_generics->filename, &inner );
+
+        updated_dnode_list->synonim =
+            strdupx( dnode_with_generics->synonim, &inner );
+        
+        updated_dnode_list->flags = dnode_with_generics->flags;
+
+        updated_dnode_list->tnode = new_tnode_with_concrete_types
+            ( dnode_with_generics->tnode, generic_table, has_generics,
+              &inner );
+        
+        updated_dnode_list->scope = dnode_with_generics->scope;
+        updated_dnode_list->offset = dnode_with_generics->offset;
+
+        updated_dnode_list->code =
+            callocx( sizeof(updated_dnode_list->code[0]),
+                     updated_dnode_list->code_length,
+                     &inner );
+        memcpy( updated_dnode_list->code,
+                dnode_with_generics->code,
+                sizeof(updated_dnode_list->code[0]) *
+                updated_dnode_list->code_length);
+
+        updated_dnode_list->code_flags =
+            callocx( sizeof(updated_dnode_list->code_flags[0]),
+                     updated_dnode_list->code_length,
+                     &inner );
+        memcpy( updated_dnode_list->code_flags,
+                dnode_with_generics->code_flags,
+                sizeof(updated_dnode_list->code_flags[0]) *
+                updated_dnode_list->code_length);
+
+        assert( !dnode_with_generics->code_fixups );
+
+        updated_dnode_list->value =
+            dnode_with_generics->value;
+            
+        const_value_copy( &updated_dnode_list->cvalue,
+                          &dnode_with_generics->cvalue, &inner );
+
+        assert( !dnode_with_generics->vartab );
+        assert( !dnode_with_generics->consts );
+        assert( !dnode_with_generics->typetab );
+        assert( !dnode_with_generics->operators );
+        assert( !dnode_with_generics->module_args );
+
+        updated_dnode_list->next = next;
+
+        if( next ) {
+            next->prev = updated_dnode_list;
+            if( next->last ) {
+                updated_dnode_list->last = next->last;
+            } else {
+                updated_dnode_list->last = next;
+            }
+        }
+    }
+    cexception_catch {
+        delete_dnode( updated_dnode_list );
+        delete_dnode( next );
+        cexception_reraise( inner, ex );
+    }
+    
+    return updated_dnode_list;
+}
+
+int dnode_list_has_generic_type( DNODE *dnode_list )
+{
+    DNODE *current;
+
+    foreach_dnode( current, dnode_list ) {
+        if( tnode_has_generic_type( dnode_type( current ))) {
+            return 1;
+        }
+    }
+
+    return 0;
+}

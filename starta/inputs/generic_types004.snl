@@ -1,0 +1,67 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada) in interfaces.
+
+use std;
+
+type R = generic ref;
+
+interface I1 {
+    method set( some_ref : R );
+    method get() : R;
+};
+
+interface I2 {
+    method set( some_ref : R );
+    method get() : R;
+};
+
+class G implements I1, I2 {
+    R x;
+
+    method set(R r)
+    {
+        self.x = r;
+    }
+    
+    method set@I1( R r )
+    {
+        self.x = r;
+    }
+
+    method get@I1() : R
+    {
+        return self.x;
+    }
+
+    method set@I2( R r )
+    {
+        self.x = r;
+    }
+
+    method get@I2() : R
+    {
+        return self.x;
+    }
+}
+
+type G_string = G with (R => string);
+type G_array = G with (R => array of string);
+
+var a = new G_string;
+var b = new G_array;
+ 
+a->set@I1( "a string to set" );
+. a->get@I1();
+
+operator "." (a : array of string)
+{
+    < "[ ";
+    for var s in a do
+        < "\"" _ s _ "\", ";
+    enddo;
+    < "]";
+}
+
+b->set@I2( ["10", "100", "1000"] );
+. b->get@I2();

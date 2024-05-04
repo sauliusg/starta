@@ -7,7 +7,7 @@ use std;
 type R = generic ref;
 
 type F = ?class {
-    f : float;
+    r : array [][] of R;
 
     method funny ( x : R ) -> R
     {
