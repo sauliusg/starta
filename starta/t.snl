@@ -6,93 +6,24 @@
 
 use std;
 
-class Number {
+class A {
+    int i;
     string name;
+    long j;
 
-    constructor fromName( string name )
-    {
-        self.name = name;
-    }
-    
-    constructor ()
-        self.fromName( "Number" )
-    {}
-    
-    method get_name(): string => self.name;
+    method set( int x ) { self.i = x }
+    method get(): int { return self.i }
 }
 
-class TypedNumber : Number {
-    string type_name;
+var a = new A;
 
-    constructor fromTypeName( string name; string type_name )
-        super.fromName( name )
-    {
-        self.type_name = type_name
-    }
-    
-    constructor ()
-        self.fromTypeName( "Number", "int" )
-    {}
-    
-    method get_name(): string => self.name;
-}
+. const(A.i.offset);
+. const(A.size);
+. const(A.nref);
+//. const(A.name.offset);
 
-class Integer: TypedNumber {
-    int value;
+a.i = 10;
 
-    constructor ( int val )
-        super.fromTypeName( "Integer", "int" )
-    {
-        self.value = val;
-    }
+//a->set( 20 );
 
-    method get_value(): int => self.value;
-}
-
-class Float: TypedNumber {
-    float value;
-
-    constructor ( float val )
-        super.fromTypeName( "Float", "real" )
-    {
-        self.value = val;
-    }
-
-    method get_value(): float => self.value;
-}
-
-var n: Number = new Number;
-
-var ii: Integer = new Integer( 234 );
-var ff: Float = new Float( 23.4 );
-
-. n->get_name();
-. "=================";
-
-. ii->get_name(), ii->get_value();
-. ff->get_name(), ff->get_value();
-. "=================";
-
-var an = new Number * new [10];
-var ai = new Integer( 11 ) * new [10];
-var af = new Float( 3.14 ) * new [10];
-
-an[2] = new Float(1.11);
-
-. an[1]->get_name();
-. an[2]->get_name();
-
-. "";
-. ai[1]->get_name(), ai[1]->get_value();
-. af[1]->get_name(), af[1]->get_value();
-
-. "";
-//an = ai; // INCOMPATIBLE
-. an[1]->get_name();
-. ai[2]->get_name(), ai[2]->get_value();
-
-
-// No longer a problem here:
-an[2] = af[2];
-// an[2] = new Number; // The ai[2]->get_value() will call unimplemented method if this line is executed. 
-. ai[2]->get_name(), ai[2]->get_value(); // OK
+. a->get();

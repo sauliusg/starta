@@ -1,0 +1,43 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada) in interfaces.
+
+use std;
+
+type R = generic ref;
+
+var x : R;
+
+
+procedure s( r : R )
+{
+    x = r;
+}
+
+procedure g( r : R ): R
+{
+    return x;
+}
+
+procedure sv( a : array of R; r : R )
+{
+    a[0] = r;
+}
+
+type AS = array of string;
+type AI = array [][] of int;
+
+var sa = new string[20];
+var ia = new (int[])[10];
+
+sv( sa, "quack" );
+. sa[0];
+
+sv( ia, [11, 12] );
+. ia[0][1];
+
+s( "evil!" );
+. g( "crash" );
+
+s( [666] );
+. g( [616] )[0];

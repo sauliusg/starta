@@ -28,7 +28,7 @@
 
 void *thrcode_subsystem = &thrcode_subsystem;
 
-int thrcode_debug = 0;
+static int thrcode_debug = 0;
 static int thrcode_stackdebug = 0;
 static int thrcode_heapdebug = 0;
 

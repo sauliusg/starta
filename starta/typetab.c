@@ -275,6 +275,43 @@ void typetab_override_suffix( TYPETAB *table, const char *name,
     *tnode = NULL;
 }
 
+TNODE *typetab_lookup_type_pair( TYPETAB *table, const TNODE *generic_type )
+{
+    TYPE_NODE *node;
+    assert( table );
+    assert( generic_type );
+    for( node = table->node; node != NULL; node = node->next ) {
+        if( node->tnode &&
+            tnode_generic_type( node->tnode ) == generic_type ) {
+	    return node->tnode;
+	}
+    }
+    return NULL;
+}
+
+TNODE *typetab_lookup_paired_type( TYPETAB *table, const TNODE *generic_type )
+{
+    TNODE *tnode = typetab_lookup_type_pair( table, generic_type );
+    if( tnode ) {
+        return tnode_concrete_type( tnode );
+    } else {
+        return NULL;
+    }
+}
+
+TNODE *typetab_insert_type_pair( TYPETAB *table,
+                                 TNODE *volatile *generic_type,
+                                 TNODE *volatile *concrete_type,
+                                 cexception_t *ex )
+{
+    TNODE *volatile type_pair =
+        new_tnode_type_pair( generic_type, concrete_type, ex );
+
+    return typetab_insert( table, /*name =*/
+                           tnode_name( tnode_type_pair_left( type_pair )),
+                           &type_pair, ex );
+}
+
 void typetab_copy_table( TYPETAB *dst, TYPETAB *src, cexception_t *ex )
 {
     TYPE_NODE *curr;
