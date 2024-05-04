@@ -7,7 +7,7 @@ char *OPCODES[] = {
     NULL
 };
 
-int trace = 0;
+int test_trace = 0;
 
 static istate_t *istate_ptr;
 
@@ -29,7 +29,7 @@ static istate_t *istate_ptr;
 
 #ifdef TRACE
 #define TRACE_FUNCTION() \
-    if( trace ) printf( "%s\t" \
+    if( test_trace ) printf( "%s\t" \
                         "%4ld(%9p) %4ld(%9p) " \
                         "%4ld(%9p) %4ld(%9p) " \
                         "%4ld(%9p) %4ld(%9p) ...\n", \
@@ -50,10 +50,10 @@ int init( istate_t *global_istate )
     return 0;
 }
 
-int trace_on( int trace_flag )
+int test_trace_on( int trace_flag )
 {
-    int old_trace_flag = trace;
-    trace = trace_flag;
+    int old_trace_flag = test_trace;
+    test_trace = trace_flag;
     return old_trace_flag;
 }
 
@@ -70,5 +70,3 @@ int TEST( INSTRUCTION_FN_ARGS )
 
     return 1;
 }
-
-

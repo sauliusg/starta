@@ -1,0 +1,105 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada).
+
+use * from std;
+
+exception UNIMPLEMENTED_METHOD;
+
+type R = generic ref;
+
+type Number = class {
+
+    method print()
+    {
+     raise UNIMPLEMENTED_METHOD( "unimplemented method \"print\"" );
+    }
+};
+
+class Integer : Number {
+    int ival;
+
+    constructor ( i : int )
+    {
+        self.ival = i;
+    }
+    
+    method print()
+    {
+        . self.ival;
+    }
+}
+
+class Float : Number {
+    float fval;
+
+    constructor ( x : float )
+    {
+        self.fval = x;
+    }
+    
+    method print()
+    {
+        . self.fval;
+    }
+}
+
+operator "+" (i : Integer; delta : int) -> Integer
+{
+    var Integer ret = new Integer( i.ival + delta );
+    return ret;
+}
+
+operator "+" (x : Float; delta : float) -> Float
+{
+    var Float ret = new Float( x.fval + delta );
+    return ret;
+}
+
+operator "." (i : Integer)
+{
+    < i.ival;
+}
+
+operator "." (f : Float)
+{
+    < f.fval;
+}
+
+procedure sprinter( s : string ): string { . s; return s };
+procedure iprinter( i : Integer ): Integer { i->print(); return i };
+procedure fprinter( x : Float ): Float { x->print(); return x };
+
+procedure supdater( s : string ): string { return s + " with extra part" };
+procedure iupdater( i : Integer ): Integer { return i + 2 };
+procedure fupdater( x : Float ): Float { return x + 1.5 };
+
+procedure generic_processor( s : null struct { int i; R x }; 
+                             procedure (x : R)->(R) xmanager )
+{
+    s.x = xmanager( s.x );
+}
+
+struct IS { int i; Integer j }
+struct FS { int i; Float f }
+
+var p = new null struct { int i; string name };
+p.name = "Struct p";
+
+generic_processor( p, sprinter );
+generic_processor( p, supdater );
+generic_processor( p, sprinter );
+
+. "\n================\n";
+
+var is = struct IS { i => 2, j => new Integer(12) };
+generic_processor( is, iprinter );
+generic_processor( is, iupdater );
+generic_processor( is, iprinter );
+
+. "\n================\n";
+
+var fs = struct FS { i => 2, f => new FLOAT(3.14) };
+generic_processor( fs, fprinter );
+generic_processor( fs, fupdater );
+generic_processor( fs, fprinter );

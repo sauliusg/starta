@@ -7,6 +7,9 @@ INTERPRETER_DIR ?= interpreters/packed-type
 OTHER_DIRS ?= ../common ../lists ${INTERPRETER_DIR}
 LIB_DIRS   ?= ../getoptions ../cexceptions
 
+# To run tests, a DUMA_DISABLE_BANNER environment variable might be
+# set.
+
 ## LIBFLAGS = -ldl -lduma
 ## LIBFLAGS = -ldl -lefence
 LIBFLAGS ?= -ldl

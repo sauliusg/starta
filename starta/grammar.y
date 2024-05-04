@@ -1200,6 +1200,29 @@ static void compiler_typetab_insert( COMPILER *cc,
     } 
 }
 
+void compiler_check_generic_types( DNODE *vars )
+{
+    DNODE *current;
+
+    foreach_dnode( current, vars ) {
+        TNODE *var_type = dnode_type( current );
+        if( dnode_scope( current ) == 0 &&
+            (tnode_has_generic_field( var_type ) ||
+             tnode_kind( var_type ) == TK_GENERIC )) {
+            if( tnode_kind( var_type ) == TK_GENERIC ) {
+                yyerrorf( "Variables of generic types ('%s') can not be "
+                          "declared in the global (zero) scope",
+                          dnode_name( current ));
+            } else {
+                yyerrorf( "Variables with generic fields ('%s') can not be "
+                          "declared in the global (zero) scope",
+                          dnode_name( current ));
+            }
+        }
+    }
+}
+
+
 static void compiler_vartab_insert_named_vars( COMPILER *cc,
                                                DNODE *volatile *vars,
                                                cexception_t *ex )
@@ -1209,6 +1232,7 @@ static void compiler_vartab_insert_named_vars( COMPILER *cc,
 
     cexception_t inner;
     cexception_guard( inner ) {
+        compiler_check_generic_types( *vars );
         vartab_insert_named_vars( cc->vartab, vars, &inner );
         if( cc->current_module && dnode_scope( shared_vars ) == 0 ) {
             dnode_vartab_insert_named_vars( cc->current_module,
@@ -1386,6 +1410,7 @@ static void compiler_insert_tnode_into_suffix_list( COMPILER *cc,
         case TK_REF:
         case TK_FUNCTION_REF:
         case TK_DERIVED:
+        case TK_GENERIC:
             break;
         default:
             yyerrorf( "types of kind '%s' do not have suffix table",
@@ -2000,7 +2025,12 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
             TNODE *retval_dnode_type = dnode_type( retval_dnode );
             if( tnode_has_placeholder_element( retval_dnode_type )) {
                 retval_tnode = new_tnode_implementation( retval_dnode_type,
-                                                         generic_types, &inner );
+                                                         generic_types,
+                                                         &inner );
+            } else if( tnode_has_generic_type( retval_dnode_type )) {
+                int has_generics = 0;
+                retval_tnode = new_tnode_with_concrete_types
+                    ( retval_dnode_type, generic_types, &has_generics, &inner );
             } else {
                 retval_tnode = share_tnode( retval_dnode_type );
             }
@@ -2124,7 +2154,8 @@ static void compiler_compile_type_conversion( COMPILER *cc,
                             ( target_type, element_tnode );
                     }
 
-                    compiler_emit_function_call( cc, conversion, fixup_values, "\n", ex );
+                    compiler_emit_function_call( cc, conversion,
+                                                 fixup_values, "\n", &inner );
                 }
             }
 
@@ -5412,6 +5443,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
         cexception_guard( inner ) {
             generic_types = new_typetab( &inner );
             if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
+                tnode_kind( arg_type ) != TK_GENERIC &&
                 !tnode_types_are_assignment_compatible( arg_type, exp_type,
                                                         generic_types,
                                                         NULL /* msg */,
@@ -7631,6 +7663,7 @@ static cexception_t *px; /* parser exception */
   DNODE *dnode;
   ENODE *enode;
   TLIST *tlist;
+  TYPETAB *typetab;
   int token;           /* token value returned by lexer */
   int op;              /* type of the assign operator; for simple assignement
 			  operator, contains '='; for operators like '+=' and
@@ -7644,6 +7677,8 @@ static cexception_t *px; /* parser exception */
 %destructor { delete_dnode($$); } <dnode>
 %destructor { delete_tnode($$); } <tnode>
 %destructor { delete_anode($$); } <anode>
+%destructor { delete_tlist($$); } <tlist>
+%destructor { delete_typetab($$); } <typetab>
 
 %token _ADDRESSOF
 %token _ARRAY
@@ -7671,6 +7706,7 @@ static cexception_t *px; /* parser exception */
 %token _FORWARD
 %token _FROM
 %token _FUNCTION
+%token _GENERIC
 %token _IF
 %token _IMPLEMENTS
 %token _IMPORT
@@ -7711,6 +7747,7 @@ static cexception_t *px; /* parser exception */
 %token _UNPACK
 %token _USE
 %token _VAR
+%token _WITH
 %token _WHILE
 
 %token __ASSIGN /* := */
@@ -7814,6 +7851,8 @@ static cexception_t *px; /* parser exception */
 %type <tnode> undelimited_or_structure_description
 %type <tnode> undelimited_type_description
 %type <tnode> delimited_type_description
+%type <tnode> type_binding
+%type <typetab> type_binding_list
 %type <anode> type_attribute
 %type <dnode> use_statement
 %type <dnode> variable_access_identifier
@@ -8810,9 +8849,15 @@ identifier
 
 identifier_list
    : identifier
-     { $$ = $1; }
+     {
+         $$ = $1;
+         $1 = NULL;
+     }
    | identifier_list ',' identifier
-     { $$ = dnode_append( $1, $3 ); }
+     {
+         $$ = dnode_append( $1, $3 );
+         $3 = NULL;
+     }
    ;
 
 function_or_procedure: _FUNCTION | _PROCEDURE;
@@ -10884,6 +10929,57 @@ opt_null_type_designator
       { $$ = 1; }
   ; 
 
+type_binding
+  : type_identifier __THICK_ARROW var_type_description
+  {
+      cexception_t inner;
+
+      $$ = NULL;
+      cexception_guard( inner ) {
+          $$ = new_tnode_type_pair( &$1, &$3, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$1 );
+          dispose_tnode( &$3 );
+          cexception_reraise( inner, px );
+      }
+  }
+  ;
+
+type_binding_list
+  : type_binding
+  {
+      cexception_t inner;
+
+      $$ = new_typetab( px );
+
+      cexception_guard( inner ) {
+          typetab_insert( $$, /*name = */"", &$1, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$1 );
+          dispose_typetab( &$$ );
+          cexception_reraise( inner, px );
+      }
+  }
+  | type_binding_list ',' type_binding
+  {
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          typetab_insert( $1, /*name = */"", &$3, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$3 );
+          dispose_typetab( &$1 );
+          cexception_reraise( inner, px );
+      }
+
+      $$ = $1;
+      $1 = NULL;
+  }
+  ;
+
 delimited_type_description
   : type_identifier
     { 
@@ -10982,6 +11078,52 @@ delimited_type_description
 	$$ = tnode;
     }
 
+  | _GENERIC __IDENTIFIER
+    {
+	char *volatile type_name =
+            obtain_string_from_strpool( compiler->strpool, $2 );
+	TNODE *volatile base_tnode =
+            share_tnode( typetab_lookup( compiler->typetab, type_name ));
+	TNODE *volatile tnode = NULL;
+
+        cexception_t inner;
+        cexception_guard( inner ) {
+            tnode = new_tnode_generic( &base_tnode, &inner );
+            assert( !base_tnode );
+        }
+        cexception_catch {
+            freex( type_name );
+            delete_tnode( tnode );
+            delete_tnode( base_tnode );
+            cexception_reraise( inner, px );
+        }
+        freex( type_name );
+	$$ = tnode;
+    }
+
+  | type_identifier _WITH '(' type_binding_list ')'
+
+  {
+      cexception_t inner;
+
+      cexception_guard( inner ) {
+          int has_generics = 0;
+          $$ = new_tnode_with_concrete_types
+              ( /* tnode_with_generics = */ $1,
+                /* generic_table = */ $4,
+                &has_generics, &inner );
+      }
+      cexception_catch {
+          dispose_tnode( &$1 );
+          dispose_typetab( &$4 );
+          $$ = NULL;
+          cexception_reraise( inner, px );
+      }
+
+      dispose_tnode( &$1 );
+      dispose_typetab( &$4 );
+  }
+  
   | function_or_procedure_type_keyword '(' argument_list ')'
     {
 	int is_function = $1;
@@ -12590,9 +12732,11 @@ multivalue_function_call
                         method = tnode_lookup_method( interface_type, method_name );
                     }
                 } else {
-                    class_has_interface =
-                        tnode_lookup_interface( object_type, interface_name )
-                        != NULL;
+                    TNODE *concrete_interface =
+                        tnode_lookup_interface( object_type, interface_name );
+
+                    class_has_interface = (concrete_interface != NULL);
+
                     if( !class_has_interface ) {
                         char *class_name =
                             object_type ? tnode_name( object_type ) : NULL;
@@ -12606,7 +12750,8 @@ multivalue_function_call
                                       interface_name );
                         }
                     } else {
-                        method = tnode_lookup_method( interface_type, method_name );
+                        method = tnode_lookup_method( concrete_interface,
+                                                      method_name );
                     }
                 }
             } else {

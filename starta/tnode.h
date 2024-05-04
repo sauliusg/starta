@@ -45,6 +45,29 @@ typedef enum {
                                    counts come from cycle references,
                                    and the node can be safely
                                    collected. */
+    TF_HAS_GENERICS    = 0x1000, /* Specifies that a (composite) type
+                                    has fields (for classes and
+                                    structures), elements (for arrays
+                                    ot hashes), parameters or reteru
+                                    values (for functions and
+                                    procedure) of some generic
+                                    type. Types that have
+                                    TF_HAS_GENERICS flag set need to
+                                    be recursively re-described
+                                    (re-instantiated) when a concrete
+                                    type is substituted for a generic
+                                    one.*/
+    TF_HAS_GENERIC_FIELD = 0x2000, /* Specifies that a (composite)
+                                    type has fields (for classes and
+                                    structures), elements (for arrays
+                                    ot hashes). It is *not* set when a
+                                    class has methods with generic
+                                    parameters – only persistently
+                                    assignable generic values
+                                    coun. Types that have
+                                    TF_HAS_GENERIC_FILEDS flag can not
+                                    be used for variables on the
+                                    global (0) scope..*/
     last_TYPE_FLAG
 } type_flag_t;
 
@@ -70,6 +93,11 @@ typedef enum {
     TK_DESTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
+    TK_GENERIC,     /* generic types a-la Ada. The compiler MUST have
+                       some base type that shares size and load/store
+                       operators to compile the generic code; later a
+                       specific type will be substituted for the
+                       generic via type-erasure mechanism. */
     TK_DERIVED,     /* A new derived type inherits implementation and
                        interface (operators) from its parent, or base,
                        type, but which itself can not be assigned to
@@ -83,6 +111,9 @@ typedef enum {
     TK_TYPE, /* for module parameters that represent types */
     TK_CONST, /* for module parameters that represent constants */
     TK_VAR, /* for module parameters that represent variables */
+    TK_PAIR, /* TNODE used to represent type pair; two TNODE
+                references will be stored in the 'generic_type' and
+                'concrete_type' fields. */
     last_type_kind_t
 } type_kind_t;
 
@@ -99,6 +130,9 @@ void take_ownership_of_all_tnodes( void );
 void delete_all_tnodes( void );
 TNODE* tnode_break_cycles( TNODE *tnode );
 TNODE *new_tnode( cexception_t *ex );
+TNODE *new_tnode_type_pair( TNODE *volatile *generic_type,
+                            TNODE *volatile *concrete_type,
+                            cexception_t *ex );
 TNODE *new_tnode_forward( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_struct( char *name, cexception_t *ex );
 TNODE *new_tnode_forward_class( char *name, cexception_t *ex );
@@ -175,9 +209,13 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
 
+TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex );
+
 TNODE *new_tnode_implementation( TNODE *generic_tnode,
                                  TYPETAB *generic_types,
                                  cexception_t *ex );
+
+TNODE *tnode_append( TNODE *head, TNODE *volatile *tail );
 
 TNODE *tnode_move_operators( TNODE *dst, TNODE *src );
 
@@ -287,6 +325,8 @@ TNODE *tnode_insert_base_type( TNODE *tnode, TNODE *volatile *base_type );
 TNODE *tnode_insert_interfaces( TNODE *tnode, TLIST *interfaces );
 TNODE *tnode_first_interface( TNODE *class_tnode );
 TNODE *tnode_element_type( TNODE *tnode );
+TNODE *tnode_generic_type( TNODE *tnode );
+TNODE *tnode_concrete_type( TNODE *tnode );
 TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type );
 TNODE *tnode_append_element_type( TNODE* tnode, TNODE *element_type );
 
@@ -301,10 +341,13 @@ int tnode_function_prototypes_match( TNODE *f1, TNODE *f2 );
 
 TNODE *tnode_set_flags( TNODE* node, type_flag_t flags );
 TNODE *tnode_reset_flags( TNODE* node, type_flag_t flags );
-int tnode_has_placeholder_element( TNODE *tnode );
-int tnode_has_flags( TNODE* node, type_flag_t flags );
 TNODE *tnode_set_has_references( TNODE *tnode );
 TNODE *tnode_set_has_no_numbers( TNODE *tnode );
+TNODE *tnode_set_has_generics( TNODE *tnode );
+int tnode_has_placeholder_element( TNODE *tnode );
+int tnode_has_flags( TNODE* node, type_flag_t flags );
+int tnode_has_generic_type( TNODE *tnode );
+int tnode_has_generic_field( TNODE *tnode );
 int tnode_has_references( TNODE *tnode );
 int tnode_has_numbers( TNODE *tnode );
 int tnode_is_addressof( TNODE *tnode );
@@ -335,6 +378,10 @@ TNODE *tnode_set_string_attribute( TNODE *tnode, const char *attr_name,
 DNODE *tnode_default_constructor( TNODE *tnode );
 
 DNODE *tnode_lookup_constructor( TNODE *tnode, const char *name );
+
+TNODE *tnode_type_pair_left( TNODE *tnode );
+
+TNODE *tnode_type_pair_right( TNODE *tnode );
 
 DNODE *tnode_destructor( TNODE *tnode );
 

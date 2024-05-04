@@ -25,4 +25,9 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 			       TYPETAB *generic_types,
 			       cexception_t *ex );
 
+TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
+                                      TYPETAB *generic_table,
+                                      int *has_generics,
+                                      cexception_t *ex );
+
 #endif

@@ -1,0 +1,29 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada) in interfaces.
+
+use std;
+
+type R = generic ref;
+
+type G = ?class {
+    s : string;
+    n : int;
+
+    method funny ( x : R ) -> R
+    {
+        return x;
+    }
+};
+
+var g : G = new G;
+
+operator "."  (a : array of int)
+{
+    for (var e in a) {
+        < e, " ";
+    }
+}
+
+. g->funny( "hi" );
+. g->funny( [1, 2, 3] );
