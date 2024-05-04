@@ -37,6 +37,26 @@
 
  */
 
+#ifndef REMOVE_UNDERSCORES_DEFINED
+#define REMOVE_UNDERSCORES_DEFINED
+
+static void remove_underscores( char *s )
+{
+    if( s ) {
+        char *d = s;
+        while( *s ) {
+            if( *s == '_' ) {
+                s++;
+            } else {
+                *d++ = *s++;
+            }
+        }
+        *d = '\0';
+    }
+}
+
+#endif
+
 #if DO_NOT_USE_LDCS_OPTIMISATION
 
 int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
@@ -46,6 +66,7 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     istate.ep --;
+    remove_underscores( istate.static_data + offset );
     istate.ep[0].I = strtoll( istate.static_data + offset, NULL, 0 );
 
     return 2;
@@ -61,6 +82,7 @@ int @PREFIX1@LDCS( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
     /* convert and check the value for errors: */
     errno = 0;
+    remove_underscores( istate.static_data + offset );
     value = strtoll( istate.static_data + offset, NULL, 0 );
     if( errno || value > @type_max@ || value < @type_min@ ) {
         char *errmsg = errno ? strerror(errno) : "integer constant too ";
