@@ -2,7 +2,7 @@ package NumCheck;
 
 use std;
 
-load "libraries/src/numcheck/lib/libnumcheck.so.0.01";
+load "libraries/lib/numcheck/libnumcheck.so.0.01";
 
 inline bytecode function is_integer( s: string ) : bool
 { libnumcheck:ISINTEGER }

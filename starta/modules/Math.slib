@@ -2,7 +2,7 @@ package Math;
 
 use * from std;
 
-load "libraries/src/math/lib/libmath.so.0.01";
+load "libraries/lib/math/libmath.so.0.01";
 
 inline bytecode operator "**" ( x : float; y : float ) : float
 { libmath:FPOW }
