@@ -1,4 +1,6 @@
-include ../../Makeconf
+COMPILER_SOURCE_DIR ?= ../../..
 
-CFLAGS = -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions
+include ${COMPILER_SOURCE_DIR}/Makeconf
+
+CFLAGS = -I${COMPILER_SOURCE_DIR} -I${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR} -I${COMPILER_SOURCE_DIR}/../cexceptions
 LIBFLAGS =

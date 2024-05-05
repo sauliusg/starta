@@ -5,4 +5,4 @@
 # Test dynamic library loading
 #
 
-load "libraries/just-so/libjust-so.so.0.01";
+load "libraries/src/just-so/libjust-so.so.0.01";
