@@ -55,6 +55,7 @@ include ${DEPEND_FILES}
 INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
 
 ${OBJ_DIR}.%.d: %.c
+	@mkdir -p $(dir $@)
 	${GCC} ${CFLAGS} -M -MG ${INTERPRETER_OPT} ${OPTFLAGS} $< \
 	| perl -pe 's|^(.*?)\.o:|${OBJ_DIR}$$1\.o:|' \
 	| perl -pe 's|(locally-generated/)|${OBJ_DIR}$$1|g' \
