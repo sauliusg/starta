@@ -17,9 +17,10 @@ BASE = $(notdir ${CWD})
 TOP1 = $(dir ${CWD})
 TOP2 = $(dir ${TOP1:%/=%})
 
-# The directory name mys end with the slash (e.g. "lib/", not "lib"),
-# or it can be empty:
+# The directory names must end with the slash (e.g. "lib/", not
+# "lib"), or they can be empty:
 LIB_DIR ?= ${TOP2}lib/${BASE}/
+OBJ_DIR ?= ${TOP2}obj/${BASE}/
 
 SO_MAJOR = 0
 SO_MINOR = 01
@@ -31,7 +32,7 @@ PACKAGE     = ${notdir ${PWD}}
 LIBNAME     = ${addprefix lib, ${PACKAGE}}
 
 CFILES = ${wildcard *.c}
-OFILES = ${CFILES:%.c=%.o}
+OFILES = ${CFILES:%.c=${OBJ_DIR}%.o}
 LIBFILES = ${LIB_DIR}${LIBNAME}.so.${SO_VERSION}
 DEPEND_FILES = ${CFILES:%.c=.%.d}
 
@@ -54,9 +55,12 @@ include ${DEPEND_FILES}
 INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
 
 .%.d: %.c
-	${GCC} ${CFLAGS} -M -MG ${INTERPRETER_OPT} ${OPTFLAGS} $< > $@
+	${GCC} ${CFLAGS} -M -MG ${INTERPRETER_OPT} ${OPTFLAGS} $< \
+	| perl -pe 's|^(.*?)\.o|${OBJ_DIR}$$1\.o:|' \
+	> $@
 
-%.o: %.c
+${OBJ_DIR}%.o: %.c
+	@mkdir -p $(dir $@)
 	${CC} -c ${CFLAGS} ${INTERPRETER_OPT} ${OPTFLAGS} -o $@ $<
 
 ${LIB_DIR}%.so.${SO_VERSION}: ${OFILES}
