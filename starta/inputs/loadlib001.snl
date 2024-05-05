@@ -5,7 +5,7 @@
 # Test dynamic library loading
 #
 
-load "libraries/src/test/libtest.so.0.01";
+load "libraries/src/test/lib/libtest.so.0.01";
 
 bytecode {
     libtest:TEST

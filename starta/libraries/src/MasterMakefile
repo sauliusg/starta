@@ -11,6 +11,10 @@ ifneq ("${MAKECONF_FILES}","")
 include ${MAKECONF_FILES}
 endif
 
+# The directory name mys end with the slash (e.g. "lib/", not "lib"),
+# or it can be empty:
+LIB_DIR ?= lib/
+
 SO_MAJOR = 0
 SO_MINOR = 01
 
@@ -22,7 +26,7 @@ LIBNAME     = ${addprefix lib, ${PACKAGE}}
 
 CFILES = ${wildcard *.c}
 OFILES = ${CFILES:%.c=%.o}
-LIBFILES = ${LIBNAME}.so.${SO_VERSION}
+LIBFILES = ${LIB_DIR}${LIBNAME}.so.${SO_VERSION}
 DEPEND_FILES = ${CFILES:%.c=.%.d}
 
 GCC   = gcc
@@ -49,7 +53,7 @@ INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
 %.o: %.c
 	${CC} -c ${CFLAGS} ${INTERPRETER_OPT} ${OPTFLAGS} -o $@ $<
 
-%.so.${SO_VERSION}: ${OFILES}
+${LIB_DIR}%.so.${SO_VERSION}: ${OFILES}
 	${GCC} -shared -Xlinker -soname=$*.so.${SO_MAJOR} -o $@ $^ ${LIBFLAGS}
 
 clean:

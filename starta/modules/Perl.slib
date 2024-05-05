@@ -4,7 +4,7 @@ package Perl;
 
 use * from std;
 
-load "libraries/src/Perl/libPerl.so.0.01";
+load "libraries/src/Perl/lib/libPerl.so.0.01";
 
 
 end package Perl;
