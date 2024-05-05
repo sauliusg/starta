@@ -4,7 +4,7 @@ package ArrayMath;
 
 use * from std;
 
-load "libraries/arraymath/libarraymath.so.0.01";
+load "libraries/src/arraymath/libarraymath.so.0.01";
 
 // Copy elements of one array into the other:
 

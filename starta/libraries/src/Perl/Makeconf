@@ -1,6 +1,8 @@
-include ../../Makeconf
+COMPILER_SOURCE_DIR ?= ../../..
 
-CFLAGS = -I../.. -I../../${INTERPRETER_DIR} -I../../../cexceptions \
+include ${COMPILER_SOURCE_DIR}/Makeconf
+
+CFLAGS = -I${COMPILER_SOURCE_DIR} -I${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR} -I${COMPILER_SOURCE_DIR}/../cexceptions \
        $(shell perl -MExtUtils::Embed -e ccopts -e ldopts)
 
 LIBFLAGS = $(shell perl -MExtUtils::Embed -e ldopts)

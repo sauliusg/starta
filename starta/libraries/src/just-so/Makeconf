@@ -1,3 +1,5 @@
-include ../../Makeconf
+COMPILER_SOURCE_DIR ?= ../../..
 
-CFLAGS = -I. -I../../${INTEPRETER_DIR}
+include ${COMPILER_SOURCE_DIR}/Makeconf
+
+CFLAGS = -I. -I${COMPILER_SOURCE_DIR}/${INTEPRETER_DIR}

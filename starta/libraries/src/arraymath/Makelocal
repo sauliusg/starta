@@ -1,5 +1,7 @@
 # --*- Makefile -*--
 
+COMPILER_SOURCE_DIR ?= ../../..
+
 IFUNCTION_DIR = ifunctions
 GEN_DIR = locally-generated
 
@@ -13,27 +15,27 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%_arrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.hin
-	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_arrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.cin
-	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_farrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/farrays.hin
-	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_farrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/farrays.cin
-	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_iarrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/iarrays.hin
-	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_iarrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/iarrays.cin
-	sed -f ../../${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
+	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 #-----------------------------------------------------------------------------
