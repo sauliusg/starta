@@ -7,7 +7,7 @@
 
 use * from std;
 
-load "libraries/src/math/libmath.so.0.01";
+load "libraries/src/math/lib/libmath.so.0.01";
 
 inline bytecode operator "**" ( i : float; j : float ) : float
 { libmath:FPOW }

@@ -6,7 +6,7 @@
 #
 
 include "stdtypes.slib";
-load "libraries/src/math/libmath.so.0.01";
+load "libraries/src/math/lib/libmath.so.0.01";
 
 inline bytecode function
 round( x : float ) : long

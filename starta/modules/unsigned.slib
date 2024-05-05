@@ -2,7 +2,7 @@ package unsigned;
 
 use * from std;
 
-load "libraries/src/unsigned/libunsigned.so.0.01";
+load "libraries/src/unsigned/lib/libunsigned.so.0.01";
 
 inline bytecode function strict( bool strict ): bool
 {

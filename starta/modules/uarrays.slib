@@ -4,7 +4,7 @@ package uarrays
 use std;
 use unsigned;
 
-load "libraries/src/uarrays/libuarrays.so.0.01";
+load "libraries/src/uarrays/lib/libuarrays.so.0.01";
 
 inline bytecode function strict( bool strict ): bool
 {
