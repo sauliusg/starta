@@ -11,9 +11,15 @@ ifneq ("${MAKECONF_FILES}","")
 include ${MAKECONF_FILES}
 endif
 
+CWD := $(shell pwd -L)
+BASE = $(notdir ${CWD})
+
+TOP1 = $(dir ${CWD})
+TOP2 = $(dir ${TOP1:%/=%})
+
 # The directory name mys end with the slash (e.g. "lib/", not "lib"),
 # or it can be empty:
-LIB_DIR ?= lib/
+LIB_DIR ?= ${TOP2}lib/${BASE}/
 
 SO_MAJOR = 0
 SO_MINOR = 01
@@ -54,6 +60,7 @@ INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
 	${CC} -c ${CFLAGS} ${INTERPRETER_OPT} ${OPTFLAGS} -o $@ $<
 
 ${LIB_DIR}%.so.${SO_VERSION}: ${OFILES}
+	@mkdir -p $(dir $@)
 	${GCC} -shared -Xlinker -soname=$*.so.${SO_MAJOR} -o $@ $^ ${LIBFLAGS}
 
 clean:

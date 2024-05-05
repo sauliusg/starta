@@ -2,7 +2,7 @@ package GNUrand48;
 
 use * from std;
 
-load "libraries/src/GNUrand48/lib/libGNUrand48.so.0.01";
+load "libraries/lib/GNUrand48/libGNUrand48.so.0.01";
 
 inline bytecode function srand48( long seed )
 {
