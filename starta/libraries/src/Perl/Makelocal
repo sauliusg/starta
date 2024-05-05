@@ -1,10 +1,12 @@
+#--*- Makefile -*--
 
 IFUNCTION_DIR = ifunctions
-GEN_DIR = locally-generated
+GEN_DIR = ${OBJ_DIR}locally-generated
 
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
+	@mkdir -p $(dir $@)
 	awk '/^ *int /{print $$2}' $< \
 	| sed -e 's/(//' \
 	| awk '{print "\""$$1"\","}' > $@
@@ -12,27 +14,35 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%_common.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/common.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_integer.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/integer.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_intfloat.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intfloat.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_float.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/float.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_common.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/common.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_integer.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/integer.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_intfloat.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intfloat.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_float.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/float.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 #-----------------------------------------------------------------------------

@@ -3,11 +3,12 @@
 COMPILER_SOURCE_DIR ?= ../../..
 
 IFUNCTION_DIR = ifunctions
-GEN_DIR = locally-generated
+GEN_DIR = ${OBJ_DIR}locally-generated
 
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
+	@mkdir -p $(dir $@)
 	awk '/^ *int /{print $$2}' $< \
 	| sed -e 's/(//' \
 	| awk '{print "\""$$1"\","}' > $@
@@ -15,26 +16,32 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%_arrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.hin
+	@mkdir -p $(dir $@)
 	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_arrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/arrays.cin
+	@mkdir -p $(dir $@)
 	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_farrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/farrays.hin
+	@mkdir -p $(dir $@)
 	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_farrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/farrays.cin
+	@mkdir -p $(dir $@)
 	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_iarrays.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/iarrays.hin
+	@mkdir -p $(dir $@)
 	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 
 ${GEN_DIR}/%_iarrays.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/iarrays.cin
+	@mkdir -p $(dir $@)
 	sed -f ${COMPILER_SOURCE_DIR}/${INTERPRETER_DIR}/arrays.sed ${word 2, $^} \
 	| sed -f $< > $@
 

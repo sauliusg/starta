@@ -38,7 +38,7 @@ DEPEND_FILES = ${CFILES:%.c=${OBJ_DIR}.%.d}
 
 GCC   = gcc
 
-CFLAGS += -fPIC
+CFLAGS += -I${OBJ_DIR} -fPIC
 
 .PHONY: all clean distclean cleanAll static test
 
@@ -56,7 +56,8 @@ INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
 
 ${OBJ_DIR}.%.d: %.c
 	${GCC} ${CFLAGS} -M -MG ${INTERPRETER_OPT} ${OPTFLAGS} $< \
-	| perl -pe 's|^(.*?)\.o|${OBJ_DIR}$$1\.o:|' \
+	| perl -pe 's|^(.*?)\.o:|${OBJ_DIR}$$1\.o:|' \
+	| perl -pe 's|(locally-generated/)|${OBJ_DIR}$$1|g' \
 	> $@
 
 ${OBJ_DIR}%.o: %.c
