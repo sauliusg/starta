@@ -1,16 +1,18 @@
 #--*- Makefile -*--
 
 IFUNCTION_DIR = ifunctions
-GEN_DIR = locally-generated
+GEN_DIR = ${OBJ_DIR}locally-generated
 
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/opcodes.tab.c: opcodes.h
+	@mkdir -p $(dir $@)
 	awk '/^ *int /{print $$2}' $< \
 	| sed -e 's/(//' \
 	| awk '{print "\""$$1"\","}' > $@
 
 ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
+	@mkdir -p $(dir $@)
 	awk '/^ *int /{print $$2}' $< \
 	| sed -e 's/(//' \
 	| awk '{print "\""$$1"\","}' > $@
@@ -18,9 +20,11 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/unsigned_%.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/unsigned.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/unsigned_%.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/$(notdir ${INTERPRETER_DIR})/unsigned.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 #-----------------------------------------------------------------------------

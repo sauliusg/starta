@@ -1,10 +1,12 @@
+#--*- Makefile -*--
 
 IFUNCTION_DIR = ifunctions
-GEN_DIR = locally-generated
+GEN_DIR = ${OBJ_DIR}locally-generated
 
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
+	@mkdir -p $(dir $@)
 	awk '/^ *int /{print $$2}' $< \
 	| sed -e 's/(//' \
 	| awk '{print "\""$$1"\","}' > $@
@@ -12,21 +14,27 @@ ${GEN_DIR}/%.tab.c: ${GEN_DIR}/%.h
 #-----------------------------------------------------------------------------
 
 ${GEN_DIR}/%_vectors.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/vectors.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_vectors.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/vectors.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_intvect.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intvect.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_intvect.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/intvect.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_floatvect.h: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/floatvect.hin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 ${GEN_DIR}/%_floatvect.c: ${IFUNCTION_DIR}/%.sed ${IFUNCTION_DIR}/floatvect.cin
+	@mkdir -p $(dir $@)
 	sed -f $^ > $@
 
 #-----------------------------------------------------------------------------
