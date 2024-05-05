@@ -34,7 +34,7 @@ LIBNAME     = ${addprefix lib, ${PACKAGE}}
 CFILES = ${wildcard *.c}
 OFILES = ${CFILES:%.c=${OBJ_DIR}%.o}
 LIBFILES = ${LIB_DIR}${LIBNAME}.so.${SO_VERSION}
-DEPEND_FILES = ${CFILES:%.c=.%.d}
+DEPEND_FILES = ${CFILES:%.c=${OBJ_DIR}.%.d}
 
 GCC   = gcc
 
@@ -54,7 +54,7 @@ include ${DEPEND_FILES}
 
 INTERPRETER_OPT = -D$(subst -,_,$(notdir ${INTERPRETER_DIR}))=1
 
-.%.d: %.c
+${OBJ_DIR}.%.d: %.c
 	${GCC} ${CFLAGS} -M -MG ${INTERPRETER_OPT} ${OPTFLAGS} $< \
 	| perl -pe 's|^(.*?)\.o|${OBJ_DIR}$$1\.o:|' \
 	> $@
