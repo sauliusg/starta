@@ -1,7 +1,7 @@
 #--*- Java -*--
 # Starta compiler tests.
 #
-# Check classes and arrays
+# Check constants and variables with underscores.
 #
 
 use std;
