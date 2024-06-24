@@ -1,15 +1,31 @@
 #--*- Java -*--
 # Starta compiler tests.
 #
-# Check ...
+# Check functional primitives: map()
 #
 
 use std;
 
-var _funny_integer_ = 102_001_;
+type R = ref;
 
-. _funny_integer_;
+pragma prepend "inputs/functional";
 
-var _funny_hex_ = 0x_1FF_BCD__;
+use Mapper (int);
 
-. _funny_hex_;
+var m = [2, 12, 23];
+
+var a : array of int;
+
+function inc( int x ): int => x + 2;
+
+a = map (inc, m);
+
+for var e in a {
+    . ">>>", e;
+}
+
+. "";
+
+{
+    use Mapper;
+}
