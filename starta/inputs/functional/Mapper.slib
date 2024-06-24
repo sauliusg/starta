@@ -1,0 +1,14 @@
+module Mapper (type T = ref)
+
+use std;
+    
+function map(f : function (x : T) -> (T); a : array of T) -> (array of T)
+{
+    var r = new T [length (a)];
+    for var i = 0 to last(a) {
+        r[i] = f(a[i]);
+    }
+    return r;
+}
+
+end module Mapper;
