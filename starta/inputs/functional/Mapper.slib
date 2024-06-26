@@ -1,4 +1,4 @@
-module Mapper (type T = ref)
+module Mapper (type T = generic ref)
 
 use std;
     
