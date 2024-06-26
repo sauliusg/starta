@@ -8369,6 +8369,8 @@ opt_default_module_parameter
     { $$ = -1; }
 | '=' __IDENTIFIER
     { $$ = $2; }
+| '=' _GENERIC __IDENTIFIER
+    { $$ = $3; }
 ;
 
 module_statement
@@ -8459,6 +8461,8 @@ module_argument_list
 
 module_argument
 : identifier
+| _GENERIC identifier
+    { $$ = $2; }
 | _CONST constant_expression
     { $$ = new_dnode_constant( /* name */ NULL, &$2, px ); }
 | __INTEGER_CONST
