@@ -27,5 +27,8 @@ for var e in a {
 . "";
 
 {
-    use Mapper;
+    type R = generic ref;
+    
+    // use Mapper (R);
+    use Mapper (generic ref);
 }
