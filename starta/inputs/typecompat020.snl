@@ -6,6 +6,8 @@
 
 use std;
 
+type R = ref;
+
 pragma prepend "inputs/functional";
 
 use Mapper (int);
@@ -51,11 +53,9 @@ operator "." (a : array of string)
 }
 
 {
-    type R = generic ref;
-
-    use Mapper (R) as RefMapper;
+    use Mapper (generic ref) as RefMapper;
 
     var s : array of string = ["abcd", "qrn", "uvw"];
 
-    . RefMapper::map (toupper, s);
+    . RefMapper::map (toupper, s);    
 }
