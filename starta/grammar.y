@@ -2031,6 +2031,7 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
                 int has_generics = 0;
                 retval_tnode = new_tnode_with_concrete_types
                     ( retval_dnode_type, generic_types, &has_generics, &inner );
+                tnode_set_flags (retval_tnode, TF_IS_EQUIVALENT);
             } else {
                 retval_tnode = share_tnode( retval_dnode_type );
             }

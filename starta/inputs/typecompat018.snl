@@ -1,0 +1,34 @@
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check functional primitives: map()
+#
+
+use std;
+
+type R = ref;
+
+pragma prepend "inputs/functional";
+
+use Mapper (int);
+
+var m = [2, 12, 23];
+
+var a : array of int;
+
+function inc( int x ): int => x + 2;
+
+a = map (inc, m);
+
+for var e in a {
+    . ">>>", e;
+}
+
+. "";
+
+{
+    type R = generic ref;
+    
+    use Mapper (R);
+    // use Mapper (generic ref);
+}
