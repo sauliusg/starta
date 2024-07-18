@@ -1,14 +1,62 @@
-// --*- C -*--
-
-// Test list and hash (dictionary) expressions:
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check functional primitives: map()
+#
 
 use std;
-use Lists;
 
-var a = (1,);
-var b = (3,4,7);
-var c = (3,4,7,);
-var d = ( "one": 1, "two": 2 );
-var e = ( "one": 1, "two": 2, );
+pragma prepend "inputs/functional";
 
-var t = ((2,),(2,3,4),(4,),(6,));
+use Mapper (int);
+
+var m = [2, 12, 23];
+
+var a : array of int;
+
+function inc( int x ): int => x + 2;
+
+a = map (inc, m);
+
+for var e in a {
+    . ">>>", e;
+}
+
+. "";
+
+inline bytecode function ord( char c ) : byte {}
+inline bytecode function chr( byte c ) : char {}
+inline bytecode function str( blob b ) : string {}
+
+function toupper( s: string ): string
+{
+    var m = new char[length(s)];
+
+    for var i = 0 to last(s)-1 {
+        m[i] = chr( ord(s[i]) - 32B );
+    }
+
+    var r: blob = new blob(length(s)+1);
+    pack r, 0, "i1", m;
+    return str(r);
+}
+
+operator "." (a : array of string)
+{
+    < "[ ";
+    for var s in a {
+        < "\"" _ s _ "\" ";
+    }
+    . "]"
+}
+
+{
+    type R = ref;
+
+    // use Mapper (ref) as RefMapper; // This also works.
+    use Mapper (R) as RefMapper;
+
+    var s : array of string = ["abcd", "qrn", "uvw"];
+
+    . RefMapper::map (toupper, s);
+}
