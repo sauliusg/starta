@@ -925,6 +925,10 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
 
                 concrete_tnode->params = tnode_with_generics->params;
                 
+                if( concrete_tnode->params.kind == TK_DERIVED ) {
+                    tnode_set_flags( concrete_tnode, TF_IS_EQUIVALENT );
+                }
+                
                 cexception_guard( inner ) {
 
                     // Interface names are inherited:
