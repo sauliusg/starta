@@ -159,7 +159,10 @@ TNODE *typetab_insert_suffix( TYPETAB *table, const char *name,
     TYPE_NODE *lookup_node = NULL;
 
     assert( table );
-    assert( name );
+    // assert( name );
+    if( name == NULL ) {
+        name = "";
+    }
 
     lookup_node = typetab_lookup_typenode( table, name, suffix );
 
