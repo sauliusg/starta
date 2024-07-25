@@ -8843,6 +8843,7 @@ identifier
          cexception_t inner;
          cexception_guard( inner ) {
              $$ = new_dnode_name( name, &inner );
+             dnode_set_scope( $$, compiler_current_scope( compiler ));
          }
          cexception_catch {
              freex( name );
