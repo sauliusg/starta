@@ -491,11 +491,11 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     }
 
     if( t1->params.kind == TK_REF ) {
-	return tnode_is_reference( t2 );
+        return tnode_is_reference( t2 );
     }
-    if( t2->params.kind == TK_REF ) {
-	return t1->params.kind == TK_REF;
-    }
+    // if( t2->params.kind == TK_REF ) {
+    //     return t1->params.kind == TK_REF;
+    // }
     if( t1->params.kind == TK_BLOB && t2->params.kind == TK_BLOB ) {
 	return 1;
     }
