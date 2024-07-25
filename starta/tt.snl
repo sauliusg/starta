@@ -47,7 +47,7 @@ operator "." (a : array of string)
     for var s in a {
         < "\"" _ s _ "\" ";
     }
-    . "]"
+    < "]"
 }
 
 {
@@ -58,5 +58,20 @@ operator "." (a : array of string)
 
     var s : array of string = ["abcd", "qrn", "uvw"];
 
+    var s2 : string[];
+
+    s2 = RefMapper::map (toupper, s);
+    // s2 = s[];
+    
+    . s;
     . RefMapper::map (toupper, s);
+    . RefMapper::map (toupper, s);
+    . s2[];
+
+    . "";
+    var r : ref[] = s;
+    . r;
+    s2 = r;
+    . s2;
+    
 }
