@@ -8,7 +8,7 @@ use std;
 
 pragma prepend "inputs/functional";
 
-use Mapper (int);
+use Mapper (int) as IntMapper;
 
 var m = [2, 12, 23];
 
@@ -50,12 +50,41 @@ operator "." (a : array of string)
     . "]"
 }
 
+operator "." (a : array of int)
 {
+    < "[ ";
+    for var s in a {
+        < s, " ";
+    }
+    . "]"
+}
+
+{
+
     type R = generic ref;
 
     use Mapper (R) as RefMapper;
 
-    var s : array of string = ["abcd", "qrn", "uvw"];
+    var n : array of string = ["abcd", "qrn", "uvw"];
 
-    . RefMapper::map (toupper, s);
+    type S = struct {
+        x, y : int
+    };
+
+    var s : S = new S;
+    var b : array of string = ["one", "two", "three", "four"];
+    var r : ref;
+
+    r = s;
+    r = b;
+    r = n;
+
+    // s = r; // ERROR, incompatible types for assignment to variable 's'
+    // b = r; // ERROR, incompatible types for assignment to variable 'b'
+    // n = r; // ERROR, incompatible types for assignment to variable 'n'
+    
+    n = RefMapper::map (toupper, b);
+    a = RefMapper::map (inc, m);
+    . n;
+    . a;
 }
