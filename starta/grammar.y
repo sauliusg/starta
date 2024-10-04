@@ -11397,6 +11397,15 @@ inheritance_and_implementation_list
               if( !tnode_base_type( current_class )) {
                   tnode_insert_base_type( current_class, &shared_base_type );
               }
+          } else {
+              if( current_class && !tnode_base_type( current_class ) &&
+                  (tnode_kind(current_class) == TK_STRUCT ||
+                   tnode_kind(current_class) == TK_CLASS ||
+                   tnode_kind(current_class) == TK_INTERFACE)) {
+                  TNODE *base =
+                      share_tnode(typetab_lookup( compiler->typetab, "struct" ));
+                      tnode_insert_base_type( current_class, &base );
+              }
           }
 
           if( !tnode_interface_list( current_class )) {
