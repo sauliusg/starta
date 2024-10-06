@@ -185,6 +185,40 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
 }
 
 static int
+tnode_check_generic_compatibility( TNODE *generic_type,
+                                   TNODE *implementing_type )
+{
+    assert( generic_type );
+    assert( implementing_type );
+
+    while( generic_type != NULL &&
+           tnode_kind( generic_type ) == TK_GENERIC ) {
+        generic_type = tnode_base_type( generic_type );
+    }
+
+    TNODE *t1 = generic_type;
+    TNODE *t2 = implementing_type;
+
+    // printf(">>>> Adding generic implementation for:\n");
+    // printf(">>>> t1 name: '%s'\n", tnode_name(t1));
+    // printf(">>>> t2 name: '%s'\n", tnode_name(t2));
+    // printf(">>>> t1 kind: '%s'\n", tnode_kind_name(t1));
+    // printf(">>>> t2 kind: '%s'\n", tnode_kind_name(t2));
+
+    if( tnode_is_reference(t1) &&
+        tnode_is_reference(t2) ) {
+        return 1;
+    }
+    
+    if( tnode_is_reference(t1) &&
+        tnode_is_reference(t2) ) {
+        return 1;
+    }
+    
+    return 0;
+}
+
+static int
 tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
                                       TYPETAB *generic_types,
                                       int (*tnode_check_types)
@@ -218,6 +252,10 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
             TNODE *volatile generic_type = share_tnode( t1 );
             TNODE *volatile implementation_type = share_tnode( t2 );
             cexception_guard( inner ) {
+                if( !tnode_check_generic_compatibility
+                    ( generic_type, implementation_type )) {
+                    return 0;
+                }; 
                 typetab_insert_type_pair( generic_types, &generic_type,
                                           &implementation_type, &inner );
                 return 1;
