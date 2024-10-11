@@ -1,0 +1,11 @@
+./sl: inputs/typecompat024.snl(88,31): ERROR, incompatible types for function 'map' argument nr. 2
+    a = RefMapper::map (inc, m);
+                              ^
+./sl: inputs/typecompat024.snl(88,31): ERROR, incompatible types for function 'map' argument nr. 1
+    a = RefMapper::map (inc, m);
+                              ^
+./sl: inputs/typecompat024.snl(88,32): ERROR, incompatible types for assignment to variable 'a'
+    a = RefMapper::map (inc, m);
+                               ^
+./sl: 3 error(s) detected
+

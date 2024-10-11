@@ -2523,24 +2523,32 @@ static void compiler_push_operator_retvals( COMPILER *cc,
 
     retval_type = od->retvals ? dnode_type( od->retvals ) : NULL;
 
-    if( od->containing_type &&
+    // fprintf(stderr, ">>> retval_type (1): '%s'\n", retval_type ? tnode_name(retval_type) : "<null>");
+
+    if( retval_type ) {
+        if( od->containing_type &&
 	    ( tnode_kind( od->containing_type ) == TK_DERIVED ||
 	      tnode_kind( od->containing_type ) == TK_ENUM ) &&
 	    (od->flags & ODF_IS_INHERITED) != 0 ) {
-	TNODE *curr_type = od->containing_type;
-        while( tnode_has_flags( curr_type, TF_IS_EQUIVALENT ) &&
-               (curr_type = tnode_base_type( curr_type )) != NULL );
-        TNODE *base_type = tnode_base_type( curr_type );
-	if( retval_type == base_type ) {
-	    retval_type = od->containing_type;
-	}
+            TNODE *curr_type = od->containing_type;
+            while( tnode_has_flags( curr_type, TF_IS_EQUIVALENT ) &&
+                   (curr_type = tnode_base_type( curr_type )) != NULL );
+            TNODE *base_type = tnode_base_type( curr_type );
+            if( retval_type == base_type ) {
+                retval_type = od->containing_type;
+            }
+        }
     }
+
+    // fprintf(stderr, ">>> retval_type (2): '%s'\n", retval_type ? tnode_name(retval_type) : "<null>");
 
     if( generic_types ) {
         retval_type = new_tnode_implementation( retval_type, generic_types, ex );
     } else {
         share_tnode( retval_type );
     }
+
+    // fprintf(stderr, ">>> retval_type (3): '%s'\n", retval_type ? tnode_name(retval_type) : "<null>");
 
     if( od->containing_type && retval_type &&
         tnode_kind( retval_type ) == TK_PLACEHOLDER ) {
@@ -2551,10 +2559,13 @@ static void compiler_push_operator_retvals( COMPILER *cc,
         }
     }
 
+    // fprintf(stderr, ">>> retval_type (4): '%s'\n", retval_type ? tnode_name(retval_type) : "<null>");
+
     cexception_t inner;
     cexception_guard( inner ) {
         if( retval_type ) {
             TNODE *shared_retval = share_tnode( retval_type );
+            // fprintf(stderr, ">>> pushing type '%s'\n", tnode_name(shared_retval));
             compiler_push_typed_expression( cc, &shared_retval, &inner );
         }  else {
             if( !od->operator && on_error_expr && *on_error_expr ) {
@@ -3059,8 +3070,8 @@ static void compiler_compile_unop( COMPILER *cc,
                                                       "\n", ex );
 	    compiler_check_operator_retvals( cc, &od, 0, 1 );
 	    compiler_push_operator_retvals( cc, &od, &top, generic_types, &inner );
-            //printf( ">>>> operator: %s\n", unop_name );
-            //printf( ">>>> type kind: %s\n", tnode_kind_name(enode_type( cc->e_stack )) );
+            // printf( ">>>> operator: %s\n", unop_name );
+            // printf( ">>>> type kind: %s\n", tnode_kind_name(cc->e_stack ? enode_type( cc->e_stack ) : NULL));
             if( cc->e_stack && enode_type( cc->e_stack ) &&
                 tnode_kind(enode_type( cc->e_stack )) == TK_ADDRESSOF ) {
                 //printf( ">>>> dereferencing address.\n" );
@@ -10154,9 +10165,13 @@ control_statement
                 element_type &&
                 tnode_kind( element_type ) != TK_PLACEHOLDER ) {
                 compiler_compile_ldi( compiler, &inner );
+                // fprintf(stderr, ">>>> compiled ..._ldi\n");
+                // fprintf(stderr, ">>>> aggregate expression kind: %s\n", tnode_kind_name(aggregate_expression_type));
             } else {
                 compiler_emit( compiler, &inner, "\tc\n", GLDI );
                 compiler_stack_top_dereference( compiler );
+                // fprintf(stderr, ">>>> compiled ..._glti\n");
+                // fprintf(stderr, ">>>> aggregate expression kind: %s\n", tnode_kind_name(aggregate_expression_type));
             }
             compiler_compile_variable_initialisation
                 ( compiler, loop_counter_var, &inner );
@@ -10188,12 +10203,17 @@ control_statement
                                                   loop_counter_var, px );
             if( aggregate_expression_type &&
                 tnode_kind( aggregate_expression_type ) == TK_ARRAY &&
-                tnode_kind( element_type ) != TK_PLACEHOLDER ) {
+                tnode_kind( element_type ) != TK_PLACEHOLDER
+                ) {
                 compiler_compile_sti( compiler, px );
+                // fprintf(stderr, ">>>> compiled ..._sti\n");
+                // fprintf(stderr, ">>>> aggregate expression kind: %s\n", tnode_kind_name(aggregate_expression_type));
             } else {
                 compiler_emit( compiler, px, "\tc\n", GSTI );
                 compiler_drop_top_expression( compiler );
                 compiler_drop_top_expression( compiler );
+                // fprintf(stderr, ">>>> compiled ..._gsti\n");
+                // fprintf(stderr, ">>>> aggregate expression kind: %s\n", tnode_kind_name(aggregate_expression_type));
             }
         }
 
@@ -11364,8 +11384,10 @@ inheritance_and_implementation_list
   : opt_base_type opt_implemented_interfaces
   {
       TNODE *current_class = compiler->current_type;
-      TNODE *volatile base_type = $1 ?
-          $1 : share_tnode(typetab_lookup( compiler->typetab, "struct" ));
+      TNODE *volatile base_type = $1
+          // ?
+          // $1 : share_tnode(typetab_lookup( compiler->typetab, "struct" ))
+          ;
       TNODE *volatile shared_base_type = share_tnode( base_type );
       TLIST *volatile interfaces = $2;
       cexception_t inner;
@@ -11374,6 +11396,15 @@ inheritance_and_implementation_list
           if( base_type && current_class != base_type ) {
               if( !tnode_base_type( current_class )) {
                   tnode_insert_base_type( current_class, &shared_base_type );
+              }
+          } else {
+              if( current_class && !tnode_base_type( current_class ) &&
+                  (tnode_kind(current_class) == TK_STRUCT ||
+                   tnode_kind(current_class) == TK_CLASS ||
+                   tnode_kind(current_class) == TK_INTERFACE)) {
+                  TNODE *base =
+                      share_tnode(typetab_lookup( compiler->typetab, "struct" ));
+                      tnode_insert_base_type( current_class, &base );
               }
           }
 
