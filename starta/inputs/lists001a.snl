@@ -7,7 +7,7 @@
 
 use * from std;
 
-type list of T = ?{
+type list of T = ? : ref {
     value : T;
     next : list of T;
 
