@@ -690,7 +690,7 @@ TNODE *new_tnode_array( TNODE *element_type,
     TNODE * volatile tnode = new_tnode( ex );
 
     tnode->params.kind = TK_ARRAY;
-    tnode->element_type = element_type;
+    tnode_insert_element_type( tnode, element_type );
     assert( tnode != base_type );
     tnode->base_type = base_type;
     tnode->flags |= TF_IS_REF;
