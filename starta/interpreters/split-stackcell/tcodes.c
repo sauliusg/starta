@@ -5448,7 +5448,7 @@ int STRPACK( INSTRUCTION_FN_ARGS )
 {
     char *value = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
-    ssize_t offset = istate.ep[2].num.ssize;
+    ssize_t offset = istate.ep[2].num.i;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
     char typechar;
@@ -5500,7 +5500,7 @@ int STRPACKARRAY( INSTRUCTION_FN_ARGS )
 {
     void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
-    ssize_t offset = istate.ep[2].num.ssize;
+    ssize_t offset = istate.ep[2].num.i;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -5548,7 +5548,7 @@ int STRPACKMDARRAY( INSTRUCTION_FN_ARGS )
 
     void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
-    ssize_t offset = istate.ep[2].num.ssize;
+    ssize_t offset = istate.ep[2].num.i;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -5669,7 +5669,7 @@ int STRUNPACK( INSTRUCTION_FN_ARGS )
     char *description = STACKCELL_PTR( istate.ep[0] );
     ssize_t size;
     char typechar;
-    ssize_t offset = istate.ep[1].num.ssize;
+    ssize_t offset = istate.ep[1].num.i;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -5723,7 +5723,7 @@ int STRUNPACK( INSTRUCTION_FN_ARGS )
 int STRUNPACKARRAY( INSTRUCTION_FN_ARGS )
 {
     char *description = STACKCELL_PTR( istate.ep[0] );
-    ssize_t offset = istate.ep[1].num.ssize;
+    ssize_t offset = istate.ep[1].num.i;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -5775,7 +5775,7 @@ int STRUNPACKMDARRAY( INSTRUCTION_FN_ARGS )
     int level = istate.code[istate.ip+1].ssizeval;
 
     char *description = STACKCELL_PTR( istate.ep[0] );
-    ssize_t offset = istate.ep[1].num.ssize;
+    ssize_t offset = istate.ep[1].num.i;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
 
     TRACE_FUNCTION();
