@@ -571,7 +571,7 @@ int @PREFIX@SPRINTF( INSTRUCTION_FN_ARGS )
 int @PREFIX1@PACK( INSTRUCTION_FN_ARGS )
 {
     char *description = STACKCELL_PTR( istate.ep[1] );
-    ssize_t offset = istate.ep[2].num.i;
+    ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
     alloccell_t *blob_header;
     char typechar;
@@ -634,7 +634,7 @@ int @PREFIX1@PACKARRAY( INSTRUCTION_FN_ARGS )
 {
     void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
-    ssize_t offset = istate.ep[2].num.i;
+    ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
     alloccell_t *blob_header;
 
@@ -692,7 +692,7 @@ int @PREFIX1@PACKMDARRAY( INSTRUCTION_FN_ARGS )
 
     void **array = STACKCELL_PTR( istate.ep[0] );
     char *description = STACKCELL_PTR( istate.ep[1] );
-    ssize_t offset = istate.ep[2].num.i;
+    ssize_t offset = istate.ep[2].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[3] );
     alloccell_t *blob_header;
 
@@ -759,7 +759,7 @@ int @PREFIX1@UNPACK( INSTRUCTION_FN_ARGS )
     char *description = STACKCELL_PTR( istate.ep[0] );
     ssize_t size;
     char typechar;
-    ssize_t offset = istate.ep[1].num.i;
+    ssize_t offset = istate.ep[1].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -811,7 +811,7 @@ int @PREFIX1@UNPACK( INSTRUCTION_FN_ARGS )
 int @PREFIX1@UNPACKARRAY( INSTRUCTION_FN_ARGS )
 {
     char *description = STACKCELL_PTR( istate.ep[0] );
-    ssize_t offset = istate.ep[1].num.i;
+    ssize_t offset = istate.ep[1].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -858,7 +858,7 @@ int @PREFIX1@UNPACKMDARRAY( INSTRUCTION_FN_ARGS )
     int level = istate.code[istate.ip+1].ssizeval;
 
     char *description = STACKCELL_PTR( istate.ep[0] );
-    ssize_t offset = istate.ep[1].num.i;
+    ssize_t offset = istate.ep[1].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     stackcell_t *array = &istate.ep[3];
 

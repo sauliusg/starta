@@ -4,6 +4,7 @@
 
 type string;
 type int;
+type long;
 
 type bool = {
     size = 1;
@@ -89,27 +90,27 @@ type char = {
     inline bytecode operator "%%" ( x : char ) : string
         { SLDC "%c" SWAP BSPRINTF };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; char value )
         { BPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; char[] value )
         { BPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; array value )
         { BPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : char
         { BUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of char
         { BUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                        	      string description ) : array
         { BUNPACKMDARRAY %%level };
 }
@@ -274,19 +275,19 @@ type byte = {
     inline bytecode operator "%%" ( x : byte ) : string
         { SLDC "%hhd" SWAP BSPRINTF };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; byte value )
         { BPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; byte[] value )
         { BPACKARRAY };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : byte
         { BUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of byte
         { BUNPACKARRAY };
 
@@ -383,30 +384,30 @@ type short = {
     inline bytecode operator "new[][]" ( i : short ) : array
         { HMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; short value )
         { HPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of short value )
         { HPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { HPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : short
         { HUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : 
 					    array of short
         { HUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { HUNPACKMDARRAY %%level };
 
@@ -521,29 +522,29 @@ type int = {
     inline bytecode operator "exceptionset" ( i : int ) : int
         { /* empty */ };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; int value )
         { PACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of int value )
         { PACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { PACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : int
         { UNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of int
         { UNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { UNPACKMDARRAY %%level };
 
@@ -658,30 +659,30 @@ type long = {
     inline bytecode operator "new[][]" ( i : long ) : array
         { LMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; long value )
         { LPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of long value )
         { LPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { LPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : long
         { LUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : 
                                                 array of long
         { LUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { LUNPACKMDARRAY %%level };
 
@@ -795,30 +796,30 @@ type llong = {
     inline bytecode operator "new[][]" ( i : llong ) : array
         { LLMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; llong value )
         { LLPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of llong value )
         { LLPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { LLPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : long
         { LLUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : 
                                                 array of llong
         { LLUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { LLUNPACKMDARRAY %%level };
 
@@ -895,27 +896,27 @@ type float = {
     inline bytecode operator "ldc" () : float
         { FLDCS };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; float value )
         { FPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; float[] value )
         { FPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; array value )
         { FPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : float
         { FUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of float
         { FUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                        	      string description ) : array
         { FUNPACKMDARRAY %%level };
 }
@@ -990,27 +991,27 @@ type double = {
     inline bytecode operator "ldc" () : double
         { DLDCS };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; double value )
         { DPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; double[] value )
         { DPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; array value )
         { DPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : double
         { DUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of double
         { DUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                        	      string description ) : array
         { DUNPACKMDARRAY %%level };
 }
@@ -1156,27 +1157,27 @@ type string = ? : ref {
     inline bytecode operator "exceptionset" ( i : string ) : string
         { /* empty */ };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; string value )
         { STRPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; string[] value )
         { STRPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; array value )
         { STRPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : string
         { STRUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of string
         { STRUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                        	      string description ) : array
         { STRUNPACKMDARRAY %%level };
 }
