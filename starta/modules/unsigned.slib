@@ -105,29 +105,29 @@ type ubyte = {
     inline bytecode operator "new[][]" ( i : ubyte ) : array
         { libunsigned:UBMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; ubyte value )
         { libunsigned:UBPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of ubyte value )
         { libunsigned:UBPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:UBPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : ubyte
         { libunsigned:UBUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of ubyte
         { libunsigned:UBUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { libunsigned:UBUNPACKMDARRAY %%level };
 
@@ -242,29 +242,29 @@ type ushort = {
     inline bytecode operator "new[][]" ( i : ushort ) : array
         { libunsigned:UHMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; ushort value )
         { libunsigned:UHPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of ushort value )
         { libunsigned:UHPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:UHPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : ushort
         { libunsigned:UHUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of ushort
         { libunsigned:UHUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { libunsigned:UHUNPACKMDARRAY %%level };
 
@@ -385,29 +385,29 @@ type uint = {
     inline bytecode operator "new[][]" ( i : uint ) : array
         { libunsigned:UMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; uint value )
         { libunsigned:UPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of uint value )
         { libunsigned:UPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:UPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : uint
         { libunsigned:UUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of uint
         { libunsigned:UUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { libunsigned:UUNPACKMDARRAY %%level };
 
@@ -535,29 +535,29 @@ type ulong = {
     inline bytecode operator "new[][]" ( i : ulong ) : array
         { libunsigned:ULMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; ulong value )
         { libunsigned:ULPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of ulong value )
         { libunsigned:ULPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:ULPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : ulong
         { libunsigned:ULUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of ulong
         { libunsigned:ULUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { libunsigned:ULUNPACKMDARRAY %%level };
 
@@ -692,29 +692,29 @@ type ullong = {
     inline bytecode operator "new[][]" ( i : ullong ) : array
         { libunsigned:ULLMDALLOCC %%element_size %%element_nref %%level };
 
-    inline bytecode operator "pack"( blob b; int offset;
+    inline bytecode operator "pack"( blob b; long offset;
                                      string description; ullong value )
         { libunsigned:ULLPACK };
 
-    inline bytecode operator "packarray"( blob b; int offset;
+    inline bytecode operator "packarray"( blob b; long offset;
                                      	  string description; 
 				     	  array of ullong value )
         { libunsigned:ULLPACKARRAY };
 
-    inline bytecode operator "packmdarray"( blob b; int offset;
+    inline bytecode operator "packmdarray"( blob b; long offset;
                                      	    string description; 
 				     	    array value )
         { libunsigned:ULLPACKMDARRAY %%level };
 
-    inline bytecode operator "unpack"( blob b; int offset;
+    inline bytecode operator "unpack"( blob b; long offset;
                                        string description ) : ullong
         { libunsigned:ULLUNPACK };
 
-    inline bytecode operator "unpackarray"( blob b; int offset;
+    inline bytecode operator "unpackarray"( blob b; long offset;
                                        	    string description ) : array of ullong
         { libunsigned:ULLUNPACKARRAY };
 
-    inline bytecode operator "unpackmdarray"( blob b; int offset;
+    inline bytecode operator "unpackmdarray"( blob b; long offset;
                                       	      string description ) : array
         { libunsigned:ULLUNPACKMDARRAY %%level };
 

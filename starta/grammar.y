@@ -7997,7 +7997,18 @@ assert_statement
    //-- blob, offset, size, value
 */
 pack_statement
-: _PACK expression ',' expression ',' expression ',' expression
+: _PACK expression ',' expression ','
+  {
+      /* convert offset to type 'long' here: */
+      TNODE *offset_tnode = enode_type( compiler->e_stack );
+      TNODE *long_tnode = typetab_lookup( compiler->typetab, "long" );
+
+      if( offset_tnode != long_tnode ) {
+          compiler_compile_type_conversion( compiler, long_tnode,
+                                            "long", px );
+      }
+  }
+   expression ',' expression
 {
     TNODE *type_to_pack = enode_type( compiler->e_stack );
 
@@ -13820,7 +13831,18 @@ opt_comma
 */
 unpack_expression
   : _UNPACK compact_type_description
-    '(' expression ',' expression ',' expression ')'
+  '(' expression ',' expression ','
+  {
+      /* convert offset to type 'long' here: */
+      TNODE *offset_tnode = enode_type( compiler->e_stack );
+      TNODE *long_tnode = typetab_lookup( compiler->typetab, "long" );
+
+      if( offset_tnode != long_tnode ) {
+          compiler_compile_type_conversion( compiler, long_tnode,
+                                            "long", px );
+      }
+  }
+      expression ')'
   {
       TNODE *type = $2;
       cexception_t inner;
@@ -13847,7 +13869,18 @@ unpack_expression
       compiler_emit( compiler, px, "\n" );
   }
   | _UNPACK compact_type_description '[' ']'
-    '(' expression ',' expression ',' expression ')'
+    '(' expression ',' expression ','
+  {
+      /* convert offset to type 'long' here: */
+      TNODE *offset_tnode = enode_type( compiler->e_stack );
+      TNODE *long_tnode = typetab_lookup( compiler->typetab, "long" );
+
+      if( offset_tnode != long_tnode ) {
+          compiler_compile_type_conversion( compiler, long_tnode,
+                                            "long", px );
+      }
+  }
+        expression ')'
   {
       TNODE *element_type = $2;
       cexception_t inner;
@@ -13868,7 +13901,18 @@ unpack_expression
   | _UNPACK compact_type_description md_array_allocator '[' ']' 
     /*  blob,          offset,        format_and_size */
     /*  b,             123,           "i4x10" */
-    '(' expression ',' expression ',' expression ')'
+    '(' expression ',' expression ','
+  {
+      /* convert offset to type 'long' here: */
+      TNODE *offset_tnode = enode_type( compiler->e_stack );
+      TNODE *long_tnode = typetab_lookup( compiler->typetab, "long" );
+
+      if( offset_tnode != long_tnode ) {
+          compiler_compile_type_conversion( compiler, long_tnode,
+                                            "long", px );
+      }
+  }
+        expression ')'
   {
       char *operator_name = "unpackmdarray";
       int arity = 3;

@@ -5687,7 +5687,7 @@ int STRUNPACK( INSTRUCTION_FN_ARGS )
     char *description = STACKCELL_PTR( istate.ep[0] );
     ssize_t size;
     char typechar;
-    ssize_t offset = istate.ep[1].num.i;
+    ssize_t offset = istate.ep[1].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -5741,7 +5741,7 @@ int STRUNPACK( INSTRUCTION_FN_ARGS )
 int STRUNPACKARRAY( INSTRUCTION_FN_ARGS )
 {
     char *description = STACKCELL_PTR( istate.ep[0] );
-    ssize_t offset = istate.ep[1].num.i;
+    ssize_t offset = istate.ep[1].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
     alloccell_t *blob_header = ((alloccell_t*)blob) - 1;
 
@@ -5794,7 +5794,7 @@ int STRUNPACKMDARRAY( INSTRUCTION_FN_ARGS )
     int level = istate.code[istate.ip+1].ssizeval;
 
     char *description = STACKCELL_PTR( istate.ep[0] );
-    ssize_t offset = istate.ep[1].num.i;
+    ssize_t offset = istate.ep[1].num.ssize;
     byte *blob = STACKCELL_PTR( istate.ep[2] );
 
     TRACE_FUNCTION();
