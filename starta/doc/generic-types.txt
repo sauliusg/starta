@@ -1,0 +1,66 @@
+Flavours of generic types
+=========================
+
+1. Generic container of values for any future type T:
+
+type aggregate of T = ...
+
+Properties and implementation details of T are unknown at the point of
+compilation of this type definition. Currently resolved as low-level
+"bytecode macros".
+
+Type compatibility: usual rules apply when the concrete type is used
+in the declaration;
+
+2. functions with aggregates or fields of unknown types:
+
+compare_lengths (a, b : array of type T): bool;
+
+Properties and implementation details of T are unknown at the point of
+compilation. If the function 'compare_lengths' only deals with the
+aggregate itself, these details are not needed. No resolution is
+necessary.
+
+Type compatibility: only name matters, types with identical element
+names are equivalent, types with different element names (at any
+depth) are incompatible.
+
+Other possible examples of this kind:
+
+clone (m : array of T) -> array of T;
+
+length (a : array of T) -> int;
+length (a : array) -> int;
+
+3. Generic types (a-la Ada), with known implementation (type erasure):
+
+type I = generic int;
+type R = generic ref;
+
+procedure push (m : array of R; element : R) -> array of R;
+procedure sort (m : array of R; function compare (a, b : R): bool) -> array of R;
+
+The code is compiled only once, using the known representation of the
+generic type; at the point when the subroutine is called, or when
+concrete type is instantiated, a concrete type is substituted. No
+further resolution is necessary.
+
+This flavour can be efficiently used with the package parameters.
+
+Type compatibility: based on the names of generic types. Generic types
+with types with identical element names are equivalent; generic types
+different names (at any depth) are incompatible.
+
+4. Parameterised modules:
+
+module Mod (type T = generic ref);
+
+use Mod as RefMod;
+use Mod (generic int) as IntMod;
+
+Generic types are handled and compiled as regular types, but at the
+final point where a type with generic components or a subroutine with
+generic parameters or return values is used, the generic type is
+replaced by specific concrete implementations in the symbol table
+(i.e. a new type description is generated), and type compatibility is
+decided based on this newly generated type.
