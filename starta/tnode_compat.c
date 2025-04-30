@@ -368,6 +368,8 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     }
 
     if( t1->params.kind == TK_GENERIC ||
+        t1->params.kind == TK_PLACEHOLDER ||
+        t2->params.kind == TK_PLACEHOLDER ||
         t1->params.kind == TK_NOMINAL ||
         t2->params.kind == TK_NOMINAL ) {
         if( generic_types ) {
@@ -614,6 +616,8 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     }
 
     if( t1->params.kind == TK_GENERIC ||
+        t1->params.kind == TK_PLACEHOLDER ||
+        t2->params.kind == TK_PLACEHOLDER ||
         t1->params.kind == TK_NOMINAL ||
         t2->params.kind == TK_NOMINAL ) {
         if( generic_types ) {
