@@ -34,3 +34,13 @@ Curretnly designated using the 'LIKE' keyword.
 'type T = new int' – possibly; the type T inherits implementation from 
 'int' but is otherwise incompatible with int. Can be converted to/from 
 int.
+
+- nominal types:
+
+  type T in the 'array of type T'. The serve to identify some type in
+  an aggregate, so that these aggregates can be checked for
+  compatibility and porcessed. The 'type T' itself can not be used to
+  declare variables or subroutine arguments. Two nominal types are
+  deemed identical of they have the same name.
+
+  Example: 'function trim (a : array of type T) -> array of type T'
