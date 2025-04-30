@@ -379,8 +379,8 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
     }
 
     if( t1->params.kind == TK_COMPOSITE && t2->params.kind == TK_COMPOSITE ) {
-	if( (t1->element_type && t1->element_type->params.kind == TK_NOMINAL) &&
-	    (t2->element_type && t2->element_type->params.kind == TK_NOMINAL) ) {
+	if( (t1->element_type && t1->element_type->params.kind == TK_PLACEHOLDER) &&
+	    (t2->element_type && t2->element_type->params.kind == TK_PLACEHOLDER) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
@@ -625,13 +625,13 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
     }
 
     if( t1->params.kind == TK_COMPOSITE && t2->params.kind == TK_COMPOSITE ) {
-	if( (t1->element_type && t1->element_type->params.kind == TK_NOMINAL) &&
-	    (t2->element_type && t2->element_type->params.kind == TK_NOMINAL) ) {
+	if( (t1->element_type && t1->element_type->params.kind == TK_PLACEHOLDER) &&
+	    (t2->element_type && t2->element_type->params.kind == TK_PLACEHOLDER) ) {
 	    return (!t1->name || !t2->name ||
 		    strcmp( t1->name, t2->name ) == 0);
 	} else {
             if( t2->element_type &&
-                t2->element_type->params.kind == TK_NOMINAL &&
+                t2->element_type->params.kind == TK_PLACEHOLDER &&
                 t1->base_type ) {
                 return
                     tnode_types_are_assignment_compatible
