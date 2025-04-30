@@ -1114,7 +1114,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 
 int APUSH( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *value = &istate.ep[0];
+    alloccell_t *value = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
     ssize_t nref, size, length, element_size;
     alloccell_flag_t flags;
@@ -1126,6 +1126,15 @@ int APUSH( INSTRUCTION_FN_ARGS )
 	    ( /* err_code = */ -1,
 	      /* message = */
 	      "can not push value onto a null array",
+	      /* module_id = */ 0,
+	      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
+	      EXCEPTION );
+    } else
+    if( !value || value[-1].length == 0 ) {
+	interpret_raise_exception_with_bcalloc_message
+	    ( /* err_code = */ -1,
+	      /* message = */
+	      "can not push empty value array",
 	      /* module_id = */ 0,
 	      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
 	      EXCEPTION );
@@ -1149,9 +1158,9 @@ int APUSH( INSTRUCTION_FN_ARGS )
             }
             /* Array now has enough capacity to push a new element: */
             if( flags & AF_HAS_REFS ) {
-                *((void**)array + length) = STACKCELL_PTR( *value );
+                *((void**)array + length) = *((void**)value);
             } else {
-                memcpy( (char*)array + length * element_size, &(value->num), element_size );
+                memcpy( (char*)array + length * element_size, value, element_size );
             }
             array[-1].length++;
             if( flags & AF_HAS_REFS ) {

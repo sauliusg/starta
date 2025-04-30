@@ -1085,6 +1085,23 @@ TNODE *new_tnode_placeholder( char *name, cexception_t *ex )
     return node;
 }
 
+TNODE *new_tnode_nominal( char *name, cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE * volatile node = new_tnode( ex );
+
+    cexception_guard( inner ) {
+	node->params.kind = TK_NOMINAL;
+	node->name = strdupx( name, &inner );
+    }
+    cexception_catch {
+	delete_tnode( node );
+	cexception_reraise( inner, ex );
+    }
+
+    return node;
+}
+
 TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex )
 {
     assert( base_type );
@@ -1115,7 +1132,8 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
     if( !generic_tnode ) return NULL;
     if( !generic_types ) return share_tnode( generic_tnode );
 
-    if( generic_tnode->params.kind == TK_PLACEHOLDER ) {
+    if( generic_tnode->params.kind == TK_PLACEHOLDER ||
+        generic_tnode->params.kind == TK_NOMINAL ) {
         TNODE *concrete_type = typetab_lookup( generic_types,
                                                tnode_name( generic_tnode ));
         if( concrete_type ) {
@@ -2344,7 +2362,8 @@ TNODE *tnode_set_has_generics( TNODE *tnode )
 int tnode_has_placeholder_element( TNODE *tnode )
 {
     while( tnode ) {
-        if( tnode->params.kind == TK_PLACEHOLDER )
+        if( tnode->params.kind == TK_PLACEHOLDER ||
+            tnode->params.kind == TK_NOMINAL )
             return 1;
         tnode = tnode->element_type;
     }

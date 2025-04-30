@@ -11098,7 +11098,7 @@ delimited_type_description
         cexception_t inner;
         cexception_guard( inner ) {
             if( !tnode ) {
-                tnode = new_tnode_placeholder( type_name, &inner );
+                tnode = new_tnode_nominal( type_name, &inner );
                 shared_tnode = share_tnode( tnode );
                 typetab_insert( compiler->typetab, type_name,
                                 &shared_tnode, &inner );

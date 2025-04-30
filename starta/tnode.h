@@ -210,6 +210,8 @@ TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
 
+TNODE *new_tnode_nominal( char *name, cexception_t *ex );
+
 TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex );
 
 TNODE *new_tnode_implementation( TNODE *generic_tnode,
