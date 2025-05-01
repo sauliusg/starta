@@ -1,5 +1,8 @@
+./sl: inputs/err-selective017.snl(23,19): ERROR, cannot declare 'for' loop variable 'e' of a nominal type 'T'
+    foreach var T e in a do
+                  ^
 ./sl: inputs/err-selective017.snl(35,20): ERROR, incompatible types for function 'push' argument nr. 2
     m = push( m, n );
                    ^
-./sl: 1 error(s) detected
+./sl: 2 error(s) detected
 
