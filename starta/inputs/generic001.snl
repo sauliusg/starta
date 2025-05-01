@@ -7,16 +7,10 @@
 
 use * from std;
 
-procedure printmax( a, b : type T;
-                    gt : function( x, y : type T ) -> (bool);
-                    print : procedure( t : type T ))
-begin
-    if( gt( a, b )) {
-        print( a );
-    } else {
-        print( b );
-    }
-end
+pragma append "$D/modules";
+
+use Printmax (int) as PrintmaxInt;
+use Printmax (float) as PrintmaxFlt;
 
 function gt_int( i, j : int ) : bool
 begin
@@ -38,5 +32,5 @@ begin
     . x;
 end
 
-printmax( 7, 8, gt_int, print_int );
-printmax( 11.5, 9.3, gt_float, print_float );
+PrintmaxInt::printmax( 7, 8, gt_int, print_int );
+PrintmaxFlt::printmax( 11.5, 9.3, gt_float, print_float );

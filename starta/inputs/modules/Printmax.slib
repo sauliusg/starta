@@ -1,0 +1,16 @@
+module Printmax (type T)
+
+use std;
+
+procedure printmax( a, b : T;
+                    gt : function( x, y : T ) -> (bool);
+                    print : procedure( t : T ))
+begin
+    if( gt( a, b )) {
+        print( a );
+    } else {
+        print( b );
+    }
+end
+
+end module Printmax;
