@@ -9335,6 +9335,12 @@ variable_declaration
       cexception_t inner;
 
       cexception_guard( inner ) {
+          if( tnode_kind( type_tnode ) == TK_NOMINAL ) {
+              yyerrorf("cannot declare variables (starting with '%s') "
+                       "of a nominal type '%s'",
+                       dnode_name(identifier_dnode), tnode_name(type_tnode));
+          }
+
           dnode_list_append_type( identifier_dnode, type_tnode );
           type_tnode = NULL;
           dnode_list_assign_offsets( identifier_dnode,
@@ -9368,6 +9374,13 @@ variable_declaration
      DNODE *volatile shared_dnode = NULL;
 
      identifier_dnode = dnode_append( identifier_dnode, $4 );
+
+     if( tnode_kind($6) == TK_NOMINAL ) {
+         yyerrorf("cannot declare variables (starting with '%s') "
+                  "of a nominal type '%s'",
+                  dnode_name(identifier_dnode), tnode_name($6));
+     }
+
      dnode_list_append_type( identifier_dnode, $6 );
      dnode_list_assign_offsets( identifier_dnode, &compiler->local_offset );
 
@@ -9400,6 +9413,12 @@ variable_declaration
      DNODE *volatile var = $2;
      DNODE *volatile shared_dnode = NULL;
 
+     if( tnode_kind($4) == TK_NOMINAL ) {
+         yyerrorf("cannot declare variable '%s' "
+                  "of a nominal type '%s'",
+                  dnode_name(var), tnode_name($4));
+     }
+
      dnode_list_append_type( var, $4 );
      dnode_list_assign_offsets( var, &compiler->local_offset );
 
@@ -9428,6 +9447,12 @@ variable_declaration
      DNODE *volatile identifier_dnode = $2;
      DNODE *volatile shared_dnode = NULL;
      int expr_nr = $8;
+
+     if( tnode_kind($6) == TK_NOMINAL ) {
+         yyerrorf("cannot declare variables (starting with '%s') "
+                  "of a nominal type '%s'",
+                  dnode_name(identifier_dnode), tnode_name($6));
+     }
 
      identifier_dnode = dnode_append( identifier_dnode, $4 );
      dnode_list_append_type( identifier_dnode, $6 );
@@ -9492,6 +9517,12 @@ variable_declaration
         int readonly = $1;
         DNODE *volatile var_list_dnode = $3;
         DNODE *volatile shared_dnode = NULL;
+
+        if( tnode_kind($2) == TK_NOMINAL ) {
+            yyerrorf("cannot declare variables (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name(var_list_dnode), tnode_name($2));
+        }
 
 	dnode_list_append_type( var_list_dnode, $2 );
 	dnode_list_assign_offsets( var_list_dnode, &compiler->local_offset );
@@ -15506,6 +15537,12 @@ opt_readonly
 argument
   : opt_readonly identifier_list ':' var_type_description
     {
+        if( tnode_kind($4) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($2), tnode_name($4));
+        }
+
 	$$ = dnode_list_append_type( $2, $4 );
 	if( $1 ) {
 	    dnode_list_set_flags( $2, DF_IS_READONLY );
@@ -15516,6 +15553,12 @@ argument
         '=' constant_expression
     {
 	DNODE *arg;
+
+        if( tnode_kind($4) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($2), tnode_name($4));
+        }
 
 	$$ = dnode_list_append_type( $2, $4 );
 	foreach_dnode( arg, $2 ) {
@@ -15533,6 +15576,11 @@ argument
 
   | opt_readonly var_type_description uninitialised_var_declarator_list
       {
+        if( tnode_kind($2) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($3), tnode_name($2));
+        }
 	$$ = dnode_list_append_type( $3, $2 );
 	if( $1 ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
@@ -15542,6 +15590,11 @@ argument
   | opt_readonly var_type_description variable_declarator
         '=' constant_expression
       {
+        if( tnode_kind($2) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($3), tnode_name($2));
+        }
         $$ = dnode_list_append_type( $3, $2 );
 	compiler_check_default_value_compatibility( $3, &$5 );
 	dnode_set_value( $3, &$5 );
@@ -15765,9 +15818,21 @@ function_or_operator_body
 
 retval_description_list
   : var_type_description 
-      { $$ = new_dnode_return_value( $1, px ); }
+      {
+          if( tnode_kind($1) == TK_NOMINAL ) {
+              yyerrorf("cannot return value of a nominal type '%s'",
+                       tnode_name($1));
+          }
+          $$ = new_dnode_return_value( $1, px );
+      }
   | retval_description_list ',' var_type_description
-      { $$ = dnode_append( $1, new_dnode_return_value( $3, px )); }
+      {
+          if( tnode_kind($3) == TK_NOMINAL ) {
+              yyerrorf("cannot return value of a nominal type '%s'",
+                       tnode_name($3));
+          }
+          $$ = dnode_append( $1, new_dnode_return_value( $3, px ));
+      }
   ;
 
 opt_retval_description_list
