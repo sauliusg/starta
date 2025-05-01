@@ -7,17 +7,10 @@
 
 use * from std;
 
-procedure g( type T a; b : type T ) : int
-begin
-    var n : type T;
+type R = generic ref;
 
-    n = a;
-
-    return 1;
-end
-
-procedure max( a, b : type T; 
-               gt : function( x, y : type T ) -> (bool) ) : type T
+procedure max( a, b : R; 
+               gt : function( x, y : R ) -> (bool) ) : R
 begin
     if( gt( a, b )) {
         return a
@@ -26,14 +19,24 @@ begin
     }
 end
 
-function gt_int( i, j : int ) : bool
+operator "." (m : int[])
+{
+    < m[0];
+}
+
+operator "." (m : float[])
+{
+    < m[0];
+}
+
+function gt_int( i, j : int[] ) : bool
 begin
-    return i > j ? true : false;
+    return i[0] > j[0] ? true : false;
 end
 
-function gt_float( i, j : float ) : bool
+function gt_float( i, j : float[] ) : bool
 begin
-    return i > j ? true : false;
+    return i[0] > j[0] ? true : false;
 end
 
 inline bytecode function gt_string( i, j : string ) : bool
@@ -46,8 +49,8 @@ begin
     STRLE
 end
 
-. max( 7, 8, gt_int );
-. max( 7.1, 5.5, gt_float );
+. max( [7], [8], gt_int );
+. max( [7.1], [5.5], gt_float );
 . max( "more", "less", gt_string );
 . max( "less", "more", gt_string );
 . max( "more", "less", le_string );
