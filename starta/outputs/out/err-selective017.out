@@ -1,0 +1,5 @@
+./sl: inputs/err-selective017.snl(35,20): ERROR, incompatible types for function 'push' argument nr. 2
+    m = push( m, n );
+                   ^
+./sl: 1 error(s) detected
+

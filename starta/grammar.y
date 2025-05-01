@@ -9763,12 +9763,22 @@ if_condition
 for_variable_declaration
   : identifier ':' var_type_description
       {
+          if( tnode_kind($3) == TK_NOMINAL ) {
+              yyerrorf("cannot declare 'for' loop variable '%s' "
+                       "of a nominal type '%s'",
+                       dnode_name($1), tnode_name($3));
+          }
 	  dnode_append_type( $1, $3 );
 	  dnode_assign_offset( $1, &compiler->local_offset );
 	  $$ = $1;
       }
   | var_type_description identifier
       {
+          if( tnode_kind($1) == TK_NOMINAL ) {
+              yyerrorf("cannot declare 'for' loop variable '%s' "
+                       "of a nominal type '%s'",
+                       dnode_name($2), tnode_name($1));
+          }
 	  dnode_append_type( $2, $1 );
 	  dnode_assign_offset( $2, &compiler->local_offset );
 	  $$ = $2;
