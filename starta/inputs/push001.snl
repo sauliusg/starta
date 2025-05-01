@@ -7,15 +7,17 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
+inline bytecode procedure push( a : array of type T; value : T[] )
     -> array of type T
 {
     APUSH
 }
 
-function print_array( array of type T a; function ( T element ) print )
+type I = generic int;
+
+function print_array( array of I a; function ( I element ) print )
 {
-    foreach var T e in a do
+    foreach var I e in a do
         print( e );
     enddo
 }
@@ -32,12 +34,12 @@ print_array( n, function( float i ) { . i } );
 
 . "========================================";
 
-m = push( m, 10 );
+m = push( m, [10] );
 
 . "length(m) ==", length(m);
 print_array( m, function( int i ) { . i } );
 
-n = push( n, 123.12 );
+n = push( n, [123.12] );
 
 . "length(n) ==", length(n);
 print_array( n, function( float i ) { . i } );
