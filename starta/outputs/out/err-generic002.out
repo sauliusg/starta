@@ -1,6 +1,12 @@
+./sl: inputs/err-generic002.snl(4,29): ERROR, cannot declare parameters (starting with 'point') of a nominal type 'T'
+function mini( point: type T;
+                            ^
+./sl: inputs/err-generic002.snl(8,81): ERROR, cannot return value of a nominal type 'T'
+               makecenter: function( simplex: array of type T; i: long )->(type T)
+                                                                                ^
 Debug statement reached in line 12
 ./sl: inputs/err-generic002.snl(15,60): ERROR, incompatible types for assignment to variable 'simplex'
     var simplex: array [][][][] of T = makearray( ndim+1L );
                                                            ^
-./sl: 1 error(s) detected
+./sl: 3 error(s) detected
 

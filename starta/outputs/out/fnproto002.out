@@ -1,2 +1,26 @@
-2 1 8 2
-4 5 49.8 3.3
+./sl: inputs/fnproto002.snl(5,55): ERROR, cannot declare parameters (starting with 'a') of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int;
+                                                      ^
+./sl: inputs/fnproto002.snl(5,60): ERROR, cannot declare parameters (starting with 'b') of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int;
+                                                           ^
+./sl: inputs/fnproto002.snl(5,73): ERROR, cannot return value of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int;
+                                                                        ^
+./sl: inputs/fnproto002.snl(5,76): ERROR, cannot return value of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int;
+                                                                           ^
+./sl: inputs/fnproto002.snl(24,55): ERROR, cannot declare parameters (starting with 'a') of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int
+                                                      ^
+./sl: inputs/fnproto002.snl(24,60): ERROR, cannot declare parameters (starting with 'b') of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int
+                                                           ^
+./sl: inputs/fnproto002.snl(24,73): ERROR, cannot return value of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int
+                                                                        ^
+./sl: inputs/fnproto002.snl(24,76): ERROR, cannot return value of a nominal type 'T'
+function minmax( a: array of type T; cmp: function(T a; T b)->(int) ): T, T, int, int
+                                                                           ^
+./sl: 8 error(s) detected
+

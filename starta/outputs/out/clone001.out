@@ -1,5 +1,20 @@
+./sl: inputs/clone001.snl(41,36): ERROR, cannot declare parameters (starting with 'p') of a nominal type 'T'
+procedure generic_shift( p : type T;
+                                   ^
+./sl: inputs/clone001.snl(42,49): ERROR, cannot declare parameters (starting with 'p') of a nominal type 'T'
+                         shifter: procedure (p:T; amount:float)->(T);
+                                                ^
+./sl: inputs/clone001.snl(42,68): ERROR, cannot return value of a nominal type 'T'
+                         shifter: procedure (p:T; amount:float)->(T);
+                                                                   ^
+./sl: inputs/clone001.snl(43,49): ERROR, cannot declare parameters (starting with 'p') of a nominal type 'T'
+                         printer: procedure (p:T)
+                                                ^
+./sl: inputs/clone001.snl(44,32): ERROR, cannot return value of a nominal type 'T'
+                       ): type T
+                               ^
 ./sl: inputs/clone001.snl(46,42): ERROR, in this type representation, can not allocate array of generic type T
     var new_p: array [] of T = new T[2+1];
                                          ^
-./sl: 1 error(s) detected
+./sl: 6 error(s) detected
 
