@@ -1687,6 +1687,7 @@ TNODE *tnode_set_size( TNODE *tnode, int size )
 {
     assert( tnode );
     assert( tnode->params.size == 0 );
+    assert( tnode->params.kind != TK_NOMINAL );
     tnode->params.size = size;
     return tnode;
 }
