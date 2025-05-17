@@ -5480,7 +5480,7 @@ static void compiler_convert_function_argument( COMPILER *cc,
                     compiler_compile_type_conversion
                         ( cc, arg_type, /* target_name: */NULL, &inner );
                 } else {
-                    /* convert type T into teh array of type T*/
+                    /* convert type T into the array of type T*/
                     if (tnode_kind( arg_type ) == TK_ARRAY &&
                         tnode_types_are_assignment_compatible
                         ( tnode_element_type (arg_type),
