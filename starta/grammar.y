@@ -15624,9 +15624,15 @@ argument
   | opt_readonly var_type_description uninitialised_var_declarator_list
       {
         if( tnode_kind($2) == TK_NOMINAL ) {
-            yyerrorf("cannot declare parameters (starting with '%s') "
-                     "of a nominal type '%s'",
-                     dnode_name($3), tnode_name($2));
+            DNODE *param;
+            foreach_dnode (param, $3) {
+                if( !dnode_is_array( param )) {
+                    yyerrorf("cannot declare parameters (starting with '%s') "
+                             "of a nominal type '%s'",
+                             dnode_name(param), tnode_name($2));
+                    break;
+                }
+            }
         }
 	$$ = dnode_list_append_type( $3, $2 );
 	if( $1 ) {
