@@ -6,13 +6,12 @@
 
 use * from std;
 
-function print_array( array of type T a; function ( T element ) print )
+function print_array( array of type T a; function ( T[] element ) print )
 {
     var i = 0;
-    foreach var T e in a do
+    for i = 0 to last(a) do
         < "[", i , "]: ";
-        print( e );
-        i ++;
+        print( a[i:i] );
     enddo
 }
 
@@ -24,39 +23,40 @@ null struct S {
 var m = new string[0];
 
 . "length(m) ==", length(m);
-print_array( m, function( string i ) { . i } );
+print_array( m, function( string[] i ) { . i[0] } );
 
 var n = new S[0];
 
 . "length(n) ==", length(n);
-print_array( n, function( S s ) { . s.name, s.val } );
+print_array( n, function( S s[] ) { . s[0].name, s[0].val } );
 
 . "========================================";
 
 m = push( push( push( m, "eins" ), "zwei" ), "drei" );
 
 . "length(m) ==", length(m);
-print_array( m, function( string i ) { . i } );
+print_array( m, function( string[] s ) { . s[0] } );
 
-n = push( n, struct S { val => 123, name => "first" } );
+n = push( n, [ struct S { val => 123, name => "first" } ] );
 n = push( n, struct S { val => 200, name => "second" } );
 n = push( n, struct S { val => 300, name => "third" } );
 n = push( n, struct S { val => 400, name => "fourth" } );
 
 . "length(n) ==", length(n);
-print_array( n, function( S s ) { . s.name, s.val } );
+print_array( n, function( S s[] ) { . s[0].name, s[0].val } );
 
 . "========================================";
 
-. "popped value =", pop( m );
-. "popped value =", pop( m );
+var p = pop( m );
+
+. "popped value =", p[0];
+. "popped value =", pop( m )[0];
 
 . "length(m) ==", length(m);
-print_array( m, function( string i ) { . i } );
+print_array( m, function( string i[] ) { . i[0] } );
 
-. "popped value =", pop( n ).name;
-. "popped value =", pop( n ).name;
+. "popped value =", pop( n )[0].name;
+. "popped value =", pop( n )[0].name;
 
 . "length(n) ==", length(n);
-print_array( n, function( S s ) { . s.val, " ", s.name } );
-
+print_array( n, function( S[] s ) { . s[0].val, " ", s[0].name } );

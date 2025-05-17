@@ -1147,7 +1147,8 @@ int APUSH( INSTRUCTION_FN_ARGS )
             if( flags & AF_HAS_REFS ) {
                 *((void**)array + length) = *((void**)value);
             } else {
-                memcpy( (char*)array + length * element_size, value, element_size );
+                memcpy( (char*)array + length * element_size, value,
+                        element_size );
             }
             array[-1].length++;
             if( flags & AF_HAS_REFS ) {
@@ -1194,7 +1195,7 @@ int APOP( INSTRUCTION_FN_ARGS )
         flags = array[-1].flags;
         length = array[-1].length;
         element_size = array[-1].element_size;
-        /* We only pop values onto arrays, not to structures: */
+        /* We only pop values from arrays, not to structures: */
         if( length >= 0 && element_size > 0 ) {
             if( length == 0 ) {
                 interpret_raise_exception_with_bcalloc_message
@@ -1205,20 +1206,32 @@ int APOP( INSTRUCTION_FN_ARGS )
                       /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
                       EXCEPTION );
             }
+            // get extra stack cell to temporarily store the popped value:
+            istate.ep --;
+            // allocate a new array for the popped value:
+            void **new_array = bcalloc( element_size, element_size, 1, 1,
+                                        EXCEPTION );
+            BC_CHECK_PTR( new_array );
+            STACKCELL_SET_ADDR( istate.ep[0], new_array );
+
+            // copy the popped value:
             if( flags & AF_HAS_REFS ) {
-                STACKCELL_SET_ADDR( istate.ep[0],
-                                    *((void**)array + length - 1) );
+                new_array[0] = ((void**)array)[length - 1];
             } else {
-                STACKCELL_ZERO_PTR( istate.ep[0] );
-                memcpy( &(istate.ep[0].num),
-                        (char*)array + (length-1) * element_size, element_size );
+                memcpy( new_array, (char*)array + (length - 1) * element_size,
+                        element_size );
             }
+            // mark the popped value as no longer present in the old
+            // array:
             array[-1].length--;
             if( flags & AF_HAS_REFS ) {
                 assert( array[-1].nref > 0 );
                 array[-1].nref --;
             }
-            
+            // Return the popped value:
+            istate.ep[1] = istate.ep[0];
+            STACKCELL_ZERO_PTR( istate.ep[0] );
+            istate.ep ++;
         }
     }
 
