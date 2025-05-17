@@ -1,0 +1,20 @@
+# --*- C -*--
+
+module APush( type T = generic ref )
+
+// Push function for arrays
+
+use std;
+
+procedure push( a : array of T; value : T ): array of T
+{
+    var m = new T [length(a) + 1];
+
+    m := a;
+
+    m[last(m)] = value;
+
+    return m;
+}
+
+end module APush;
