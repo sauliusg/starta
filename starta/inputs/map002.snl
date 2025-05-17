@@ -2,14 +2,17 @@
 # Test 'map' function
 #
 
+// NOTE: after the recent changes in the language, this test
+// ("map002.snl") became essentially the same as the test "map003.snl".
+
 use * from std;
 
-function map( p: function (x:type T)->(type T); m: array of type T ): array of type T
+function map( p: function (x:array of type T)->(array of type T); m: array of type T ): array of type T
 {
-    var n = m[];
+    var n = m[-1:0];
 
     for var i = 0L to llast(m) do
-        n[i] = p(m[i]);
+        n = push( n, p( m[i:i] ));
     enddo
 
     return n;
@@ -17,7 +20,7 @@ function map( p: function (x:type T)->(type T); m: array of type T ): array of t
 
 var m = [1,2,3];
 
-var n = map( function (i:int)->(int) { return i+1 }, m );
+var n = map( function (i:int[])->(int[]) { return [i[0]+1] }, m );
 
 foreach var k in n do
     . k;
