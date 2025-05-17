@@ -4,7 +4,7 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
+inline bytecode procedure push( a : array of type T; value : type T )
     -> array of type T
 {
     APUSH

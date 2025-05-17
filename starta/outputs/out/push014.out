@@ -1,6 +1,6 @@
-./sl: inputs/push014.snl(7,69): ERROR, cannot declare parameters (starting with 'value') of a nominal type 'T'
-inline bytecode procedure push( a : array of type T; value : type T )
-                                                                    ^
+./sl: inputs/push014.snl(7,64): ERROR, cannot declare parameters (starting with 'value') of a nominal type 'T'
+inline bytecode procedure push( a : array of type T; value : T )
+                                                               ^
 ./sl: inputs/push014.snl(15,63): ERROR, cannot declare parameters (starting with 'element') of a nominal type 'T'
 function print_array( array of type T a; function ( T element ) print )
                                                               ^
