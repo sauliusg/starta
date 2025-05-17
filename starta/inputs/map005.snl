@@ -4,16 +4,17 @@
 
 use * from std;
 
-procedure map( p: function (x:type U)->(type V);
+procedure map( p: function (x: array of type U)->(array of type V);
                m: array of type U;
                v: array of type V ): array of type V
 {
-    var vv = v[];
-    foreach var e in m do
-        vv = push( vv, p(e) );
+    //var vv = v[];
+    for var i = 0 to last(m) do
+        var e = m[i:i];
+        v = push( v, p(e) );
     enddo
 
-    return vv;
+    return v;
 }
 
 var m = ["one","two","three"];
@@ -35,7 +36,7 @@ function toupper( s: string ): string
     return str(r);
 }
 
-var n = map( function (s:string)->(string) { return toupper(s) }, m, new string[0] );
+var n = map( function (s:string[])->(string[]) { return [toupper(s[0])] }, m, new string[0] );
 
 foreach var k in n do
     . k;
