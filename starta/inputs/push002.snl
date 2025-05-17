@@ -4,23 +4,23 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
+inline bytecode procedure push( a : array of type T; value : T[] )
     -> array of type T
 {
     APUSH
 }
 
-function print_array( array of type T a; function ( T element ) print )
+function print_array( array of type T a; function ( T[] element ) print )
 {
-    foreach var T e in a do
-        print( e );
+    for var i = 0 to last(a) do
+        print( a[i:i] );
     enddo
 }
 
 var m = new int[0];
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+print_array( m, function( int[] i ) { . i[0] } );
 
 . "========================================";
 
@@ -28,4 +28,4 @@ m = push( m, 10 );
 m = push( m, 12 );
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+print_array( m, function( int[] i ) { . i[0] } );

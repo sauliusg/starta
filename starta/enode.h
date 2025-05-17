@@ -31,6 +31,9 @@ void delete_enode( ENODE* node );
 
 ENODE *enode_make_type_to_element_type( ENODE *enode );
 
+ENODE *enode_make_type_to_array_type( ENODE *enode, TNODE *base_type,
+                                      cexception_t *ex );
+
 ENODE *enode_make_type_to_addressof( ENODE *enode, cexception_t *ex );
 
 ENODE *enode_replace_type( ENODE *enode, TNODE *replacement );

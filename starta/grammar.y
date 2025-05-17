@@ -3022,6 +3022,18 @@ static void compiler_make_stack_top_element_type( COMPILER *cc )
     }
 }
 
+static void compiler_make_stack_top_array_type( COMPILER *cc,
+                                                cexception_t *ex )
+{
+    if( cc->e_stack ) {
+        TNODE *base_type = typetab_lookup( cc->typetab, "array" );
+	enode_make_type_to_array_type( cc->e_stack, base_type, ex );
+    } else {
+	yyerror( "not enough values on the evaluation stack for "
+		 "makeing an array type?" );
+    }
+}
+
 static void compiler_make_stack_top_addressof( COMPILER *cc,
                                                cexception_t *ex )
 {
@@ -5467,6 +5479,32 @@ static void compiler_convert_function_argument( COMPILER *cc,
                 if( arg_type_name ) {
                     compiler_compile_type_conversion
                         ( cc, arg_type, /* target_name: */NULL, &inner );
+                } else {
+                    /* convert type T into teh array of type T*/
+                    if (tnode_kind( arg_type ) == TK_ARRAY &&
+                        tnode_types_are_assignment_compatible
+                        ( tnode_element_type (arg_type),
+                          exp_type, generic_types,
+                          NULL /* msg */, 0 /* msglen */, &inner )) {
+                        // fprintf (stderr, "... will convert types here ...");
+                        ssize_t one = 1;
+                        ssize_t element_size = tnode_size( exp_type );
+                        ssize_t element_nref =
+                            tnode_is_reference( exp_type ) ? 1 : 0;
+
+                        compiler_emit( cc, &inner, "\tce\n", LDC, &one );
+                        compiler_emit( cc, &inner, "\tcee\n", AALLOC,
+                                       &element_size, &element_nref );
+                        compiler_emit( cc, &inner, "\tc\n", SWAP );
+                        compiler_emit( cc, &inner, "\tc\n", OVER );
+                        compiler_emit( cc, &inner, "\tc\n", SWAP );
+                        if( exp_type && tnode_is_reference( exp_type )) {
+                            compiler_emit( cc, &inner, "\tc\n", PSTI );
+                        } else {
+                            compiler_emit( cc, &inner, "\tcs\n", STI, &element_size );
+                        }
+                        compiler_make_stack_top_array_type( cc, &inner );
+                    }
                 }
             }
         }
