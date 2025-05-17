@@ -437,7 +437,12 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
         if( strcmp(t1->name, t2->name) == 0 ) {
             return 1;
         } else {
-            return 0;
+            if( generic_types ) {
+                return tnode_create_and_check_placeholder_implementation
+                    ( t2, t1, generic_types, tnode_types_are_identical, ex );
+            } else {
+                return 0;
+            }
         }
     }
     

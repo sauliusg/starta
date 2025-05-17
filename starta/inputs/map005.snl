@@ -11,8 +11,7 @@ procedure map( p: function (x: array of type U)->(array of type V);
     var vv = v[];
     for var i = 0 to last(m) do
         var e = m[i:i];
-        // vv = push( v, p(e) );
-        vv = push( vv, [v[0]] );
+        vv = push( vv, p(e) );
     enddo
 
     return vv;
