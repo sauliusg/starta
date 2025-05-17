@@ -352,6 +352,17 @@ int PEEK( INSTRUCTION_FN_ARGS )
     return 2;
 }
 
+/*
+ * COPY copy contents from the source array to the destination array 
+ * 
+ * bytecode:
+ * COPY
+ * 
+ * stack:
+ * ..., dest_array, source_array -> ...
+ * 
+ */
+
 int COPY( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *ptr0 = STACKCELL_PTR( istate.ep[0] );
@@ -415,6 +426,57 @@ int COPY( INSTRUCTION_FN_ARGS )
     STACKCELL_ZERO_PTR( istate.ep[1] );
 
     istate.ep += 2;
+
+    return 1;
+}
+
+/*
+ * ICOPY copy contents from the source array to the destination array
+ *       starting at the destination position 'start'
+ * 
+ * bytecode:
+ * ICOPY
+ * 
+ * stack:
+ * ..., dest_array, start, source_array -> ...
+ * 
+ */
+
+int ICOPY( INSTRUCTION_FN_ARGS )
+{
+    alloccell_t *src = STACKCELL_PTR( istate.ep[0] );
+    alloccell_t *dst = STACKCELL_PTR( istate.ep[2] );
+    ssize_t pos = istate.ep[1].num.ssize;
+    ssize_t nref0 = 0, nref1 = 0;
+    ssize_t length = 0;
+    
+    TRACE_FUNCTION();
+
+    if( src && dst && pos < dst[-1].length ) {
+        ssize_t size = 0;
+        ssize_t dst_rest = dst[-1].length - pos;
+
+        length = src[-1].length < dst_rest ?
+            src[-1].length : dst_rest;
+
+        if( length >= 0 ) {
+            nref0 = length >= 0 && src[-1].nref < length ?
+                src[-1].nref : length;
+            nref1 = length >= 0 && dst[-1].nref < length ?
+                dst[-1].nref : length;
+
+            assert( nref0 == nref1 );
+
+            size = dst[-1].element_size * length;
+
+            memcpy( (char*)dst + pos * dst[-1].element_size, src, size );
+        }
+    }
+
+    STACKCELL_ZERO_PTR( istate.ep[0] );
+    STACKCELL_ZERO_PTR( istate.ep[2] );
+
+    istate.ep += 3;
 
     return 1;
 }

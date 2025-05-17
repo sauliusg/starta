@@ -4,11 +4,17 @@
 
 use * from std;
 
-procedure map( p: function (x:type T)->(type T); m: array of type T ): 
+inline bytecode
+procedure copy( dst : array of type X; long pos; src : array of type X )
+{
+    ICOPY
+}
+
+procedure map( p: function (x:array of type T)->(T []); m: T[] ): 
     array of type T
 {
     for var i = 0L to llast(m) do
-        m[i] = p(m[i]);
+        copy( m, i, p(m[i:i]) );
     enddo
 
     return m;
@@ -16,7 +22,7 @@ procedure map( p: function (x:type T)->(type T); m: array of type T ):
 
 var m = [1,2,3];
 
-var n = map( function (i:int)->(int) { return i+1 }, m );
+var n = map( function (i:int[])->(int[]) { return [i[0]+1] }, m );
 
 foreach var k in n do
     . k;
