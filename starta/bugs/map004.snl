@@ -6,9 +6,9 @@ use * from std;
 
 procedure map( p: function (x:array of type T)->(array of type T); m: array of type T ): array of type T
 {
-    var v = m[-1:0]; // empty slice of the array cloned
+    var v = m[];
     for var i = 0 to last( m ) do
-        v = push( v, p( m[i:i] ));
+        v = push( v[i], p( m[i] ));
     enddo
 
     return v;
