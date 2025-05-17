@@ -5043,6 +5043,14 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
 
+            if( element_type ) {
+                if( tnode_kind( element_type ) == TK_NOMINAL &&
+                    compiler_yy_error_number() == 0 ) {
+                    yyerrorf("can not index arrays with components of "
+                             "the nominal type '%s'", tnode_name(element_type));
+                }
+            }
+            
 	    if( return_type ) {
 		if( tnode_kind( return_type ) == TK_ADDRESSOF &&
 		    tnode_element_type( return_type ) == NULL ) {
