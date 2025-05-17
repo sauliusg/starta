@@ -1,20 +1,11 @@
-length(m) == 3
-nref(m)   == 3
-alpha
-beta
-gamma
-========================================
-length(m) == 4
-nref(m)   == 4
-alpha
-beta
-gamma
-delta
-========================================
-length(m) == 5
-nref(m)   == 5
-alpha
-beta
-gamma
-delta
-epsilon
+./sl: inputs/push014.snl(7,69): ERROR, cannot declare parameters (starting with 'value') of a nominal type 'T'
+inline bytecode procedure push( a : array of type T; value : type T )
+                                                                    ^
+./sl: inputs/push014.snl(15,63): ERROR, cannot declare parameters (starting with 'element') of a nominal type 'T'
+function print_array( array of type T a; function ( T element ) print )
+                                                              ^
+./sl: inputs/push014.snl(17,19): ERROR, cannot declare 'for' loop variable 'e' of a nominal type 'T'
+    foreach var T e in a do
+                  ^
+./sl: 3 error(s) detected
+
