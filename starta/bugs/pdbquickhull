@@ -681,8 +681,8 @@ function find_eye_point( face: Face ): Atom
 
 function minmax( a: array of type X; cmp: function(X a[]; X b[])->(int) ): X[], X[], int, int
 {
-    var min = [a[0]];
-    var max = [a[0]];
+    var min = a[0:0];
+    var max = a[0:0];
     var imin, imax: int;
 
     for var i = 1 to last(a) {
