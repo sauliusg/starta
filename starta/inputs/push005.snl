@@ -4,7 +4,7 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
+inline bytecode procedure push( a : array of type T; value : T[] )
     -> array of type T
 {
     APUSH
@@ -12,9 +12,10 @@ inline bytecode procedure push( a : array of type T; value : T )
 
 inline bytecode function nref( a : array ): int { NREF }
 
-function print_array( array of type T a; function ( T element ) print )
+function print_array( array of type T a; function ( T[] element ) print )
 {
-    foreach var T e in a do
+    for var i = 0 to length(a) - 1 do
+        var e = a[i:i];
         print( e );
     enddo
 }
@@ -23,7 +24,7 @@ var m = new string[0];
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+print_array( m, function( string i[] ) { . i[0] } );
 
 . "========================================";
 
@@ -31,7 +32,7 @@ m = push( m, "delta" );
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+print_array( m, function( string i[] ) { . i[0] } );
 
 . "========================================";
 
@@ -39,4 +40,4 @@ m = push( m, "epsilon" );
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+print_array( m, function( string[] i ) { . i[0] } );
