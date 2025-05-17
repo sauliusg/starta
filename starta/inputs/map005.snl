@@ -8,13 +8,14 @@ procedure map( p: function (x: array of type U)->(array of type V);
                m: array of type U;
                v: array of type V ): array of type V
 {
-    //var vv = v[];
+    var vv = v[];
     for var i = 0 to last(m) do
         var e = m[i:i];
-        v = push( v, p(e) );
+        // vv = push( v, p(e) );
+        vv = push( vv, [v[0]] );
     enddo
 
-    return v;
+    return vv;
 }
 
 var m = ["one","two","three"];
