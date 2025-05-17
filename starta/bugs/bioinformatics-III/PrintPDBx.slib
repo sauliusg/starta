@@ -1,0 +1,105 @@
+/*--*- Pascal -*-------------------------------------------------------------*\
+**$Author: saulius $
+**$Date: 2020-04-13 18:41:31 +0300 (Mon, 13 Apr 2020) $ 
+**$Revision: 6906 $
+**$URL: svn+ssh://saulius-grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/lib/BiomoleculeAtom.slib $
+\*---------------------------------------------------------------------------*/
+/*
+  A Starta module print PDBx lines.
+*/
+
+module PrintPDBx;
+
+use std;
+use BiomoleculeAtom;
+(*
+loop_
+_atom_site.group_PDB                      #  1	_atom_site.group_PDB              
+_atom_site.id                             #  2	_atom_site.id                     
+_atom_site.type_symbol                    #  3	_atom_site.type_symbol            
+_atom_site.label_atom_id                  #  4	_atom_site.label_atom_id          
+_atom_site.label_alt_id                   #  5	_atom_site.label_alt_id           
+_atom_site.label_comp_id                  #  6	_atom_site.label_comp_id          
+_atom_site.label_asym_id                  #  7	_atom_site.label_asym_id          
+_atom_site.label_entity_id                #  8	_atom_site.label_entity_id        
+_atom_site.label_seq_id                   #  9	_atom_site.label_seq_id           
+_atom_site.pdbx_PDB_ins_code              # 10	_atom_site.pdbx_PDB_ins_code      
+_atom_site.Cartn_x                        # 11	_atom_site.Cartn_x                
+_atom_site.Cartn_y                        # 12	_atom_site.Cartn_y                
+_atom_site.Cartn_z                        # 13	_atom_site.Cartn_z                
+_atom_site.occupancy                      # 14	_atom_site.occupancy              
+_atom_site.B_iso_or_equiv                 # 15	_atom_site.B_iso_or_equiv         
+
+_atom_site.Cartn_x_esd                    # 16	_atom_site.Cartn_x_esd            
+_atom_site.Cartn_y_esd                    # 17	_atom_site.Cartn_y_esd            
+_atom_site.Cartn_z_esd                    # 18	_atom_site.Cartn_z_esd            
+_atom_site.occupancy_esd                  # 19	_atom_site.occupancy_esd          
+_atom_site.B_iso_or_equiv_esd             # 20	_atom_site.B_iso_or_equiv_esd     
+
+_atom_site.pdbx_formal_charge             # 21	_atom_site.pdbx_formal_charge     
+_atom_site.auth_seq_id                    # 22	_atom_site.auth_seq_id            
+_atom_site.auth_comp_id                   # 23	_atom_site.auth_comp_id           
+_atom_site.auth_asym_id                   # 24	_atom_site.auth_asym_id           
+_atom_site.auth_atom_id                   # 25	_atom_site.auth_atom_id           
+_atom_site.pdbx_PDB_model_num             # 26	_atom_site.pdbx_PDB_model_num     
+ATOM   1    N  N   . ASN A 1 4   ? 3.407  40.303 50.109  1.00 66.19 ? ? ? ? ? ? 4    ASN A N   1 
+ATOM   2    C  CA  . ASN A 1 4   ? 4.752  40.029 49.523  1.00 67.25 ? ? ? ? ? ? 4    ASN A CA  1 
+
+# New (2021-05-11) PDBx column layout:
+loop_
+_atom_site.group_PDB                          #  1	_atom_site.group_PDB         
+_atom_site.id                                 #  2	_atom_site.id                
+_atom_site.type_symbol                        #  3	_atom_site.type_symbol       
+_atom_site.label_atom_id                      #  4	_atom_site.label_atom_id     
+_atom_site.label_alt_id                       #  5	_atom_site.label_alt_id      
+_atom_site.label_comp_id                      #  6	_atom_site.label_comp_id     
+_atom_site.label_asym_id                      #  7	_atom_site.label_asym_id     
+_atom_site.label_entity_id                    #  8	_atom_site.label_entity_id   
+_atom_site.label_seq_id                       #  9	_atom_site.label_seq_id      
+_atom_site.pdbx_PDB_ins_code                  # 10	_atom_site.pdbx_PDB_ins_code 
+_atom_site.Cartn_x                            # 11	_atom_site.Cartn_x           
+_atom_site.Cartn_y                            # 12	_atom_site.Cartn_y           
+_atom_site.Cartn_z                            # 13	_atom_site.Cartn_z           
+_atom_site.occupancy                          # 14	_atom_site.occupancy         
+_atom_site.B_iso_or_equiv                     # 15	_atom_site.B_iso_or_equiv    
+
+_atom_site.pdbx_formal_charge                 # 16	_atom_site.pdbx_formal_charge
+_atom_site.auth_seq_id                        # 17	_atom_site.auth_seq_id       
+_atom_site.auth_comp_id                       # 18	_atom_site.auth_comp_id      
+_atom_site.auth_asym_id                       # 19	_atom_site.auth_asym_id      
+_atom_site.auth_atom_id                       # 20	_atom_site.auth_atom_id      
+_atom_site.pdbx_PDB_model_num                 # 21	_atom_site.pdbx_PDB_model_num
+ATOM   1    N  N   . ASN A 1 4   ? 3.407  40.303 50.109  1.00 66.19 ? 4    ASN A N   1 
+ATOM   2    C  CA  . ASN A 1 4   ? 4.752  40.029 49.523  1.00 67.25 ? 4    ASN A CA  1 
+
+*)
+
+function atom_string( BiomoleculeAtom::Atom atom ): string
+begin
+   return
+    "%s"   %% atom.recordType
+   _" %d"  %% atom.atomNumber
+   _" %s"  %% atom.chemType
+   _" %s"  %% atom.atomName
+   _" %s"  %% (atom.altLoc == "" ? "." : atom.altLoc)
+   _" %s"  %% atom.residueName
+   _" %s"  %% (atom.chain == " " || atom.chain == "" ? "." : atom.chain)
+   _" %s"  %% (length(atom.entity_id) > 1 ? atom.entity_id : "?")
+   _" %d"  %% atom.residueNumber
+   _" %s"  %% (atom.insCode == " " || atom.insCode == "" ? "?" : atom.insCode)
+   _" %f"  %% atom.x
+   _" %f"  %% atom.y
+   _" %f"  %% atom.z
+   _" %f"  %% atom.occupancy
+   _" %f"  %% atom.B
+   _" ? ? ? ? ?"
+   _" %s"  %% (atom.chargeStr == "  " || atom.chargeStr == "" ? "?" : atom.chargeStr)
+   _" %d"  %% atom.residueNumber // once more
+   _" %s"  %% atom.residueName   // once more
+   _" %s"  %% atom.authorChain
+   _" %s"  %% atom.atomName      // once more
+   _" %s"  %% (length(atom.model) > 1 ? atom.model : "1")
+   ;
+end;
+
+end module PrintPDBx;

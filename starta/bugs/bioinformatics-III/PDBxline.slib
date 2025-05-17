@@ -1,0 +1,103 @@
+/*--*- Pascal -*-------------------------------------------------------------*\
+**$Author: saulius $
+**$Date: 2021-05-11 21:26:56 +0300 (Tue, 11 May 2021) $ 
+**$Revision: 8998 $
+**$URL: svn+ssh://saulius.grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/lib/PDBxline.slib $
+\*---------------------------------------------------------------------------*/
+(*
+  A Starta module to parse a PDBx line. Constructs BiomoleculeAtom out of it.
+*)
+
+module PDBxline;
+
+use std;
+use BiomoleculeAtom;
+use Strings;
+use NumCheck;
+
+exception INCORRECT_NUMBER_SYNTAX;
+
+function check_real(s : string; msg: string )
+begin
+   if( !is_real( s )) begin
+      raise INCORRECT_NUMBER_SYNTAX
+      (
+       "value '%s' " %% s _
+       "for %s does not conform to real number syntax" %% msg
+      )
+   end;
+end;
+
+function check_integer(s : string; msg: string )
+begin
+   if( !is_real( s )) begin
+      raise INCORRECT_NUMBER_SYNTAX
+      (
+       "value '%s' " %% s _
+       "for %s does not conform to integer number syntax" %% msg
+      )
+   end;
+end;
+
+function split( line: string ): Atom
+begin
+   var fields = Strings::split( line );
+   var fl = length( fields );
+
+   var altLoc = fields[4];
+   var entity = fields[7];
+   var insCode = fields[9];
+
+   var chargeStr: string;
+   var residueNumber: string;
+   var authorChain : string;
+   var model : string;
+
+   if( fl > 25 ) begin
+      chargeStr = fields[20];
+      residueNumber = fields[21];
+      authorChain = fields[23];
+      model = fields[25];
+   end else begin
+      chargeStr = fields[15];
+      residueNumber = fields[16];
+      authorChain = fields[18];
+      model = fields[20];
+   end;
+   
+   if chargeStr == "." or chargeStr == "?" then
+      chargeStr = "";
+   endif;
+   
+   check_integer(fields[1], "atom number" );
+   check_integer(residueNumber, "residue number" );
+   check_real(fields[10], "x coordinate" );
+   check_real(fields[11], "y coordinate" );
+   check_real(fields[12], "z coordinate" );
+   check_real(fields[13], "temperature factor" );
+   check_real(fields[14], "occupancy" );
+
+   return new Atom.fromStrings(
+                               (* recodType     => *) fields[0],
+                               (* chemType      => *) fields[2],
+                               (* atomName      => *) fields[3],
+                               (* atomNumber    => *) fields[1],
+                               (* residueName   => *) fields[5],
+                               (* residueNumber => *) residueNumber,
+                               (* chainId       => *) fields[6],
+                               (* x             => *) fields[10],
+                               (* y             => *) fields[11],
+                               (* z             => *) fields[12],
+                               (* Bfactor       => *) fields[14],
+                               (* occupancy     => *) fields[13],
+                               (* chargeStr     => *) chargeStr,
+                               (* authChainId   => *) authorChain,
+                               (* segmentId     => *) "",
+                               (* altLoc        => *) altLoc == "." ? "" : altLoc,
+                               (* insCode       => *) insCode == "?" ? "" : insCode,
+                               entity_id => entity,
+                               model     => model
+                               );
+end
+
+end module PDBxline;

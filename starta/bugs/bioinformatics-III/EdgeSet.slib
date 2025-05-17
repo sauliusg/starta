@@ -1,0 +1,84 @@
+// --*- C -*--
+// Implement an object to hold a set of edges of a graph.
+
+module EdgeSet
+
+use std;
+
+function imin( int a, b ): int
+{
+    return a < b ? a : b;
+}
+
+function elist_lookup_edge( elist : int[][]; edge: int[] ): int
+{
+    for var i = 0 to last(elist) {
+        var element = elist[i];
+        if( (element[0] == edge[0] &&
+             element[1] == edge[1]) ||
+            (element[0] == edge[1] &&
+             element[1] == edge[0]) ) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+class EdgeSet {
+ edge_count: int;
+ edges: array [][][] of int;
+    
+ constructor ( int N ) {
+     self.edges = new (int[][])[N];
+     for var i = 0 to N-1 {
+         self.edges[i] = new (int[])[0];
+     }
+ }
+
+ method add_edge( int [] edge )
+ {
+     assert length(edge) == 2;
+     var e0 = imin( edge[0], edge[1] );
+     if( elist_lookup_edge( self.edges[e0], edge ) < 0 ) {
+         self.edges[e0] = push( self.edges[e0], edge );
+         self.edge_count++;
+     }
+ }
+
+ method remove_edge( int [] edge )
+ {
+     assert length(edge) == 2;
+     var e0 = imin( edge[0], edge[1] );
+     var i = elist_lookup_edge( self.edges[e0], edge );
+     if( i >= 0 ) {
+         var edges = self.edges[e0];
+         for( var j = i; j < last(edges); j++ ) {
+             edges[j] = edges[j+1];
+         }
+         if( length(edges) > 1 ) {
+             self.edges[e0] = edges[0..last(edges)-1];
+         } else {
+             self.edges[e0] = new (int[])[0];
+         }
+         self.edge_count--;
+     }
+ }
+
+ method has_edge( int [] edge ): bool
+ {
+     var e0 = imin( edge[0], edge[1] );
+     return elist_lookup_edge( self.edges[e0], edge ) >= 0;
+ }
+
+ method edge_count(): int
+ {
+     return self.edge_count;
+ }
+ 
+ method get_edge_table(): int[][][]
+ {
+     return self.edges;
+ }
+};
+
+end module EdgeSet;

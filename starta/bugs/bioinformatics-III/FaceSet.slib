@@ -1,0 +1,47 @@
+// --*- C -*--
+// Implement an object to hold a set of faces of a triangulated polyhedron.
+
+module FaceSet
+
+use std;
+use InsertionSort(int);
+
+function lookup_face( flist : int[][]; face: int[] ): bool
+{
+    for( var element in flist ) {
+        if( element[0] == face[0] &&
+            element[1] == face[1] &&
+            element[2] == face[2] ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+class FaceSet {
+ faces: array [][][] of int;
+    
+ constructor ( int N ) {
+     self.faces = new (int[][])[N];
+     for var i = 0 to N-1 {
+         self.faces[i] = new (int[])[0];
+     }
+ }
+
+ method add_face( int [] face )
+ {
+     assert length(face) == 3;
+     var sorted_face = sorted( face );
+     var v0 = sorted_face[0];
+     if( ! lookup_face( self.faces[v0], sorted_face ) ) {
+         self.faces[v0] = push( self.faces[v0], sorted_face );
+     }
+ }
+
+ method get_face_table(): int[][][]
+ {
+     return self.faces;
+ }
+};
+
+end module FaceSet;

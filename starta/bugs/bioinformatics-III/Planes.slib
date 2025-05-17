@@ -1,0 +1,36 @@
+//--*- C -*--
+//---------------------------------------------------------------------------*\
+//$Author: saulius $
+//$Date: 2019-04-21 16:45:14 +0300 (Sun, 21 Apr 2019) $ 
+//$Revision: 5727 $
+//$URL: svn+ssh://saulius.grazulis.lt/home/saulius/svn-repositories/paskaitos/VU/software/trunk/bioinformatika-III-assignments/lib/Planes.slib $
+//---------------------------------------------------------------------------*/
+
+// Various functions to compute relations between planes and points
+// (distances, etc.)
+
+module Planes;
+
+use std;
+
+// Distance from a plane defined by the first three points to a fourth
+// point. The distance is signed and depends in the orientation of the
+// point set (pl1->pl2->pl3 is clockwise or counter-clockwise when
+// viewed from the point pt):
+
+use Vectors;
+
+// Return a unit vector normal to a plane:
+function pl_normal( pl1, pl2, pl3: double[] ): double[]
+{
+    return normalise(vcross( vect(pl1,pl2), vect(pl1,pl3) ));
+}
+
+function pl2pt_distance( pl1, pl2, pl3: double[]; pt: double[] ): double
+{
+    var normal = pl_normal( pl1, pl2, pl3 );
+    
+    return vdot( normal, vect(pl1,pt) );
+}
+
+end module Planes;
