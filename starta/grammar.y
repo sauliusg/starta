@@ -5486,7 +5486,6 @@ static void compiler_convert_function_argument( COMPILER *cc,
                         ( tnode_element_type (arg_type),
                           exp_type, generic_types,
                           NULL /* msg */, 0 /* msglen */, &inner )) {
-                        // fprintf (stderr, "... will convert types here ...");
                         ssize_t one = 1;
                         ssize_t element_size = tnode_size( exp_type );
                         ssize_t element_nref =
