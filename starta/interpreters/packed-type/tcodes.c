@@ -1109,7 +1109,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
  * APUSH
  *
  * stack:
- * array, value -> array_with_the_value
+ * array, array -> array_with_the_values_from_the_top_array
  */
 
 int APUSH( INSTRUCTION_FN_ARGS )
@@ -1172,13 +1172,13 @@ int APUSH( INSTRUCTION_FN_ARGS )
  * APOP
  *
  * stack:
- * array -> value
+ * array -> array(with a single popped element)
  */
 
 int APOP( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
-    ssize_t length, element_size;
+    ssize_t length, element_size, nref;
     alloccell_flag_t flags;
 
     TRACE_FUNCTION();
@@ -1194,6 +1194,7 @@ int APOP( INSTRUCTION_FN_ARGS )
     } else {
         flags = array[-1].flags;
         length = array[-1].length;
+        nref = array[-1].nref;
         element_size = array[-1].element_size;
         /* We only pop values from arrays, not to structures: */
         if( length >= 0 && element_size > 0 ) {
@@ -1209,7 +1210,9 @@ int APOP( INSTRUCTION_FN_ARGS )
             // get extra stack cell to temporarily store the popped value:
             istate.ep --;
             // allocate a new array for the popped value:
-            void **new_array = bcalloc( element_size, element_size, 1, 1,
+            void **new_array = bcalloc( element_size, element_size,
+                                        /*length:*/1,
+                                        /*nref:*/nref == 0 ? 0 : 1,
                                         EXCEPTION );
             BC_CHECK_PTR( new_array );
             STACKCELL_SET_ADDR( istate.ep[0], new_array );
