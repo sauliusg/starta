@@ -6,32 +6,32 @@
 
 use * from std;
 
-function print_array( array of type T a; function ( T element ) print )
+function print_array( array of type T a; function ( T element[] ) print )
 {
     var i = 0;
-    foreach var T e in a do
+    var l = length(a);
+    for( i = 0; i < l; i++ ) {
         < "[", i , "]: ";
-        print( e );
-        i ++;
-    enddo
+        print( a[i:i] );
+    }
 }
 
 var m = new int[0];
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+print_array( m, function( int[] i ) { . i[0] } );
 
 var n = new float[0];
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+print_array( n, function( float[] i ) { . i[0] } );
 
 . "========================================";
 
 m = push( push( push( m, 10 ), 12 ), 15 );
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+print_array( m, function( int[] i ) { . i[0] } );
 
 n = push( n, 123.12 );
 n = push( n, 3.14 );
@@ -39,19 +39,19 @@ n = push( n, 2.7 );
 n = push( n, 0.18 );
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+print_array( n, function( float[] i ) { . i[0] } );
 
 . "========================================";
 
-. "popped value =", pop( m );
-. "popped value =", pop( m );
+. "popped value =", pop( m )[0];
+. "popped value =", pop( m )[0];
 
 . "length(m) ==", length(m);
-print_array( m, function( int i ) { . i } );
+print_array( m, function( int[] i ) { . i[0] } );
 
-. "popped value =", pop( n );
-. "popped value =", pop( n );
+. "popped value =", pop( n )[0];
+. "popped value =", pop( n )[0];
 
 . "length(n) ==", length(n);
-print_array( n, function( float i ) { . i } );
+print_array( n, function( float[] i ) { . i[0] } );
 
