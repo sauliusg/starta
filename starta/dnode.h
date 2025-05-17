@@ -200,6 +200,8 @@ int dnode_type_has_references( DNODE *dnode );
 int dnode_function_prototypes_match_msg( DNODE *d1, DNODE *d2,
 					 char *msg, int msglen );
 
+int dnode_is_array( DNODE *dnode );
+
 int dnode_is_function_prototype( DNODE *dnode );
 
 int dnode_list_length( DNODE *dnode );
