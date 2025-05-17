@@ -1,24 +1,26 @@
 // --*- C -*--
 
-// This file illustrates a problem with the current generic type
-// design. When a structure is declared with the field of generic
+// This file illustrates a SOLUTION to the problem with the generic
+// type design. When a structure is declared with the field of generic
 // type, the assumptions about the field alignment, offset and
 // position hold only when a generic type field is the last field in
-// the structure.
+// the structure. However, we can always work with the type 'array of
+// T' for any generic type T, even without knowing its exact
+// implmentation.
 
 use * from std;
 
-function printer( s : string ) { . s };
+function printer( s : string[] ) { . s[0] };
 
-procedure generic_procedure( s : null struct { int i; type T x }; 
-                             function ( x : type T ) xprinter )
+procedure generic_procedure( s : null struct { int i; type T x[] }; 
+                             function ( x : array of type T ) xprinter )
 {
     xprinter( s.x );
 }
 
 try {
-    var p = new null struct { int i; string name };
-    p.name = "Struct p";
+    var p = new null struct { int i; string name[] };
+    p.name = ["Struct p"];
     generic_procedure( p, printer );
 }
 catch( var errno : int; var message : string ) {
