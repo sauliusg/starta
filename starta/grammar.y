@@ -329,7 +329,7 @@ static void delete_compiler( COMPILER *c )
 	delete_dnode( c->current_call );
 
 	delete_dlist( c->current_call_stack );
-        assert( !c->current_arg_stack );
+        delete_dlist( c->current_arg_stack );
         freex( c->current_interface_nr_stack );
 
 	delete_dlist( c->current_module_stack );

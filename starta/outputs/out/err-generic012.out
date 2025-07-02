@@ -1,0 +1,6 @@
+./sl: inputs/err-generic012.snl(22,53): ERROR, incorrect syntax
+a[5] = push (push (a[5], [66]), (a = push (a, [55]))[10]);
+                                                    ^
+./sl: compiler could not recover from errors, quitting now
+1 error(s) detected
+

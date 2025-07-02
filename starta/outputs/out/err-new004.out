@@ -1,0 +1,6 @@
+./sl: inputs/err-new004.snl(30,16): ERROR, incorrect syntax
+e->set( (new E)->set(f) );
+               ^
+./sl: compiler could not recover from errors, quitting now
+1 error(s) detected
+
