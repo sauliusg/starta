@@ -19,7 +19,7 @@ var i = 12;
 a[2] = push (a[2], i);
 a[5] = push (a[5], 21);
 a[5] = push (a[5], 23 );
-a[5] = push (push (a[5], [66]), a[1] = push (a, [55])[10]);
+a[5] = push (push (a[5], [66]), a[1] = (push (a, [55]))[10]);
 
 var n = 0;
 for var row in a {
