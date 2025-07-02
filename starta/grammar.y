@@ -235,6 +235,13 @@ typedef struct {
     DNODE *loops;
     DLIST *loop_stack;
 
+    /* Symbol table for generic types used during compilation of
+       function calls, and the stack of these tables when the calls
+       are nestet:*/
+    TYPETAB *generic_types;
+    TYPETAB **generic_type_table_stack;
+    int generic_type_table_stack_size;
+    
     /* number sequentially all exceptions declared in each module or
        in the main program: */
     int latest_exception_nr;
@@ -338,6 +345,14 @@ static void delete_compiler( COMPILER *c )
         delete_tlist( c->current_type_stack );
 
         delete_tnode( c->current_type );
+
+        delete_typetab( c->generic_types );
+        if( c->generic_type_table_stack ) {
+            for( int i = 0; i < c->generic_type_table_stack_size; i++) {
+                delete_typetab( c->generic_type_table_stack[i] );
+            }
+            freex( c->generic_type_table_stack );
+        }
 
         freex( c->use_module_name );
         freex( c->module_filename );
@@ -1048,6 +1063,25 @@ static ssize_t pop_ssize_t( ssize_t **array, int *size, cexception_t *ex )
     assert( *size > 0 );
     (*size) --;
     return (*array)[*size];
+}
+
+static void push_typetab( TYPETAB ***array, int *size, TYPETAB **value,
+                          cexception_t *ex )
+{
+    *array = reallocx( *array, ( *size + 1 ) * sizeof(**array), ex );
+    (*array)[*size] = *value;
+    *value = NULL;
+    (*size) ++;
+}
+
+static TYPETAB* pop_typetab( TYPETAB ***array, int *size )
+{
+    assert( size );
+    assert( *size > 0 );
+    (*size) --;
+    TYPETAB *retval = (*array)[*size];
+    (*array)[*size] = NULL;
+    return retval;
 }
 
 static void compiler_push_current_address( COMPILER *c, cexception_t *ex )
@@ -5471,11 +5505,12 @@ static void compiler_convert_function_argument( COMPILER *cc,
     TNODE *exp_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
 
     if( arg_type && exp_type ) {
-        TYPETAB *volatile generic_types = NULL;
+        // Since generic_types here are owned by the COMPILER, we do
+        // not need (and in fact may not) delete it in this function:
+        TYPETAB *volatile generic_types = cc->generic_types;
         cexception_t inner;
 
         cexception_guard( inner ) {
-            generic_types = new_typetab( &inner );
             if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
                 tnode_kind( arg_type ) != TK_GENERIC &&
                 !tnode_types_are_assignment_compatible( arg_type, exp_type,
@@ -5512,10 +5547,8 @@ static void compiler_convert_function_argument( COMPILER *cc,
             }
         }
         cexception_catch {
-            delete_typetab( generic_types );
             cexception_reraise( inner, ex );
         }
-        dispose_typetab( &generic_types );
     }
     cc->current_arg = cc->current_arg ? dnode_next( cc->current_arg ) : NULL;
 }
@@ -13107,7 +13140,21 @@ function_call
   ;
 
 opt_actual_argument_list
-  : actual_argument_list
+  : {
+        push_typetab( &compiler->generic_type_table_stack,
+                      &compiler->generic_type_table_stack_size,
+                      &compiler->generic_types, px );
+
+        compiler->generic_types = new_typetab( px );
+    }
+    actual_argument_list
+    {
+        delete_typetab( compiler->generic_types );
+
+        compiler->generic_types =
+            pop_typetab( &compiler->generic_type_table_stack,
+                         &compiler->generic_type_table_stack_size );
+    }
   |
   ;
 

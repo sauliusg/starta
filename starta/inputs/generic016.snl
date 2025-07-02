@@ -1,0 +1,18 @@
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Check function argument conversion from some type to an array of that type.
+#
+
+use std;
+
+use APrint;
+
+var m : array [][] of int = [ [1, 12], [22, 11, 13] ];
+
+. m[0];
+. m[1];
+
+m = push (m, [111, 222]);
+
+. m[2];
