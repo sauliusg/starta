@@ -4356,12 +4356,18 @@ static void compiler_check_and_drop_function_args( COMPILER *cc,
                 ( formal_type, actual_type, generic_types,
                   msg, sizeof(msg), ex )) {
                 if( msg[0] ) {
-                    yyerrorf( "incompatible types for function '%s' argument "
-                              "nr. %d - %s", dnode_name( function ),
+                    yyerrorf( "incompatible types for%s function '%s' argument "
+                              "nr. %d - %s",
+                              (cc->generic_type_table_stack_size > 1 ?
+                               " the nested call" : ""),
+                              dnode_name( function ),
                               nargs - n, /* dnode_name( formal_arg ),  */msg );
                 } else {
-                    yyerrorf( "incompatible types for function '%s' argument "
-                              "nr. %d"/* " (%s)" */, dnode_name( function ),
+                    yyerrorf( "incompatible types for function%s '%s' argument "
+                              "nr. %d"/* " (%s)" */,
+                              (cc->generic_type_table_stack_size > 1 ?
+                               " the nested call" : ""),
+                              dnode_name( function ),
                               nargs - n, dnode_name( formal_arg ));
                 }
             }

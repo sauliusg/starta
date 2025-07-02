@@ -1,0 +1,11 @@
+./sl: inputs/err-generic011.snl(22,56): ERROR, incompatible types for assignment
+a[5] = push (push (a[5], [66]), a[1] = push (a, [[55]]));
+                                                       ^
+./sl: inputs/err-generic011.snl(22,56): ERROR, incompatible types for function 'push' argument nr. 1
+a[5] = push (push (a[5], [66]), a[1] = push (a, [[55]]));
+                                                       ^
+./sl: inputs/err-generic011.snl(22,57): ERROR, incompatible types for assignment
+a[5] = push (push (a[5], [66]), a[1] = push (a, [[55]]));
+                                                        ^
+./sl: 3 error(s) detected
+
