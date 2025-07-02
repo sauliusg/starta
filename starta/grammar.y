@@ -5499,17 +5499,13 @@ static void compiler_convert_function_argument( COMPILER *cc,
                         ssize_t element_nref =
                             tnode_is_reference( exp_type ) ? 1 : 0;
 
-                        compiler_emit( cc, &inner, "\tce\n", LDC, &one );
-                        compiler_emit( cc, &inner, "\tcee\n", AALLOC,
-                                       &element_size, &element_nref );
-                        compiler_emit( cc, &inner, "\tc\n", SWAP );
-                        compiler_emit( cc, &inner, "\tc\n", OVER );
-                        compiler_emit( cc, &inner, "\tc\n", SWAP );
-                        if( exp_type && tnode_is_reference( exp_type )) {
-                            compiler_emit( cc, &inner, "\tc\n", PSTI );
+                        if( tnode_is_reference( exp_type )) {
+                            compiler_emit( cc, ex, "\tce\n", PMKARRAY, &one );
                         } else {
-                            compiler_emit( cc, &inner, "\tcs\n", STI, &element_size );
+                            compiler_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
+                                           &element_nref, &one );
                         }
+
                         compiler_make_stack_top_array_type( cc, &inner );
                     }
                 }
