@@ -22,19 +22,8 @@ procedure print_edges (e : array [][][] of int)
     }
 }
 
-var edges : array [][][] of int;
+var a = [10, 11, 12, 15];
 
-var edge : array of int;
+a = push (a, [55, 56, 58]);
 
-edge = [12,29];
-
-edges = new (int[][])[10];
-
-edges[4] = [[0,1], [2,5]];
-
-edges[3] = push (edges[3], [[7,9]]);
-edges[3] = push (edges[3], [[3,5]]);
-edges[3] = push (edges[3], edge);
-edges[3] = push (edges[3], [edge]);
-
-print_edges (edges);
+. a;

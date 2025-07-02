@@ -1178,7 +1178,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *value = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
-    ssize_t nref, size, length, element_size;
+    ssize_t nref, size, length, value_length, element_size;
     alloccell_flag_t flags;
 
     TRACE_FUNCTION();
@@ -1192,12 +1192,13 @@ int APUSH( INSTRUCTION_FN_ARGS )
         nref = array[-1].nref;
         size = array[-1].size;
         length = array[-1].length;
+        value_length = value[-1].length;
         element_size = array[-1].element_size;
         /* We only push values onto arrays, not to structures: */
         if( length >= 0 && element_size > 0 ) {
-            if( (length + 1) * element_size > size ) {
+            if( (length + value_length) * element_size > size ) {
                 /* need to reallocate the array: */
-                ssize_t new_size = element_size * (length + 1) * 2;
+                ssize_t new_size = element_size * (length + value_length) * 2;
                 void *new_array = bcalloc( new_size, element_size, length, nref, 
                                            EXCEPTION );
                 BC_CHECK_PTR( new_array );
@@ -1206,15 +1207,11 @@ int APUSH( INSTRUCTION_FN_ARGS )
                 STACKCELL_SET_ADDR( istate.ep[1], new_array );
             }
             /* Array now has enough capacity to push a new element: */
+            memcpy( (char*)array + length * element_size, value,
+                    element_size * value_length );
+            array[-1].length += value_length;
             if( flags & AF_HAS_REFS ) {
-                *((void**)array + length) = *((void**)value);
-            } else {
-                memcpy( (char*)array + length * element_size, value,
-                        element_size );
-            }
-            array[-1].length++;
-            if( flags & AF_HAS_REFS ) {
-                array[-1].nref ++;
+                array[-1].nref += value_length;
                 array[-1].flags |= AF_HAS_REFS;
             }
         }
