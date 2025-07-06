@@ -12029,6 +12029,8 @@ type_of_type_declaration
 	cexception_t inner;
 
 	cexception_guard( inner ) {
+	    compiler_begin_scope( compiler, &inner );
+
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
 
@@ -12043,7 +12045,6 @@ type_of_type_declaration
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
 
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
-	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -12087,6 +12088,8 @@ type_of_type_declaration
 
 	cexception_t inner;
 	cexception_guard( inner ) {
+	    compiler_begin_scope( compiler, &inner );
+
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
 
@@ -12101,7 +12104,6 @@ type_of_type_declaration
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
 
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
-	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -12147,6 +12149,8 @@ type_of_type_declaration
 	cexception_t inner;
 
 	cexception_guard( inner ) {
+	    compiler_begin_scope( compiler, &inner );
+
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
 	    tnode = new_tnode_composite( type_name, base, &inner );
@@ -12161,7 +12165,6 @@ type_of_type_declaration
             assert( !compiler->current_type );
 	    compiler->current_type = moveptr( (void**)&tnode );
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
-	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -14542,7 +14545,7 @@ struct_expression
     {
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $3 );
+        field_list = $3 ? tnode_fields( $3 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14592,7 +14595,7 @@ struct_expression
     {
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $2 );
+        field_list = $2 ? tnode_fields( $2 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14643,7 +14646,7 @@ struct_expression
         /* FIXME: code duplication with the above rule (S.G.) */
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $2 );
+        field_list = $2 ? tnode_fields( $2 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14694,7 +14697,7 @@ struct_expression
         /* FIXME: code duplication with the above rule (S.G.) */
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $1 );
+        field_list = $1 ? tnode_fields( $1 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
