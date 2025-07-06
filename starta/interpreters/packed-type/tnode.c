@@ -2237,11 +2237,14 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 
     assert( !tnode->element_type || 
 	    (tnode->params.kind == TK_COMPOSITE &&
-	     tnode->element_type->params.kind == TK_PLACEHOLDER));
+	     (tnode->element_type->params.kind == TK_PLACEHOLDER ||
+              tnode->element_type->params.kind == TK_NOMINAL)));
 
     if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
         tnode && tnode->params.kind == TK_COMPOSITE &&
-        tnode->element_type && tnode->element_type->params.kind == TK_PLACEHOLDER ) {
+        tnode->element_type &&
+        (tnode->element_type->params.kind == TK_PLACEHOLDER ||
+         tnode->element_type->params.kind == TK_NOMINAL)) {
         DNODE *field;
         cexception_t inner;
 
@@ -2262,7 +2265,12 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
                     printf( ">>> resetting field type for '%s'\n", dnode_name(field) );
 #endif
                 }
-                tnode_set_size_and_field_offset( tnode, cloned_field );
+                if( tnode_kind( dnode_type( cloned_field )) != TK_NOMINAL ) {
+                    tnode_set_size_and_field_offset( tnode, cloned_field );
+                } else {
+                    dnode_set_offset( cloned_field, dnode_offset( field ));
+                }
+                
 #if DEBUG_PRINT
                 printf( ">>> '%s' offset = %zd\n", dnode_name(cloned_field), dnode_offset(cloned_field) );
 #endif

@@ -6,86 +6,45 @@
 
 use std;
 
-pragma prepend "inputs/functional";
+type list of T = ? : ref {
+    next : list of T;
+    value : T;
 
-use Mapper (int) as IntMapper;
+    operator "+" ( l1, l2 : list of T ) : list of T
+    {
+	if( l1 && l2 ) {
+	    var r = l1[];
+	    var q = r;
+	    var p = l1.next;
+	    while( p != null ) {
+		q.next = p[];
+		q = q.next;
+		p = p.next;
+	    }
+	    q.next = l2;
+	    return r
+	} else {
+	    if( l1 ) {
+		return l1
+	    } else {
+		return l2
+	    }
+	}
+    }; // operator "+"
 
-var m = [2, 12, 23];
+    // inline bytecode operator "*" ( l : list of T ) : T
+    // { LDC const((list of T).value.offset) }
 
-var a : array of int;
+    inline bytecode operator "next"( l : list of T )
+    { NEXT const((list of T).next.offset) const((list of T).value.offset) }
 
-function inc( int x ): int => x + 2;
+} // type "list of T"
 
-a = map (inc, m);
+type L = list of int;
 
-for var e in a {
-    . ">>>", e;
-}
-
-. "";
-
-inline bytecode function ord( char c ) : byte {}
-inline bytecode function chr( byte c ) : char {}
-inline bytecode function str( blob b ) : string {}
-
-function toupper( s: string ): string
+procedure cat( l1, l2 : list of int ) : list of int
 {
-    var m = new char[length(s)];
-
-    for var i = 0 to last(s)-1 {
-        m[i] = chr( ord(s[i]) - 32B );
-    }
-
-    var r: blob = new blob(length(s)+1);
-    pack r, 0, "i1", m;
-    return str(r);
+    l1.next = l2;
+    return l1
 }
 
-operator "." (a : array of string)
-{
-    < "[ ";
-    for var s in a {
-        < "\"" _ s _ "\" ";
-    }
-    . "]"
-}
-
-operator "." (a : array of int)
-{
-    < "[ ";
-    for var s in a {
-        < s, " ";
-    }
-    . "]"
-}
-
-{
-
-    // type R = ref;
-    type R = generic ref;
-
-    use Mapper (R) as RefMapper;
-
-    var n : array of string = ["abcd", "qrn", "uvw"];
-
-    type S = struct {
-        x, y : int
-    };
-
-    var s : S = new S;
-    var b : array of string = ["one", "two", "three", "four"];
-    var r : ref;
-
-    r = s;
-    r = b;
-    r = n;
-
-    // s = r; // ERROR, incompatible types for assignment to variable 's'
-    // b = r; // ERROR, incompatible types for assignment to variable 'b'
-    // n = r; // ERROR, incompatible types for assignment to variable 'n'
-    
-    n = RefMapper::map (toupper, b);
-    a = RefMapper::map (inc, m);
-    . n;
-    . a;
-}
