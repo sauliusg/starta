@@ -2928,11 +2928,13 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
     ENODE *lval = NULL;
     ENODE * volatile top1 = NULL;
     ENODE * volatile top2 = NULL;
+    TYPETAB * volatile generic_types = NULL;
 
     expr = cc->e_stack;
     lval = expr ? enode_next( expr ) : NULL;
 
     cexception_guard( inner ) {
+        generic_types = new_typetab( &inner );
 	if( !expr || !lval ) {
 	    yyerrorf( "not enough values on the stack for assignment" );
 	} else {
@@ -2947,7 +2949,7 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
 		/* if( !tnode_types_are_identical( element_type, expr_type )) {
 		 */
 		if( !tnode_types_are_assignment_compatible
-                    ( element_type, expr_type, NULL /* generic_type_table*/,
+                    ( element_type, expr_type, generic_types,
                       msg, sizeof(msg)-1, ex )) {
 		    char *dst_name = tnode_name( element_type );
 		    if( expr_type && dst_name &&
@@ -3006,10 +3008,12 @@ static void compiler_compile_sti( COMPILER *cc, cexception_t *ex )
     cexception_catch {
 	delete_enode( top1 );
 	delete_enode( top2 );
+        delete_typetab( generic_types );
 	cexception_reraise( inner, ex );
     }
     delete_enode( top1 );
     delete_enode( top2 );
+    delete_typetab( generic_types );
 }
 
 static void compiler_make_stack_top_element_type( COMPILER *cc )
