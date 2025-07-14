@@ -1,0 +1,20 @@
+use std;
+
+
+var w = [1, 2, 3];
+
+var v : array of int;
+
+readonly r = w;
+
+v = r; // OK, although probably should fail...
+
+// r = v; // ERROR: cannot assign to the readonly variable 'r'
+
+
+function f (x : int[]) -> int[]
+{
+    var int[] a = x;
+
+    return a;
+}
