@@ -1,0 +1,75 @@
+//--*- Java -*--
+
+// Shared mutable lists in Starta – a legit design pattern?
+
+use std;
+use Lists;
+
+type atom = null struct {i : int; x, y, z : float};
+
+procedure print (l : list of atom)
+{
+    for var a in l do
+        . a.i;
+    enddo;
+}
+
+var l = (struct atom {i:1}, struct atom {i:2}, struct atom {i:3},
+         struct atom {i:4}, struct atom {i:5}, struct atom {i:6},
+         struct atom {i:7}, struct atom {i:8});
+
+. "Original list:";
+print (l);
+
+. "";
+
+function select_even (l : list of atom): list of atom
+{
+    var r, t : list of atom; // return, tail
+
+    for var a in l {
+        if( a.i % 2 == 0 ) {
+            if( t == null ) {
+                // (a,) creates a single element list out of value 'a':
+                r = t = (a,);
+            } else {
+                t = cat(t, (a,));
+                t = t.next;
+            }
+        }
+    }
+
+    return r;
+}
+
+procedure double_atoms (l : list of atom)
+{
+    for var a in l {
+        if( a.i % 2 == 0 ) {
+            a.i *= 2;
+        }
+    }
+}
+
+var s = select_even (l);
+
+// list 's' shares the same elements as the original list 'l':
+
+. "Selected even values:";
+print (s);
+
+. "";
+
+. "Increment the list values; " _
+   "the incremented values are shared by 's' and 'l';";
+. "";
+
+double_atoms (s);
+
+. "The original (affected) list:";
+print (l);
+
+. "";
+
+. "The selected (updated) list:";
+print (s);
