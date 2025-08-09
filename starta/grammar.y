@@ -2058,9 +2058,24 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
         foreach_dnode( retval_dnode, function_retvals ) {
             TNODE *retval_dnode_type = dnode_type( retval_dnode );
             if( tnode_has_placeholder_element( retval_dnode_type )) {
+                int has_generics = 0;
+                TNODE *old_retval_type = retval_dnode_type;
+
                 retval_tnode = new_tnode_implementation( retval_dnode_type,
                                                          generic_types,
                                                          &inner );
+
+                // retval_tnode = new_tnode_with_concrete_types( retval_dnode_type,
+                //                                               generic_types,
+                //                                               &has_generics,
+                //                                               &inner );
+
+                //// fprintf (stderr, "\n");
+                //// fprintf (stderr, ">>>> placeholder name: type '%s' ", tnode_name (retval_dnode_type));
+                //// fprintf (stderr, "of '%s'\n", tnode_element_type (retval_dnode_type) ? tnode_name (tnode_element_type (retval_dnode_type)) : "<none>");
+                //// fprintf (stderr, ">>>> has generics:     %d\n", has_generics);
+                //// fprintf (stderr, ">>>> replaced:         %d\n", old_retval_type != retval_dnode_type);
+                
             } else if( tnode_has_generic_type( retval_dnode_type )) {
                 int has_generics = 0;
                 retval_tnode = new_tnode_with_concrete_types
@@ -6695,10 +6710,10 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
     /* Generic types represented by "placeholder" tnodes pointing to
        the actual instances of these types in a particular function
        call: */
-    TYPETAB *volatile generic_types = NULL; 
+    TYPETAB *volatile generic_types = cc->generic_types; 
 
     cexception_guard( inner ) {
-	generic_types = new_typetab( &inner );
+	// generic_types = new_typetab( &inner );
         if( funct && fn_type ) {
             compiler_emit_default_arguments( cc, NULL, &inner );
             compiler_check_and_drop_function_args( cc, funct, generic_types,
@@ -6723,10 +6738,10 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
             compiler_push_error_type( cc, &inner );
             rval_nr = 1;
         }
-	delete_typetab( generic_types );
+	// delete_typetab( generic_types );
     }
     cexception_catch {
-	delete_typetab( generic_types );
+	// delete_typetab( generic_types );
         cexception_reraise( inner, ex );
     }
 
@@ -12800,7 +12815,13 @@ multivalue_function_call
 	  TNODE *fn_tnode;
           type_kind_t fn_kind;
 
-	  fn_tnode = compiler->current_call ?
+          push_typetab( &compiler->generic_type_table_stack,
+                        &compiler->generic_type_table_stack_size,
+                        &compiler->generic_types, px );
+
+          compiler->generic_types = new_typetab( px );
+
+          fn_tnode = compiler->current_call ?
 	      dnode_type( compiler->current_call ) : NULL;
 
 	  compiler->current_arg = fn_tnode ?
@@ -12829,6 +12850,12 @@ multivalue_function_call
 	    }
 
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
+
+            delete_typetab( compiler->generic_types );
+
+            compiler->generic_types =
+                pop_typetab( &compiler->generic_type_table_stack,
+                             &compiler->generic_type_table_stack_size );
 	}
   | lvalue 
         {
@@ -12878,6 +12905,12 @@ multivalue_function_call
             DNODE *method = NULL;
             int class_has_interface = 1;
             ssize_t interface_nr = 0;
+
+            push_typetab( &compiler->generic_type_table_stack,
+                          &compiler->generic_type_table_stack_size,
+                          &compiler->generic_types, px );
+
+            compiler->generic_types = new_typetab( px );
 
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
@@ -12999,6 +13032,12 @@ multivalue_function_call
 	    compiler_drop_top_expression( compiler );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
             delete_dnode( $1 );
+
+            delete_typetab( compiler->generic_types );
+
+            compiler->generic_types =
+                pop_typetab( &compiler->generic_type_table_stack,
+                             &compiler->generic_type_table_stack_size );
 	}
 
   | lvalue 
@@ -13019,6 +13058,12 @@ multivalue_function_call
             DNODE *method = NULL;
             int class_has_interface = 1;
             ssize_t interface_nr = 0;
+
+            push_typetab( &compiler->generic_type_table_stack,
+                          &compiler->generic_type_table_stack_size,
+                          &compiler->generic_types, px );
+
+            compiler->generic_types = new_typetab( px );
 
             if( !object_expr ) {
                 yyerrorf( "too little values on the evaluation stack "
@@ -13125,6 +13170,12 @@ multivalue_function_call
         {
 	    compiler_emit( compiler, px, "\tc\n", RFROMR );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
+
+            delete_typetab( compiler->generic_types );
+
+            compiler->generic_types =
+                pop_typetab( &compiler->generic_type_table_stack,
+                             &compiler->generic_type_table_stack_size );
 	}
 
   ;
@@ -13153,21 +13204,7 @@ function_call
   ;
 
 opt_actual_argument_list
-  : {
-        push_typetab( &compiler->generic_type_table_stack,
-                      &compiler->generic_type_table_stack_size,
-                      &compiler->generic_types, px );
-
-        compiler->generic_types = new_typetab( px );
-    }
-    actual_argument_list
-    {
-        delete_typetab( compiler->generic_types );
-
-        compiler->generic_types =
-            pop_typetab( &compiler->generic_type_table_stack,
-                         &compiler->generic_type_table_stack_size );
-    }
+  : actual_argument_list
   |
   ;
 
@@ -15104,6 +15141,12 @@ generator_new
           TNODE *volatile shared_tnode = NULL;
           cexception_t inner;
 
+          push_typetab( &compiler->generic_type_table_stack,
+                        &compiler->generic_type_table_stack_size,
+                        &compiler->generic_types, px );
+
+          compiler->generic_types = new_typetab( px );
+
           cexception_guard( inner ) {
               compiler_check_type_contains_non_null_ref( type_tnode );
               shared_tnode = share_tnode( type_tnode );
@@ -15155,6 +15198,12 @@ generator_new
                 yyerrorf( "constructor '%s()' should not return a value",
                           constructor_name ? constructor_name : "???" );
             }
+
+            delete_typetab( compiler->generic_types );
+
+            compiler->generic_types =
+                pop_typetab( &compiler->generic_type_table_stack,
+                             &compiler->generic_type_table_stack_size );
 	}
 
   | _NEW compact_type_description '[' expression ']'
@@ -16252,6 +16301,12 @@ opt_base_class_initialisation
         DNODE *self_dnode;
         cexception_t inner;
 
+        push_typetab( &compiler->generic_type_table_stack,
+                      &compiler->generic_type_table_stack_size,
+                      &compiler->generic_types, px );
+
+        compiler->generic_types = new_typetab( px );
+
         cexception_guard( inner ) {
             assert( type_tnode );
             compiler_emit( compiler, &inner,
@@ -16325,6 +16380,12 @@ opt_base_class_initialisation
         nretval = compiler_compile_multivalue_function_call( compiler, px );
         assert( nretval == 0 || enode_has_flags( compiler->e_stack, EF_HAS_ERRORS ) );
         $$ = 1;
+
+        delete_typetab( compiler->generic_types );
+
+        compiler->generic_types =
+            pop_typetab( &compiler->generic_type_table_stack,
+                         &compiler->generic_type_table_stack_size );
     }
 | /* empty */
     { $$ = 0; }

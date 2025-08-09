@@ -81,50 +81,10 @@ operator "@list" (i : int): list of int
     return (i,);
 }
 
-var l, p : list of string;
+var q : list of int;
 
-var m = new int[100];
+q = cons( 123, cons( 45 ));
 
-var s : list of string = cons( "one" )@list;
-// var s : list of string = new (list of string);
-
-. head( s );
-
-//s.value = "one";
-
-l = s + p;
-
-var n = new int[100];
-var r = new int[100];
-
-. head( l );
-. head( s );
-. head( s + cons( "two" ));
-. head( s + l );
-l = s + cons( "two" )@list;
-. head( tail( l ));
-
-. head( cons( "alpha", cons( "beta", cons( "gamma" ))));
-. "---";
-. head( s );
-
-. "---";
-
-l = cons( "1", cons( "2" ))@list + cons( "three", cons( "four" ))@list;
-
-. head( l );
-. head( tail( l ));
-. head( l );
-. head( tail( l ));
-. head( tail( l ) + s );
-. head( s + tail( l ));
-
-. "#========================================================================";
-
-var q : list of string;
-
-q = cons( 123, cons( 45 ))@list;
-
-. head( q );
-. head( tail( q ));
-// . head( tail( tail( q )));
+// . head( q );
+// . head( tail( q ));
+// // . head( tail( tail( q )));

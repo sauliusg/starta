@@ -973,7 +973,9 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
         *has_generics = 0;
         return share_tnode( tnode_with_generics );
     } else {
-        if( tnode_kind( tnode_with_generics ) == TK_GENERIC ) {
+        if( tnode_kind( tnode_with_generics ) == TK_GENERIC ||
+            tnode_kind( tnode_with_generics ) == TK_PLACEHOLDER ||
+            tnode_kind( tnode_with_generics ) == TK_NOMINAL ) {
             TNODE *tnode_implementation =
                 typetab_lookup_paired_type( generic_table,
                                             tnode_with_generics );
