@@ -1084,6 +1084,24 @@ static TYPETAB* pop_typetab( TYPETAB ***array, int *size )
     return retval;
 }
 
+static void compiler_push_generic_type_table( COMPILER *c, cexception_t *ex )
+{
+    push_typetab( &c->generic_type_table_stack,
+                  &c->generic_type_table_stack_size,
+                  &c->generic_types, ex );
+
+    c->generic_types = new_typetab( ex );
+}
+
+static void compiler_pop_generic_type_table( COMPILER *c )
+{
+    delete_typetab( c->generic_types );
+
+    c->generic_types =
+        pop_typetab( &c->generic_type_table_stack,
+                     &c->generic_type_table_stack_size );
+}
+
 static void compiler_push_current_address( COMPILER *c, cexception_t *ex )
 {
     push_ssize_t( &c->addr_stack, &c->addr_stack_size,
@@ -12815,11 +12833,7 @@ multivalue_function_call
 	  TNODE *fn_tnode;
           type_kind_t fn_kind;
 
-          push_typetab( &compiler->generic_type_table_stack,
-                        &compiler->generic_type_table_stack_size,
-                        &compiler->generic_types, px );
-
-          compiler->generic_types = new_typetab( px );
+          compiler_push_generic_type_table( compiler, px );
 
           fn_tnode = compiler->current_call ?
 	      dnode_type( compiler->current_call ) : NULL;
@@ -12851,11 +12865,7 @@ multivalue_function_call
 
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 
-            delete_typetab( compiler->generic_types );
-
-            compiler->generic_types =
-                pop_typetab( &compiler->generic_type_table_stack,
-                             &compiler->generic_type_table_stack_size );
+            compiler_pop_generic_type_table( compiler );
 	}
   | lvalue 
         {
@@ -12906,11 +12916,7 @@ multivalue_function_call
             int class_has_interface = 1;
             ssize_t interface_nr = 0;
 
-            push_typetab( &compiler->generic_type_table_stack,
-                          &compiler->generic_type_table_stack_size,
-                          &compiler->generic_types, px );
-
-            compiler->generic_types = new_typetab( px );
+            compiler_push_generic_type_table( compiler, px );
 
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
@@ -13033,11 +13039,7 @@ multivalue_function_call
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
             delete_dnode( $1 );
 
-            delete_typetab( compiler->generic_types );
-
-            compiler->generic_types =
-                pop_typetab( &compiler->generic_type_table_stack,
-                             &compiler->generic_type_table_stack_size );
+            compiler_pop_generic_type_table( compiler );
 	}
 
   | lvalue 
@@ -13059,11 +13061,7 @@ multivalue_function_call
             int class_has_interface = 1;
             ssize_t interface_nr = 0;
 
-            push_typetab( &compiler->generic_type_table_stack,
-                          &compiler->generic_type_table_stack_size,
-                          &compiler->generic_types, px );
-
-            compiler->generic_types = new_typetab( px );
+            compiler_push_generic_type_table( compiler, px );
 
             if( !object_expr ) {
                 yyerrorf( "too little values on the evaluation stack "
@@ -13171,11 +13169,7 @@ multivalue_function_call
 	    compiler_emit( compiler, px, "\tc\n", RFROMR );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
 
-            delete_typetab( compiler->generic_types );
-
-            compiler->generic_types =
-                pop_typetab( &compiler->generic_type_table_stack,
-                             &compiler->generic_type_table_stack_size );
+            compiler_pop_generic_type_table( compiler );
 	}
 
   ;
@@ -15141,11 +15135,7 @@ generator_new
           TNODE *volatile shared_tnode = NULL;
           cexception_t inner;
 
-          push_typetab( &compiler->generic_type_table_stack,
-                        &compiler->generic_type_table_stack_size,
-                        &compiler->generic_types, px );
-
-          compiler->generic_types = new_typetab( px );
+          compiler_push_generic_type_table( compiler, px );
 
           cexception_guard( inner ) {
               compiler_check_type_contains_non_null_ref( type_tnode );
@@ -15199,11 +15189,7 @@ generator_new
                           constructor_name ? constructor_name : "???" );
             }
 
-            delete_typetab( compiler->generic_types );
-
-            compiler->generic_types =
-                pop_typetab( &compiler->generic_type_table_stack,
-                             &compiler->generic_type_table_stack_size );
+            compiler_pop_generic_type_table( compiler );
 	}
 
   | _NEW compact_type_description '[' expression ']'
@@ -16301,11 +16287,7 @@ opt_base_class_initialisation
         DNODE *self_dnode;
         cexception_t inner;
 
-        push_typetab( &compiler->generic_type_table_stack,
-                      &compiler->generic_type_table_stack_size,
-                      &compiler->generic_types, px );
-
-        compiler->generic_types = new_typetab( px );
+        compiler_push_generic_type_table( compiler, px );
 
         cexception_guard( inner ) {
             assert( type_tnode );
@@ -16381,11 +16363,7 @@ opt_base_class_initialisation
         assert( nretval == 0 || enode_has_flags( compiler->e_stack, EF_HAS_ERRORS ) );
         $$ = 1;
 
-        delete_typetab( compiler->generic_types );
-
-        compiler->generic_types =
-            pop_typetab( &compiler->generic_type_table_stack,
-                         &compiler->generic_type_table_stack_size );
+        compiler_pop_generic_type_table( compiler );
     }
 | /* empty */
     { $$ = 0; }
