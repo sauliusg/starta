@@ -121,10 +121,10 @@ l = cons( "1", cons( "2" ))@list + cons( "three", cons( "four" ))@list;
 
 . "#========================================================================";
 
-var q : list of int;
+var q : list of string;
 
 q = cons( 123, cons( 45 ))@list;
 
 . head( q );
 . head( tail( q ));
-. head( tail( tail( q )));
+// . head( tail( tail( q )));
