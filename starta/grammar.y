@@ -4365,6 +4365,35 @@ static DNODE* compiler_make_stack_top_field_type( COMPILER *cc,
     }
 }
 
+static void
+compiler_instantiate_generic_and_nominal_types( COMPILER *cc,
+                                                DNODE *function,
+                                                TYPETAB *generic_types,
+                                                cexception_t *ex )
+{
+    DNODE *function_args = dnode_function_args( function );
+    DNODE *formal_arg = NULL;
+    ENODE *actual_arg = cc->e_stack;
+    foreach_reverse_dnode( formal_arg, function_args ) {
+        if( !actual_arg || enode_has_flags( actual_arg, EF_GUARDING_ARG )) {
+            break;
+        }
+        TNODE *formal_type = dnode_type( formal_arg );
+        TNODE *actual_type = enode_type( actual_arg );
+        if( !formal_type || !actual_type ) {
+            continue;
+        }
+        if( tnode_kind( formal_type ) == TK_GENERIC ||
+            tnode_kind( formal_type ) == TK_NOMINAL ||
+            tnode_has_generic_type( formal_type )) {
+            /* call a compatibility check to populate the
+               'generic_types' table: */
+            tnode_types_are_compatible( formal_type, actual_type,
+                                        generic_types, ex );
+        }
+    }
+}
+
 static void compiler_check_and_drop_function_args( COMPILER *cc,
                                                    DNODE *function,
                                                    TYPETAB *generic_types,
@@ -6733,6 +6762,8 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
     cexception_guard( inner ) {
 	// generic_types = new_typetab( &inner );
         if( funct && fn_type ) {
+            compiler_instantiate_generic_and_nominal_types
+                ( cc, funct, generic_types, &inner );
             compiler_emit_default_arguments( cc, NULL, &inner );
             compiler_check_and_drop_function_args( cc, funct, generic_types,
                                                    &inner );
