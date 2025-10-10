@@ -4385,12 +4385,15 @@ compiler_instantiate_generic_and_nominal_types( COMPILER *cc,
         }
         if( tnode_kind( formal_type ) == TK_GENERIC ||
             tnode_kind( formal_type ) == TK_NOMINAL ||
-            tnode_has_generic_type( formal_type )) {
+            tnode_has_generic_type( formal_type ) ||
+            tnode_has_placeholder_element( formal_type )
+            ) {
             /* call a compatibility check to populate the
                'generic_types' table: */
             tnode_types_are_compatible( formal_type, actual_type,
                                         generic_types, ex );
         }
+        actual_arg = enode_next( actual_arg );
     }
 }
 
