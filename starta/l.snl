@@ -82,8 +82,9 @@ operator "@list" (i : int): list of int
 }
 
 var q : list of int;
+var p : list of int = (123,);
 
-q = cons( 123, null );
+q = cons( p, null );
 
 // . head( q );
 // . head( tail( q ));
