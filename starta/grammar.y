@@ -2228,10 +2228,23 @@ static void compiler_compile_type_conversion( COMPILER *cc,
             }
 
 	    if( target_type ) {
-		share_tnode( target_type );
-		converted_expr = new_enode_typed( &target_type, &inner );
-		enode_list_push( &cc->e_stack, converted_expr );
-		delete_enode( expr );
+                if( tnode_has_placeholder_element( target_type )) {
+                    TNODE *retval_type = dnode_type( retvals );
+                    if( retval_type ) {
+                        share_tnode( retval_type );
+                        converted_expr = new_enode_typed( &retval_type, &inner );
+                        enode_list_push( &cc->e_stack, converted_expr );
+                        dispose_enode( &expr );
+                    } else {
+                        enode_list_push( &cc->e_stack, expr );
+                        expr = NULL;
+                    }
+                } else {
+                    share_tnode( target_type );
+                    converted_expr = new_enode_typed( &target_type, &inner );
+                    enode_list_push( &cc->e_stack, converted_expr );
+                    dispose_enode( &expr );
+                }
 	    } else {
 		enode_list_push( &cc->e_stack, expr );
 	    }
