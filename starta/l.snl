@@ -37,7 +37,7 @@ type list of T = ? : ref {
 
 procedure cons( s : list of type T; l : list of type T = null ) : list of type T
 {
-    s.next = l;
+    do s.next = l if s;
     return s;
 }
 
