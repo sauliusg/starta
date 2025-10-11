@@ -892,9 +892,9 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 
 int APUSH( INSTRUCTION_FN_ARGS )
 {
-    stackcell_t *value = &istate.ep[0];
+    alloccell_t *value = STACKCELL_PTR( istate.ep[0] );
     alloccell_t *array = STACKCELL_PTR( istate.ep[1] );
-    ssize_t nref, size, length;
+    ssize_t nref, size, length, value_length;
     ssize_t element_size = sizeof(stackcell_t);
     alloccell_flag_t flags;
 
@@ -913,11 +913,12 @@ int APUSH( INSTRUCTION_FN_ARGS )
         nref = array[-1].nref;
         size = array[-1].size;
         length = array[-1].length;
+        value_length = value[-1].length;
         /* We only push values onto arrays, not to structures: */
         if( length >= 0 && element_size > 0 ) {
-            if( (length + 1) * element_size > size ) {
+            if( (length + value_length) * element_size > size ) {
                 /* need to reallocate the array: */
-                ssize_t new_size = element_size * (length + 1) * 2;
+                ssize_t new_size = element_size * (length + value_length) * 2;
                 void *new_array = bcalloc( new_size, length, nref, EXCEPTION );
                 BC_CHECK_PTR( new_array );
                 memcpy( new_array, array, length * element_size );
@@ -925,8 +926,9 @@ int APUSH( INSTRUCTION_FN_ARGS )
                 STACKCELL_SET_ADDR( istate.ep[1], new_array );
             }
             /* Array now has enough capacity to push a new element: */
-            ((stackcell_t*)array)[length] = *value;
-            array[-1].length++;
+            memcpy( (char*)array + length * element_size, value,
+                    element_size * value_length );
+            array[-1].length += value_length;
             if( flags & AF_HAS_REFS ) {
                 array[-1].nref ++;
                 array[-1].flags |= AF_HAS_REFS;
@@ -3608,7 +3610,7 @@ int SFILEREADLN( INSTRUCTION_FN_ARGS )
  * PLDZ  load zero pointer (reference).
  *
  * bytecode:
- * PLDZ
+ * PLDLDIZ
  *
  * stack:
  * -> null
