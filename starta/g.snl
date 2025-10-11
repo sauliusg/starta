@@ -16,23 +16,40 @@ type F = ?class {
 }
 
 type G = ?class : F {
-    s : string;
     n : int;
+    r : R;
+    s : string;
 
     method funny ( x : R ) -> R
     {
         return x;
     }
+
+    method set_generic ( x : R )
+    {
+        self.r = x;
+    }
 };
 
-var g : G = new G;
-
-operator "."  (a : array of int)
+procedure p()
 {
-    for (var e in a) {
-        < e, " ";
+    operator "."  (a : array of int)
+    {
+        for (var e in a) {
+            < e, " ";
+        }
     }
+
+    var g : G = new G;
+
+    . g->funny( "hi" );
+    . g->funny( [1, 2, 3] );
+
+    // Problematic calls -- type compatibility should fail, but
+    // criterion is not clear (S.G. 2025-10-11):
+    g->set_generic( [1, 2, 3] );
+    g->set_generic( "hi" );
+    // g->set_generic( 123 ); // OK: ERROR, incompatible types for function 'set_generic' argument nr. 2
 }
 
-. g->funny( "hi" );
-. g->funny( [1, 2, 3] );
+p();
