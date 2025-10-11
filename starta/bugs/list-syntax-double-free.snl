@@ -1,0 +1,144 @@
+#
+# Snail compiler tests
+#
+#
+# Generic lists.
+#
+
+use * from std;
+
+type list of T = ? : ref {
+    next : list of T;
+    value : T;
+
+    operator "+" ( l1, l2 : list of T ) : list of T
+    {
+	if( l1 && l2 ) {
+	    var r = l1[];
+	    var q = r;
+	    var p = l1.next;
+	    while( p != null ) {
+		q.next = p[];
+		q = q.next;
+		p = p.next;
+	    }
+	    q.next = l2;
+	    return r
+	} else {
+	    if( l1 ) {
+		return l1
+	    } else {
+		return l2
+	    }
+	}
+    }; // operator "+"
+
+    inline bytecode operator "*" ( l : list of T ) : addressof
+    { OFFSET %.value }
+
+    inline bytecode operator "next"( l : list of T )
+    { NEXT const((list of T).next.offset) %.value }
+
+} // type "list of T"
+
+procedure cons( s : list of type T; l : list of type T = null ) : list of type T
+{
+    do s.next = l if s;
+    return s;
+}
+
+exception NullPointerException;
+
+procedure head( l : list of type T ) : list of type T
+{
+    if( l ) {
+        return l
+    } else {
+        raise NullPointerException( 123, "attempting to take head of a null list" );
+    }
+}
+
+procedure tail( l : list of type T ) : list of type T
+{
+    if( l ) {
+        return l.next
+    } else {
+        return null;
+    }
+}
+
+operator "." (l : list of int)
+{
+    var q = l;
+    < "( ";
+    var n = 0;
+    while( q ) {
+        if( n > 0 ) {
+           < ", ";
+        }
+        < *q;
+        q = q.next;
+        n++;
+    }
+    < " )";
+}
+
+operator "." (l : list of string)
+{
+    var q = l;
+    < "( ";
+    var n = 0;
+    while( q ) {
+        if( n > 0 ) {
+           < ", ";
+        }
+        < "\"";
+        < *q;
+        < "\"";
+        q = q.next;
+        n++;
+    }
+    < " )";
+}
+
+operator "@list" (s : string): list of string
+{
+    return (s,);
+}
+
+operator "@list" (i : int): list of int
+{
+    return (i,);
+}
+
+var q : list of int;
+var p : list of int = (123,);
+
+q = cons (112);
+. q;
+
+q = cons ((112,));
+. q;
+
+q = cons (112, null);
+. q;
+
+q = cons( 345, cons( 567 ));
+. q;
+
+q = cons( (345,), cons( 567 ));
+. q;
+
+q = cons( 345, cons( 567, null ));
+. q;
+
+q = cons( 345, cons( 567, p ));
+. q;
+
+q = cons( 345, cons( (567,), p ));
+. q;
+
+q = cons( (345,), cons( (567,), p ));
+. q;
+
+. cons( "345", cons( ("567",), (new list of string).value = "foo" ));
