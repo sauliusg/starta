@@ -33,6 +33,12 @@ type list of T = ? : ref {
 	}
     }; // operator "+"
 
+    inline bytecode operator "*" ( l : list of T ) : addressof
+    { OFFSET %.value }
+
+    inline bytecode operator "next"( l : list of T )
+    { NEXT const((list of T).next.offset) %.value }
+
 } // type "list of T"
 
 procedure cons( s : list of type T; l : list of type T = null ) : list of type T
@@ -63,12 +69,36 @@ procedure tail( l : list of type T ) : list of type T
 
 operator "." (l : list of int)
 {
-    < l.value
+    var q = l;
+    < "( ";
+    var n = 0;
+    while( q ) {
+        if( n > 0 ) {
+           < ", ";
+        }
+        < *q;
+        q = q.next;
+        n++;
+    }
+    < " )";
 }
 
 operator "." (l : list of string)
 {
-    < l.value
+    var q = l;
+    < "( ";
+    var n = 0;
+    while( q ) {
+        if( n > 0 ) {
+           < ", ";
+        }
+        < "\"";
+        < *q;
+        < "\"";
+        q = q.next;
+        n++;
+    }
+    < " )";
 }
 
 operator "@list" (s : string): list of string
@@ -84,10 +114,31 @@ operator "@list" (i : int): list of int
 var q : list of int;
 var p : list of int = (123,);
 
-// q = cons( 345, cons( 567, p ));
-q = cons (112, null);
+q = cons (112);
+. q;
 
-. head( q );
-//. head( tail( q ));
-//. head( tail( tail( q )));
-// // . head( tail( tail( q )));
+q = cons ((112,));
+. q;
+
+q = cons (112, null);
+. q;
+
+q = cons( 345, cons( 567 ));
+. q;
+
+q = cons( (345,), cons( 567 ));
+. q;
+
+q = cons( 345, cons( 567, null ));
+. q;
+
+q = cons( 345, cons( 567, p ));
+. q;
+
+q = cons( 345, cons( (567,), p ));
+. q;
+
+q = cons( (345,), cons( (567,), p ));
+. q;
+
+. cons( "345", cons( ("567",), new list of string ));
