@@ -422,7 +422,8 @@ int ICOPY( INSTRUCTION_FN_ARGS )
     ssize_t pos = istate.ep[1].num.ssize;
     ssize_t nref0 = 0, nref1 = 0;
     ssize_t length = 0;
-    ssize_t element_size = sizeof(stackcell_t);
+    ssize_t element_size = alloccell_has_references( src[-1] ) ?
+            REF_SIZE : sizeof(stackunion_t);
     
     TRACE_FUNCTION();
 
