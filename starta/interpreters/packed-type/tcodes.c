@@ -1164,7 +1164,7 @@ int PMKARRAY( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * APUSH -- Array push -- push a new element onto an array. Increase the
+ * APUSH -- Array push -- push new elements onto an array. Increase the
  *          array length accordingly. Reallocate memory if necessary.
  *
  * bytecode:
