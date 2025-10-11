@@ -1085,6 +1085,23 @@ TNODE *new_tnode_placeholder( char *name, cexception_t *ex )
     return node;
 }
 
+TNODE *new_tnode_nominal( char *name, cexception_t *ex )
+{
+    cexception_t inner;
+    TNODE * volatile node = new_tnode( ex );
+
+    cexception_guard( inner ) {
+	node->params.kind = TK_NOMINAL;
+	node->name = strdupx( name, &inner );
+    }
+    cexception_catch {
+	delete_tnode( node );
+	cexception_reraise( inner, ex );
+    }
+
+    return node;
+}
+
 TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex )
 {
     assert( base_type );
