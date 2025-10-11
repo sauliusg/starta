@@ -141,4 +141,9 @@ q = cons( 345, cons( (567,), p ));
 q = cons( (345,), cons( (567,), p ));
 . q;
 
-. cons( "345", cons( ("567",), new list of string ));
+q = cons( (345,12,22), cons( (567,), p )) + (11, 22);
+. q;
+
+. cons( "345", cons( ("567","890"), new list of string ));
+
+. cons( "345", cons( ("567","890"), new list of string )) + ("12","29");
