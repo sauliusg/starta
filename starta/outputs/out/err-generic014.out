@@ -1,0 +1,5 @@
+./sl: inputs/err-generic014.snl(37,36): ERROR, incompatible types for function 'push' argument nr. 2
+edges[3] = push (edges[3], [[edge]]);
+                                   ^
+./sl: 1 error(s) detected
+
