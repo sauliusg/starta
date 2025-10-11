@@ -943,21 +943,21 @@ int APUSH( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * APOP -- Array pop -- pop the past element from the array. Throw
+ * APOP -- Array pop -- pop the last element from the array. Throw
  *         exception if the array is empty or null.
  *
  * bytecode:
  * APOP
  *
  * stack:
- * array -> value
+ * array -> array(with a single popped element)
  */
 
 int APOP( INSTRUCTION_FN_ARGS )
 {
     alloccell_t *array = STACKCELL_PTR( istate.ep[0] );
-    ssize_t length;
-    ssize_t element_size = sizeof(stackcell_t);
+    ssize_t length, nref;
+    const ssize_t element_size = sizeof(stackcell_t);
     alloccell_flag_t flags;
 
     TRACE_FUNCTION();
@@ -973,6 +973,7 @@ int APOP( INSTRUCTION_FN_ARGS )
     } else {
         flags = array[-1].flags;
         length = array[-1].length;
+        nref = array[-1].nref;
         /* We only pop values onto arrays, not to structures: */
         if( length >= 0 && element_size > 0 ) {
             if( length == 0 ) {
@@ -984,7 +985,21 @@ int APOP( INSTRUCTION_FN_ARGS )
                       /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
                       EXCEPTION );
             }
-            istate.ep[0] = ((stackcell_t*)array)[length-1];
+            // get extra stack cell to temporarily store the popped value:
+            istate.ep --;
+            // allocate a new array for the popped value:
+            void **new_array = bcalloc( /*size:*/element_size, /*length:*/1,
+                                        /*nref:*/nref == 0 ? 0 : 1,
+                                        EXCEPTION );
+            BC_CHECK_PTR( new_array );
+            STACKCELL_SET_ADDR( istate.ep[0], new_array );
+
+            // copy the popped value:
+            memcpy( new_array, (char*)array + (length - 1) * element_size,
+                    element_size );
+
+            // mark the popped value as no longer present in the old
+            // array:
             STACKCELL_ZERO_PTR( ((stackcell_t*)array)[length-1] );
             array[-1].length--;
             if( flags & AF_HAS_REFS ) {
@@ -992,7 +1007,10 @@ int APOP( INSTRUCTION_FN_ARGS )
                 array[-1].nref --;
                 array[-1].flags |= AF_HAS_REFS;
             }
-            
+            // Return the popped value:
+            istate.ep[1] = istate.ep[0];
+            STACKCELL_ZERO_PTR( istate.ep[0] );
+            istate.ep ++;            
         }
     }
 

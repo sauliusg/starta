@@ -1224,7 +1224,7 @@ int APUSH( INSTRUCTION_FN_ARGS )
 }
 
 /*
- * APOP -- Array pop -- pop the past element from the array. Throw
+ * APOP -- Array pop -- pop the last element from the array. Throw
  *         exception if the array is empty or null.
  *
  * bytecode:
