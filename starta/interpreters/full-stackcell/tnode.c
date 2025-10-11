@@ -1132,7 +1132,8 @@ TNODE *new_tnode_implementation( TNODE *generic_tnode,
     if( !generic_tnode ) return NULL;
     if( !generic_types ) return share_tnode( generic_tnode );
 
-    if( generic_tnode->params.kind == TK_PLACEHOLDER ) {
+    if( generic_tnode->params.kind == TK_PLACEHOLDER ||
+        generic_tnode->params.kind == TK_NOMINAL ) {
         TNODE *concrete_type = typetab_lookup( generic_types,
                                                tnode_name( generic_tnode ));
         if( concrete_type ) {
@@ -1675,6 +1676,7 @@ TNODE *tnode_set_size( TNODE *tnode, int size )
 {
     assert( tnode );
     assert( tnode->params.size == 0 );
+    assert( tnode->params.kind != TK_NOMINAL );
     tnode->params.size = size;
     return tnode;
 }
@@ -2179,11 +2181,14 @@ TNODE *tnode_insert_element_type( TNODE* tnode, TNODE *element_type )
 
     assert( !tnode->element_type || 
 	    (tnode->params.kind == TK_COMPOSITE &&
-	     tnode->element_type->params.kind == TK_PLACEHOLDER));
+	     (tnode->element_type->params.kind == TK_PLACEHOLDER ||
+              tnode->element_type->params.kind == TK_NOMINAL)));
 
     if( tnode_kind( element_type ) != TK_PLACEHOLDER &&
         tnode && tnode->params.kind == TK_COMPOSITE &&
-        tnode->element_type && tnode->element_type->params.kind == TK_PLACEHOLDER ) {
+        tnode->element_type &&
+        (tnode->element_type->params.kind == TK_PLACEHOLDER ||
+         tnode->element_type->params.kind == TK_NOMINAL)) {
         DNODE *field;
         cexception_t inner;
 
@@ -2293,7 +2298,8 @@ TNODE *tnode_set_has_generics( TNODE *tnode )
 int tnode_has_placeholder_element( TNODE *tnode )
 {
     while( tnode ) {
-        if( tnode->params.kind == TK_PLACEHOLDER )
+        if( tnode->params.kind == TK_PLACEHOLDER ||
+            tnode->params.kind == TK_NOMINAL )
             return 1;
         tnode = tnode->element_type;
     }
