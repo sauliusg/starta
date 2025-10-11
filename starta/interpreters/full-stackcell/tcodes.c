@@ -901,13 +901,8 @@ int APUSH( INSTRUCTION_FN_ARGS )
     TRACE_FUNCTION();
 
     if( !array ) {
-	interpret_raise_exception_with_bcalloc_message
-	    ( /* err_code = */ -1,
-	      /* message = */
-	      "can not push value onto a null array",
-	      /* module_id = */ 0,
-	      /* exception_id = */ SL_EXCEPTION_ARRAY_OVERFLOW,
-	      EXCEPTION );
+        /* Just return the pushed 'value' array: */
+        istate.ep[1] = istate.ep[0];
     } else {
         flags = array[-1].flags;
         nref = array[-1].nref;
