@@ -2076,24 +2076,9 @@ static void compiler_push_function_retvals( COMPILER *cc, DNODE *function,
         foreach_dnode( retval_dnode, function_retvals ) {
             TNODE *retval_dnode_type = dnode_type( retval_dnode );
             if( tnode_has_placeholder_element( retval_dnode_type )) {
-                int has_generics = 0;
-                TNODE *old_retval_type = retval_dnode_type;
-
                 retval_tnode = new_tnode_implementation( retval_dnode_type,
                                                          generic_types,
                                                          &inner );
-
-                // retval_tnode = new_tnode_with_concrete_types( retval_dnode_type,
-                //                                               generic_types,
-                //                                               &has_generics,
-                //                                               &inner );
-
-                //// fprintf (stderr, "\n");
-                //// fprintf (stderr, ">>>> placeholder name: type '%s' ", tnode_name (retval_dnode_type));
-                //// fprintf (stderr, "of '%s'\n", tnode_element_type (retval_dnode_type) ? tnode_name (tnode_element_type (retval_dnode_type)) : "<none>");
-                //// fprintf (stderr, ">>>> has generics:     %d\n", has_generics);
-                //// fprintf (stderr, ">>>> replaced:         %d\n", old_retval_type != retval_dnode_type);
-                
             } else if( tnode_has_generic_type( retval_dnode_type )) {
                 int has_generics = 0;
                 retval_tnode = new_tnode_with_concrete_types
