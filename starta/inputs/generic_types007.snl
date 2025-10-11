@@ -55,7 +55,7 @@ procedure p()
 
     g->set_generic( "Suoer OK!" );
     h->set_generic( [1, 2, 3, 6, 7, 9] );
-    // g->set_generic( 123 ); // OK: ERROR, incompatible types for function 'set_generic' argument nr. 2
+    // g->set_generic( 123 ); // OK: ERROR, type 'string' has no conversion from type 'int'
 
     . g->get_generic();
     . h->get_generic();
