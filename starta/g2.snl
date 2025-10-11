@@ -17,6 +17,9 @@ null class A {
 var a : A with ( T => ref );
 var b : A with ( T => string );
 
+a = new A with ( T => ref );
+b = new A with ( T => string );
+
 b.value = "foo";
 
 . b.value;
