@@ -93,6 +93,7 @@ typedef enum {
     TK_DESTRUCTOR,
     TK_COMPOSITE, /* user-declared array-like types */
     TK_PLACEHOLDER, /* placeholders for 'T'  in 'type array of T = ...' */
+    TK_NOMINAL,     /* nominal type, as in 'array of type T' */
     TK_GENERIC,     /* generic types a-la Ada. The compiler MUST have
                        some base type that shares size and load/store
                        operators to compile the generic code; later a
@@ -208,6 +209,8 @@ TNODE *new_tnode_operator_NEW( char *name,
 TNODE *new_tnode_composite( char *name, TNODE *element_type, cexception_t *ex );
 
 TNODE *new_tnode_placeholder( char *name, cexception_t *ex );
+
+TNODE *new_tnode_nominal( char *name, cexception_t *ex );
 
 TNODE *new_tnode_generic( TNODE *volatile *base_type, cexception_t *ex );
 

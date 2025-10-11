@@ -35,17 +35,18 @@ type list of T = ? : ref {
 
 } // type "list of T"
 
-procedure cons( s : type T; l : list of type T = null ) : list of type T
+procedure cons( s : list of type T; l : list of type T = null ) : list of type T
 {
-    return type list of T { value => s, next => l };
+    s.next = l;
+    return s;
 }
 
 exception NullPointerException;
 
-procedure head( l : list of type T ) : type T
+procedure head( l : list of type T ) : list of type T
 {
     if( l ) {
-        return l.value
+        return l
     } else {
         raise NullPointerException( 123, "attempting to take head of a null list" );
     }
@@ -60,11 +61,31 @@ procedure tail( l : list of type T ) : list of type T
     }
 }
 
+operator "." (l : list of int)
+{
+    < l.value
+}
+
+operator "." (l : list of string)
+{
+    < l.value
+}
+
+operator "@list" (s : string): list of string
+{
+    return (s,);
+}
+
+operator "@list" (i : int): list of int
+{
+    return (i,);
+}
+
 var l, p : list of string;
 
 var m = new int[100];
 
-var s : list of string = cons( "one" );
+var s : list of string = cons( "one" )@list;
 // var s : list of string = new (list of string);
 
 . head( s );
@@ -80,7 +101,7 @@ var r = new int[100];
 . head( s );
 . head( s + cons( "two" ));
 . head( s + l );
-l = s + cons( "two" );
+l = s + cons( "two" )@list;
 . head( tail( l ));
 
 . head( cons( "alpha", cons( "beta", cons( "gamma" ))));
@@ -89,7 +110,7 @@ l = s + cons( "two" );
 
 . "---";
 
-l = cons( "1", cons( "2" )) + cons( "three", cons( "four" ));
+l = cons( "1", cons( "2" ))@list + cons( "three", cons( "four" ))@list;
 
 . head( l );
 . head( tail( l ));
@@ -102,7 +123,7 @@ l = cons( "1", cons( "2" )) + cons( "three", cons( "four" ));
 
 var q : list of int;
 
-q = cons( 123, cons( 45 ));
+q = cons( 123, cons( 45 ))@list;
 
 . head( q );
 . head( tail( q ));

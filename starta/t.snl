@@ -1,91 +1,9 @@
 #--*- Java -*--
 # Starta compiler tests.
 #
-# Check functional primitives: map()
+# Check the new compiler features...
 #
 
 use std;
 
-pragma prepend "inputs/functional";
-
-use Mapper (int) as IntMapper;
-
-var m = [2, 12, 23];
-
-var a : array of int;
-
-function inc( int x ): int => x + 2;
-
-a = map (inc, m);
-
-for var e in a {
-    . ">>>", e;
-}
-
-. "";
-
-inline bytecode function ord( char c ) : byte {}
-inline bytecode function chr( byte c ) : char {}
-inline bytecode function str( blob b ) : string {}
-
-function toupper( s: string ): string
-{
-    var m = new char[length(s)];
-
-    for var i = 0 to last(s)-1 {
-        m[i] = chr( ord(s[i]) - 32B );
-    }
-
-    var r: blob = new blob(length(s)+1);
-    pack r, 0, "i1", m;
-    return str(r);
-}
-
-operator "." (a : array of string)
-{
-    < "[ ";
-    for var s in a {
-        < "\"" _ s _ "\" ";
-    }
-    . "]"
-}
-
-operator "." (a : array of int)
-{
-    < "[ ";
-    for var s in a {
-        < s, " ";
-    }
-    . "]"
-}
-
-{
-
-    // type R = ref;
-    type R = generic ref;
-
-    use Mapper (R) as RefMapper;
-
-    var n : array of string = ["abcd", "qrn", "uvw"];
-
-    type S = struct {
-        x, y : int
-    };
-
-    var s : S = new S;
-    var b : array of string = ["one", "two", "three", "four"];
-    var r : ref;
-
-    r = s;
-    r = b;
-    r = n;
-
-    // s = r; // ERROR, incompatible types for assignment to variable 's'
-    // b = r; // ERROR, incompatible types for assignment to variable 'b'
-    // n = r; // ERROR, incompatible types for assignment to variable 'n'
-    
-    n = RefMapper::map (toupper, b);
-    a = RefMapper::map (inc, m);
-    . n;
-    . a;
-}
+. "Feature: ...";

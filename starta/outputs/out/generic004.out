@@ -1,5 +1,11 @@
+./sl: inputs/generic004.snl(26,49): ERROR, cannot declare parameters (starting with 'p') of a nominal type 'T'
+                         shifter: procedure (p:T; amount:float)->(T)
+                                                ^
+./sl: inputs/generic004.snl(26,68): ERROR, cannot return value of a nominal type 'T'
+                         shifter: procedure (p:T; amount:float)->(T)
+                                                                   ^
 ./sl: inputs/generic004.snl(29,48): ERROR, in this type representation, can not allocate array of generic type T
     var new_p: array [] of T = new T[length(p)];
                                                ^
-./sl: 1 error(s) detected
+./sl: 3 error(s) detected
 

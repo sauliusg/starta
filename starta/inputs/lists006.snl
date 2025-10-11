@@ -7,6 +7,12 @@
 use * from std;
 use * from Lists;
 
+procedure cons( s : list of type T; l : list of type T = null ) : list of type T
+{
+    // return type list of T { value => s, next => l };
+    return cat( s, l );
+}
+
 class S
 { 
   int x
@@ -22,7 +28,7 @@ do
     . e.x
 enddo
 
-a = cons( new S, cons( new S(), cons( new S(3) )));
+a = cons( (new S,), cons( (new S(),), cons( (new S(3),) )));
 
 foreach var e in a
 do

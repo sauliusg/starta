@@ -8,7 +8,7 @@
 // Minimise a multidimensional function using simplex method.
 //**
 
-package Simplex;
+package Simplex (type T);
 
 use * from std;
 use * from Math;
@@ -17,10 +17,10 @@ exception SimplexNotConverged;
 
 function maxmaxmin( a : array of float ): long, long, long;
 
-procedure minimise( point: type T;
+procedure minimise( point: T;
                     ndim: long;
                     stepsize: float;
-                    energy: function ( point: type T ) -> (float);
+                    energy: function ( point: T ) -> (float);
                     scale: procedure( simplex: array of T;
                                       index: long;
                                       factor: float );
@@ -30,9 +30,9 @@ procedure minimise( point: type T;
                     flip: function( simplex: array of T;
                                     pivot: T;
                                     index: long;
-                                    factor: float )-> (type T);
+                                    factor: float )-> (T);
                     makearray: function( length : long ) -> (array of T);
-                    makecenter: function( simplex: array of T; i: long )->(type T);
+                    makecenter: function( simplex: array of T; i: long )->(T);
                     ftol: float = 1.0E-15;
                     maxsteps: long = 10000;
                     reporter: procedure( simplex: array of T;
@@ -42,15 +42,15 @@ procedure minimise( point: type T;
                                          maxindex: long;
                                          stepnr: long
                                         ) = null
-                  ): float, type T, long
+                  ): float, T, long
 {
     const tiny = 1.0E-10;
     var long nsteps;
     // var simplex: array [] of T = new T[ ndim + 1L ];
     var simplex: array [] of T = makearray( ndim+1L );
     var energies: array of float = new float[ndim+1L];
-    var center: type T;
-    var new_point: type T;
+    var center: T;
+    var new_point: T;
     var new_energy, rtol: float;
     var ihigh, inext, ilow: long;
 

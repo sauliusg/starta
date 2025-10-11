@@ -35,17 +35,17 @@ type list of T = ? : ref {
 
 } // type "list of T"
 
-procedure cons( s : type T; l : list of type T = null ) : list of type T
+procedure cons( s : list of type T; l : list of type T = null ) : list of type T
 {
     return type list of T { value => s, next => l };
 }
 
 exception NullPointerException;
 
-procedure head( l : list of type T ) : type T
+procedure head( l : list of type T ) : list of type T
 {
     if( l ) {
-        return l.value
+        return l
     } else {
         raise NullPointerException( 123, "attempting to take head of a null list" );
     }
@@ -58,6 +58,26 @@ procedure tail( l : list of type T ) : list of type T
     } else {
         return null;
     }
+}
+
+operator "@list" (i : int): list of int
+{
+    return (i,);
+}
+
+operator "@list" (s : string): list of string
+{
+    return (s,);
+}
+
+operator "." (l : list of int)
+{
+    < l.value
+}
+
+operator "." (l : list of string)
+{
+    < l.value
 }
 
 var l, p : list of string;

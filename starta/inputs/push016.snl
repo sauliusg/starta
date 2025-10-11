@@ -4,7 +4,7 @@
 
 use * from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
+inline bytecode procedure push( a : array of type T; value : T[] )
     -> array of type T
 {
     APUSH
@@ -12,9 +12,12 @@ inline bytecode procedure push( a : array of type T; value : T )
 
 inline bytecode function nref( a : array ): int { NREF }
 
-function print_array( array of type T a; function ( T element ) print )
+type R = generic ref;
+
+function print_array( R a[];
+                      function ( R element ) print )
 {
-    foreach var T e in a do
+    foreach var R e in a do
         print( e );
     enddo
 }
@@ -27,7 +30,7 @@ print_array( m, function( string i ) { . i } );
 
 . "========================================";
 
-m = push( m, "delta" );
+m = push( m, ["delta"] );
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
@@ -35,7 +38,7 @@ print_array( m, function( string i ) { . i } );
 
 . "========================================";
 
-m = push( m, "epsilon" );
+m = push( m, ["epsilon"] );
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);

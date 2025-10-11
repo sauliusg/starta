@@ -8,7 +8,7 @@ use type int, string from std;
 use function length from std;
 use var true from std;
 
-inline bytecode procedure push( a : array of type T; value : T )
+inline bytecode procedure push( a : array of type T; value : array of type T )
     -> array of type T
 {
     APUSH
@@ -18,13 +18,6 @@ inline bytecode function nref( a : array ): int { NREF }
 inline bytecode function capacity( a : array ): int { CAPACITY }
 inline bytecode function trim( a : array of T ): array of T { TRIM }
 
-function print_array( array of type T a; function ( T element ) print )
-{
-    foreach var T e in a do
-        print( e );
-    enddo
-}
-
 var m = new int[0];
 
 . "length(m) ==" string, length(m);
@@ -32,7 +25,7 @@ var m = new int[0];
 
 var n = 0;
 while true {
-    m = push( m, n );
+    m = push( m, [n] );
     var l = length(m);
     if l < 16 or l % 100 == 0 {
         . l, capacity(m), capacity(m=trim(m))

@@ -1,0 +1,5 @@
+./sl: inputs/err-nominal001.snl(12,17): ERROR, can not index arrays with components of the nominal type 'T'
+    var b = m[0]; // ERROR, unknown size and nref of an array component
+                ^
+./sl: 1 error(s) detected
+

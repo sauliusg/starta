@@ -235,6 +235,13 @@ typedef struct {
     DNODE *loops;
     DLIST *loop_stack;
 
+    /* Symbol table for generic types used during compilation of
+       function calls, and the stack of these tables when the calls
+       are nestet:*/
+    TYPETAB *generic_types;
+    TYPETAB **generic_type_table_stack;
+    int generic_type_table_stack_size;
+    
     /* number sequentially all exceptions declared in each module or
        in the main program: */
     int latest_exception_nr;
@@ -322,7 +329,7 @@ static void delete_compiler( COMPILER *c )
 	delete_dnode( c->current_call );
 
 	delete_dlist( c->current_call_stack );
-        assert( !c->current_arg_stack );
+        delete_dlist( c->current_arg_stack );
         freex( c->current_interface_nr_stack );
 
 	delete_dlist( c->current_module_stack );
@@ -338,6 +345,14 @@ static void delete_compiler( COMPILER *c )
         delete_tlist( c->current_type_stack );
 
         delete_tnode( c->current_type );
+
+        delete_typetab( c->generic_types );
+        if( c->generic_type_table_stack ) {
+            for( int i = 0; i < c->generic_type_table_stack_size; i++) {
+                delete_typetab( c->generic_type_table_stack[i] );
+            }
+            freex( c->generic_type_table_stack );
+        }
 
         freex( c->use_module_name );
         freex( c->module_filename );
@@ -1048,6 +1063,43 @@ static ssize_t pop_ssize_t( ssize_t **array, int *size, cexception_t *ex )
     assert( *size > 0 );
     (*size) --;
     return (*array)[*size];
+}
+
+static void push_typetab( TYPETAB ***array, int *size, TYPETAB **value,
+                          cexception_t *ex )
+{
+    *array = reallocx( *array, ( *size + 1 ) * sizeof(**array), ex );
+    (*array)[*size] = *value;
+    *value = NULL;
+    (*size) ++;
+}
+
+static TYPETAB* pop_typetab( TYPETAB ***array, int *size )
+{
+    assert( size );
+    assert( *size > 0 );
+    (*size) --;
+    TYPETAB *retval = (*array)[*size];
+    (*array)[*size] = NULL;
+    return retval;
+}
+
+static void compiler_push_generic_type_table( COMPILER *c, cexception_t *ex )
+{
+    push_typetab( &c->generic_type_table_stack,
+                  &c->generic_type_table_stack_size,
+                  &c->generic_types, ex );
+
+    c->generic_types = new_typetab( ex );
+}
+
+static void compiler_pop_generic_type_table( COMPILER *c )
+{
+    delete_typetab( c->generic_types );
+
+    c->generic_types =
+        pop_typetab( &c->generic_type_table_stack,
+                     &c->generic_type_table_stack_size );
 }
 
 static void compiler_push_current_address( COMPILER *c, cexception_t *ex )
@@ -2161,10 +2213,23 @@ static void compiler_compile_type_conversion( COMPILER *cc,
             }
 
 	    if( target_type ) {
-		share_tnode( target_type );
-		converted_expr = new_enode_typed( &target_type, &inner );
-		enode_list_push( &cc->e_stack, converted_expr );
-		delete_enode( expr );
+                if( tnode_has_placeholder_element( target_type )) {
+                    TNODE *retval_type = dnode_type( retvals );
+                    if( retval_type ) {
+                        share_tnode( retval_type );
+                        converted_expr = new_enode_typed( &retval_type, &inner );
+                        enode_list_push( &cc->e_stack, converted_expr );
+                        dispose_enode( &expr );
+                    } else {
+                        enode_list_push( &cc->e_stack, expr );
+                        expr = NULL;
+                    }
+                } else {
+                    share_tnode( target_type );
+                    converted_expr = new_enode_typed( &target_type, &inner );
+                    enode_list_push( &cc->e_stack, converted_expr );
+                    dispose_enode( &expr );
+                }
 	    } else {
 		enode_list_push( &cc->e_stack, expr );
 	    }
@@ -3023,6 +3088,18 @@ static void compiler_make_stack_top_element_type( COMPILER *cc )
     } else {
 	yyerror( "not enough values on the evaluation stack for "
 		 "taking base type?" );
+    }
+}
+
+static void compiler_make_stack_top_array_type( COMPILER *cc,
+                                                cexception_t *ex )
+{
+    if( cc->e_stack ) {
+        TNODE *base_type = typetab_lookup( cc->typetab, "array" );
+	enode_make_type_to_array_type( cc->e_stack, base_type, ex );
+    } else {
+	yyerror( "not enough values on the evaluation stack for "
+		 "makeing an array type?" );
     }
 }
 
@@ -4023,7 +4100,9 @@ static void compiler_compile_array_alloc( COMPILER *cc,
     key_value_t *fixup_values =
         make_tnode_key_value_list( NULL, *element_type );
 
-    if( *element_type && tnode_kind( *element_type ) != TK_PLACEHOLDER ) {
+    if( *element_type &&
+        tnode_kind( *element_type ) != TK_PLACEHOLDER &&
+        tnode_kind( *element_type ) != TK_NOMINAL ) {
         compiler_compile_array_alloc_operator( cc, "new[]", fixup_values, ex );
     } else {
         if( *element_type ) {
@@ -4284,6 +4363,38 @@ static DNODE* compiler_make_stack_top_field_type( COMPILER *cc,
     }
 }
 
+static void
+compiler_instantiate_generic_and_nominal_types( COMPILER *cc,
+                                                DNODE *function,
+                                                TYPETAB *generic_types,
+                                                cexception_t *ex )
+{
+    DNODE *function_args = dnode_function_args( function );
+    DNODE *formal_arg = NULL;
+    ENODE *actual_arg = cc->e_stack;
+    foreach_reverse_dnode( formal_arg, function_args ) {
+        if( !actual_arg || enode_has_flags( actual_arg, EF_GUARDING_ARG )) {
+            break;
+        }
+        TNODE *formal_type = dnode_type( formal_arg );
+        TNODE *actual_type = enode_type( actual_arg );
+        if( !formal_type || !actual_type ) {
+            continue;
+        }
+        if( tnode_kind( formal_type ) == TK_GENERIC ||
+            tnode_kind( formal_type ) == TK_NOMINAL ||
+            tnode_has_generic_type( formal_type ) ||
+            tnode_has_placeholder_element( formal_type )
+            ) {
+            /* call a compatibility check to populate the
+               'generic_types' table: */
+            tnode_types_are_compatible( formal_type, actual_type,
+                                        generic_types, ex );
+        }
+        actual_arg = enode_next( actual_arg );
+    }
+}
+
 static void compiler_check_and_drop_function_args( COMPILER *cc,
                                                    DNODE *function,
                                                    TYPETAB *generic_types,
@@ -4312,12 +4423,18 @@ static void compiler_check_and_drop_function_args( COMPILER *cc,
                 ( formal_type, actual_type, generic_types,
                   msg, sizeof(msg), ex )) {
                 if( msg[0] ) {
-                    yyerrorf( "incompatible types for function '%s' argument "
-                              "nr. %d - %s", dnode_name( function ),
+                    yyerrorf( "incompatible types for%s function '%s' argument "
+                              "nr. %d - %s",
+                              (cc->generic_type_table_stack_size > 1 ?
+                               " the nested call" : ""),
+                              dnode_name( function ),
                               nargs - n, /* dnode_name( formal_arg ),  */msg );
                 } else {
-                    yyerrorf( "incompatible types for function '%s' argument "
-                              "nr. %d"/* " (%s)" */, dnode_name( function ),
+                    yyerrorf( "incompatible types for function%s '%s' argument "
+                              "nr. %d"/* " (%s)" */,
+                              (cc->generic_type_table_stack_size > 1 ?
+                               " the nested call" : ""),
+                              dnode_name( function ),
                               nargs - n, dnode_name( formal_arg ));
                 }
             }
@@ -5033,6 +5150,14 @@ static void compiler_compile_address_of_indexed_element( COMPILER *cc,
 	    compiler_check_operator_retvals( cc, &od, 1, 1 );
 	    return_type = od.retvals ? dnode_type( od.retvals ) : NULL;
 
+            if( element_type ) {
+                if( tnode_kind( element_type ) == TK_NOMINAL &&
+                    compiler_yy_error_number() == 0 ) {
+                    yyerrorf("can not index arrays with components of "
+                             "the nominal type '%s'", tnode_name(element_type));
+                }
+            }
+            
 	    if( return_type ) {
 		if( tnode_kind( return_type ) == TK_ADDRESSOF &&
 		    tnode_element_type( return_type ) == NULL ) {
@@ -5453,11 +5578,12 @@ static void compiler_convert_function_argument( COMPILER *cc,
     TNODE *exp_type = cc->e_stack ? enode_type( cc->e_stack ) : NULL;
 
     if( arg_type && exp_type ) {
-        TYPETAB *volatile generic_types = NULL;
+        // Since generic_types here are owned by the COMPILER, we do
+        // not need (and in fact may not) delete it in this function:
+        TYPETAB *volatile generic_types = cc->generic_types;
         cexception_t inner;
 
         cexception_guard( inner ) {
-            generic_types = new_typetab( &inner );
             if( tnode_kind( arg_type ) != TK_PLACEHOLDER &&
                 tnode_kind( arg_type ) != TK_GENERIC &&
                 !tnode_types_are_assignment_compatible( arg_type, exp_type,
@@ -5469,14 +5595,33 @@ static void compiler_convert_function_argument( COMPILER *cc,
                 if( arg_type_name ) {
                     compiler_compile_type_conversion
                         ( cc, arg_type, /* target_name: */NULL, &inner );
+                } else {
+                    /* convert type T into the array of type T */
+                    if( tnode_kind( arg_type ) == TK_ARRAY &&
+                        tnode_types_are_assignment_compatible
+                        ( tnode_element_type (arg_type),
+                          exp_type, generic_types,
+                          NULL /* msg */, 0 /* msglen */, &inner )) {
+                        ssize_t one = 1;
+                        ssize_t element_size = tnode_size( exp_type );
+                        ssize_t element_nref =
+                            tnode_is_reference( exp_type ) ? 1 : 0;
+
+                        if( tnode_is_reference( exp_type )) {
+                            compiler_emit( cc, ex, "\tce\n", PMKARRAY, &one );
+                        } else {
+                            compiler_emit( cc, ex, "\tcsee\n", MKARRAY, &element_size,
+                                           &element_nref, &one );
+                        }
+
+                        compiler_make_stack_top_array_type( cc, &inner );
+                    }
                 }
             }
         }
         cexception_catch {
-            delete_typetab( generic_types );
             cexception_reraise( inner, ex );
         }
-        dispose_typetab( &generic_types );
     }
     cc->current_arg = cc->current_arg ? dnode_next( cc->current_arg ) : NULL;
 }
@@ -6613,11 +6758,13 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
     /* Generic types represented by "placeholder" tnodes pointing to
        the actual instances of these types in a particular function
        call: */
-    TYPETAB *volatile generic_types = NULL; 
+    TYPETAB *volatile generic_types = cc->generic_types; 
 
     cexception_guard( inner ) {
-	generic_types = new_typetab( &inner );
+	// generic_types = new_typetab( &inner );
         if( funct && fn_type ) {
+            compiler_instantiate_generic_and_nominal_types
+                ( cc, funct, generic_types, &inner );
             compiler_emit_default_arguments( cc, NULL, &inner );
             compiler_check_and_drop_function_args( cc, funct, generic_types,
                                                    &inner );
@@ -6641,10 +6788,10 @@ static ssize_t compiler_compile_multivalue_function_call( COMPILER *cc,
             compiler_push_error_type( cc, &inner );
             rval_nr = 1;
         }
-	delete_typetab( generic_types );
+	// delete_typetab( generic_types );
     }
     cexception_catch {
-	delete_typetab( generic_types );
+	// delete_typetab( generic_types );
         cexception_reraise( inner, ex );
     }
 
@@ -9337,6 +9484,12 @@ variable_declaration
       cexception_t inner;
 
       cexception_guard( inner ) {
+          if( tnode_kind( type_tnode ) == TK_NOMINAL ) {
+              yyerrorf("cannot declare variables (starting with '%s') "
+                       "of a nominal type '%s'",
+                       dnode_name(identifier_dnode), tnode_name(type_tnode));
+          }
+
           dnode_list_append_type( identifier_dnode, type_tnode );
           type_tnode = NULL;
           dnode_list_assign_offsets( identifier_dnode,
@@ -9370,6 +9523,13 @@ variable_declaration
      DNODE *volatile shared_dnode = NULL;
 
      identifier_dnode = dnode_append( identifier_dnode, $4 );
+
+     if( tnode_kind($6) == TK_NOMINAL ) {
+         yyerrorf("cannot declare variables (starting with '%s') "
+                  "of a nominal type '%s'",
+                  dnode_name(identifier_dnode), tnode_name($6));
+     }
+
      dnode_list_append_type( identifier_dnode, $6 );
      dnode_list_assign_offsets( identifier_dnode, &compiler->local_offset );
 
@@ -9402,6 +9562,12 @@ variable_declaration
      DNODE *volatile var = $2;
      DNODE *volatile shared_dnode = NULL;
 
+     if( tnode_kind($4) == TK_NOMINAL ) {
+         yyerrorf("cannot declare variable '%s' "
+                  "of a nominal type '%s'",
+                  dnode_name(var), tnode_name($4));
+     }
+
      dnode_list_append_type( var, $4 );
      dnode_list_assign_offsets( var, &compiler->local_offset );
 
@@ -9430,6 +9596,12 @@ variable_declaration
      DNODE *volatile identifier_dnode = $2;
      DNODE *volatile shared_dnode = NULL;
      int expr_nr = $8;
+
+     if( tnode_kind($6) == TK_NOMINAL ) {
+         yyerrorf("cannot declare variables (starting with '%s') "
+                  "of a nominal type '%s'",
+                  dnode_name(identifier_dnode), tnode_name($6));
+     }
 
      identifier_dnode = dnode_append( identifier_dnode, $4 );
      dnode_list_append_type( identifier_dnode, $6 );
@@ -9494,6 +9666,12 @@ variable_declaration
         int readonly = $1;
         DNODE *volatile var_list_dnode = $3;
         DNODE *volatile shared_dnode = NULL;
+
+        if( tnode_kind($2) == TK_NOMINAL ) {
+            yyerrorf("cannot declare variables (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name(var_list_dnode), tnode_name($2));
+        }
 
 	dnode_list_append_type( var_list_dnode, $2 );
 	dnode_list_assign_offsets( var_list_dnode, &compiler->local_offset );
@@ -9734,12 +9912,22 @@ if_condition
 for_variable_declaration
   : identifier ':' var_type_description
       {
+          if( tnode_kind($3) == TK_NOMINAL ) {
+              yyerrorf("cannot declare 'for' loop variable '%s' "
+                       "of a nominal type '%s'",
+                       dnode_name($1), tnode_name($3));
+          }
 	  dnode_append_type( $1, $3 );
 	  dnode_assign_offset( $1, &compiler->local_offset );
 	  $$ = $1;
       }
   | var_type_description identifier
       {
+          if( tnode_kind($1) == TK_NOMINAL ) {
+              yyerrorf("cannot declare 'for' loop variable '%s' "
+                       "of a nominal type '%s'",
+                       dnode_name($2), tnode_name($1));
+          }
 	  dnode_append_type( $2, $1 );
 	  dnode_assign_offset( $2, &compiler->local_offset );
 	  $$ = $2;
@@ -11102,7 +11290,7 @@ delimited_type_description
         cexception_t inner;
         cexception_guard( inner ) {
             if( !tnode ) {
-                tnode = new_tnode_placeholder( type_name, &inner );
+                tnode = new_tnode_nominal( type_name, &inner );
                 shared_tnode = share_tnode( tnode );
                 typetab_insert( compiler->typetab, type_name,
                                 &shared_tnode, &inner );
@@ -11910,6 +12098,8 @@ type_of_type_declaration
 	cexception_t inner;
 
 	cexception_guard( inner ) {
+	    compiler_begin_scope( compiler, &inner );
+
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
 
@@ -11924,7 +12114,6 @@ type_of_type_declaration
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
 
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
-	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -11968,6 +12157,8 @@ type_of_type_declaration
 
 	cexception_t inner;
 	cexception_guard( inner ) {
+	    compiler_begin_scope( compiler, &inner );
+
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
 
@@ -11982,7 +12173,6 @@ type_of_type_declaration
 	    compiler_push_current_type( compiler, &shared_tnode, &inner );
 
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
-	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -12028,6 +12218,8 @@ type_of_type_declaration
 	cexception_t inner;
 
 	cexception_guard( inner ) {
+	    compiler_begin_scope( compiler, &inner );
+
 	    base = new_tnode_placeholder( element_name, &inner );
             shared_base = share_tnode( base );
 	    tnode = new_tnode_composite( type_name, base, &inner );
@@ -12042,7 +12234,6 @@ type_of_type_declaration
             assert( !compiler->current_type );
 	    compiler->current_type = moveptr( (void**)&tnode );
 	    compiler_typetab_insert( compiler, &shared_base, &inner );
-	    compiler_begin_scope( compiler, &inner );
 	}
 	cexception_catch {
 	    delete_tnode( base );
@@ -12674,7 +12865,9 @@ multivalue_function_call
 	  TNODE *fn_tnode;
           type_kind_t fn_kind;
 
-	  fn_tnode = compiler->current_call ?
+          compiler_push_generic_type_table( compiler, px );
+
+          fn_tnode = compiler->current_call ?
 	      dnode_type( compiler->current_call ) : NULL;
 
 	  compiler->current_arg = fn_tnode ?
@@ -12703,6 +12896,8 @@ multivalue_function_call
 	    }
 
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
+
+            compiler_pop_generic_type_table( compiler );
 	}
   | lvalue 
         {
@@ -12752,6 +12947,8 @@ multivalue_function_call
             DNODE *method = NULL;
             int class_has_interface = 1;
             ssize_t interface_nr = 0;
+
+            compiler_push_generic_type_table( compiler, px );
 
             if( interface_type ) {
                 char *interface_name = tnode_name( interface_type );
@@ -12873,6 +13070,8 @@ multivalue_function_call
 	    compiler_drop_top_expression( compiler );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
             delete_dnode( $1 );
+
+            compiler_pop_generic_type_table( compiler );
 	}
 
   | lvalue 
@@ -12893,6 +13092,8 @@ multivalue_function_call
             DNODE *method = NULL;
             int class_has_interface = 1;
             ssize_t interface_nr = 0;
+
+            compiler_push_generic_type_table( compiler, px );
 
             if( !object_expr ) {
                 yyerrorf( "too little values on the evaluation stack "
@@ -12999,6 +13200,8 @@ multivalue_function_call
         {
 	    compiler_emit( compiler, px, "\tc\n", RFROMR );
 	    $$ = compiler_compile_multivalue_function_call( compiler, px );
+
+            compiler_pop_generic_type_table( compiler );
 	}
 
   ;
@@ -14409,7 +14612,7 @@ struct_expression
     {
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $3 );
+        field_list = $3 ? tnode_fields( $3 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14459,7 +14662,7 @@ struct_expression
     {
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $2 );
+        field_list = $2 ? tnode_fields( $2 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14510,7 +14713,7 @@ struct_expression
         /* FIXME: code duplication with the above rule (S.G.) */
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $2 );
+        field_list = $2 ? tnode_fields( $2 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14561,7 +14764,7 @@ struct_expression
         /* FIXME: code duplication with the above rule (S.G.) */
         DNODE *field, *field_list;
 
-        field_list = tnode_fields( $1 );
+        field_list = $1 ? tnode_fields( $1 ) : NULL;
         foreach_dnode( field, field_list ) {
             TNODE *field_type = dnode_type( field );
             char * field_name = dnode_name( field );
@@ -14964,6 +15167,8 @@ generator_new
           TNODE *volatile shared_tnode = NULL;
           cexception_t inner;
 
+          compiler_push_generic_type_table( compiler, px );
+
           cexception_guard( inner ) {
               compiler_check_type_contains_non_null_ref( type_tnode );
               shared_tnode = share_tnode( type_tnode );
@@ -15015,6 +15220,8 @@ generator_new
                 yyerrorf( "constructor '%s()' should not return a value",
                           constructor_name ? constructor_name : "???" );
             }
+
+            compiler_pop_generic_type_table( compiler );
 	}
 
   | _NEW compact_type_description '[' expression ']'
@@ -15508,6 +15715,12 @@ opt_readonly
 argument
   : opt_readonly identifier_list ':' var_type_description
     {
+        if( tnode_kind($4) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($2), tnode_name($4));
+        }
+
 	$$ = dnode_list_append_type( $2, $4 );
 	if( $1 ) {
 	    dnode_list_set_flags( $2, DF_IS_READONLY );
@@ -15518,6 +15731,12 @@ argument
         '=' constant_expression
     {
 	DNODE *arg;
+
+        if( tnode_kind($4) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($2), tnode_name($4));
+        }
 
 	$$ = dnode_list_append_type( $2, $4 );
 	foreach_dnode( arg, $2 ) {
@@ -15535,6 +15754,17 @@ argument
 
   | opt_readonly var_type_description uninitialised_var_declarator_list
       {
+        if( tnode_kind($2) == TK_NOMINAL ) {
+            DNODE *param;
+            foreach_dnode (param, $3) {
+                if( !dnode_is_array( param )) {
+                    yyerrorf("cannot declare parameters (starting with '%s') "
+                             "of a nominal type '%s'",
+                             dnode_name(param), tnode_name($2));
+                    break;
+                }
+            }
+        }
 	$$ = dnode_list_append_type( $3, $2 );
 	if( $1 ) {
 	    dnode_list_set_flags( $3, DF_IS_READONLY );
@@ -15544,6 +15774,11 @@ argument
   | opt_readonly var_type_description variable_declarator
         '=' constant_expression
       {
+        if( tnode_kind($2) == TK_NOMINAL ) {
+            yyerrorf("cannot declare parameters (starting with '%s') "
+                     "of a nominal type '%s'",
+                     dnode_name($3), tnode_name($2));
+        }
         $$ = dnode_list_append_type( $3, $2 );
 	compiler_check_default_value_compatibility( $3, &$5 );
 	dnode_set_value( $3, &$5 );
@@ -15767,9 +16002,21 @@ function_or_operator_body
 
 retval_description_list
   : var_type_description 
-      { $$ = new_dnode_return_value( $1, px ); }
+      {
+          if( tnode_kind($1) == TK_NOMINAL ) {
+              yyerrorf("cannot return value of a nominal type '%s'",
+                       tnode_name($1));
+          }
+          $$ = new_dnode_return_value( $1, px );
+      }
   | retval_description_list ',' var_type_description
-      { $$ = dnode_append( $1, new_dnode_return_value( $3, px )); }
+      {
+          if( tnode_kind($3) == TK_NOMINAL ) {
+              yyerrorf("cannot return value of a nominal type '%s'",
+                       tnode_name($3));
+          }
+          $$ = dnode_append( $1, new_dnode_return_value( $3, px ));
+      }
   ;
 
 opt_retval_description_list
@@ -16072,6 +16319,8 @@ opt_base_class_initialisation
         DNODE *self_dnode;
         cexception_t inner;
 
+        compiler_push_generic_type_table( compiler, px );
+
         cexception_guard( inner ) {
             assert( type_tnode );
             compiler_emit( compiler, &inner,
@@ -16145,6 +16394,8 @@ opt_base_class_initialisation
         nretval = compiler_compile_multivalue_function_call( compiler, px );
         assert( nretval == 0 || enode_has_flags( compiler->e_stack, EF_HAS_ERRORS ) );
         $$ = 1;
+
+        compiler_pop_generic_type_table( compiler );
     }
 | /* empty */
     { $$ = 0; }

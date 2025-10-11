@@ -8,25 +8,25 @@
 
 use * from std;
 
-function printer( s : string ) { . s };
-function iprinter( i : int ) { . i };
-function fprinter( x : float ) { . x };
+function printer( s : string[] ) { . s[0] };
+function iprinter( i : int[] ) { . i[0] };
+function fprinter( x : float[] ) { . x[0] };
 
-procedure generic_procedure( s : null struct { int i; type T x }; 
-                             function ( x : type T ) xprinter )
+procedure generic_procedure( s : null struct { int i; type T x[] }; 
+                             function ( x : array of type T ) xprinter )
 {
     xprinter( s.x );
 }
 
-struct IS { int i; int j }
-struct FS { int i; float f }
+struct IS { int i; int[] j }
+struct FS { int i; float[] f }
 
 try {
-    var p = new null struct { int i; string name };
-    p.name = "Struct p";
+    var p = new null struct { int i; string name[] };
+    p.name = ["Struct p"];
     generic_procedure( p, printer );
-    generic_procedure( struct IS { i => 2, j => 12 }, iprinter );
-    generic_procedure( struct FS { i => 2, f => 3.14 }, fprinter );
+    generic_procedure( struct IS { i => 2, j => [12] }, iprinter );
+    generic_procedure( struct FS { i => 2, f => [3.14] }, fprinter );
 }
 catch( var errno : int; var message : string ) {
     . message;

@@ -4,13 +4,14 @@
 
 use * from std;
 
-procedure map( p: function (x:type T)->(type T); m: array of type T ): array of type T
+procedure map( p: function (x:array of type T)->(array of type T); m: array of type T ): array of type T
 {
-    foreach var e in m do
-        e = p(e);
+    var v = m[-1:0]; // empty slice of the array cloned
+    for var i = 0 to last( m ) do
+        v = push( v, p( m[i:i] ));
     enddo
 
-    return m;
+    return v;
 }
 
 var m = ["one","two","three"];
@@ -32,7 +33,7 @@ function toupper( s: string ): string
     return str(r);
 }
 
-var n = map( function (s:string)->(string) { return toupper(s) }, m );
+var n = map( function (s:string[])->(string[]) { return [toupper(s[0])] }, m );
 
 foreach var k in n do
     . k;

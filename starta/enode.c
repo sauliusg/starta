@@ -73,6 +73,27 @@ ENODE *enode_make_type_to_element_type( ENODE *enode )
     return enode;
 }
 
+ENODE *enode_make_type_to_array_type( ENODE *enode, TNODE *base_type,
+                                      cexception_t *ex )
+{
+    assert( enode );
+    if( enode->value.expr_type ) {
+        TNODE *expr_type = enode->value.expr_type;
+        TNODE *shared_base_type = share_tnode( base_type );
+        cexception_t inner;
+
+        cexception_guard (inner) {
+            enode->value.expr_type =
+                new_tnode_array( expr_type, shared_base_type, &inner );
+        }
+        cexception_catch {
+            delete_tnode( shared_base_type );
+            cexception_reraise( inner, ex );
+        }
+    }
+    return enode;
+}
+
 ENODE *enode_make_type_to_addressof( ENODE *enode, cexception_t *ex )
 {
     assert( enode );

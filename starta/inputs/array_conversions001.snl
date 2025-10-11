@@ -1,0 +1,41 @@
+#--*- C -*--
+#
+# Starta language compiler tests
+#
+#
+# Test for automatic conversion from type 'T' to 'array of T'
+#
+
+use std;
+
+use APrint (int);
+
+procedure print_edges (e : array [][][] of int)
+{
+    for var v in e {
+        . length(v);
+        for var l in v {
+            < length(l), "";
+            . l
+        }
+        . "--"
+    }
+}
+
+var edges : array [][][] of int;
+
+var edge : array of int;
+
+edge = [12,29];
+
+edges = new (int[][])[10];
+
+edges[4] = [[0,1], [2,5]];
+
+edges[3] = push (edges[3], [[7,9]]);
+edges[3] = push (edges[3], [[3,5]]);
+// edges[3] = push (edges[3], [[edge]]); // ERROR, incompatible types for function 'push' argument nr. 2
+edges[3] = push (edges[3], [edge]);
+edges[3] = push (edges[3], edge);
+
+print_edges (edges);

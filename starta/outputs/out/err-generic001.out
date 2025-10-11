@@ -1,5 +1,14 @@
-./sl: inputs/err-generic001.snl(20,11): ERROR, incompatible types for function 'g' argument nr. 1
+./sl: inputs/err-generic001.snl(10,22): ERROR, cannot declare parameters (starting with 'a') of a nominal type 'T'
+procedure g( type T a; b : type T ) : int
+                     ^
+./sl: inputs/err-generic001.snl(10,35): ERROR, cannot declare parameters (starting with 'b') of a nominal type 'T'
+procedure g( type T a; b : type T ) : int
+                                  ^
+./sl: inputs/err-generic001.snl(12,19): ERROR, cannot declare variables (starting with 'n') of a nominal type 'T'
+    var n : type T;
+                  ^
+./sl: inputs/err-generic001.snl(20,11): ERROR, incompatible types for function 'g' argument nr. 2
 g( "a", 2 );
           ^
-./sl: 1 error(s) detected
+./sl: 4 error(s) detected
 

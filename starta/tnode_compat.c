@@ -157,8 +157,8 @@ tnode_create_and_check_placeholder_implementation( TNODE *t1, TNODE *t2,
                                                    cexception_t *ex)
 {
     TNODE *volatile shared_t1 = NULL;
-    TNODE *volatile placeholder_implementation =
-        typetab_lookup( generic_types, t2->name );
+    TNODE *volatile placeholder_implementation = t2->name ?
+        typetab_lookup( generic_types, t2->name ) : NULL;
 
     if( placeholder_implementation ) {
         return tnode_check_types
@@ -242,6 +242,22 @@ tnode_create_and_check_generic_types( TNODE *t1, TNODE *t2,
             return tnode_create_and_check_placeholder_implementation
                 ( t2, t1, generic_types, tnode_check_types, ex );
         }
+    } else
+    if( generic_types && ( t1->params.kind == TK_NOMINAL ||
+			   t2->params.kind == TK_NOMINAL )) {
+        if( t2->params.kind == TK_NOMINAL ) {
+            if( t2->base_type ) {
+                /* placeholder is already implemented: */
+                return tnode_check_types
+                    ( t1, t2->base_type, generic_types, ex );
+            } else {
+                return tnode_create_and_check_placeholder_implementation
+                    ( t2, t1, generic_types, tnode_check_types, ex );
+            }
+        } else {
+            return tnode_create_and_check_placeholder_implementation
+                ( t2, t1, generic_types, tnode_check_types, ex );
+        }
     } else if( generic_types && t1->params.kind == TK_GENERIC ) {
         TNODE *concrete_type = typetab_lookup_paired_type( generic_types, t1 );
 
@@ -310,6 +326,14 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 	return 1;
     }
 
+    if( t1->params.kind == TK_NOMINAL && t2->params.kind == TK_NOMINAL ) {
+        if( strcmp(t1->name, t2->name) == 0 ) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    
     if( t1->params.kind == TK_REF ) {
 	return tnode_is_reference( t2 );
     }
@@ -345,7 +369,9 @@ tnode_check_type_identity( TNODE *t1, TNODE *t2,
 
     if( t1->params.kind == TK_GENERIC ||
         t1->params.kind == TK_PLACEHOLDER ||
-        t2->params.kind == TK_PLACEHOLDER ) {
+        t2->params.kind == TK_PLACEHOLDER ||
+        t1->params.kind == TK_NOMINAL ||
+        t2->params.kind == TK_NOMINAL ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -407,6 +433,19 @@ int tnode_types_are_identical( TNODE *t1, TNODE *t2,
 	return 1;
     }
 
+    if( t1->params.kind == TK_NOMINAL && t2->params.kind == TK_NOMINAL ) {
+        if( strcmp(t1->name, t2->name) == 0 ) {
+            return 1;
+        } else {
+            if( generic_types ) {
+                return tnode_create_and_check_placeholder_implementation
+                    ( t2, t1, generic_types, tnode_types_are_identical, ex );
+            } else {
+                return 0;
+            }
+        }
+    }
+    
     if( t1->params.kind == TK_DERIVED && tnode_has_flags( t1, TF_IS_EQUIVALENT )) {
         return tnode_types_are_identical( t1->base_type, t2, 
                                           generic_types, ex );
@@ -538,7 +577,7 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 	return 1;
     }
     if( t2->params.kind == TK_NULLREF ) {
-        if( generic_types && t1->params.kind == TK_PLACEHOLDER ) {
+        if( generic_types && t1->params.kind == TK_NOMINAL ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
         } else {
@@ -583,7 +622,9 @@ int tnode_types_are_assignment_compatible( TNODE *t1, TNODE *t2,
 
     if( t1->params.kind == TK_GENERIC ||
         t1->params.kind == TK_PLACEHOLDER ||
-        t2->params.kind == TK_PLACEHOLDER ) {
+        t2->params.kind == TK_PLACEHOLDER ||
+        t1->params.kind == TK_NOMINAL ||
+        t2->params.kind == TK_NOMINAL ) {
         if( generic_types ) {
             return tnode_create_and_check_generic_types
                 ( t1, t2, generic_types, tnode_types_are_identical, ex );
@@ -646,7 +687,9 @@ static TNODE *tnode_placeholder_implementation( TNODE *abstract,
                                                 TYPETAB *generic_types,
                                                 cexception_t *ex )
 {
-    if( generic_types && abstract->params.kind == TK_PLACEHOLDER ) {
+    if( generic_types &&
+        (abstract->params.kind == TK_PLACEHOLDER ||
+         abstract->params.kind == TK_NOMINAL)) {
         TNODE *volatile placeholder_implementation =
             typetab_lookup( generic_types, abstract->name );
 
@@ -695,7 +738,9 @@ static int tnode_function_arguments_match_msg( TNODE *f1, TNODE *f2,
 	TNODE *f2_arg_type = dnode_type( f2_arg );
         int arguments_are_compatible;
 
-        if( f1_arg_type && f1_arg_type->params.kind == TK_PLACEHOLDER ) {
+        if( f1_arg_type &&
+            (f1_arg_type->params.kind == TK_PLACEHOLDER ||
+             f1_arg_type->params.kind == TK_NOMINAL)) {
             f1_arg_type =
                 tnode_placeholder_implementation( f1_arg_type, f2_arg_type,
                                                   generic_types, ex );
@@ -928,7 +973,9 @@ TNODE *new_tnode_with_concrete_types( TNODE *tnode_with_generics,
         *has_generics = 0;
         return share_tnode( tnode_with_generics );
     } else {
-        if( tnode_kind( tnode_with_generics ) == TK_GENERIC ) {
+        if( tnode_kind( tnode_with_generics ) == TK_GENERIC ||
+            tnode_kind( tnode_with_generics ) == TK_PLACEHOLDER ||
+            tnode_kind( tnode_with_generics ) == TK_NOMINAL ) {
             TNODE *tnode_implementation =
                 typetab_lookup_paired_type( generic_table,
                                             tnode_with_generics );

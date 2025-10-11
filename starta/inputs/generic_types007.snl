@@ -1,0 +1,64 @@
+// --*- C -*--
+
+// Test the new generic type implementation (a-la Ada) in interfaces.
+
+use std;
+
+type R = generic ref;
+
+type F = ?class {
+    f : float;
+
+    method funny ( x : R ) -> R
+    {
+        return null;
+    }
+}
+
+type G = ?class : F {
+    n : int;
+    r : R;
+    s : string;
+
+    method funny ( x : R ) -> R
+    {
+        return x;
+    }
+
+    method set_generic ( x : R )
+    {
+        self.r = x;
+    }
+
+    method get_generic(): R
+    {
+        return self.r;
+    }
+};
+
+procedure p()
+{
+    operator "."  (a : array of int)
+    {
+        for (var e in a) {
+            < e, " ";
+        }
+    }
+
+    type array_type = array of int;
+
+    var g : G with (R => string) = new G with (R => string);
+    var h = new G with (R => array_type);
+
+    . g->funny( "hi" );
+    . h->funny( [1, 2, 3] );
+
+    g->set_generic( "Suoer OK!" );
+    h->set_generic( [1, 2, 3, 6, 7, 9] );
+    // g->set_generic( 123 ); // OK: ERROR, type 'string' has no conversion from type 'int'
+
+    . g->get_generic();
+    . h->get_generic();
+}
+
+p();

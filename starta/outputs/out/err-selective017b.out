@@ -1,0 +1,5 @@
+./sl: inputs/err-selective017b.snl(23,19): ERROR, cannot declare 'for' loop variable 'e' of a nominal type 'T'
+    foreach var T e in a do
+                  ^
+./sl: 1 error(s) detected
+

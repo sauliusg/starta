@@ -1,0 +1,39 @@
+//--*- C -*--
+//
+// Starta language compiler tests
+//
+//
+// Test for automatic conversion from type 'T' to 'array of T'
+//
+
+use std;
+
+use APrint (int);
+
+var a : array [][] of int;
+
+a = new (int[])[10];
+
+var i = 12;
+
+a[2] = push (a[2], i);
+a[5] = push (a[5], 21);
+a[5] = push (a[5], 23 );
+a[5] = push (push (a[5], [66]), a[1] = (push (a, [55]))[10]);
+
+var n = 0;
+for var row in a {
+    < n, "";
+   . row;
+   n ++;
+}
+
+a = push (a, [22, 33, 44]);
+
+. "";
+n = 0;
+for var row in a {
+    < n, "";
+   . row;
+   n ++;
+}

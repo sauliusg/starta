@@ -803,6 +803,17 @@ int dnode_type_has_references( DNODE *dnode )
     }
 }
 
+int dnode_is_array( DNODE *dnode )
+{
+    TNODE *dt = dnode_type( dnode );
+
+    if( dt && tnode_kind( dt ) == TK_ARRAY ) {
+        return 1;
+    }
+    
+    return 0;
+}
+
 int dnode_is_function_prototype( DNODE *dnode )
 {
     if( !dnode ) {

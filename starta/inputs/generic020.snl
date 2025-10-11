@@ -1,0 +1,29 @@
+#--*- C -*--
+#
+# Starta language compiler tests
+#
+#
+# Test for automatic conversion from type 'T' to 'array of T'
+#
+
+use std;
+
+use APrint (int);
+
+procedure print_edges (e : array [][][] of int)
+{
+    for var v in e {
+        . length(v);
+        for var l in v {
+            < length(l), "";
+            . l
+        }
+        . "--"
+    }
+}
+
+var a = [10, 11, 12, 15];
+
+a = push (a, [55, 56, 58]);
+
+. a;

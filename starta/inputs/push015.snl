@@ -4,31 +4,27 @@
 
 use * from std;
 
-function print_array( array of type T a; function ( T element ) print )
-{
-    foreach var T e in a do
-        print( e );
-    enddo
-}
+use APush;
+use APrint (string);
 
 var m = new string[0];
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+. m;
 
 . "========================================";
 
-m = push( m, "delta" );
+m = APush::push( m, "delta" );
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+. m;
 
 . "========================================";
 
-m = push( m, "epsilon" );
+m = APush::push( m, "epsilon" );
 
 . "length(m) ==", length(m);
 . "nref(m)   ==", nref(m);
-print_array( m, function( string i ) { . i } );
+. m;

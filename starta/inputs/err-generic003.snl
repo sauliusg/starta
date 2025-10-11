@@ -11,14 +11,14 @@ struct S { int i; string s };
 
 var s = new S[0];
 
-s = push( s, new S );
+s = push( s, [new S] );
 
 s[0].i = 1;
 s[0].s = "S";
 
-s = push( s, struct S { s => "Second S", i => 12345 } );
+s = push( s, [struct S { s => "Second S", i => 12345 }] );
 
-s = push( s, null );
+s = push( s, [null] );
 
 for var i = 0 to last(s) do
     . s[i].s _ ",", s[i].i

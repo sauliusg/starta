@@ -1,0 +1,46 @@
+Redesign the type system
+========================
+
+The following kinds of types should be present in the end:
+
+- placeholder: 
+
+type T in the 'type dictionary of T =' declarations that will be 
+replaced by concrete types during instantiation;
+
+- some (any?) type designators:
+
+type T in 'x : array of some type T' designations, indicating that an 
+aggregate some type T will be used in a function call, but we do not 
+know what type when compiling the function. The only limitations is that 
+types with different names are incompatible;
+
+- generic types:
+
+type T in 'type T = generic ref'; it indicates what implementation shold 
+be used for the type; compiles with type erasure and must be 
+instantiated using 'with' clause;
+
+- synonims, with possible operator extensions:
+
+type T in 'type T = int { operator "**" (T x; T p): T }'. The declared 
+type T must be treated as 'int' for all compatibility purposes, but can 
+have additional operators;
+
+Curretnly designated using the 'LIKE' keyword.
+
+- new types (?):
+
+'type T = new int' – possibly; the type T inherits implementation from 
+'int' but is otherwise incompatible with int. Can be converted to/from 
+int.
+
+- nominal types:
+
+  type T in the 'array of type T'. The serve to identify some type in
+  an aggregate, so that these aggregates can be checked for
+  compatibility and porcessed. The 'type T' itself can not be used to
+  declare variables or subroutine arguments. Two nominal types are
+  deemed identical of they have the same name.
+
+  Example: 'function trim (a : array of type T) -> array of type T'

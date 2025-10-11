@@ -6,7 +6,7 @@ use * from std;
 
 var m = new ldouble[0];
 
-m = push( m, 125.88LD );
+m = push( m, [125.88LD] );
 
 . m[0];
 
