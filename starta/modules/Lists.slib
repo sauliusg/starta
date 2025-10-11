@@ -32,18 +32,23 @@ type list of T = ? : ref {
 	}
     }; // operator "+"
 
-    // inline bytecode operator "*" ( l : list of T ) : T
-    // { LDC const((list of T).value.offset) }
+    inline bytecode operator "*" ( l : list of T ) : addressof
+    { OFFSET %.value }
 
-    inline bytecode operator "next"( l : list of T )
-    { NEXT const((list of T).next.offset) const((list of T).value.offset) }
+    inline bytecode operator "next" ( l : list of T )
+    { NEXT %.next %.value }
 
 } // type "list of T"
 
+procedure cons( s : list of type T; l : list of type T = null ) : list of type T
+{
+    do s.next = l if s;
+    return s;
+}
+
 procedure cat( l1, l2 : list of type T ) : list of type T
 {
-    l1.next = l2;
-    return l1
+    return l1 + l2;
 }
 
 exception NullPointerException;
@@ -56,12 +61,5 @@ procedure tail( l : list of type T ) : list of type T
         return null;
     }
 }
-
-// Need:
-
-# Operator 'cat': +, _
-# Operator 'cons': ::
-# Operator 'head': @
-# Operator 'tail': _ (unary)
 
 end package Lists;
