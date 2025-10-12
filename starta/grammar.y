@@ -15309,6 +15309,7 @@ lvalue
   : function_call
   | field_access
   | indexed_lvalue
+  | function_expression
   ;
 
 lvariable

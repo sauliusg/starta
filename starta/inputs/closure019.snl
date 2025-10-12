@@ -1,0 +1,20 @@
+#--*- Java -*--
+# Starta compiler tests.
+#
+# Calling closure expressions...
+#
+
+use std;
+
+. "Feature test: calling closure expressions";
+
+var n = 2;
+var m = 44;
+
+var f = closure (x : int): int lc {var nn : int = n} => {x + lc.nn};
+var y = f(m);
+
+var yy = closure (x : int): int lc {var nn : int = n} => {x + lc.nn} (m + 2);
+
+. y;
+. yy;
